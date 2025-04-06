@@ -244,6 +244,37 @@ function loadTransactions() {
         });
 }
 
+// Search transactions
+function searchTransactions() {
+    const customerName = document.getElementById("customerName").value.toLowerCase();
+    const email = document.getElementById("email").value.toLowerCase();
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Dữ liệu giao dịch!A2:P?key=${API_KEY}`)
+        .then(response => response.json())
+        .then(data => {
+            const transactions = (data.values || []).filter(row => 
+                row[15] === loggedInEmployee.id &&
+                (customerName ? row[3].toLowerCase().includes(customerName) : true) &&
+                (email ? row[4].toLowerCase().includes(email) : true)
+            );
+            const transactionList = document.getElementById("transactionList");
+            transactionList.innerHTML = "";
+            const start = (currentPage - 1) * transactionsPerPage;
+            const end = start + transactionsPerPage;
+            transactions.slice(start, end).forEach((row, index) => {
+                transactionList.innerHTML += `
+                    <div>
+                        ${row[2]} - ${row[3]} - ${row[11]}
+                        <button onclick="editTransaction('${row[0]}')">Sửa</button>
+                        <button onclick="confirmDelete('${row[0]}')">Xóa</button>
+                    </div>`;
+            });
+            updatePagination(transactions.length);
+            logAction("Tìm kiếm", `Tìm kiếm với điều kiện: Tên khách hàng=${customerName}, Email=${email}`);
+        }).catch(error => {
+            console.error("Error searching transactions:", error);
+        });
+}
+
 // Update pagination
 function updatePagination(total) {
     const totalPages = Math.ceil(total / transactionsPerPage);
