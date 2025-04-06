@@ -7,10 +7,25 @@ body {
     margin: 50px auto;
     text-align: center;
 }
-input, select, textarea, button {
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+.form-group {
+    flex: 1;
+    min-width: 200px;
+}
+.form-group.full-width {
+    flex: 100%;
+}
+.form-group label {
     display: block;
+    margin-bottom: 5px;
+}
+input, select, textarea, button {
     width: 100%;
-    margin: 10px 0;
     padding: 8px;
     box-sizing: border-box;
 }
