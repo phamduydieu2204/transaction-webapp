@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Dashboard</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://apis.google.com/js/api.js" async defer></script>
 </head>
 <body>
     <div class="tabs">
@@ -11,12 +12,11 @@
         <button onclick="showTab('report')">Thống kê & Báo cáo</button>
         <button onclick="logout()">Đăng xuất</button>
     </div>
-
-    <!-- Tab Nhập liệu -->
     <div id="input" class="tab-content" style="display: none;">
         <h2>Nhập liệu giao dịch</h2>
         <form id="transactionForm">
             <select id="transactionType" required>
+                <option value="" disabled selected>Chọn loại giao dịch</option>
                 <option value="Mua hàng">Mua hàng</option>
                 <option value="Đổi gói">Đổi gói</option>
                 <option value="Hoàn trả">Hoàn trả</option>
@@ -30,43 +30,36 @@
             <input type="text" id="startDate" placeholder="Ngày bắt đầu (dd/mm/yyyy)" required>
             <input type="text" id="endDate" placeholder="Ngày kết thúc" readonly>
             <input type="number" id="devices" placeholder="Số thiết bị" min="1" required>
-            <select id="software" required></select>
-            <select id="package" required></select>
+            <select id="software" required>
+                <option value="" disabled selected>Chọn phần mềm</option>
+            </select>
+            <select id="package" required>
+                <option value="" disabled selected>Chọn gói phần mềm</option>
+            </select>
             <input type="number" id="revenue" placeholder="Doanh thu" min="0" required>
             <textarea id="note" placeholder="Ghi chú"></textarea>
             <input type="file" id="image" accept="image/*">
             <button type="button" onclick="addTransaction()">Thêm giao dịch</button>
             <button type="button" onclick="updateTransaction()" id="updateBtn" style="display: none;">Sửa</button>
-            <button type="button" onclick="resetForm()">Hủy</button>
+            <button type="button" onclick="deleteTransaction()" id="deleteBtn" style="display: none;">Xóa</button>
         </form>
-
         <h3>Danh sách giao dịch</h3>
         <div id="transactionList"></div>
-        <div id="pagination">
-            <button onclick="prevPage()" id="prevBtn">Trang trước</button>
-            <span id="pageInfo"></span>
-            <button onclick="nextPage()" id="nextBtn">Trang sau</button>
-        </div>
+        <div id="pagination"></div>
     </div>
-
-    <!-- Tab Thống kê -->
     <div id="report" class="tab-content" style="display: none;">
         <h2>Thống kê & Báo cáo</h2>
         <p>Chào mừng bạn đến với tab thống kê!</p>
     </div>
-
     <script src="script.js"></script>
     <script>
-        // Check if employee is logged in
         const loggedInEmployee = JSON.parse(localStorage.getItem("loggedInEmployee"));
         if (!loggedInEmployee) {
             window.location.href = "index.html";
         } else {
-            // Load initial data for the form
+            gapi.load('client:auth2', initClient);
             loadSoftwareOptions();
-            loadCustomerSuggestions();
             loadTransactions();
-            setDefaultStartDate();
         }
     </script>
 </body>
