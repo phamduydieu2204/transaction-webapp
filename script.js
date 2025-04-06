@@ -4,6 +4,7 @@ const SHEET_ID = '1OKMn-g-mOm2MlsAOoWEMi3JjRlwfdw5IpVTRmwMKcHU';
 const DISCOVERY_DOCS = ['https://sheets.googleapis.com/$discovery/rest?version=v4'];
 const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
 
+// Khởi tạo Google API
 function initClient() {
     gapi.load('client:auth2', () => {
         gapi.client.init({
@@ -17,36 +18,50 @@ function initClient() {
             if (employee) {
                 document.getElementById('login-page').style.display = 'none';
                 document.getElementById('main-page').style.display = 'block';
-                loadSoftwareOptions();
-                loadCustomerSuggestions();
                 setupForm();
             }
         }).catch(err => console.error('Error initializing Google API:', err));
     });
-    setupForm();
 }
 
+// Hàm đăng nhập
 function login() {
     const empId = document.getElementById('employee-id').value;
     const password = document.getElementById('password').value;
+
+    if (!empId || !password) {
+        document.getElementById('error-message').textContent = 'Vui lòng nhập đầy đủ thông tin';
+        return;
+    }
+
     gapi.client.sheets.spreadsheets.values.get({
         spreadsheetId: SHEET_ID,
         range: 'Danh sách nhân viên!A2:E'
     }).then(response => {
         const employees = response.result.values || [];
         const employee = employees.find(row => row[0] === empId && row[2] === password);
-        if (employee) {
-            localStorage.setItem('loggedInEmployee', JSON.stringify({ id: empId, name: employee[1], role: employee[3] }));
-            document.getElementById('login-page').style.display = 'none';
-            document.getElementById('main-page').style.display = 'block';
-            loadSoftwareOptions();
-        } else {
-            document.getElementById('error-message').textContent = 'Sai thông tin đăng nhập';
+
+        if (!employee) {
+            document.getElementById('error-message').textContent = 'Sai mã nhân viên hoặc mật khẩu';
+            return;
         }
+
+        if (employee[4] === 'OFF') {
+            document.getElementById('error-message').textContent = 'Tài khoản đã bị khóa';
+            return;
+        }
+
+        localStorage.setItem('loggedInEmployee', JSON.stringify({ id: empId, name: employee[1], role: employee[3] }));
+        document.getElementById('login-page').style.display = 'none';
+        document.getElementById('main-page').style.display = 'block';
+        setupForm(); // Khởi tạo form sau khi đăng nhập
+    }).catch(err => {
+        console.error('Error fetching employee data:', err);
+        document.getElementById('error-message').textContent = 'Lỗi kết nối, vui lòng thử lại';
     });
 }
 
-function loadSoftwareOptions() {
+function loadSoftwareOptions() { // Load phần mềm từ google sheet, đã hoạt động tốt
     gapi.client.sheets.spreadsheets.values.get({
         spreadsheetId: SHEET_ID,
         range: 'Danh sách phần mềm!A2:C'
@@ -101,8 +116,14 @@ function loadCustomerSuggestions() {
     });
 }
 
+// Chuyển tab
+function showTab(tabId) {
+    document.querySelectorAll('#main-page > div').forEach(tab => tab.style.display = 'none');
+    document.getElementById(tabId).style.display = 'block';
+}
+
 // Thiết lập form (ngày bắt đầu, tự động tính ngày kết thúc)
-// Khởi tạo form
+// Thiết lập form ngày tháng
 function setupForm() {
     const startDateInput = document.getElementById('start-date');
     const endDateInput = document.getElementById('end-date');
