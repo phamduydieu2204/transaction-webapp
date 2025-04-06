@@ -19,6 +19,7 @@ function initClient() {
                 document.getElementById('login-page').style.display = 'none';
                 document.getElementById('main-page').style.display = 'block';
                 setupForm();
+                loadSoftwareOptions(); // Tải danh sách phần mềm
             }
         }).catch(err => console.error('Error initializing Google API:', err));
     });
@@ -54,7 +55,8 @@ function login() {
         localStorage.setItem('loggedInEmployee', JSON.stringify({ id: empId, name: employee[1], role: employee[3] }));
         document.getElementById('login-page').style.display = 'none';
         document.getElementById('main-page').style.display = 'block';
-        setupForm(); // Khởi tạo form sau khi đăng nhập
+        setupForm();
+        loadSoftwareOptions(); // Tải danh sách phần mềm sau khi đăng nhập
     }).catch(err => {
         console.error('Error fetching employee data:', err);
         document.getElementById('error-message').textContent = 'Lỗi kết nối, vui lòng thử lại';
@@ -111,6 +113,36 @@ function setupForm() {
     startDateInput.addEventListener('change', calculateEndDate);
 }
 
+// Tải danh sách phần mềm và gói phần mềm
+function loadSoftwareOptions() {
+    gapi.client.sheets.spreadsheets.values.get({
+        spreadsheetId: SHEET_ID,
+        range: 'Danh sách phần mềm!A2:C'
+    }).then(response => {
+        const softwareData = response.result.values || [];
+        console.log('Software data:', softwareData);
+        const softwareSelect = document.getElementById('software');
+        const packageSelect = document.getElementById('package');
+
+        const uniqueSoftware = [...new Set(softwareData.map(row => row[0]))];
+        softwareSelect.innerHTML = '<option value="">Chọn phần mềm</option>';
+        uniqueSoftware.forEach(software => {
+            softwareSelect.innerHTML += `<option value="${software}">${software}</option>`;
+        });
+
+        softwareSelect.onchange = () => {
+            const selectedSoftware = softwareSelect.value;
+            packageSelect.innerHTML = '<option value="">Chọn gói phần mềm</option>';
+            if (selectedSoftware) {
+                const packages = softwareData.filter(row => row[0] === selectedSoftware);
+                packages.forEach(row => {
+                    packageSelect.innerHTML += `<option value="${row[1]}">${row[1]}</option>`;
+                });
+            }
+        };
+    }).catch(err => console.error('Error loading software data:', err));
+}
+
 // Nút kiểm tra tạm thời
 function testForm() {
     console.log('Start Date:', document.getElementById('start-date').value);
@@ -118,7 +150,7 @@ function testForm() {
     console.log('End Date:', document.getElementById('end-date').value);
 }
 
-// Các hàm placeholder để tránh lỗi (sẽ hoàn thiện sau)
+// Các hàm placeholder để tránh lỗi
 function addTransaction() {
     console.log('Add transaction clicked');
 }
