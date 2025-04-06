@@ -189,7 +189,7 @@ function addTransaction() {
     };
     gapi.client.sheets.spreadsheets.values.append({
         spreadsheetId: SHEET_ID,
-        range: "D%E1%BB%AF%20li%E1%BB%87u%20giao%20d%E1%BB%8Bch!A:P",
+        range: "Dulieugiaodich!A:P",
         valueInputOption: "RAW",
         resource: {
             values: [[
@@ -225,7 +225,7 @@ function addTransaction() {
 // Load transactions
 function loadTransactions() {
     console.log("Loading transactions...");
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/D%E1%BB%AF%20li%E1%BB%87u%20giao%20d%E1%BB%8Bch!A2:P?key=${API_KEY}`)
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Dulieugiaodich!A2:P?key=${API_KEY}`)
         .then(response => {
             console.log("Response status:", response.status);
             if (!response.ok) {
@@ -272,7 +272,7 @@ function changePage(page) {
 
 // Edit transaction
 function editTransaction(id) {
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/D%E1%BB%AF%20li%E1%BB%87u%20giao%20d%E1%BB%8Bch!A2:P?key=${API_KEY}`)
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Dulieugiaodich!A2:P?key=${API_KEY}`)
         .then(response => response.json())
         .then(data => {
             const transaction = (data.values || []).find(row => row[0] === id && row[15] === loggedInEmployee.id);
@@ -320,14 +320,14 @@ function updateTransaction() {
     };
     gapi.client.sheets.spreadsheets.values.get({
         spreadsheetId: SHEET_ID,
-        range: "D%E1%BB%AF%20li%E1%BB%87u%20giao%20d%E1%BB%8Bch!A2:P",
+        range: "Dulieugiaodich!A2:P",
     }).then(response => {
         const transactions = response.result.values || [];
         const rowIndex = transactions.findIndex(row => row[0] === currentTransactionId) + 2;
         if (rowIndex > 1) {
             gapi.client.sheets.spreadsheets.values.update({
                 spreadsheetId: SHEET_ID,
-                range: `D%E1%BB%AF%20li%E1%BB%87u%20giao%20d%E1%BB%8Bch!A${rowIndex}:P${rowIndex}`,
+                range: `Dulieugiaodich!A${rowIndex}:P${rowIndex}`,
                 valueInputOption: "RAW",
                 resource: {
                     values: [[
@@ -370,14 +370,14 @@ function confirmDelete(id) {
     if (confirm("Bạn có chắc chắn muốn xóa giao dịch này?")) {
         gapi.client.sheets.spreadsheets.values.get({
             spreadsheetId: SHEET_ID,
-            range: "D%E1%BB%AF%20li%E1%BB%87u%20giao%20d%E1%BB%8Bch!A2:P",
+            range: "Dulieugiaodich!A2:P",
         }).then(response => {
             const transactions = response.result.values || [];
             const rowIndex = transactions.findIndex(row => row[0] === id) + 2;
             if (rowIndex > 1) {
                 gapi.client.sheets.spreadsheets.values.clear({
                     spreadsheetId: SHEET_ID,
-                    range: `D%E1%BB%AF%20li%E1%BB%87u%20giao%20d%E1%BB%8Bch!A${rowIndex}:P${rowIndex}`,
+                    range: `Dulieugiaodich!A${rowIndex}:P${rowIndex}`,
                 }).then(() => {
                     logAction("Xóa giao dịch", id);
                     loadTransactions();
