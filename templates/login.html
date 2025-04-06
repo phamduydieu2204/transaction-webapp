@@ -1,7 +1,9 @@
 <div id="login-page">
     <h2>Đăng nhập</h2>
-    <input type="text" id="employee-id" placeholder="Mã nhân viên" required>
-    <input type="password" id="password" placeholder="Mật khẩu" required>
-    <button onclick="login()">Đăng nhập</button>
-    <p id="error-message" style="color: red;"></p>
+    <form autocomplete="off">
+        <input type="text" id="employee-id" placeholder="Mã nhân viên" required>
+        <input type="password" id="password" placeholder="Mật khẩu" required>
+        <button onclick="login()">Đăng nhập</button>
+        <p id="error-message" style="color: red;"></p>
+    </form>
 </div>
