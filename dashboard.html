@@ -20,5 +20,12 @@
         <p>Chào mừng bạn đến với tab thống kê!</p>
     </div>
     <script src="script.js"></script>
+    <script>
+        // Kiểm tra xem nhân viên đã đăng nhập chưa
+        const loggedInEmployee = JSON.parse(localStorage.getItem("loggedInEmployee"));
+        if (!loggedInEmployee) {
+            window.location.href = "index.html";
+        }
+    </script>
 </body>
 </html>
