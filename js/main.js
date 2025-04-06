@@ -3,7 +3,7 @@ import { login as loginUser } from './auth/login.js';
 import { setupDateLogic } from './form/dateLogic.js';
 import { loadCustomerSuggestions } from './form/customerSuggestions.js';
 import { testForm } from './form/testForm.js';
-import { loadSoftwareOptions } from './software/loadSoftware.js';
+import { loadSoftwareOptions } from './software/loadSoftware.js'; // Đảm bảo dòng này đúng
 import { addTransaction } from './transactions/addTransaction.js';
 import { editTransaction } from './transactions/editTransaction.js';
 import { deleteTransaction } from './transactions/deleteTransaction.js';
@@ -17,6 +17,7 @@ async function initTemplates() {
     await loadTemplate('main-page', 'templates/main.html');
     await loadTemplate('input-tab', 'templates/input-tab.html');
     await loadTemplate('report-tab', 'templates/report-tab.html');
+    await loadTemplate('transaction-list-container', 'templates/transaction-list.html');
 }
 
 // Gắn các hàm vào window để gọi từ HTML
@@ -39,4 +40,6 @@ initTemplates().then(() => {
         loadCustomerSuggestions();
         loadSoftwareOptions();
     });
+}).catch(err => {
+    console.error('Error initializing templates:', err);
 });
