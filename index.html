@@ -24,12 +24,15 @@
         <div id="input-tab">
             <h2>Nhập liệu giao dịch</h2>
             <select id="transaction-type" required>
+                <option value="">Chọn loại giao dịch</option>
                 <option value="Mua hàng">Mua hàng</option>
                 <option value="Đổi gói">Đổi gói</option>
                 <option value="Hoàn trả">Hoàn trả</option>
             </select>
-            <input type="text" id="customer-name" placeholder="Tên khách hàng" required>
-            <input type="email" id="email" placeholder="Email" required>
+            <input type="text" id="customer-name" placeholder="Tên khách hàng" list="customer-suggestions" required>
+            <datalist id="customer-suggestions"></datalist>
+            <input type="email" id="email" placeholder="Email" list="email-suggestions" required>
+            <datalist id="email-suggestions"></datalist>
             <input type="text" id="contact" placeholder="Liên hệ" required>
             <input type="number" id="months" placeholder="Số tháng đăng ký" min="1" required>
             <input type="text" id="start-date" placeholder="Ngày bắt đầu (dd/mm/yyyy)" required>
@@ -41,7 +44,7 @@
             <textarea id="note" placeholder="Ghi chú"></textarea>
             <button onclick="addTransaction()">Thêm giao dịch</button>
             <button onclick="searchTransactions()">Tìm kiếm</button>
-    
+        
             <table id="transaction-list">
                 <thead>
                     <tr>

@@ -18,6 +18,8 @@ function initClient() {
                 document.getElementById('login-page').style.display = 'none';
                 document.getElementById('main-page').style.display = 'block';
                 loadSoftwareOptions();
+                loadCustomerSuggestions();
+                setupForm();
             }
         }).catch(err => console.error('Error initializing Google API:', err));
     });
@@ -70,6 +72,112 @@ function loadSoftwareOptions() {
             }
         };
     }).catch(err => console.error('Error loading software data:', err));
+}
+
+// Gợi ý tên khách hàng và email
+function loadCustomerSuggestions() {
+    gapi.client.sheets.spreadsheets.values.get({
+        spreadsheetId: SHEET_ID,
+        range: 'Dữ liệu giao dịch!D2:E' // Cột Tên khách hàng và Email
+    }).then(response => {
+        const transactions = response.result.values || [];
+        const customers = [...new Set(transactions.map(row => row[0]))];
+        const emails = [...new Set(transactions.map(row => row[1]))];
+
+        const customerList = document.getElementById('customer-suggestions');
+        const emailList = document.getElementById('email-suggestions');
+        customerList.innerHTML = customers.map(c => `<option value="${c}">`).join('');
+        emailList.innerHTML = emails.map(e => `<option value="${e}">`).join('');
+
+        // Tự động điền liên hệ khi chọn email
+        document.getElementById('email').addEventListener('change', () => {
+            const selectedEmail = document.getElementById('email').value;
+            const transaction = transactions.find(row => row[1] === selectedEmail);
+            if (transaction) {
+                document.getElementById('contact').value = transaction[2] || ''; // Cột Liên hệ
+            }
+        });
+    });
+}
+
+// Thiết lập form (ngày bắt đầu, tự động tính ngày kết thúc)
+function setupForm() {
+    const startDateInput = document.getElementById('start-date');
+    const end—ifDateInput = document.getElementById('end-date');
+    const monthsInput = document.getElementById('months');
+
+    // Đặt ngày bắt đầu mặc định
+    const today = new Date().toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+    startDateInput.value = today;
+
+    // Tính ngày kết thúc khi thay đổi số tháng hoặc ngày bắt đầu
+    function calculateEndDate() {
+        const startDate = startDateInput.value.split('/').reverse().join('-'); // Chuyển dd/mm/yyyy thành yyyy-mm-dd
+        const months = parseInt(monthsInput.value) || 0;
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + months * 30); // Giả định 1 tháng = 30 ngày
+        end—ifDateInput.value = endDate.toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+    }
+
+    startDateInput.addEventListener('change', calculateEndDate);
+    monthsInput.addEventListener('input', calculateEndDate);
+}
+
+// Thêm giao dịch
+function addTransaction() {
+    const employee = JSON.parse(localStorage.getItem('loggedInEmployee'));
+    if (!employee) {
+        alert('Vui lòng đăng nhập lại');
+        return;
+    }
+
+    const data = {
+        id: 'TX' + Date.now(),
+        timestamp: new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }),
+        type: document.getElementById('transaction-type').value,
+        customer: document.getElementById('customer-name').value.toLowerCase(),
+        email: document.getElementById('email').value.toLowerCase(),
+        contact: document.getElementById('contact').value,
+        months: document.getElementById('months').value,
+        startDate: document.getElementById('start-date').value,
+        endDate: document.getElementById('end-date').value,
+        devices: document.getElementById('devices').value,
+        software: document.getElementById('software').value,
+        package: document.getElementById('package').value,
+        revenue: document.getElementById('revenue').value,
+        note: document.getElementById('note').value,
+        empName: employee.name,
+        empId: employee.id
+    };
+
+    if (!Object.values(data).every(val => val || val === data.note)) {
+        alert('Vui lòng nhập đầy đủ thông tin (trừ ghi chú)');
+        return;
+    }
+
+    const row = Object.values(data);
+    gapi.client.sheets.spreadsheets.values.append({
+        spreadsheetId: SHEET_ID,
+        range: 'Dữ liệu giao dịch!A:O',
+        valueInputOption: 'RAW',
+        resource: { values: [row] }
+    }).then(() => {
+        logActivity(employee.id, 'Thêm giao dịch', JSON.stringify(data));
+        alert('Thêm giao dịch thành công');
+        loadCustomerSuggestions(); // Cập nhật gợi ý sau khi thêm
+    }).catch(err => console.error('Error adding transaction:', err));
+}
+
+// Ghi log (giữ nguyên từ trước)
+function logActivity(empId, action, details = '') {
+    const timestamp = new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+    const logEntry = [[empId, timestamp, action, details]];
+    gapi.client.sheets.spreadsheets.values.append({
+        spreadsheetId: SHEET_ID,
+        range: 'Logs!A:D',
+        valueInputOption: 'RAW',
+        resource: { values: logEntry }
+    }).then(() => console.log('Logged:', action));
 }
 
 window.onload = initClient;
