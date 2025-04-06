@@ -2,7 +2,7 @@
 let loggedInEmployee = null;
 let loginAttempts = {};
 const SHEET_ID = "1pl7DwxtXTeVqKmfQl1UdIS7A2WcFl2sjCrkOqOegv9U";
-const API_KEY = "AIzaSyD9tPlmQbNY2K0U3xG1zX0d6C0s8g";
+const API_KEY = "AIzaSyDt9wLPmhQBYN2OKUnO3tXqiZdo6DCoS0g";
 const CLIENT_ID = "490612546849-1vqphpttqqislvdc1e9eb7jdjt8lrbdi.apps.googleusercontent.com";
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive";
 let currentPage = 1;
