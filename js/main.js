@@ -4,10 +4,10 @@ import { setupDateLogic } from './form/dateLogic.js';
 import { loadCustomerSuggestions } from './form/customerSuggestions.js';
 import { testForm } from './form/testForm.js';
 import { loadSoftwareOptions } from './software/loadSoftware.js';
-import { addTransaction } from './transactions/addTransaction.js';
-import { editTransaction } from './transactions/editTransaction.js';
-import { deleteTransaction } from './transactions/deleteTransaction.js';
-import { searchTransactions } from './transactions/searchTransactions.js';
+//import { addTransaction } from './transactions/addTransaction.js';
+//import { editTransaction } from './transactions/editTransaction.js';
+//import { deleteTransaction } from './transactions/deleteTransaction.js';
+//import { searchTransactions } from './transactions/searchTransactions.js';
 import { showTab } from './ui/showTab.js';
 import { loadTemplate } from './ui/loadTemplate.js';
 
