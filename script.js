@@ -23,6 +23,7 @@ function initClient() {
             }
         }).catch(err => console.error('Error initializing Google API:', err));
     });
+    setupForm();
 }
 
 function login() {
@@ -209,7 +210,4 @@ function logActivity(empId, action, details = '') {
     }).then(() => console.log('Logged:', action));
 }
 
-// Khởi động
-window.onload = function() {
-    setupForm();
-};
+window.onload = initClient;
