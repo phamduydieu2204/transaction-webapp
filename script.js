@@ -1,16 +1,18 @@
-// Biến toàn cục
+// Global variables
 let loggedInEmployee = null;
-const SHEET_ID = "1pl7DwxtXTeVqKmfQl1UdIS7A2WcFl2sjCrkOqOegv9U"; // Thay bằng Sheet ID từ Bước 1
+let loginAttempts = {};
+const SHEET_ID = "1P7DnxTXevkAF0l1d5T2AWCf2l5CrkQ0e9UY"; // Your Sheet ID from Step 1
+const API_KEY = "YOUR_API_KEY"; // Replace with your API Key
 
-// Xử lý đăng nhập bằng Google
+// Handle Google Sign-In response
 function handleCredentialResponse(response) {
-    const profile = jwt_decode(response.credential); // Giải mã token từ Google
+    const profile = jwt_decode(response.credential); // Decode Google token
     console.log("Google User:", profile);
-    // Lưu thông tin đăng nhập (có thể lưu vào localStorage)
+    // Save Google user info to localStorage
     localStorage.setItem("googleUser", JSON.stringify(profile));
 }
 
-// Giải mã JWT (thêm hàm jwt_decode)
+// Decode JWT token
 function jwt_decode(token) {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -20,18 +22,29 @@ function jwt_decode(token) {
     return JSON.parse(jsonPayload);
 }
 
-// Kiểm tra đăng nhập bằng mã nhân viên và mật khẩu
+// Check login with employee ID and password
 function checkLogin() {
     const employeeId = document.getElementById("employeeId").value;
     const password = document.getElementById("password").value;
 
-    // Gọi Google Sheets API để kiểm tra thông tin nhân viên
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Danh sách nhân viên!A2:E?key=AIzaSyDt9wLPmhQBYN2OKUnO3tXqiZdo6DCoS0g`)
-        .then(response => response.json())
+    // Fetch employee data from Google Sheets
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Danh sách nhân viên!A2:E?key=${API_KEY}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to fetch employee data: " + response.statusText);
+            }
+            return response.json();
+        })
         .then(data => {
             const employees = data.values || [];
             const employee = employees.find(row => row[0] === employeeId && row[2] === password);
             if (!employee) {
+                loginAttempts[employeeId] = (loginAttempts[employeeId] || 0) + 1;
+                if (loginAttempts[employeeId] >= 5) {
+                    updateEmployeeStatus(employeeId, "OFF");
+                    document.getElementById("error").textContent = "Tài khoản bị khóa do đăng nhập sai quá 5 lần!";
+                    return;
+                }
                 document.getElementById("error").textContent = "Sai mã nhân viên hoặc mật khẩu!";
                 return;
             }
@@ -39,17 +52,25 @@ function checkLogin() {
                 document.getElementById("error").textContent = "Tài khoản của bạn đã bị khóa!";
                 return;
             }
+            loginAttempts[employeeId] = 0; // Reset attempts on successful login
             loggedInEmployee = { id: employee[0], name: employee[1], role: employee[3] };
             localStorage.setItem("loggedInEmployee", JSON.stringify(loggedInEmployee));
             window.location.href = "dashboard.html";
         })
         .catch(error => {
-            console.error("Lỗi khi kiểm tra đăng nhập:", error);
+            console.error("Error during login:", error);
             document.getElementById("error").textContent = "Đã có lỗi xảy ra, vui lòng thử lại!";
         });
 }
 
-// Hiển thị tab
+// Update employee status (to be implemented with OAuth 2.0)
+function updateEmployeeStatus(employeeId, status) {
+    // This requires OAuth 2.0 to write to Google Sheets
+    console.log(`Update status of ${employeeId} to ${status}`);
+    // Placeholder: In the next step, we'll implement this using OAuth 2.0
+}
+
+// Show tab
 function showTab(tabId) {
     document.querySelectorAll(".tab-content").forEach(tab => {
         tab.style.display = "none";
@@ -57,7 +78,7 @@ function showTab(tabId) {
     document.getElementById(tabId).style.display = "block";
 }
 
-// Đăng xuất
+// Logout
 function logout() {
     loggedInEmployee = null;
     localStorage.removeItem("loggedInEmployee");
