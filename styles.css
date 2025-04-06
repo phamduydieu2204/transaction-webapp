@@ -7,35 +7,46 @@ body {
     margin: 50px auto;
     text-align: center;
 }
-input, button, select, textarea {
+input, select, textarea, button {
     display: block;
     width: 100%;
     margin: 10px 0;
     padding: 8px;
     box-sizing: border-box;
 }
+textarea {
+    height: 100px;
+}
+.tabs {
+    display: flex;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 20px;
+}
 .tabs button {
-    margin-right: 10px;
-    padding: 10px;
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    background: #f1f1f1;
+    cursor: pointer;
+    margin-right: 5px;
+    border-radius: 5px 5px 0 0;
+}
+.tabs button:hover {
+    background: #ddd;
 }
 .tab-content {
-    margin-top: 20px;
-}
-#transactionList {
     margin-top: 20px;
 }
 #transactionList div {
     border: 1px solid #ccc;
     padding: 10px;
-    margin-bottom: 5px;
+    margin: 5px 0;
 }
-#pagination {
-    margin-top: 10px;
-}
-#pagination button {
+#transactionList button {
     display: inline-block;
     width: auto;
+    margin-left: 10px;
 }
-#pagination span {
-    margin: 0 10px;
+#pagination button {
+    margin: 5px;
 }
