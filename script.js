@@ -114,7 +114,12 @@ function updateEmployeeStatus(employeeId, status) {
 // Load software options
 function loadSoftwareOptions() {
     fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Danh sách phần mềm!A2:C?key=${API_KEY}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Failed to fetch software data: ${response.status} - ${response.statusText}`);
+            }
+            return response.json();
+        })
         .then(data => {
             const softwareSelect = document.getElementById("software");
             const packageSelect = document.getElementById("package");
@@ -139,7 +144,7 @@ function loadSoftwareOptions() {
                 });
             });
         }).catch(error => {
-            console.error("Error loading software options:", error);
+            console.error("Error loading software options:", error.message);
         });
 }
 
