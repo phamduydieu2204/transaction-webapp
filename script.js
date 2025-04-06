@@ -3,7 +3,7 @@ let loggedInEmployee = null;
 let loginAttempts = {};
 const SHEET_ID = "1P7DnxTXevkAF0l1d5T2AWCf2l5CrkQ0e9UY";
 const API_KEY = "AIzaSyD9tPlmQbNY2K0U3xG1zX0d6C0s8g";
-const CLIENT_ID = "490612546849-1vqphpttqqislvdc1e9eb7jdjt8lrbdi.apps.googleusercontent.com"; // Replace with your Client ID
+const CLIENT_ID = "490612546849-1vqphpttqqislvdc1e9eb7jdjt8lrbdi.apps.googleusercontent.com";
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive";
 let currentPage = 1;
 const transactionsPerPage = 10;
@@ -18,6 +18,8 @@ function initClient() {
     }).then(() => {
         gapi.auth2.getAuthInstance().isSignedIn.listen(updateSignInStatus);
         updateSignInStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+    }).catch(error => {
+        console.error("Error initializing Google API Client:", error);
     });
 }
 
@@ -102,6 +104,8 @@ function updateEmployeeStatus(employeeId, status) {
                 console.log(`Updated status of ${employeeId} to ${status}`);
             });
         }
+    }).catch(error => {
+        console.error("Error updating employee status:", error);
     });
 }
 
@@ -132,6 +136,8 @@ function loadSoftwareOptions() {
                     packageSelect.appendChild(option);
                 });
             });
+        }).catch(error => {
+            console.error("Error loading software options:", error);
         });
 }
 
@@ -201,6 +207,9 @@ function addTransaction() {
         logAction("Thêm giao dịch", JSON.stringify(transaction));
         loadTransactions();
         form.reset();
+    }).catch(error => {
+        console.error("Error adding transaction:", error);
+        alert("Đã có lỗi khi thêm giao dịch, vui lòng thử lại!");
     });
 }
 
@@ -223,6 +232,8 @@ function loadTransactions() {
                     </div>`;
             });
             updatePagination(transactions.length);
+        }).catch(error => {
+            console.error("Error loading transactions:", error);
         });
 }
 
@@ -265,6 +276,8 @@ function editTransaction(id) {
                 document.getElementById("updateBtn").style.display = "inline-block";
                 document.getElementById("deleteBtn").style.display = "inline-block";
             }
+        }).catch(error => {
+            console.error("Error editing transaction:", error);
         });
 }
 
@@ -328,6 +341,9 @@ function updateTransaction() {
                 currentTransactionId = null;
             });
         }
+    }).catch(error => {
+        console.error("Error updating transaction:", error);
+        alert("Đã có lỗi khi sửa giao dịch, vui lòng thử lại!");
     });
 }
 
@@ -349,6 +365,9 @@ function confirmDelete(id) {
                     loadTransactions();
                 });
             }
+        }).catch(error => {
+            console.error("Error deleting transaction:", error);
+            alert("Đã có lỗi khi xóa giao dịch, vui lòng thử lại!");
         });
     }
 }
@@ -370,6 +389,8 @@ function logAction(action, content) {
         }
     }).then(() => {
         console.log("Log saved:", log);
+    }).catch(error => {
+        console.error("Error logging action:", error);
     });
 }
 
