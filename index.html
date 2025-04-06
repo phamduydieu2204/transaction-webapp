@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <title>Đăng nhập</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Thêm Google Sign-In API -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/api.js" async defer></script>
 </head>
 <body>
     <div class="login-container">
@@ -14,7 +14,6 @@
         <input type="password" id="password" placeholder="Mật khẩu" required>
         <button onclick="checkLogin()">Đăng nhập</button>
         <p id="error" style="color: red;"></p>
-        <!-- Nút đăng nhập bằng Google -->
         <div id="g_id_onload"
              data-client_id="490612546849-1vqphpttqqislvdc1e9eb7jdjt8lrbdi.apps.googleusercontent.com"
              data-callback="handleCredentialResponse"
