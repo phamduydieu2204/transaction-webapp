@@ -54,7 +54,9 @@ function checkLogin() {
     fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Danh sách nhân viên!A2:E?key=${API_KEY}`)
         .then(response => {
             if (!response.ok) {
-                throw new Error(`Failed to fetch employee data: ${response.status} - ${response.statusText}`);
+                return response.text().then(text => {
+                    throw new Error(`Failed to fetch employee data: ${response.status} - ${response.statusText} - ${text}`);
+                });
             }
             return response.json();
         })
@@ -407,8 +409,16 @@ function logout() {
     loggedInEmployee = null;
     localStorage.removeItem("loggedInEmployee");
     localStorage.removeItem("googleUser");
-    gapi.auth2.getAuthInstance().signOut();
-    window.location.href = "index.html";
+    if (gapi.auth2) {
+        gapi.auth2.getAuthInstance().signOut().then(() => {
+            window.location.href = "index.html";
+        }).catch(error => {
+            console.error("Error during sign out:", error);
+            window.location.href = "index.html";
+        });
+    } else {
+        window.location.href = "index.html";
+    }
 }
 
 // Add event listeners for dynamic calculations
