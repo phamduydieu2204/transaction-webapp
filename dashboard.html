@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="tabs">
+        <button onclick="showTab('input')">Nhập liệu</button>
+        <button onclick="showTab('report')">Thống kê & Báo cáo</button>
+        <button onclick="logout()">Đăng xuất</button>
+    </div>
+    <div id="input" class="tab-content" style="display: none;">
+        <h2>Nhập liệu giao dịch</h2>
+        <p>Chào mừng bạn đến với tab nhập liệu!</p>
+    </div>
+    <div id="report" class="tab-content" style="display: none;">
+        <h2>Thống kê & Báo cáo</h2>
+        <p>Chào mừng bạn đến với tab thống kê!</p>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
