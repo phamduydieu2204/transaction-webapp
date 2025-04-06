@@ -1,11 +1,31 @@
 // Global variables
 let loggedInEmployee = null;
 let loginAttempts = {};
-const SHEET_ID = "1P7DnxTXevkAF0l1d5T2AWCf2l5CrkQ0e9UY"; // Your Sheet ID
-const API_KEY = "AIzaSyD9tPlmQbNY2K0U3xG1zX0d6C0s8g"; // Replace with your API Key
+const SHEET_ID = "1P7DnxTXevkAF0l1d5T2AWCf2l5CrkQ0e9UY";
+const API_KEY = "AIzaSyD9tPlmQbNY2K0U3xG1zX0d6C0s8g";
+const CLIENT_ID = "490612546849-1vqphpttqqislvdc1e9eb7jdjt8lrbdi.apps.googleusercontent.com"; // Replace with your Client ID
+const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive";
 let currentPage = 1;
 const transactionsPerPage = 10;
 let currentTransactionId = null;
+
+// Initialize Google API Client
+function initClient() {
+    gapi.client.init({
+        clientId: CLIENT_ID,
+        scope: SCOPES,
+        discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
+    }).then(() => {
+        gapi.auth2.getAuthInstance().isSignedIn.listen(updateSignInStatus);
+        updateSignInStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+    });
+}
+
+function updateSignInStatus(isSignedIn) {
+    if (!isSignedIn) {
+        gapi.auth2.getAuthInstance().signIn();
+    }
+}
 
 // Handle Google Sign-In response
 function handleCredentialResponse(response) {
@@ -64,9 +84,25 @@ function checkLogin() {
         });
 }
 
-// Update employee status (placeholder for OAuth 2.0)
+// Update employee status
 function updateEmployeeStatus(employeeId, status) {
-    console.log(`Update status of ${employeeId} to ${status}`);
+    gapi.client.sheets.spreadsheets.values.get({
+        spreadsheetId: SHEET_ID,
+        range: "Danh sách nhân viên!A2:E",
+    }).then(response => {
+        const employees = response.result.values || [];
+        const rowIndex = employees.findIndex(row => row[0] === employeeId) + 2;
+        if (rowIndex > 1) {
+            gapi.client.sheets.spreadsheets.values.update({
+                spreadsheetId: SHEET_ID,
+                range: `Danh sách nhân viên!E${rowIndex}`,
+                valueInputOption: "RAW",
+                resource: { values: [[status]] },
+            }).then(() => {
+                console.log(`Updated status of ${employeeId} to ${status}`);
+            });
+        }
+    });
 }
 
 // Load software options
@@ -137,11 +173,35 @@ function addTransaction() {
         employeeName: loggedInEmployee.name,
         employeeId: loggedInEmployee.id
     };
-    // Placeholder: Save to Google Sheets (requires OAuth 2.0)
-    console.log("Add transaction:", transaction);
-    logAction("Thêm giao dịch", JSON.stringify(transaction));
-    loadTransactions();
-    form.reset();
+    gapi.client.sheets.spreadsheets.values.append({
+        spreadsheetId: SHEET_ID,
+        range: "Dữ liệu giao dịch!A:P",
+        valueInputOption: "RAW",
+        resource: {
+            values: [[
+                transaction.id,
+                transaction.timestamp,
+                transaction.type,
+                transaction.customerName,
+                transaction.email,
+                transaction.contact,
+                transaction.months,
+                transaction.startDate,
+                transaction.endDate,
+                transaction.devices,
+                transaction.software,
+                transaction.package,
+                transaction.revenue,
+                transaction.note,
+                transaction.employeeName,
+                transaction.employeeId
+            ]]
+        }
+    }).then(() => {
+        logAction("Thêm giao dịch", JSON.stringify(transaction));
+        loadTransactions();
+        form.reset();
+    });
 }
 
 // Load transactions
@@ -228,23 +288,68 @@ function updateTransaction() {
         employeeName: loggedInEmployee.name,
         employeeId: loggedInEmployee.id
     };
-    // Placeholder: Update in Google Sheets (requires OAuth 2.0)
-    console.log("Update transaction:", transaction);
-    logAction("Sửa giao dịch", JSON.stringify(transaction));
-    loadTransactions();
-    document.getElementById("transactionForm").reset();
-    document.getElementById("updateBtn").style.display = "none";
-    document.getElementById("deleteBtn").style.display = "none";
-    currentTransactionId = null;
+    gapi.client.sheets.spreadsheets.values.get({
+        spreadsheetId: SHEET_ID,
+        range: "Dữ liệu giao dịch!A2:P",
+    }).then(response => {
+        const transactions = response.result.values || [];
+        const rowIndex = transactions.findIndex(row => row[0] === currentTransactionId) + 2;
+        if (rowIndex > 1) {
+            gapi.client.sheets.spreadsheets.values.update({
+                spreadsheetId: SHEET_ID,
+                range: `Dữ liệu giao dịch!A${rowIndex}:P${rowIndex}`,
+                valueInputOption: "RAW",
+                resource: {
+                    values: [[
+                        transaction.id,
+                        transaction.timestamp,
+                        transaction.type,
+                        transaction.customerName,
+                        transaction.email,
+                        transaction.contact,
+                        transaction.months,
+                        transaction.startDate,
+                        transaction.endDate,
+                        transaction.devices,
+                        transaction.software,
+                        transaction.package,
+                        transaction.revenue,
+                        transaction.note,
+                        transaction.employeeName,
+                        transaction.employeeId
+                    ]]
+                }
+            }).then(() => {
+                logAction("Sửa giao dịch", JSON.stringify(transaction));
+                loadTransactions();
+                document.getElementById("transactionForm").reset();
+                document.getElementById("updateBtn").style.display = "none";
+                document.getElementById("deleteBtn").style.display = "none";
+                currentTransactionId = null;
+            });
+        }
+    });
 }
 
 // Confirm delete
 function confirmDelete(id) {
     if (confirm("Bạn có chắc chắn muốn xóa giao dịch này?")) {
-        // Placeholder: Delete from Google Sheets (requires OAuth 2.0)
-        console.log("Delete transaction:", id);
-        logAction("Xóa giao dịch", id);
-        loadTransactions();
+        gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: SHEET_ID,
+            range: "Dữ liệu giao dịch!A2:P",
+        }).then(response => {
+            const transactions = response.result.values || [];
+            const rowIndex = transactions.findIndex(row => row[0] === id) + 2;
+            if (rowIndex > 1) {
+                gapi.client.sheets.spreadsheets.values.clear({
+                    spreadsheetId: SHEET_ID,
+                    range: `Dữ liệu giao dịch!A${rowIndex}:P${rowIndex}`,
+                }).then(() => {
+                    logAction("Xóa giao dịch", id);
+                    loadTransactions();
+                });
+            }
+        });
     }
 }
 
@@ -256,8 +361,16 @@ function logAction(action, content) {
         action: action,
         content: content
     };
-    // Placeholder: Save to Google Sheets (requires OAuth 2.0)
-    console.log("Log:", log);
+    gapi.client.sheets.spreadsheets.values.append({
+        spreadsheetId: SHEET_ID,
+        range: "Logs!A:D",
+        valueInputOption: "RAW",
+        resource: {
+            values: [[log.employeeId, log.timestamp, log.action, log.content]]
+        }
+    }).then(() => {
+        console.log("Log saved:", log);
+    });
 }
 
 // Show tab
@@ -273,6 +386,7 @@ function logout() {
     loggedInEmployee = null;
     localStorage.removeItem("loggedInEmployee");
     localStorage.removeItem("googleUser");
+    gapi.auth2.getAuthInstance().signOut();
     window.location.href = "index.html";
 }
 
