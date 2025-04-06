@@ -11,20 +11,62 @@
         <button onclick="showTab('report')">Thống kê & Báo cáo</button>
         <button onclick="logout()">Đăng xuất</button>
     </div>
+
+    <!-- Tab Nhập liệu -->
     <div id="input" class="tab-content" style="display: none;">
         <h2>Nhập liệu giao dịch</h2>
-        <p>Chào mừng bạn đến với tab nhập liệu!</p>
+        <form id="transactionForm">
+            <select id="transactionType" required>
+                <option value="Mua hàng">Mua hàng</option>
+                <option value="Đổi gói">Đổi gói</option>
+                <option value="Hoàn trả">Hoàn trả</option>
+            </select>
+            <input type="text" id="customerName" placeholder="Tên khách hàng" list="customerList" required>
+            <datalist id="customerList"></datalist>
+            <input type="email" id="email" placeholder="Email" list="emailList" required>
+            <datalist id="emailList"></datalist>
+            <input type="text" id="contact" placeholder="Liên hệ" required>
+            <input type="number" id="months" placeholder="Số tháng đăng ký" min="1" required>
+            <input type="text" id="startDate" placeholder="Ngày bắt đầu (dd/mm/yyyy)" required>
+            <input type="text" id="endDate" placeholder="Ngày kết thúc" readonly>
+            <input type="number" id="devices" placeholder="Số thiết bị" min="1" required>
+            <select id="software" required></select>
+            <select id="package" required></select>
+            <input type="number" id="revenue" placeholder="Doanh thu" min="0" required>
+            <textarea id="note" placeholder="Ghi chú"></textarea>
+            <input type="file" id="image" accept="image/*">
+            <button type="button" onclick="addTransaction()">Thêm giao dịch</button>
+            <button type="button" onclick="updateTransaction()" id="updateBtn" style="display: none;">Sửa</button>
+            <button type="button" onclick="resetForm()">Hủy</button>
+        </form>
+
+        <h3>Danh sách giao dịch</h3>
+        <div id="transactionList"></div>
+        <div id="pagination">
+            <button onclick="prevPage()" id="prevBtn">Trang trước</button>
+            <span id="pageInfo"></span>
+            <button onclick="nextPage()" id="nextBtn">Trang sau</button>
+        </div>
     </div>
+
+    <!-- Tab Thống kê -->
     <div id="report" class="tab-content" style="display: none;">
         <h2>Thống kê & Báo cáo</h2>
         <p>Chào mừng bạn đến với tab thống kê!</p>
     </div>
+
     <script src="script.js"></script>
     <script>
-        // Kiểm tra xem nhân viên đã đăng nhập chưa
+        // Check if employee is logged in
         const loggedInEmployee = JSON.parse(localStorage.getItem("loggedInEmployee"));
         if (!loggedInEmployee) {
             window.location.href = "index.html";
+        } else {
+            // Load initial data for the form
+            loadSoftwareOptions();
+            loadCustomerSuggestions();
+            loadTransactions();
+            setDefaultStartDate();
         }
     </script>
 </body>
