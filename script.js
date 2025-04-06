@@ -101,26 +101,55 @@ function loadCustomerSuggestions() {
 }
 
 // Thiết lập form (ngày bắt đầu, tự động tính ngày kết thúc)
+// Khởi tạo form
 function setupForm() {
     const startDateInput = document.getElementById('start-date');
-    const end—ifDateInput = document.getElementById('end-date');
+    const endDateInput = document.getElementById('end-date');
     const monthsInput = document.getElementById('months');
 
-    // Đặt ngày bắt đầu mặc định
-    const today = new Date().toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
-    startDateInput.value = today;
+    // Đặt ngày bắt đầu mặc định là ngày hiện tại
+    const today = new Date();
+    const formattedToday = today.toLocaleDateString('vi-VN', { 
+        timeZone: 'Asia/Ho_Chi_Minh',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+    startDateInput.value = formattedToday;
 
-    // Tính ngày kết thúc khi thay đổi số tháng hoặc ngày bắt đầu
+    // Hàm tính ngày kết thúc
     function calculateEndDate() {
-        const startDate = startDateInput.value.split('/').reverse().join('-'); // Chuyển dd/mm/yyyy thành yyyy-mm-dd
+        const startDateStr = startDateInput.value; // Định dạng dd/mm/yyyy
         const months = parseInt(monthsInput.value) || 0;
+
+        // Chuyển đổi ngày bắt đầu sang đối tượng Date
+        const [day, month, year] = startDateStr.split('/').map(Number);
+        const startDate = new Date(year, month - 1, day); // month bắt đầu từ 0
+
+        // Tính ngày kết thúc
         const endDate = new Date(startDate);
-        endDate.setDate(endDate.getDate() + months * 30); // Giả định 1 tháng = 30 ngày
-        end—ifDateInput.value = endDate.toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+        endDate.setDate(startDate.getDate() + months * 30);
+
+        // Định dạng ngày kết thúc
+        const formattedEndDate = endDate.toLocaleDateString('vi-VN', { 
+            timeZone: 'Asia/Ho_Chi_Minh',
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+        endDateInput.value = formattedEndDate;
     }
 
-    startDateInput.addEventListener('change', calculateEndDate);
+    // Gọi tính ngày kết thúc khi thay đổi số tháng hoặc ngày bắt đầu
     monthsInput.addEventListener('input', calculateEndDate);
+    startDateInput.addEventListener('change', calculateEndDate);
+}
+
+// Nút kiểm tra tạm thời
+function testForm() {
+    console.log('Start Date:', document.getElementById('start-date').value);
+    console.log('Months:', document.getElementById('months').value);
+    console.log('End Date:', document.getElementById('end-date').value);
 }
 
 // Thêm giao dịch
@@ -180,4 +209,7 @@ function logActivity(empId, action, details = '') {
     }).then(() => console.log('Logged:', action));
 }
 
-window.onload = initClient;
+// Khởi động
+window.onload = function() {
+    setupForm();
+};
