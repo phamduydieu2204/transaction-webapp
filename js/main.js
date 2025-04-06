@@ -34,10 +34,10 @@ window.login = () => loginUser(() => {
 });
 window.showTab = showTab;
 window.testForm = testForm;
-window.addTransaction = addTransaction;
-window.editTransaction = editTransaction;
-window.deleteTransaction = deleteTransaction;
-window.searchTransactions = searchTransactions;
+//window.addTransaction = addTransaction;
+//window.editTransaction = editTransaction;
+//window.deleteTransaction = deleteTransaction;
+//window.searchTransactions = searchTransactions;
 
 // Khởi động
 initTemplates().then(() => {
