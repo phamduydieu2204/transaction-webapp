@@ -1,9 +1,9 @@
 // Global variables
 let loggedInEmployee = null;
 let loginAttempts = {};
-const SHEET_ID = "1pl7DwxtXTeVqKmfQl1UdIS7A2WcFl2sjCrkOqOegv9U";
-const API_KEY = "AIzaSyDt9wLPmhQBYN2OKUnO3tXqiZdo6DCoS0g";
-const CLIENT_ID = "490612546849-1vqphpttqqislvdc1e9eb7jdjt8lrbdi.apps.googleusercontent.com";
+const SHEET_ID = "1P7DnxTXevkAF0l1d5T2AWCf2l5CrkQ0e9UY"; // Thay bằng SHEET_ID của bạn
+const API_KEY = "AIzaSyD9tPlmQbNY2K0U3xG1zX0d6C0s8g"; // Thay bằng API_KEY của bạn
+const CLIENT_ID = "490612546849-1vqphpttqqislvdc1e9eb7jdjt8lrbdi.apps.googleusercontent.com"; // Thay bằng CLIENT_ID của bạn
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive";
 let currentPage = 1;
 const transactionsPerPage = 10;
@@ -51,12 +51,10 @@ function checkLogin() {
     const employeeId = document.getElementById("employeeId").value;
     const password = document.getElementById("password").value;
 
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Danh sách nhân viên!A2:E?key=${API_KEY}`)
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Danh%20s%C3%A1ch%20nh%C3%A2n%20vi%C3%AAn!A2:E?key=${API_KEY}`)
         .then(response => {
             if (!response.ok) {
-                return response.text().then(text => {
-                    throw new Error(`Failed to fetch employee data: ${response.status} - ${response.statusText} - ${text}`);
-                });
+                throw new Error(`Failed to fetch employee data: ${response.status} - ${response.statusText}`);
             }
             return response.json();
         })
@@ -92,14 +90,14 @@ function checkLogin() {
 function updateEmployeeStatus(employeeId, status) {
     gapi.client.sheets.spreadsheets.values.get({
         spreadsheetId: SHEET_ID,
-        range: "Danh sách nhân viên!A2:E",
+        range: "Danh%20s%C3%A1ch%20nh%C3%A2n%20vi%C3%AAn!A2:E",
     }).then(response => {
         const employees = response.result.values || [];
         const rowIndex = employees.findIndex(row => row[0] === employeeId) + 2;
         if (rowIndex > 1) {
             gapi.client.sheets.spreadsheets.values.update({
                 spreadsheetId: SHEET_ID,
-                range: `Danh sách nhân viên!E${rowIndex}`,
+                range: `Danh%20s%C3%A1ch%20nh%C3%A2n%20vi%C3%AAn!E${rowIndex}`,
                 valueInputOption: "RAW",
                 resource: { values: [[status]] },
             }).then(() => {
@@ -113,14 +111,17 @@ function updateEmployeeStatus(employeeId, status) {
 
 // Load software options
 function loadSoftwareOptions() {
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Danh sách phần mềm!A2:C?key=${API_KEY}`)
+    console.log("Loading software options...");
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Danh%20s%C3%A1ch%20ph%E1%BA%A7n%20m%E1%BB%81m!A2:C?key=${API_KEY}`)
         .then(response => {
+            console.log("Response status:", response.status);
             if (!response.ok) {
                 throw new Error(`Failed to fetch software data: ${response.status} - ${response.statusText}`);
             }
             return response.json();
         })
         .then(data => {
+            console.log("Software data:", data);
             const softwareSelect = document.getElementById("software");
             const packageSelect = document.getElementById("package");
             const softwares = data.values || [];
@@ -188,7 +189,7 @@ function addTransaction() {
     };
     gapi.client.sheets.spreadsheets.values.append({
         spreadsheetId: SHEET_ID,
-        range: "Dữ liệu giao dịch!A:P",
+        range: "D%E1%BB%AF%20li%E1%BB%87u%20giao%20d%E1%BB%8Bch!A:P",
         valueInputOption: "RAW",
         resource: {
             values: [[
@@ -214,6 +215,7 @@ function addTransaction() {
         logAction("Thêm giao dịch", JSON.stringify(transaction));
         loadTransactions();
         form.reset();
+        setDefaultStartDate(); // Reset ngày bắt đầu về hôm nay
     }).catch(error => {
         console.error("Error adding transaction:", error);
         alert("Đã có lỗi khi thêm giao dịch, vui lòng thử lại!");
@@ -222,9 +224,17 @@ function addTransaction() {
 
 // Load transactions
 function loadTransactions() {
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Dữ liệu giao dịch!A2:P?key=${API_KEY}`)
-        .then(response => response.json())
+    console.log("Loading transactions...");
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/D%E1%BB%AF%20li%E1%BB%87u%20giao%20d%E1%BB%8Bch!A2:P?key=${API_KEY}`)
+        .then(response => {
+            console.log("Response status:", response.status);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch transaction data: ${response.status} - ${response.statusText}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log("Transaction data:", data);
             const transactions = (data.values || []).filter(row => row[15] === loggedInEmployee.id);
             const transactionList = document.getElementById("transactionList");
             transactionList.innerHTML = "";
@@ -240,38 +250,7 @@ function loadTransactions() {
             });
             updatePagination(transactions.length);
         }).catch(error => {
-            console.error("Error loading transactions:", error);
-        });
-}
-
-// Search transactions
-function searchTransactions() {
-    const customerName = document.getElementById("customerName").value.toLowerCase();
-    const email = document.getElementById("email").value.toLowerCase();
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Dữ liệu giao dịch!A2:P?key=${API_KEY}`)
-        .then(response => response.json())
-        .then(data => {
-            const transactions = (data.values || []).filter(row => 
-                row[15] === loggedInEmployee.id &&
-                (customerName ? row[3].toLowerCase().includes(customerName) : true) &&
-                (email ? row[4].toLowerCase().includes(email) : true)
-            );
-            const transactionList = document.getElementById("transactionList");
-            transactionList.innerHTML = "";
-            const start = (currentPage - 1) * transactionsPerPage;
-            const end = start + transactionsPerPage;
-            transactions.slice(start, end).forEach((row, index) => {
-                transactionList.innerHTML += `
-                    <div>
-                        ${row[2]} - ${row[3]} - ${row[11]}
-                        <button onclick="editTransaction('${row[0]}')">Sửa</button>
-                        <button onclick="confirmDelete('${row[0]}')">Xóa</button>
-                    </div>`;
-            });
-            updatePagination(transactions.length);
-            logAction("Tìm kiếm", `Tìm kiếm với điều kiện: Tên khách hàng=${customerName}, Email=${email}`);
-        }).catch(error => {
-            console.error("Error searching transactions:", error);
+            console.error("Error loading transactions:", error.message);
         });
 }
 
@@ -293,7 +272,7 @@ function changePage(page) {
 
 // Edit transaction
 function editTransaction(id) {
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Dữ liệu giao dịch!A2:P?key=${API_KEY}`)
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/D%E1%BB%AF%20li%E1%BB%87u%20giao%20d%E1%BB%8Bch!A2:P?key=${API_KEY}`)
         .then(response => response.json())
         .then(data => {
             const transaction = (data.values || []).find(row => row[0] === id && row[15] === loggedInEmployee.id);
@@ -341,14 +320,14 @@ function updateTransaction() {
     };
     gapi.client.sheets.spreadsheets.values.get({
         spreadsheetId: SHEET_ID,
-        range: "Dữ liệu giao dịch!A2:P",
+        range: "D%E1%BB%AF%20li%E1%BB%87u%20giao%20d%E1%BB%8Bch!A2:P",
     }).then(response => {
         const transactions = response.result.values || [];
         const rowIndex = transactions.findIndex(row => row[0] === currentTransactionId) + 2;
         if (rowIndex > 1) {
             gapi.client.sheets.spreadsheets.values.update({
                 spreadsheetId: SHEET_ID,
-                range: `Dữ liệu giao dịch!A${rowIndex}:P${rowIndex}`,
+                range: `D%E1%BB%AF%20li%E1%BB%87u%20giao%20d%E1%BB%8Bch!A${rowIndex}:P${rowIndex}`,
                 valueInputOption: "RAW",
                 resource: {
                     values: [[
@@ -377,6 +356,7 @@ function updateTransaction() {
                 document.getElementById("updateBtn").style.display = "none";
                 document.getElementById("deleteBtn").style.display = "none";
                 currentTransactionId = null;
+                setDefaultStartDate(); // Reset ngày bắt đầu về hôm nay
             });
         }
     }).catch(error => {
@@ -390,14 +370,14 @@ function confirmDelete(id) {
     if (confirm("Bạn có chắc chắn muốn xóa giao dịch này?")) {
         gapi.client.sheets.spreadsheets.values.get({
             spreadsheetId: SHEET_ID,
-            range: "Dữ liệu giao dịch!A2:P",
+            range: "D%E1%BB%AF%20li%E1%BB%87u%20giao%20d%E1%BB%8Bch!A2:P",
         }).then(response => {
             const transactions = response.result.values || [];
             const rowIndex = transactions.findIndex(row => row[0] === id) + 2;
             if (rowIndex > 1) {
                 gapi.client.sheets.spreadsheets.values.clear({
                     spreadsheetId: SHEET_ID,
-                    range: `Dữ liệu giao dịch!A${rowIndex}:P${rowIndex}`,
+                    range: `D%E1%BB%AF%20li%E1%BB%87u%20giao%20d%E1%BB%8Bch!A${rowIndex}:P${rowIndex}`,
                 }).then(() => {
                     logAction("Xóa giao dịch", id);
                     loadTransactions();
@@ -443,8 +423,7 @@ function showTab(tabId) {
 // Logout
 function logout() {
     loggedInEmployee = null;
-    localStorage.removeItem("loggedInEmployee");
-    localStorage.removeItem("googleUser");
+    localStorage.clear(); // Xóa toàn bộ localStorage
     if (gapi.auth2) {
         gapi.auth2.getAuthInstance().signOut().then(() => {
             window.location.href = "index.html";
@@ -457,8 +436,18 @@ function logout() {
     }
 }
 
+// Set default start date to today
+function setDefaultStartDate() {
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const year = today.getFullYear();
+    document.getElementById("startDate").value = `${day}/${month}/${year}`;
+}
+
 // Add event listeners for dynamic calculations
 document.addEventListener("DOMContentLoaded", () => {
+    setDefaultStartDate();
     const startDateInput = document.getElementById("startDate");
     const monthsInput = document.getElementById("months");
     if (startDateInput && monthsInput) {
