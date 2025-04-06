@@ -54,7 +54,7 @@ function checkLogin() {
     fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Danh sách nhân viên!A2:E?key=${API_KEY}`)
         .then(response => {
             if (!response.ok) {
-                throw new Error("Failed to fetch employee data: " + response.statusText);
+                throw new Error(`Failed to fetch employee data: ${response.status} - ${response.statusText}`);
             }
             return response.json();
         })
@@ -81,8 +81,8 @@ function checkLogin() {
             window.location.href = "dashboard.html";
         })
         .catch(error => {
-            console.error("Error during login:", error);
-            document.getElementById("error").textContent = "Đã có lỗi xảy ra, vui lòng thử lại!";
+            console.error("Error during login:", error.message);
+            document.getElementById("error").textContent = "Lỗi: " + error.message;
         });
 }
 
