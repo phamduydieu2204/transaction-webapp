@@ -1,0 +1,22 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+.login-container {
+    max-width: 400px;
+    margin: 50px auto;
+    text-align: center;
+}
+input, button {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 8px;
+}
+.tabs button {
+    margin-right: 10px;
+    padding: 10px;
+}
+.tab-content {
+    margin-top: 20px;
+}
