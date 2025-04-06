@@ -15,7 +15,7 @@ body {
 }
 .form-group {
     flex: 1;
-    min-width: 200px;
+    min-width: 150px; /* Kích thước vừa phải */
 }
 .form-group.full-width {
     flex: 100%;
@@ -34,11 +34,12 @@ textarea {
 }
 .tabs {
     display: flex;
+    justify-content: flex-start; /* Nằm sát bên trái */
     border-bottom: 1px solid #ccc;
     margin-bottom: 20px;
 }
 .tabs button {
-    padding: 10px 20px;
+    padding: 10px 20px; /* Kích thước vừa phải */
     border: 1px solid #ccc;
     border-bottom: none;
     background: #f1f1f1;
@@ -64,4 +65,8 @@ textarea {
 }
 #pagination button {
     margin: 5px;
+}
+button {
+    padding: 8px 16px; /* Kích thước vừa phải cho các nút */
+    font-size: 14px;
 }
