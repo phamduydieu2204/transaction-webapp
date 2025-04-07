@@ -5,14 +5,16 @@ const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googlea
 const YOUR_SPREADSHEET_ID = '1OKMn-g-mOm2MlsAOoWEMi3JjRlwfdw5IpVTRmwMKcHU';
 
 function initClient() {
-  gapi.load('client:auth2', () => {
-    gapi.client.init({
-      apiKey: API_KEY,
-      clientId: CLIENT_ID,
-      discoveryDocs: DISCOVERY_DOCS,
-      scope: SCOPES
-    }).then(() => {
-      // API đã sẵn sàng
+    gapi.load('client:auth2', () => {
+      gapi.client.init({
+        apiKey: API_KEY,
+        clientId: CLIENT_ID,
+        discoveryDocs: DISCOVERY_DOCS,
+        scope: SCOPES
+      }).then(() => {
+        console.log('Google API đã sẵn sàng');
+      }).catch(error => {
+        console.error('Lỗi khởi tạo Google API:', error);
+      });
     });
-  });
-}
+  }
