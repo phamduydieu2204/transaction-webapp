@@ -94,6 +94,13 @@
   <tbody></tbody>
 </table>
 
+<div id="phanTrang" style="margin-top: 10px; text-align: center;">
+    <button onclick="chuyenTrang(-1)">← Trang trước</button>
+    <span id="soTrangHienTai" style="margin: 0 10px;">Trang 1</span>
+    <button onclick="chuyenTrang(1)">Trang sau →</button>
+  </div>
+
+  
 <hr>
 <h2>Thống kê & Báo cáo</h2>
 <div id="thongKe"></div>
@@ -103,7 +110,11 @@
 <button onclick="dangXuat()">Đăng xuất</button>
 
 <script>
-  const URL_API = 'YOUR_GAS_WEBAPP_URL_HERE';
+let danhSachGiaoDich = [];
+let trangHienTai = 1;
+const soDongMoiTrang = 10;
+
+  const URL_API = 'https://script.google.com/macros/s/AKfycby4zyKgL5_nzsIGXvWGmddmJUWX5G_KDGOE8KEAhoF6N_KXTIzVVuUpx5MsYPFpjH7Q/exec';
 
   let user;
 
@@ -194,40 +205,25 @@
   }
 
   async function loadGiaoDich() {
-    const res = await fetch(`${URL_API}?action=searchTransaction`, {
-      method: 'POST',
-      body: JSON.stringify({
-        maNhanVien: user.maNhanVien,
-        tenNhanVien: user.tenNhanVien,
-        vaiTro: user.vaiTro,
-        dieuKien: {}
-      })
-    });
+  const res = await fetch(`${URL_API}?action=searchTransaction`, {
+    method: 'POST',
+    body: JSON.stringify({
+      maNhanVien: user.maNhanVien,
+      tenNhanVien: user.tenNhanVien,
+      vaiTro: user.vaiTro,
+      dieuKien: {}
+    })
+  });
 
-    const data = await res.json();
-    if (data.success) {
-      const tbody = document.querySelector('#bangGiaoDich tbody');
-      tbody.innerHTML = '';
-      data.data.forEach(gd => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${gd['Ma giao dich']}</td>
-          <td>${gd['Ten khach hang']}</td>
-          <td>${gd['Email']}</td>
-          <td>${gd['Ten phan mem']}</td>
-          <td>${gd['Goi phan mem']}</td>
-          <td>${gd['Doanh thu']}</td>
-          <td>${gd['Ngay bat dau']}</td>
-          <td>${gd['Ngay ket thuc']}</td>
-          <td>
-            <button onclick='suaGiaoDich(${JSON.stringify(gd)})'>Sửa</button>
-            <button onclick='xoaGiaoDich("${gd["Ma giao dich"]}")'>Xóa</button>
-        </td>
-        `;
-        tbody.appendChild(row);
-      });
-    }
+  const data = await res.json();
+  if (data.success) {
+    // Lưu danh sách vào biến toàn cục để phân trang
+    danhSachGiaoDich = data.data;
+    trangHienTai = 1;
+    hienThiTrang(); // Gọi hàm hiển thị giao dịch theo trang
   }
+}
+
 
   function dangXuat() {
     localStorage.removeItem('user');
@@ -381,6 +377,44 @@ async function loadThongKe() {
       }
     });
   }
+}
+
+function hienThiTrang() {
+  const tbody = document.querySelector('#bangGiaoDich tbody');
+  tbody.innerHTML = '';
+
+  const batDau = (trangHienTai - 1) * soDongMoiTrang;
+  const ketThuc = Math.min(batDau + soDongMoiTrang, danhSachGiaoDich.length);
+
+  for (let i = batDau; i < ketThuc; i++) {
+    const gd = danhSachGiaoDich[i];
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${gd['Ma giao dich']}</td>
+      <td>${gd['Ten khach hang']}</td>
+      <td>${gd['Email']}</td>
+      <td>${gd['Ten phan mem']}</td>
+      <td>${gd['Goi phan mem']}</td>
+      <td>${gd['Doanh thu']}</td>
+      <td>${gd['Ngay bat dau']}</td>
+      <td>${gd['Ngay ket thuc']}</td>
+      <td>
+        <button onclick='suaGiaoDich(${JSON.stringify(gd)})'>Sửa</button>
+        <button onclick='xoaGiaoDich("${gd["Ma giao dich"]}")'>Xóa</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  }
+
+  document.getElementById('soTrangHienTai').textContent = `Trang ${trangHienTai} / ${Math.ceil(danhSachGiaoDich.length / soDongMoiTrang)}`;
+}
+
+function chuyenTrang(delta) {
+  const tongTrang = Math.ceil(danhSachGiaoDich.length / soDongMoiTrang);
+  trangHienTai += delta;
+  if (trangHienTai < 1) trangHienTai = 1;
+  if (trangHienTai > tongTrang) trangHienTai = tongTrang;
+  hienThiTrang();
 }
 
 
