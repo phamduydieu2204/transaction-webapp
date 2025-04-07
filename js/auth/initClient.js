@@ -1,14 +1,11 @@
-// Khởi tạo Google API
-import { CLIENT_ID, API_KEY, DISCOVERY_DOCS, SCOPES } from '../config.js';
+import { API_KEY, DISCOVERY_DOCS } from '../config.js';
 
 export function initClient(callback) {
     console.log('Starting initClient...');
-    gapi.load('client:auth2', () => {
+    gapi.load('client', () => {
         gapi.client.init({
             apiKey: API_KEY,
-            clientId: CLIENT_ID,
-            discoveryDocs: DISCOVERY_DOCS,
-            scope: SCOPES
+            discoveryDocs: DISCOVERY_DOCS
         }).then(() => {
             console.log('Google API initialized successfully');
             const employee = JSON.parse(localStorage.getItem('loggedInEmployee'));
