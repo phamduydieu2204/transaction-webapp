@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Trang quản lý giao dịch</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
+      background: #f9f9f9;
+    }
+    h2 {
+      color: #007BFF;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background: #007BFF;
+      color: white;
+    }
+    .success {
+      color: green;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Nhập giao dịch</h2>
+
+<div id="formGiaoDich">
+  <label>Loại giao dịch
+    <select id="loaiGiaoDich">
+      <option value="Mua hàng">Mua hàng</option>
+      <option value="Đổi gói">Đổi gói</option>
+      <option value="Hoàn trả">Hoàn trả</option>
+    </select>
+  </label>
+
+  <label>Tên khách hàng <input type="text" id="tenKhachHang"></label>
+  <label>Email <input type="email" id="email"></label>
+  <label>Liên hệ <input type="text" id="lienHe"></label>
+  <label>Số tháng đăng ký <input type="number" id="soThangDangKy" min="1"></label>
+  <label>Ngày bắt đầu <input type="text" id="ngayBatDau" placeholder="dd/mm/yyyy"></label>
+  <label>Số thiết bị <input type="number" id="soThietBi" min="1"></label>
+
+  <label>Tên phần mềm <select id="tenPhanMem"></select></label>
+  <label>Gói phần mềm <select id="goiPhanMem"></select></label>
+  <label>Doanh thu <input type="number" id="doanhThu" min="0"></label>
+  <label>Ghi chú <input type="text" id="ghiChu"></label>
+
+  <button onclick="themGiaoDich()">Thêm giao dịch</button>
+  <p id="thongBao" class="error"></p>
+</div>
+
+<hr>
+
+<h2>Danh sách giao dịch của bạn</h2>
+<table id="bangGiaoDich">
+  <thead>
+    <tr>
+      <th>Mã GD</th>
+      <th>Khách hàng</th>
+      <th>Email</th>
+      <th>Phần mềm</th>
+      <th>Gói</th>
+      <th>Doanh thu</th>
+      <th>Ngày bắt đầu</th>
+      <th>Ngày kết thúc</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<button onclick="dangXuat()">Đăng xuất</button>
+
+<script>
+  const URL_API = 'YOUR_GAS_WEBAPP_URL_HERE';
+
+  let user;
+
+  window.onload = () => {
+    const storedUser = localStorage.getItem('user');
+    if (!storedUser) {
+      alert('Vui lòng đăng nhập.');
+      window.location.href = 'index.html';
+      return;
+    }
+
+    user = JSON.parse(storedUser);
+    document.getElementById('ngayBatDau').value = new Date().toLocaleDateString('vi-VN');
+
+    loadPhanMem();
+    loadGiaoDich();
+  };
+
+  async function loadPhanMem() {
+    const res = await fetch(`${URL_API}?action=getSoftwares`, { method: 'POST' });
+    const data = await res.json();
+
+    if (data.success) {
+      const tenSelect = document.getElementById('tenPhanMem');
+      const goiSelect = document.getElementById('goiPhanMem');
+      const list = data.data;
+
+      // Lấy danh sách phần mềm duy nhất
+      const tenList = [...new Set(list.map(item => item.tenPhanMem))];
+      tenList.forEach(ten => {
+        const option = document.createElement('option');
+        option.value = ten;
+        option.textContent = ten;
+        tenSelect.appendChild(option);
+      });
+
+      tenSelect.addEventListener('change', () => {
+        const selected = tenSelect.value;
+        goiSelect.innerHTML = '';
+        list.filter(item => item.tenPhanMem === selected).forEach(item => {
+          const option = document.createElement('option');
+          option.value = item.goiPhanMem;
+          option.textContent = item.goiPhanMem;
+          goiSelect.appendChild(option);
+        });
+        goiSelect.selectedIndex = 0;
+      });
+
+      // Kích hoạt mặc định
+      tenSelect.dispatchEvent(new Event('change'));
+    }
+  }
+
+  async function themGiaoDich() {
+    const thongBao = document.getElementById('thongBao');
+    const body = {
+      loaiGiaoDich: document.getElementById('loaiGiaoDich').value,
+      tenKhachHang: document.getElementById('tenKhachHang').value,
+      email: document.getElementById('email').value.toLowerCase(),
+      lienHe: document.getElementById('lienHe').value,
+      soThangDangKy: document.getElementById('soThangDangKy').value,
+      ngayBatDau: document.getElementById('ngayBatDau').value,
+      soThietBi: document.getElementById('soThietBi').value,
+      tenPhanMem: document.getElementById('tenPhanMem').value,
+      goiPhanMem: document.getElementById('goiPhanMem').value,
+      doanhThu: document.getElementById('doanhThu').value,
+      ghiChu: document.getElementById('ghiChu').value,
+      maNhanVien: user.maNhanVien,
+      tenNhanVien: user.tenNhanVien
+    };
+
+    const res = await fetch(`${URL_API}?action=addTransaction`, {
+      method: 'POST',
+      body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      thongBao.className = 'success';
+      thongBao.textContent = 'Thêm giao dịch thành công.';
+      loadGiaoDich();
+    } else {
+      thongBao.className = 'error';
+      thongBao.textContent = data.message || 'Lỗi khi thêm giao dịch.';
+    }
+  }
+
+  async function loadGiaoDich() {
+    const res = await fetch(`${URL_API}?action=searchTransaction`, {
+      method: 'POST',
+      body: JSON.stringify({
+        maNhanVien: user.maNhanVien,
+        tenNhanVien: user.tenNhanVien,
+        vaiTro: user.vaiTro,
+        dieuKien: {}
+      })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      const tbody = document.querySelector('#bangGiaoDich tbody');
+      tbody.innerHTML = '';
+      data.data.forEach(gd => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${gd['Ma giao dich']}</td>
+          <td>${gd['Ten khach hang']}</td>
+          <td>${gd['Email']}</td>
+          <td>${gd['Ten phan mem']}</td>
+          <td>${gd['Goi phan mem']}</td>
+          <td>${gd['Doanh thu']}</td>
+          <td>${gd['Ngay bat dau']}</td>
+          <td>${gd['Ngay ket thuc']}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+  }
+
+  function dangXuat() {
+    localStorage.removeItem('user');
+    window.location.href = 'index.html';
+  }
+</script>
+
+</body>
+</html>
