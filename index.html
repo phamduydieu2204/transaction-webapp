@@ -1,16 +1,24 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transaction Webapp</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transaction Webapp</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body>
-    <div id="login-page"></div>
-    <div id="main-page"></div>
-
-    <script src="https://apis.google.com/js/api.js"></script>
-    <script type="module" src="js/main.js"></script>
+  <div id="app"></div> <!-- Container để hiển thị giao diện -->
+  <script src="js/auth/initClient.js"></script>
+  <script src="js/auth/login.js"></script>
+  <script src="js/ui/loadTemplate.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initClient(); // Khởi tạo Google API
+      loadTemplate('templates/login.html', 'app'); // Tải giao diện đăng nhập
+      login(); // Gắn sự kiện đăng nhập
+    });
+  </script>
 </body>
 </html>
