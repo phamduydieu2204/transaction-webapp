@@ -88,10 +88,17 @@
       <th>Doanh thu</th>
       <th>Ngày bắt đầu</th>
       <th>Ngày kết thúc</th>
+      <th>Hành động</th>
     </tr>
   </thead>
   <tbody></tbody>
 </table>
+
+<hr>
+<h2>Thống kê & Báo cáo</h2>
+<div id="thongKe"></div>
+<canvas id="bieuDo" height="200"></canvas>
+
 
 <button onclick="dangXuat()">Đăng xuất</button>
 
@@ -113,6 +120,7 @@
 
     loadPhanMem();
     loadGiaoDich();
+    loadThongKe();
   };
 
   async function loadPhanMem() {
@@ -211,6 +219,10 @@
           <td>${gd['Doanh thu']}</td>
           <td>${gd['Ngay bat dau']}</td>
           <td>${gd['Ngay ket thuc']}</td>
+          <td>
+            <button onclick='suaGiaoDich(${JSON.stringify(gd)})'>Sửa</button>
+            <button onclick='xoaGiaoDich("${gd["Ma giao dich"]}")'>Xóa</button>
+        </td>
         `;
         tbody.appendChild(row);
       });
@@ -221,7 +233,161 @@
     localStorage.removeItem('user');
     window.location.href = 'index.html';
   }
+  function suaGiaoDich(gd) {
+  // Gán dữ liệu lên form
+  document.getElementById('loaiGiaoDich').value = gd['Loai giao dich'];
+  document.getElementById('tenKhachHang').value = gd['Ten khach hang'];
+  document.getElementById('email').value = gd['Email'];
+  document.getElementById('lienHe').value = gd['Lien he'];
+  document.getElementById('soThangDangKy').value = gd['So thang dang ky'];
+  document.getElementById('ngayBatDau').value = gd['Ngay bat dau'];
+  document.getElementById('soThietBi').value = gd['So thiet bi'];
+  document.getElementById('tenPhanMem').value = gd['Ten phan mem'];
+  
+  // Gọi change để cập nhật gói
+  document.getElementById('tenPhanMem').dispatchEvent(new Event('change'));
+  setTimeout(() => {
+    document.getElementById('goiPhanMem').value = gd['Goi phan mem'];
+  }, 100);
+
+  document.getElementById('doanhThu').value = gd['Doanh thu'];
+  document.getElementById('ghiChu').value = gd['Ghi chu'];
+
+  // Gắn tạm mã giao dịch vào thẻ input ẩn hoặc lưu biến
+  document.getElementById('formGiaoDich').setAttribute('data-magiaodich', gd['Ma giao dich']);
+  document.getElementById('thongBao').textContent = 'Đang chỉnh sửa: ' + gd['Ma giao dich'];
+
+  // Đổi nút "Thêm" thành "Cập nhật"
+  const btn = document.querySelector('#formGiaoDich button');
+  btn.textContent = 'Cập nhật giao dịch';
+  btn.onclick = capNhatGiaoDich;
+}
+
+async function capNhatGiaoDich() {
+  const maGiaoDich = document.getElementById('formGiaoDich').getAttribute('data-magiaodich');
+  if (!maGiaoDich) return;
+
+  const body = {
+    ...thuThongTinForm(),
+    maGiaoDich,
+    maNhanVien: user.maNhanVien,
+    tenNhanVien: user.tenNhanVien,
+    vaiTro: user.vaiTro
+  };
+
+  const res = await fetch(`${URL_API}?action=editTransaction`, {
+    method: 'POST',
+    body: JSON.stringify(body)
+  });
+
+  const data = await res.json();
+  if (data.success) {
+    alert('Cập nhật thành công!');
+    resetForm();
+    loadGiaoDich();
+  } else {
+    alert(data.message || 'Lỗi khi cập nhật.');
+  }
+}
+
+async function xoaGiaoDich(maGiaoDich) {
+  if (!confirm('Bạn có chắc muốn xóa giao dịch này?')) return;
+
+  const res = await fetch(`${URL_API}?action=deleteTransaction`, {
+    method: 'POST',
+    body: JSON.stringify({
+      maGiaoDich,
+      maNhanVien: user.maNhanVien,
+      tenNhanVien: user.tenNhanVien,
+      vaiTro: user.vaiTro
+    })
+  });
+
+  const data = await res.json();
+  if (data.success) {
+    alert('Đã xóa giao dịch.');
+    loadGiaoDich();
+  } else {
+    alert(data.message || 'Lỗi khi xóa.');
+  }
+}
+
+function thuThongTinForm() {
+  return {
+    loaiGiaoDich: document.getElementById('loaiGiaoDich').value,
+    tenKhachHang: document.getElementById('tenKhachHang').value,
+    email: document.getElementById('email').value.toLowerCase(),
+    lienHe: document.getElementById('lienHe').value,
+    soThangDangKy: document.getElementById('soThangDangKy').value,
+    ngayBatDau: document.getElementById('ngayBatDau').value,
+    soThietBi: document.getElementById('soThietBi').value,
+    tenPhanMem: document.getElementById('tenPhanMem').value,
+    goiPhanMem: document.getElementById('goiPhanMem').value,
+    doanhThu: document.getElementById('doanhThu').value,
+    ghiChu: document.getElementById('ghiChu').value
+  };
+}
+
+function resetForm() {
+  document.getElementById('formGiaoDich').reset();
+  document.getElementById('thongBao').textContent = '';
+  document.getElementById('formGiaoDich').removeAttribute('data-magiaodich');
+  const btn = document.querySelector('#formGiaoDich button');
+  btn.textContent = 'Thêm giao dịch';
+  btn.onclick = themGiaoDich;
+}
+
+async function loadThongKe() {
+  const res = await fetch(`${URL_API}?action=getStats`, {
+    method: 'POST',
+    body: JSON.stringify({
+      maNhanVien: user.maNhanVien,
+      vaiTro: user.vaiTro
+    })
+  });
+
+  const data = await res.json();
+  if (!data.success) return;
+
+  const { doanhThu, tongGD, phanMemPhoBien } = data.data;
+
+  document.getElementById('thongKe').innerHTML = `
+    <p><strong>Doanh thu:</strong></p>
+    <ul>
+      <li>Hôm nay: ${doanhThu.ngay.toLocaleString('vi-VN')}</li>
+      <li>Tháng này: ${doanhThu.thang.toLocaleString('vi-VN')}</li>
+      <li>Năm nay: ${doanhThu.nam.toLocaleString('vi-VN')}</li>
+    </ul>
+    <p><strong>Tổng số giao dịch:</strong> ${tongGD}</p>
+  `;
+
+  if (phanMemPhoBien.length) {
+    const ctx = document.getElementById('bieuDo').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: phanMemPhoBien.map(pm => pm.label),
+        datasets: [{
+          label: 'Số lần sử dụng',
+          data: phanMemPhoBien.map(pm => pm.value)
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          title: { display: true, text: 'Top phần mềm phổ biến' }
+        }
+      }
+    });
+  }
+}
+
+
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </body>
 </html>
+
