@@ -1,22 +1,18 @@
-import { API_KEY, DISCOVERY_DOCS } from '../config.js';
+const CLIENT_ID = '490612546849-1vqphpttqqislvdc1e9eb7jdjt8lrbdi.apps.googleusercontent.com'; // Lấy từ config.js
+const API_KEY = 'AIzaSyDt9wLPmhQBYN2OKUnO3tXqiZdo6DCoS0g';
+const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
+const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive";
+const YOUR_SPREADSHEET_ID = '1OKMn-g-mOm2MlsAOoWEMi3JjRlwfdw5IpVTRmwMKcHU';
 
-export function initClient(callback) {
-    console.log('Starting initClient...');
-    gapi.load('client', () => {
-        gapi.client.init({
-            apiKey: API_KEY,
-            discoveryDocs: DISCOVERY_DOCS
-        }).then(() => {
-            console.log('Google API initialized successfully');
-            const employee = JSON.parse(localStorage.getItem('loggedInEmployee'));
-            if (employee) {
-                console.log('User already logged in:', employee);
-                document.getElementById('login-page').style.display = 'none';
-                document.getElementById('main-page').style.display = 'block';
-                callback();
-            }
-        }).catch(err => {
-            console.error('Error initializing Google API:', err);
-        });
+function initClient() {
+  gapi.load('client:auth2', () => {
+    gapi.client.init({
+      apiKey: API_KEY,
+      clientId: CLIENT_ID,
+      discoveryDocs: DISCOVERY_DOCS,
+      scope: SCOPES
+    }).then(() => {
+      // API đã sẵn sàng
     });
+  });
 }
