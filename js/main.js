@@ -18,20 +18,43 @@ async function initTemplates() {
     console.log('Loaded login.html');
     await loadTemplate('main-page', 'templates/main.html');
     console.log('Loaded main.html');
-    await loadTemplate('input-tab', 'templates/input-tab.html');
-    console.log('Loaded input-tab.html');
-    await loadTemplate('report-tab', 'templates/report-tab.html');
-    console.log('Loaded report-tab.html');
-    await loadTemplate('transaction-list-container', 'templates/transaction-list.html');
-    console.log('Loaded transaction-list.html');
+
+    // Kiểm tra xem input-tab có tồn tại không
+    if (document.getElementById('input-tab')) {
+        await loadTemplate('input-tab', 'templates/input-tab.html');
+        console.log('Loaded input-tab.html');
+    } else {
+        console.error('Element with id "input-tab" not found');
+    }
+
+    // Kiểm tra xem report-tab có tồn tại không
+    if (document.getElementById('report-tab')) {
+        await loadTemplate('report-tab', 'templates/report-tab.html');
+        console.log('Loaded report-tab.html');
+    } else {
+        console.error('Element with id "report-tab" not found');
+    }
+
+    // Kiểm tra xem transaction-list-container có tồn tại không
+    if (document.getElementById('transaction-list-container')) {
+        await loadTemplate('transaction-list-container', 'templates/transaction-list.html');
+        console.log('Loaded transaction-list.html');
+    } else {
+        console.error('Element with id "transaction-list-container" not found');
+    }
 }
 
 // Gắn các hàm vào window để gọi từ HTML
-window.login = () => loginUser(() => {
-    setupDateLogic();
-    loadCustomerSuggestions();
-    loadSoftwareOptions();
-});
+console.log('Defining window.login...');
+window.login = () => {
+    console.log('Calling loginUser...');
+    loginUser(() => {
+        console.log('Login successful, initializing form...');
+        setupDateLogic();
+        loadCustomerSuggestions();
+        loadSoftwareOptions();
+    });
+};
 window.showTab = showTab;
 window.testForm = testForm;
 window.addTransaction = addTransaction;
