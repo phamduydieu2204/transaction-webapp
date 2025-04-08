@@ -1,106 +1,26 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <title>Đăng nhập hệ thống</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      display: flex;
-      height: 100vh;
-      align-items: center;
-      justify-content: center;
-    }
-    .login-box {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      width: 300px;
-    }
-    .login-box h2 {
-      margin-bottom: 20px;
-      text-align: center;
-    }
-    .login-box input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-    }
-    .login-box button {
-      width: 100%;
-      padding: 10px;
-      background: #007BFF;
-      border: none;
-      color: white;
-      font-weight: bold;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .login-box .error {
-      color: red;
-      font-size: 14px;
-      text-align: center;
-      margin-top: 10px;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>Đăng nhập - Quản lý giao dịch</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <div class="login-container">
+    <h2>🔐 Đăng nhập hệ thống</h2>
+    <form id="login-form">
+      <label for="maNhanVien">Mã nhân viên:</label>
+      <input type="text" id="maNhanVien" name="maNhanVien" required>
 
-<div class="login-box">
-  <h2>Đăng nhập</h2>
-  <input type="text" id="maNhanVien" placeholder="Mã nhân viên" />
-  <input type="password" id="matKhau" placeholder="Mật khẩu" />
-  <button onclick="dangNhap()">Đăng nhập</button>
-  <div class="error" id="thongBao"></div>
-</div>
+      <label for="matKhau">Mật khẩu:</label>
+      <input type="password" id="matKhau" name="matKhau" required>
 
-<script>
-  const URL_API = 'https://script.google.com/macros/s/AKfycby4zyKgL5_nzsIGXvWGmddmJUWX5G_KDGOE8KEAhoF6N_KXTIzVVuUpx5MsYPFpjH7Q/exec'; // ← Dán URL Web App tại đây
+      <button type="submit">Đăng nhập</button>
+    </form>
 
-  function dangNhap() {
-    const maNhanVien = document.getElementById('maNhanVien').value.trim();
-    const matKhau = document.getElementById('matKhau').value.trim();
-    const thongBao = document.getElementById('thongBao');
+    <div id="login-message" style="margin-top: 10px; color: red;"></div>
+  </div>
 
-    if (!maNhanVien || !matKhau) {
-      thongBao.textContent = 'Vui lòng nhập đầy đủ thông tin.';
-      return;
-    }
-
-    thongBao.textContent = 'Đang kiểm tra...';
-
-    fetch(`${URL_API}?action=login`, {
-      method: 'POST',
-      body: JSON.stringify({ maNhanVien, matKhau })
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        // Lưu vào localStorage
-        localStorage.setItem('user', JSON.stringify(data));
-        thongBao.style.color = 'green';
-        thongBao.textContent = 'Đăng nhập thành công!';
-
-        // Chuyển sang trang nhập liệu (ví dụ: main.html)
-        setTimeout(() => {
-          window.location.href = 'main.html';
-        }, 1000);
-      } else {
-        thongBao.style.color = 'red';
-        thongBao.textContent = data.message;
-      }
-    })
-    .catch(err => {
-      thongBao.textContent = 'Lỗi kết nối đến server.';
-      console.error(err);
-    });
-  }
-</script>
-
+  <script src="js/login.v1.js"></script>
 </body>
 </html>
