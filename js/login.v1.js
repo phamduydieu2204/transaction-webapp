@@ -7,17 +7,32 @@ document.getElementById("login-form").addEventListener("submit", function (e) {
   const matKhau = document.getElementById("matKhau").value.trim();
   const messageDiv = document.getElementById("login-message");
 
+  const formData = new FormData();
+  formData.append("action", "login");
+  formData.append("maNhanVien", maNhanVien);
+  formData.append("matKhau", matKhau);
+  
   fetch(GAS_URL, {
     method: "POST",
-    body: JSON.stringify({
-      action: "login",
-      maNhanVien: maNhanVien,
-      matKhau: matKhau
-    }),
-    headers: {
-      "Content-Type": "application/json"
-    }
+    body: formData
   })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "success") {
+        localStorage.setItem("maNhanVien", data.maNhanVien);
+        localStorage.setItem("tenNhanVien", data.tenNhanVien);
+        localStorage.setItem("vaiTro", data.vaiTro);
+        window.location.href = "main.html";
+      } else {
+        messageDiv.textContent = data.message;
+      }
+    })
+    .catch(error => {
+      console.error("Lỗi kết nối:", error);
+      messageDiv.textContent = "Không kết nối được máy chủ.";
+    });
+  
+  
     .then(res => res.json())
     .then(data => {
       if (data.status === "success") {
