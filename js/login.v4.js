@@ -11,7 +11,7 @@ document.getElementById("login-form").addEventListener("submit", function (e) {
   formData.append("action", "login");
   formData.append("maNhanVien", maNhanVien);
   formData.append("matKhau", matKhau);
-  
+
   fetch(GAS_URL, {
     method: "POST",
     body: formData
@@ -22,26 +22,7 @@ document.getElementById("login-form").addEventListener("submit", function (e) {
         localStorage.setItem("maNhanVien", data.maNhanVien);
         localStorage.setItem("tenNhanVien", data.tenNhanVien);
         localStorage.setItem("vaiTro", data.vaiTro);
-        window.location.href = "main.html";
-      } else {
-        messageDiv.textContent = data.message;
-      }
-    })
-    .catch(error => {
-      console.error("Lỗi kết nối:", error);
-      messageDiv.textContent = "Không kết nối được máy chủ.";
-    });
-  
-  
-    .then(res => res.json())
-    .then(data => {
-      if (data.status === "success") {
-        // Lưu thông tin vào localStorage
-        localStorage.setItem("maNhanVien", data.maNhanVien);
-        localStorage.setItem("tenNhanVien", data.tenNhanVien);
-        localStorage.setItem("vaiTro", data.vaiTro);
 
-        // Chuyển sang trang chính
         window.location.href = "main.html";
       } else {
         messageDiv.textContent = data.message;
@@ -49,6 +30,6 @@ document.getElementById("login-form").addEventListener("submit", function (e) {
     })
     .catch(error => {
       console.error("Lỗi kết nối:", error);
-      messageDiv.textContent = "Đã xảy ra lỗi khi đăng nhập.";
+      messageDiv.textContent = "Không thể kết nối đến máy chủ. Vui lòng thử lại sau.";
     });
 });
