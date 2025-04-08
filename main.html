@@ -74,8 +74,25 @@
   <p id="thongBao" class="error"></p>
 </div>
 
-<hr>
+<div id="boLoc" style="margin-bottom: 15px;">
+    <label>
+      Tên khách hàng:
+      <input type="text" id="locTenKH" placeholder="Nhập tên khách hàng">
+    </label>
+    <label>
+      Email:
+      <input type="text" id="locEmail" placeholder="Nhập email">
+    </label>
+    <label>
+      Tên phần mềm:
+      <input type="text" id="locTenPM" placeholder="Nhập tên phần mềm">
+    </label>
+    <button onclick="timKiemGiaoDich()">Tìm kiếm</button>
+    <button onclick="resetBoLoc()">Xóa lọc</button>
+  </div>
+  
 
+<hr>
 <h2>Danh sách giao dịch của bạn</h2>
 <table id="bangGiaoDich">
   <thead>
@@ -197,6 +214,7 @@ const soDongMoiTrang = 10;
     if (data.success) {
       thongBao.className = 'success';
       thongBao.textContent = 'Thêm giao dịch thành công.';
+      resetForm();
       loadGiaoDich();
     } else {
       thongBao.className = 'error';
@@ -229,8 +247,7 @@ const soDongMoiTrang = 10;
     localStorage.removeItem('user');
     window.location.href = 'index.html';
   }
-  function suaGiaoDich(gd) {
-  // Gán dữ liệu lên form
+  async function suaGiaoDich(gd) {
   document.getElementById('loaiGiaoDich').value = gd['Loai giao dich'];
   document.getElementById('tenKhachHang').value = gd['Ten khach hang'];
   document.getElementById('email').value = gd['Email'];
@@ -239,25 +256,24 @@ const soDongMoiTrang = 10;
   document.getElementById('ngayBatDau').value = gd['Ngay bat dau'];
   document.getElementById('soThietBi').value = gd['So thiet bi'];
   document.getElementById('tenPhanMem').value = gd['Ten phan mem'];
-  
-  // Gọi change để cập nhật gói
-  document.getElementById('tenPhanMem').dispatchEvent(new Event('change'));
-  setTimeout(() => {
-    document.getElementById('goiPhanMem').value = gd['Goi phan mem'];
-  }, 100);
 
+  await new Promise(resolve => {
+    document.getElementById('tenPhanMem').dispatchEvent(new Event('change'));
+    setTimeout(resolve, 200); // đợi dropdown cập nhật
+  });
+
+  document.getElementById('goiPhanMem').value = gd['Goi phan mem'];
   document.getElementById('doanhThu').value = gd['Doanh thu'];
   document.getElementById('ghiChu').value = gd['Ghi chu'];
 
-  // Gắn tạm mã giao dịch vào thẻ input ẩn hoặc lưu biến
   document.getElementById('formGiaoDich').setAttribute('data-magiaodich', gd['Ma giao dich']);
   document.getElementById('thongBao').textContent = 'Đang chỉnh sửa: ' + gd['Ma giao dich'];
 
-  // Đổi nút "Thêm" thành "Cập nhật"
   const btn = document.querySelector('#formGiaoDich button');
   btn.textContent = 'Cập nhật giao dịch';
   btn.onclick = capNhatGiaoDich;
 }
+
 
 async function capNhatGiaoDich() {
   const maGiaoDich = document.getElementById('formGiaoDich').getAttribute('data-magiaodich');
@@ -309,7 +325,7 @@ async function xoaGiaoDich(maGiaoDich) {
 }
 
 function thuThongTinForm() {
-  return {
+  const fields = {
     loaiGiaoDich: document.getElementById('loaiGiaoDich').value,
     tenKhachHang: document.getElementById('tenKhachHang').value,
     email: document.getElementById('email').value.toLowerCase(),
@@ -322,7 +338,21 @@ function thuThongTinForm() {
     doanhThu: document.getElementById('doanhThu').value,
     ghiChu: document.getElementById('ghiChu').value
   };
+
+  for (let key in fields) {
+    if (key !== 'ghiChu' && !fields[key]) {
+      alert('Vui lòng điền đầy đủ thông tin.');
+      throw new Error('Thiếu dữ liệu: ' + key);
+    }
+    if (!/^\d{2}\/\d{2}\/\d{4}$/.test(fields.ngayBatDau)) {
+        alert('Định dạng ngày bắt đầu không hợp lệ (dd/mm/yyyy).');
+        throw new Error('Sai định dạng ngày.');
+        }
+  }
+
+  return fields;
 }
+
 
 function resetForm() {
   document.getElementById('formGiaoDich').reset();
@@ -415,6 +445,43 @@ function chuyenTrang(delta) {
   if (trangHienTai < 1) trangHienTai = 1;
   if (trangHienTai > tongTrang) trangHienTai = tongTrang;
   hienThiTrang();
+}
+
+async function timKiemGiaoDich() {
+  const tenKH = document.getElementById('locTenKH').value.trim();
+  const email = document.getElementById('locEmail').value.trim().toLowerCase();
+  const tenPM = document.getElementById('locTenPM').value.trim();
+
+  const dieuKien = {};
+  if (tenKH) dieuKien['Ten khach hang'] = tenKH;
+  if (email) dieuKien['Email'] = email;
+  if (tenPM) dieuKien['Ten phan mem'] = tenPM;
+
+  const res = await fetch(`${URL_API}?action=searchTransaction`, {
+    method: 'POST',
+    body: JSON.stringify({
+      maNhanVien: user.maNhanVien,
+      tenNhanVien: user.tenNhanVien,
+      vaiTro: user.vaiTro,
+      dieuKien
+    })
+  });
+
+  const data = await res.json();
+  if (data.success) {
+    danhSachGiaoDich = data.data;
+    trangHienTai = 1;
+    hienThiTrang();
+  } else {
+    alert('Không tìm thấy kết quả.');
+  }
+}
+
+function resetBoLoc() {
+  document.getElementById('locTenKH').value = '';
+  document.getElementById('locEmail').value = '';
+  document.getElementById('locTenPM').value = '';
+  loadGiaoDich(); // gọi lại toàn bộ dữ liệu không lọc
 }
 
 
