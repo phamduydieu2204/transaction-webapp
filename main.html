@@ -4,491 +4,388 @@
   <meta charset="UTF-8">
   <title>Trang quản lý giao dịch</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      font-family: Arial;
-      padding: 20px;
-      background: #f9f9f9;
-    }
-    h2 {
-      color: #007BFF;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-    input, select, button {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      box-sizing: border-box;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 30px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background: #007BFF;
-      color: white;
-    }
-    .success {
-      color: green;
-    }
-    .error {
-      color: red;
-    }
-  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
+<body class="bg-gray-100 min-h-screen p-6">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="text-2xl font-bold text-blue-600 mb-4">Nhập giao dịch</h2>
 
-<h2>Nhập giao dịch</h2>
+    <div id="formGiaoDich" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-6 rounded-xl shadow">
+      <div>
+        <label class="block font-medium mb-1">Loại giao dịch</label>
+        <select id="loaiGiaoDich" class="w-full border border-gray-300 p-2 rounded">
+          <option value="Mua hàng">Mua hàng</option>
+          <option value="Đổi gói">Đổi gói</option>
+          <option value="Hoàn trả">Hoàn trả</option>
+        </select>
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Tên khách hàng</label>
+        <input type="text" id="tenKhachHang" class="w-full border border-gray-300 p-2 rounded" />
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Email</label>
+        <input type="email" id="email" class="w-full border border-gray-300 p-2 rounded" />
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Liên hệ</label>
+        <input type="text" id="lienHe" class="w-full border border-gray-300 p-2 rounded" />
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Số tháng đăng ký</label>
+        <input type="number" id="soThangDangKy" min="1" class="w-full border border-gray-300 p-2 rounded" />
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Ngày bắt đầu</label>
+        <input type="text" id="ngayBatDau" placeholder="dd/mm/yyyy" class="w-full border border-gray-300 p-2 rounded" />
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Số thiết bị</label>
+        <input type="number" id="soThietBi" min="1" class="w-full border border-gray-300 p-2 rounded" />
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Tên phần mềm</label>
+        <select id="tenPhanMem" class="w-full border border-gray-300 p-2 rounded"></select>
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Gói phần mềm</label>
+        <select id="goiPhanMem" class="w-full border border-gray-300 p-2 rounded"></select>
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Doanh thu</label>
+        <input type="number" id="doanhThu" min="0" class="w-full border border-gray-300 p-2 rounded" />
+      </div>
+      <div class="md:col-span-2">
+        <label class="block font-medium mb-1">Ghi chú</label>
+        <input type="text" id="ghiChu" class="w-full border border-gray-300 p-2 rounded" />
+      </div>
+      <div class="md:col-span-2 text-right">
+        <button onclick="themGiaoDich()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded transition">Thêm giao dịch</button>
+        <p id="thongBao" class="mt-2 text-red-600"></p>
+      </div>
+    </div>
 
-<div id="formGiaoDich">
-  <label>Loại giao dịch
-    <select id="loaiGiaoDich">
-      <option value="Mua hàng">Mua hàng</option>
-      <option value="Đổi gói">Đổi gói</option>
-      <option value="Hoàn trả">Hoàn trả</option>
-    </select>
-  </label>
+    <div id="boLoc" class="mt-10 bg-white p-6 rounded-xl shadow grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <label class="block font-medium mb-1">Tên khách hàng</label>
+        <input type="text" id="locTenKH" placeholder="Nhập tên khách hàng" class="w-full border border-gray-300 p-2 rounded" />
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Email</label>
+        <input type="text" id="locEmail" placeholder="Nhập email" class="w-full border border-gray-300 p-2 rounded" />
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Tên phần mềm</label>
+        <input type="text" id="locTenPM" placeholder="Nhập tên phần mềm" class="w-full border border-gray-300 p-2 rounded" />
+      </div>
+      <div class="md:col-span-3 text-right">
+        <button onclick="timKiemGiaoDich()" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded mr-2">Tìm kiếm</button>
+        <button onclick="resetBoLoc()" class="bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded">Xóa lọc</button>
+      </div>
+    </div>
 
-  <label>Tên khách hàng <input type="text" id="tenKhachHang"></label>
-  <label>Email <input type="email" id="email"></label>
-  <label>Liên hệ <input type="text" id="lienHe"></label>
-  <label>Số tháng đăng ký <input type="number" id="soThangDangKy" min="1"></label>
-  <label>Ngày bắt đầu <input type="text" id="ngayBatDau" placeholder="dd/mm/yyyy"></label>
-  <label>Số thiết bị <input type="number" id="soThietBi" min="1"></label>
+    <h2 class="text-2xl font-bold text-blue-600 mt-10 mb-4">Danh sách giao dịch của bạn</h2>
+    <div class="overflow-auto bg-white rounded-xl shadow">
+      <table class="w-full text-sm text-left">
+        <thead class="bg-blue-600 text-white">
+          <tr>
+            <th class="p-3">Mã GD</th>
+            <th class="p-3">Khách hàng</th>
+            <th class="p-3">Email</th>
+            <th class="p-3">Phần mềm</th>
+            <th class="p-3">Gói</th>
+            <th class="p-3">Doanh thu</th>
+            <th class="p-3">Bắt đầu</th>
+            <th class="p-3">Kết thúc</th>
+            <th class="p-3">Hành động</th>
+          </tr>
+        </thead>
+        <tbody id="bangGiaoDichBody" class="bg-white"></tbody>
+      </table>
+    </div>
 
-  <label>Tên phần mềm <select id="tenPhanMem"></select></label>
-  <label>Gói phần mềm <select id="goiPhanMem"></select></label>
-  <label>Doanh thu <input type="number" id="doanhThu" min="0"></label>
-  <label>Ghi chú <input type="text" id="ghiChu"></label>
+    <div id="phanTrang" class="mt-4 flex justify-center items-center gap-4">
+      <button onclick="chuyenTrang(-1)" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300">← Trang trước</button>
+      <span id="soTrangHienTai" class="text-sm font-medium">Trang 1</span>
+      <button onclick="chuyenTrang(1)" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300">Trang sau →</button>
+    </div>
 
-  <button onclick="themGiaoDich()">Thêm giao dịch</button>
-  <p id="thongBao" class="error"></p>
-</div>
+    <h2 class="text-2xl font-bold text-blue-600 mt-10 mb-4">Thống kê & Báo cáo</h2>
+    <div id="thongKe" class="bg-white p-6 rounded-xl shadow"></div>
+    <div class="bg-white p-6 rounded-xl shadow mt-4">
+      <canvas id="bieuDo" height="200"></canvas>
+    </div>
 
-<div id="boLoc" style="margin-bottom: 15px;">
-    <label>
-      Tên khách hàng:
-      <input type="text" id="locTenKH" placeholder="Nhập tên khách hàng">
-    </label>
-    <label>
-      Email:
-      <input type="text" id="locEmail" placeholder="Nhập email">
-    </label>
-    <label>
-      Tên phần mềm:
-      <input type="text" id="locTenPM" placeholder="Nhập tên phần mềm">
-    </label>
-    <button onclick="timKiemGiaoDich()">Tìm kiếm</button>
-    <button onclick="resetBoLoc()">Xóa lọc</button>
+    <div class="mt-10 text-center">
+      <button onclick="dangXuat()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded">Đăng xuất</button>
+    </div>
   </div>
-  
 
-<hr>
-<h2>Danh sách giao dịch của bạn</h2>
-<table id="bangGiaoDich">
-  <thead>
-    <tr>
-      <th>Mã GD</th>
-      <th>Khách hàng</th>
-      <th>Email</th>
-      <th>Phần mềm</th>
-      <th>Gói</th>
-      <th>Doanh thu</th>
-      <th>Ngày bắt đầu</th>
-      <th>Ngày kết thúc</th>
-      <th>Hành động</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
+  <script>
+    const URL_API = 'https://script.google.com/macros/s/AKfycby4zyKgL5_nzsIGXvWGmddmJUWX5G_KDGOE8KEAhoF6N_KXTIzVVuUpx5MsYPFpjH7Q/exec';
+    let user = JSON.parse(localStorage.getItem('user') || '{}');
+    let danhSachGiaoDich = [];
+    let trangHienTai = 1;
+    const soDongMoiTrang = 10;
 
-<div id="phanTrang" style="margin-top: 10px; text-align: center;">
-    <button onclick="chuyenTrang(-1)">← Trang trước</button>
-    <span id="soTrangHienTai" style="margin: 0 10px;">Trang 1</span>
-    <button onclick="chuyenTrang(1)">Trang sau →</button>
-  </div>
-
-  
-<hr>
-<h2>Thống kê & Báo cáo</h2>
-<div id="thongKe"></div>
-<canvas id="bieuDo" height="200"></canvas>
-
-
-<button onclick="dangXuat()">Đăng xuất</button>
-
-<script>
-let danhSachGiaoDich = [];
-let trangHienTai = 1;
-const soDongMoiTrang = 10;
-
-  const URL_API = 'https://script.google.com/macros/s/AKfycby4zyKgL5_nzsIGXvWGmddmJUWX5G_KDGOE8KEAhoF6N_KXTIzVVuUpx5MsYPFpjH7Q/exec';
-
-  let user;
-
-  window.onload = () => {
-    const storedUser = localStorage.getItem('user');
-    if (!storedUser) {
+    if (!user.maNhanVien) {
       alert('Vui lòng đăng nhập.');
       window.location.href = 'index.html';
-      return;
     }
 
-    user = JSON.parse(storedUser);
-    document.getElementById('ngayBatDau').value = new Date().toLocaleDateString('vi-VN');
+    window.onload = () => {
+      document.getElementById('ngayBatDau').value = new Date().toLocaleDateString('vi-VN');
+      loadPhanMem();
+      loadGiaoDich();
+      loadThongKe();
+    };
 
-    loadPhanMem();
-    loadGiaoDich();
-    loadThongKe();
-  };
+    const getValue = id => document.getElementById(id).value.trim();
+    const setValue = (id, val) => document.getElementById(id).value = val;
 
-  async function loadPhanMem() {
-    const res = await fetch(`${URL_API}?action=getSoftwares`, { method: 'POST' });
-    const data = await res.json();
+    async function loadPhanMem() {
+      const res = await fetch(`${URL_API}?action=getSoftwares`, { method: 'POST' });
+      const data = await res.json();
+      if (!data.success) return;
 
-    if (data.success) {
       const tenSelect = document.getElementById('tenPhanMem');
       const goiSelect = document.getElementById('goiPhanMem');
       const list = data.data;
-
-      // Lấy danh sách phần mềm duy nhất
       const tenList = [...new Set(list.map(item => item.tenPhanMem))];
-      tenList.forEach(ten => {
-        const option = document.createElement('option');
-        option.value = ten;
-        option.textContent = ten;
-        tenSelect.appendChild(option);
-      });
+
+      tenList.forEach(ten => tenSelect.innerHTML += `<option value="${ten}">${ten}</option>`);
 
       tenSelect.addEventListener('change', () => {
         const selected = tenSelect.value;
         goiSelect.innerHTML = '';
-        list.filter(item => item.tenPhanMem === selected).forEach(item => {
-          const option = document.createElement('option');
-          option.value = item.goiPhanMem;
-          option.textContent = item.goiPhanMem;
-          goiSelect.appendChild(option);
-        });
-        goiSelect.selectedIndex = 0;
+        list.filter(item => item.tenPhanMem === selected)
+            .forEach(item => goiSelect.innerHTML += `<option value="${item.goiPhanMem}">${item.goiPhanMem}</option>`);
       });
 
-      // Kích hoạt mặc định
       tenSelect.dispatchEvent(new Event('change'));
     }
-  }
 
-  async function themGiaoDich() {
-    const thongBao = document.getElementById('thongBao');
-    const body = {
-      loaiGiaoDich: document.getElementById('loaiGiaoDich').value,
-      tenKhachHang: document.getElementById('tenKhachHang').value,
-      email: document.getElementById('email').value.toLowerCase(),
-      lienHe: document.getElementById('lienHe').value,
-      soThangDangKy: document.getElementById('soThangDangKy').value,
-      ngayBatDau: document.getElementById('ngayBatDau').value,
-      soThietBi: document.getElementById('soThietBi').value,
-      tenPhanMem: document.getElementById('tenPhanMem').value,
-      goiPhanMem: document.getElementById('goiPhanMem').value,
-      doanhThu: document.getElementById('doanhThu').value,
-      ghiChu: document.getElementById('ghiChu').value,
-      maNhanVien: user.maNhanVien,
-      tenNhanVien: user.tenNhanVien
-    };
+    async function themGiaoDich() {
+      const data = thuThongTinForm();
+      const res = await fetch(`${URL_API}?action=addTransaction`, {
+        method: 'POST',
+        body: JSON.stringify({ ...data, maNhanVien: user.maNhanVien, tenNhanVien: user.tenNhanVien })
+      });
 
-    const res = await fetch(`${URL_API}?action=addTransaction`, {
-      method: 'POST',
-      body: JSON.stringify(body)
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      thongBao.className = 'success';
-      thongBao.textContent = 'Thêm giao dịch thành công.';
-      resetForm();
-      loadGiaoDich();
-    } else {
-      thongBao.className = 'error';
-      thongBao.textContent = data.message || 'Lỗi khi thêm giao dịch.';
-    }
-  }
-
-  async function loadGiaoDich() {
-  const res = await fetch(`${URL_API}?action=searchTransaction`, {
-    method: 'POST',
-    body: JSON.stringify({
-      maNhanVien: user.maNhanVien,
-      tenNhanVien: user.tenNhanVien,
-      vaiTro: user.vaiTro,
-      dieuKien: {}
-    })
-  });
-
-  const data = await res.json();
-  if (data.success) {
-    // Lưu danh sách vào biến toàn cục để phân trang
-    danhSachGiaoDich = data.data;
-    trangHienTai = 1;
-    hienThiTrang(); // Gọi hàm hiển thị giao dịch theo trang
-  }
-}
-
-
-  function dangXuat() {
-    localStorage.removeItem('user');
-    window.location.href = 'index.html';
-  }
-  async function suaGiaoDich(gd) {
-  document.getElementById('loaiGiaoDich').value = gd['Loai giao dich'];
-  document.getElementById('tenKhachHang').value = gd['Ten khach hang'];
-  document.getElementById('email').value = gd['Email'];
-  document.getElementById('lienHe').value = gd['Lien he'];
-  document.getElementById('soThangDangKy').value = gd['So thang dang ky'];
-  document.getElementById('ngayBatDau').value = gd['Ngay bat dau'];
-  document.getElementById('soThietBi').value = gd['So thiet bi'];
-  document.getElementById('tenPhanMem').value = gd['Ten phan mem'];
-
-  await new Promise(resolve => {
-    document.getElementById('tenPhanMem').dispatchEvent(new Event('change'));
-    setTimeout(resolve, 200); // đợi dropdown cập nhật
-  });
-
-  document.getElementById('goiPhanMem').value = gd['Goi phan mem'];
-  document.getElementById('doanhThu').value = gd['Doanh thu'];
-  document.getElementById('ghiChu').value = gd['Ghi chu'];
-
-  document.getElementById('formGiaoDich').setAttribute('data-magiaodich', gd['Ma giao dich']);
-  document.getElementById('thongBao').textContent = 'Đang chỉnh sửa: ' + gd['Ma giao dich'];
-
-  const btn = document.querySelector('#formGiaoDich button');
-  btn.textContent = 'Cập nhật giao dịch';
-  btn.onclick = capNhatGiaoDich;
-}
-
-
-async function capNhatGiaoDich() {
-  const maGiaoDich = document.getElementById('formGiaoDich').getAttribute('data-magiaodich');
-  if (!maGiaoDich) return;
-
-  const body = {
-    ...thuThongTinForm(),
-    maGiaoDich,
-    maNhanVien: user.maNhanVien,
-    tenNhanVien: user.tenNhanVien,
-    vaiTro: user.vaiTro
-  };
-
-  const res = await fetch(`${URL_API}?action=editTransaction`, {
-    method: 'POST',
-    body: JSON.stringify(body)
-  });
-
-  const data = await res.json();
-  if (data.success) {
-    alert('Cập nhật thành công!');
-    resetForm();
-    loadGiaoDich();
-  } else {
-    alert(data.message || 'Lỗi khi cập nhật.');
-  }
-}
-
-async function xoaGiaoDich(maGiaoDich) {
-  if (!confirm('Bạn có chắc muốn xóa giao dịch này?')) return;
-
-  const res = await fetch(`${URL_API}?action=deleteTransaction`, {
-    method: 'POST',
-    body: JSON.stringify({
-      maGiaoDich,
-      maNhanVien: user.maNhanVien,
-      tenNhanVien: user.tenNhanVien,
-      vaiTro: user.vaiTro
-    })
-  });
-
-  const data = await res.json();
-  if (data.success) {
-    alert('Đã xóa giao dịch.');
-    loadGiaoDich();
-  } else {
-    alert(data.message || 'Lỗi khi xóa.');
-  }
-}
-
-function thuThongTinForm() {
-  const fields = {
-    loaiGiaoDich: document.getElementById('loaiGiaoDich').value,
-    tenKhachHang: document.getElementById('tenKhachHang').value,
-    email: document.getElementById('email').value.toLowerCase(),
-    lienHe: document.getElementById('lienHe').value,
-    soThangDangKy: document.getElementById('soThangDangKy').value,
-    ngayBatDau: document.getElementById('ngayBatDau').value,
-    soThietBi: document.getElementById('soThietBi').value,
-    tenPhanMem: document.getElementById('tenPhanMem').value,
-    goiPhanMem: document.getElementById('goiPhanMem').value,
-    doanhThu: document.getElementById('doanhThu').value,
-    ghiChu: document.getElementById('ghiChu').value
-  };
-
-  for (let key in fields) {
-    if (key !== 'ghiChu' && !fields[key]) {
-      alert('Vui lòng điền đầy đủ thông tin.');
-      throw new Error('Thiếu dữ liệu: ' + key);
-    }
-    if (!/^\d{2}\/\d{2}\/\d{4}$/.test(fields.ngayBatDau)) {
-        alert('Định dạng ngày bắt đầu không hợp lệ (dd/mm/yyyy).');
-        throw new Error('Sai định dạng ngày.');
-        }
-  }
-
-  return fields;
-}
-
-
-function resetForm() {
-  document.getElementById('formGiaoDich').reset();
-  document.getElementById('thongBao').textContent = '';
-  document.getElementById('formGiaoDich').removeAttribute('data-magiaodich');
-  const btn = document.querySelector('#formGiaoDich button');
-  btn.textContent = 'Thêm giao dịch';
-  btn.onclick = themGiaoDich;
-}
-
-async function loadThongKe() {
-  const res = await fetch(`${URL_API}?action=getStats`, {
-    method: 'POST',
-    body: JSON.stringify({
-      maNhanVien: user.maNhanVien,
-      vaiTro: user.vaiTro
-    })
-  });
-
-  const data = await res.json();
-  if (!data.success) return;
-
-  const { doanhThu, tongGD, phanMemPhoBien } = data.data;
-
-  document.getElementById('thongKe').innerHTML = `
-    <p><strong>Doanh thu:</strong></p>
-    <ul>
-      <li>Hôm nay: ${doanhThu.ngay.toLocaleString('vi-VN')}</li>
-      <li>Tháng này: ${doanhThu.thang.toLocaleString('vi-VN')}</li>
-      <li>Năm nay: ${doanhThu.nam.toLocaleString('vi-VN')}</li>
-    </ul>
-    <p><strong>Tổng số giao dịch:</strong> ${tongGD}</p>
-  `;
-
-  if (phanMemPhoBien.length) {
-    const ctx = document.getElementById('bieuDo').getContext('2d');
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: phanMemPhoBien.map(pm => pm.label),
-        datasets: [{
-          label: 'Số lần sử dụng',
-          data: phanMemPhoBien.map(pm => pm.value)
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false },
-          title: { display: true, text: 'Top phần mềm phổ biến' }
-        }
+      const result = await res.json();
+      const tb = document.getElementById('thongBao');
+      tb.className = result.success ? 'text-green-600' : 'text-red-600';
+      tb.textContent = result.message || (result.success ? 'Thêm giao dịch thành công.' : 'Lỗi khi thêm.');
+      if (result.success) {
+        resetForm();
+        loadGiaoDich();
       }
-    });
-  }
-}
+    }
 
-function hienThiTrang() {
-  const tbody = document.querySelector('#bangGiaoDich tbody');
-  tbody.innerHTML = '';
+    function thuThongTinForm() {
+      const fields = ['loaiGiaoDich','tenKhachHang','email','lienHe','soThangDangKy','ngayBatDau','soThietBi','tenPhanMem','goiPhanMem','doanhThu','ghiChu'];
+      const obj = {};
+      for (let f of fields) {
+        const val = getValue(f);
+        if (!val && f !== 'ghiChu') throw alert(`Vui lòng nhập ${f}`);
+        obj[f] = f === 'email' ? val.toLowerCase() : val;
+      }
+      if (!/^\d{2}\/\d{2}\/\d{4}$/.test(obj.ngayBatDau)) throw alert('Sai định dạng ngày (dd/mm/yyyy)');
+      return obj;
+    }
 
-  const batDau = (trangHienTai - 1) * soDongMoiTrang;
-  const ketThuc = Math.min(batDau + soDongMoiTrang, danhSachGiaoDich.length);
+    async function loadGiaoDich() {
+      const res = await fetch(`${URL_API}?action=searchTransaction`, {
+        method: 'POST',
+        body: JSON.stringify({
+          maNhanVien: user.maNhanVien,
+          tenNhanVien: user.tenNhanVien,
+          vaiTro: user.vaiTro,
+          dieuKien: {}
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        danhSachGiaoDich = data.data;
+        trangHienTai = 1;
+        hienThiTrang();
+      }
+    }
 
-  for (let i = batDau; i < ketThuc; i++) {
-    const gd = danhSachGiaoDich[i];
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${gd['Ma giao dich']}</td>
-      <td>${gd['Ten khach hang']}</td>
-      <td>${gd['Email']}</td>
-      <td>${gd['Ten phan mem']}</td>
-      <td>${gd['Goi phan mem']}</td>
-      <td>${gd['Doanh thu']}</td>
-      <td>${gd['Ngay bat dau']}</td>
-      <td>${gd['Ngay ket thuc']}</td>
-      <td>
-        <button onclick='suaGiaoDich(${JSON.stringify(gd)})'>Sửa</button>
-        <button onclick='xoaGiaoDich("${gd["Ma giao dich"]}")'>Xóa</button>
-      </td>
-    `;
-    tbody.appendChild(row);
-  }
+    function hienThiTrang() {
+      const tbody = document.getElementById('bangGiaoDichBody');
+      tbody.innerHTML = '';
+      const start = (trangHienTai - 1) * soDongMoiTrang;
+      const end = Math.min(start + soDongMoiTrang, danhSachGiaoDich.length);
 
-  document.getElementById('soTrangHienTai').textContent = `Trang ${trangHienTai} / ${Math.ceil(danhSachGiaoDich.length / soDongMoiTrang)}`;
-}
+      for (let i = start; i < end; i++) {
+        const gd = danhSachGiaoDich[i];
+        tbody.innerHTML += `
+          <tr class="border-b">
+            <td class="p-2">${gd['Ma giao dich']}</td>
+            <td class="p-2">${gd['Ten khach hang']}</td>
+            <td class="p-2">${gd['Email']}</td>
+            <td class="p-2">${gd['Ten phan mem']}</td>
+            <td class="p-2">${gd['Goi phan mem']}</td>
+            <td class="p-2">${gd['Doanh thu']}</td>
+            <td class="p-2">${gd['Ngay bat dau']}</td>
+            <td class="p-2">${gd['Ngay ket thuc']}</td>
+            <td class="p-2">
+              <button class="text-blue-600 mr-2" onclick='suaGiaoDich(${JSON.stringify(gd)})'>Sửa</button>
+              <button class="text-red-600" onclick='xoaGiaoDich("${gd['Ma giao dich']}")'>Xóa</button>
+            </td>
+          </tr>`;
+      }
 
-function chuyenTrang(delta) {
-  const tongTrang = Math.ceil(danhSachGiaoDich.length / soDongMoiTrang);
-  trangHienTai += delta;
-  if (trangHienTai < 1) trangHienTai = 1;
-  if (trangHienTai > tongTrang) trangHienTai = tongTrang;
-  hienThiTrang();
-}
+      document.getElementById('soTrangHienTai').textContent = `Trang ${trangHienTai} / ${Math.ceil(danhSachGiaoDich.length / soDongMoiTrang)}`;
+    }
 
-async function timKiemGiaoDich() {
-  const tenKH = document.getElementById('locTenKH').value.trim();
-  const email = document.getElementById('locEmail').value.trim().toLowerCase();
-  const tenPM = document.getElementById('locTenPM').value.trim();
+    function chuyenTrang(delta) {
+      const tongTrang = Math.ceil(danhSachGiaoDich.length / soDongMoiTrang);
+      trangHienTai = Math.min(Math.max(1, trangHienTai + delta), tongTrang);
+      hienThiTrang();
+    }
 
-  const dieuKien = {};
-  if (tenKH) dieuKien['Ten khach hang'] = tenKH;
-  if (email) dieuKien['Email'] = email;
-  if (tenPM) dieuKien['Ten phan mem'] = tenPM;
+    function suaGiaoDich(gd) {
+      ['loaiGiaoDich','tenKhachHang','email','lienHe','soThangDangKy','ngayBatDau','soThietBi','tenPhanMem','doanhThu','ghiChu']
+        .forEach(k => setValue(k, gd[formatKey(k)] || ''));
+      document.getElementById('tenPhanMem').dispatchEvent(new Event('change'));
+      setTimeout(() => setValue('goiPhanMem', gd['Goi phan mem']), 200);
 
-  const res = await fetch(`${URL_API}?action=searchTransaction`, {
-    method: 'POST',
-    body: JSON.stringify({
-      maNhanVien: user.maNhanVien,
-      tenNhanVien: user.tenNhanVien,
-      vaiTro: user.vaiTro,
-      dieuKien
-    })
-  });
+      document.getElementById('formGiaoDich').dataset.magiaodich = gd['Ma giao dich'];
+      document.getElementById('thongBao').textContent = 'Đang chỉnh sửa: ' + gd['Ma giao dich'];
+      const btn = document.querySelector('#formGiaoDich button');
+      btn.textContent = 'Cập nhật giao dịch';
+      btn.onclick = capNhatGiaoDich;
+    }
 
-  const data = await res.json();
-  if (data.success) {
-    danhSachGiaoDich = data.data;
-    trangHienTai = 1;
-    hienThiTrang();
-  } else {
-    alert('Không tìm thấy kết quả.');
-  }
-}
+    function formatKey(key) {
+      return key.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/([A-Z])/g, m => ' ' + m).replace(/^./, s => s.toUpperCase());
+    }
 
-function resetBoLoc() {
-  document.getElementById('locTenKH').value = '';
-  document.getElementById('locEmail').value = '';
-  document.getElementById('locTenPM').value = '';
-  loadGiaoDich(); // gọi lại toàn bộ dữ liệu không lọc
-}
+    async function capNhatGiaoDich() {
+      const maGiaoDich = document.getElementById('formGiaoDich').dataset.magiaodich;
+      if (!maGiaoDich) return;
 
+      const res = await fetch(`${URL_API}?action=editTransaction`, {
+        method: 'POST',
+        body: JSON.stringify({
+          ...thuThongTinForm(),
+          maGiaoDich,
+          maNhanVien: user.maNhanVien,
+          tenNhanVien: user.tenNhanVien,
+          vaiTro: user.vaiTro
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Cập nhật thành công!');
+        resetForm();
+        loadGiaoDich();
+      } else {
+        alert(data.message || 'Lỗi khi cập nhật.');
+      }
+    }
 
-</script>
+    async function xoaGiaoDich(maGiaoDich) {
+      if (!confirm('Bạn có chắc muốn xóa giao dịch này?')) return;
+      const res = await fetch(`${URL_API}?action=deleteTransaction`, {
+        method: 'POST',
+        body: JSON.stringify({ maGiaoDich, maNhanVien: user.maNhanVien, tenNhanVien: user.tenNhanVien, vaiTro: user.vaiTro })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Đã xóa giao dịch.');
+        loadGiaoDich();
+      } else {
+        alert(data.message || 'Lỗi khi xóa.');
+      }
+    }
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    function resetForm() {
+      document.getElementById('formGiaoDich').reset();
+      document.getElementById('thongBao').textContent = '';
+      delete document.getElementById('formGiaoDich').dataset.magiaodich;
+      const btn = document.querySelector('#formGiaoDich button');
+      btn.textContent = 'Thêm giao dịch';
+      btn.onclick = themGiaoDich;
+    }
 
+    async function loadThongKe() {
+      const res = await fetch(`${URL_API}?action=getStats`, {
+        method: 'POST',
+        body: JSON.stringify({ maNhanVien: user.maNhanVien, vaiTro: user.vaiTro })
+      });
+      const data = await res.json();
+      if (!data.success) return;
+
+      const { doanhThu, tongGD, phanMemPhoBien } = data.data;
+      document.getElementById('thongKe').innerHTML = `
+        <p class="font-semibold">Doanh thu:</p>
+        <ul class="list-disc ml-6 text-sm">
+          <li>Hôm nay: ${doanhThu.ngay.toLocaleString('vi-VN')}</li>
+          <li>Tháng này: ${doanhThu.thang.toLocaleString('vi-VN')}</li>
+          <li>Năm nay: ${doanhThu.nam.toLocaleString('vi-VN')}</li>
+        </ul>
+        <p class="mt-2 font-semibold">Tổng số giao dịch: ${tongGD}</p>
+      `;
+
+      if (phanMemPhoBien.length) {
+        const ctx = document.getElementById('bieuDo').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: phanMemPhoBien.map(pm => pm.label),
+            datasets: [{ label: 'Số lần sử dụng', data: phanMemPhoBien.map(pm => pm.value) }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+              title: { display: true, text: 'Top phần mềm phổ biến' }
+            }
+          }
+        });
+      }
+    }
+
+    async function timKiemGiaoDich() {
+      const dieuKien = {};
+      if (getValue('locTenKH')) dieuKien['Ten khach hang'] = getValue('locTenKH');
+      if (getValue('locEmail')) dieuKien['Email'] = getValue('locEmail');
+      if (getValue('locTenPM')) dieuKien['Ten phan mem'] = getValue('locTenPM');
+
+      const res = await fetch(`${URL_API}?action=searchTransaction`, {
+        method: 'POST',
+        body: JSON.stringify({
+          maNhanVien: user.maNhanVien,
+          tenNhanVien: user.tenNhanVien,
+          vaiTro: user.vaiTro,
+          dieuKien
+        })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        danhSachGiaoDich = data.data;
+        trangHienTai = 1;
+        hienThiTrang();
+      } else {
+        alert('Không tìm thấy kết quả.');
+      }
+    }
+
+    function resetBoLoc() {
+      ['locTenKH','locEmail','locTenPM'].forEach(id => setValue(id, ''));
+      loadGiaoDich();
+    }
+
+    function dangXuat() {
+      localStorage.removeItem('user');
+      window.location.href = 'index.html';
+    }
+  </script>
+  <!-- Script và Chart.js thêm sau -->
 </body>
 </html>
-
