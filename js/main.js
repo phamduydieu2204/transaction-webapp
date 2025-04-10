@@ -1,33 +1,61 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const userData = localStorage.getItem("employeeInfo"); // ✅ đúng với key đã lưu
-    let userInfo = null;
-    
-    try {
-      userInfo = userData ? JSON.parse(userData) : null;
-    } catch (e) {
-      userInfo = null;
-    }
-  
+  const userData = localStorage.getItem("employeeInfo");
+  let userInfo = null;
+
+  try {
+    userInfo = userData ? JSON.parse(userData) : null;
+  } catch (e) {
+    userInfo = null;
+  }
+
   const welcome = document.getElementById("welcome");
   if (userInfo) {
     welcome.textContent = `Xin chào ${userInfo.tenNhanVien} (${userInfo.maNhanVien}) - ${userInfo.vaiTro}`;
   } else {
-    window.location.href = "index.html"; // quay về login nếu không có session
+    window.location.href = "index.html";
+    return;
   }
 
+  // Mặc định ngày bắt đầu = hôm nay
+  const startDateInput = document.getElementById("startDate");
+  const durationInput = document.getElementById("duration");
+  const endDateInput = document.getElementById("endDate");
+  const today = new Date().toISOString().split("T")[0];
+  startDateInput.value = today;
+
+  function calculateEndDate() {
+    const start = new Date(startDateInput.value);
+    const months = parseInt(durationInput.value || 0);
+    if (!isNaN(months)) {
+      const estimated = new Date(start.getTime() + months * 30 * 24 * 60 * 60 * 1000);
+      endDateInput.value = estimated.toISOString().split("T")[0];
+    }
+  }
+  startDateInput.addEventListener("change", calculateEndDate);
+  durationInput.addEventListener("input", calculateEndDate);
+
+  // Submit form
   const form = document.getElementById("transactionForm");
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-
     const { BACKEND_URL } = getConstants();
+
     const data = {
       action: "addTransaction",
       maNhanVien: userInfo.maNhanVien,
-      customerCode: document.getElementById("customerCode").value.trim(),
-      customerName: document.getElementById("customerName").value.trim(),
-      toolName: document.getElementById("toolName").value.trim(),
-      price: parseFloat(document.getElementById("price").value),
-      transactionDate: document.getElementById("transactionDate").value
+      tenNhanVien: userInfo.tenNhanVien,
+      transactionType: document.getElementById("transactionType").value,
+      customerName: document.getElementById("customerName").value,
+      customerEmail: document.getElementById("customerEmail").value,
+      customerPhone: document.getElementById("customerPhone").value,
+      duration: parseInt(document.getElementById("duration").value),
+      startDate: document.getElementById("startDate").value,
+      endDate: document.getElementById("endDate").value,
+      deviceCount: parseInt(document.getElementById("deviceCount").value),
+      softwareName: document.getElementById("softwareName").value,
+      softwarePackage: document.getElementById("softwarePackage").value,
+      revenue: parseFloat(document.getElementById("revenue").value),
+      note: document.getElementById("note").value
     };
 
     try {
@@ -40,6 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (result.status === "success") {
         document.getElementById("successMessage").textContent = "Giao dịch đã được lưu!";
         form.reset();
+        startDateInput.value = today; // đặt lại mặc định
+        endDateInput.value = "";
       } else {
         document.getElementById("errorMessage").textContent = result.message || "Không thể lưu giao dịch!";
       }
@@ -48,22 +78,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-const startDateInput = document.getElementById("startDate");
-const durationInput = document.getElementById("duration");
-const endDateInput = document.getElementById("endDate");
-
-// Đặt ngày bắt đầu mặc định là hôm nay
-const today = new Date().toISOString().split("T")[0];
-startDateInput.value = today;
-
-// Tự động tính ngày kết thúc khi nhập số tháng
-function calculateEndDate() {
-  const start = new Date(startDateInput.value);
-  const months = parseInt(durationInput.value || 0);
-  if (!isNaN(months)) {
-    const estimated = new Date(start.getTime() + months * 30 * 24 * 60 * 60 * 1000);
-    endDateInput.value = estimated.toISOString().split("T")[0];
-  }
-}
-startDateInput.addEventListener("change", calculateEndDate);
-durationInput.addEventListener("input", calculateEndDate);
