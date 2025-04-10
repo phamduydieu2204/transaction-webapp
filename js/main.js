@@ -48,3 +48,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+const startDateInput = document.getElementById("startDate");
+const durationInput = document.getElementById("duration");
+const endDateInput = document.getElementById("endDate");
+
+// Đặt ngày bắt đầu mặc định là hôm nay
+const today = new Date().toISOString().split("T")[0];
+startDateInput.value = today;
+
+// Tự động tính ngày kết thúc khi nhập số tháng
+function calculateEndDate() {
+  const start = new Date(startDateInput.value);
+  const months = parseInt(durationInput.value || 0);
+  if (!isNaN(months)) {
+    const estimated = new Date(start.getTime() + months * 30 * 24 * 60 * 60 * 1000);
+    endDateInput.value = estimated.toISOString().split("T")[0];
+  }
+}
+startDateInput.addEventListener("change", calculateEndDate);
+durationInput.addEventListener("input", calculateEndDate);
