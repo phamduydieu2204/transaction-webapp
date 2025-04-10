@@ -4,11 +4,38 @@
   <meta charset="UTF-8" />
   <title>Trang chính</title>
   <link rel="stylesheet" href="css/style.css" />
+  <script defer src="js/constants.js"></script>
+  <script defer src="js/main.js"></script>
 </head>
 <body>
   <div class="container">
-    <h1>Xin chào!</h1>
-    <p>Bạn đã đăng nhập thành công vào hệ thống.</p>
+    <h1>Hệ thống quản lý</h1>
+    <p id="welcome"></p>
+
+    <hr>
+
+    <h2>Nhập giao dịch</h2>
+    <form id="transactionForm">
+      <label>Mã khách:</label>
+      <input type="text" id="customerCode" placeholder="VD: KH001" required>
+
+      <label>Tên khách:</label>
+      <input type="text" id="customerName" placeholder="VD: Nguyễn Văn A" required>
+
+      <label>Tên tool:</label>
+      <input type="text" id="toolName" placeholder="VD: ChatGPT Plus" required>
+
+      <label>Giá bán:</label>
+      <input type="number" id="price" required>
+
+      <label>Ngày giao dịch:</label>
+      <input type="date" id="transactionDate" required>
+
+      <button type="submit">Lưu giao dịch</button>
+    </form>
+
+    <p id="successMessage" style="color: green;"></p>
+    <p id="errorMessage" style="color: red;"></p>
   </div>
 </body>
 </html>
