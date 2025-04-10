@@ -43,3 +43,23 @@ button:hover {
   color: red;
   margin-top: 10px;
 }
+// CSS Con mắt xem mật khẩu
+.password-container {
+  position: relative;
+  width: 90%;
+  margin: 10px auto;
+}
+
+.password-container input {
+  width: 100%;
+  padding-right: 30px;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
