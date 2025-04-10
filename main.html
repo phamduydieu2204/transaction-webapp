@@ -13,9 +13,8 @@
     <p id="welcome"></p>
     <hr>
 
-    <h2>Nhập giao dịch</h2>
     <form id="transactionForm" class="form-grid">
-      <!-- Nhóm: Giao dịch -->
+      <!-- Dòng 1 -->
       <div>
         <label>Loại giao dịch:</label>
         <select id="transactionType" required>
@@ -27,65 +26,69 @@
       </div>
 
       <div>
-        <label>Số tháng đăng ký:</label>
-        <input type="number" id="duration" placeholder="VD: 3" required />
-      </div>
-
-      <div>
-        <label>Ngày bắt đầu:</label>
-        <input type="date" id="startDate" required />
-      </div>
-
-      <div>
-        <label>Ngày kết thúc:</label>
-        <input type="date" id="endDate" required />
-      </div>
-
-      <div>
-        <label>Doanh thu:</label>
-        <input type="number" id="revenue" placeholder="VD: 300000" required />
-      </div>
-
-      <div class="extra-wide">
-        <label>Ghi chú:</label>
-        <textarea id="note" placeholder="Ghi chú nếu có..."></textarea>
-      </div>
-
-      <!-- Nhóm: Khách hàng -->
-      <div>
         <label>Tên khách hàng:</label>
-        <input type="text" id="customerName" required />
+        <input type="text" id="customerName" required>
       </div>
 
       <div>
         <label>Email:</label>
-        <input type="email" id="email" required />
+        <input type="email" id="customerEmail" required>
       </div>
 
-      <div class="extra-wide">
+      <div class="wide">
         <label>Liên hệ:</label>
-        <input type="text" id="phone" required />
+        <input type="text" id="customerPhone" required>
       </div>
 
-      <div>
-        <label>Số thiết bị:</label>
-        <input type="number" id="deviceCount" required />
-      </div>
-
-      <!-- Nhóm: Phần mềm -->
+      <!-- Dòng 2 -->
       <div>
         <label>Tên phần mềm:</label>
-        <input type="text" id="softwareName" required />
+        <input type="text" id="softwareName" required>
       </div>
 
       <div>
         <label>Gói phần mềm:</label>
-        <input type="text" id="packageName" required />
+        <input type="text" id="softwarePackage" required>
       </div>
 
-      <!-- Nút -->
+      <div>
+        <label>Số tháng đăng ký:</label>
+        <input type="number" id="duration" required>
+      </div>
+
+      <div>
+        <label>Số thiết bị:</label>
+        <input type="number" id="deviceCount" required>
+      </div>
+
+      <!-- Dòng 3 -->
+      <div>
+        <label>Ngày bắt đầu:</label>
+        <input type="date" id="startDate" required>
+      </div>
+
+      <div>
+        <label>Ngày kết thúc:</label>
+        <input type="date" id="endDate" readonly>
+      </div>
+
+      <div>
+        <label>Doanh thu:</label>
+        <input type="number" id="revenue" required>
+      </div>
+
       <div class="wide">
-        <button type="submit">Lưu giao dịch</button>
+        <label>Ghi chú:</label>
+        <textarea id="note" rows="2"></textarea>
+      </div>
+
+      <!-- Dòng 4 -->
+      <div class="full-row">
+        <button type="button" onclick="handleAdd()">Thêm</button>
+        <button type="button" onclick="handleUpdate()">Sửa</button>
+        <button type="button" onclick="handleDelete()">Xóa</button>
+        <button type="button" onclick="handleSearch()">Tìm kiếm</button>
+        <button type="reset">Làm mới</button>
       </div>
     </form>
 
