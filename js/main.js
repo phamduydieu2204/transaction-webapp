@@ -1,26 +1,30 @@
+let userInfo = null;
+let currentEditIndex = -1;
+let transactionList = [];
+let today = new Date().toISOString().split("T")[0];
+
+// DOM đã sẵn sàng
 document.addEventListener("DOMContentLoaded", () => {
   const userData = localStorage.getItem("employeeInfo");
-  let userInfo = null;
-
   try {
     userInfo = userData ? JSON.parse(userData) : null;
   } catch (e) {
     userInfo = null;
   }
 
-  const welcome = document.getElementById("welcome");
-  if (userInfo) {
-    welcome.textContent = `Xin chào ${userInfo.tenNhanVien} (${userInfo.maNhanVien}) - ${userInfo.vaiTro}`;
-  } else {
+  if (!userInfo) {
     window.location.href = "index.html";
     return;
   }
 
-  const form = document.getElementById("transactionForm");
+  document.getElementById("welcome").textContent =
+    `Xin chào ${userInfo.tenNhanVien} (${userInfo.maNhanVien}) - ${userInfo.vaiTro}`;
+
+  // Ngày bắt đầu mặc định là hôm nay
   const startDateInput = document.getElementById("startDate");
   const durationInput = document.getElementById("duration");
   const endDateInput = document.getElementById("endDate");
-  const today = new Date().toISOString().split("T")[0];
+
   startDateInput.value = today;
 
   function calculateEndDate() {
@@ -35,61 +39,74 @@ document.addEventListener("DOMContentLoaded", () => {
   startDateInput.addEventListener("change", calculateEndDate);
   durationInput.addEventListener("input", calculateEndDate);
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const { BACKEND_URL } = getConstants();
-
-    const data = {
-      action: "addTransaction",
-      maNhanVien: userInfo.maNhanVien,
-      tenNhanVien: userInfo.tenNhanVien,
-      transactionType: document.getElementById("transactionType").value,
-      customerName: document.getElementById("customerName").value,
-      customerEmail: document.getElementById("customerEmail").value,
-      customerPhone: document.getElementById("customerPhone").value,
-      softwareName: document.getElementById("softwareName").value,
-      softwarePackage: document.getElementById("softwarePackage").value,
-      duration: parseInt(document.getElementById("duration").value),
-      startDate: document.getElementById("startDate").value,
-      endDate: document.getElementById("endDate").value,
-      revenue: parseFloat(document.getElementById("revenue").value),
-      deviceCount: parseInt(document.getElementById("deviceCount").value),
-      note: document.getElementById("note").value
-    };
-
-    try {
-      const response = await fetch(BACKEND_URL, {
-        method: "POST",
-        body: JSON.stringify(data)
-      });
-
-      const result = await response.json();
-      if (result.status === "success") {
-        transactionList.push(data);
-        updateTable();
-        document.getElementById("successMessage").textContent = "Giao dịch đã được lưu!";
-        form.reset();
-        startDateInput.value = today;
-        endDateInput.value = "";
-        currentEditIndex = -1;
-      } else {
-        document.getElementById("errorMessage").textContent = result.message || "Không thể lưu giao dịch!";
-      }
-    } catch (err) {
-      document.getElementById("errorMessage").textContent = "Lỗi kết nối server.";
-    }
-  });
+  loadTransactions();
 });
 
-// ============================
-// Bảng giao dịch
-// ============================
-let transactionList = [];
-let currentEditIndex = -1;
-const tableBody = document.querySelector("#transactionTable tbody");
+async function handleAdd() {
+  const { BACKEND_URL } = getConstants();
+
+  const data = {
+    action: "addTransaction",
+    maNhanVien: userInfo.maNhanVien,
+    tenNhanVien: userInfo.tenNhanVien,
+    transactionType: document.getElementById("transactionType").value,
+    customerName: document.getElementById("customerName").value,
+    customerEmail: document.getElementById("customerEmail").value,
+    customerPhone: document.getElementById("customerPhone").value,
+    softwareName: document.getElementById("softwareName").value,
+    softwarePackage: document.getElementById("softwarePackage").value,
+    duration: parseInt(document.getElementById("duration").value),
+    startDate: document.getElementById("startDate").value,
+    endDate: document.getElementById("endDate").value,
+    revenue: parseFloat(document.getElementById("revenue").value),
+    deviceCount: parseInt(document.getElementById("deviceCount").value),
+    note: document.getElementById("note").value
+  };
+
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    if (result.status === "success") {
+      document.getElementById("successMessage").textContent = "Giao dịch đã được lưu!";
+      document.getElementById("transactionForm").reset();
+      document.getElementById("startDate").value = today;
+      document.getElementById("endDate").value = "";
+      await loadTransactions();
+      currentEditIndex = -1;
+    } else {
+      document.getElementById("errorMessage").textContent = result.message || "Không thể lưu giao dịch!";
+    }
+  } catch (err) {
+    document.getElementById("errorMessage").textContent = "Lỗi kết nối server.";
+  }
+}
+
+async function loadTransactions() {
+  const { BACKEND_URL } = getConstants();
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "getTransactions" })
+    });
+
+    const result = await response.json();
+    if (result.status === "success") {
+      transactionList = result.data;
+      updateTable();
+    }
+  } catch (err) {
+    console.error("Lỗi khi tải danh sách giao dịch", err);
+  }
+}
 
 function updateTable() {
+  const tableBody = document.querySelector("#transactionTable tbody");
   tableBody.innerHTML = "";
+
   transactionList.forEach((t, i) => {
     const row = document.createElement("tr");
     row.innerHTML = `
@@ -114,7 +131,7 @@ function updateTable() {
   });
 }
 
-window.editRow = function(index) {
+window.editRow = function (index) {
   const t = transactionList[index];
   document.getElementById("transactionType").value = t.transactionType;
   document.getElementById("customerName").value = t.customerName;
@@ -131,7 +148,7 @@ window.editRow = function(index) {
   currentEditIndex = index;
 };
 
-window.deleteRow = function(index) {
+window.deleteRow = function (index) {
   if (confirm("Bạn có chắc muốn xóa dòng này?")) {
     transactionList.splice(index, 1);
     updateTable();
