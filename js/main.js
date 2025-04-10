@@ -1,5 +1,13 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const userInfo = JSON.parse(localStorage.getItem("employeeInfo"));
+  const userData = localStorage.getItem("user");
+    let userInfo = null;
+    
+    try {
+      userInfo = userData ? JSON.parse(userData) : null;
+    } catch (e) {
+      userInfo = null;
+    }
+  
   const welcome = document.getElementById("welcome");
   if (userInfo) {
     welcome.textContent = `Xin chào ${userInfo.tenNhanVien} (${userInfo.maNhanVien}) - ${userInfo.vaiTro}`;
