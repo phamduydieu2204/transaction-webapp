@@ -1,6 +1,11 @@
+function togglePassword() {
+  const passwordInput = document.getElementById('password');
+  passwordInput.type = (passwordInput.type === 'password') ? 'text' : 'password';
+}
+
 async function handleLogin() {
-  const { BACKEND_URL } = getAppConstants(); // Hoặc getConstants() nếu bạn dùng lại tên cũ
-  const employeeCode = document.getElementById('employeeCode').value.trim().toUpperCase(); // CHUYỂN VỀ VIẾT HOA
+  const { BACKEND_URL } = getConstants();
+  const employeeCode = document.getElementById('employeeCode').value.trim().toUpperCase(); // chuyển về in hoa
   const password = document.getElementById('password').value.trim();
   const errorEl = document.getElementById('errorMessage');
 
