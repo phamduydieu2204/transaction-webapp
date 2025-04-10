@@ -96,9 +96,12 @@ console.log("📤 Gửi lên:", data); /* Thêm vào để kiểm tra*/
 async function loadTransactions() {
   const { BACKEND_URL } = getConstants();
   try {
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      body: JSON.stringify({ action: "getTransactions" })
+      const response = await fetch(BACKEND_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ action: "getTransactions" })
     });
 
     const result = await response.json();
