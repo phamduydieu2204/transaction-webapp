@@ -44,6 +44,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function handleAdd() {
   const { BACKEND_URL } = getConstants();
+  /* thêm vào để kiểm tra phần if !userInffo*/
+if (!userInfo) {
+  alert("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.");
+  return;
+}
 
   const data = {
     action: "addTransaction",
@@ -62,7 +67,7 @@ async function handleAdd() {
     deviceCount: parseInt(document.getElementById("deviceCount").value),
     note: document.getElementById("note").value
   };
-
+console.log("📤 Gửi lên:", data); /* Thêm vào để kiểm tra*/
   try {
     const response = await fetch(BACKEND_URL, {
       method: "POST",
