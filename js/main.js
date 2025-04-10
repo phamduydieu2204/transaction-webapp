@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const userData = localStorage.getItem("user");
+  const userData = localStorage.getItem("employeeInfo"); // ✅ đúng với key đã lưu
     let userInfo = null;
     
     try {
