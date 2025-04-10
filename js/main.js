@@ -78,3 +78,62 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+let currentEditIndex = -1; // theo dõi dòng đang chỉnh sửa
+const tableBody = document.querySelector("#transactionTable tbody");
+
+function renderRow(data, index) {
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td>${data.transactionType}</td>
+    <td>${data.customerName}</td>
+    <td>${data.customerEmail}</td>
+    <td>${data.customerPhone}</td>
+    <td>${data.softwareName}</td>
+    <td>${data.softwarePackage}</td>
+    <td>${data.duration}</td>
+    <td>${data.startDate}</td>
+    <td>${data.endDate}</td>
+    <td>${data.revenue}</td>
+    <td>${data.deviceCount}</td>
+    <td>${data.note}</td>
+    <td>
+      <button class="edit-btn" onclick="editRow(${index})">Sửa</button>
+      <button class="delete-btn" onclick="deleteRow(${index})">Xóa</button>
+    </td>
+  `;
+  return row;
+}
+
+let transactionList = [];
+
+function updateTable() {
+  tableBody.innerHTML = "";
+  transactionList.forEach((t, i) => {
+    tableBody.appendChild(renderRow(t, i));
+  });
+}
+
+window.editRow = function(index) {
+  const t = transactionList[index];
+  document.getElementById("transactionType").value = t.transactionType;
+  document.getElementById("customerName").value = t.customerName;
+  document.getElementById("customerEmail").value = t.customerEmail;
+  document.getElementById("customerPhone").value = t.customerPhone;
+  document.getElementById("softwareName").value = t.softwareName;
+  document.getElementById("softwarePackage").value = t.softwarePackage;
+  document.getElementById("duration").value = t.duration;
+  document.getElementById("startDate").value = t.startDate;
+  document.getElementById("endDate").value = t.endDate;
+  document.getElementById("revenue").value = t.revenue;
+  document.getElementById("deviceCount").value = t.deviceCount;
+  document.getElementById("note").value = t.note;
+  currentEditIndex = index;
+}
+
+window.deleteRow = function(index) {
+  if (confirm("Bạn có chắc muốn xóa dòng này?")) {
+    transactionList.splice(index, 1);
+    updateTable();
+  }
+}
+
