@@ -52,14 +52,19 @@ button:hover {
 
 .password-container input {
   width: 100%;
-  padding-right: 30px;
+  padding: 10px 40px 10px 10px; /* chừa chỗ bên phải cho icon 👁️ */
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
 }
 
 .toggle-password {
   position: absolute;
   top: 50%;
-  right: 10px;
+  right: 12px;
   transform: translateY(-50%);
   cursor: pointer;
+  font-size: 18px;
 }
+
 
