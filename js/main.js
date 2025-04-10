@@ -69,8 +69,11 @@ if (!userInfo) {
   };
 console.log("📤 Gửi lên:", data); /* Thêm vào để kiểm tra*/
   try {
-    const response = await fetch(BACKEND_URL, {
+      const response = await fetch(BACKEND_URL, {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json" // <-- Dòng QUAN TRỌNG này!
+      },
       body: JSON.stringify(data)
     });
 
