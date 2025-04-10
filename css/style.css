@@ -121,3 +121,21 @@ button:hover {
 #successMessage {
   color: green;
 }
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+}
+
+.wide {
+  grid-column: span 2;
+}
+
+.full-row {
+  grid-column: span 5;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 10px;
+}
