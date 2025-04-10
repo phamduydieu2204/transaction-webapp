@@ -6,19 +6,19 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<div class="password-container">
-  <input type="password" id="password" placeholder="Mật khẩu">
-  <span class="toggle-password" onclick="togglePassword()">👁️</span>
-</div>
-    <script>
-  function togglePassword() {
-    const passwordInput = document.getElementById('password');
-    passwordInput.type = (passwordInput.type === 'password') ? 'text' : 'password';
-  }
-</script>
+  <div class="login-container">
+    <h2>Đăng nhập hệ thống</h2>
+    <input type="text" id="employeeCode" placeholder="Mã nhân viên">
+
+    <div class="password-container">
+      <input type="password" id="password" placeholder="Mật khẩu">
+      <span class="toggle-password" onclick="togglePassword()">👁️</span>
+    </div>
+
     <button onclick="handleLogin()">Đăng nhập</button>
     <p id="errorMessage" class="error"></p>
   </div>
+
   <script src="js/constants.js"></script>
   <script src="js/login.js"></script>
 </body>
