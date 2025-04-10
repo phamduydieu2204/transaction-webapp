@@ -1,13 +1,12 @@
+/* GIAO DIỆN CHUNG */
 body {
   font-family: Arial, sans-serif;
   background: #f2f2f2;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
   margin: 0;
+  min-height: 100vh;
 }
 
+/* GIAO DIỆN TRANG ĐĂNG NHẬP */
 .login-container {
   background: white;
   padding: 30px;
@@ -15,9 +14,10 @@ body {
   box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.1);
   width: 320px;
   text-align: center;
+  margin: 60px auto;
 }
 
-input {
+.login-container input {
   width: 90%;
   padding: 10px;
   margin: 10px auto;
@@ -68,9 +68,10 @@ button:hover {
   font-size: 14px;
 }
 
-// GIAO DIỆN FORM NHẬP LIỆU
+
+/* GIAO DIỆN FORM NHẬP LIỆU TRANG CHÍNH */
 .container {
-  max-width: 600px;
+  max-width: 900px;
   margin: 40px auto;
   background: white;
   padding: 30px;
@@ -78,18 +79,34 @@ button:hover {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.container h2 {
-  font-size: 20px;
-  margin-bottom: 20px;
+.container h1 {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 10px;
 }
 
+.container p#welcome {
+  text-align: center;
+  margin-bottom: 30px;
+  font-style: italic;
+}
+
+.container h2 {
+  font-size: 20px;
+  margin-bottom: 15px;
+  margin-top: 20px;
+}
+
+/* Form nhập liệu */
 form label {
   display: block;
   font-weight: 600;
   margin-top: 10px;
 }
 
-form input {
+form input,
+form select,
+form textarea {
   width: 100%;
   padding: 10px;
   border: 1px solid #ddd;
@@ -113,7 +130,8 @@ form button {
 form button:hover {
   background-color: #0056b3;
 }
-// giao diện giống helium10
+
+/* Giao diện giống Helium10 – Grid và nhóm field */
 .form-grid {
   display: grid;
   gap: 20px;
@@ -121,25 +139,16 @@ form button:hover {
 }
 
 fieldset {
-  border: 1px solid #ddd;
-  padding: 15px;
-  border-radius: 6px;
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 10px;
+  background: #f9f9f9;
+  margin-bottom: 20px;
 }
 
 fieldset legend {
+  font-size: 16px;
   font-weight: bold;
-  padding: 0 5px;
+  padding: 0 10px;
+  color: #333;
 }
-
-label {
-  display: block;
-  margin-top: 10px;
-}
-
-input, select, textarea {
-  width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-  box-sizing: border-box;
-}
-
