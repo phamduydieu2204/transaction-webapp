@@ -15,21 +15,73 @@
     <hr>
 
     <h2>Nhập giao dịch</h2>
-    <form id="transactionForm">
-      <label>Mã khách:</label>
-      <input type="text" id="customerCode" placeholder="VD: KH001" required>
+    <form id="transactionForm" class="form-grid">
+      <!-- Nhóm 1: Thông tin giao dịch -->
+      <fieldset>
+        <legend>Thông tin giao dịch</legend>
 
-      <label>Tên khách:</label>
-      <input type="text" id="customerName" placeholder="VD: Nguyễn Văn A" required>
+        <label>Loại giao dịch:</label>
+        <select id="transactionType" required>
+          <option value="">-- Chọn loại --</option>
+          <option value="Mua hàng">Mua hàng</option>
+          <option value="Nâng gói">Nâng gói</option>
+          <option value="Hoàn hàng">Hoàn hàng</option>
+        </select>
 
-      <label>Tên tool:</label>
-      <input type="text" id="toolName" placeholder="VD: ChatGPT Plus" required>
+        <label>Số tháng đăng ký:</label>
+        <input type="number" id="duration" placeholder="VD: 3" required>
 
-      <label>Giá bán:</label>
-      <input type="number" id="price" required>
+        <label>Ngày bắt đầu:</label>
+        <input type="date" id="startDate" required>
 
-      <label>Ngày giao dịch:</label>
-      <input type="date" id="transactionDate" required>
+        <label>Ngày kết thúc:</label>
+        <input type="date" id="endDate" required>
+
+        <label>Doanh thu:</label>
+        <input type="number" id="revenue" placeholder="VD: 300000" required>
+
+        <label>Ghi chú:</label>
+        <textarea id="note" rows="2" placeholder="Ghi chú nếu có..."></textarea>
+      </fieldset>
+
+      <!-- Nhóm 2: Khách hàng -->
+      <fieldset>
+        <legend>Khách hàng</legend>
+
+        <label>Tên khách hàng:</label>
+        <input type="text" id="customerName" required>
+
+        <label>Email:</label>
+        <input type="email" id="customerEmail" required>
+
+        <label>Liên hệ:</label>
+        <input type="text" id="customerPhone" required>
+
+        <label>Số thiết bị:</label>
+        <input type="number" id="deviceCount" required>
+      </fieldset>
+
+      <!-- Nhóm 3: Sản phẩm -->
+      <fieldset>
+        <legend>Phần mềm</legend>
+
+        <label>Tên phần mềm:</label>
+        <input type="text" id="softwareName" required>
+
+        <label>Gói phần mềm:</label>
+        <input type="text" id="softwarePackage" required>
+      </fieldset>
+
+      <!-- Nhóm 4: Nhân viên -->
+      <fieldset>
+        <legend>Nhân viên thực hiện</legend>
+
+        <label>Tên nhân viên:</label>
+        <input type="text" id="employeeName" readonly>
+
+        <label>Mã nhân viên:</label>
+        <input type="text" id="employeeCode" readonly>
+      </fieldset>
 
       <button type="submit">Lưu giao dịch</button>
     </form>
@@ -38,4 +90,5 @@
     <p id="errorMessage" style="color: red;"></p>
   </div>
 </body>
+
 </html>
