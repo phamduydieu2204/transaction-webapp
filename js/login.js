@@ -4,8 +4,10 @@ function togglePassword() {
 }
 
 async function handleLogin() {
-  const { BACKEND_URL } = getConstants();
-  const employeeCode = document.getElementById('employeeCode').value.trim().toUpperCase(); // chuyển về in hoa
+  console.log("Bắt đầu đăng nhập...");
+
+  const { BACKEND_URL } = getAppConstants(); // dùng đúng tên hàm ở constants.js
+  const employeeCode = document.getElementById('employeeCode').value.trim().toUpperCase();
   const password = document.getElementById('password').value.trim();
   const errorEl = document.getElementById('errorMessage');
 
