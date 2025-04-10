@@ -5,45 +5,28 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
+  margin: 0;
 }
 
 .login-container {
   background: white;
   padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.1);
   width: 320px;
   text-align: center;
 }
 
 input {
-  display: block;
   width: 90%;
   padding: 10px;
   margin: 10px auto;
-  border-radius: 5px;
+  border-radius: 6px;
   border: 1px solid #ccc;
+  font-size: 16px;
+  box-sizing: border-box;
 }
 
-button {
-  background: #007bff;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  margin-top: 10px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #0056b3;
-}
-
-.error {
-  color: red;
-  margin-top: 10px;
-}
-// CSS Con mắt xem mật khẩu
 .password-container {
   position: relative;
   width: 90%;
@@ -52,10 +35,7 @@ button:hover {
 
 .password-container input {
   width: 100%;
-  padding: 10px 40px 10px 10px; /* chừa chỗ bên phải cho icon 👁️ */
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
+  padding-right: 40px;
 }
 
 .toggle-password {
@@ -67,4 +47,23 @@ button:hover {
   font-size: 18px;
 }
 
+button {
+  background: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 15px;
+  font-size: 16px;
+}
 
+button:hover {
+  background: #0056b3;
+}
+
+.error {
+  color: red;
+  margin-top: 10px;
+  font-size: 14px;
+}
