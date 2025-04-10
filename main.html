@@ -11,15 +11,12 @@
   <div class="container">
     <h1>Hệ thống quản lý</h1>
     <p id="welcome"></p>
-
     <hr>
 
     <h2>Nhập giao dịch</h2>
     <form id="transactionForm" class="form-grid">
-      <!-- Nhóm 1: Thông tin giao dịch -->
-      <fieldset>
-        <legend>Thông tin giao dịch</legend>
-
+      <!-- Nhóm: Giao dịch -->
+      <div>
         <label>Loại giao dịch:</label>
         <select id="transactionType" required>
           <option value="">-- Chọn loại --</option>
@@ -27,140 +24,73 @@
           <option value="Nâng gói">Nâng gói</option>
           <option value="Hoàn hàng">Hoàn hàng</option>
         </select>
+      </div>
 
+      <div>
         <label>Số tháng đăng ký:</label>
-        <input type="number" id="duration" placeholder="VD: 3" required>
+        <input type="number" id="duration" placeholder="VD: 3" required />
+      </div>
 
+      <div>
         <label>Ngày bắt đầu:</label>
-        <input type="date" id="startDate" required>
+        <input type="date" id="startDate" required />
+      </div>
 
+      <div>
         <label>Ngày kết thúc:</label>
-        <input type="date" id="endDate" required>
+        <input type="date" id="endDate" required />
+      </div>
 
+      <div>
         <label>Doanh thu:</label>
-        <input type="number" id="revenue" placeholder="VD: 300000" required>
+        <input type="number" id="revenue" placeholder="VD: 300000" required />
+      </div>
 
+      <div class="extra-wide">
         <label>Ghi chú:</label>
-        <textarea id="note" rows="2" placeholder="Ghi chú nếu có..."></textarea>
-      </fieldset>
+        <textarea id="note" placeholder="Ghi chú nếu có..."></textarea>
+      </div>
 
-      <!-- Nhóm 2: Khách hàng -->
-      <fieldset>
-        <legend>Khách hàng</legend>
-
+      <!-- Nhóm: Khách hàng -->
+      <div>
         <label>Tên khách hàng:</label>
-        <input type="text" id="customerName" required>
+        <input type="text" id="customerName" required />
+      </div>
 
+      <div>
         <label>Email:</label>
-        <input type="email" id="customerEmail" required>
+        <input type="email" id="email" required />
+      </div>
 
+      <div class="extra-wide">
         <label>Liên hệ:</label>
-        <input type="text" id="customerPhone" required>
+        <input type="text" id="phone" required />
+      </div>
 
+      <div>
         <label>Số thiết bị:</label>
-        <input type="number" id="deviceCount" required>
-      </fieldset>
+        <input type="number" id="deviceCount" required />
+      </div>
 
-      <!-- Nhóm 3: Sản phẩm -->
-      <fieldset>
-        <legend>Phần mềm</legend>
-
+      <!-- Nhóm: Phần mềm -->
+      <div>
         <label>Tên phần mềm:</label>
-        <input type="text" id="softwareName" required>
+        <input type="text" id="softwareName" required />
+      </div>
 
+      <div>
         <label>Gói phần mềm:</label>
-        <input type="text" id="softwarePackage" required>
-      </fieldset>
+        <input type="text" id="packageName" required />
+      </div>
 
-      <!-- Nhóm 4: Nhân viên -->
-      <fieldset>
-        <legend>Nhân viên thực hiện</legend>
-
-        <label>Tên nhân viên:</label>
-        <input type="text" id="employeeName" readonly>
-
-        <label>Mã nhân viên:</label>
-        <input type="text" id="employeeCode" readonly>
-      </fieldset>
-
-      <button type="submit">Lưu giao dịch</button>
+      <!-- Nút -->
+      <div class="wide">
+        <button type="submit">Lưu giao dịch</button>
+      </div>
     </form>
 
-    <p id="successMessage" style="color: green;"></p>
-    <p id="errorMessage" style="color: red;"></p>
+    <p id="successMessage"></p>
+    <p id="errorMessage"></p>
   </div>
 </body>
-<form id="transactionForm">
-  <!-- Cột 1 -->
-  <div>
-    <label>Loại giao dịch:</label>
-    <select id="transactionType" required>
-      <option value="">-- Chọn loại --</option>
-      <option value="Mua">Mua hàng</option>
-      <option value="Nâng gói">Nâng gói</option>
-      <option value="Hoàn">Hoàn hàng</option>
-    </select>
-  </div>
-
-  <div>
-    <label>Số tháng đăng ký:</label>
-    <input type="number" id="duration" placeholder="VD: 3" />
-  </div>
-
-  <div>
-    <label>Ngày bắt đầu:</label>
-    <input type="date" id="startDate" />
-  </div>
-
-  <div>
-    <label>Ngày kết thúc:</label>
-    <input type="date" id="endDate" />
-  </div>
-
-  <div>
-    <label>Doanh thu:</label>
-    <input type="number" id="revenue" placeholder="VD: 300000" />
-  </div>
-
-  <div class="extra-wide">
-    <label>Ghi chú:</label>
-    <textarea id="note" placeholder="Ghi chú nếu có..."></textarea>
-  </div>
-
-  <!-- Cột 2 -->
-  <div>
-    <label>Tên khách hàng:</label>
-    <input type="text" id="customerName" />
-  </div>
-
-  <div>
-    <label>Email:</label>
-    <input type="email" id="email" />
-  </div>
-
-  <div class="extra-wide">
-    <label>Liên hệ:</label>
-    <input type="text" id="phone" />
-  </div>
-
-  <div>
-    <label>Số thiết bị:</label>
-    <input type="number" id="deviceCount" />
-  </div>
-
-  <!-- Cột 3 -->
-  <div>
-    <label>Tên phần mềm:</label>
-    <input type="text" id="softwareName" />
-  </div>
-
-  <div>
-    <label>Gói phần mềm:</label>
-    <input type="text" id="packageName" />
-  </div>
-
-  <!-- Nút -->
-  <button type="submit">Lưu giao dịch</button>
-</form>
-
 </html>
