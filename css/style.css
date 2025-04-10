@@ -67,3 +67,50 @@ button:hover {
   margin-top: 10px;
   font-size: 14px;
 }
+
+// GIAO DIỆN FORM NHẬP LIỆU
+.container {
+  max-width: 600px;
+  margin: 40px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.container h2 {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+form label {
+  display: block;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+form input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-top: 5px;
+  box-sizing: border-box;
+}
+
+form button {
+  margin-top: 20px;
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+form button:hover {
+  background-color: #0056b3;
+}
+
