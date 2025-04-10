@@ -30,7 +30,7 @@ async function handleLogin() {
     const result = await response.json();
 
     if (result.status === 'success') {
-      localStorage.setItem('employeeInfo', JSON.stringify(result.data));
+      localStorage.setItem('employeeInfo', JSON.stringify(result));
       window.location.href = 'main.html';
     } else {
       errorEl.textContent = result.message || 'Đăng nhập thất bại!';
