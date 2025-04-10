@@ -24,7 +24,7 @@ async function handleLogin() {
   
       if (result.status === 'success') {
         localStorage.setItem('employeeInfo', JSON.stringify(result.data));
-        window.location.href = 'main.html';  // Trang chính sau khi login
+        window.location.href = 'main.html';
       } else {
         errorEl.textContent = result.message || 'Đăng nhập thất bại!';
       }
