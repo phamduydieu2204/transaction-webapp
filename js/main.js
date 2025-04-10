@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // Mặc định ngày bắt đầu = hôm nay
+  const form = document.getElementById("transactionForm");
   const startDateInput = document.getElementById("startDate");
   const durationInput = document.getElementById("duration");
   const endDateInput = document.getElementById("endDate");
@@ -31,11 +31,10 @@ document.addEventListener("DOMContentLoaded", () => {
       endDateInput.value = estimated.toISOString().split("T")[0];
     }
   }
+
   startDateInput.addEventListener("change", calculateEndDate);
   durationInput.addEventListener("input", calculateEndDate);
 
-  // Submit form
-  const form = document.getElementById("transactionForm");
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const { BACKEND_URL } = getConstants();
@@ -48,13 +47,13 @@ document.addEventListener("DOMContentLoaded", () => {
       customerName: document.getElementById("customerName").value,
       customerEmail: document.getElementById("customerEmail").value,
       customerPhone: document.getElementById("customerPhone").value,
+      softwareName: document.getElementById("softwareName").value,
+      softwarePackage: document.getElementById("softwarePackage").value,
       duration: parseInt(document.getElementById("duration").value),
       startDate: document.getElementById("startDate").value,
       endDate: document.getElementById("endDate").value,
-      deviceCount: parseInt(document.getElementById("deviceCount").value),
-      softwareName: document.getElementById("softwareName").value,
-      softwarePackage: document.getElementById("softwarePackage").value,
       revenue: parseFloat(document.getElementById("revenue").value),
+      deviceCount: parseInt(document.getElementById("deviceCount").value),
       note: document.getElementById("note").value
     };
 
@@ -66,10 +65,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const result = await response.json();
       if (result.status === "success") {
+        transactionList.push(data);
+        updateTable();
         document.getElementById("successMessage").textContent = "Giao dịch đã được lưu!";
         form.reset();
-        startDateInput.value = today; // đặt lại mặc định
+        startDateInput.value = today;
         endDateInput.value = "";
+        currentEditIndex = -1;
       } else {
         document.getElementById("errorMessage").textContent = result.message || "Không thể lưu giao dịch!";
       }
@@ -78,38 +80,37 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-let currentEditIndex = -1; // theo dõi dòng đang chỉnh sửa
-const tableBody = document.querySelector("#transactionTable tbody");
 
-function renderRow(data, index) {
-  const row = document.createElement("tr");
-  row.innerHTML = `
-    <td>${data.transactionType}</td>
-    <td>${data.customerName}</td>
-    <td>${data.customerEmail}</td>
-    <td>${data.customerPhone}</td>
-    <td>${data.softwareName}</td>
-    <td>${data.softwarePackage}</td>
-    <td>${data.duration}</td>
-    <td>${data.startDate}</td>
-    <td>${data.endDate}</td>
-    <td>${data.revenue}</td>
-    <td>${data.deviceCount}</td>
-    <td>${data.note}</td>
-    <td>
-      <button class="edit-btn" onclick="editRow(${index})">Sửa</button>
-      <button class="delete-btn" onclick="deleteRow(${index})">Xóa</button>
-    </td>
-  `;
-  return row;
-}
-
+// ============================
+// Bảng giao dịch
+// ============================
 let transactionList = [];
+let currentEditIndex = -1;
+const tableBody = document.querySelector("#transactionTable tbody");
 
 function updateTable() {
   tableBody.innerHTML = "";
   transactionList.forEach((t, i) => {
-    tableBody.appendChild(renderRow(t, i));
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${t.transactionType}</td>
+      <td>${t.customerName}</td>
+      <td>${t.customerEmail}</td>
+      <td>${t.customerPhone}</td>
+      <td>${t.softwareName}</td>
+      <td>${t.softwarePackage}</td>
+      <td>${t.duration}</td>
+      <td>${t.startDate}</td>
+      <td>${t.endDate}</td>
+      <td>${t.revenue}</td>
+      <td>${t.deviceCount}</td>
+      <td>${t.note}</td>
+      <td>
+        <button class="edit-btn" onclick="editRow(${i})">Sửa</button>
+        <button class="delete-btn" onclick="deleteRow(${i})">Xóa</button>
+      </td>
+    `;
+    tableBody.appendChild(row);
   });
 }
 
@@ -128,12 +129,11 @@ window.editRow = function(index) {
   document.getElementById("deviceCount").value = t.deviceCount;
   document.getElementById("note").value = t.note;
   currentEditIndex = index;
-}
+};
 
 window.deleteRow = function(index) {
   if (confirm("Bạn có chắc muốn xóa dòng này?")) {
     transactionList.splice(index, 1);
     updateTable();
   }
-}
-
+};
