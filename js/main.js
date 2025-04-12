@@ -391,14 +391,16 @@ function updateTable() {
       <td>${t.customerName}</td>
       <td>${t.customerEmail}</td>
       <td>${t.customerPhone}</td>
-      <td>${t.softwareName}</td>
-      <td>${t.softwarePackage}</td>
       <td>${t.duration}</td>
       <td>${t.startDate}</td>
       <td>${t.endDate}</td>
-      <td>${t.revenue}</td>
       <td>${t.deviceCount}</td>
+      <td>${t.softwareName}</td>
+      <td>${t.softwarePackage}</td>
+      <td>${t.revenue}</td>
       <td>${t.note}</td>
+      <td>${t.tenNhanVien}</td>
+      <td>${t.maNhanVien}</td>
       <td>
         <button class="edit-btn" onclick="editRow(${start + i})">Sửa</button>
         <button class="delete-btn" onclick="deleteRow(${start + i})">Xóa</button>
