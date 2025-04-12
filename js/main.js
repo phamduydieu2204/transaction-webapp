@@ -40,7 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
   durationInput.addEventListener("input", calculateEndDate);
 
   loadTransactions();
-  loadStats();
 });
 
 async function handleAdd() {
@@ -85,7 +84,6 @@ async function handleAdd() {
       document.getElementById("startDate").value = today;
       document.getElementById("endDate").value = "";
       await loadTransactions();
-      await loadStats();
       currentEditIndex = -1;
     } else {
       document.getElementById("errorMessage").textContent = result.message || "Không thể lưu giao dịch!";
@@ -138,7 +136,6 @@ async function handleUpdate() {
       document.getElementById("startDate").value = today;
       document.getElementById("endDate").value = "";
       await loadTransactions();
-      await loadStats();
       currentEditIndex = -1;
     } else {
       document.getElementById("errorMessage").textContent = result.message || "Không thể cập nhật giao dịch!";
@@ -180,7 +177,6 @@ async function handleDelete() {
       document.getElementById("startDate").value = today;
       document.getElementById("endDate").value = "";
       await loadTransactions();
-      await loadStats();
       currentEditIndex = -1;
     } else {
       document.getElementById("errorMessage").textContent = result.message || "Không thể xóa giao dịch!";
@@ -251,126 +247,6 @@ async function loadTransactions() {
   } catch (err) {
     document.getElementById("errorMessage").textContent = `Lỗi khi tải danh sách giao dịch: ${err.message}`;
     console.error("Lỗi khi tải danh sách giao dịch", err);
-  }
-}
-
-async function loadStats() {
-  const { BACKEND_URL } = getConstants();
-  try {
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ action: "getTransactions", maNhanVien: userInfo.maNhanVien })
-    });
-
-    const result = await response.json();
-    if (result.status === "success") {
-      const transactions = result.data;
-      const timeRange = document.getElementById("timeRange").value;
-
-      let totalRevenue = 0;
-      let totalTransactions = transactions.length;
-      const softwareCount = {};
-      const packageCount = {};
-      const revenueByTime = {};
-
-      transactions.forEach(t => {
-        totalRevenue += t.revenue;
-
-        softwareCount[t.softwareName] = (softwareCount[t.softwareName] || 0) + 1;
-        packageCount[t.softwarePackage] = (packageCount[t.softwarePackage] || 0) + 1;
-
-        const date = new Date(t.startDate);
-        let key;
-        if (timeRange === "day") {
-          key = date.toISOString().split("T")[0];
-        } else if (timeRange === "month") {
-          key = `${date.getFullYear()}-${date.getMonth() + 1}`;
-        } else {
-          key = date.getFullYear().toString();
-        }
-        revenueByTime[key] = (revenueByTime[key] || 0) + t.revenue;
-      });
-
-      document.getElementById("totalRevenue").textContent = totalRevenue.toLocaleString();
-      document.getElementById("totalTransactions").textContent = totalTransactions;
-
-      const popularSoftware = Object.keys(softwareCount).reduce((a, b) => softwareCount[a] > softwareCount[b] ? a : b, "");
-      const popularPackage = Object.keys(packageCount).reduce((a, b) => packageCount[a] > packageCount[b] ? a : b, "");
-      document.getElementById("popularSoftware").textContent = popularSoftware || "Không có";
-      document.getElementById("popularPackage").textContent = popularPackage || "Không có";
-
-      const revenueLabels = Object.keys(revenueByTime).sort();
-      const revenueData = revenueLabels.map(label => revenueByTime[label]);
-      const revenueChart = new Chart(document.getElementById("revenueChart"), {
-        type: 'bar',
-        data: {
-          labels: revenueLabels,
-          datasets: [{
-            label: 'Doanh thu',
-            data: revenueData,
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-            borderColor: 'rgba(54, 162, 235, 1)',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
-
-      const softwareChart = new Chart(document.getElementById("softwareChart"), {
-        type: 'pie',
-        data: {
-          labels: Object.keys(softwareCount),
-          datasets: [{
-            label: 'Số lượng',
-            data: Object.values(softwareCount),
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.2)',
-              'rgba(54, 162, 235, 0.2)',
-              'rgba(255, 206, 86, 0.2)',
-              'rgba(75, 192, 192, 0.2)',
-              'rgba(153, 102, 255, 0.2)',
-            ],
-            borderColor: [
-              'rgba(255, 99, 132, 1)',
-              'rgba(54, 162, 235, 1)',
-              'rgba(255, 206, 86, 1)',
-              'rgba(75, 192, 192, 1)',
-              'rgba(153, 102, 255, 1)',
-            ],
-            borderWidth: 1
-          }]
-        }
-      });
-
-      const expiredTableBody = document.querySelector("#expiredTransactionsTable tbody");
-      expiredTableBody.innerHTML = "";
-      transactions.forEach(t => {
-        if (t.endDate === today) {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${t.transactionId}</td>
-            <td>${t.customerName}</td>
-            <td>${t.customerEmail}</td>
-            <td>${t.softwareName}</td>
-            <td>${t.softwarePackage}</td>
-            <td>${t.endDate}</td>
-          `;
-          expiredTableBody.appendChild(row);
-        }
-      });
-    }
-  } catch (err) {
-    document.getElementById("errorMessage").textContent = `Lỗi khi tải thống kê: ${err.message}`;
-    console.error("Lỗi khi tải thống kê", err);
   }
 }
 
@@ -455,10 +331,3 @@ window.deleteRow = function (index) {
   currentEditIndex = index;
   handleDelete();
 };
-
-function openTab(tabId) {
-  document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-  document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-  document.getElementById(tabId).classList.add('active');
-  document.querySelector(`button[onclick="openTab('${tabId}')"]`).classList.add('active');
-}
