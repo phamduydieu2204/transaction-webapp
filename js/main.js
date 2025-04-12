@@ -51,20 +51,20 @@ async function handleAdd() {
 
   const data = {
     action: "addTransaction",
-    maNhanVien: userInfo.maNhanVien,
-    tenNhanVien: userInfo.tenNhanVien,
-    transactionType: document.getElementById("transactionType").value,
-    customerName: document.getElementById("customerName").value,
-    customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
-    customerPhone: document.getElementById("customerPhone").value,
-    softwareName: document.getElementById("softwareName").value,
-    softwarePackage: document.getElementById("softwarePackage").value,
-    duration: parseInt(document.getElementById("duration").value),
-    startDate: document.getElementById("startDate").value,
-    endDate: document.getElementById("endDate").value,
-    revenue: parseFloat(document.getElementById("revenue").value),
-    deviceCount: parseInt(document.getElementById("deviceCount").value),
-    note: document.getElementById("note").value
+    transactionType: document.getElementById("transactionType").value,    // Cột C
+    customerName: document.getElementById("customerName").value,         // Cột D
+    customerEmail: document.getElementById("customerEmail").value.toLowerCase(), // Cột E
+    customerPhone: document.getElementById("customerPhone").value,       // Cột F
+    duration: parseInt(document.getElementById("duration").value),       // Cột G
+    startDate: document.getElementById("startDate").value,               // Cột H
+    endDate: document.getElementById("endDate").value,                   // Cột I
+    deviceCount: parseInt(document.getElementById("deviceCount").value), // Cột J
+    softwareName: document.getElementById("softwareName").value,         // Cột K
+    softwarePackage: document.getElementById("softwarePackage").value,   // Cột L
+    revenue: parseFloat(document.getElementById("revenue").value),       // Cột M
+    note: document.getElementById("note").value,                         // Cột N
+    tenNhanVien: userInfo.tenNhanVien,                                   // Cột O
+    maNhanVien: userInfo.maNhanVien                                      // Cột P
   };
   console.log("📤 Gửi lên:", data);
 
@@ -104,20 +104,20 @@ async function handleUpdate() {
   const data = {
     action: "updateTransaction",
     transactionId: transactionList[currentEditIndex].transactionId,
-    maNhanVien: userInfo.maNhanVien,
-    tenNhanVien: userInfo.tenNhanVien,
-    transactionType: document.getElementById("transactionType").value,
-    customerName: document.getElementById("customerName").value,
-    customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
-    customerPhone: document.getElementById("customerPhone").value,
-    softwareName: document.getElementById("softwareName").value,
-    softwarePackage: document.getElementById("softwarePackage").value,
-    duration: parseInt(document.getElementById("duration").value),
-    startDate: document.getElementById("startDate").value,
-    endDate: document.getElementById("endDate").value,
-    revenue: parseFloat(document.getElementById("revenue").value),
-    deviceCount: parseInt(document.getElementById("deviceCount").value),
-    note: document.getElementById("note").value
+    transactionType: document.getElementById("transactionType").value,    // Cột C
+    customerName: document.getElementById("customerName").value,         // Cột D
+    customerEmail: document.getElementById("customerEmail").value.toLowerCase(), // Cột E
+    customerPhone: document.getElementById("customerPhone").value,       // Cột F
+    duration: parseInt(document.getElementById("duration").value),       // Cột G
+    startDate: document.getElementById("startDate").value,               // Cột H
+    endDate: document.getElementById("endDate").value,                   // Cột I
+    deviceCount: parseInt(document.getElementById("deviceCount").value), // Cột J
+    softwareName: document.getElementById("softwareName").value,         // Cột K
+    softwarePackage: document.getElementById("softwarePackage").value,   // Cột L
+    revenue: parseFloat(document.getElementById("revenue").value),       // Cột M
+    note: document.getElementById("note").value,                         // Cột N
+    tenNhanVien: userInfo.tenNhanVien,                                   // Cột O
+    maNhanVien: userInfo.maNhanVien                                      // Cột P
   };
 
   try {
