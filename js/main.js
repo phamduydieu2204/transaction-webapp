@@ -51,20 +51,20 @@ async function handleAdd() {
 
   const data = {
     action: "addTransaction",
-    transactionType: document.getElementById("transactionType").value,    // Cột C
-    customerName: document.getElementById("customerName").value,         // Cột D
-    customerEmail: document.getElementById("customerEmail").value.toLowerCase(), // Cột E
-    customerPhone: document.getElementById("customerPhone").value,       // Cột F
-    duration: parseInt(document.getElementById("duration").value),       // Cột G
-    startDate: document.getElementById("startDate").value,               // Cột H
-    endDate: document.getElementById("endDate").value,                   // Cột I
-    deviceCount: parseInt(document.getElementById("deviceCount").value), // Cột J
-    softwareName: document.getElementById("softwareName").value,         // Cột K
-    softwarePackage: document.getElementById("softwarePackage").value,   // Cột L
-    revenue: parseFloat(document.getElementById("revenue").value),       // Cột M
-    note: document.getElementById("note").value,                         // Cột N
-    tenNhanVien: userInfo.tenNhanVien,                                   // Cột O
-    maNhanVien: userInfo.maNhanVien                                      // Cột P
+    transactionType: document.getElementById("transactionType").value,    // Cột C: Loại giao dịch
+    customerName: document.getElementById("customerName").value,         // Cột D: Tên khách hàng
+    customerEmail: document.getElementById("customerEmail").value.toLowerCase(), // Cột E: Email
+    customerPhone: document.getElementById("customerPhone").value,       // Cột F: Liên hệ
+    duration: parseInt(document.getElementById("duration").value),       // Cột G: Số tháng đăng ký
+    startDate: document.getElementById("startDate").value,               // Cột H: Ngày bắt đầu
+    endDate: document.getElementById("endDate").value,                   // Cột I: Ngày kết thúc
+    deviceCount: parseInt(document.getElementById("deviceCount").value), // Cột J: Số thiết bị
+    softwareName: document.getElementById("softwareName").value,         // Cột K: Tên phần mềm
+    softwarePackage: document.getElementById("softwarePackage").value,   // Cột L: Gói phần mềm
+    revenue: parseFloat(document.getElementById("revenue").value),       // Cột M: Doanh thu
+    note: document.getElementById("note").value,                         // Cột N: Ghi chú
+    tenNhanVien: userInfo.tenNhanVien,                                   // Cột O: Tên nhân viên
+    maNhanVien: userInfo.maNhanVien                                      // Cột P: Mã nhân viên
   };
   console.log("📤 Gửi lên:", data);
 
@@ -104,20 +104,20 @@ async function handleUpdate() {
   const data = {
     action: "updateTransaction",
     transactionId: transactionList[currentEditIndex].transactionId,
-    transactionType: document.getElementById("transactionType").value,    // Cột C
-    customerName: document.getElementById("customerName").value,         // Cột D
-    customerEmail: document.getElementById("customerEmail").value.toLowerCase(), // Cột E
-    customerPhone: document.getElementById("customerPhone").value,       // Cột F
-    duration: parseInt(document.getElementById("duration").value),       // Cột G
-    startDate: document.getElementById("startDate").value,               // Cột H
-    endDate: document.getElementById("endDate").value,                   // Cột I
-    deviceCount: parseInt(document.getElementById("deviceCount").value), // Cột J
-    softwareName: document.getElementById("softwareName").value,         // Cột K
-    softwarePackage: document.getElementById("softwarePackage").value,   // Cột L
-    revenue: parseFloat(document.getElementById("revenue").value),       // Cột M
-    note: document.getElementById("note").value,                         // Cột N
-    tenNhanVien: userInfo.tenNhanVien,                                   // Cột O
-    maNhanVien: userInfo.maNhanVien                                      // Cột P
+    transactionType: document.getElementById("transactionType").value,    // Cột C: Loại giao dịch
+    customerName: document.getElementById("customerName").value,         // Cột D: Tên khách hàng
+    customerEmail: document.getElementById("customerEmail").value.toLowerCase(), // Cột E: Email
+    customerPhone: document.getElementById("customerPhone").value,       // Cột F: Liên hệ
+    duration: parseInt(document.getElementById("duration").value),       // Cột G: Số tháng đăng ký
+    startDate: document.getElementById("startDate").value,               // Cột H: Ngày bắt đầu
+    endDate: document.getElementById("endDate").value,                   // Cột I: Ngày kết thúc
+    deviceCount: parseInt(document.getElementById("deviceCount").value), // Cột J: Số thiết bị
+    softwareName: document.getElementById("softwareName").value,         // Cột K: Tên phần mềm
+    softwarePackage: document.getElementById("softwarePackage").value,   // Cột L: Gói phần mềm
+    revenue: parseFloat(document.getElementById("revenue").value),       // Cột M: Doanh thu
+    note: document.getElementById("note").value,                         // Cột N: Ghi chú
+    tenNhanVien: userInfo.tenNhanVien,                                   // Cột O: Tên nhân viên
+    maNhanVien: userInfo.maNhanVien                                      // Cột P: Mã nhân viên
   };
 
   try {
