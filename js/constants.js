@@ -1,5 +1,5 @@
 function getConstants() {
   return {
-    BACKEND_URL: 'http://localhost:3000/api/proxy'
+    BACKEND_URL: 'https://sleepy-bastion-81523-f30e287dba50.herokuapp.com/api/proxy'
   };
 }
