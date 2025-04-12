@@ -6,7 +6,7 @@ function togglePassword() {
 async function handleLogin() {
   console.log("Bắt đầu đăng nhập...");
 
-  const { BACKEND_URL } = getConstants(); // dùng đúng tên hàm ở constants.js
+  const { BACKEND_URL } = getConstants();
   const employeeCode = document.getElementById('employeeCode').value.trim().toUpperCase();
   const password = document.getElementById('password').value.trim();
   const errorEl = document.getElementById('errorMessage');
@@ -25,8 +25,16 @@ async function handleLogin() {
   try {
     const response = await fetch(BACKEND_URL, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json' // Thêm header này
+      },
       body: JSON.stringify(body)
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
     const result = await response.json();
 
     if (result.status === 'success') {
@@ -36,7 +44,7 @@ async function handleLogin() {
       errorEl.textContent = result.message || 'Đăng nhập thất bại!';
     }
   } catch (error) {
-    errorEl.textContent = 'Lỗi kết nối máy chủ!';
+    errorEl.textContent = 'Lỗi kết nối máy chủ: ' + error.message;
     console.error(error);
   }
 }
