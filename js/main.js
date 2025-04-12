@@ -83,7 +83,9 @@ async function handleAdd() {
       document.getElementById("transactionForm").reset();
       document.getElementById("startDate").value = today;
       document.getElementById("endDate").value = "";
-      await loadTransactions();
+      // Thêm giao dịch mới vào transactionList
+      transactionList.push(result);
+      updateTable();
       currentEditIndex = -1;
     } else {
       document.getElementById("errorMessage").textContent = result.message || "Không thể lưu giao dịch!";
@@ -261,22 +263,22 @@ function updateTable() {
   paginatedItems.forEach((t, i) => {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${t.transactionId}</td>
-      <td>${t.transactionDate}</td>
-      <td>${t.transactionType}</td>
-      <td>${t.customerName}</td>
-      <td>${t.customerEmail}</td>
-      <td>${t.customerPhone}</td>
-      <td>${t.duration}</td>
-      <td>${t.startDate}</td>
-      <td>${t.endDate}</td>
-      <td>${t.deviceCount}</td>
-      <td>${t.softwareName}</td>
-      <td>${t.softwarePackage}</td>
-      <td>${t.revenue}</td>
-      <td>${t.note}</td>
-      <td>${t.tenNhanVien}</td>
-      <td>${t.maNhanVien}</td>
+      <td>${t.transactionId || ''}</td>
+      <td>${t.transactionDate || ''}</td>
+      <td>${t.transactionType || ''}</td>
+      <td>${t.customerName || ''}</td>
+      <td>${t.customerEmail || ''}</td>
+      <td>${t.customerPhone || ''}</td>
+      <td>${t.duration || ''}</td>
+      <td>${t.startDate || ''}</td>
+      <td>${t.endDate || ''}</td>
+      <td>${t.deviceCount || ''}</td>
+      <td>${t.softwareName || ''}</td>
+      <td>${t.softwarePackage || ''}</td>
+      <td>${t.revenue || ''}</td>
+      <td>${t.note || ''}</td>
+      <td>${t.tenNhanVien || ''}</td>
+      <td>${t.maNhanVien || ''}</td>
       <td>
         <button class="edit-btn" onclick="editRow(${start + i})">Sửa</button>
         <button class="delete-btn" onclick="deleteRow(${start + i})">Xóa</button>
@@ -312,18 +314,18 @@ function nextPage() {
 
 window.editRow = function (index) {
   const t = transactionList[index];
-  document.getElementById("transactionType").value = t.transactionType;
-  document.getElementById("customerName").value = t.customerName;
-  document.getElementById("customerEmail").value = t.customerEmail;
-  document.getElementById("customerPhone").value = t.customerPhone;
-  document.getElementById("softwareName").value = t.softwareName;
-  document.getElementById("softwarePackage").value = t.softwarePackage;
-  document.getElementById("duration").value = t.duration;
-  document.getElementById("startDate").value = t.startDate;
-  document.getElementById("endDate").value = t.endDate;
-  document.getElementById("revenue").value = t.revenue;
-  document.getElementById("deviceCount").value = t.deviceCount;
-  document.getElementById("note").value = t.note;
+  document.getElementById("transactionType").value = t.transactionType || '';
+  document.getElementById("customerName").value = t.customerName || '';
+  document.getElementById("customerEmail").value = t.customerEmail || '';
+  document.getElementById("customerPhone").value = t.customerPhone || '';
+  document.getElementById("softwareName").value = t.softwareName || '';
+  document.getElementById("softwarePackage").value = t.softwarePackage || '';
+  document.getElementById("duration").value = t.duration || '';
+  document.getElementById("startDate").value = t.startDate || '';
+  document.getElementById("endDate").value = t.endDate || '';
+  document.getElementById("revenue").value = t.revenue || '';
+  document.getElementById("deviceCount").value = t.deviceCount || '';
+  document.getElementById("note").value = t.note || '';
   currentEditIndex = index;
 };
 
