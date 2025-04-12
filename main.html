@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Trang chính</title>
   <link rel="stylesheet" href="css/style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="js/constants.js"></script>
   <script defer src="js/main.js"></script>
 </head>
@@ -13,109 +14,219 @@
     <p id="welcome"></p>
     <hr>
 
-    <form id="transactionForm" class="form-grid">
-      <!-- Dòng 1 -->
-      <div>
-        <label>Loại giao dịch:</label>
-        <select id="transactionType" required>
-          <option value="">-- Chọn loại --</option>
-          <option value="Mua hàng">Mua hàng</option>
-          <option value="Nâng gói">Nâng gói</option>
-          <option value="Hoàn hàng">Hoàn hàng</option>
-        </select>
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-button active" onclick="openTab('inputTab')">Nhập liệu</button>
+      <button class="tab-button" onclick="openTab('statsTab')">Thống kê & Báo cáo</button>
+    </div>
+
+    <!-- Tab Nhập liệu -->
+    <div id="inputTab" class="tab-content active">
+      <form id="transactionForm" class="form-grid">
+        <!-- Dòng 1 -->
+        <div>
+          <label>Loại giao dịch:</label>
+          <select id="transactionType" required>
+            <option value="">-- Chọn loại --</option>
+            <option value="Mua hàng">Mua hàng</option>
+            <option value="Nâng gói">Nâng gói</option>
+            <option value="Hoàn hàng">Hoàn hàng</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Tên khách hàng:</label>
+          <input type="text" id="customerName" required>
+        </div>
+
+        <div>
+          <label>Email:</label>
+          <input type="email" id="customerEmail" required>
+        </div>
+
+        <div class="wide">
+          <label>Liên hệ:</label>
+          <input type="text" id="customerPhone" required>
+        </div>
+
+        <!-- Dòng 2 -->
+        <div>
+          <label>Tên phần mềm:</label>
+          <input type="text" id="softwareName" required>
+        </div>
+
+        <div>
+          <label>Gói phần mềm:</label>
+          <input type="text" id="softwarePackage" required>
+        </div>
+
+        <div>
+          <label>Số tháng đăng ký:</label>
+          <input type="number" id="duration" required>
+        </div>
+
+        <div>
+          <label>Số thiết bị:</label>
+          <input type="number" id="deviceCount" required>
+        </div>
+
+        <!-- Dòng 3 -->
+        <div>
+          <label>Ngày bắt đầu:</label>
+          <input type="date" id="startDate" required>
+        </div>
+
+        <div>
+          <label>Ngày kết thúc:</label>
+          <input type="date" id="endDate" readonly>
+        </div>
+
+        <div>
+          <label>Doanh thu:</label>
+          <input type="number" id="revenue" required>
+        </div>
+
+        <div class="wide">
+          <label>Ghi chú:</label>
+          <textarea id="note" rows="2"></textarea>
+        </div>
+
+        <!-- Dòng 4 -->
+        <div class="full-row">
+          <button type="button" onclick="handleAdd()">Thêm</button>
+          <button type="button" onclick="handleUpdate()">Sửa</button>
+          <button type="button" onclick="handleDelete()">Xóa</button>
+          <button type="button" onclick="handleSearch()">Tìm kiếm</button>
+          <button type="reset">Làm mới</button>
+        </div>
+      </form>
+
+      <!-- Form tìm kiếm -->
+      <h2>Tìm kiếm giao dịch</h2>
+      <form id="searchForm" class="form-grid">
+        <div>
+          <label>Loại giao dịch:</label>
+          <select id="searchTransactionType">
+            <option value="">-- Chọn loại --</option>
+            <option value="Mua hàng">Mua hàng</option>
+            <option value="Nâng gói">Nâng gói</option>
+            <option value="Hoàn hàng">Hoàn hàng</option>
+          </select>
+        </div>
+        <div>
+          <label>Tên khách hàng:</label>
+          <input type="text" id="searchCustomerName">
+        </div>
+        <div>
+          <label>Email:</label>
+          <input type="email" id="searchCustomerEmail">
+        </div>
+        <div>
+          <label>Tên phần mềm:</label>
+          <input type="text" id="searchSoftwareName">
+        </div>
+        <div class="full-row">
+          <button type="button" onclick="handleSearch()">Tìm kiếm</button>
+          <button type="reset">Xóa bộ lọc</button>
+        </div>
+      </form>
+
+      <h2>Danh sách giao dịch</h2>
+      <div class="pagination">
+        <button onclick="prevPage()">Trang trước</button>
+        <span id="pageInfo"></span>
+        <button onclick="nextPage()">Trang sau</button>
+      </div>
+      <table id="transactionTable">
+        <thead>
+          <tr>
+            <th>Mã giao dịch</th>
+            <th>Ngày giờ giao dịch</th>
+            <th>Loại giao dịch</th>
+            <th>Tên khách hàng</th>
+            <th>Email</th>
+            <th>Liên hệ</th>
+            <th>Số tháng đăng ký</th>
+            <th>Ngày bắt đầu</th>
+            <th>Ngày kết thúc</th>
+            <th>Số thiết bị</th>
+            <th>Tên phần mềm</th>
+            <th>Gói phần mềm</th>
+            <th>Doanh thu</th>
+            <th>Ghi chú</th>
+            <th>Tên nhân viên</th>
+            <th>Mã nhân viên</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Dữ liệu sẽ được render ở đây -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tab Thống kê & Báo cáo -->
+    <div id="statsTab" class="tab-content">
+      <h2>Thống kê & Báo cáo</h2>
+      <div class="stats-grid">
+        <div>
+          <label>Chọn khoảng thời gian:</label>
+          <select id="timeRange" onchange="loadStats()">
+            <option value="day">Theo ngày</option>
+            <option value="month">Theo tháng</option>
+            <option value="year">Theo năm</option>
+          </select>
+        </div>
       </div>
 
-      <div>
-        <label>Tên khách hàng:</label>
-        <input type="text" id="customerName" required>
+      <div class="stats-grid">
+        <div>
+          <h3>Tổng doanh thu</h3>
+          <p id="totalRevenue">0</p>
+        </div>
+        <div>
+          <h3>Tổng giao dịch</h3>
+          <p id="totalTransactions">0</p>
+        </div>
       </div>
 
-      <div>
-        <label>Email:</label>
-        <input type="email" id="customerEmail" required>
+      <div class="stats-grid">
+        <div>
+          <h3>Phần mềm phổ biến</h3>
+          <p id="popularSoftware"></p>
+        </div>
+        <div>
+          <h3>Gói phổ biến</h3>
+          <p id="popularPackage"></p>
+        </div>
       </div>
 
-      <div class="wide">
-        <label>Liên hệ:</label>
-        <input type="text" id="customerPhone" required>
+      <div class="stats-grid">
+        <div>
+          <h3>Biểu đồ doanh thu</h3>
+          <canvas id="revenueChart"></canvas>
+        </div>
+        <div>
+          <h3>Biểu đồ phần mềm</h3>
+          <canvas id="softwareChart"></canvas>
+        </div>
       </div>
 
-      <!-- Dòng 2 -->
-      <div>
-        <label>Tên phần mềm:</label>
-        <input type="text" id="softwareName" required>
-      </div>
-
-      <div>
-        <label>Gói phần mềm:</label>
-        <input type="text" id="softwarePackage" required>
-      </div>
-
-      <div>
-        <label>Số tháng đăng ký:</label>
-        <input type="number" id="duration" required>
-      </div>
-
-      <div>
-        <label>Số thiết bị:</label>
-        <input type="number" id="deviceCount" required>
-      </div>
-
-      <!-- Dòng 3 -->
-      <div>
-        <label>Ngày bắt đầu:</label>
-        <input type="date" id="startDate" required>
-      </div>
-
-      <div>
-        <label>Ngày kết thúc:</label>
-        <input type="date" id="endDate" readonly>
-      </div>
-
-      <div>
-        <label>Doanh thu:</label>
-        <input type="number" id="revenue" required>
-      </div>
-
-      <div class="wide">
-        <label>Ghi chú:</label>
-        <textarea id="note" rows="2"></textarea>
-      </div>
-
-      <!-- Dòng 4 -->
-      <div class="full-row">
-        <button type="button" onclick="handleAdd()">Thêm</button>
-        <button type="button" onclick="handleUpdate()">Sửa</button>
-        <button type="button" onclick="handleDelete()">Xóa</button>
-        <button type="button" onclick="handleSearch()">Tìm kiếm</button>
-        <button type="reset">Làm mới</button>
-      </div>
-    </form>
-
-<h2>Danh sách giao dịch</h2>
-<table id="transactionTable">
-  <thead>
-    <tr>
-      <th>Loại</th>
-      <th>Khách hàng</th>
-      <th>Email</th>
-      <th>Liên hệ</th>
-      <th>Phần mềm</th>
-      <th>Gói</th>
-      <th>Số tháng</th>
-      <th>Ngày bắt đầu</th>
-      <th>Ngày kết thúc</th>
-      <th>Doanh thu</th>
-      <th>Số thiết bị</th>
-      <th>Ghi chú</th>
-      <th>Hành động</th>
-    </tr>
-  </thead>
-  <tbody>
-    <!-- Dữ liệu sẽ được render ở đây -->
-  </tbody>
-</table>
-
+      <h3>Danh sách giao dịch hết hạn hôm nay</h3>
+      <table id="expiredTransactionsTable">
+        <thead>
+          <tr>
+            <th>Mã giao dịch</th>
+            <th>Khách hàng</th>
+            <th>Email</th>
+            <th>Phần mềm</th>
+            <th>Gói</th>
+            <th>Ngày kết thúc</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
 
     <p id="successMessage"></p>
     <p id="errorMessage"></p>
