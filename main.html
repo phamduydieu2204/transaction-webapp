@@ -27,28 +27,28 @@
 
       <div>
         <label>Tên khách hàng:</label>
-        <input type="text" id="customerName" required>
+        <input type="text" id="customerName">
       </div>
 
       <div>
         <label>Email:</label>
-        <input type="email" id="customerEmail" required>
+        <input type="email" id="customerEmail">
       </div>
 
       <div class="wide">
         <label>Liên hệ:</label>
-        <input type="text" id="customerPhone" required>
+        <input type="text" id="customerPhone">
       </div>
 
       <!-- Dòng 2 -->
       <div>
         <label>Số tháng đăng ký:</label>
-        <input type="number" id="duration" required>
+        <input type="number" id="duration">
       </div>
 
       <div>
         <label>Ngày bắt đầu:</label>
-        <input type="date" id="startDate" required>
+        <input type="date" id="startDate">
       </div>
 
       <div>
@@ -58,13 +58,13 @@
 
       <div>
         <label>Số thiết bị:</label>
-        <input type="number" id="deviceCount" required>
+        <input type="number" id="deviceCount">
       </div>
 
       <!-- Dòng 3 -->
       <div>
         <label>Tên phần mềm:</label>
-        <select id="softwareName" required>
+        <select id="softwareName">
           <option value="">-- Chọn phần mềm --</option>
           <!-- Danh sách phần mềm sẽ được điền động bằng JavaScript -->
         </select>
@@ -72,7 +72,7 @@
 
       <div>
         <label>Gói phần mềm:</label>
-        <select id="softwarePackage" required>
+        <select id="softwarePackage">
           <option value="">-- Chọn gói --</option>
           <!-- Danh sách gói sẽ được điền động bằng JavaScript -->
         </select>
@@ -80,7 +80,7 @@
 
       <div>
         <label>Doanh thu:</label>
-        <input type="number" id="revenue" required>
+        <input type="number" id="revenue">
       </div>
 
       <div class="wide">
@@ -95,36 +95,6 @@
         <button type="button" onclick="handleDelete()">Xóa</button>
         <button type="button" onclick="handleSearch()">Tìm kiếm</button>
         <button type="reset">Làm mới</button>
-      </div>
-    </form>
-
-    <!-- Form tìm kiếm -->
-    <h2>Tìm kiếm giao dịch</h2>
-    <form id="searchForm" class="form-grid">
-      <div>
-        <label>Loại giao dịch:</label>
-        <select id="searchTransactionType">
-          <option value="">-- Chọn loại --</option>
-          <option value="Mua hàng">Mua hàng</option>
-          <option value="Nâng gói">Nâng gói</option>
-          <option value="Hoàn hàng">Hoàn hàng</option>
-        </select>
-      </div>
-      <div>
-        <label>Tên khách hàng:</label>
-        <input type="text" id="searchCustomerName">
-      </div>
-      <div>
-        <label>Email:</label>
-        <input type="email" id="searchCustomerEmail">
-      </div>
-      <div>
-        <label>Tên phần mềm:</label>
-        <input type="text" id="searchSoftwareName">
-      </div>
-      <div class="full-row">
-        <button type="button" onclick="handleSearch()">Tìm kiếm</button>
-        <button type="reset">Xóa bộ lọc</button>
       </div>
     </form>
 
