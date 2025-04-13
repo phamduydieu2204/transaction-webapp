@@ -345,43 +345,43 @@ async function loadTransactions() {
   }
 }
 
-function updateTable() {
-  const tableBody = document.querySelector("#transactionTable tbody");
-  tableBody.innerHTML = "";
-
-  const start = (currentPage - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  const paginatedItems = transactionList.slice(start, end);
-
-  paginatedItems.forEach((t, i) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${t.transactionId || ''}</td>
-      <td>${t.transactionDate || ''}</td>
-      <td>${t.transactionType || ''}</td>
-      <td>${t.customerName || ''}</td>
-      <td>${t.customerEmail || ''}</td>
-      <td>${t.customerPhone || ''}</td>
-      <td>${t.duration || ''}</td>
-      <td>${t.startDate || ''}</td>
-      <td>${t.endDate || ''}</td>
-      <td>${t.deviceCount || ''}</td>
-      <td>${t.softwareName || ''}</td>
-      <td>${t.softwarePackage || ''}</td>
-      <td>${t.revenue || ''}</td>
-      <td>${t.note || ''}</td>
-      <td>${t.tenNhanVien || ''}</td>
-      <td>${t.maNhanVien || ''}</td>
-      <td>
-        <button class="edit-btn" onclick="editRow(${start + i})">Sửa</button>
-        <button class="delete-btn" onclick="deleteRow(${start + i})">Xóa</button>
-      </td>
-    `;
-    tableBody.appendChild(row);
-  });
-
-  updatePagination();
-}
+  function updateTable() {
+    const tableBody = document.querySelector("#transactionTable tbody");
+    tableBody.innerHTML = "";
+  
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedItems = transactionList.slice(startIndex, endIndex);
+  
+    paginatedItems.forEach((transaction, index) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${transaction.transactionId}</td>
+        <td>${formatDateTime(transaction.transactionDate)}</td> <!-- Định dạng ngày giờ -->
+        <td>${transaction.transactionType}</td>
+        <td>${transaction.customerName}</td>
+        <td>${transaction.customerEmail}</td>
+        <td>${transaction.customerPhone}</td>
+        <td>${transaction.duration}</td>
+        <td>${transaction.startDate}</td>
+        <td>${transaction.endDate}</td>
+        <td>${transaction.deviceCount}</td>
+        <td>${transaction.softwareName}</td>
+        <td>${transaction.softwarePackage}</td>
+        <td>${transaction.revenue}</td>
+        <td>${transaction.note}</td>
+        <td>${transaction.tenNhanVien}</td>
+        <td>${transaction.maNhanVien}</td>
+        <td>
+          <button class="edit-btn" onclick="editTransaction(${startIndex + index})">Sửa</button>
+          <button class="delete-btn" onclick="deleteTransaction(${startIndex + index})">Xóa</button>
+        </td>
+      `;
+      tableBody.appendChild(row);
+    });
+  
+    document.getElementById("pageInfo").textContent = `Trang ${currentPage} / ${Math.ceil(transactionList.length / itemsPerPage)}`;
+  }
 
 function updatePagination() {
   const totalPages = Math.ceil(transactionList.length / itemsPerPage);
@@ -426,3 +426,14 @@ window.deleteRow = function (index) {
   currentEditIndex = index;
   handleDelete();
 };
+
+// Hàm định dạng ngày giờ từ ISO sang dd/mm/yyyy hh:mm
+function formatDateTime(isoDate) {
+    const date = new Date(isoDate);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  }
