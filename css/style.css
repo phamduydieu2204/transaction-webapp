@@ -71,11 +71,6 @@ h1 {
   margin-bottom: 20px;
 }
 
-textarea {
-  resize: vertical;
-  min-height: 70px;
-}
-
 button {
   background: #007bff;
   color: white;
@@ -90,10 +85,6 @@ button {
 
 button:hover {
   background-color: #0056b3;
-}
-
-.wide {
-  grid-column: span 2;
 }
 
 .extra-wide {
@@ -112,14 +103,37 @@ button:hover {
 #successMessage {
   color: green;
 }
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 20px;
 }
 
-.wide {
-  grid-column: span 2;
+.form-grid div {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Đảm bảo kích thước đồng đều cho các trường trong form */
+.form-grid input,
+.form-grid select,
+.form-grid textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  margin-bottom: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  font-size: 15px;
+  height: 40px; /* Đặt chiều cao đồng đều */
+}
+
+/* Điều chỉnh chiều cao của textarea */
+.form-grid textarea {
+  resize: none; /* Ngăn thay đổi kích thước */
+  height: 40px; /* Đặt chiều cao giống các trường khác */
 }
 
 .full-row {
@@ -170,4 +184,3 @@ table .edit-btn {
 table .delete-btn {
   background-color: #dc3545;
 }
-
