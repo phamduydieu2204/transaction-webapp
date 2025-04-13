@@ -40,10 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
   startDateInput.addEventListener("change", calculateEndDate);
   durationInput.addEventListener("input", calculateEndDate);
 
-  // Lấy danh sách phần mềm khi tải trang
   fetchSoftwareList();
-
-  // Thêm sự kiện thay đổi cho trường Tên phần mềm
   document.getElementById("softwareName").addEventListener("change", updatePackageList);
 
   loadTransactions();
@@ -63,7 +60,7 @@ async function fetchSoftwareList() {
 
     const result = await response.json();
     if (result.status === "success") {
-      softwareData = result.data; // Lưu danh sách phần mềm và gói
+      softwareData = result.data;
       populateSoftwareList();
     } else {
       console.error("Không thể lấy danh sách phần mềm:", result.message);
@@ -118,13 +115,13 @@ async function handleAdd() {
     customerName: document.getElementById("customerName").value,
     customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
     customerPhone: document.getElementById("customerPhone").value,
-    duration: parseInt(document.getElementById("duration").value),
+    duration: parseInt(document.getElementById("duration").value) || 0,
     startDate: document.getElementById("startDate").value,
     endDate: document.getElementById("endDate").value,
-    deviceCount: parseInt(document.getElementById("deviceCount").value),
+    deviceCount: parseInt(document.getElementById("deviceCount").value) || 0,
     softwareName: document.getElementById("softwareName").value,
     softwarePackage: document.getElementById("softwarePackage").value,
-    revenue: parseFloat(document.getElementById("revenue").value),
+    revenue: parseFloat(document.getElementById("revenue").value) || 0,
     note: document.getElementById("note").value,
     tenNhanVien: userInfo.tenNhanVien,
     maNhanVien: userInfo.maNhanVien
@@ -149,7 +146,6 @@ async function handleAdd() {
       document.getElementById("endDate").value = "";
       await loadTransactions();
       currentEditIndex = -1;
-      // Reset danh sách gói phần mềm
       updatePackageList();
     } else {
       document.getElementById("errorMessage").textContent = result.message || "Không thể lưu giao dịch!";
@@ -257,10 +253,20 @@ async function handleDelete() {
 async function handleSearch() {
   const { BACKEND_URL } = getConstants();
   const conditions = {
-    transactionType: document.getElementById("searchTransactionType").value,
-    customerName: document.getElementById("searchCustomerName").value,
-    customerEmail: document.getElementById("searchCustomerEmail").value.toLowerCase(),
-    softwareName: document.getElementById("searchSoftwareName").value
+    transactionType: document.getElementById("transactionType").value,
+    customerName: document.getElementById("customerName").value,
+    customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
+    customerPhone: document.getElementById("customerPhone").value,
+    duration: document.getElementById("duration").value,
+    startDate: document.getElementById("startDate").value,
+    endDate: document.getElementById("endDate").value,
+    deviceCount: document.getElementById("deviceCount").value,
+    softwareName: document.getElementById("softwareName").value,
+    softwarePackage: document.getElementById("softwarePackage").value,
+    revenue: document.getElementById("revenue").value,
+    note: document.getElementById("note").value,
+    tenNhanVien: userInfo.tenNhanVien,
+    maNhanVien: userInfo.maNhanVien
   };
 
   const data = {
