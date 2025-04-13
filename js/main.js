@@ -357,14 +357,14 @@ async function loadTransactions() {
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${transaction.transactionId}</td>
-        <td>${formatDateTime(transaction.transactionDate)}</td> <!-- Định dạng ngày giờ -->
+        <td>${formatDateTime(transaction.transactionDate)}</td>
         <td>${transaction.transactionType}</td>
         <td>${transaction.customerName}</td>
         <td>${transaction.customerEmail}</td>
         <td>${transaction.customerPhone}</td>
         <td>${transaction.duration}</td>
-        <td>${transaction.startDate}</td>
-        <td>${transaction.endDate}</td>
+        <td>${formatDate(transaction.startDate)}</td> <!-- Định dạng ngày bắt đầu -->
+        <td>${formatDate(transaction.endDate)}</td> <!-- Định dạng ngày kết thúc -->
         <td>${transaction.deviceCount}</td>
         <td>${transaction.softwareName}</td>
         <td>${transaction.softwarePackage}</td>
@@ -436,4 +436,14 @@ function formatDateTime(isoDate) {
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     return `${day}/${month}/${year} ${hours}:${minutes}`;
+  }
+
+  // Hàm định dạng ngày từ ISO sang dd/mm/yyyy
+  function formatDate(isoDate) {
+    if (!isoDate) return "";
+    const date = new Date(isoDate);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   }
