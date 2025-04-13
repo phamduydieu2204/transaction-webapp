@@ -5,7 +5,7 @@
   <title>Trang chính</title>
   <link rel="stylesheet" href="css/style.css" />
   <script defer src="js/constants.js"></script>
-  <script defer src\\[0] src="js/main.js"></script>
+  <script defer src="js/main.js"></script>
 </head>
 <body>
   <div class="container">
@@ -16,6 +16,11 @@
     <form id="transactionForm" class="form-grid">
       <!-- Dòng 1 -->
       <div>
+        <label>Ngày giao dịch:</label>
+        <input type="date" id="transactionDate">
+      </div>
+
+      <div>
         <label>Loại giao dịch:</label>
         <select id="transactionType" required>
           <option value="">-- Chọn loại --</option>
@@ -23,11 +28,6 @@
           <option value="Nâng gói">Nâng gói</option>
           <option value="Hoàn hàng">Hoàn hàng</option>
         </select>
-      </div>
-
-      <div>
-        <label>Ngày giao dịch:</label>
-        <input type="date" id="transactionDate">
       </div>
 
       <div>
@@ -40,17 +40,12 @@
         <input type="email" id="customerEmail">
       </div>
 
-      <div class="wide">
+      <div>
         <label>Liên hệ:</label>
         <input type="text" id="customerPhone">
       </div>
 
       <!-- Dòng 2 -->
-      <div>
-        <label>Số tháng đăng ký:</label>
-        <input type="number" id="duration">
-      </div>
-
       <div>
         <label>Ngày bắt đầu:</label>
         <input type="date" id="startDate">
@@ -62,8 +57,18 @@
       </div>
 
       <div>
+        <label>Số tháng đăng ký:</label>
+        <input type="number" id="duration">
+      </div>
+
+      <div>
         <label>Số thiết bị:</label>
         <input type="number" id="deviceCount">
+      </div>
+
+      <div>
+        <label>Ghi chú:</label>
+        <textarea id="note" rows="2"></textarea>
       </div>
 
       <!-- Dòng 3 -->
@@ -86,11 +91,6 @@
       <div>
         <label>Doanh thu:</label>
         <input type="number" id="revenue">
-      </div>
-
-      <div class="wide">
-        <label>Ghi chú:</label>
-        <textarea id="note" rows="2"></textarea>
       </div>
 
       <!-- Dòng 4 -->
