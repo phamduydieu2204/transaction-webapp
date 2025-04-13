@@ -4,7 +4,7 @@ let transactionList = [];
 let today = new Date().toISOString().split("T")[0];
 let currentPage = 1;
 const itemsPerPage = 10;
-let softwareData = []; // Biến lưu danh sách phần mềm và gói
+let softwareData = [];
 
 document.addEventListener("DOMContentLoaded", () => {
   const userData = localStorage.getItem("employeeInfo");
@@ -252,22 +252,39 @@ async function handleDelete() {
 
 async function handleSearch() {
   const { BACKEND_URL } = getConstants();
-  const conditions = {
-    transactionType: document.getElementById("transactionType").value,
-    customerName: document.getElementById("customerName").value,
-    customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
-    customerPhone: document.getElementById("customerPhone").value,
-    duration: document.getElementById("duration").value,
-    startDate: document.getElementById("startDate").value,
-    endDate: document.getElementById("endDate").value,
-    deviceCount: document.getElementById("deviceCount").value,
-    softwareName: document.getElementById("softwareName").value,
-    softwarePackage: document.getElementById("softwarePackage").value,
-    revenue: document.getElementById("revenue").value,
-    note: document.getElementById("note").value,
-    tenNhanVien: userInfo.tenNhanVien,
-    maNhanVien: userInfo.maNhanVien
-  };
+  const conditions = {};
+
+  // Lấy giá trị từ các trường trong form
+  const transactionType = document.getElementById("transactionType").value;
+  const customerName = document.getElementById("customerName").value;
+  const customerEmail = document.getElementById("customerEmail").value.toLowerCase();
+  const customerPhone = document.getElementById("customerPhone").value;
+  const duration = document.getElementById("duration").value;
+  const startDate = document.getElementById("startDate").value;
+  const endDate = document.getElementById("endDate").value;
+  const deviceCount = document.getElementById("deviceCount").value;
+  const softwareName = document.getElementById("softwareName").value;
+  const softwarePackage = document.getElementById("softwarePackage").value;
+  const revenue = document.getElementById("revenue").value;
+  const note = document.getElementById("note").value;
+  const tenNhanVien = userInfo.tenNhanVien;
+  const maNhanVien = userInfo.maNhanVien;
+
+  // Chỉ thêm điều kiện tìm kiếm nếu trường không ở trạng thái mặc định
+  if (transactionType && transactionType !== "") conditions.transactionType = transactionType;
+  if (customerName) conditions.customerName = customerName;
+  if (customerEmail) conditions.customerEmail = customerEmail;
+  if (customerPhone) conditions.customerPhone = customerPhone;
+  if (duration && duration !== "0") conditions.duration = duration;
+  if (startDate && startDate !== today) conditions.startDate = startDate;
+  if (endDate && endDate !== "") conditions.endDate = endDate;
+  if (deviceCount && deviceCount !== "0") conditions.deviceCount = deviceCount;
+  if (softwareName && softwareName !== "") conditions.softwareName = softwareName;
+  if (softwarePackage && softwarePackage !== "") conditions.softwarePackage = softwarePackage;
+  if (revenue && revenue !== "0") conditions.revenue = revenue;
+  if (note) conditions.note = note;
+  if (tenNhanVien) conditions.tenNhanVien = tenNhanVien;
+  if (maNhanVien) conditions.maNhanVien = maNhanVien;
 
   const data = {
     action: "searchTransactions",
