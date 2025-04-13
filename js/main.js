@@ -49,24 +49,27 @@ async function handleAdd() {
     return;
   }
 
+  // Tạo đối tượng dữ liệu từ các trường trong form
   const data = {
     action: "addTransaction",
-    transactionType: document.getElementById("transactionType").value,    // Cột C: Loại giao dịch
-    customerName: document.getElementById("customerName").value,         // Cột D: Tên khách hàng
-    customerEmail: document.getElementById("customerEmail").value.toLowerCase(), // Cột E: Email
-    customerPhone: document.getElementById("customerPhone").value,       // Cột F: Liên hệ
-    duration: parseInt(document.getElementById("duration").value),       // Cột G: Số tháng đăng ký
-    startDate: document.getElementById("startDate").value,               // Cột H: Ngày bắt đầu
-    endDate: document.getElementById("endDate").value,                   // Cột I: Ngày kết thúc
-    deviceCount: parseInt(document.getElementById("deviceCount").value), // Cột J: Số thiết bị
-    softwareName: document.getElementById("softwareName").value,         // Cột K: Tên phần mềm
-    softwarePackage: document.getElementById("softwarePackage").value,   // Cột L: Gói phần mềm
-    revenue: parseFloat(document.getElementById("revenue").value),       // Cột M: Doanh thu
-    note: document.getElementById("note").value,                         // Cột N: Ghi chú
-    tenNhanVien: userInfo.tenNhanVien,                                   // Cột O: Tên nhân viên
-    maNhanVien: userInfo.maNhanVien                                      // Cột P: Mã nhân viên
+    transactionType: document.getElementById("transactionType").value,
+    customerName: document.getElementById("customerName").value,
+    customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
+    customerPhone: document.getElementById("customerPhone").value,
+    duration: parseInt(document.getElementById("duration").value),
+    startDate: document.getElementById("startDate").value,
+    endDate: document.getElementById("endDate").value,
+    deviceCount: parseInt(document.getElementById("deviceCount").value),
+    softwareName: document.getElementById("softwareName").value,
+    softwarePackage: document.getElementById("softwarePackage").value,
+    revenue: parseFloat(document.getElementById("revenue").value),
+    note: document.getElementById("note").value,
+    tenNhanVien: userInfo.tenNhanVien,
+    maNhanVien: userInfo.maNhanVien
   };
-  console.log("📤 Gửi lên:", data);
+
+  // Ghi log dữ liệu gửi đi (định dạng JSON cho dễ đọc)
+  console.log("📤 Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
 
   try {
     const response = await fetch(BACKEND_URL, {
@@ -83,9 +86,7 @@ async function handleAdd() {
       document.getElementById("transactionForm").reset();
       document.getElementById("startDate").value = today;
       document.getElementById("endDate").value = "";
-      // Thêm giao dịch mới vào transactionList
-      transactionList.push(result);
-      updateTable();
+      await loadTransactions();
       currentEditIndex = -1;
     } else {
       document.getElementById("errorMessage").textContent = result.message || "Không thể lưu giao dịch!";
