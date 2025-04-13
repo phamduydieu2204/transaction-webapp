@@ -4,6 +4,7 @@ let transactionList = [];
 let today = new Date().toISOString().split("T")[0];
 let currentPage = 1;
 const itemsPerPage = 10;
+let softwareData = []; // Biến lưu danh sách phần mềm và gói
 
 document.addEventListener("DOMContentLoaded", () => {
   const userData = localStorage.getItem("employeeInfo");
@@ -39,8 +40,70 @@ document.addEventListener("DOMContentLoaded", () => {
   startDateInput.addEventListener("change", calculateEndDate);
   durationInput.addEventListener("input", calculateEndDate);
 
+  // Lấy danh sách phần mềm khi tải trang
+  fetchSoftwareList();
+
+  // Thêm sự kiện thay đổi cho trường Tên phần mềm
+  document.getElementById("softwareName").addEventListener("change", updatePackageList);
+
   loadTransactions();
 });
+
+// Hàm lấy danh sách phần mềm từ Google Apps Script
+async function fetchSoftwareList() {
+  const { BACKEND_URL } = getConstants();
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ action: "getSoftwareList" })
+    });
+
+    const result = await response.json();
+    if (result.status === "success") {
+      softwareData = result.data; // Lưu danh sách phần mềm và gói
+      populateSoftwareList();
+    } else {
+      console.error("Không thể lấy danh sách phần mềm:", result.message);
+    }
+  } catch (err) {
+    console.error("Lỗi khi lấy danh sách phần mềm:", err);
+  }
+}
+
+// Hàm điền danh sách Tên phần mềm vào select
+function populateSoftwareList() {
+  const softwareSelect = document.getElementById("softwareName");
+  softwareSelect.innerHTML = '<option value="">-- Chọn phần mềm --</option>';
+  softwareData.forEach(software => {
+    const option = document.createElement("option");
+    option.value = software.name;
+    option.textContent = software.name;
+    softwareSelect.appendChild(option);
+  });
+}
+
+// Hàm cập nhật danh sách Gói phần mềm dựa trên Tên phần mềm được chọn
+function updatePackageList() {
+  const softwareSelect = document.getElementById("softwareName");
+  const packageSelect = document.getElementById("softwarePackage");
+  const selectedSoftware = softwareSelect.value;
+
+  packageSelect.innerHTML = '<option value="">-- Chọn gói --</option>';
+  if (selectedSoftware) {
+    const software = softwareData.find(s => s.name === selectedSoftware);
+    if (software && software.packages) {
+      software.packages.forEach(pkg => {
+        const option = document.createElement("option");
+        option.value = pkg;
+        option.textContent = pkg;
+        packageSelect.appendChild(option);
+      });
+    }
+  }
+}
 
 async function handleAdd() {
   const { BACKEND_URL } = getConstants();
@@ -49,7 +112,6 @@ async function handleAdd() {
     return;
   }
 
-  // Tạo đối tượng dữ liệu từ các trường trong form
   const data = {
     action: "addTransaction",
     transactionType: document.getElementById("transactionType").value,
@@ -68,7 +130,6 @@ async function handleAdd() {
     maNhanVien: userInfo.maNhanVien
   };
 
-  // Ghi log dữ liệu gửi đi (định dạng JSON cho dễ đọc)
   console.log("📤 Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
 
   try {
@@ -88,6 +149,8 @@ async function handleAdd() {
       document.getElementById("endDate").value = "";
       await loadTransactions();
       currentEditIndex = -1;
+      // Reset danh sách gói phần mềm
+      updatePackageList();
     } else {
       document.getElementById("errorMessage").textContent = result.message || "Không thể lưu giao dịch!";
     }
@@ -96,6 +159,7 @@ async function handleAdd() {
     console.error("Lỗi:", err);
   }
 }
+
 
 async function handleUpdate() {
   if (currentEditIndex === -1) {
