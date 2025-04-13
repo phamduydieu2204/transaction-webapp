@@ -25,8 +25,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const startDateInput = document.getElementById("startDate");
   const durationInput = document.getElementById("duration");
   const endDateInput = document.getElementById("endDate");
+  const transactionDateInput = document.getElementById("transactionDate");
 
   startDateInput.value = today;
+  transactionDateInput.value = today; // Đặt giá trị mặc định là ngày hôm nay
 
   function calculateEndDate() {
     const start = new Date(startDateInput.value);
@@ -45,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   loadTransactions();
 });
+
 
 // Hàm lấy danh sách phần mềm từ Google Apps Script
 async function fetchSoftwareList() {
@@ -112,6 +115,7 @@ async function handleAdd() {
   const data = {
     action: "addTransaction",
     transactionType: document.getElementById("transactionType").value,
+    transactionDate: today, // Sử dụng ngày hôm nay, bỏ qua giá trị nhập từ form
     customerName: document.getElementById("customerName").value,
     customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
     customerPhone: document.getElementById("customerPhone").value,
@@ -143,6 +147,7 @@ async function handleAdd() {
       document.getElementById("successMessage").textContent = "Giao dịch đã được lưu!";
       document.getElementById("transactionForm").reset();
       document.getElementById("startDate").value = today;
+      document.getElementById("transactionDate").value = today; // Reset Ngày giao dịch về ngày hôm nay
       document.getElementById("endDate").value = "";
       await loadTransactions();
       currentEditIndex = -1;
@@ -254,8 +259,8 @@ async function handleSearch() {
   const { BACKEND_URL } = getConstants();
   const conditions = {};
 
-  // Lấy giá trị từ các trường trong form
   const transactionType = document.getElementById("transactionType").value;
+  const transactionDate = document.getElementById("transactionDate").value;
   const customerName = document.getElementById("customerName").value;
   const customerEmail = document.getElementById("customerEmail").value.toLowerCase();
   const customerPhone = document.getElementById("customerPhone").value;
@@ -270,8 +275,8 @@ async function handleSearch() {
   const tenNhanVien = userInfo.tenNhanVien;
   const maNhanVien = userInfo.maNhanVien;
 
-  // Chỉ thêm điều kiện tìm kiếm nếu trường không ở trạng thái mặc định
   if (transactionType && transactionType !== "") conditions.transactionType = transactionType;
+  if (transactionDate && transactionDate !== today) conditions.transactionDate = transactionDate; // Chỉ thêm nếu không phải ngày mặc định
   if (customerName) conditions.customerName = customerName;
   if (customerEmail) conditions.customerEmail = customerEmail;
   if (customerPhone) conditions.customerPhone = customerPhone;
