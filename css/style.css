@@ -149,10 +149,11 @@ button:hover {
 
 /* CSS cho các nút trong button-row */
 .button-row {
-  display: flex;
-  flex-direction: row;
+  grid-column: span 5; /* Chiếm toàn bộ chiều rộng của form-grid */
+  display: flex !important;
+  flex-direction: row !important;
   justify-content: flex-end; /* Căn phải */
-  gap: 5px; /* Khoảng cách giữa các nút, đồng bộ với pagination */
+  gap: 5px; /* Khoảng cách giữa các nút */
   margin-top: 10px;
   flex-wrap: nowrap;
 }
