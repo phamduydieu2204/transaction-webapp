@@ -128,13 +128,13 @@ async function handleAdd() {
   const data = {
     action: "addTransaction",
     transactionType: document.getElementById("transactionType").value,
-    transactionDate: document.getElementById("transactionDate").value, // Đã ở định dạng yyyy/mm/dd
+    transactionDate: document.getElementById("transactionDate").value,
     customerName: document.getElementById("customerName").value,
     customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
     customerPhone: document.getElementById("customerPhone").value,
     duration: parseInt(document.getElementById("duration").value) || 0,
-    startDate: document.getElementById("startDate").value, // Đã ở định dạng yyyy/mm/dd
-    endDate: document.getElementById("endDate").value, // Đã ở định dạng yyyy/mm/dd
+    startDate: document.getElementById("startDate").value,
+    endDate: document.getElementById("endDate").value,
     deviceCount: parseInt(document.getElementById("deviceCount").value) || 0,
     softwareName: document.getElementById("softwareName").value,
     softwarePackage: document.getElementById("softwarePackage").value,
@@ -179,13 +179,13 @@ async function handleSearch() {
   const conditions = {};
 
   const transactionType = document.getElementById("transactionType").value;
-  const transactionDate = document.getElementById("transactionDate").value; // Đã ở định dạng yyyy/mm/dd
+  const transactionDate = document.getElementById("transactionDate").value;
   const customerName = document.getElementById("customerName").value;
   const customerEmail = document.getElementById("customerEmail").value.toLowerCase();
   const customerPhone = document.getElementById("customerPhone").value;
   const duration = document.getElementById("duration").value;
-  const startDate = document.getElementById("startDate").value; // Đã ở định dạng yyyy/mm/dd
-  const endDate = document.getElementById("endDate").value; // Đã ở định dạng yyyy/mm/dd
+  const startDate = document.getElementById("startDate").value;
+  const endDate = document.getElementById("endDate").value;
   const deviceCount = document.getElementById("deviceCount").value;
   const softwareName = document.getElementById("softwareName").value;
   const softwarePackage = document.getElementById("softwarePackage").value;
@@ -228,7 +228,6 @@ async function handleSearch() {
     const result = await response.json();
     if (result.status === "success") {
       transactionList = result.data;
-      // Sắp xếp theo Mã giao dịch giảm dần
       transactionList.sort((a, b) => {
         const idA = parseInt(a.transactionId.replace("GD", ""));
         const idB = parseInt(b.transactionId.replace("GD", ""));
@@ -264,7 +263,6 @@ async function loadTransactions() {
     const result = await response.json();
     if (result.status === "success") {
       transactionList = result.data;
-      // Sắp xếp theo Mã giao dịch giảm dần
       transactionList.sort((a, b) => {
         const idA = parseInt(a.transactionId.replace("GD", ""));
         const idB = parseInt(b.transactionId.replace("GD", ""));
@@ -285,6 +283,7 @@ function updateTable() {
   const tableBody = document.querySelector("#transactionTable tbody");
   tableBody.innerHTML = "";
 
+  const totalPages = Math.ceil(transactionList.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedItems = transactionList.slice(startIndex, endIndex);
@@ -316,7 +315,107 @@ function updateTable() {
     tableBody.appendChild(row);
   });
 
-  document.getElementById("pageInfo").textContent = `Trang ${currentPage} / ${Math.ceil(transactionList.length / itemsPerPage)}`;
+  updatePagination(totalPages);
+}
+
+function updatePagination(totalPages) {
+  const pagination = document.getElementById("pagination");
+  pagination.innerHTML = "";
+
+  // Nút "Trang đầu" (<<)
+  const firstButton = document.createElement("button");
+  firstButton.textContent = "«";
+  firstButton.onclick = () => firstPage();
+  firstButton.disabled = currentPage === 1;
+  pagination.appendChild(firstButton);
+
+  // Nút "Trang trước" (<)
+  const prevButton = document.createElement("button");
+  prevButton.textContent = "‹";
+  prevButton.onclick = () => prevPage();
+  prevButton.disabled = currentPage === 1;
+  pagination.appendChild(prevButton);
+
+  // Hiển thị các số trang
+  const maxVisiblePages = 5; // Số trang tối đa hiển thị trước khi thêm "..."
+  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+  let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+  if (endPage - startPage + 1 < maxVisiblePages) {
+    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+  }
+
+  // Thêm "..." nếu có nhiều trang trước
+  if (startPage > 1) {
+    const dots = document.createElement("span");
+    dots.textContent = "...";
+    dots.style.padding = "4px 8px";
+    pagination.appendChild(dots);
+  }
+
+  // Hiển thị các số trang
+  for (let i = startPage; i <= endPage; i++) {
+    const pageButton = document.createElement("button");
+    pageButton.textContent = i;
+    pageButton.onclick = () => goToPage(i);
+    if (i === currentPage) {
+      pageButton.classList.add("active");
+    }
+    pagination.appendChild(pageButton);
+  }
+
+  // Thêm "..." nếu có nhiều trang sau
+  if (endPage < totalPages) {
+    const dots = document.createElement("span");
+    dots.textContent = "...";
+    dots.style.padding = "4px 8px";
+    pagination.appendChild(dots);
+  }
+
+  // Nút "Trang sau" (>)
+  const nextButton = document.createElement("button");
+  nextButton.textContent = "›";
+  nextButton.onclick = () => nextPage();
+  nextButton.disabled = currentPage === totalPages;
+  pagination.appendChild(nextButton);
+
+  // Nút "Trang cuối" (>>)
+  const lastButton = document.createElement("button");
+  lastButton.textContent = "»";
+  lastButton.onclick = () => lastPage();
+  lastButton.disabled = currentPage === totalPages;
+  pagination.appendChild(lastButton);
+}
+
+function firstPage() {
+  currentPage = 1;
+  updateTable();
+}
+
+function prevPage() {
+  if (currentPage > 1) {
+    currentPage--;
+    updateTable();
+  }
+}
+
+function nextPage() {
+  const totalPages = Math.ceil(transactionList.length / itemsPerPage);
+  if (currentPage < totalPages) {
+    currentPage++;
+    updateTable();
+  }
+}
+
+function lastPage() {
+  const totalPages = Math.ceil(transactionList.length / itemsPerPage);
+  currentPage = totalPages;
+  updateTable();
+}
+
+function goToPage(page) {
+  currentPage = page;
+  updateTable();
 }
 
 
@@ -484,27 +583,7 @@ async function handleDelete() {
 }
 
 
-function updatePagination() {
-  const totalPages = Math.ceil(transactionList.length / itemsPerPage);
-  document.getElementById("pageInfo").textContent = `Trang ${currentPage} / ${totalPages}`;
-  document.querySelector(".pagination button:first-child").disabled = currentPage === 1;
-  document.querySelector(".pagination button:last-child").disabled = currentPage === totalPages;
-}
 
-function prevPage() {
-  if (currentPage > 1) {
-    currentPage--;
-    updateTable();
-  }
-}
-
-function nextPage() {
-  const totalPages = Math.ceil(transactionList.length / itemsPerPage);
-  if (currentPage < totalPages) {
-    currentPage++;
-    updateTable();
-  }
-}
 
 window.editRow = function (index) {
   const t = transactionList[index];
