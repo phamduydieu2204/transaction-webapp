@@ -1,5 +1,5 @@
 let userInfo = null;
-let currentEditIndex = -1;
+let currentEditIndex = -1; // Biến lưu chỉ số của giao dịch đang chỉnh sửa
 let transactionList = [];
 let today = new Date();
 let todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`; // Định dạng yyyy/mm/dd
@@ -110,6 +110,7 @@ function handleReset() {
   const transactionDateInput = document.getElementById("transactionDate");
   startDateInput.value = todayFormatted;
   transactionDateInput.value = todayFormatted;
+  currentEditIndex = -1; // Đặt lại trạng thái chỉnh sửa
 }
 
 // Hàm định dạng ngày từ yyyy/mm/dd sang yyyy/mm/dd (giữ nguyên định dạng)
@@ -167,6 +168,68 @@ async function handleAdd() {
       updatePackageList();
     } else {
       document.getElementById("errorMessage").textContent = result.message || "Không thể lưu giao dịch!";
+    }
+  } catch (err) {
+    document.getElementById("errorMessage").textContent = `Lỗi kết nối server: ${err.message}`;
+    console.error("Lỗi:", err);
+  }
+}
+
+async function handleUpdate() {
+  const { BACKEND_URL } = getConstants();
+  if (!userInfo) {
+    alert("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.");
+    return;
+  }
+
+  if (currentEditIndex === -1) {
+    alert("Vui lòng chọn một giao dịch để chỉnh sửa!");
+    return;
+  }
+
+  const transaction = transactionList[currentEditIndex];
+  const data = {
+    action: "updateTransaction",
+    transactionId: transaction.transactionId, // Gửi Mã giao dịch để xác định giao dịch cần cập nhật
+    transactionType: document.getElementById("transactionType").value,
+    transactionDate: document.getElementById("transactionDate").value,
+    customerName: document.getElementById("customerName").value,
+    customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
+    customerPhone: document.getElementById("customerPhone").value,
+    duration: parseInt(document.getElementById("duration").value) || 0,
+    startDate: document.getElementById("startDate").value,
+    endDate: document.getElementById("endDate").value,
+    deviceCount: parseInt(document.getElementById("deviceCount").value) || 0,
+    softwareName: document.getElementById("softwareName").value,
+    softwarePackage: document.getElementById("softwarePackage").value,
+    revenue: parseFloat(document.getElementById("revenue").value) || 0,
+    note: document.getElementById("note").value,
+    tenNhanVien: userInfo.tenNhanVien,
+    maNhanVien: userInfo.maNhanVien
+  };
+
+  console.log("📤 Dữ liệu cập nhật gửi đi:", JSON.stringify(data, null, 2));
+
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    if (result.status === "success") {
+      document.getElementById("successMessage").textContent = "Giao dịch đã được cập nhật!";
+      document.getElementById("transactionForm").reset();
+      document.getElementById("startDate").value = todayFormatted;
+      document.getElementById("transactionDate").value = todayFormatted;
+      document.getElementById("endDate").value = "yyyy/mm/dd";
+      await loadTransactions();
+      currentEditIndex = -1;
+    } else {
+      document.getElementById("errorMessage").textContent = result.message || "Không thể cập nhật giao dịch!";
     }
   } catch (err) {
     document.getElementById("errorMessage").textContent = `Lỗi kết nối server: ${err.message}`;
@@ -418,6 +481,26 @@ function goToPage(page) {
   updateTable();
 }
 
+function editTransaction(index) {
+  currentEditIndex = index; // Lưu chỉ số giao dịch đang chỉnh sửa
+  const transaction = transactionList[index];
+
+  // Điền dữ liệu giao dịch lên form
+  document.getElementById("transactionDate").value = transaction.transactionDate;
+  document.getElementById("transactionType").value = transaction.transactionType;
+  document.getElementById("customerName").value = transaction.customerName;
+  document.getElementById("customerEmail").value = transaction.customerEmail;
+  document.getElementById("customerPhone").value = transaction.customerPhone;
+  document.getElementById("duration").value = transaction.duration;
+  document.getElementById("startDate").value = transaction.startDate;
+  document.getElementById("endDate").value = transaction.endDate;
+  document.getElementById("deviceCount").value = transaction.deviceCount;
+  document.getElementById("softwareName").value = transaction.softwareName;
+  document.getElementById("softwarePackage").value = transaction.softwarePackage;
+  document.getElementById("revenue").value = transaction.revenue;
+  document.getElementById("note").value = transaction.note;
+}
+
 
 // Hàm định dạng ngày từ yyyy-mm-dd sang yyyy/mm/dd để hiển thị trên form
 function formatToInputDate(isoDate) {
@@ -489,57 +572,7 @@ function updatePackageList() {
   }
 }
 
-async function handleUpdate() {
-  if (currentEditIndex === -1) {
-    document.getElementById("errorMessage").textContent = "Vui lòng chọn giao dịch để sửa!";
-    return;
-  }
 
-  const { BACKEND_URL } = getConstants();
-  const data = {
-    action: "updateTransaction",
-    transactionId: transactionList[currentEditIndex].transactionId,
-    transactionType: document.getElementById("transactionType").value,    // Cột C: Loại giao dịch
-    customerName: document.getElementById("customerName").value,         // Cột D: Tên khách hàng
-    customerEmail: document.getElementById("customerEmail").value.toLowerCase(), // Cột E: Email
-    customerPhone: document.getElementById("customerPhone").value,       // Cột F: Liên hệ
-    duration: parseInt(document.getElementById("duration").value),       // Cột G: Số tháng đăng ký
-    startDate: document.getElementById("startDate").value,               // Cột H: Ngày bắt đầu
-    endDate: document.getElementById("endDate").value,                   // Cột I: Ngày kết thúc
-    deviceCount: parseInt(document.getElementById("deviceCount").value), // Cột J: Số thiết bị
-    softwareName: document.getElementById("softwareName").value,         // Cột K: Tên phần mềm
-    softwarePackage: document.getElementById("softwarePackage").value,   // Cột L: Gói phần mềm
-    revenue: parseFloat(document.getElementById("revenue").value),       // Cột M: Doanh thu
-    note: document.getElementById("note").value,                         // Cột N: Ghi chú
-    tenNhanVien: userInfo.tenNhanVien,                                   // Cột O: Tên nhân viên
-    maNhanVien: userInfo.maNhanVien                                      // Cột P: Mã nhân viên
-  };
-
-  try {
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
-    });
-
-    const result = await response.json();
-    if (result.status === "success") {
-      document.getElementById("successMessage").textContent = "Giao dịch đã được cập nhật!";
-      document.getElementById("transactionForm").reset();
-      document.getElementById("startDate").value = today;
-      document.getElementById("endDate").value = "";
-      await loadTransactions();
-      currentEditIndex = -1;
-    } else {
-      document.getElementById("errorMessage").textContent = result.message || "Không thể cập nhật giao dịch!";
-    }
-  } catch (err) {
-    document.getElementById("errorMessage").textContent = `Lỗi kết nối server: ${err.message}`;
-    console.error("Lỗi:", err);
-  }
-}
 
 async function handleDelete() {
   if (currentEditIndex === -1) {
