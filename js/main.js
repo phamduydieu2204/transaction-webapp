@@ -255,7 +255,12 @@ async function loadTransactions() {
     const result = await response.json();
     if (result.status === "success") {
       transactionList = result.data;
-      transactionList.sort((a, b) => new Date(b.transactionDate) - new Date(a.transactionDate)); // Sắp xếp từ gần nhất đến xa nhất
+      // Sắp xếp từ gần nhất đến xa nhất
+      transactionList.sort((a, b) => {
+        const dateA = new Date(a.transactionDate);
+        const dateB = new Date(b.transactionDate);
+        return dateB - dateA; // Giảm dần
+      });
       currentPage = 1;
       updateTable();
     } else {
