@@ -30,10 +30,12 @@
     }
     /* CSS cho các nút */
     .button-row {
-      display: flex;
+      display: flex !important; /* Tăng độ ưu tiên */
+      flex-direction: row !important; /* Đảm bảo xếp ngang */
       justify-content: flex-start;
       gap: 8px; /* Khoảng cách giữa các nút */
       margin-top: 10px;
+      flex-wrap: nowrap; /* Không xuống dòng */
     }
     .button-row button {
       min-width: 70px; /* Chiều rộng vừa đủ chứa chữ "Tìm kiếm" */
@@ -46,9 +48,19 @@
       cursor: pointer;
       transition: background-color 0.3s;
       box-sizing: border-box;
+      display: inline-block; /* Đảm bảo không bị ảnh hưởng bởi display: block */
     }
     .button-row button:hover {
       background-color: #0056b3;
+    }
+    /* Đảm bảo form-grid không ảnh hưởng đến button-row */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .form-grid .button-row {
+      grid-column: 1 / -1; /* Đảm bảo button-row chiếm toàn bộ chiều rộng */
     }
   </style>
 </head>
