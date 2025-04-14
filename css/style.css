@@ -186,29 +186,39 @@ button:hover {
   background-color: #0056b3;
 }
 
-/* CSS cho table-header */
-.table-header {
-  display: flex;
-  justify-content: space-between; /* Căn trái h2, căn phải pagination */
-  align-items: center; /* Căn giữa theo chiều dọc */
-  margin-top: 30px;
-}
-
-.table-header h2 {
-  margin: 0; /* Loại bỏ margin mặc định của h2 */
-}
-
+/* CSS cho pagination */
 .pagination {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end; /* Căn phải */
   gap: 5px;
-  margin: 0; /* Loại bỏ margin để nằm cùng hàng với h2 */
+  margin-top: 5px; /* Khoảng cách nhỏ giữa "Danh sách giao dịch" và pagination */
+}
+
+.pagination button {
+  padding: 4px 8px;
+  font-size: 13px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  box-sizing: border-box;
+}
+
+.pagination button:hover {
+  background-color: #0056b3;
+}
+
+.pagination button.active {
+  background-color: #0056b3; /* Màu nền cho trang hiện tại */
+  font-weight: bold;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px; /* Giảm khoảng cách giữa table-header và table */
+  margin-top: 10px; /* Giảm khoảng cách giữa pagination và table */
 }
 
 table thead {
