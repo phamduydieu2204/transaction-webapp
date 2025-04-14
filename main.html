@@ -4,8 +4,31 @@
   <meta charset="UTF-8" />
   <title>Trang chính</title>
   <link rel="stylesheet" href="css/style.css" />
+  <!-- Thêm Flatpickr CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <!-- Thêm Font Awesome cho icon lịch -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script defer src="js/constants.js"></script>
   <script defer src="js/main.js"></script>
+  <!-- Thêm Flatpickr JS -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <style>
+    .date-input-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .date-input-container input {
+      width: 100%;
+      padding-right: 30px; /* Để dành chỗ cho icon */
+    }
+    .date-input-container .calendar-icon {
+      position: absolute;
+      right: 5px;
+      cursor: pointer;
+      color: #007bff;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -13,11 +36,14 @@
     <p id="welcome"></p>
     <hr>
 
-    <form id="transactionForm" class="form-grid">
+    <form id="transactionForm" class="form-grid" onreset="handleReset()">
       <!-- Dòng 1 -->
       <div>
         <label>Ngày giao dịch:</label>
-        <input type="text" id="transactionDate" placeholder="yyyy/mm/dd">
+        <div class="date-input-container">
+          <input type="text" id="transactionDate" placeholder="yyyy/mm/dd">
+          <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('transactionDate')"></i>
+        </div>
       </div>
 
       <div>
@@ -31,13 +57,13 @@
       </div>
 
       <div>
-        <label>Tên khách hàng:</label>
-        <input type="text" id="customerName">
+        <label>Email:</label>
+        <input type="email" id="customerEmail" oninput="updateCustomerInfo()">
       </div>
 
       <div>
-        <label>Email:</label>
-        <input type="email" id="customerEmail">
+        <label>Tên khách hàng:</label>
+        <input type="text" id="customerName">
       </div>
 
       <div>
@@ -47,18 +73,24 @@
 
       <!-- Dòng 2 -->
       <div>
+        <label>Số tháng đăng ký:</label>
+        <input type="number" id="duration">
+      </div>
+
+      <div>
         <label>Ngày bắt đầu:</label>
-        <input type="text" id="startDate" placeholder="yyyy/mm/dd">
+        <div class="date-input-container">
+          <input type="text" id="startDate" placeholder="yyyy/mm/dd">
+          <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('startDate')"></i>
+        </div>
       </div>
 
       <div>
         <label>Ngày kết thúc:</label>
-        <input type="text" id="endDate" placeholder="yyyy/mm/dd">
-      </div>
-
-      <div>
-        <label>Số tháng đăng ký:</label>
-        <input type="number" id="duration">
+        <div class="date-input-container">
+          <input type="text" id="endDate" placeholder="yyyy/mm/dd">
+          <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('endDate')"></i>
+        </div>
       </div>
 
       <div>
@@ -113,7 +145,7 @@
       <thead>
         <tr>
           <th>Mã giao dịch</th>
-          <th>Ngày giờ giao dịch</th>
+          <th>Ngày giao dịch</th>
           <th>Loại giao dịch</th>
           <th>Tên khách hàng</th>
           <th>Email</th>
