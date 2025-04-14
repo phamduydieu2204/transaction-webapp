@@ -1,5 +1,5 @@
 let userInfo = null;
-let currentEditIndex = -1; // Biến lưu chỉ số của giao dịch đang chỉnh sửa
+let currentEditIndex = -1;
 let transactionList = [];
 let today = new Date();
 let todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`; // Định dạng yyyy/mm/dd
@@ -371,10 +371,19 @@ function updateTable() {
       <td>${transaction.tenNhanVien}</td>
       <td>${transaction.maNhanVien}</td>
       <td>
-        <button class="edit-btn" onclick="editTransaction(${startIndex + index})">Sửa</button>
-        <button class="delete-btn" onclick="deleteTransaction(${startIndex + index})">Xóa</button>
+        <button class="edit-btn">Sửa</button>
+        <button class="delete-btn">Xóa</button>
       </td>
     `;
+
+    // Gán sự kiện click cho nút "Sửa"
+    const editButton = row.querySelector(".edit-btn");
+    editButton.addEventListener("click", () => editTransaction(startIndex + index));
+
+    // Gán sự kiện click cho nút "Xóa"
+    const deleteButton = row.querySelector(".delete-btn");
+    deleteButton.addEventListener("click", () => deleteTransaction(startIndex + index));
+
     tableBody.appendChild(row);
   });
 
