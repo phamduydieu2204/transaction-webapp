@@ -236,6 +236,37 @@ async function handleSearch() {
   }
 }
 
+async function loadTransactions() {
+  const { BACKEND_URL } = getConstants();
+  const data = {
+    action: "getTransactions",
+    maNhanVien: userInfo.maNhanVien
+  };
+
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    if (result.status === "success") {
+      transactionList = result.data;
+      transactionList.sort((a, b) => new Date(b.transactionDate) - new Date(a.transactionDate)); // Sắp xếp từ gần nhất đến xa nhất
+      currentPage = 1;
+      updateTable();
+    } else {
+      document.getElementById("errorMessage").textContent = result.message || "Không thể tải danh sách giao dịch!";
+    }
+  } catch (err) {
+    document.getElementById("errorMessage").textContent = `Lỗi khi tải danh sách giao dịch: ${err.message}`;
+    console.error("Lỗi khi tải danh sách giao dịch", err);
+  }
+}
+
 function updateTable() {
   const tableBody = document.querySelector("#transactionTable tbody");
   tableBody.innerHTML = "";
@@ -438,30 +469,6 @@ async function handleDelete() {
   }
 }
 
-async function loadTransactions() {
-  const { BACKEND_URL } = getConstants();
-  try {
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ action: "getTransactions", maNhanVien: userInfo.maNhanVien })
-    });
-
-    const result = await response.json();
-    if (result.status === "success") {
-      transactionList = result.data;
-      currentPage = 1;
-      updateTable();
-    } else {
-      document.getElementById("errorMessage").textContent = result.message || "Không thể tải danh sách giao dịch!";
-    }
-  } catch (err) {
-    document.getElementById("errorMessage").textContent = `Lỗi khi tải danh sách giao dịch: ${err.message}`;
-    console.error("Lỗi khi tải danh sách giao dịch", err);
-  }
-}
 
 function updatePagination() {
   const totalPages = Math.ceil(transactionList.length / itemsPerPage);
