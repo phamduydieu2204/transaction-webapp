@@ -89,8 +89,12 @@ async function updateCustomerInfo() {
 
     const result = await response.json();
     if (result.status === "success" && result.data.length > 0) {
-      // Lấy giao dịch gần nhất (sắp xếp theo ngày giảm dần)
-      const sortedTransactions = result.data.sort((a, b) => new Date(b.transactionDate) - new Date(a.transactionDate));
+      // Lấy giao dịch có mã giao dịch lớn nhất (gần nhất)
+      const sortedTransactions = result.data.sort((a, b) => {
+        const idA = parseInt(a.transactionId.replace("GD", ""));
+        const idB = parseInt(b.transactionId.replace("GD", ""));
+        return idB - idA; // Giảm dần
+      });
       const latestTransaction = sortedTransactions[0];
       document.getElementById("customerName").value = latestTransaction.customerName;
       document.getElementById("customerPhone").value = latestTransaction.customerPhone;
@@ -224,7 +228,12 @@ async function handleSearch() {
     const result = await response.json();
     if (result.status === "success") {
       transactionList = result.data;
-      transactionList.sort((a, b) => new Date(b.transactionDate) - new Date(a.transactionDate)); // Sắp xếp từ gần nhất đến xa nhất
+      // Sắp xếp theo Mã giao dịch giảm dần
+      transactionList.sort((a, b) => {
+        const idA = parseInt(a.transactionId.replace("GD", ""));
+        const idB = parseInt(b.transactionId.replace("GD", ""));
+        return idB - idA; // Giảm dần
+      });
       currentPage = 1;
       updateTable();
     } else {
@@ -255,11 +264,11 @@ async function loadTransactions() {
     const result = await response.json();
     if (result.status === "success") {
       transactionList = result.data;
-      // Sắp xếp từ gần nhất đến xa nhất
+      // Sắp xếp theo Mã giao dịch giảm dần
       transactionList.sort((a, b) => {
-        const dateA = new Date(a.transactionDate);
-        const dateB = new Date(b.transactionDate);
-        return dateB - dateA; // Giảm dần
+        const idA = parseInt(a.transactionId.replace("GD", ""));
+        const idB = parseInt(b.transactionId.replace("GD", ""));
+        return idB - idA; // Giảm dần
       });
       currentPage = 1;
       updateTable();
