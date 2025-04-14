@@ -28,6 +28,27 @@
       cursor: pointer;
       color: #007bff;
     }
+    /* CSS cho các nút */
+    .button-row {
+      display: flex;
+      justify-content: flex-start;
+      gap: 10px; /* Khoảng cách giữa các nút */
+      margin-top: 10px;
+    }
+    .button-row button {
+      min-width: 90px; /* Chiều rộng tối thiểu dựa trên chữ "Tìm kiếm" */
+      padding: 8px 12px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .button-row button:hover {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 <body>
@@ -125,8 +146,8 @@
         <input type="number" id="revenue">
       </div>
 
-      <!-- Dòng 4 -->
-      <div class="full-row">
+      <!-- Dòng 4: Các nút -->
+      <div class="button-row">
         <button type="button" onclick="handleAdd()">Thêm</button>
         <button type="button" onclick="handleUpdate()">Sửa</button>
         <button type="button" onclick="handleDelete()">Xóa</button>
