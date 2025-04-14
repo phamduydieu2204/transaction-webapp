@@ -1,7 +1,7 @@
 let userInfo = null;
 let currentEditIndex = -1;
 let transactionList = [];
-let today = new Date().toISOString().split("T")[0];
+let today = new Date().toISOString().split("T")[0]; // Định dạng yyyy-mm-dd
 let currentPage = 1;
 const itemsPerPage = 10;
 let softwareData = [];
@@ -27,15 +27,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const endDateInput = document.getElementById("endDate");
   const transactionDateInput = document.getElementById("transactionDate");
 
-  startDateInput.value = today;
-  transactionDateInput.value = today; // Đặt giá trị mặc định là ngày hôm nay
+  // Đặt giá trị mặc định cho các trường ngày
+  startDateInput.value = formatToInputDate(today);
+  transactionDateInput.value = formatToInputDate(today);
 
   function calculateEndDate() {
     const start = new Date(startDateInput.value);
     const months = parseInt(durationInput.value || 0);
     if (!isNaN(months)) {
       const estimated = new Date(start.getTime() + months * 30 * 24 * 60 * 60 * 1000);
-      endDateInput.value = estimated.toISOString().split("T")[0];
+      endDateInput.value = formatToInputDate(estimated.toISOString().split("T")[0]);
     }
   }
 
@@ -47,6 +48,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   loadTransactions();
 });
+
+// Hàm định dạng ngày từ yyyy-mm-dd sang dd/mm/yyyy để hiển thị trên form
+function formatToInputDate(isoDate) {
+  if (!isoDate) return "dd/mm/yyyy";
+  const [year, month, day] = isoDate.split("-");
+  return `${day}/${month}/${year}`;
+}
+
+// Hàm định dạng ngày từ dd/mm/yyyy sang yyyy/mm/dd để gửi lên server
+function parseInputDate(inputDate) {
+  if (!inputDate || inputDate === "dd/mm/yyyy") return "";
+  const [day, month, year] = inputDate.split("/");
+  return `${year}/${month}/${day}`;
+}
 
 
 // Hàm lấy danh sách phần mềm từ Google Apps Script
@@ -115,13 +130,13 @@ async function handleAdd() {
   const data = {
     action: "addTransaction",
     transactionType: document.getElementById("transactionType").value,
-    transactionDate: today, // Sử dụng ngày hôm nay, bỏ qua giá trị nhập từ form
+    transactionDate: today, // Sử dụng ngày hôm nay
     customerName: document.getElementById("customerName").value,
     customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
     customerPhone: document.getElementById("customerPhone").value,
     duration: parseInt(document.getElementById("duration").value) || 0,
-    startDate: document.getElementById("startDate").value,
-    endDate: document.getElementById("endDate").value,
+    startDate: parseInputDate(document.getElementById("startDate").value),
+    endDate: parseInputDate(document.getElementById("endDate").value),
     deviceCount: parseInt(document.getElementById("deviceCount").value) || 0,
     softwareName: document.getElementById("softwareName").value,
     softwarePackage: document.getElementById("softwarePackage").value,
@@ -146,9 +161,9 @@ async function handleAdd() {
     if (result.status === "success") {
       document.getElementById("successMessage").textContent = "Giao dịch đã được lưu!";
       document.getElementById("transactionForm").reset();
-      document.getElementById("startDate").value = today;
-      document.getElementById("transactionDate").value = today; // Reset Ngày giao dịch về ngày hôm nay
-      document.getElementById("endDate").value = "";
+      document.getElementById("startDate").value = formatToInputDate(today);
+      document.getElementById("transactionDate").value = formatToInputDate(today);
+      document.getElementById("endDate").value = "dd/mm/yyyy";
       await loadTransactions();
       currentEditIndex = -1;
       updatePackageList();
@@ -160,6 +175,8 @@ async function handleAdd() {
     console.error("Lỗi:", err);
   }
 }
+
+
 
 
 async function handleUpdate() {
@@ -260,13 +277,13 @@ async function handleSearch() {
   const conditions = {};
 
   const transactionType = document.getElementById("transactionType").value;
-  const transactionDate = document.getElementById("transactionDate").value;
+  const transactionDate = parseInputDate(document.getElementById("transactionDate").value);
   const customerName = document.getElementById("customerName").value;
   const customerEmail = document.getElementById("customerEmail").value.toLowerCase();
   const customerPhone = document.getElementById("customerPhone").value;
   const duration = document.getElementById("duration").value;
-  const startDate = document.getElementById("startDate").value;
-  const endDate = document.getElementById("endDate").value;
+  const startDate = parseInputDate(document.getElementById("startDate").value);
+  const endDate = parseInputDate(document.getElementById("endDate").value);
   const deviceCount = document.getElementById("deviceCount").value;
   const softwareName = document.getElementById("softwareName").value;
   const softwarePackage = document.getElementById("softwarePackage").value;
@@ -276,13 +293,13 @@ async function handleSearch() {
   const maNhanVien = userInfo.maNhanVien;
 
   if (transactionType && transactionType !== "") conditions.transactionType = transactionType;
-  if (transactionDate && transactionDate !== today) conditions.transactionDate = transactionDate; // Chỉ thêm nếu không phải ngày mặc định
+  if (transactionDate) conditions.transactionDate = transactionDate;
   if (customerName) conditions.customerName = customerName;
   if (customerEmail) conditions.customerEmail = customerEmail;
   if (customerPhone) conditions.customerPhone = customerPhone;
   if (duration && duration !== "0") conditions.duration = duration;
-  if (startDate && startDate !== today) conditions.startDate = startDate;
-  if (endDate && endDate !== "") conditions.endDate = endDate;
+  if (startDate) conditions.startDate = startDate;
+  if (endDate) conditions.endDate = endDate;
   if (deviceCount && deviceCount !== "0") conditions.deviceCount = deviceCount;
   if (softwareName && softwareName !== "") conditions.softwareName = softwareName;
   if (softwarePackage && softwarePackage !== "") conditions.softwarePackage = softwarePackage;
@@ -438,12 +455,9 @@ function formatDateTime(isoDate) {
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   }
 
-  // Hàm định dạng ngày từ ISO sang dd/mm/yyyy
-  function formatDate(isoDate) {
-    if (!isoDate) return "";
-    const date = new Date(isoDate);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  }
+// Hàm định dạng ngày từ yyyy/mm/dd sang dd/mm/yyyy
+function formatDate(dateString) {
+  if (!dateString) return "";
+  const [year, month, day] = dateString.split("/");
+  return `${day}/${month}/${year}`;
+}
