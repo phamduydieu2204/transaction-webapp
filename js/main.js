@@ -1,5 +1,6 @@
 let userInfo = null;
-let currentEditIndex = -1;
+let currentEditIndex = -1; // Biến lưu chỉ số của giao dịch đang chỉnh sửa
+let currentEditTransactionId = null; // Biến lưu Mã giao dịch của giao dịch đang chỉnh sửa
 let transactionList = [];
 let today = new Date();
 let todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`; // Định dạng yyyy/mm/dd
@@ -24,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
     `Xin chào ${userInfo.tenNhanVien} (${userInfo.maNhanVien}) - ${userInfo.vaiTro}`;
 
   const startDateInput = document.getElementById("startDate");
-  const durationInput = document.getElementById("duration");
+  const durationInput = document.getElementByInstanceId("duration");
   const endDateInput = document.getElementById("endDate");
   const transactionDateInput = document.getElementById("transactionDate");
 
@@ -110,7 +111,9 @@ function handleReset() {
   const transactionDateInput = document.getElementById("transactionDate");
   startDateInput.value = todayFormatted;
   transactionDateInput.value = todayFormatted;
-  currentEditIndex = -1; // Đặt lại trạng thái chỉnh sửa
+  document.getElementById("transactionForm").reset();
+  currentEditIndex = -1;
+  currentEditTransactionId = null; // Đặt lại transactionId đang chỉnh sửa
 }
 
 // Hàm định dạng ngày từ yyyy/mm/dd sang yyyy/mm/dd (giữ nguyên định dạng)
@@ -159,12 +162,8 @@ async function handleAdd() {
     const result = await response.json();
     if (result.status === "success") {
       document.getElementById("successMessage").textContent = "Giao dịch đã được lưu!";
-      document.getElementById("transactionForm").reset();
-      document.getElementById("startDate").value = todayFormatted;
-      document.getElementById("transactionDate").value = todayFormatted;
-      document.getElementById("endDate").value = "yyyy/mm/dd";
+      handleReset();
       await loadTransactions();
-      currentEditIndex = -1;
       updatePackageList();
     } else {
       document.getElementById("errorMessage").textContent = result.message || "Không thể lưu giao dịch!";
@@ -182,15 +181,25 @@ async function handleUpdate() {
     return;
   }
 
-  if (currentEditIndex === -1) {
+  if (currentEditTransactionId === null) {
     alert("Vui lòng chọn một giao dịch để chỉnh sửa!");
     return;
   }
 
-  const transaction = transactionList[currentEditIndex];
+  // Làm mới transactionList trước khi cập nhật để đảm bảo đồng bộ
+  await loadTransactions();
+
+  // Kiểm tra xem giao dịch có tồn tại không
+  const transaction = transactionList.find(t => t.transactionId === currentEditTransactionId);
+  if (!transaction) {
+    alert("Giao dịch không tồn tại hoặc đã bị xóa. Vui lòng thử lại!");
+    handleReset();
+    return;
+  }
+
   const data = {
     action: "updateTransaction",
-    transactionId: transaction.transactionId, // Gửi Mã giao dịch để xác định giao dịch cần cập nhật
+    transactionId: currentEditTransactionId, // Sử dụng transactionId được lưu
     transactionType: document.getElementById("transactionType").value,
     transactionDate: document.getElementById("transactionDate").value,
     customerName: document.getElementById("customerName").value,
@@ -222,12 +231,8 @@ async function handleUpdate() {
     const result = await response.json();
     if (result.status === "success") {
       document.getElementById("successMessage").textContent = "Giao dịch đã được cập nhật!";
-      document.getElementById("transactionForm").reset();
-      document.getElementById("startDate").value = todayFormatted;
-      document.getElementById("transactionDate").value = todayFormatted;
-      document.getElementById("endDate").value = "yyyy/mm/dd";
+      handleReset();
       await loadTransactions();
-      currentEditIndex = -1;
     } else {
       document.getElementById("errorMessage").textContent = result.message || "Không thể cập nhật giao dịch!";
     }
@@ -493,6 +498,7 @@ function goToPage(page) {
 function editTransaction(index) {
   currentEditIndex = index; // Lưu chỉ số giao dịch đang chỉnh sửa
   const transaction = transactionList[index];
+  currentEditTransactionId = transaction.transactionId; // Lưu Mã giao dịch
 
   // Điền dữ liệu giao dịch lên form
   document.getElementById("transactionDate").value = transaction.transactionDate;
@@ -509,6 +515,7 @@ function editTransaction(index) {
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 }
+
 
 
 // Hàm định dạng ngày từ yyyy-mm-dd sang yyyy/mm/dd để hiển thị trên form
