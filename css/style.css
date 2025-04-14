@@ -134,4 +134,91 @@ button:hover {
 
 /* Điều chỉnh chiều cao của textarea */
 .form-grid textarea {
-  resize: none; /* Ngăn thay đổ
+  resize: none; /* Ngăn thay đổi kích thước */
+  height: 40px; /* Đặt chiều cao giống các trường khác */
+}
+
+.full-row {
+  grid-column: span 5;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 10px;
+}
+
+/* CSS cho các nút trong button-row */
+.button-row {
+  grid-column: span 5; /* Chiếm toàn bộ chiều rộng của form-grid */
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end; /* Căn phải */
+  gap: 5px; /* Khoảng cách giữa các nút */
+  margin-top: 10px;
+  flex-wrap: nowrap;
+}
+
+.button-row button {
+  width: auto !important; /* Tăng độ ưu tiên để ghi đè width: 100% từ button */
+  min-width: 0; /* Bỏ min-width để nút chỉ vừa nội dung */
+  padding: 4px 10px; /* Đồng bộ với kích thước nút trong pagination */
+  font-size: 13px; /* Đồng bộ với font-size của nút trong pagination */
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  box-sizing: border-box;
+}
+
+.button-row button:hover {
+  background-color: #0056b3;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 30px;
+}
+
+table thead {
+  background-color: #007bff;
+  color: white;
+}
+
+table th, table td {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+  font-size: 14px;
+}
+
+table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+table button {
+  padding: 4px 10px;
+  margin: 0 2px;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  color: white;
+}
+
+table .edit-btn {
+  background-color: #28a745;
+}
+
+table .delete-btn {
+  background-color: #dc3545;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 10px;
+}
