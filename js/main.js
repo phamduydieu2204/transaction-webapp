@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
     `Xin chào ${userInfo.tenNhanVien} (${userInfo.maNhanVien}) - ${userInfo.vaiTro}`;
 
   const startDateInput = document.getElementById("startDate");
-  const durationInput = document.getElementByInstanceId("duration");
+  const durationInput = document.getElementById("duration"); // Sửa lỗi: getElementByInstanceId -> getElementById
   const endDateInput = document.getElementById("endDate");
   const transactionDateInput = document.getElementById("transactionDate");
 
@@ -515,7 +515,6 @@ function editTransaction(index) {
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 }
-
 
 
 // Hàm định dạng ngày từ yyyy-mm-dd sang yyyy/mm/dd để hiển thị trên form
