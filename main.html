@@ -32,12 +32,12 @@
     .button-row {
       display: flex;
       justify-content: flex-start;
-      gap: 10px; /* Khoảng cách giữa các nút */
+      gap: 8px; /* Khoảng cách giữa các nút */
       margin-top: 10px;
     }
     .button-row button {
-      min-width: 90px; /* Chiều rộng tối thiểu dựa trên chữ "Tìm kiếm" */
-      padding: 8px 12px;
+      min-width: 70px; /* Chiều rộng vừa đủ chứa chữ "Tìm kiếm" */
+      padding: 6px 10px;
       font-size: 14px;
       border: none;
       border-radius: 4px;
@@ -45,6 +45,7 @@
       color: white;
       cursor: pointer;
       transition: background-color 0.3s;
+      box-sizing: border-box;
     }
     .button-row button:hover {
       background-color: #0056b3;
@@ -149,8 +150,7 @@
       <!-- Dòng 4: Các nút -->
       <div class="button-row">
         <button type="button" onclick="handleAdd()">Thêm</button>
-        <button type="button" onclick="handleUpdate()">Sửa</button>
-        <button type="button" onclick="handleDelete()">Xóa</button>
+        <button type="button" onclick="handleUpdate()">Cập nhật</button>
         <button type="button" onclick="handleSearch()">Tìm kiếm</button>
         <button type="reset">Làm mới</button>
       </div>
