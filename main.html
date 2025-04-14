@@ -134,14 +134,9 @@
       </div>
     </form>
 
-    <!-- Bọc h2 và pagination trong một div để xếp ngang -->
-    <div class="table-header">
-      <h2>Danh sách giao dịch</h2>
-      <div class="pagination">
-        <button onclick="prevPage()">Trang trước</button>
-        <span id="pageInfo"></span>
-        <button onclick="nextPage()">Trang sau</button>
-      </div>
+    <h2>Danh sách giao dịch</h2>
+    <div class="pagination" id="pagination">
+      <!-- Phân trang sẽ được render động bằng JavaScript -->
     </div>
 
     <table id="transactionTable">
