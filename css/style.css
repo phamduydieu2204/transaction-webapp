@@ -81,7 +81,7 @@ button {
   font-size: 16px;
   cursor: pointer;
   transition: 0.3s;
-  width: auto; /* Đảm bảo nút chỉ rộng vừa nội dung */
+  width: auto;
   display: inline-block;
 }
 
@@ -115,6 +115,16 @@ button:hover {
 .form-grid div {
   display: flex;
   flex-direction: column;
+}
+
+/* Loại bỏ flex-direction: column cho button-row */
+.form-grid .button-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 5px;
+  margin-top: 10px;
+  flex-wrap: nowrap;
 }
 
 /* Đảm bảo kích thước đồng đều cho các trường trong form */
@@ -159,7 +169,7 @@ button:hover {
 }
 
 .button-row button {
-  width: auto !important; /* Tăng độ ưu tiên để ghi đè width: 100% từ button */
+  width: auto; /* Đảm bảo nút chỉ rộng vừa nội dung */
   min-width: 0; /* Bỏ min-width để nút chỉ vừa nội dung */
   padding: 4px 10px; /* Đồng bộ với kích thước nút trong pagination */
   font-size: 13px; /* Đồng bộ với font-size của nút trong pagination */
