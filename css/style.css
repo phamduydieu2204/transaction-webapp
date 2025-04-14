@@ -186,10 +186,29 @@ button:hover {
   background-color: #0056b3;
 }
 
+/* CSS cho table-header */
+.table-header {
+  display: flex;
+  justify-content: space-between; /* Căn trái h2, căn phải pagination */
+  align-items: center; /* Căn giữa theo chiều dọc */
+  margin-top: 30px;
+}
+
+.table-header h2 {
+  margin: 0; /* Loại bỏ margin mặc định của h2 */
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin: 0; /* Loại bỏ margin để nằm cùng hàng với h2 */
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 30px;
+  margin-top: 10px; /* Giảm khoảng cách giữa table-header và table */
 }
 
 table thead {
@@ -224,11 +243,4 @@ table .edit-btn {
 
 table .delete-btn {
   background-color: #dc3545;
-}
-
-.pagination {
-  display: flex;
-  justify-content: center;
-  gap: 5px;
-  margin-top: 10px;
 }
