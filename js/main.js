@@ -49,11 +49,176 @@ document.addEventListener("DOMContentLoaded", () => {
   loadTransactions();
 });
 
-// Hàm định dạng ngày từ yyyy-mm-dd sang dd/mm/yyyy để hiển thị trên form
+// Hàm định dạng ngày từ yyyy-mm-dd sang yyyy/mm/dd để hiển thị trên form
 function formatToInputDate(isoDate) {
-  if (!isoDate) return "dd/mm/yyyy";
+  if (!isoDate) return "yyyy/mm/dd";
   const [year, month, day] = isoDate.split("-");
-  return `${day}/${month}/${year}`;
+  return `${year}/${month}/${day}`;
+}
+
+// Hàm định dạng ngày từ yyyy/mm/dd sang yyyy/mm/dd (giữ nguyên định dạng)
+function formatDate(dateString) {
+  if (!dateString) return "";
+  return dateString; // Giữ nguyên định dạng yyyy/mm/dd
+}
+
+async function handleAdd() {
+  const { BACKEND_URL } = getConstants();
+  if (!userInfo) {
+    alert("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.");
+    return;
+  }
+
+  const data = {
+    action: "addTransaction",
+    transactionType: document.getElementById("transactionType").value,
+    transactionDate: document.getElementById("transactionDate").value, // Đã ở định dạng yyyy/mm/dd
+    customerName: document.getElementById("customerName").value,
+    customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
+    customerPhone: document.getElementById("customerPhone").value,
+    duration: parseInt(document.getElementById("duration").value) || 0,
+    startDate: document.getElementById("startDate").value, // Đã ở định dạng yyyy/mm/dd
+    endDate: document.getElementById("endDate").value, // Đã ở định dạng yyyy/mm/dd
+    deviceCount: parseInt(document.getElementById("deviceCount").value) || 0,
+    softwareName: document.getElementById("softwareName").value,
+    softwarePackage: document.getElementById("softwarePackage").value,
+    revenue: parseFloat(document.getElementById("revenue").value) || 0,
+    note: document.getElementById("note").value,
+    tenNhanVien: userInfo.tenNhanVien,
+    maNhanVien: userInfo.maNhanVien
+  };
+
+  console.log("📤 Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
+
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    if (result.status === "success") {
+      document.getElementById("successMessage").textContent = "Giao dịch đã được lưu!";
+      document.getElementById("transactionForm").reset();
+      document.getElementById("startDate").value = formatToInputDate(today);
+      document.getElementById("transactionDate").value = formatToInputDate(today);
+      document.getElementById("endDate").value = "yyyy/mm/dd";
+      await loadTransactions();
+      currentEditIndex = -1;
+      updatePackageList();
+    } else {
+      document.getElementById("errorMessage").textContent = result.message || "Không thể lưu giao dịch!";
+    }
+  } catch (err) {
+    document.getElementById("errorMessage").textContent = `Lỗi kết nối server: ${err.message}`;
+    console.error("Lỗi:", err);
+  }
+}
+
+async function handleSearch() {
+  const { BACKEND_URL } = getConstants();
+  const conditions = {};
+
+  const transactionType = document.getElementById("transactionType").value;
+  const transactionDate = document.getElementById("transactionDate").value; // Đã ở định dạng yyyy/mm/dd
+  const customerName = document.getElementById("customerName").value;
+  const customerEmail = document.getElementById("customerEmail").value.toLowerCase();
+  const customerPhone = document.getElementById("customerPhone").value;
+  const duration = document.getElementById("duration").value;
+  const startDate = document.getElementById("startDate").value; // Đã ở định dạng yyyy/mm/dd
+  const endDate = document.getElementById("endDate").value; // Đã ở định dạng yyyy/mm/dd
+  const deviceCount = document.getElementById("deviceCount").value;
+  const softwareName = document.getElementById("softwareName").value;
+  const softwarePackage = document.getElementById("softwarePackage").value;
+  const revenue = document.getElementById("revenue").value;
+  const note = document.getElementById("note").value;
+  const tenNhanVien = userInfo.tenNhanVien;
+  const maNhanVien = userInfo.maNhanVien;
+
+  if (transactionType && transactionType !== "") conditions.transactionType = transactionType;
+  if (transactionDate && transactionDate !== "yyyy/mm/dd") conditions.transactionDate = transactionDate;
+  if (customerName) conditions.customerName = customerName;
+  if (customerEmail) conditions.customerEmail = customerEmail;
+  if (customerPhone) conditions.customerPhone = customerPhone;
+  if (duration && duration !== "0") conditions.duration = duration;
+  if (startDate && startDate !== "yyyy/mm/dd") conditions.startDate = startDate;
+  if (endDate && endDate !== "yyyy/mm/dd") conditions.endDate = endDate;
+  if (deviceCount && deviceCount !== "0") conditions.deviceCount = deviceCount;
+  if (softwareName && softwareName !== "") conditions.softwareName = softwareName;
+  if (softwarePackage && softwarePackage !== "") conditions.softwarePackage = softwarePackage;
+  if (revenue && revenue !== "0") conditions.revenue = revenue;
+  if (note) conditions.note = note;
+  if (tenNhanVien) conditions.tenNhanVien = tenNhanVien;
+  if (maNhanVien) conditions.maNhanVien = maNhanVien;
+
+  const data = {
+    action: "searchTransactions",
+    maNhanVien: userInfo.maNhanVien,
+    conditions: conditions
+  };
+
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    if (result.status === "success") {
+      transactionList = result.data;
+      currentPage = 1;
+      updateTable();
+    } else {
+      document.getElementById("errorMessage").textContent = result.message || "Không thể tìm kiếm giao dịch!";
+    }
+  } catch (err) {
+    document.getElementById("errorMessage").textContent = `Lỗi khi tìm kiếm giao dịch: ${err.message}`;
+    console.error("Lỗi khi tìm kiếm giao dịch", err);
+  }
+}
+
+function updateTable() {
+  const tableBody = document.querySelector("#transactionTable tbody");
+  tableBody.innerHTML = "";
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedItems = transactionList.slice(startIndex, endIndex);
+
+  paginatedItems.forEach((transaction, index) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${transaction.transactionId}</td>
+      <td>${formatDate(transaction.transactionDate)}</td>
+      <td>${transaction.transactionType}</td>
+      <td>${transaction.customerName}</td>
+      <td>${transaction.customerEmail}</td>
+      <td>${transaction.customerPhone}</td>
+      <td>${transaction.duration}</td>
+      <td>${formatDate(transaction.startDate)}</td>
+      <td>${formatDate(transaction.endDate)}</td>
+      <td>${transaction.deviceCount}</td>
+      <td>${transaction.softwareName}</td>
+      <td>${transaction.softwarePackage}</td>
+      <td>${transaction.revenue}</td>
+      <td>${transaction.note}</td>
+      <td>${transaction.tenNhanVien}</td>
+      <td>${transaction.maNhanVien}</td>
+      <td>
+        <button class="edit-btn" onclick="editTransaction(${startIndex + index})">Sửa</button>
+        <button class="delete-btn" onclick="deleteTransaction(${startIndex + index})">Xóa</button>
+      </td>
+    `;
+    tableBody.appendChild(row);
+  });
+
+  document.getElementById("pageInfo").textContent = `Trang ${currentPage} / ${Math.ceil(transactionList.length / itemsPerPage)}`;
 }
 
 // Hàm định dạng ngày từ dd/mm/yyyy sang yyyy/mm/dd để gửi lên server
@@ -120,61 +285,6 @@ function updatePackageList() {
   }
 }
 
-async function handleAdd() {
-  const { BACKEND_URL } = getConstants();
-  if (!userInfo) {
-    alert("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.");
-    return;
-  }
-
-  const data = {
-    action: "addTransaction",
-    transactionType: document.getElementById("transactionType").value,
-    transactionDate: today, // Sử dụng ngày hôm nay
-    customerName: document.getElementById("customerName").value,
-    customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
-    customerPhone: document.getElementById("customerPhone").value,
-    duration: parseInt(document.getElementById("duration").value) || 0,
-    startDate: parseInputDate(document.getElementById("startDate").value),
-    endDate: parseInputDate(document.getElementById("endDate").value),
-    deviceCount: parseInt(document.getElementById("deviceCount").value) || 0,
-    softwareName: document.getElementById("softwareName").value,
-    softwarePackage: document.getElementById("softwarePackage").value,
-    revenue: parseFloat(document.getElementById("revenue").value) || 0,
-    note: document.getElementById("note").value,
-    tenNhanVien: userInfo.tenNhanVien,
-    maNhanVien: userInfo.maNhanVien
-  };
-
-  console.log("📤 Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
-
-  try {
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
-    });
-
-    const result = await response.json();
-    if (result.status === "success") {
-      document.getElementById("successMessage").textContent = "Giao dịch đã được lưu!";
-      document.getElementById("transactionForm").reset();
-      document.getElementById("startDate").value = formatToInputDate(today);
-      document.getElementById("transactionDate").value = formatToInputDate(today);
-      document.getElementById("endDate").value = "dd/mm/yyyy";
-      await loadTransactions();
-      currentEditIndex = -1;
-      updatePackageList();
-    } else {
-      document.getElementById("errorMessage").textContent = result.message || "Không thể lưu giao dịch!";
-    }
-  } catch (err) {
-    document.getElementById("errorMessage").textContent = `Lỗi kết nối server: ${err.message}`;
-    console.error("Lỗi:", err);
-  }
-}
 
 
 
@@ -272,71 +382,6 @@ async function handleDelete() {
   }
 }
 
-async function handleSearch() {
-  const { BACKEND_URL } = getConstants();
-  const conditions = {};
-
-  const transactionType = document.getElementById("transactionType").value;
-  const transactionDate = parseInputDate(document.getElementById("transactionDate").value);
-  const customerName = document.getElementById("customerName").value;
-  const customerEmail = document.getElementById("customerEmail").value.toLowerCase();
-  const customerPhone = document.getElementById("customerPhone").value;
-  const duration = document.getElementById("duration").value;
-  const startDate = parseInputDate(document.getElementById("startDate").value);
-  const endDate = parseInputDate(document.getElementById("endDate").value);
-  const deviceCount = document.getElementById("deviceCount").value;
-  const softwareName = document.getElementById("softwareName").value;
-  const softwarePackage = document.getElementById("softwarePackage").value;
-  const revenue = document.getElementById("revenue").value;
-  const note = document.getElementById("note").value;
-  const tenNhanVien = userInfo.tenNhanVien;
-  const maNhanVien = userInfo.maNhanVien;
-
-  if (transactionType && transactionType !== "") conditions.transactionType = transactionType;
-  if (transactionDate) conditions.transactionDate = transactionDate;
-  if (customerName) conditions.customerName = customerName;
-  if (customerEmail) conditions.customerEmail = customerEmail;
-  if (customerPhone) conditions.customerPhone = customerPhone;
-  if (duration && duration !== "0") conditions.duration = duration;
-  if (startDate) conditions.startDate = startDate;
-  if (endDate) conditions.endDate = endDate;
-  if (deviceCount && deviceCount !== "0") conditions.deviceCount = deviceCount;
-  if (softwareName && softwareName !== "") conditions.softwareName = softwareName;
-  if (softwarePackage && softwarePackage !== "") conditions.softwarePackage = softwarePackage;
-  if (revenue && revenue !== "0") conditions.revenue = revenue;
-  if (note) conditions.note = note;
-  if (tenNhanVien) conditions.tenNhanVien = tenNhanVien;
-  if (maNhanVien) conditions.maNhanVien = maNhanVien;
-
-  const data = {
-    action: "searchTransactions",
-    maNhanVien: userInfo.maNhanVien,
-    conditions: conditions
-  };
-
-  try {
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
-    });
-
-    const result = await response.json();
-    if (result.status === "success") {
-      transactionList = result.data;
-      currentPage = 1;
-      updateTable();
-    } else {
-      document.getElementById("errorMessage").textContent = result.message || "Không thể tìm kiếm giao dịch!";
-    }
-  } catch (err) {
-    document.getElementById("errorMessage").textContent = `Lỗi khi tìm kiếm giao dịch: ${err.message}`;
-    console.error("Lỗi khi tìm kiếm giao dịch", err);
-  }
-}
-
 async function loadTransactions() {
   const { BACKEND_URL } = getConstants();
   try {
@@ -361,44 +406,6 @@ async function loadTransactions() {
     console.error("Lỗi khi tải danh sách giao dịch", err);
   }
 }
-
-  function updateTable() {
-    const tableBody = document.querySelector("#transactionTable tbody");
-    tableBody.innerHTML = "";
-  
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const paginatedItems = transactionList.slice(startIndex, endIndex);
-  
-    paginatedItems.forEach((transaction, index) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${transaction.transactionId}</td>
-        <td>${formatDateTime(transaction.transactionDate)}</td>
-        <td>${transaction.transactionType}</td>
-        <td>${transaction.customerName}</td>
-        <td>${transaction.customerEmail}</td>
-        <td>${transaction.customerPhone}</td>
-        <td>${transaction.duration}</td>
-        <td>${formatDate(transaction.startDate)}</td> <!-- Định dạng ngày bắt đầu -->
-        <td>${formatDate(transaction.endDate)}</td> <!-- Định dạng ngày kết thúc -->
-        <td>${transaction.deviceCount}</td>
-        <td>${transaction.softwareName}</td>
-        <td>${transaction.softwarePackage}</td>
-        <td>${transaction.revenue}</td>
-        <td>${transaction.note}</td>
-        <td>${transaction.tenNhanVien}</td>
-        <td>${transaction.maNhanVien}</td>
-        <td>
-          <button class="edit-btn" onclick="editTransaction(${startIndex + index})">Sửa</button>
-          <button class="delete-btn" onclick="deleteTransaction(${startIndex + index})">Xóa</button>
-        </td>
-      `;
-      tableBody.appendChild(row);
-    });
-  
-    document.getElementById("pageInfo").textContent = `Trang ${currentPage} / ${Math.ceil(transactionList.length / itemsPerPage)}`;
-  }
 
 function updatePagination() {
   const totalPages = Math.ceil(transactionList.length / itemsPerPage);
@@ -455,9 +462,3 @@ function formatDateTime(isoDate) {
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   }
 
-// Hàm định dạng ngày từ yyyy/mm/dd sang dd/mm/yyyy
-function formatDate(dateString) {
-  if (!dateString) return "";
-  const [year, month, day] = dateString.split("/");
-  return `${day}/${month}/${year}`;
-}
