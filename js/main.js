@@ -1,7 +1,8 @@
 let userInfo = null;
 let currentEditIndex = -1;
 let transactionList = [];
-let today = new Date().toISOString().split("T")[0]; // Định dạng yyyy-mm-dd
+let today = new Date();
+let todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`; // Định dạng yyyy/mm/dd
 let currentPage = 1;
 const itemsPerPage = 10;
 let softwareData = [];
@@ -28,15 +29,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const transactionDateInput = document.getElementById("transactionDate");
 
   // Đặt giá trị mặc định cho các trường ngày
-  startDateInput.value = formatToInputDate(today);
-  transactionDateInput.value = formatToInputDate(today);
+  startDateInput.value = todayFormatted;
+  transactionDateInput.value = todayFormatted;
 
   function calculateEndDate() {
     const start = new Date(startDateInput.value);
     const months = parseInt(durationInput.value || 0);
     if (!isNaN(months)) {
       const estimated = new Date(start.getTime() + months * 30 * 24 * 60 * 60 * 1000);
-      endDateInput.value = formatToInputDate(estimated.toISOString().split("T")[0]);
+      const year = estimated.getFullYear();
+      const month = String(estimated.getMonth() + 1).padStart(2, '0');
+      const day = String(estimated.getDate()).padStart(2, '0');
+      endDateInput.value = `${year}/${month}/${day}`;
     }
   }
 
@@ -49,11 +53,59 @@ document.addEventListener("DOMContentLoaded", () => {
   loadTransactions();
 });
 
-// Hàm định dạng ngày từ yyyy-mm-dd sang yyyy/mm/dd để hiển thị trên form
-function formatToInputDate(isoDate) {
-  if (!isoDate) return "yyyy/mm/dd";
-  const [year, month, day] = isoDate.split("-");
-  return `${year}/${month}/${day}`;
+// Hàm mở lịch Flatpickr
+function openCalendar(inputId) {
+  flatpickr(`#${inputId}`, {
+    dateFormat: "Y/m/d", // Định dạng yyyy/mm/dd
+    onChange: function(selectedDates, dateStr) {
+      document.getElementById(inputId).value = dateStr;
+      if (inputId === "startDate") {
+        calculateEndDate(); // Cập nhật Ngày kết thúc nếu thay đổi Ngày bắt đầu
+      }
+    }
+  }).open();
+}
+
+// Hàm tự động cập nhật Tên khách hàng và Liên hệ khi nhập Email
+async function updateCustomerInfo() {
+  const email = document.getElementById("customerEmail").value.toLowerCase();
+  if (!email) return;
+
+  const { BACKEND_URL } = getConstants();
+  const data = {
+    action: "searchTransactions",
+    maNhanVien: userInfo.maNhanVien,
+    conditions: { customerEmail: email }
+  };
+
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    if (result.status === "success" && result.data.length > 0) {
+      // Lấy giao dịch gần nhất (sắp xếp theo ngày giảm dần)
+      const sortedTransactions = result.data.sort((a, b) => new Date(b.transactionDate) - new Date(a.transactionDate));
+      const latestTransaction = sortedTransactions[0];
+      document.getElementById("customerName").value = latestTransaction.customerName;
+      document.getElementById("customerPhone").value = latestTransaction.customerPhone;
+    }
+  } catch (err) {
+    console.error("Lỗi khi tìm kiếm giao dịch theo Email:", err);
+  }
+}
+
+// Hàm xử lý khi nhấn "Làm mới"
+function handleReset() {
+  const startDateInput = document.getElementById("startDate");
+  const transactionDateInput = document.getElementById("transactionDate");
+  startDateInput.value = todayFormatted;
+  transactionDateInput.value = todayFormatted;
 }
 
 // Hàm định dạng ngày từ yyyy/mm/dd sang yyyy/mm/dd (giữ nguyên định dạng)
@@ -103,8 +155,8 @@ async function handleAdd() {
     if (result.status === "success") {
       document.getElementById("successMessage").textContent = "Giao dịch đã được lưu!";
       document.getElementById("transactionForm").reset();
-      document.getElementById("startDate").value = formatToInputDate(today);
-      document.getElementById("transactionDate").value = formatToInputDate(today);
+      document.getElementById("startDate").value = todayFormatted;
+      document.getElementById("transactionDate").value = todayFormatted;
       document.getElementById("endDate").value = "yyyy/mm/dd";
       await loadTransactions();
       currentEditIndex = -1;
@@ -172,6 +224,7 @@ async function handleSearch() {
     const result = await response.json();
     if (result.status === "success") {
       transactionList = result.data;
+      transactionList.sort((a, b) => new Date(b.transactionDate) - new Date(a.transactionDate)); // Sắp xếp từ gần nhất đến xa nhất
       currentPage = 1;
       updateTable();
     } else {
@@ -221,13 +274,20 @@ function updateTable() {
   document.getElementById("pageInfo").textContent = `Trang ${currentPage} / ${Math.ceil(transactionList.length / itemsPerPage)}`;
 }
 
+
+// Hàm định dạng ngày từ yyyy-mm-dd sang yyyy/mm/dd để hiển thị trên form
+function formatToInputDate(isoDate) {
+  if (!isoDate) return "yyyy/mm/dd";
+  const [year, month, day] = isoDate.split("-");
+  return `${year}/${month}/${day}`;
+}
+
 // Hàm định dạng ngày từ dd/mm/yyyy sang yyyy/mm/dd để gửi lên server
 function parseInputDate(inputDate) {
   if (!inputDate || inputDate === "dd/mm/yyyy") return "";
   const [day, month, year] = inputDate.split("/");
   return `${year}/${month}/${day}`;
 }
-
 
 // Hàm lấy danh sách phần mềm từ Google Apps Script
 async function fetchSoftwareList() {
@@ -284,10 +344,6 @@ function updatePackageList() {
     }
   }
 }
-
-
-
-
 
 async function handleUpdate() {
   if (currentEditIndex === -1) {
