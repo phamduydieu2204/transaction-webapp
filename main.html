@@ -101,6 +101,56 @@
     .detail-content .copy-icon:hover {
       color: #0056b3;
     }
+
+    /* CSS để cố định tiêu đề và các phần tử phía trên */
+    .container {
+      padding-bottom: 20px;
+    }
+
+    .fixed-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background-color: #fff;
+    }
+
+    #transactionTable {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    #transactionTable thead {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background-color: #007bff;
+      color: white;
+    }
+
+    #transactionTable th,
+    #transactionTable td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    #transactionTable tbody {
+      display: block;
+      max-height: 400px; /* Chiều cao cố định cho phần thân bảng */
+      overflow-y: auto; /* Thêm thanh cuộn dọc */
+    }
+
+    #transactionTable thead,
+    #transactionTable tbody tr {
+      display: table;
+      width: 100%;
+      table-layout: fixed; /* Đảm bảo các cột có độ rộng cố định và đồng bộ */
+    }
+
+    #transactionTable tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
   </style>
 </head>
 <body>
@@ -109,7 +159,7 @@
     <p id="welcome"></p>
     <hr>
 
-    <form id="transactionForm" class="form-grid" onreset="handleReset()">
+    <form id="transactionForm" class="form-grid fixed-header" onreset="handleReset()">
       <!-- Dòng 1 -->
       <div>
         <label>Ngày giao dịch:</label>
@@ -215,8 +265,8 @@
       </div>
     </form>
 
-    <h2>Danh sách giao dịch</h2>
-    <div class="pagination" id="pagination">
+    <h2 class="fixed-header">Danh sách giao dịch</h2>
+    <div class="pagination fixed-header" id="pagination">
       <!-- Phân trang sẽ được render động bằng JavaScript -->
     </div>
 
