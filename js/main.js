@@ -67,26 +67,39 @@ async function updateAccountList() {
   const softwareName = document.getElementById("softwareName").value;
   const softwarePackage = document.getElementById("softwarePackage").value;
   const accountNameSelect = document.getElementById("accountName");
+  const currentAccountName = accountNameSelect.value; // Lưu giá trị hiện tại của Tên tài khoản
+
   accountNameSelect.innerHTML = '<option value="">-- Chọn tài khoản --</option>';
 
   if (softwareName && softwarePackage) {
-    // Lấy danh sách tài khoản thỏa mãn điều kiện
     const accounts = softwareData
       .filter(item =>
         item.softwareName === softwareName &&
         item.softwarePackage === softwarePackage &&
-        item.activeUsers < item.allowedUsers // Điều kiện: Số người dùng đang hoạt động < Số người dùng cho phép
+        item.activeUsers < item.allowedUsers
       )
       .map(item => item.accountName);
 
-    // Lấy danh sách tài khoản duy nhất
     const uniqueAccounts = [...new Set(accounts)];
+
+    // Nếu giá trị hiện tại của Tên tài khoản không có trong danh sách, thêm nó vào
+    if (currentAccountName && !uniqueAccounts.includes(currentAccountName)) {
+      uniqueAccounts.push(currentAccountName);
+    }
+
+    console.log("Danh sách tài khoản trong dropdown:", uniqueAccounts); // Log để debug
+
     uniqueAccounts.forEach(account => {
       const option = document.createElement("option");
       option.value = account;
       option.textContent = account;
       accountNameSelect.appendChild(option);
     });
+
+    // Khôi phục giá trị hiện tại (nếu có)
+    if (currentAccountName && uniqueAccounts.includes(currentAccountName)) {
+      accountNameSelect.value = currentAccountName;
+    }
   }
 }
 
@@ -674,27 +687,29 @@ function goToPage(page) {
 }
 
 function editTransaction(index) {
-  currentEditIndex = index; // Lưu chỉ số giao dịch đang chỉnh sửa
+  currentEditIndex = index;
   const transaction = transactionList[index];
-  currentEditTransactionId = transaction.transactionId; // Lưu Mã giao dịch
+  currentEditTransactionId = transaction.transactionId;
 
-  // Lấy các phần tử dropdown
   const softwareNameSelect = document.getElementById("softwareName");
   const softwarePackageSelect = document.getElementById("softwarePackage");
   const accountNameSelect = document.getElementById("accountName");
 
-  // Lưu giá trị ban đầu của giao dịch
   const softwareNameValue = transaction.softwareName;
   const softwarePackageValue = transaction.softwarePackage;
   const accountNameValue = transaction.accountName || "";
 
-  // Tạm thời vô hiệu hóa sự kiện change để tránh làm mới dropdown không mong muốn
+  console.log("Dữ liệu giao dịch để sửa:", {
+    softwareName: softwareNameValue,
+    softwarePackage: softwarePackageValue,
+    accountName: accountNameValue
+  }); // Log để debug
+
   const softwareNameChangeHandler = softwareNameSelect.onchange;
   const softwarePackageChangeHandler = softwarePackageSelect.onchange;
   softwareNameSelect.onchange = null;
   softwarePackageSelect.onchange = null;
 
-  // Điền dữ liệu giao dịch lên form
   document.getElementById("transactionDate").value = transaction.transactionDate;
   document.getElementById("transactionType").value = transaction.transactionType;
   document.getElementById("customerName").value = transaction.customerName;
@@ -707,18 +722,19 @@ function editTransaction(index) {
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 
-  // Điền các trường dropdown
   softwareNameSelect.value = softwareNameValue;
-
-  // Làm mới dropdown "Gói phần mềm" và khôi phục giá trị
   updatePackageList();
   softwarePackageSelect.value = softwarePackageValue;
 
-  // Làm mới dropdown "Tên tài khoản" và khôi phục giá trị
   updateAccountList();
   accountNameSelect.value = accountNameValue;
 
-  // Khôi phục sự kiện change
+  console.log("Giá trị sau khi điền lên form:", {
+    softwareName: softwareNameSelect.value,
+    softwarePackage: softwarePackageSelect.value,
+    accountName: accountNameSelect.value
+  }); // Log để debug
+
   softwareNameSelect.onchange = softwareNameChangeHandler;
   softwarePackageSelect.onchange = softwarePackageChangeHandler;
 }
