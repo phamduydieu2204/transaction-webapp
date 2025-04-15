@@ -58,7 +58,7 @@
 
       <div>
         <label>Email:</label>
-        <input type="email" id="customerEmail">
+        <input type="email" id="customerEmail" oninput="updateCustomerInfo()">
       </div>
 
       <div>
@@ -139,34 +139,32 @@
       <!-- Phân trang sẽ được render động bằng JavaScript -->
     </div>
 
-    <div class="table-wrapper">
-      <table id="transactionTable">
-        <thead>
-          <tr>
-            <th>Mã giao dịch</th>
-            <th>Ngày giao dịch</th>
-            <th>Loại giao dịch</th>
-            <th>Tên khách hàng</th>
-            <th>Email</th>
-            <th>Liên hệ</th>
-            <th>Số tháng đăng ký</th>
-            <th>Ngày bắt đầu</th>
-            <th>Ngày kết thúc</th>
-            <th>Số thiết bị</th>
-            <th>Tên phần mềm</th>
-            <th>Gói phần mềm</th>
-            <th>Doanh thu</th>
-            <th>Ghi chú</th>
-            <th>Tên nhân viên</th>
-            <th>Mã nhân viên</th>
-            <th>Hành động</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Dữ liệu sẽ được render ở đây -->
-        </tbody>
-      </table>
-    </div>
+    <table id="transactionTable">
+      <thead>
+        <tr>
+          <th>Mã giao dịch</th>
+          <th>Ngày giao dịch</th>
+          <th>Loại giao dịch</th>
+          <th>Tên khách hàng</th>
+          <th>Email</th>
+          <th>Liên hệ</th>
+          <th>Số tháng đăng ký</th>
+          <th>Ngày bắt đầu</th>
+          <th>Ngày kết thúc</th>
+          <th>Số thiết bị</th>
+          <th>Tên phần mềm</th>
+          <th>Gói phần mềm</th>
+          <th>Doanh thu</th>
+          <th>Ghi chú</th>
+          <th>Tên nhân viên</th>
+          <th>Mã nhân viên</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Dữ liệu sẽ được render ở đây -->
+      </tbody>
+    </table>
 
     <p id="successMessage"></p>
     <p id="errorMessage"></p>
