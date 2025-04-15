@@ -485,12 +485,19 @@ function viewTransaction(index) {
     // Gán sự kiện click cho icon copy (nếu có)
     if (field.showCopy) {
       const copyIcon = row.querySelector(".copy-icon");
-      copyIcon.addEventListener("click", () => copyToClipboard(field.value));
+      copyIcon.addEventListener("click", () => copyToClipboard(field.value, copyIcon));
     }
   });
 
   // Hiển thị modal
   modal.style.display = "block";
+
+  // Thêm sự kiện click để đóng modal khi click ra ngoài
+  modal.addEventListener("click", function(event) {
+    if (event.target === modal) {
+      closeModal();
+    }
+  });
 }
 
 function copyToClipboard(text) {
