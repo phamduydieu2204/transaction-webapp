@@ -407,6 +407,8 @@ function updateTable() {
       <td>${transaction.softwareName}</td>
       <td>${transaction.softwarePackage}</td>
       <td>${transaction.accountName || ""}</td>
+      <td>${transaction.revenue}</td>
+      <td>${transaction.tenNhanVien}</td>
       <td>
         <button class="edit-btn">Sửa</button>
         <button class="delete-btn">Xóa</button>
