@@ -50,9 +50,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
   fetchSoftwareList();
   document.getElementById("softwareName").addEventListener("change", updatePackageList);
+  document.getElementById("softwarePackage").addEventListener("change", updateAccountList); // Thêm sự kiện cho dropdown "Gói phần mềm"
 
   loadTransactions();
 });
+
+function updateAccountList() {
+  const softwareName = document.getElementById("softwareName").value;
+  const softwarePackage = document.getElementById("softwarePackage").value;
+  const accountNameSelect = document.getElementById("accountName");
+  accountNameSelect.innerHTML = '<option value="">-- Chọn tài khoản --</option>';
+
+  if (softwareName && softwarePackage) {
+    // Lấy danh sách tài khoản thỏa mãn điều kiện
+    const accounts = softwareData
+      .filter(item =>
+        item.softwareName === softwareName &&
+        item.softwarePackage === softwarePackage &&
+        item.activeUsers < item.allowedUsers // Điều kiện: Số người dùng đang hoạt động < Số người dùng cho phép
+      )
+      .map(item => item.accountName);
+
+    // Lấy danh sách tài khoản duy nhất
+    const uniqueAccounts = [...new Set(accounts)];
+    uniqueAccounts.forEach(account => {
+      const option = document.createElement("option");
+      option.value = account;
+      option.textContent = account;
+      accountNameSelect.appendChild(option);
+    });
+  }
+}
 
 // Hàm mở lịch Flatpickr
 function openCalendar(inputId) {
@@ -114,6 +142,7 @@ function handleReset() {
   document.getElementById("transactionForm").reset();
   currentEditIndex = -1;
   currentEditTransactionId = null; // Đặt lại transactionId đang chỉnh sửa
+  fetchSoftwareList(); // Làm mới dropdown
 }
 
 // Hàm định dạng ngày từ yyyy/mm/dd sang yyyy/mm/dd (giữ nguyên định dạng)
@@ -518,6 +547,9 @@ function editTransaction(index) {
   document.getElementById("softwarePackage").value = transaction.softwarePackage;
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
+
+  // Cập nhật dropdown "Tên tài khoản" dựa trên phần mềm và gói đã chọn
+  updateAccountList();
 }
 
 // Hàm định dạng ngày từ yyyy-mm-dd sang yyyy/mm/dd để hiển thị trên form
@@ -537,21 +569,37 @@ function parseInputDate(inputDate) {
 // Hàm lấy danh sách phần mềm từ Google Apps Script
 async function fetchSoftwareList() {
   const { BACKEND_URL } = getConstants();
+  const data = {
+    action: "getSoftwareList"
+  };
+
   try {
     const response = await fetch(BACKEND_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ action: "getSoftwareList" })
+      body: JSON.stringify(data)
     });
 
     const result = await response.json();
     if (result.status === "success") {
-      softwareData = result.data;
-      populateSoftwareList();
+      softwareData = result.data; // Lưu dữ liệu từ sheet PhanMem
+
+      // Lấy danh sách tên phần mềm duy nhất
+      const softwareNames = [...new Set(softwareData.map(item => item.softwareName))];
+      const softwareNameSelect = document.getElementById("softwareName");
+      softwareNameSelect.innerHTML = '<option value="">-- Chọn phần mềm --</option>';
+      softwareNames.forEach(name => {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        softwareNameSelect.appendChild(option);
+      });
+
+      updatePackageList(); // Cập nhật dropdown "Gói phần mềm"
     } else {
-      console.error("Không thể lấy danh sách phần mềm:", result.message);
+      console.error("Lỗi khi lấy danh sách phần mềm:", result.message);
     }
   } catch (err) {
     console.error("Lỗi khi lấy danh sách phần mềm:", err);
@@ -572,24 +620,27 @@ function populateSoftwareList() {
 
 // Hàm cập nhật danh sách Gói phần mềm dựa trên Tên phần mềm được chọn
 function updatePackageList() {
-  const softwareSelect = document.getElementById("softwareName");
-  const packageSelect = document.getElementById("softwarePackage");
-  const selectedSoftware = softwareSelect.value;
+  const softwareName = document.getElementById("softwareName").value;
+  const softwarePackageSelect = document.getElementById("softwarePackage");
+  softwarePackageSelect.innerHTML = '<option value="">-- Chọn gói --</option>';
 
-  packageSelect.innerHTML = '<option value="">-- Chọn gói --</option>';
-  if (selectedSoftware) {
-    const software = softwareData.find(s => s.name === selectedSoftware);
-    if (software && software.packages) {
-      software.packages.forEach(pkg => {
-        const option = document.createElement("option");
-        option.value = pkg;
-        option.textContent = pkg;
-        packageSelect.appendChild(option);
-      });
-    }
+  if (softwareName) {
+    // Lấy danh sách gói phần mềm duy nhất theo tên phần mềm đã chọn
+    const packages = [...new Set(softwareData
+      .filter(item => item.softwareName === softwareName)
+      .map(item => item.softwarePackage)
+    )];
+
+    packages.forEach(pkg => {
+      const option = document.createElement("option");
+      option.value = pkg;
+      option.textContent = pkg;
+      softwarePackageSelect.appendChild(option);
+    });
   }
-}
 
+  updateAccountList(); // Cập nhật dropdown "Tên tài khoản"
+}
 
 
 async function handleDelete() {
