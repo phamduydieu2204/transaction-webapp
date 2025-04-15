@@ -1,287 +1,305 @@
 /* Căn giữa trang đăng nhập */
 body.login-page {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background: #f2f2f2;
-    margin: 0;
-    font-family: Arial, sans-serif;
-  }
-  
-  /* Login container */
-  .login-container {
-    background: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.1);
-    width: 320px;
-    text-align: center;
-  }
-  
-  .password-container {
-    position: relative;
-    width: 100%;
-  }
-  
-  .toggle-password {
-    position: absolute;
-    top: 50%;
-    right: 12px;
-    transform: translateY(-50%);
-    cursor: pointer;
-  }
-  
-  input, select, textarea {
-    width: 100%;
-    padding: 10px;
-    margin-top: 8px;
-    margin-bottom: 16px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-    font-size: 15px;
-  }
-  
-  /* Trang chính */
-  body {
-    margin: 0;
-    background: #f2f2f2;
-    font-family: Arial, sans-serif;
-  }
-  
-  .container {
-    max-width: 95%;
-    margin: 30px auto 0 auto;
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-  }
-  
-  h1 {
-    text-align: center;
-    margin-bottom: 5px;
-  }
-  
-  #welcome {
-    text-align: center;
-    font-style: italic;
-    color: #666;
-    margin-bottom: 20px;
-  }
-  
-  button {
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 12px 16px;
-    border-radius: 6px;
-    font-weight: bold;
-    font-size: 16px;
-    cursor: pointer;
-    transition: 0.3s;
-    width: auto;
-    display: inline-block;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  
-  .extra-wide {
-    grid-column: span 3;
-  }
-  
-  #errorMessage, #successMessage {
-    text-align: center;
-    font-weight: bold;
-  }
-  
-  #errorMessage {
-    color: red;
-  }
-  
-  #successMessage {
-    color: green;
-  }
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #f2f2f2;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* Login container */
+.login-container {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.1);
+  width: 320px;
+  text-align: center;
+}
+
+.password-container {
+  position: relative;
+  width: 100%;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  margin-bottom: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  font-size: 15px;
+}
+
+/* Trang chính */
+body {
+  margin: 0;
+  background: #f2f2f2;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  max-width: 95%;
+  margin: 30px auto 0 auto;
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+#welcome {
+  text-align: center;
+  font-style: italic;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+  width: auto;
+  display: inline-block;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.extra-wide {
+  grid-column: span 3;
+}
+
+#errorMessage, #successMessage {
+  text-align: center;
+  font-weight: bold;
+}
+
+#errorMessage {
+  color: red;
+}
+
+#successMessage {
+  color: green;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  width: 100%; /* Đảm bảo form chiếm toàn bộ chiều rộng của container */
+  box-sizing: border-box;
+}
+
+.form-grid div {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Loại bỏ flex-direction: column cho button-row */
+.form-grid .button-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 5px;
+  margin-top: 10px;
+  flex-wrap: nowrap;
+}
+
+/* Đảm bảo kích thước đồng đều cho các trường trong form */
+.form-grid input,
+.form-grid select,
+.form-grid textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  margin-bottom: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  font-size: 15px;
+  height: 40px; /* Đặt chiều cao đồng đều */
+}
+
+/* Điều chỉnh chiều cao của textarea */
+.form-grid textarea {
+  resize: none; /* Ngăn thay đổi kích thước */
+  height: 40px; /* Đặt chiều cao giống các trường khác */
+}
+
+/* Media query cho màn hình nhỏ (điện thoại) */
+@media (max-width: 768px) {
   .form-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 20px;
-    width: 100%; /* Đảm bảo form chiếm toàn bộ chiều rộng của container */
-    box-sizing: border-box;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Tự động điều chỉnh số cột */
+    gap: 10px; /* Giảm khoảng cách giữa các trường */
   }
-  
+
   .form-grid div {
-    display: flex;
-    flex-direction: column;
+    width: 100%; /* Đảm bảo mỗi trường chiếm toàn bộ chiều rộng của cột */
   }
-  
-  /* Loại bỏ flex-direction: column cho button-row */
-  .form-grid .button-row {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    gap: 5px;
-    margin-top: 10px;
-    flex-wrap: nowrap;
-  }
-  
-  /* Đảm bảo kích thước đồng đều cho các trường trong form */
+
   .form-grid input,
   .form-grid select,
   .form-grid textarea {
-    width: 100%;
-    padding: 10px;
-    margin-top: 8px;
-    margin-bottom: 16px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-    font-size: 15px;
-    height: 40px; /* Đặt chiều cao đồng đều */
+    font-size: 14px; /* Giảm kích thước font trên điện thoại */
+    height: 36px; /* Giảm chiều cao trường nhập liệu */
   }
-  
-  /* Điều chỉnh chiều cao của textarea */
-  .form-grid textarea {
-    resize: none; /* Ngăn thay đổi kích thước */
-    height: 40px; /* Đặt chiều cao giống các trường khác */
+
+  .form-grid .button-row {
+    justify-content: center; /* Căn giữa các nút trên điện thoại */
+    flex-wrap: wrap; /* Cho phép các nút xuống dòng nếu không đủ chỗ */
   }
-  
-  /* Media query cho màn hình nhỏ (điện thoại) */
-  @media (max-width: 768px) {
-    .form-grid {
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Tự động điều chỉnh số cột */
-      gap: 10px; /* Giảm khoảng cách giữa các trường */
-    }
-  
-    .form-grid div {
-      width: 100%; /* Đảm bảo mỗi trường chiếm toàn bộ chiều rộng của cột */
-    }
-  
-    .form-grid input,
-    .form-grid select,
-    .form-grid textarea {
-      font-size: 14px; /* Giảm kích thước font trên điện thoại */
-      height: 36px; /* Giảm chiều cao trường nhập liệu */
-    }
-  
-    .form-grid .button-row {
-      justify-content: center; /* Căn giữa các nút trên điện thoại */
-      flex-wrap: wrap; /* Cho phép các nút xuống dòng nếu không đủ chỗ */
-    }
-  
-    .button-row button {
-      padding: 4px 8px; /* Giảm padding cho nút trên điện thoại */
-      font-size: 12px; /* Giảm kích thước font của nút */
-    }
-  }
-  
-  .full-row {
-    grid-column: span 5;
-    display: flex;
-    gap: 12px;
-    justify-content: flex-start;
-    align-items: center;
-    margin-top: 10px;
-  }
-  
-  /* CSS cho các nút trong button-row */
-  .button-row {
-    grid-column: span 5; /* Chiếm toàn bộ chiều rộng của form-grid */
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end; /* Căn phải */
-    gap: 5px; /* Khoảng cách giữa các nút */
-    margin-top: 10px;
-    flex-wrap: nowrap;
-  }
-  
+
   .button-row button {
-    width: auto; /* Đảm bảo nút chỉ rộng vừa nội dung */
-    min-width: 0; /* Bỏ min-width để nút chỉ vừa nội dung */
-    padding: 4px 10px; /* Đồng bộ với kích thước nút trong pagination */
-    font-size: 13px; /* Đồng bộ với font-size của nút trong pagination */
-    border: none;
-    border-radius: 4px;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    box-sizing: border-box;
+    padding: 4px 8px; /* Giảm padding cho nút trên điện thoại */
+    font-size: 12px; /* Giảm kích thước font của nút */
   }
-  
-  .button-row button:hover {
-    background-color: #0056b3;
-  }
-  
-  /* CSS cho pagination */
-  .pagination {
-    display: flex;
-    justify-content: flex-end; /* Căn phải */
-    gap: 5px;
-    margin-top: 5px; /* Khoảng cách nhỏ giữa "Danh sách giao dịch" và pagination */
-  }
-  
-  .pagination button {
-    padding: 4px 8px;
-    font-size: 13px;
-    border: none;
-    border-radius: 4px;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    box-sizing: border-box;
-  }
-  
-  .pagination button:hover {
-    background-color: #0056b3;
-  }
-  
-  .pagination button.active {
-    background-color: #0056b3; /* Màu nền cho trang hiện tại */
-    font-weight: bold;
-  }
-  
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px; /* Giảm khoảng cách giữa pagination và table */
-  }
-  
-  table thead {
-    background-color: #007bff;
-    color: white;
-  }
-  
+}
+
+.full-row {
+  grid-column: span 5;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 10px;
+}
+
+/* CSS cho các nút trong button-row */
+.button-row {
+  grid-column: span 5; /* Chiếm toàn bộ chiều rộng của form-grid */
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end; /* Căn phải */
+  gap: 5px; /* Khoảng cách giữa các nút */
+  margin-top: 10px;
+  flex-wrap: nowrap;
+}
+
+.button-row button {
+  width: auto; /* Đảm bảo nút chỉ rộng vừa nội dung */
+  min-width: 0; /* Bỏ min-width để nút chỉ vừa nội dung */
+  padding: 4px 10px; /* Đồng bộ với kích thước nút trong pagination */
+  font-size: 13px; /* Đồng bộ với font-size của nút trong pagination */
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  box-sizing: border-box;
+}
+
+.button-row button:hover {
+  background-color: #0056b3;
+}
+
+/* CSS cho pagination */
+.pagination {
+  display: flex;
+  justify-content: flex-end; /* Căn phải */
+  gap: 5px;
+  margin-top: 5px; /* Khoảng cách nhỏ giữa "Danh sách giao dịch" và pagination */
+}
+
+.pagination button {
+  padding: 4px 8px;
+  font-size: 13px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  box-sizing: border-box;
+}
+
+.pagination button:hover {
+  background-color: #0056b3;
+}
+
+.pagination button.active {
+  background-color: #0056b3; /* Màu nền cho trang hiện tại */
+  font-weight: bold;
+}
+
+/* CSS cho bảng danh sách giao dịch */
+.table-wrapper {
+  width: 100%; /* Đảm bảo wrapper chiếm toàn bộ chiều rộng của container */
+  overflow-x: auto; /* Cho phép cuộn ngang nếu bảng quá rộng */
+}
+
+table {
+  width: 100%; /* Đảm bảo bảng chiếm toàn bộ chiều rộng của wrapper */
+  table-layout: fixed; /* Cố định chiều rộng cột, không mở rộng theo nội dung */
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+table th, table td {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+  font-size: 14px;
+  white-space: nowrap; /* Ngăn nội dung xuống dòng */
+  overflow: hidden; /* Ẩn nội dung thừa */
+  text-overflow: ellipsis; /* Hiển thị dấu ... nếu nội dung bị cắt */
+}
+
+/* Media query cho màn hình nhỏ (điện thoại) */
+@media (max-width: 768px) {
   table th, table td {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    text-align: left;
-    font-size: 14px;
+    padding: 6px 8px; /* Giảm padding trên điện thoại */
+    font-size: 12px; /* Giảm kích thước chữ trên điện thoại */
   }
-  
-  table tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-  
-  table button {
-    padding: 4px 10px;
-    margin: 0 2px;
-    font-size: 13px;
-    cursor: pointer;
-    border: none;
-    border-radius: 4px;
-    color: white;
-  }
-  
-  table .edit-btn {
-    background-color: #28a745;
-  }
-  
-  table .delete-btn {
-    background-color: #dc3545;
-  }
+}
+
+table thead {
+  background-color: #007bff;
+  color: white;
+}
+
+table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+table button {
+  padding: 4px 10px;
+  margin: 0 2px;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  color: white;
+}
+
+table .edit-btn {
+  background-color: #28a745;
+}
+
+table .delete-btn {
+  background-color: #dc3545;
+}
