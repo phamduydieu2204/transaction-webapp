@@ -55,6 +55,14 @@ document.addEventListener("DOMContentLoaded", () => {
   loadTransactions();
 });
 
+function logout() {
+  // Xóa thông tin người dùng khỏi localStorage
+  localStorage.removeItem("employeeInfo");
+  
+  // Chuyển hướng về trang đăng nhập
+  window.location.href = "index.html";
+}
+
 async function updateAccountList() {
   const softwareName = document.getElementById("softwareName").value;
   const softwarePackage = document.getElementById("softwarePackage").value;
