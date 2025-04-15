@@ -137,12 +137,38 @@ async function updateCustomerInfo() {
 function handleReset() {
   const startDateInput = document.getElementById("startDate");
   const transactionDateInput = document.getElementById("transactionDate");
+  
+  // Đặt ngày giao dịch và ngày bắt đầu về ngày hiện tại
   startDateInput.value = todayFormatted;
   transactionDateInput.value = todayFormatted;
+
+  // Xóa dữ liệu các trường nhập liệu
   document.getElementById("transactionForm").reset();
+
+  // Đặt các trường select về giá trị mặc định
+  document.getElementById("transactionType").value = "";
+  document.getElementById("softwareName").value = "";
+  document.getElementById("softwarePackage").value = "";
+  document.getElementById("accountName").value = "";
+
+  // Xóa các trường khác (đảm bảo không bị ảnh hưởng bởi reset)
+  document.getElementById("customerName").value = "";
+  document.getElementById("customerEmail").value = "";
+  document.getElementById("customerPhone").value = "";
+  document.getElementById("duration").value = "";
+  document.getElementById("endDate").value = "";
+  document.getElementById("deviceCount").value = "";
+  document.getElementById("note").value = "";
+  document.getElementById("revenue").value = "";
+
   currentEditIndex = -1;
   currentEditTransactionId = null; // Đặt lại transactionId đang chỉnh sửa
-  fetchSoftwareList(); // Làm mới dropdown
+  
+  // Làm mới dropdown
+  fetchSoftwareList();
+  
+  // Tải lại danh sách giao dịch
+  loadTransactions();
 }
 
 // Hàm định dạng ngày từ yyyy/mm/dd sang yyyy/mm/dd (giữ nguyên định dạng)
