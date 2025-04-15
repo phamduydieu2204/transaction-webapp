@@ -291,6 +291,7 @@ async function handleSearch() {
   const deviceCount = document.getElementById("deviceCount").value;
   const softwareName = document.getElementById("softwareName").value;
   const softwarePackage = document.getElementById("softwarePackage").value;
+  const accountName = document.getElementById("accountName").value;
   const revenue = document.getElementById("revenue").value;
   const note = document.getElementById("note").value;
   const tenNhanVien = userInfo.tenNhanVien;
@@ -307,6 +308,7 @@ async function handleSearch() {
   if (deviceCount && deviceCount !== "0") conditions.deviceCount = deviceCount;
   if (softwareName && softwareName !== "") conditions.softwareName = softwareName;
   if (softwarePackage && softwarePackage !== "") conditions.softwarePackage = softwarePackage;
+  if (accountName && accountName !== "") conditions.accountName = accountName;
   if (revenue && revenue !== "0") conditions.revenue = revenue;
   if (note) conditions.note = note;
   if (tenNhanVien) conditions.tenNhanVien = tenNhanVien;
@@ -405,6 +407,8 @@ function updateTable() {
       <td>${transaction.deviceCount}</td>
       <td>${transaction.softwareName}</td>
       <td>${transaction.softwarePackage}</td>
+      <td>${transaction.accountName || ""}</td>
+      <td>${transaction.accountSheetId || ""}</td>
       <td>${transaction.revenue}</td>
       <td>${transaction.note}</td>
       <td>${transaction.tenNhanVien}</td>
@@ -546,6 +550,7 @@ function editTransaction(index) {
   document.getElementById("deviceCount").value = transaction.deviceCount;
   document.getElementById("softwareName").value = transaction.softwareName;
   document.getElementById("softwarePackage").value = transaction.softwarePackage;
+  document.getElementById("accountName").value = transaction.accountName || "";
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 
