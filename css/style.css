@@ -110,8 +110,6 @@ button:hover {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 20px;
-  width: 100%; /* Đảm bảo form chiếm toàn bộ chiều rộng của container */
-  box-sizing: border-box;
 }
 
 .form-grid div {
@@ -148,35 +146,6 @@ button:hover {
 .form-grid textarea {
   resize: none; /* Ngăn thay đổi kích thước */
   height: 40px; /* Đặt chiều cao giống các trường khác */
-}
-
-/* Media query cho màn hình nhỏ (điện thoại) */
-@media (max-width: 768px) {
-  .form-grid {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Tự động điều chỉnh số cột */
-    gap: 10px; /* Giảm khoảng cách giữa các trường */
-  }
-
-  .form-grid div {
-    width: 100%; /* Đảm bảo mỗi trường chiếm toàn bộ chiều rộng của cột */
-  }
-
-  .form-grid input,
-  .form-grid select,
-  .form-grid textarea {
-    font-size: 14px; /* Giảm kích thước font trên điện thoại */
-    height: 36px; /* Giảm chiều cao trường nhập liệu */
-  }
-
-  .form-grid .button-row {
-    justify-content: center; /* Căn giữa các nút trên điện thoại */
-    flex-wrap: wrap; /* Cho phép các nút xuống dòng nếu không đủ chỗ */
-  }
-
-  .button-row button {
-    padding: 4px 8px; /* Giảm padding cho nút trên điện thoại */
-    font-size: 12px; /* Giảm kích thước font của nút */
-  }
 }
 
 .full-row {
@@ -246,17 +215,15 @@ button:hover {
   font-weight: bold;
 }
 
-/* CSS cho bảng danh sách giao dịch */
-.table-wrapper {
-  width: 100%; /* Đảm bảo wrapper chiếm toàn bộ chiều rộng của container */
-  overflow-x: auto; /* Cho phép cuộn ngang nếu bảng quá rộng */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px; /* Giảm khoảng cách giữa pagination và table */
 }
 
-table {
-  width: 100%; /* Đảm bảo bảng chiếm toàn bộ chiều rộng của wrapper */
-  table-layout: fixed; /* Cố định chiều rộng cột, không mở rộng theo nội dung */
-  border-collapse: collapse;
-  margin-top: 10px;
+table thead {
+  background-color: #007bff;
+  color: white;
 }
 
 table th, table td {
@@ -264,22 +231,6 @@ table th, table td {
   border: 1px solid #ddd;
   text-align: left;
   font-size: 14px;
-  white-space: nowrap; /* Ngăn nội dung xuống dòng */
-  overflow: hidden; /* Ẩn nội dung thừa */
-  text-overflow: ellipsis; /* Hiển thị dấu ... nếu nội dung bị cắt */
-}
-
-/* Media query cho màn hình nhỏ (điện thoại) */
-@media (max-width: 768px) {
-  table th, table td {
-    padding: 6px 8px; /* Giảm padding trên điện thoại */
-    font-size: 12px; /* Giảm kích thước chữ trên điện thoại */
-  }
-}
-
-table thead {
-  background-color: #007bff;
-  color: white;
 }
 
 table tbody tr:nth-child(even) {
