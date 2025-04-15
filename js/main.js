@@ -62,9 +62,6 @@ async function updateAccountList() {
   accountNameSelect.innerHTML = '<option value="">-- Chọn tài khoản --</option>';
 
   if (softwareName && softwarePackage) {
-    // Làm mới dữ liệu từ sheet PhanMem trước khi cập nhật dropdown
-    await fetchSoftwareList();
-
     // Lấy danh sách tài khoản thỏa mãn điều kiện
     const accounts = softwareData
       .filter(item =>
@@ -577,6 +574,10 @@ async function fetchSoftwareList() {
     action: "getSoftwareList"
   };
 
+  // Lưu giá trị hiện tại của "Tên phần mềm" và "Gói phần mềm"
+  const currentSoftwareName = document.getElementById("softwareName").value;
+  const currentSoftwarePackage = document.getElementById("softwarePackage").value;
+
   try {
     const response = await fetch(BACKEND_URL, {
       method: "POST",
@@ -601,7 +602,17 @@ async function fetchSoftwareList() {
         softwareNameSelect.appendChild(option);
       });
 
-      updatePackageList(); // Cập nhật dropdown "Gói phần mềm"
+      // Khôi phục giá trị "Tên phần mềm" sau khi làm mới dropdown
+      if (currentSoftwareName) {
+        softwareNameSelect.value = currentSoftwareName;
+      }
+
+      updatePackageList();
+
+      // Khôi phục giá trị "Gói phần mềm" sau khi làm mới dropdown
+      if (currentSoftwarePackage) {
+        document.getElementById("softwarePackage").value = currentSoftwarePackage;
+      }
     } else {
       console.error("Lỗi khi lấy danh sách phần mềm:", result.message);
     }
@@ -626,6 +637,10 @@ function populateSoftwareList() {
 function updatePackageList() {
   const softwareName = document.getElementById("softwareName").value;
   const softwarePackageSelect = document.getElementById("softwarePackage");
+  
+  // Lưu giá trị hiện tại của "Gói phần mềm"
+  const currentSoftwarePackage = softwarePackageSelect.value;
+
   softwarePackageSelect.innerHTML = '<option value="">-- Chọn gói --</option>';
 
   if (softwareName) {
@@ -641,6 +656,11 @@ function updatePackageList() {
       option.textContent = pkg;
       softwarePackageSelect.appendChild(option);
     });
+
+    // Khôi phục giá trị "Gói phần mềm" sau khi làm mới dropdown
+    if (currentSoftwarePackage && packages.includes(currentSoftwarePackage)) {
+      softwarePackageSelect.value = currentSoftwarePackage;
+    }
   }
 
   updateAccountList(); // Cập nhật dropdown "Tên tài khoản"
