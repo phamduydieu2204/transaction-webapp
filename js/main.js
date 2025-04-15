@@ -55,13 +55,16 @@ document.addEventListener("DOMContentLoaded", () => {
   loadTransactions();
 });
 
-function updateAccountList() {
+async function updateAccountList() {
   const softwareName = document.getElementById("softwareName").value;
   const softwarePackage = document.getElementById("softwarePackage").value;
   const accountNameSelect = document.getElementById("accountName");
   accountNameSelect.innerHTML = '<option value="">-- Chọn tài khoản --</option>';
 
   if (softwareName && softwarePackage) {
+    // Làm mới dữ liệu từ sheet PhanMem trước khi cập nhật dropdown
+    await fetchSoftwareList();
+
     // Lấy danh sách tài khoản thỏa mãn điều kiện
     const accounts = softwareData
       .filter(item =>
@@ -152,60 +155,61 @@ function formatDate(dateString) {
 }
 
 async function handleAdd() {
-  const { BACKEND_URL } = getConstants();
-  if (!userInfo) {
-    alert("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.");
-    return;
-  }
-
-  // Lấy ngày hiện tại để sử dụng cho ngày giao dịch
-  const today = new Date();
-  const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
-
-  const data = {
-    action: "addTransaction",
-    transactionType: document.getElementById("transactionType").value,
-    transactionDate: todayFormatted, // Luôn sử dụng ngày hiện tại
-    customerName: document.getElementById("customerName").value,
-    customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
-    customerPhone: document.getElementById("customerPhone").value,
-    duration: parseInt(document.getElementById("duration").value) || 0,
-    startDate: document.getElementById("startDate").value,
-    endDate: document.getElementById("endDate").value,
-    deviceCount: parseInt(document.getElementById("deviceCount").value) || 0,
-    softwareName: document.getElementById("softwareName").value,
-    softwarePackage: document.getElementById("softwarePackage").value,
-    revenue: parseFloat(document.getElementById("revenue").value) || 0,
-    note: document.getElementById("note").value,
-    tenNhanVien: userInfo.tenNhanVien,
-    maNhanVien: userInfo.maNhanVien
-  };
-
-  console.log("📤 Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
-
-  try {
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
-    });
-
-    const result = await response.json();
-    if (result.status === "success") {
-      document.getElementById("successMessage").textContent = "Giao dịch đã được lưu!";
-      handleReset();
-      await loadTransactions();
-      updatePackageList();
-    } else {
-      document.getElementById("errorMessage").textContent = result.message || "Không thể lưu giao dịch!";
+    const { BACKEND_URL } = getConstants();
+    if (!userInfo) {
+      alert("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.");
+      return;
     }
-  } catch (err) {
-    document.getElementById("errorMessage").textContent = `Lỗi kết nối server: ${err.message}`;
-    console.error("Lỗi:", err);
+  
+    // Lấy ngày hiện tại để sử dụng cho ngày giao dịch
+    const today = new Date();
+    const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
+  
+    const data = {
+      action: "addTransaction",
+      transactionType: document.getElementById("transactionType").value,
+      transactionDate: todayFormatted, // Luôn sử dụng ngày hiện tại
+      customerName: document.getElementById("customerName").value,
+      customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
+      customerPhone: document.getElementById("customerPhone").value,
+      duration: parseInt(document.getElementById("duration").value) || 0,
+      startDate: document.getElementById("startDate").value,
+      endDate: document.getElementById("endDate").value,
+      deviceCount: parseInt(document.getElementById("deviceCount").value) || 0,
+      softwareName: document.getElementById("softwareName").value,
+      softwarePackage: document.getElementById("softwarePackage").value,
+      accountName: document.getElementById("accountName").value, // Thêm tên tài khoản
+      revenue: parseFloat(document.getElementById("revenue").value) || 0,
+      note: document.getElementById("note").value,
+      tenNhanVien: userInfo.tenNhanVien,
+      maNhanVien: userInfo.maNhanVien
+    };
+  
+    console.log("📤 Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
+  
+    try {
+      const response = await fetch(BACKEND_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+  
+      const result = await response.json();
+      if (result.status === "success") {
+        document.getElementById("successMessage").textContent = "Giao dịch đã được lưu!";
+        handleReset();
+        await loadTransactions();
+        updatePackageList();
+      } else {
+        document.getElementById("errorMessage").textContent = result.message || "Không thể lưu giao dịch!";
+      }
+    } catch (err) {
+      document.getElementById("errorMessage").textContent = `Lỗi kết nối server: ${err.message}`;
+      console.error("Lỗi:", err);
+    }
   }
-}
 
 async function handleUpdate() {
   const { BACKEND_URL } = getConstants();
