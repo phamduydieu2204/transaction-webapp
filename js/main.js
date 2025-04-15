@@ -435,6 +435,18 @@ function viewTransaction(index) {
   const modal = document.getElementById("transactionDetailModal");
   const detailContent = document.getElementById("transactionDetailContent");
 
+  // Kiểm tra xem detailContent có tồn tại không
+  if (!detailContent) {
+    console.error("Lỗi: Không tìm thấy phần tử transactionDetailContent trong DOM");
+    return;
+  }
+
+  // Kiểm tra xem modal có tồn tại không
+  if (!modal) {
+    console.error("Lỗi: Không tìm thấy phần tử transactionDetailModal trong DOM");
+    return;
+  }
+
   // Xóa nội dung cũ
   detailContent.innerHTML = "";
 
