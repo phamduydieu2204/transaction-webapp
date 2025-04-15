@@ -400,7 +400,6 @@ function updateTable() {
       <td>${transaction.transactionType}</td>
       <td>${transaction.customerName}</td>
       <td>${transaction.customerEmail}</td>
-      <td>${transaction.customerPhone}</td>
       <td>${transaction.duration}</td>
       <td>${formatDate(transaction.startDate)}</td>
       <td>${formatDate(transaction.endDate)}</td>
@@ -408,15 +407,10 @@ function updateTable() {
       <td>${transaction.softwareName}</td>
       <td>${transaction.softwarePackage}</td>
       <td>${transaction.accountName || ""}</td>
-      <td>${transaction.accountSheetId || ""}</td>
-      <td>${transaction.orderInfo || ""}</td>
-      <td>${transaction.revenue}</td>
-      <td>${transaction.note}</td>
-      <td>${transaction.tenNhanVien}</td>
-      <td>${transaction.maNhanVien}</td>
       <td>
         <button class="edit-btn">Sửa</button>
         <button class="delete-btn">Xóa</button>
+        <button class="view-btn" onclick="viewTransaction(${startIndex + index})">Xem</button>
       </td>
     `;
 
@@ -432,6 +426,48 @@ function updateTable() {
   });
 
   updatePagination(totalPages);
+}
+
+function viewTransaction(index) {
+  const transaction = transactionList[index];
+  const modal = document.getElementById("transactionDetailModal");
+  const tableBody = document.querySelector("#transactionDetailTable tbody");
+
+  // Xóa nội dung cũ trong bảng chi tiết
+  tableBody.innerHTML = "";
+
+  // Thêm dòng dữ liệu vào bảng chi tiết
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td>${transaction.transactionId}</td>
+    <td>${formatDate(transaction.transactionDate)}</td>
+    <td>${transaction.transactionType}</td>
+    <td>${transaction.customerName}</td>
+    <td>${transaction.customerEmail}</td>
+    <td>${transaction.customerPhone}</td>
+    <td>${transaction.duration}</td>
+    <td>${formatDate(transaction.startDate)}</td>
+    <td>${formatDate(transaction.endDate)}</td>
+    <td>${transaction.deviceCount}</td>
+    <td>${transaction.softwareName}</td>
+    <td>${transaction.softwarePackage}</td>
+    <td>${transaction.accountName || ""}</td>
+    <td>${transaction.accountSheetId || ""}</td>
+    <td>${transaction.orderInfo || ""}</td>
+    <td>${transaction.revenue}</td>
+    <td>${transaction.note}</td>
+    <td>${transaction.tenNhanVien}</td>
+    <td>${transaction.maNhanVien}</td>
+  `;
+  tableBody.appendChild(row);
+
+  // Hiển thị modal
+  modal.style.display = "block";
+}
+
+function closeModal() {
+  const modal = document.getElementById("transactionDetailModal");
+  modal.style.display = "none";
 }
 
 function updatePagination(totalPages) {
