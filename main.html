@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="css/style.css" />
   <!-- Thêm Flatpickr CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <!-- Thêm Font Awesome cho icon lịch và icon copy -->
+  <!-- Thêm Font Awesome cho icon lịch, icon copy và icon đăng xuất -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script defer src="js/constants.js"></script>
   <script defer src="js/main.js"></script>
@@ -33,7 +33,7 @@
     .modal {
       display: none;
       position: fixed;
-      z-index: 100; /* Đảm bảo modal hiển thị phía trên tất cả */
+      z-index: 100;
       left: 0;
       top: 0;
       width: 100%;
@@ -121,6 +121,7 @@
     /* CSS để cố định tiêu đề và các phần tử phía trên */
     .container {
       padding-bottom: 20px;
+      position: relative; /* Để chứa nút đăng xuất */
     }
 
     .fixed-header {
@@ -153,24 +154,53 @@
 
     #transactionTable tbody {
       display: block;
-      max-height: 400px; /* Chiều cao cố định cho phần thân bảng */
-      overflow-y: auto; /* Thêm thanh cuộn dọc */
+      max-height: 400px;
+      overflow-y: auto;
     }
 
     #transactionTable thead,
     #transactionTable tbody tr {
       display: table;
       width: 100%;
-      table-layout: fixed; /* Đảm bảo các cột có độ rộng cố định và đồng bộ */
+      table-layout: fixed;
     }
 
     #transactionTable tbody tr:nth-child(even) {
       background-color: #f9f9f9;
     }
+
+    /* CSS cho nút đăng xuất */
+    .logout-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      z-index: 20; /* Đảm bảo nút hiển thị phía trên các phần tử khác */
+    }
+
+    .logout-btn:hover {
+      background-color: #c82333;
+    }
+
+    .logout-btn i {
+      margin-right: 5px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- Nút đăng xuất -->
+    <button class="logout-btn" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i> Đăng xuất
+    </button>
+
     <h1>Hệ thống quản lý</h1>
     <p id="welcome"></p>
     <hr>
