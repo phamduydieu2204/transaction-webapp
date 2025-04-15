@@ -678,6 +678,22 @@ function editTransaction(index) {
   const transaction = transactionList[index];
   currentEditTransactionId = transaction.transactionId; // Lưu Mã giao dịch
 
+  // Lấy các phần tử dropdown
+  const softwareNameSelect = document.getElementById("softwareName");
+  const softwarePackageSelect = document.getElementById("softwarePackage");
+  const accountNameSelect = document.getElementById("accountName");
+
+  // Lưu giá trị ban đầu của giao dịch
+  const softwareNameValue = transaction.softwareName;
+  const softwarePackageValue = transaction.softwarePackage;
+  const accountNameValue = transaction.accountName || "";
+
+  // Tạm thời vô hiệu hóa sự kiện change để tránh làm mới dropdown không mong muốn
+  const softwareNameChangeHandler = softwareNameSelect.onchange;
+  const softwarePackageChangeHandler = softwarePackageSelect.onchange;
+  softwareNameSelect.onchange = null;
+  softwarePackageSelect.onchange = null;
+
   // Điền dữ liệu giao dịch lên form
   document.getElementById("transactionDate").value = transaction.transactionDate;
   document.getElementById("transactionType").value = transaction.transactionType;
@@ -688,14 +704,23 @@ function editTransaction(index) {
   document.getElementById("startDate").value = transaction.startDate;
   document.getElementById("endDate").value = transaction.endDate;
   document.getElementById("deviceCount").value = transaction.deviceCount;
-  document.getElementById("softwareName").value = transaction.softwareName;
-  document.getElementById("softwarePackage").value = transaction.softwarePackage;
-  document.getElementById("accountName").value = transaction.accountName || "";
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 
-  // Cập nhật dropdown "Tên tài khoản" dựa trên phần mềm và gói đã chọn
+  // Điền các trường dropdown
+  softwareNameSelect.value = softwareNameValue;
+
+  // Làm mới dropdown "Gói phần mềm" và khôi phục giá trị
+  updatePackageList();
+  softwarePackageSelect.value = softwarePackageValue;
+
+  // Làm mới dropdown "Tên tài khoản" và khôi phục giá trị
   updateAccountList();
+  accountNameSelect.value = accountNameValue;
+
+  // Khôi phục sự kiện change
+  softwareNameSelect.onchange = softwareNameChangeHandler;
+  softwarePackageSelect.onchange = softwarePackageChangeHandler;
 }
 
 // Hàm định dạng ngày từ yyyy-mm-dd sang yyyy/mm/dd để hiển thị trên form
