@@ -433,38 +433,61 @@ function updateTable() {
 function viewTransaction(index) {
   const transaction = transactionList[index];
   const modal = document.getElementById("transactionDetailModal");
-  const tableBody = document.querySelector("#transactionDetailTable tbody");
+  const detailContent = document.getElementById("transactionDetailContent");
 
-  // Xóa nội dung cũ trong bảng chi tiết
-  tableBody.innerHTML = "";
+  // Xóa nội dung cũ
+  detailContent.innerHTML = "";
 
-  // Thêm dòng dữ liệu vào bảng chi tiết
-  const row = document.createElement("tr");
-  row.innerHTML = `
-    <td>${transaction.transactionId}</td>
-    <td>${formatDate(transaction.transactionDate)}</td>
-    <td>${transaction.transactionType}</td>
-    <td>${transaction.customerName}</td>
-    <td>${transaction.customerEmail}</td>
-    <td>${transaction.customerPhone}</td>
-    <td>${transaction.duration}</td>
-    <td>${formatDate(transaction.startDate)}</td>
-    <td>${formatDate(transaction.endDate)}</td>
-    <td>${transaction.deviceCount}</td>
-    <td>${transaction.softwareName}</td>
-    <td>${transaction.softwarePackage}</td>
-    <td>${transaction.accountName || ""}</td>
-    <td>${transaction.accountSheetId || ""}</td>
-    <td>${transaction.orderInfo || ""}</td>
-    <td>${transaction.revenue}</td>
-    <td>${transaction.note}</td>
-    <td>${transaction.tenNhanVien}</td>
-    <td>${transaction.maNhanVien}</td>
-  `;
-  tableBody.appendChild(row);
+  // Danh sách các trường và giá trị tương ứng
+  const fields = [
+    { label: "Mã giao dịch", value: transaction.transactionId },
+    { label: "Ngày giao dịch", value: formatDate(transaction.transactionDate) },
+    { label: "Loại giao dịch", value: transaction.transactionType },
+    { label: "Tên khách hàng", value: transaction.customerName },
+    { label: "Email", value: transaction.customerEmail },
+    { label: "Liên hệ", value: transaction.customerPhone },
+    { label: "Số tháng đăng ký", value: transaction.duration },
+    { label: "Ngày bắt đầu", value: formatDate(transaction.startDate) },
+    { label: "Ngày kết thúc", value: formatDate(transaction.endDate) },
+    { label: "Số thiết bị", value: transaction.deviceCount },
+    { label: "Tên phần mềm", value: transaction.softwareName },
+    { label: "Gói phần mềm", value: transaction.softwarePackage },
+    { label: "Tên tài khoản", value: transaction.accountName || "" },
+    { label: "ID Sheet Tài Khoản", value: transaction.accountSheetId || "" },
+    { label: "Thông tin đơn hàng", value: transaction.orderInfo || "" },
+    { label: "Doanh thu", value: transaction.revenue },
+    { label: "Ghi chú", value: transaction.note },
+    { label: "Tên nhân viên", value: transaction.tenNhanVien },
+    { label: "Mã nhân viên", value: transaction.maNhanVien }
+  ];
+
+  // Thêm các dòng dữ liệu dạng text với icon copy
+  fields.forEach(field => {
+    const row = document.createElement("div");
+    row.className = "detail-row";
+    row.innerHTML = `
+      <span class="detail-label">${field.label}:</span>
+      <span class="detail-value">${field.value}</span>
+      <i class="fas fa-copy copy-icon" onclick="copyToClipboard('${field.value}')"></i>
+    `;
+    detailContent.appendChild(row);
+  });
 
   // Hiển thị modal
   modal.style.display = "block";
+}
+
+function copyToClipboard(text) {
+  // Tạo một textarea tạm để copy nội dung
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+
+  // Thông báo copy thành công (tùy chọn)
+  alert("Đã copy: " + text);
 }
 
 function closeModal() {
