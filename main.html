@@ -48,7 +48,7 @@
       padding: 20px;
       border: 1px solid #888;
       width: 90%;
-      max-width: 1200px;
+      max-width: 600px;
       border-radius: 10px;
       position: relative;
     }
@@ -83,6 +83,11 @@
     .detail-table th {
       background-color: #007bff;
       color: white;
+      width: 30%;
+    }
+
+    .detail-table td {
+      width: 70%;
     }
 
     .detail-table tr:nth-child(even) {
@@ -222,6 +227,8 @@
           <th>Tên phần mềm</th>
           <th>Gói phần mềm</th>
           <th>Tên tài khoản</th>
+          <th>Doanh thu</th>
+          <th>Tên nhân viên</th>
           <th>Hành động</th>
         </tr>
       </thead>
@@ -233,32 +240,9 @@
     <!-- Modal để hiển thị chi tiết giao dịch -->
     <div id="transactionDetailModal" class="modal">
       <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
+        <span class="close" onclick="closeModal()">×</span>
         <h2>Chi tiết giao dịch</h2>
         <table class="detail-table" id="transactionDetailTable">
-          <thead>
-            <tr>
-              <th>Mã giao dịch</th>
-              <th>Ngày giao dịch</th>
-              <th>Loại giao dịch</th>
-              <th>Tên khách hàng</th>
-              <th>Email</th>
-              <th>Liên hệ</th>
-              <th>Số tháng đăng ký</th>
-              <th>Ngày bắt đầu</th>
-              <th>Ngày kết thúc</th>
-              <th>Số thiết bị</th>
-              <th>Tên phần mềm</th>
-              <th>Gói phần mềm</th>
-              <th>Tên tài khoản</th>
-              <th>ID Sheet Tài Khoản</th>
-              <th>Thông tin đơn hàng</th>
-              <th>Doanh thu</th>
-              <th>Ghi chú</th>
-              <th>Tên nhân viên</th>
-              <th>Mã nhân viên</th>
-            </tr>
-          </thead>
           <tbody></tbody>
         </table>
       </div>
