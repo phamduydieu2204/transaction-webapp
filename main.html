@@ -33,7 +33,7 @@
     .modal {
       display: none;
       position: fixed;
-      z-index: 100; /* Tăng z-index để modal hiển thị phía trên tất cả */
+      z-index: 100; /* Đảm bảo modal hiển thị phía trên tất cả */
       left: 0;
       top: 0;
       width: 100%;
@@ -96,10 +96,26 @@
       margin-left: 10px;
       cursor: pointer;
       color: #007bff;
+      position: relative;
     }
 
     .detail-content .copy-icon:hover {
       color: #0056b3;
+    }
+
+    /* CSS cho thông báo "Đã copy" */
+    .copy-message {
+      position: absolute;
+      left: 100%;
+      margin-left: 10px;
+      color: #28a745;
+      font-size: 12px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .copy-message.show {
+      opacity: 1;
     }
 
     /* CSS để cố định tiêu đề và các phần tử phía trên */
