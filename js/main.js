@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
     `Xin chào ${userInfo.tenNhanVien} (${userInfo.maNhanVien}) - ${userInfo.vaiTro}`;
 
   const startDateInput = document.getElementById("startDate");
-  const durationInput = document.getElementById("duration"); // Sửa lỗi: getElementByInstanceId -> getElementById
+  const durationInput = document.getElementById("duration");
   const endDateInput = document.getElementById("endDate");
   const transactionDateInput = document.getElementById("transactionDate");
 
@@ -129,10 +129,14 @@ async function handleAdd() {
     return;
   }
 
+  // Lấy ngày hiện tại để sử dụng cho ngày giao dịch
+  const today = new Date();
+  const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
+
   const data = {
     action: "addTransaction",
     transactionType: document.getElementById("transactionType").value,
-    transactionDate: document.getElementById("transactionDate").value,
+    transactionDate: todayFormatted, // Luôn sử dụng ngày hiện tại
     customerName: document.getElementById("customerName").value,
     customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
     customerPhone: document.getElementById("customerPhone").value,
@@ -199,9 +203,9 @@ async function handleUpdate() {
 
   const data = {
     action: "updateTransaction",
-    transactionId: currentEditTransactionId, // Sử dụng transactionId được lưu
+    transactionId: currentEditTransactionId,
     transactionType: document.getElementById("transactionType").value,
-    transactionDate: document.getElementById("transactionDate").value,
+    transactionDate: document.getElementById("transactionDate").value, // Giữ nguyên logic: lấy từ form
     customerName: document.getElementById("customerName").value,
     customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
     customerPhone: document.getElementById("customerPhone").value,
@@ -515,7 +519,6 @@ function editTransaction(index) {
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 }
-
 
 // Hàm định dạng ngày từ yyyy-mm-dd sang yyyy/mm/dd để hiển thị trên form
 function formatToInputDate(isoDate) {
