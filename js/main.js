@@ -376,10 +376,14 @@ async function handleSearch() {
 
 async function loadTransactions() {
   const { BACKEND_URL } = getConstants();
+  const vaiTro = userInfo.vaiTro ? userInfo.vaiTro.toLowerCase() : ""; // Chuẩn hóa vaiTro, không phân biệt hoa thường
   const data = {
     action: "getTransactions",
-    maNhanVien: userInfo.maNhanVien
+    maNhanVien: userInfo.maNhanVien,
+    vaiTro: vaiTro
   };
+
+  console.log("Dữ liệu gửi lên backend:", data); // Log để debug
 
   try {
     const response = await fetch(BACKEND_URL, {
@@ -391,6 +395,8 @@ async function loadTransactions() {
     });
 
     const result = await response.json();
+    console.log("Dữ liệu trả về từ backend:", result); // Log để debug
+
     if (result.status === "success") {
       transactionList = result.data;
       transactionList.sort((a, b) => {
