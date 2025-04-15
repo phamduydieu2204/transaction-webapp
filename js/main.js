@@ -703,7 +703,7 @@ function editTransaction(index) {
     softwareName: softwareNameValue,
     softwarePackage: softwarePackageValue,
     accountName: accountNameValue
-  }); // Log để debug
+  });
 
   const softwareNameChangeHandler = softwareNameSelect.onchange;
   const softwarePackageChangeHandler = softwarePackageSelect.onchange;
@@ -722,10 +722,12 @@ function editTransaction(index) {
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 
+  // Điền và khôi phục các trường dropdown
   softwareNameSelect.value = softwareNameValue;
   updatePackageList();
   softwarePackageSelect.value = softwarePackageValue;
 
+  // Đảm bảo softwarePackage đã được đặt trước khi gọi updateAccountList
   updateAccountList();
   accountNameSelect.value = accountNameValue;
 
@@ -733,7 +735,7 @@ function editTransaction(index) {
     softwareName: softwareNameSelect.value,
     softwarePackage: softwarePackageSelect.value,
     accountName: accountNameSelect.value
-  }); // Log để debug
+  });
 
   softwareNameSelect.onchange = softwareNameChangeHandler;
   softwarePackageSelect.onchange = softwarePackageChangeHandler;
@@ -824,17 +826,22 @@ function updatePackageList() {
   const softwareName = document.getElementById("softwareName").value;
   const softwarePackageSelect = document.getElementById("softwarePackage");
   
-  // Lưu giá trị hiện tại của "Gói phần mềm"
   const currentSoftwarePackage = softwarePackageSelect.value;
 
   softwarePackageSelect.innerHTML = '<option value="">-- Chọn gói --</option>';
 
   if (softwareName) {
-    // Lấy danh sách gói phần mềm duy nhất theo tên phần mềm đã chọn
     const packages = [...new Set(softwareData
       .filter(item => item.softwareName === softwareName)
       .map(item => item.softwarePackage)
     )];
+
+    // Nếu giá trị hiện tại của Gói phần mềm không có trong danh sách, thêm nó vào
+    if (currentSoftwarePackage && !packages.includes(currentSoftwarePackage)) {
+      packages.push(currentSoftwarePackage);
+    }
+
+    console.log("Danh sách gói phần mềm trong dropdown:", packages); // Log để debug
 
     packages.forEach(pkg => {
       const option = document.createElement("option");
@@ -843,13 +850,13 @@ function updatePackageList() {
       softwarePackageSelect.appendChild(option);
     });
 
-    // Khôi phục giá trị "Gói phần mềm" sau khi làm mới dropdown
+    // Khôi phục giá trị hiện tại (nếu có)
     if (currentSoftwarePackage && packages.includes(currentSoftwarePackage)) {
       softwarePackageSelect.value = currentSoftwarePackage;
     }
   }
 
-  updateAccountList(); // Cập nhật dropdown "Tên tài khoản"
+  updateAccountList();
 }
 
 
