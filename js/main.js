@@ -409,6 +409,7 @@ function updateTable() {
       <td>${transaction.softwarePackage}</td>
       <td>${transaction.accountName || ""}</td>
       <td>${transaction.accountSheetId || ""}</td>
+      <td>${transaction.orderInfo || ""}</td>
       <td>${transaction.revenue}</td>
       <td>${transaction.note}</td>
       <td>${transaction.tenNhanVien}</td>
