@@ -500,15 +500,31 @@ function viewTransaction(index) {
   });
 }
 
-function copyToClipboard(text) {
+function copyToClipboard(text, iconElement) {
   // Sử dụng Clipboard API để copy nội dung
   navigator.clipboard.writeText(text)
     .then(() => {
-      alert("Đã copy: " + text);
+      // Tạo phần tử thông báo "Đã copy"
+      const message = document.createElement("span");
+      message.className = "copy-message";
+      message.textContent = "Đã copy";
+      iconElement.appendChild(message);
+
+      // Hiển thị thông báo
+      message.classList.add("show");
+
+      // Ẩn thông báo sau 1 giây
+      setTimeout(() => {
+        message.classList.remove("show");
+        setTimeout(() => {
+          if (message.parentNode) {
+            message.parentNode.removeChild(message);
+          }
+        }, 300); // Đợi thêm 0.3 giây để hoàn thành hiệu ứng mờ dần
+      }, 1000);
     })
     .catch(err => {
       console.error("Lỗi khi copy nội dung: ", err);
-      alert("Không thể copy nội dung. Vui lòng thử lại!");
     });
 }
 
