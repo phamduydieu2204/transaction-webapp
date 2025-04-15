@@ -435,15 +435,13 @@ function viewTransaction(index) {
   const modal = document.getElementById("transactionDetailModal");
   const detailContent = document.getElementById("transactionDetailContent");
 
-  // Kiểm tra xem detailContent có tồn tại không
-  if (!detailContent) {
-    console.error("Lỗi: Không tìm thấy phần tử transactionDetailContent trong DOM");
-    return;
-  }
-
-  // Kiểm tra xem modal có tồn tại không
+  // Kiểm tra xem modal và detailContent có tồn tại không
   if (!modal) {
     console.error("Lỗi: Không tìm thấy phần tử transactionDetailModal trong DOM");
+    return;
+  }
+  if (!detailContent) {
+    console.error("Lỗi: Không tìm thấy phần tử transactionDetailContent trong DOM");
     return;
   }
 
@@ -452,37 +450,43 @@ function viewTransaction(index) {
 
   // Danh sách các trường và giá trị tương ứng
   const fields = [
-    { label: "Mã giao dịch", value: transaction.transactionId },
-    { label: "Ngày giao dịch", value: formatDate(transaction.transactionDate) },
-    { label: "Loại giao dịch", value: transaction.transactionType },
-    { label: "Tên khách hàng", value: transaction.customerName },
-    { label: "Email", value: transaction.customerEmail },
-    { label: "Liên hệ", value: transaction.customerPhone },
-    { label: "Số tháng đăng ký", value: transaction.duration },
-    { label: "Ngày bắt đầu", value: formatDate(transaction.startDate) },
-    { label: "Ngày kết thúc", value: formatDate(transaction.endDate) },
-    { label: "Số thiết bị", value: transaction.deviceCount },
-    { label: "Tên phần mềm", value: transaction.softwareName },
-    { label: "Gói phần mềm", value: transaction.softwarePackage },
-    { label: "Tên tài khoản", value: transaction.accountName || "" },
-    { label: "ID Sheet Tài Khoản", value: transaction.accountSheetId || "" },
-    { label: "Thông tin đơn hàng", value: transaction.orderInfo || "" },
-    { label: "Doanh thu", value: transaction.revenue },
-    { label: "Ghi chú", value: transaction.note },
-    { label: "Tên nhân viên", value: transaction.tenNhanVien },
-    { label: "Mã nhân viên", value: transaction.maNhanVien }
+    { label: "Mã giao dịch", value: transaction.transactionId, showCopy: true },
+    { label: "Ngày giao dịch", value: formatDate(transaction.transactionDate), showCopy: false },
+    { label: "Loại giao dịch", value: transaction.transactionType, showCopy: false },
+    { label: "Tên khách hàng", value: transaction.customerName, showCopy: false },
+    { label: "Email", value: transaction.customerEmail, showCopy: true },
+    { label: "Liên hệ", value: transaction.customerPhone, showCopy: true },
+    { label: "Số tháng đăng ký", value: transaction.duration, showCopy: false },
+    { label: "Ngày bắt đầu", value: formatDate(transaction.startDate), showCopy: false },
+    { label: "Ngày kết thúc", value: formatDate(transaction.endDate), showCopy: false },
+    { label: "Số thiết bị", value: transaction.deviceCount, showCopy: false },
+    { label: "Tên phần mềm", value: transaction.softwareName, showCopy: false },
+    { label: "Gói phần mềm", value: transaction.softwarePackage, showCopy: false },
+    { label: "Tên tài khoản", value: transaction.accountName || "", showCopy: false },
+    { label: "ID Sheet Tài Khoản", value: transaction.accountSheetId || "", showCopy: false },
+    { label: "Thông tin đơn hàng", value: transaction.orderInfo || "", showCopy: true },
+    { label: "Doanh thu", value: transaction.revenue, showCopy: false },
+    { label: "Ghi chú", value: transaction.note, showCopy: false },
+    { label: "Tên nhân viên", value: transaction.tenNhanVien, showCopy: false },
+    { label: "Mã nhân viên", value: transaction.maNhanVien, showCopy: false }
   ];
 
-  // Thêm các dòng dữ liệu dạng text với icon copy
+  // Thêm các dòng dữ liệu dạng text
   fields.forEach(field => {
     const row = document.createElement("div");
     row.className = "detail-row";
     row.innerHTML = `
       <span class="detail-label">${field.label}:</span>
       <span class="detail-value">${field.value}</span>
-      <i class="fas fa-copy copy-icon" onclick="copyToClipboard('${field.value}')"></i>
+      ${field.showCopy ? '<i class="fas fa-copy copy-icon"></i>' : ''}
     `;
     detailContent.appendChild(row);
+
+    // Gán sự kiện click cho icon copy (nếu có)
+    if (field.showCopy) {
+      const copyIcon = row.querySelector(".copy-icon");
+      copyIcon.addEventListener("click", () => copyToClipboard(field.value));
+    }
   });
 
   // Hiển thị modal
@@ -490,16 +494,15 @@ function viewTransaction(index) {
 }
 
 function copyToClipboard(text) {
-  // Tạo một textarea tạm để copy nội dung
-  const textarea = document.createElement("textarea");
-  textarea.value = text;
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand("copy");
-  document.body.removeChild(textarea);
-
-  // Thông báo copy thành công (tùy chọn)
-  alert("Đã copy: " + text);
+  // Sử dụng Clipboard API để copy nội dung
+  navigator.clipboard.writeText(text)
+    .then(() => {
+      alert("Đã copy: " + text);
+    })
+    .catch(err => {
+      console.error("Lỗi khi copy nội dung: ", err);
+      alert("Không thể copy nội dung. Vui lòng thử lại!");
+    });
 }
 
 function closeModal() {
