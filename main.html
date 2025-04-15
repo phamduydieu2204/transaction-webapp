@@ -28,6 +28,66 @@
       cursor: pointer;
       color: #007bff;
     }
+
+    /* CSS cho modal chi tiết giao dịch */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 90%;
+      max-width: 1200px;
+      border-radius: 10px;
+      position: relative;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+    }
+
+    .detail-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .detail-table th, .detail-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .detail-table th {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .detail-table tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
   </style>
 </head>
 <body>
@@ -155,17 +215,13 @@
           <th>Loại giao dịch</th>
           <th>Tên khách hàng</th>
           <th>Email</th>
-          <th>Liên hệ</th>
           <th>Số tháng đăng ký</th>
           <th>Ngày bắt đầu</th>
           <th>Ngày kết thúc</th>
           <th>Số thiết bị</th>
           <th>Tên phần mềm</th>
           <th>Gói phần mềm</th>
-          <th>Doanh thu</th>
-          <th>Ghi chú</th>
-          <th>Tên nhân viên</th>
-          <th>Mã nhân viên</th>
+          <th>Tên tài khoản</th>
           <th>Hành động</th>
         </tr>
       </thead>
@@ -173,6 +229,40 @@
         <!-- Dữ liệu sẽ được render ở đây -->
       </tbody>
     </table>
+
+    <!-- Modal để hiển thị chi tiết giao dịch -->
+    <div id="transactionDetailModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Chi tiết giao dịch</h2>
+        <table class="detail-table" id="transactionDetailTable">
+          <thead>
+            <tr>
+              <th>Mã giao dịch</th>
+              <th>Ngày giao dịch</th>
+              <th>Loại giao dịch</th>
+              <th>Tên khách hàng</th>
+              <th>Email</th>
+              <th>Liên hệ</th>
+              <th>Số tháng đăng ký</th>
+              <th>Ngày bắt đầu</th>
+              <th>Ngày kết thúc</th>
+              <th>Số thiết bị</th>
+              <th>Tên phần mềm</th>
+              <th>Gói phần mềm</th>
+              <th>Tên tài khoản</th>
+              <th>ID Sheet Tài Khoản</th>
+              <th>Thông tin đơn hàng</th>
+              <th>Doanh thu</th>
+              <th>Ghi chú</th>
+              <th>Tên nhân viên</th>
+              <th>Mã nhân viên</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
 
     <p id="successMessage"></p>
     <p id="errorMessage"></p>
