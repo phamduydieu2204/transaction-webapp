@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="css/style.css" />
   <!-- Thêm Flatpickr CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <!-- Thêm Font Awesome cho icon lịch, icon copy và icon đăng xuất -->
+  <!-- Thêm Font Awesome cho icon lịch, icon copy, icon đăng xuất và icon kính lúp -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script defer src="js/constants.js"></script>
   <script defer src="js/main.js"></script>
@@ -194,6 +194,23 @@
       font-style: italic;
       color: #888;
     }
+
+    /* CSS cho icon kính lúp */
+    .search-icon-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .search-icon-container input {
+      width: 100%;
+      padding-right: 30px;
+    }
+    .search-icon-container .search-icon {
+      position: absolute;
+      right: 5px;
+      cursor: pointer;
+      color: #007bff;
+    }
   </style>
 </head>
 <body>
@@ -228,12 +245,15 @@
 
       <div>
         <label>Email:</label>
-        <input type="email" id="customerEmail" oninput="updateCustomerInfo()">
+        <input type="email" id="customerEmail">
       </div>
 
       <div>
         <label>Tên khách hàng:</label>
-        <input type="text" id="customerName">
+        <div class="search-icon-container">
+          <input type="text" id="customerName">
+          <i class="fas fa-search search-icon" onclick="updateCustomerInfo()"></i>
+        </div>
       </div>
 
       <div>
@@ -278,7 +298,6 @@
         <label>Tên phần mềm:</label>
         <select id="softwareName">
           <option value="">-- Chọn phần mềm --</option>
-          <!-- Danh sách phần mềm sẽ được điền động bằng JavaScript -->
         </select>
       </div>
 
@@ -286,7 +305,6 @@
         <label>Gói phần mềm:</label>
         <select id="softwarePackage">
           <option value="">-- Chọn gói --</option>
-          <!-- Danh sách gói sẽ được điền động bằng JavaScript -->
         </select>
       </div>
 
@@ -294,7 +312,6 @@
         <label>Tên tài khoản:</label>
         <select id="accountName">
           <option value="">-- Chọn tài khoản --</option>
-          <!-- Danh sách tài khoản sẽ được điền động bằng JavaScript -->
         </select>
       </div>
 
@@ -314,7 +331,6 @@
 
     <h2 class="fixed-header">Danh sách giao dịch</h2>
     <div class="pagination fixed-header" id="pagination">
-      <!-- Phân trang sẽ được render động bằng JavaScript -->
     </div>
 
     <table id="transactionTable">
@@ -338,11 +354,9 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Dữ liệu sẽ được render ở đây -->
       </tbody>
     </table>
 
-    <!-- Modal để hiển thị chi tiết giao dịch -->
     <div id="transactionDetailModal" class="modal">
       <div class="modal-content">
         <span class="close" onclick="closeModal()">×</span>
