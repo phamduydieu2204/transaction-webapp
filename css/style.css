@@ -1,256 +1,476 @@
 /* Căn giữa trang đăng nhập */
 body.login-page {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: #f2f2f2;
-  margin: 0;
-  font-family: Arial, sans-serif;
-}
-
-/* Login container */
-.login-container {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.1);
-  width: 320px;
-  text-align: center;
-}
-
-.password-container {
-  position: relative;
-  width: 100%;
-}
-
-.toggle-password {
-  position: absolute;
-  top: 50%;
-  right: 12px;
-  transform: translateY(-50%);
-  cursor: pointer;
-}
-
-input, select, textarea {
-  width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-  margin-bottom: 16px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-  font-size: 15px;
-}
-
-/* Trang chính */
-body {
-  margin: 0;
-  background: #f2f2f2;
-  font-family: Arial, sans-serif;
-}
-
-.container {
-  max-width: 95%;
-  margin: 30px auto 0 auto;
-  background: white;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-}
-
-h1 {
-  text-align: center;
-  margin-bottom: 5px;
-}
-
-#welcome {
-  text-align: center;
-  font-style: italic;
-  color: #666;
-  margin-bottom: 20px;
-}
-
-button {
-  background: #007bff;
-  color: white;
-  border: none;
-  padding: 12px 16px;
-  border-radius: 6px;
-  font-weight: bold;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.3s;
-  width: auto;
-  display: inline-block;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-.extra-wide {
-  grid-column: span 3;
-}
-
-#errorMessage, #successMessage {
-  text-align: center;
-  font-weight: bold;
-}
-
-#errorMessage {
-  color: red;
-}
-
-#successMessage {
-  color: green;
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 20px;
-}
-
-.form-grid div {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Loại bỏ flex-direction: column cho button-row */
-.form-grid .button-row {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  gap: 5px;
-  margin-top: 10px;
-  flex-wrap: nowrap;
-}
-
-/* Đảm bảo kích thước đồng đều cho các trường trong form */
-.form-grid input,
-.form-grid select,
-.form-grid textarea {
-  width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-  margin-bottom: 16px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-  font-size: 15px;
-  height: 40px; /* Đặt chiều cao đồng đều */
-}
-
-/* Điều chỉnh chiều cao của textarea */
-.form-grid textarea {
-  resize: none; /* Ngăn thay đổi kích thước */
-  height: 40px; /* Đặt chiều cao giống các trường khác */
-}
-
-.full-row {
-  grid-column: span 5;
-  display: flex;
-  gap: 12px;
-  justify-content: flex-start;
-  align-items: center;
-  margin-top: 10px;
-}
-
-/* CSS cho các nút trong button-row */
-.button-row {
-  grid-column: span 5; /* Chiếm toàn bộ chiều rộng của form-grid */
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end; /* Căn phải */
-  gap: 5px; /* Khoảng cách giữa các nút */
-  margin-top: 10px;
-  flex-wrap: nowrap;
-}
-
-.button-row button {
-  width: auto; /* Đảm bảo nút chỉ rộng vừa nội dung */
-  min-width: 0; /* Bỏ min-width để nút chỉ vừa nội dung */
-  padding: 4px 10px; /* Đồng bộ với kích thước nút trong pagination */
-  font-size: 13px; /* Đồng bộ với font-size của nút trong pagination */
-  border: none;
-  border-radius: 4px;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  box-sizing: border-box;
-}
-
-.button-row button:hover {
-  background-color: #0056b3;
-}
-
-/* CSS cho pagination */
-.pagination {
-  display: flex;
-  justify-content: flex-end; /* Căn phải */
-  gap: 5px;
-  margin-top: 5px; /* Khoảng cách nhỏ giữa "Danh sách giao dịch" và pagination */
-}
-
-.pagination button {
-  padding: 4px 8px;
-  font-size: 13px;
-  border: none;
-  border-radius: 4px;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  box-sizing: border-box;
-}
-
-.pagination button:hover {
-  background-color: #0056b3;
-}
-
-.pagination button.active {
-  background-color: #0056b3; /* Màu nền cho trang hiện tại */
-  font-weight: bold;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px; /* Giảm khoảng cách giữa pagination và table */
-}
-
-table thead {
-  background-color: #007bff;
-  color: white;
-}
-
-table th, table td {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  text-align: left;
-  font-size: 14px;
-}
-
-table tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-table button {
-  padding: 4px 10px;
-  margin: 0 2px;
-  font-size: 13px;
-  cursor: pointer;
-  border: none;
-  border-radius: 4px;
-  color: white;
-}
-
-table .edit-btn {
-  background-color: #28a745;
-}
-
-table .delete-btn {
-  background-color: #dc3545;
-}
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #f2f2f2;
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Login container */
+  .login-container {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.1);
+    width: 320px;
+    text-align: center;
+  }
+  
+  .password-container {
+    position: relative;
+    width: 100%;
+  }
+  
+  .toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+  
+  input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-size: 15px;
+  }
+  
+  /* Trang chính */
+  body {
+    margin: 0;
+    background: #f2f2f2;
+    font-family: Arial, sans-serif;
+  }
+  
+  .container {
+    max-width: 95%;
+    margin: 30px auto 0 auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  h1 {
+    text-align: center;
+    margin-bottom: 5px;
+  }
+  
+  #welcome {
+    text-align: center;
+    font-style: italic;
+    color: #666;
+    margin-bottom: 20px;
+  }
+  
+  button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+    width: auto;
+    display: inline-block;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  .extra-wide {
+    grid-column: span 3;
+  }
+  
+  #errorMessage, #successMessage {
+    text-align: center;
+    font-weight: bold;
+  }
+  
+  #errorMessage {
+    color: red;
+  }
+  
+  #successMessage {
+    color: green;
+  }
+  
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+  }
+  
+  .form-grid div {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Loại bỏ flex-direction: column cho button-row */
+  .form-grid .button-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 5px;
+    margin-top: 10px;
+    flex-wrap: nowrap;
+  }
+  
+  /* Đảm bảo kích thước đồng đều cho các trường trong form */
+  .form-grid input,
+  .form-grid select,
+  .form-grid textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-size: 15px;
+    height: 40px; /* Đặt chiều cao đồng đều */
+  }
+  
+  /* Điều chỉnh chiều cao của textarea */
+  .form-grid textarea {
+    resize: none; /* Ngăn thay đổi kích thước */
+    height: 40px; /* Đặt chiều cao giống các trường khác */
+  }
+  
+  .full-row {
+    grid-column: span 5;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 10px;
+  }
+  
+  /* CSS cho các nút trong button-row */
+  .button-row {
+    grid-column: span 5; /* Chiếm toàn bộ chiều rộng của form-grid */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end; /* Căn phải */
+    gap: 5px; /* Khoảng cách giữa các nút */
+    margin-top: 10px;
+    flex-wrap: nowrap;
+  }
+  
+  .button-row button {
+    width: auto; /* Đảm bảo nút chỉ rộng vừa nội dung */
+    min-width: 0; /* Bỏ min-width để nút chỉ vừa nội dung */
+    padding: 4px 10px; /* Đồng bộ với kích thước nút trong pagination */
+    font-size: 13px; /* Đồng bộ với font-size của nút trong pagination */
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    box-sizing: border-box;
+  }
+  
+  .button-row button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* CSS cho pagination */
+  .pagination {
+    display: flex;
+    justify-content: flex-end; /* Căn phải */
+    gap: 5px;
+    margin-top: 5px; /* Khoảng cách nhỏ giữa "Danh sách giao dịch" và pagination */
+  }
+  
+  .pagination button {
+    padding: 4px 8px;
+    font-size: 13px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    box-sizing: border-box;
+  }
+  
+  .pagination button:hover {
+    background-color: #0056b3;
+  }
+  
+  .pagination button.active {
+    background-color: #0056b3; /* Màu nền cho trang hiện tại */
+    font-weight: bold;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px; /* Giảm khoảng cách giữa pagination và table */
+  }
+  
+  table thead {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  table th, table td {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+    font-size: 14px;
+  }
+  
+  table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  table button {
+    padding: 4px 10px;
+    margin: 0 2px;
+    font-size: 13px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    color: white;
+  }
+  
+  table .edit-btn {
+    background-color: #28a745;
+  }
+  
+  table .delete-btn {
+    background-color: #dc3545;
+  }
+  
+  /* Modal styles */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+  
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* Căn giữa theo chiều dọc */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 400px; /* Modal nhỏ gọn hơn */
+    border-radius: 10px;
+    position: relative;
+    text-align: center;
+  }
+  
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+  }
+  
+  .detail-content {
+    margin-top: 20px;
+    font-size: 14px;
+  }
+  
+  .detail-content .detail-row {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .detail-content .detail-row:last-child {
+    border-bottom: none;
+  }
+  
+  .detail-content .detail-label {
+    font-weight: bold;
+    margin-right: 10px;
+  }
+  
+  .detail-content .detail-value {
+    flex: 1;
+  }
+  
+  .detail-content .copy-icon {
+    margin-left: 10px;
+    cursor: pointer;
+    color: #007bff;
+    position: relative;
+  }
+  
+  .detail-content .copy-icon:hover {
+    color: #0056b3;
+  }
+  
+  .copy-message {
+    position: absolute;
+    left: 100%;
+    margin-left: 10px;
+    color: #28a745;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .copy-message.show {
+    opacity: 1;
+  }
+  
+  .container {
+    padding-bottom: 20px;
+    position: relative;
+  }
+  
+  .fixed-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #fff;
+  }
+  
+  #transactionTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  #transactionTable thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #007bff;
+    color: white;
+  }
+  
+  #transactionTable th,
+  #transactionTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  #transactionTable tbody {
+    display: block;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  
+  #transactionTable thead,
+  #transactionTable tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+  
+  #transactionTable tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .logout-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    z-index: 20;
+  }
+  
+  .logout-btn:hover {
+    background-color: #c82333;
+  }
+  
+  .logout-btn i {
+    margin-right: 5px;
+  }
+  
+  /* CSS để in nghiêng các tùy chọn không khả dụng */
+  option.unavailable {
+    font-style: italic;
+    color: #888;
+  }
+  
+  /* CSS cho icon kính lúp */
+  .search-icon-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .search-icon-container input {
+    width: 100%;
+    padding-right: 30px;
+  }
+  
+  .search-icon-container .search-icon {
+    position: absolute;
+    right: 5px;
+    cursor: pointer;
+    color: #007bff;
+  }
+  
+  /* CSS cho placeholder "Đang tìm kiếm..." */
+  input[placeholder="Đang tìm kiếm..."] {
+    font-style: italic;
+    color: #888;
+    opacity: 0.7;
+  }
+  
+  /* Định dạng mặc định cho các trường input */
+  input[type="text"],
+  input[type="email"],
+  input[type="number"],
+  textarea {
+    font-style: normal;
+    color: #000;
+    opacity: 1;
+  }
+  
+  /* CSS cho modal xử lý */
+  #processingModal .modal-content {
+    max-width: 400px;
+    padding: 30px;
+  }
+  
+  #processingModal h2 {
+    margin-bottom: 20px;
+    font-size: 20px;
+  }
+  
+  #processingModal p {
+    font-size: 16px;
+    margin: 0;
+  }
