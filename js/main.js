@@ -291,6 +291,16 @@ async function handleUpdate() {
     return;
   }
 
+  // Kiểm tra ngày giao dịch và vai trò người dùng
+  const today = new Date();
+  const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
+  const isAdmin = userInfo.vaiTro && userInfo.vaiTro.toLowerCase() === "admin";
+
+  if (transaction.transactionDate !== todayFormatted && !isAdmin) {
+    alert("Bạn chỉ có thể chỉnh sửa các giao dịch được tạo trong ngày hôm nay!");
+    return;
+  }
+
   const softwareNameElement = document.getElementById("softwareName");
   const softwarePackageElement = document.getElementById("softwarePackage");
   const accountNameElement = document.getElementById("accountName");
@@ -336,7 +346,7 @@ async function handleUpdate() {
     if (result.status === "success") {
       document.getElementById("successMessage").textContent = "Giao dịch đã được cập nhật!";
       handleReset();
-      await loadTransactions(); // Giữ lại lần gọi này
+      await loadTransactions();
     } else {
       document.getElementById("errorMessage").textContent = result.message || "Không thể cập nhật giao dịch!";
     }
@@ -718,10 +728,23 @@ function goToPage(page) {
 }
 
 function editTransaction(index) {
-  currentEditIndex = index;
   const transaction = transactionList[index];
   currentEditTransactionId = transaction.transactionId;
 
+  // Kiểm tra ngày giao dịch
+  const today = new Date();
+  const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
+
+  // Kiểm tra vai trò người dùng
+  const isAdmin = userInfo.vaiTro && userInfo.vaiTro.toLowerCase() === "admin";
+
+  if (transaction.transactionDate !== todayFormatted && !isAdmin) {
+    // Nếu giao dịch không được tạo trong ngày hôm nay và người dùng không phải Admin
+    alert("Bạn chỉ có thể chỉnh sửa các giao dịch được tạo trong ngày hôm nay!");
+    return;
+  }
+
+  // Nếu giao dịch được tạo trong ngày hôm nay hoặc người dùng là Admin, cho phép chỉnh sửa
   const softwareNameSelect = document.getElementById("softwareName");
   const softwarePackageSelect = document.getElementById("softwarePackage");
   const accountNameSelect = document.getElementById("accountName");
@@ -753,7 +776,6 @@ function editTransaction(index) {
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 
-  // Điền giá trị vào dropdown
   fetchSoftwareList(softwareNameValue);
   softwareNameSelect.value = softwareNameValue;
 
