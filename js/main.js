@@ -149,7 +149,59 @@ function updateCustomerInfo() {
   customerPhoneInput.placeholder = "";
 }
 
+// Hàm hiển thị modal xử lý
+function showProcessingModal(message = "Hệ thống đang thực thi...") {
+  const modal = document.getElementById("processingModal");
+  const modalMessage = document.getElementById("modalMessage");
+  const modalClose = document.getElementById("modalClose");
+  const modalTitle = document.getElementById("modalTitle");
+
+  modalTitle.textContent = "Thông báo";
+  modalMessage.textContent = message;
+  modalClose.style.display = "none"; // Ẩn nút đóng
+  modal.style.display = "block";
+
+  // Khóa giao diện
+  document.querySelectorAll("input, select, textarea, button").forEach(element => {
+    element.disabled = true;
+  });
+}
+
+// Hàm hiển thị kết quả thực thi và cho phép đóng modal
+function showResultModal(message, isSuccess) {
+  const modal = document.getElementById("processingModal");
+  const modalMessage = document.getElementById("modalMessage");
+  const modalClose = document.getElementById("modalClose");
+  const modalTitle = document.getElementById("modalTitle");
+
+  modalTitle.textContent = isSuccess ? "Thành công" : "Lỗi";
+  modalMessage.textContent = message;
+  modalMessage.style.color = isSuccess ? "green" : "red";
+  modalClose.style.display = "block"; // Hiện nút đóng
+
+  // Mở khóa giao diện
+  document.querySelectorAll("input, select, textarea, button").forEach(element => {
+    element.disabled = false;
+  });
+
+  // Cho phép đóng modal khi click bên ngoài
+  modal.addEventListener("click", function handler(event) {
+    if (event.target === modal) {
+      closeProcessingModal();
+      modal.removeEventListener("click", handler); // Xóa sự kiện sau khi đóng
+    }
+  });
+}
+
+// Hàm đóng modal xử lý
+function closeProcessingModal() {
+  const modal = document.getElementById("processingModal");
+  modal.style.display = "none";
+  document.getElementById("modalMessage").style.color = "black"; // Reset màu chữ
+}
+
 function handleReset() {
+  showProcessingModal("Đang làm mới dữ liệu...");
   const startDateInput = document.getElementById("startDate");
   const transactionDateInput = document.getElementById("transactionDate");
   
@@ -183,7 +235,11 @@ function handleReset() {
   currentEditIndex = -1;
   currentEditTransactionId = null;
   
-  fetchSoftwareList();
+  fetchSoftwareList().then(() => {
+    showResultModal("Dữ liệu đã được làm mới!", true);
+  }).catch(err => {
+    showResultModal(`Lỗi khi làm mới dữ liệu: ${err.message}`, false);
+  });
 }
 
 function formatDate(dateString) {
@@ -192,9 +248,10 @@ function formatDate(dateString) {
 }
 
 async function handleAdd() {
+  showProcessingModal("Đang thêm giao dịch...");
   const { BACKEND_URL } = getConstants();
   if (!userInfo) {
-    alert("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.");
+    showResultModal("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.", false);
     return;
   }
 
@@ -238,36 +295,38 @@ async function handleAdd() {
       handleReset();
       await loadTransactions();
       updatePackageList();
+      showResultModal("Giao dịch đã được lưu!", true);
     } else {
-      document.getElementById("errorMessage").textContent = result.message || "Không thể lưu giao dịch!";
+      showResultModal(result.message || "Không thể lưu giao dịch!", false);
     }
   } catch (err) {
-    document.getElementById("errorMessage").textContent = `Lỗi kết nối server: ${err.message}`;
+    showResultModal(`Lỗi kết nối server: ${err.message}`, false);
     console.error("Lỗi:", err);
   }
 }
 
 async function handleUpdate() {
+  showProcessingModal("Đang cập nhật giao dịch...");
   const { BACKEND_URL } = getConstants();
   if (!userInfo) {
-    alert("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.");
+    showResultModal("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.", false);
     return;
   }
 
   if (currentEditTransactionId === null) {
-    alert("Vui lòng chọn một giao dịch để chỉnh sửa!");
+    showResultModal("Vui lòng chọn một giao dịch để chỉnh sửa!", false);
     return;
   }
 
   const loadResult = await loadTransactions();
   if (loadResult.status === "error") {
-    alert(loadResult.message);
+    showResultModal(loadResult.message, false);
     return;
   }
 
   const transaction = transactionList.find(t => t.transactionId === currentEditTransactionId);
   if (!transaction) {
-    alert("Giao dịch không tồn tại hoặc đã bị xóa. Vui lòng thử lại!");
+    showResultModal("Giao dịch không tồn tại hoặc đã bị xóa. Vui lòng thử lại!", false);
     handleReset();
     return;
   }
@@ -277,7 +336,7 @@ async function handleUpdate() {
   const accountNameElement = document.getElementById("accountName");
 
   if (!softwareNameElement || !softwarePackageElement || !accountNameElement) {
-    alert("Không tìm thấy các trường dữ liệu trên form. Vui lòng thử lại!");
+    showResultModal("Không tìm thấy các trường dữ liệu trên form. Vui lòng thử lại!", false);
     return;
   }
 
@@ -320,16 +379,18 @@ async function handleUpdate() {
       document.getElementById("successMessage").textContent = "Giao dịch đã được cập nhật!";
       handleReset();
       await loadTransactions();
+      showResultModal("Giao dịch đã được cập nhật!", true);
     } else {
-      document.getElementById("errorMessage").textContent = result.message || "Không thể cập nhật giao dịch!";
+      showResultModal(result.message || "Không thể cập nhật giao dịch!", false);
     }
   } catch (err) {
-    document.getElementById("errorMessage").textContent = `Lỗi kết nối server: ${err.message}`;
+    showResultModal(`Lỗi kết nối server: ${err.message}`, false);
     console.error("Lỗi:", err);
   }
 }
 
 async function handleSearch() {
+  showProcessingModal("Đang tìm kiếm giao dịch...");
   const { BACKEND_URL } = getConstants();
   const conditions = {};
 
@@ -392,11 +453,12 @@ async function handleSearch() {
       });
       currentPage = 1;
       updateTable();
+      showResultModal(`Tìm kiếm thành công! Tìm thấy ${result.data.length} giao dịch.`, true);
     } else {
-      document.getElementById("errorMessage").textContent = result.message || "Không thể tìm kiếm giao dịch!";
+      showResultModal(result.message || "Không thể tìm kiếm giao dịch!", false);
     }
   } catch (err) {
-    document.getElementById("errorMessage").textContent = `Lỗi khi tìm kiếm giao dịch: ${err.message}`;
+    showResultModal(`Lỗi khi tìm kiếm giao dịch: ${err.message}`, false);
     console.error("Lỗi khi tìm kiếm giao dịch", err);
   }
 }
