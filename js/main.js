@@ -29,7 +29,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const endDateInput = document.getElementById("endDate");
   const transactionDateInput = document.getElementById("transactionDate");
 
-  // Đặt giá trị mặc định cho các trường ngày
   startDateInput.value = todayFormatted;
   transactionDateInput.value = todayFormatted;
 
@@ -48,9 +47,9 @@ document.addEventListener("DOMContentLoaded", () => {
   startDateInput.addEventListener("change", calculateEndDate);
   durationInput.addEventListener("input", calculateEndDate);
 
-  fetchSoftwareList();
+  fetchSoftwareList(null);
   document.getElementById("softwareName").addEventListener("change", updatePackageList);
-  document.getElementById("softwarePackage").addEventListener("change", updateAccountList); // Thêm sự kiện cho dropdown "Gói phần mềm"
+  document.getElementById("softwarePackage").addEventListener("change", updateAccountList);
 
   loadTransactions();
 });
@@ -159,20 +158,16 @@ function handleReset() {
   const startDateInput = document.getElementById("startDate");
   const transactionDateInput = document.getElementById("transactionDate");
   
-  // Đặt ngày giao dịch và ngày bắt đầu về ngày hiện tại
   startDateInput.value = todayFormatted;
   transactionDateInput.value = todayFormatted;
 
-  // Xóa dữ liệu các trường nhập liệu
   document.getElementById("transactionForm").reset();
 
-  // Đặt các trường select về giá trị mặc định
   document.getElementById("transactionType").value = "";
   document.getElementById("softwareName").value = "";
   document.getElementById("softwarePackage").value = "";
   document.getElementById("accountName").value = "";
 
-  // Xóa các trường khác (đảm bảo không bị ảnh hưởng bởi reset)
   document.getElementById("customerName").value = "";
   document.getElementById("customerEmail").value = "";
   document.getElementById("customerPhone").value = "";
@@ -183,12 +178,9 @@ function handleReset() {
   document.getElementById("revenue").value = "";
 
   currentEditIndex = -1;
-  currentEditTransactionId = null; // Đặt lại transactionId đang chỉnh sửa
+  currentEditTransactionId = null;
   
-  // Làm mới dropdown
-  fetchSoftwareList();
-  
-  // Tải lại danh sách giao dịch
+  fetchSoftwareList(null); // Không giữ giá trị Tên phần mềm
   loadTransactions();
 }
 
@@ -723,13 +715,9 @@ function editTransaction(index) {
   document.getElementById("note").value = transaction.note;
 
   // Điền và khôi phục các trường dropdown
-  softwareNameSelect.value = softwareNameValue;
-  updatePackageList();
-  softwarePackageSelect.value = softwarePackageValue;
-
-  // Đảm bảo softwarePackage đã được đặt trước khi gọi updateAccountList
-  updateAccountList();
-  accountNameSelect.value = accountNameValue;
+  fetchSoftwareList(softwareNameValue); // Truyền giá trị cần giữ
+  updatePackageList(softwarePackageValue);
+  updateAccountList(accountNameValue);
 
   console.log("Giá trị sau khi điền lên form:", {
     softwareName: softwareNameSelect.value,
@@ -756,14 +744,13 @@ function parseInputDate(inputDate) {
 }
 
 // Hàm lấy danh sách phần mềm từ Google Apps Script
-async function fetchSoftwareList() {
+async function fetchSoftwareList(softwareNameToKeep) {
   const { BACKEND_URL } = getConstants();
   const data = {
     action: "getSoftwareList"
   };
 
-  // Lưu giá trị hiện tại của "Tên phần mềm" và "Gói phần mềm"
-  const currentSoftwareName = document.getElementById("softwareName").value;
+  const currentSoftwareName = softwareNameToKeep || document.getElementById("softwareName").value;
   const currentSoftwarePackage = document.getElementById("softwarePackage").value;
 
   try {
@@ -777,10 +764,17 @@ async function fetchSoftwareList() {
 
     const result = await response.json();
     if (result.status === "success") {
-      softwareData = result.data; // Lưu dữ liệu từ sheet PhanMem
+      softwareData = result.data;
 
-      // Lấy danh sách tên phần mềm duy nhất
       const softwareNames = [...new Set(softwareData.map(item => item.softwareName))];
+      
+      // Nếu giá trị cần giữ không có trong danh sách, thêm nó vào
+      if (currentSoftwareName && !softwareNames.includes(currentSoftwareName)) {
+        softwareNames.push(currentSoftwareName);
+      }
+
+      console.log("Danh sách tên phần mềm trong dropdown:", softwareNames);
+
       const softwareNameSelect = document.getElementById("softwareName");
       softwareNameSelect.innerHTML = '<option value="">-- Chọn phần mềm --</option>';
       softwareNames.forEach(name => {
@@ -790,14 +784,12 @@ async function fetchSoftwareList() {
         softwareNameSelect.appendChild(option);
       });
 
-      // Khôi phục giá trị "Tên phần mềm" sau khi làm mới dropdown
       if (currentSoftwareName) {
         softwareNameSelect.value = currentSoftwareName;
       }
 
-      updatePackageList();
+      updatePackageList(currentSoftwarePackage);
 
-      // Khôi phục giá trị "Gói phần mềm" sau khi làm mới dropdown
       if (currentSoftwarePackage) {
         document.getElementById("softwarePackage").value = currentSoftwarePackage;
       }
