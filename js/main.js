@@ -727,93 +727,213 @@ function goToPage(page) {
   updateTable();
 }
 
+// Sửa hàm editTransaction để chuẩn hóa kiểm tra vai trò
 function editTransaction(index) {
-  const transaction = transactionList[index];
-  currentEditTransactionId = transaction.transactionId;
-
-  // Kiểm tra ngày giao dịch
-  const today = new Date();
-  const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
-
-  // Kiểm tra vai trò người dùng
-  const isAdmin = userInfo.vaiTro && userInfo.vaiTro.toLowerCase() === "admin";
-
-  if (transaction.transactionDate !== todayFormatted && !isAdmin) {
-    // Nếu giao dịch không được tạo trong ngày hôm nay và người dùng không phải Admin
-    alert("Bạn chỉ có thể chỉnh sửa các giao dịch được tạo trong ngày hôm nay!");
-    return;
-  }
-
-  // Nếu giao dịch được tạo trong ngày hôm nay hoặc người dùng là Admin, cho phép chỉnh sửa
-  const softwareNameSelect = document.getElementById("softwareName");
-  const softwarePackageSelect = document.getElementById("softwarePackage");
-  const accountNameSelect = document.getElementById("accountName");
-
-  const softwareNameValue = transaction.softwareName || "";
-  const softwarePackageValue = transaction.softwarePackage || "";
-  const accountNameValue = transaction.accountName || "";
-
-  console.log("Dữ liệu giao dịch để sửa:", {
-    softwareName: softwareNameValue,
-    softwarePackage: softwarePackageValue,
-    accountName: accountNameValue
-  });
-
-  const softwareNameChangeHandler = softwareNameSelect.onchange;
-  const softwarePackageChangeHandler = softwarePackageSelect.onchange;
-  softwareNameSelect.onchange = null;
-  softwarePackageSelect.onchange = null;
-
-  document.getElementById("transactionDate").value = transaction.transactionDate;
-  document.getElementById("transactionType").value = transaction.transactionType;
-  document.getElementById("customerName").value = transaction.customerName;
-  document.getElementById("customerEmail").value = transaction.customerEmail;
-  document.getElementById("customerPhone").value = transaction.customerPhone;
-  document.getElementById("duration").value = transaction.duration;
-  document.getElementById("startDate").value = transaction.startDate;
-  document.getElementById("endDate").value = transaction.endDate;
-  document.getElementById("deviceCount").value = transaction.deviceCount;
-  document.getElementById("revenue").value = transaction.revenue;
-  document.getElementById("note").value = transaction.note;
-
-  fetchSoftwareList(softwareNameValue);
-  softwareNameSelect.value = softwareNameValue;
-
-  updatePackageList(softwarePackageValue);
-  softwarePackageSelect.value = softwarePackageValue;
-
-  updateAccountList(accountNameValue);
-  accountNameSelect.value = accountNameValue;
-
-  console.log("Giá trị sau khi điền lên form:", {
-    softwareName: softwareNameSelect.value,
-    softwarePackage: softwarePackageSelect.value,
-    accountName: accountNameSelect.value
-  });
-
-  softwareNameSelect.onchange = softwareNameChangeHandler;
-  softwarePackageSelect.onchange = softwarePackageChangeHandler;
-
-  // Xóa các trình xử lý focus cũ trước khi thêm mới
-  softwareNameSelect.removeEventListener("focus", softwareNameSelect.focusHandler);
-  softwarePackageSelect.removeEventListener("focus", softwarePackageSelect.focusHandler);
-  accountNameSelect.removeEventListener("focus", accountNameSelect.focusHandler);
-
-  // Thêm sự kiện focus mới
-  softwareNameSelect.focusHandler = function() {
+    const transaction = transactionList[index];
+    currentEditTransactionId = transaction.transactionId;
+  
+    // Kiểm tra ngày giao dịch
+    const today = new Date();
+    const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
+  
+    // Kiểm tra vai trò người dùng (chuẩn hóa giá trị vaiTro)
+    const vaiTro = userInfo.vaiTro ? userInfo.vaiTro.trim().toLowerCase() : "";
+    const isAdmin = vaiTro === "admin";
+    console.log("Vai trò người dùng:", userInfo.vaiTro, "isAdmin:", isAdmin);
+  
+    if (transaction.transactionDate !== todayFormatted && !isAdmin) {
+      alert("Chỉ Admin mới có thể chỉnh sửa các giao dịch từ những ngày trước!");
+      return;
+    }
+  
+    // Nếu giao dịch được tạo trong ngày hôm nay hoặc người dùng là Admin, cho phép chỉnh sửa
+    const softwareNameSelect = document.getElementById("softwareName");
+    const softwarePackageSelect = document.getElementById("softwarePackage");
+    const accountNameSelect = document.getElementById("accountName");
+  
+    const softwareNameValue = transaction.softwareName || "";
+    const softwarePackageValue = transaction.softwarePackage || "";
+    const accountNameValue = transaction.accountName || "";
+  
+    console.log("Dữ liệu giao dịch để sửa:", {
+      softwareName: softwareNameValue,
+      softwarePackage: softwarePackageValue,
+      accountName: accountNameValue
+    });
+  
+    const softwareNameChangeHandler = softwareNameSelect.onchange;
+    const softwarePackageChangeHandler = softwarePackageSelect.onchange;
+    softwareNameSelect.onchange = null;
+    softwarePackageSelect.onchange = null;
+  
+    document.getElementById("transactionDate").value = transaction.transactionDate;
+    document.getElementById("transactionType").value = transaction.transactionType;
+    document.getElementById("customerName").value = transaction.customerName;
+    document.getElementById("customerEmail").value = transaction.customerEmail;
+    document.getElementById("customerPhone").value = transaction.customerPhone;
+    document.getElementById("duration").value = transaction.duration;
+    document.getElementById("startDate").value = transaction.startDate;
+    document.getElementById("endDate").value = transaction.endDate;
+    document.getElementById("deviceCount").value = transaction.deviceCount;
+    document.getElementById("revenue").value = transaction.revenue;
+    document.getElementById("note").value = transaction.note;
+  
     fetchSoftwareList(softwareNameValue);
-  };
-  softwarePackageSelect.focusHandler = function() {
+    softwareNameSelect.value = softwareNameValue;
+  
     updatePackageList(softwarePackageValue);
-  };
-  accountNameSelect.focusHandler = function() {
+    softwarePackageSelect.value = softwarePackageValue;
+  
     updateAccountList(accountNameValue);
-  };
-
-  softwareNameSelect.addEventListener("focus", softwareNameSelect.focusHandler);
-  softwarePackageSelect.addEventListener("focus", softwarePackageSelect.focusHandler);
-  accountNameSelect.addEventListener("focus", accountNameSelect.focusHandler);
-}
+    accountNameSelect.value = accountNameValue;
+  
+    console.log("Giá trị sau khi điền lên form:", {
+      softwareName: softwareNameSelect.value,
+      softwarePackage: softwarePackageSelect.value,
+      accountName: accountNameSelect.value
+    });
+  
+    softwareNameSelect.onchange = softwareNameChangeHandler;
+    softwarePackageSelect.onchange = softwarePackageChangeHandler;
+  
+    // Xóa các trình xử lý focus cũ trước khi thêm mới
+    softwareNameSelect.removeEventListener("focus", softwareNameSelect.focusHandler);
+    softwarePackageSelect.removeEventListener("focus", softwarePackageSelect.focusHandler);
+    accountNameSelect.removeEventListener("focus", accountNameSelect.focusHandler);
+  
+    // Thêm sự kiện focus mới
+    softwareNameSelect.focusHandler = function() {
+      fetchSoftwareList(softwareNameValue);
+    };
+    softwarePackageSelect.focusHandler = function() {
+      updatePackageList(softwarePackageValue);
+    };
+    accountNameSelect.focusHandler = function() {
+      updateAccountList(accountNameValue);
+    };
+  
+    softwareNameSelect.addEventListener("focus", softwareNameSelect.focusHandler);
+    softwarePackageSelect.addEventListener("focus", softwarePackageSelect.focusHandler);
+    accountNameSelect.addEventListener("focus", accountNameSelect.focusHandler);
+  }
+  
+  // Sửa hàm handleUpdate để giữ nguyên thông tin nhân viên và thêm ghi chú
+  async function handleUpdate() {
+    const { BACKEND_URL } = getConstants();
+    if (!userInfo) {
+      alert("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.");
+      return;
+    }
+  
+    if (currentEditTransactionId === null) {
+      alert("Vui lòng chọn một giao dịch để chỉnh sửa!");
+      return;
+    }
+  
+    const loadResult = await loadTransactions();
+    if (loadResult.status === "error") {
+      alert(loadResult.message);
+      return;
+    }
+  
+    const transaction = transactionList.find(t => t.transactionId === currentEditTransactionId);
+    if (!transaction) {
+      alert("Giao dịch không tồn tại hoặc đã bị xóa. Vui lòng thử lại!");
+      handleReset();
+      return;
+    }
+  
+    // Kiểm tra ngày giao dịch và vai trò người dùng
+    const today = new Date();
+    const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
+    const vaiTro = userInfo.vaiTro ? userInfo.vaiTro.trim().toLowerCase() : "";
+    const isAdmin = vaiTro === "admin";
+    console.log("Vai trò người dùng:", userInfo.vaiTro, "isAdmin:", isAdmin);
+  
+    if (transaction.transactionDate !== todayFormatted && !isAdmin) {
+      alert("Chỉ Admin mới có thể chỉnh sửa các giao dịch từ những ngày trước!");
+      return;
+    }
+  
+    const softwareNameElement = document.getElementById("softwareName");
+    const softwarePackageElement = document.getElementById("softwarePackage");
+    const accountNameElement = document.getElementById("accountName");
+  
+    if (!softwareNameElement || !softwarePackageElement || !accountNameElement) {
+      alert("Không tìm thấy các trường dữ liệu trên form. Vui lòng thử lại!");
+      return;
+    }
+  
+    // So sánh dữ liệu cũ và mới để tìm các trường thay đổi
+    const changes = [];
+    const fieldsToCompare = [
+      "transactionType", "transactionDate", "customerName", "customerEmail", "customerPhone",
+      "duration", "startDate", "endDate", "deviceCount", "softwareName", "softwarePackage",
+      "accountName", "revenue", "note"
+    ];
+  
+    const data = {
+      action: "updateTransaction",
+      transactionId: currentEditTransactionId,
+      transactionType: document.getElementById("transactionType").value,
+      transactionDate: document.getElementById("transactionDate").value,
+      customerName: document.getElementById("customerName").value,
+      customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
+      customerPhone: document.getElementById("customerPhone").value,
+      duration: parseInt(document.getElementById("duration").value) || 0,
+      startDate: document.getElementById("startDate").value,
+      endDate: document.getElementById("endDate").value,
+      deviceCount: parseInt(document.getElementById("deviceCount").value) || 0,
+      softwareName: softwareNameElement.value,
+      softwarePackage: softwarePackageElement.value,
+      accountName: accountNameElement.value,
+      revenue: parseFloat(document.getElementById("revenue").value) || 0,
+      note: document.getElementById("note").value,
+      tenNhanVien: transaction.tenNhanVien, // Giữ nguyên tên nhân viên cũ
+      maNhanVien: transaction.maNhanVien // Giữ nguyên mã nhân viên cũ
+    };
+  
+    // So sánh các trường để tìm thay đổi
+    fieldsToCompare.forEach(field => {
+      const oldValue = transaction[field];
+      const newValue = data[field];
+      if (oldValue !== newValue) {
+        changes.push(`${field}: (${oldValue} - ${newValue})`);
+      }
+    });
+  
+    // Nếu là Admin và có thay đổi, thêm ghi chú
+    if (isAdmin && changes.length > 0) {
+      const now = new Date();
+      const timestamp = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      const adminNote = `(${timestamp}) ${userInfo.tenNhanVien} sửa: ${changes.join(", ")}`;
+      data.note = data.note ? `${data.note}\n${adminNote}` : adminNote;
+    }
+  
+    console.log("📤 Dữ liệu cập nhật gửi đi:", JSON.stringify(data, null, 2));
+  
+    try {
+      const response = await fetch(BACKEND_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+  
+      const result = await response.json();
+      if (result.status === "success") {
+        document.getElementById("successMessage").textContent = "Giao dịch đã được cập nhật!";
+        handleReset();
+        await loadTransactions();
+      } else {
+        document.getElementById("errorMessage").textContent = result.message || "Không thể cập nhật giao dịch!";
+      }
+    } catch (err) {
+      document.getElementById("errorMessage").textContent = `Lỗi kết nối server: ${err.message}`;
+      console.error("Lỗi:", err);
+    }
+  }
 
 // Hàm định dạng ngày từ yyyy-mm-dd sang yyyy/mm/dd để hiển thị trên form
 function formatToInputDate(isoDate) {
