@@ -294,10 +294,12 @@ async function handleUpdate() {
   // Kiểm tra ngày giao dịch và vai trò người dùng
   const today = new Date();
   const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
-  const isAdmin = userInfo.vaiTro && userInfo.vaiTro.toLowerCase() === "admin";
+  const vaiTro = userInfo.vaiTro ? userInfo.vaiTro.trim().toLowerCase() : "";
+  const isAdmin = vaiTro === "admin";
+  console.log("Vai trò người dùng:", userInfo.vaiTro, "isAdmin:", isAdmin);
 
   if (transaction.transactionDate !== todayFormatted && !isAdmin) {
-    alert("Bạn chỉ có thể chỉnh sửa các giao dịch được tạo trong ngày hôm nay!");
+    alert("Chỉ Admin mới có thể chỉnh sửa các giao dịch từ những ngày trước!");
     return;
   }
 
@@ -327,8 +329,9 @@ async function handleUpdate() {
     accountName: accountNameElement.value,
     revenue: parseFloat(document.getElementById("revenue").value) || 0,
     note: document.getElementById("note").value,
-    tenNhanVien: userInfo.tenNhanVien,
-    maNhanVien: userInfo.maNhanVien
+    tenNhanVien: transaction.tenNhanVien, // Giữ nguyên tên nhân viên cũ
+    maNhanVien: transaction.maNhanVien,   // Giữ nguyên mã nhân viên cũ
+    vaiTro: userInfo.vaiTro               // Thêm vai trò để backend biết người dùng là Admin
   };
 
   console.log("📤 Dữ liệu cập nhật gửi đi:", JSON.stringify(data, null, 2));
