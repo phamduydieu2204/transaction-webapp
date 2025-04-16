@@ -745,10 +745,12 @@ function editTransaction(index) {
   document.getElementById("note").value = transaction.note;
 
   // Điền giá trị vào dropdown
+  fetchSoftwareList(softwareNameValue); // Truyền giá trị cần giữ
   softwareNameSelect.value = softwareNameValue;
-  fetchSoftwareList();
+
   updatePackageList();
   softwarePackageSelect.value = softwarePackageValue;
+
   updateAccountList();
   accountNameSelect.value = accountNameValue;
 
@@ -763,7 +765,7 @@ function editTransaction(index) {
 
   // Thêm sự kiện focus để làm mới danh sách tùy chọn khi mở dropdown
   softwareNameSelect.addEventListener("focus", function() {
-    fetchSoftwareList();
+    fetchSoftwareList(softwareNameValue);
   });
 
   softwarePackageSelect.addEventListener("focus", function() {
@@ -790,7 +792,7 @@ function parseInputDate(inputDate) {
 }
 
 // Hàm lấy danh sách phần mềm từ Google Apps Script
-async function fetchSoftwareList() {
+async function fetchSoftwareList(softwareNameToKeep) {
   const { BACKEND_URL } = getConstants();
   const data = {
     action: "getSoftwareList"
@@ -812,8 +814,8 @@ async function fetchSoftwareList() {
       const softwareNames = [...new Set(softwareData.map(item => item.softwareName))];
       const softwareNameSelect = document.getElementById("softwareName");
 
-      // Lưu giá trị hiện tại của dropdown
-      const currentSoftwareName = softwareNameSelect.value;
+      // Lấy giá trị cần giữ
+      const currentSoftwareName = softwareNameToKeep || softwareNameSelect.value;
 
       // Làm mới danh sách tùy chọn
       softwareNameSelect.innerHTML = '<option value="">-- Chọn phần mềm --</option>';
@@ -835,7 +837,7 @@ async function fetchSoftwareList() {
         softwareNameSelect.appendChild(option);
       }
 
-      // Khôi phục giá trị hiện tại
+      // Khôi phục giá trị
       softwareNameSelect.value = currentSoftwareName;
 
       updatePackageList();
