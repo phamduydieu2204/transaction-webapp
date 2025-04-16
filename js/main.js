@@ -329,8 +329,8 @@ async function handleUpdate() {
     accountName: accountNameElement.value,
     revenue: parseFloat(document.getElementById("revenue").value) || 0,
     note: document.getElementById("note").value,
-    tenNhanVien: userInfo.tenNhanVien, // Sử dụng tên người sửa (Admin hoặc nhân viên hiện tại)
-    maNhanVien: userInfo.maNhanVien,   // Sử dụng mã người sửa (Admin hoặc nhân viên hiện tại)
+    tenNhanVien: userInfo.tenNhanVien, // Sử dụng tên người sửa (Phạm Duy Diệu)
+    maNhanVien: userInfo.maNhanVien,   // Sử dụng mã người sửa (NV001)
     vaiTro: userInfo.vaiTro            // Thêm vai trò để backend biết người dùng là Admin
   };
 
