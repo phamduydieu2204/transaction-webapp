@@ -329,9 +329,11 @@ async function handleUpdate() {
     accountName: accountNameElement.value,
     revenue: parseFloat(document.getElementById("revenue").value) || 0,
     note: document.getElementById("note").value,
-    tenNhanVien: userInfo.tenNhanVien, // Sử dụng tên người sửa (Phạm Duy Diệu)
-    maNhanVien: userInfo.maNhanVien,   // Sử dụng mã người sửa (NV001)
-    vaiTro: userInfo.vaiTro            // Thêm vai trò để backend biết người dùng là Admin
+    tenNhanVien: transaction.tenNhanVien, // Giữ nguyên tên nhân viên cũ
+    maNhanVien: transaction.maNhanVien,   // Giữ nguyên mã nhân viên cũ
+    editorTenNhanVien: userInfo.tenNhanVien, // Tên người sửa (Phạm Duy Diệu)
+    editorMaNhanVien: userInfo.maNhanVien,   // Mã người sửa (NV001)
+    vaiTro: userInfo.vaiTro                  // Vai trò người dùng
   };
 
   console.log("📤 Dữ liệu cập nhật gửi đi:", JSON.stringify(data, null, 2));
