@@ -197,15 +197,6 @@ function handleReset() {
   document.getElementById("note").value = "";
   document.getElementById("revenue").value = "";
 
-  // Đặt lại các trường hiển thị và ẩn
-  document.getElementById("softwareNameDisplay").textContent = "-- Chọn phần mềm --";
-  document.getElementById("softwarePackageDisplay").textContent = "-- Chọn gói --";
-  document.getElementById("accountNameDisplay").textContent = "-- Chọn tài khoản --";
-
-  document.getElementById("softwareNameHidden").value = "";
-  document.getElementById("softwarePackageHidden").value = "";
-  document.getElementById("accountNameHidden").value = "";
-
   currentEditIndex = -1;
   currentEditTransactionId = null;
   
@@ -240,9 +231,9 @@ async function handleAdd() {
     startDate: document.getElementById("startDate").value,
     endDate: document.getElementById("endDate").value,
     deviceCount: parseInt(document.getElementById("deviceCount").value) || 0,
-    softwareName: document.getElementById("softwareNameHidden").value || document.getElementById("softwareName").value,
-    softwarePackage: document.getElementById("softwarePackageHidden").value || document.getElementById("softwarePackage").value,
-    accountName: document.getElementById("accountNameHidden").value || document.getElementById("accountName").value,
+    softwareName: document.getElementById("softwareName").value,
+    softwarePackage: document.getElementById("softwarePackage").value,
+    accountName: document.getElementById("accountName").value,
     revenue: parseFloat(document.getElementById("revenue").value) || 0,
     note: document.getElementById("note").value,
     tenNhanVien: userInfo.tenNhanVien,
@@ -300,7 +291,6 @@ async function handleUpdate() {
     return;
   }
 
-  // Kiểm tra xem các phần tử có tồn tại trước khi truy cập .value
   const softwareNameElement = document.getElementById("softwareName");
   const softwarePackageElement = document.getElementById("softwarePackage");
   const accountNameElement = document.getElementById("accountName");
@@ -369,9 +359,9 @@ async function handleSearch() {
   const startDate = document.getElementById("startDate").value;
   const endDate = document.getElementById("endDate").value;
   const deviceCount = document.getElementById("deviceCount").value;
-  const softwareName = document.getElementById("softwareNameHidden").value || document.getElementById("softwareName").value;
-  const softwarePackage = document.getElementById("softwarePackageHidden").value || document.getElementById("softwarePackage").value;
-  const accountName = document.getElementById("accountNameHidden").value || document.getElementById("accountName").value;
+  const softwareName = document.getElementById("softwareName").value;
+  const softwarePackage = document.getElementById("softwarePackage").value;
+  const accountName = document.getElementById("accountName").value;
   const revenue = document.getElementById("revenue").value;
   const note = document.getElementById("note").value;
   const tenNhanVien = userInfo.tenNhanVien;
