@@ -20,7 +20,7 @@
     }
     .date-input-container input {
       width: 100%;
-      padding-right: 30px; /* Để dành chỗ cho icon */
+      padding-right: 30px;
     }
     .date-input-container .calendar-icon {
       position: absolute;
@@ -29,7 +29,6 @@
       color: #007bff;
     }
 
-    /* CSS cho modal chi tiết giao dịch */
     .modal {
       display: none;
       position: fixed;
@@ -103,7 +102,6 @@
       color: #0056b3;
     }
 
-    /* CSS cho thông báo "Đã copy" */
     .copy-message {
       position: absolute;
       left: 100%;
@@ -118,10 +116,9 @@
       opacity: 1;
     }
 
-    /* CSS để cố định tiêu đề và các phần tử phía trên */
     .container {
       padding-bottom: 20px;
-      position: relative; /* Để chứa nút đăng xuất */
+      position: relative;
     }
 
     .fixed-header {
@@ -169,7 +166,6 @@
       background-color: #f9f9f9;
     }
 
-    /* CSS cho nút đăng xuất */
     .logout-btn {
       position: absolute;
       top: 10px;
@@ -182,7 +178,7 @@
       cursor: pointer;
       display: flex;
       align-items: center;
-      z-index: 20; /* Đảm bảo nút hiển thị phía trên các phần tử khác */
+      z-index: 20;
     }
 
     .logout-btn:hover {
@@ -192,11 +188,29 @@
     .logout-btn i {
       margin-right: 5px;
     }
+
+    /* CSS cho hiển thị giá trị ban đầu bên cạnh dropdown */
+    .field-with-display {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .field-display {
+      flex: 1;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+    }
+
+    .field-dropdown {
+      flex: 1;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Nút đăng xuất -->
     <button class="logout-btn" onclick="logout()">
       <i class="fas fa-sign-out-alt"></i> Đăng xuất
     </button>
@@ -275,26 +289,38 @@
       <!-- Dòng 3 -->
       <div>
         <label>Tên phần mềm:</label>
-        <select id="softwareName">
-          <option value="">-- Chọn phần mềm --</option>
-          <!-- Danh sách phần mềm sẽ được điền động bằng JavaScript -->
-        </select>
+        <div class="field-with-display">
+          <span id="softwareNameDisplay" class="field-display">-- Chọn phần mềm --</span>
+          <select id="softwareName" class="field-dropdown">
+            <option value="">-- Chọn phần mềm --</option>
+            <!-- Danh sách phần mềm sẽ được điền động bằng JavaScript -->
+          </select>
+          <input type="hidden" id="softwareNameHidden" name="softwareName">
+        </div>
       </div>
 
       <div>
         <label>Gói phần mềm:</label>
-        <select id="softwarePackage">
-          <option value="">-- Chọn gói --</option>
-          <!-- Danh sách gói sẽ được điền động bằng JavaScript -->
-        </select>
+        <div class="field-with-display">
+          <span id="softwarePackageDisplay" class="field-display">-- Chọn gói --</span>
+          <select id="softwarePackage" class="field-dropdown">
+            <option value="">-- Chọn gói --</option>
+            <!-- Danh sách gói sẽ được điền động bằng JavaScript -->
+          </select>
+          <input type="hidden" id="softwarePackageHidden" name="softwarePackage">
+        </div>
       </div>
 
       <div>
         <label>Tên tài khoản:</label>
-        <select id="accountName">
-          <option value="">-- Chọn tài khoản --</option>
-          <!-- Danh sách tài khoản sẽ được điền động bằng JavaScript -->
-        </select>
+        <div class="field-with-display">
+          <span id="accountNameDisplay" class="field-display">-- Chọn tài khoản --</span>
+          <select id="accountName" class="field-dropdown">
+            <option value="">-- Chọn tài khoản --</option>
+            <!-- Danh sách tài khoản sẽ được điền động bằng JavaScript -->
+          </select>
+          <input type="hidden" id="accountNameHidden" name="accountName">
+        </div>
       </div>
 
       <div>
