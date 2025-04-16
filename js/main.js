@@ -906,13 +906,6 @@ function editTransaction(index) {
       }
     });
   
-    // Nếu là Admin và có thay đổi, thêm ghi chú
-    if (isAdmin && changes.length > 0) {
-      const now = new Date();
-      const timestamp = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-      const adminNote = `(${timestamp}) ${userInfo.tenNhanVien} sửa: ${changes.join(", ")}`;
-      data.note = data.note ? `${data.note}\n${adminNote}` : adminNote;
-    }
   
     console.log("📤 Dữ liệu cập nhật gửi đi:", JSON.stringify(data, null, 2));
   
