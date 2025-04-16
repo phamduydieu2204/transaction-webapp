@@ -287,12 +287,26 @@ async function handleUpdate() {
     return;
   }
 
-  await loadTransactions();
+  const loadResult = await loadTransactions();
+  if (loadResult.status === "error") {
+    alert(loadResult.message);
+    return;
+  }
 
   const transaction = transactionList.find(t => t.transactionId === currentEditTransactionId);
   if (!transaction) {
     alert("Giao dịch không tồn tại hoặc đã bị xóa. Vui lòng thử lại!");
     handleReset();
+    return;
+  }
+
+  // Kiểm tra xem các phần tử có tồn tại trước khi truy cập .value
+  const softwareNameElement = document.getElementById("softwareName");
+  const softwarePackageElement = document.getElementById("softwarePackage");
+  const accountNameElement = document.getElementById("accountName");
+
+  if (!softwareNameElement || !softwarePackageElement || !accountNameElement) {
+    alert("Không tìm thấy các trường dữ liệu trên form. Vui lòng thử lại!");
     return;
   }
 
@@ -308,9 +322,9 @@ async function handleUpdate() {
     startDate: document.getElementById("startDate").value,
     endDate: document.getElementById("endDate").value,
     deviceCount: parseInt(document.getElementById("deviceCount").value) || 0,
-    softwareName: document.getElementById("softwareNameHidden").value || document.getElementById("softwareName").value,
-    softwarePackage: document.getElementById("softwarePackageHidden").value || document.getElementById("softwarePackage").value,
-    accountName: document.getElementById("accountNameHidden").value || document.getElementById("accountName").value,
+    softwareName: softwareNameElement.value,
+    softwarePackage: softwarePackageElement.value,
+    accountName: accountNameElement.value,
     revenue: parseFloat(document.getElementById("revenue").value) || 0,
     note: document.getElementById("note").value,
     tenNhanVien: userInfo.tenNhanVien,
@@ -415,15 +429,20 @@ async function handleSearch() {
 }
 
 async function loadTransactions() {
+  if (!userInfo) {
+    console.error("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.");
+    return { status: "error", message: "Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại." };
+  }
+
   const { BACKEND_URL } = getConstants();
-  const vaiTro = userInfo.vaiTro ? userInfo.vaiTro.toLowerCase() : ""; // Chuẩn hóa vaiTro, không phân biệt hoa thường
+  const vaiTro = userInfo.vaiTro ? userInfo.vaiTro.toLowerCase() : "";
   const data = {
     action: "getTransactions",
     maNhanVien: userInfo.maNhanVien,
     vaiTro: vaiTro
   };
 
-  console.log("Dữ liệu gửi lên backend:", data); // Log để debug
+  console.log("Dữ liệu gửi lên backend:", data);
 
   try {
     const response = await fetch(BACKEND_URL, {
@@ -435,23 +454,26 @@ async function loadTransactions() {
     });
 
     const result = await response.json();
-    console.log("Dữ liệu trả về từ backend:", result); // Log để debug
+    console.log("Dữ liệu trả về từ backend:", result);
 
     if (result.status === "success") {
       transactionList = result.data;
       transactionList.sort((a, b) => {
         const idA = parseInt(a.transactionId.replace("GD", ""));
         const idB = parseInt(b.transactionId.replace("GD", ""));
-        return idB - idA; // Giảm dần
+        return idB - idA;
       });
       currentPage = 1;
       updateTable();
+      return { status: "success", data: result.data };
     } else {
       document.getElementById("errorMessage").textContent = result.message || "Không thể tải danh sách giao dịch!";
+      return { status: "error", message: result.message || "Không thể tải danh sách giao dịch!" };
     }
   } catch (err) {
     document.getElementById("errorMessage").textContent = `Lỗi khi tải danh sách giao dịch: ${err.message}`;
     console.error("Lỗi khi tải danh sách giao dịch", err);
+    return { status: "error", message: `Lỗi khi tải danh sách giao dịch: ${err.message}` };
   }
 }
 
