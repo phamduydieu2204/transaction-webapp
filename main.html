@@ -228,6 +228,22 @@
       color: #000;
       opacity: 1;
     }
+
+    /* CSS cho thông báo */
+    #notification {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 5px;
+      display: none;
+    }
+    #notification.success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    #notification.error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
   </style>
 </head>
 <body>
@@ -345,6 +361,9 @@
         <button type="reset">Làm mới</button>
       </div>
     </form>
+
+    <!-- Khu vực thông báo -->
+    <div id="notification"></div>
 
     <h2 class="fixed-header">Danh sách giao dịch</h2>
     <div class="pagination fixed-header" id="pagination">
