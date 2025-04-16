@@ -183,6 +183,15 @@ function handleReset() {
 
   document.getElementById("transactionForm").reset();
 
+  const softwareNameSelect = document.getElementById("softwareName");
+  const softwarePackageSelect = document.getElementById("softwarePackage");
+  const accountNameSelect = document.getElementById("accountName");
+
+  // Xóa các trình xử lý focus
+  softwareNameSelect.removeEventListener("focus", softwareNameSelect.focusHandler);
+  softwarePackageSelect.removeEventListener("focus", softwarePackageSelect.focusHandler);
+  accountNameSelect.removeEventListener("focus", accountNameSelect.focusHandler);
+
   document.getElementById("transactionType").value = "";
   document.getElementById("softwareName").value = "";
   document.getElementById("softwarePackage").value = "";
@@ -201,7 +210,6 @@ function handleReset() {
   currentEditTransactionId = null;
   
   fetchSoftwareList();
-  // Xóa loadTransactions ở đây
 }
 
 // Hàm định dạng ngày từ yyyy/mm/dd sang yyyy/mm/dd (giữ nguyên định dạng)
@@ -772,18 +780,25 @@ function editTransaction(index) {
   softwareNameSelect.onchange = softwareNameChangeHandler;
   softwarePackageSelect.onchange = softwarePackageChangeHandler;
 
-  // Thêm sự kiện focus để làm mới danh sách tùy chọn khi mở dropdown
-  softwareNameSelect.addEventListener("focus", function() {
+  // Xóa các trình xử lý focus cũ trước khi thêm mới
+  softwareNameSelect.removeEventListener("focus", softwareNameSelect.focusHandler);
+  softwarePackageSelect.removeEventListener("focus", softwarePackageSelect.focusHandler);
+  accountNameSelect.removeEventListener("focus", accountNameSelect.focusHandler);
+
+  // Thêm sự kiện focus mới
+  softwareNameSelect.focusHandler = function() {
     fetchSoftwareList(softwareNameValue);
-  });
-
-  softwarePackageSelect.addEventListener("focus", function() {
+  };
+  softwarePackageSelect.focusHandler = function() {
     updatePackageList(softwarePackageValue);
-  });
-
-  accountNameSelect.addEventListener("focus", function() {
+  };
+  accountNameSelect.focusHandler = function() {
     updateAccountList(accountNameValue);
-  });
+  };
+
+  softwareNameSelect.addEventListener("focus", softwareNameSelect.focusHandler);
+  softwarePackageSelect.addEventListener("focus", softwarePackageSelect.focusHandler);
+  accountNameSelect.addEventListener("focus", accountNameSelect.focusHandler);
 }
 
 // Hàm định dạng ngày từ yyyy-mm-dd sang yyyy/mm/dd để hiển thị trên form
