@@ -431,8 +431,11 @@ async function handleSearch() {
   const data = {
     action: "searchTransactions",
     maNhanVien: userInfo.maNhanVien,
+    vaiTro: userInfo.vaiTro ? userInfo.vaiTro.toLowerCase() : "",
     conditions: conditions
   };
+
+  console.log("📤 Dữ liệu tìm kiếm gửi đi:", JSON.stringify(data, null, 2));
 
   try {
     const response = await fetch(BACKEND_URL, {
