@@ -321,7 +321,7 @@ async function handleUpdate() {
     customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
     customerPhone: document.getElementById("customerPhone").value,
     duration: parseInt(document.getElementById("duration").value) || 0,
-    startDate: document.getElementById("startDate").value,
+    startDate: document.getElementById("startDate").value, // Sửa lỗi: Lấy từ "startDate" thay vì "transactionDate"
     endDate: document.getElementById("endDate").value,
     deviceCount: parseInt(document.getElementById("deviceCount").value) || 0,
     softwareName: softwareNameElement.value,
