@@ -141,22 +141,23 @@ function updateCustomerInfo() {
   const customerNameInput = document.getElementById("customerName");
   const customerPhoneInput = document.getElementById("customerPhone");
 
-  console.log("Bắt đầu tìm kiếm email:", email);
-  let iterationCount = 0;
+  // Hiển thị "Đang tìm kiếm..." ngay khi nhấn icon
+  customerNameInput.value = "";
+  customerPhoneInput.value = "";
+  customerNameInput.placeholder = "Đang tìm kiếm...";
+  customerPhoneInput.placeholder = "Đang tìm kiếm...";
 
-  const transaction = transactionList.find(t => {
-    iterationCount++;
-    console.log(`Đang kiểm tra giao dịch ${iterationCount}:`, t.customerEmail.toLowerCase());
-    return t.customerEmail.toLowerCase() === email;
-  });
+  // Tìm kiếm trong transactionList
+  const transaction = transactionList.find(t => t.customerEmail.toLowerCase() === email);
 
-  console.log("Tổng số giao dịch đã kiểm tra:", iterationCount);
+  // Cập nhật kết quả
   if (transaction) {
-    console.log("Tìm thấy giao dịch:", transaction);
     customerNameInput.value = transaction.customerName || "";
     customerPhoneInput.value = transaction.customerPhone || "";
   } else {
-    console.log("Không tìm thấy giao dịch nào khớp với email:", email);
+    // Nếu không tìm thấy, xóa placeholder và giữ trường trống
+    customerNameInput.placeholder = "";
+    customerPhoneInput.placeholder = "";
   }
 }
 
