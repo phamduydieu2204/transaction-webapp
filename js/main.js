@@ -136,40 +136,27 @@ function openCalendar(inputId) {
 }
 
 // Hàm tự động cập nhật Tên khách hàng và Liên hệ khi nhập Email
-async function updateCustomerInfo() {
+function updateCustomerInfo() {
   const email = document.getElementById("customerEmail").value.toLowerCase();
-  if (!email) return;
+  const customerNameInput = document.getElementById("customerName");
+  const customerPhoneInput = document.getElementById("customerPhone");
 
-  const { BACKEND_URL } = getConstants();
-  const data = {
-    action: "searchTransactions",
-    maNhanVien: userInfo.maNhanVien,
-    conditions: { customerEmail: email }
-  };
+  console.log("Bắt đầu tìm kiếm email:", email);
+  let iterationCount = 0;
 
-  try {
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
-    });
+  const transaction = transactionList.find(t => {
+    iterationCount++;
+    console.log(`Đang kiểm tra giao dịch ${iterationCount}:`, t.customerEmail.toLowerCase());
+    return t.customerEmail.toLowerCase() === email;
+  });
 
-    const result = await response.json();
-    if (result.status === "success" && result.data.length > 0) {
-      // Lấy giao dịch có mã giao dịch lớn nhất (gần nhất)
-      const sortedTransactions = result.data.sort((a, b) => {
-        const idA = parseInt(a.transactionId.replace("GD", ""));
-        const idB = parseInt(b.transactionId.replace("GD", ""));
-        return idB - idA; // Giảm dần
-      });
-      const latestTransaction = sortedTransactions[0];
-      document.getElementById("customerName").value = latestTransaction.customerName;
-      document.getElementById("customerPhone").value = latestTransaction.customerPhone;
-    }
-  } catch (err) {
-    console.error("Lỗi khi tìm kiếm giao dịch theo Email:", err);
+  console.log("Tổng số giao dịch đã kiểm tra:", iterationCount);
+  if (transaction) {
+    console.log("Tìm thấy giao dịch:", transaction);
+    customerNameInput.value = transaction.customerName || "";
+    customerPhoneInput.value = transaction.customerPhone || "";
+  } else {
+    console.log("Không tìm thấy giao dịch nào khớp với email:", email);
   }
 }
 
