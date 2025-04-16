@@ -189,23 +189,10 @@
       margin-right: 5px;
     }
 
-    /* CSS cho hiển thị giá trị ban đầu bên cạnh dropdown */
-    .field-with-display {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .field-display {
-      flex: 1;
-      padding: 5px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      background-color: #f9f9f9;
-    }
-
-    .field-dropdown {
-      flex: 1;
+    /* CSS để in nghiêng các tùy chọn không khả dụng */
+    option.unavailable {
+      font-style: italic;
+      color: #888;
     }
   </style>
 </head>
@@ -289,38 +276,26 @@
       <!-- Dòng 3 -->
       <div>
         <label>Tên phần mềm:</label>
-        <div class="field-with-display">
-          <span id="softwareNameDisplay" class="field-display">-- Chọn phần mềm --</span>
-          <select id="softwareName" class="field-dropdown">
-            <option value="">-- Chọn phần mềm --</option>
-            <!-- Danh sách phần mềm sẽ được điền động bằng JavaScript -->
-          </select>
-          <input type="hidden" id="softwareNameHidden" name="softwareName">
-        </div>
+        <select id="softwareName">
+          <option value="">-- Chọn phần mềm --</option>
+          <!-- Danh sách phần mềm sẽ được điền động bằng JavaScript -->
+        </select>
       </div>
 
       <div>
         <label>Gói phần mềm:</label>
-        <div class="field-with-display">
-          <span id="softwarePackageDisplay" class="field-display">-- Chọn gói --</span>
-          <select id="softwarePackage" class="field-dropdown">
-            <option value="">-- Chọn gói --</option>
-            <!-- Danh sách gói sẽ được điền động bằng JavaScript -->
-          </select>
-          <input type="hidden" id="softwarePackageHidden" name="softwarePackage">
-        </div>
+        <select id="softwarePackage">
+          <option value="">-- Chọn gói --</option>
+          <!-- Danh sách gói sẽ được điền động bằng JavaScript -->
+        </select>
       </div>
 
       <div>
         <label>Tên tài khoản:</label>
-        <div class="field-with-display">
-          <span id="accountNameDisplay" class="field-display">-- Chọn tài khoản --</span>
-          <select id="accountName" class="field-dropdown">
-            <option value="">-- Chọn tài khoản --</option>
-            <!-- Danh sách tài khoản sẽ được điền động bằng JavaScript -->
-          </select>
-          <input type="hidden" id="accountNameHidden" name="accountName">
-        </div>
+        <select id="accountName">
+          <option value="">-- Chọn tài khoản --</option>
+          <!-- Danh sách tài khoản sẽ được điền động bằng JavaScript -->
+        </select>
       </div>
 
       <div>
