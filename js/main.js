@@ -155,10 +155,14 @@ function updateCustomerInfo() {
     customerNameInput.value = transaction.customerName || "";
     customerPhoneInput.value = transaction.customerPhone || "";
   } else {
-    // Nếu không tìm thấy, xóa placeholder và giữ trường trống
-    customerNameInput.placeholder = "";
-    customerPhoneInput.placeholder = "";
+    // Nếu không tìm thấy, để trống và đảm bảo định dạng mặc định
+    customerNameInput.value = "";
+    customerPhoneInput.value = "";
   }
+
+  // Xóa placeholder sau khi tìm kiếm
+  customerNameInput.placeholder = "";
+  customerPhoneInput.placeholder = "";
 }
 
 // Hàm xử lý khi nhấn "Làm mới"
