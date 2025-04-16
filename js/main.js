@@ -201,7 +201,7 @@ function handleReset() {
   currentEditTransactionId = null;
   
   fetchSoftwareList();
-  loadTransactions();
+  // Xóa loadTransactions ở đây
 }
 
 // Hàm định dạng ngày từ yyyy/mm/dd sang yyyy/mm/dd (giữ nguyên định dạng)
@@ -336,7 +336,7 @@ async function handleUpdate() {
     if (result.status === "success") {
       document.getElementById("successMessage").textContent = "Giao dịch đã được cập nhật!";
       handleReset();
-      await loadTransactions();
+      await loadTransactions(); // Giữ lại lần gọi này
     } else {
       document.getElementById("errorMessage").textContent = result.message || "Không thể cập nhật giao dịch!";
     }
