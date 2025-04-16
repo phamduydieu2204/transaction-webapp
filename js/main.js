@@ -62,13 +62,10 @@ function logout() {
   window.location.href = "index.html";
 }
 
-async function updateAccountList() {
+async function updateAccountList(accountNameToKeep) {
   const softwareName = document.getElementById("softwareName").value;
   const softwarePackage = document.getElementById("softwarePackage").value;
   const accountNameSelect = document.getElementById("accountName");
-
-  // Lưu giá trị hiện tại của dropdown
-  const currentAccountName = accountNameSelect.value;
 
   accountNameSelect.innerHTML = '<option value="">-- Chọn tài khoản --</option>';
 
@@ -111,17 +108,17 @@ async function updateAccountList() {
       accountNameSelect.appendChild(option);
     });
 
-    // Thêm giá trị hiện tại nếu không có trong danh sách (in nghiêng)
-    if (currentAccountName && !allAccounts.includes(currentAccountName)) {
+    // Thêm giá trị cần giữ nếu không có trong danh sách (in nghiêng)
+    if (accountNameToKeep && !allAccounts.includes(accountNameToKeep)) {
       const option = document.createElement("option");
-      option.value = currentAccountName;
-      option.textContent = currentAccountName;
+      option.value = accountNameToKeep;
+      option.textContent = accountNameToKeep;
       option.className = "unavailable";
       accountNameSelect.appendChild(option);
     }
 
-    // Khôi phục giá trị hiện tại
-    accountNameSelect.value = currentAccountName;
+    // Khôi phục giá trị
+    accountNameSelect.value = accountNameToKeep || "";
   }
 }
 
@@ -745,13 +742,13 @@ function editTransaction(index) {
   document.getElementById("note").value = transaction.note;
 
   // Điền giá trị vào dropdown
-  fetchSoftwareList(softwareNameValue); // Truyền giá trị cần giữ
+  fetchSoftwareList(softwareNameValue);
   softwareNameSelect.value = softwareNameValue;
 
-  updatePackageList();
+  updatePackageList(softwarePackageValue);
   softwarePackageSelect.value = softwarePackageValue;
 
-  updateAccountList();
+  updateAccountList(accountNameValue);
   accountNameSelect.value = accountNameValue;
 
   console.log("Giá trị sau khi điền lên form:", {
@@ -769,11 +766,11 @@ function editTransaction(index) {
   });
 
   softwarePackageSelect.addEventListener("focus", function() {
-    updatePackageList();
+    updatePackageList(softwarePackageValue);
   });
 
   accountNameSelect.addEventListener("focus", function() {
-    updateAccountList();
+    updateAccountList(accountNameValue);
   });
 }
 
@@ -814,9 +811,6 @@ async function fetchSoftwareList(softwareNameToKeep) {
       const softwareNames = [...new Set(softwareData.map(item => item.softwareName))];
       const softwareNameSelect = document.getElementById("softwareName");
 
-      // Lấy giá trị cần giữ
-      const currentSoftwareName = softwareNameToKeep || softwareNameSelect.value;
-
       // Làm mới danh sách tùy chọn
       softwareNameSelect.innerHTML = '<option value="">-- Chọn phần mềm --</option>';
 
@@ -828,17 +822,17 @@ async function fetchSoftwareList(softwareNameToKeep) {
         softwareNameSelect.appendChild(option);
       });
 
-      // Thêm giá trị hiện tại nếu không có trong danh sách (in nghiêng)
-      if (currentSoftwareName && !softwareNames.includes(currentSoftwareName)) {
+      // Thêm giá trị cần giữ nếu không có trong danh sách (in nghiêng)
+      if (softwareNameToKeep && !softwareNames.includes(softwareNameToKeep)) {
         const option = document.createElement("option");
-        option.value = currentSoftwareName;
-        option.textContent = currentSoftwareName;
+        option.value = softwareNameToKeep;
+        option.textContent = softwareNameToKeep;
         option.className = "unavailable";
         softwareNameSelect.appendChild(option);
       }
 
       // Khôi phục giá trị
-      softwareNameSelect.value = currentSoftwareName;
+      softwareNameSelect.value = softwareNameToKeep || "";
 
       updatePackageList();
     } else {
@@ -862,12 +856,9 @@ function populateSoftwareList() {
 }
 
 // Hàm cập nhật danh sách Gói phần mềm dựa trên Tên phần mềm được chọn
-function updatePackageList() {
+function updatePackageList(softwarePackageToKeep) {
   const softwareName = document.getElementById("softwareName").value;
   const softwarePackageSelect = document.getElementById("softwarePackage");
-
-  // Lưu giá trị hiện tại của dropdown
-  const currentSoftwarePackage = softwarePackageSelect.value;
 
   softwarePackageSelect.innerHTML = '<option value="">-- Chọn gói --</option>';
 
@@ -903,17 +894,17 @@ function updatePackageList() {
       softwarePackageSelect.appendChild(option);
     });
 
-    // Thêm giá trị hiện tại nếu không có trong danh sách (in nghiêng)
-    if (currentSoftwarePackage && !allPackages.includes(currentSoftwarePackage)) {
+    // Thêm giá trị cần giữ nếu không có trong danh sách (in nghiêng)
+    if (softwarePackageToKeep && !allPackages.includes(softwarePackageToKeep)) {
       const option = document.createElement("option");
-      option.value = currentSoftwarePackage;
-      option.textContent = currentSoftwarePackage;
+      option.value = softwarePackageToKeep;
+      option.textContent = softwarePackageToKeep;
       option.className = "unavailable";
       softwarePackageSelect.appendChild(option);
     }
 
-    // Khôi phục giá trị hiện tại
-    softwarePackageSelect.value = currentSoftwarePackage;
+    // Khôi phục giá trị
+    softwarePackageSelect.value = softwarePackageToKeep || "";
   }
 
   updateAccountList();
