@@ -66,7 +66,6 @@ async function updateAccountList() {
   const softwareName = document.getElementById("softwareName").value;
   const softwarePackage = document.getElementById("softwarePackage").value;
   const accountNameSelect = document.getElementById("accountName");
-  const currentAccountName = accountNameSelect.value; // Lưu giá trị hiện tại của Tên tài khoản
 
   accountNameSelect.innerHTML = '<option value="">-- Chọn tài khoản --</option>';
 
@@ -80,25 +79,12 @@ async function updateAccountList() {
       .map(item => item.accountName);
 
     const uniqueAccounts = [...new Set(accounts)];
-
-    // Nếu giá trị hiện tại của Tên tài khoản không có trong danh sách, thêm nó vào
-    if (currentAccountName && !uniqueAccounts.includes(currentAccountName)) {
-      uniqueAccounts.push(currentAccountName);
-    }
-
-    console.log("Danh sách tài khoản trong dropdown:", uniqueAccounts); // Log để debug
-
     uniqueAccounts.forEach(account => {
       const option = document.createElement("option");
       option.value = account;
       option.textContent = account;
       accountNameSelect.appendChild(option);
     });
-
-    // Khôi phục giá trị hiện tại (nếu có)
-    if (currentAccountName && uniqueAccounts.includes(currentAccountName)) {
-      accountNameSelect.value = currentAccountName;
-    }
   }
 }
 
@@ -177,10 +163,19 @@ function handleReset() {
   document.getElementById("note").value = "";
   document.getElementById("revenue").value = "";
 
+  // Đặt lại các trường hiển thị và ẩn
+  document.getElementById("softwareNameDisplay").textContent = "-- Chọn phần mềm --";
+  document.getElementById("softwarePackageDisplay").textContent = "-- Chọn gói --";
+  document.getElementById("accountNameDisplay").textContent = "-- Chọn tài khoản --";
+
+  document.getElementById("softwareNameHidden").value = "";
+  document.getElementById("softwarePackageHidden").value = "";
+  document.getElementById("accountNameHidden").value = "";
+
   currentEditIndex = -1;
   currentEditTransactionId = null;
   
-  fetchSoftwareList(null); // Không giữ giá trị Tên phần mềm
+  fetchSoftwareList();
   loadTransactions();
 }
 
@@ -191,61 +186,60 @@ function formatDate(dateString) {
 }
 
 async function handleAdd() {
-    const { BACKEND_URL } = getConstants();
-    if (!userInfo) {
-      alert("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.");
-      return;
-    }
-  
-    // Lấy ngày hiện tại để sử dụng cho ngày giao dịch
-    const today = new Date();
-    const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
-  
-    const data = {
-      action: "addTransaction",
-      transactionType: document.getElementById("transactionType").value,
-      transactionDate: todayFormatted, // Luôn sử dụng ngày hiện tại
-      customerName: document.getElementById("customerName").value,
-      customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
-      customerPhone: document.getElementById("customerPhone").value,
-      duration: parseInt(document.getElementById("duration").value) || 0,
-      startDate: document.getElementById("startDate").value,
-      endDate: document.getElementById("endDate").value,
-      deviceCount: parseInt(document.getElementById("deviceCount").value) || 0,
-      softwareName: document.getElementById("softwareName").value,
-      softwarePackage: document.getElementById("softwarePackage").value,
-      accountName: document.getElementById("accountName").value, // Thêm tên tài khoản
-      revenue: parseFloat(document.getElementById("revenue").value) || 0,
-      note: document.getElementById("note").value,
-      tenNhanVien: userInfo.tenNhanVien,
-      maNhanVien: userInfo.maNhanVien
-    };
-  
-    console.log("📤 Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
-  
-    try {
-      const response = await fetch(BACKEND_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-      });
-  
-      const result = await response.json();
-      if (result.status === "success") {
-        document.getElementById("successMessage").textContent = "Giao dịch đã được lưu!";
-        handleReset();
-        await loadTransactions();
-        updatePackageList();
-      } else {
-        document.getElementById("errorMessage").textContent = result.message || "Không thể lưu giao dịch!";
-      }
-    } catch (err) {
-      document.getElementById("errorMessage").textContent = `Lỗi kết nối server: ${err.message}`;
-      console.error("Lỗi:", err);
-    }
+  const { BACKEND_URL } = getConstants();
+  if (!userInfo) {
+    alert("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.");
+    return;
   }
+
+  const today = new Date();
+  const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
+
+  const data = {
+    action: "addTransaction",
+    transactionType: document.getElementById("transactionType").value,
+    transactionDate: todayFormatted,
+    customerName: document.getElementById("customerName").value,
+    customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
+    customerPhone: document.getElementById("customerPhone").value,
+    duration: parseInt(document.getElementById("duration").value) || 0,
+    startDate: document.getElementById("startDate").value,
+    endDate: document.getElementById("endDate").value,
+    deviceCount: parseInt(document.getElementById("deviceCount").value) || 0,
+    softwareName: document.getElementById("softwareNameHidden").value || document.getElementById("softwareName").value,
+    softwarePackage: document.getElementById("softwarePackageHidden").value || document.getElementById("softwarePackage").value,
+    accountName: document.getElementById("accountNameHidden").value || document.getElementById("accountName").value,
+    revenue: parseFloat(document.getElementById("revenue").value) || 0,
+    note: document.getElementById("note").value,
+    tenNhanVien: userInfo.tenNhanVien,
+    maNhanVien: userInfo.maNhanVien
+  };
+
+  console.log("📤 Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
+
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    if (result.status === "success") {
+      document.getElementById("successMessage").textContent = "Giao dịch đã được lưu!";
+      handleReset();
+      await loadTransactions();
+      updatePackageList();
+    } else {
+      document.getElementById("errorMessage").textContent = result.message || "Không thể lưu giao dịch!";
+    }
+  } catch (err) {
+    document.getElementById("errorMessage").textContent = `Lỗi kết nối server: ${err.message}`;
+    console.error("Lỗi:", err);
+  }
+}
 
 async function handleUpdate() {
   const { BACKEND_URL } = getConstants();
@@ -259,10 +253,8 @@ async function handleUpdate() {
     return;
   }
 
-  // Làm mới transactionList trước khi cập nhật để đảm bảo đồng bộ
   await loadTransactions();
 
-  // Kiểm tra xem giao dịch có tồn tại không
   const transaction = transactionList.find(t => t.transactionId === currentEditTransactionId);
   if (!transaction) {
     alert("Giao dịch không tồn tại hoặc đã bị xóa. Vui lòng thử lại!");
@@ -274,7 +266,7 @@ async function handleUpdate() {
     action: "updateTransaction",
     transactionId: currentEditTransactionId,
     transactionType: document.getElementById("transactionType").value,
-    transactionDate: document.getElementById("transactionDate").value, // Giữ nguyên logic: lấy từ form
+    transactionDate: document.getElementById("transactionDate").value,
     customerName: document.getElementById("customerName").value,
     customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
     customerPhone: document.getElementById("customerPhone").value,
@@ -282,8 +274,9 @@ async function handleUpdate() {
     startDate: document.getElementById("startDate").value,
     endDate: document.getElementById("endDate").value,
     deviceCount: parseInt(document.getElementById("deviceCount").value) || 0,
-    softwareName: document.getElementById("softwareName").value,
-    softwarePackage: document.getElementById("softwarePackage").value,
+    softwareName: document.getElementById("softwareNameHidden").value || document.getElementById("softwareName").value,
+    softwarePackage: document.getElementById("softwarePackageHidden").value || document.getElementById("softwarePackage").value,
+    accountName: document.getElementById("accountNameHidden").value || document.getElementById("accountName").value,
     revenue: parseFloat(document.getElementById("revenue").value) || 0,
     note: document.getElementById("note").value,
     tenNhanVien: userInfo.tenNhanVien,
@@ -328,9 +321,9 @@ async function handleSearch() {
   const startDate = document.getElementById("startDate").value;
   const endDate = document.getElementById("endDate").value;
   const deviceCount = document.getElementById("deviceCount").value;
-  const softwareName = document.getElementById("softwareName").value;
-  const softwarePackage = document.getElementById("softwarePackage").value;
-  const accountName = document.getElementById("accountName").value;
+  const softwareName = document.getElementById("softwareNameHidden").value || document.getElementById("softwareName").value;
+  const softwarePackage = document.getElementById("softwarePackageHidden").value || document.getElementById("softwarePackage").value;
+  const accountName = document.getElementById("accountNameHidden").value || document.getElementById("accountName").value;
   const revenue = document.getElementById("revenue").value;
   const note = document.getElementById("note").value;
   const tenNhanVien = userInfo.tenNhanVien;
@@ -374,7 +367,7 @@ async function handleSearch() {
       transactionList.sort((a, b) => {
         const idA = parseInt(a.transactionId.replace("GD", ""));
         const idB = parseInt(b.transactionId.replace("GD", ""));
-        return idB - idA; // Giảm dần
+        return idB - idA;
       });
       currentPage = 1;
       updateTable();
@@ -687,9 +680,17 @@ function editTransaction(index) {
   const softwarePackageSelect = document.getElementById("softwarePackage");
   const accountNameSelect = document.getElementById("accountName");
 
-  const softwareNameValue = transaction.softwareName;
-  const softwarePackageValue = transaction.softwarePackage;
-  const accountNameValue = transaction.accountName || "";
+  const softwareNameDisplay = document.getElementById("softwareNameDisplay");
+  const softwarePackageDisplay = document.getElementById("softwarePackageDisplay");
+  const accountNameDisplay = document.getElementById("accountNameDisplay");
+
+  const softwareNameHidden = document.getElementById("softwareNameHidden");
+  const softwarePackageHidden = document.getElementById("softwarePackageHidden");
+  const accountNameHidden = document.getElementById("accountNameHidden");
+
+  const softwareNameValue = transaction.softwareName || "-- Chọn phần mềm --";
+  const softwarePackageValue = transaction.softwarePackage || "-- Chọn gói --";
+  const accountNameValue = transaction.accountName || "-- Chọn tài khoản --";
 
   console.log("Dữ liệu giao dịch để sửa:", {
     softwareName: softwareNameValue,
@@ -714,19 +715,50 @@ function editTransaction(index) {
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 
-  // Điền và khôi phục các trường dropdown
-  fetchSoftwareList(softwareNameValue); // Truyền giá trị cần giữ
-  updatePackageList(softwarePackageValue);
-  updateAccountList(accountNameValue);
+  // Hiển thị giá trị ban đầu trong các span và lưu vào trường ẩn
+  softwareNameDisplay.textContent = softwareNameValue;
+  softwarePackageDisplay.textContent = softwarePackageValue;
+  accountNameDisplay.textContent = accountNameValue;
+
+  softwareNameHidden.value = transaction.softwareName || "";
+  softwarePackageHidden.value = transaction.softwarePackage || "";
+  accountNameHidden.value = transaction.accountName || "";
+
+  // Làm mới dropdown nhưng không đặt giá trị từ dropdown
+  fetchSoftwareList();
+  updatePackageList();
+  updateAccountList();
 
   console.log("Giá trị sau khi điền lên form:", {
-    softwareName: softwareNameSelect.value,
-    softwarePackage: softwarePackageSelect.value,
-    accountName: accountNameSelect.value
+    softwareName: softwareNameHidden.value,
+    softwarePackage: softwarePackageHidden.value,
+    accountName: accountNameHidden.value
   });
 
   softwareNameSelect.onchange = softwareNameChangeHandler;
   softwarePackageSelect.onchange = softwarePackageChangeHandler;
+
+  // Thêm sự kiện change để cập nhật giá trị hiển thị và trường ẩn khi người dùng thay đổi
+  softwareNameSelect.addEventListener("change", function() {
+    softwareNameDisplay.textContent = this.value || "-- Chọn phần mềm --";
+    softwareNameHidden.value = this.value;
+    softwarePackageDisplay.textContent = "-- Chọn gói --";
+    softwarePackageHidden.value = "";
+    accountNameDisplay.textContent = "-- Chọn tài khoản --";
+    accountNameHidden.value = "";
+  });
+
+  softwarePackageSelect.addEventListener("change", function() {
+    softwarePackageDisplay.textContent = this.value || "-- Chọn gói --";
+    softwarePackageHidden.value = this.value;
+    accountNameDisplay.textContent = "-- Chọn tài khoản --";
+    accountNameHidden.value = "";
+  });
+
+  accountNameSelect.addEventListener("change", function() {
+    accountNameDisplay.textContent = this.value || "-- Chọn tài khoản --";
+    accountNameHidden.value = this.value;
+  });
 }
 
 // Hàm định dạng ngày từ yyyy-mm-dd sang yyyy/mm/dd để hiển thị trên form
@@ -744,14 +776,11 @@ function parseInputDate(inputDate) {
 }
 
 // Hàm lấy danh sách phần mềm từ Google Apps Script
-async function fetchSoftwareList(softwareNameToKeep) {
+async function fetchSoftwareList() {
   const { BACKEND_URL } = getConstants();
   const data = {
     action: "getSoftwareList"
   };
-
-  const currentSoftwareName = softwareNameToKeep || document.getElementById("softwareName").value;
-  const currentSoftwarePackage = document.getElementById("softwarePackage").value;
 
   try {
     const response = await fetch(BACKEND_URL, {
@@ -767,14 +796,6 @@ async function fetchSoftwareList(softwareNameToKeep) {
       softwareData = result.data;
 
       const softwareNames = [...new Set(softwareData.map(item => item.softwareName))];
-      
-      // Nếu giá trị cần giữ không có trong danh sách, thêm nó vào
-      if (currentSoftwareName && !softwareNames.includes(currentSoftwareName)) {
-        softwareNames.push(currentSoftwareName);
-      }
-
-      console.log("Danh sách tên phần mềm trong dropdown:", softwareNames);
-
       const softwareNameSelect = document.getElementById("softwareName");
       softwareNameSelect.innerHTML = '<option value="">-- Chọn phần mềm --</option>';
       softwareNames.forEach(name => {
@@ -784,15 +805,7 @@ async function fetchSoftwareList(softwareNameToKeep) {
         softwareNameSelect.appendChild(option);
       });
 
-      if (currentSoftwareName) {
-        softwareNameSelect.value = currentSoftwareName;
-      }
-
-      updatePackageList(currentSoftwarePackage);
-
-      if (currentSoftwarePackage) {
-        document.getElementById("softwarePackage").value = currentSoftwarePackage;
-      }
+      updatePackageList();
     } else {
       console.error("Lỗi khi lấy danh sách phần mềm:", result.message);
     }
@@ -817,8 +830,6 @@ function populateSoftwareList() {
 function updatePackageList() {
   const softwareName = document.getElementById("softwareName").value;
   const softwarePackageSelect = document.getElementById("softwarePackage");
-  
-  const currentSoftwarePackage = softwarePackageSelect.value;
 
   softwarePackageSelect.innerHTML = '<option value="">-- Chọn gói --</option>';
 
@@ -828,24 +839,12 @@ function updatePackageList() {
       .map(item => item.softwarePackage)
     )];
 
-    // Nếu giá trị hiện tại của Gói phần mềm không có trong danh sách, thêm nó vào
-    if (currentSoftwarePackage && !packages.includes(currentSoftwarePackage)) {
-      packages.push(currentSoftwarePackage);
-    }
-
-    console.log("Danh sách gói phần mềm trong dropdown:", packages); // Log để debug
-
     packages.forEach(pkg => {
       const option = document.createElement("option");
       option.value = pkg;
       option.textContent = pkg;
       softwarePackageSelect.appendChild(option);
     });
-
-    // Khôi phục giá trị hiện tại (nếu có)
-    if (currentSoftwarePackage && packages.includes(currentSoftwarePackage)) {
-      softwarePackageSelect.value = currentSoftwarePackage;
-    }
   }
 
   updateAccountList();
