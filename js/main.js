@@ -390,6 +390,12 @@ async function handleUpdate() {
 }
 
 async function handleSearch() {
+
+  if (!userInfo || !userInfo.vaiTro) {
+    showResultModal("Thông tin vai trò không hợp lệ. Vui lòng đăng nhập lại.", false);
+    return;
+  }
+  
   showProcessingModal("Đang tìm kiếm giao dịch...");
   const { BACKEND_URL } = getConstants();
   const conditions = {};
