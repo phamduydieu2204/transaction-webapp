@@ -414,8 +414,6 @@ async function handleSearch() {
   const accountName = document.getElementById("accountName").value;
   const revenue = document.getElementById("revenue").value;
   const note = document.getElementById("note").value;
-  const tenNhanVien = userInfo.tenNhanVien;
-  const maNhanVien = userInfo.maNhanVien;
 
   if (transactionType && transactionType !== "") conditions.transactionType = transactionType;
   if (transactionDate && transactionDate !== "yyyy/mm/dd") conditions.transactionDate = transactionDate;
@@ -431,8 +429,6 @@ async function handleSearch() {
   if (accountName && accountName !== "") conditions.accountName = accountName;
   if (revenue && revenue !== "0") conditions.revenue = revenue;
   if (note) conditions.note = note;
-  if (tenNhanVien) conditions.tenNhanVien = tenNhanVien;
-  if (maNhanVien) conditions.maNhanVien = maNhanVien;
 
   const data = {
     action: "searchTransactions",
