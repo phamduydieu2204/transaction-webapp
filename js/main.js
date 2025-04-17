@@ -390,7 +390,6 @@ async function handleUpdate() {
 }
 
 async function handleSearch() {
-
   if (!userInfo || !userInfo.vaiTro) {
     showResultModal("Thông tin vai trò không hợp lệ. Vui lòng đăng nhập lại.", false);
     return;
@@ -414,7 +413,6 @@ async function handleSearch() {
   const accountName = document.getElementById("accountName").value;
   const revenue = document.getElementById("revenue").value;
   const note = document.getElementById("note").value;
-  const tenNhanVien = userInfo.tenNhanVien;
   const maNhanVien = userInfo.maNhanVien;
 
   if (transactionType && transactionType !== "") conditions.transactionType = transactionType;
@@ -431,7 +429,6 @@ async function handleSearch() {
   if (accountName && accountName !== "") conditions.accountName = accountName;
   if (revenue && revenue !== "0") conditions.revenue = revenue;
   if (note) conditions.note = note;
-  if (tenNhanVien) conditions.tenNhanVien = tenNhanVien;
   if (maNhanVien) conditions.maNhanVien = maNhanVien;
 
   const data = {
@@ -471,6 +468,7 @@ async function handleSearch() {
     console.error("Lỗi khi tìm kiếm giao dịch", err);
   }
 }
+
 
 async function loadTransactions() {
   if (!userInfo) {
