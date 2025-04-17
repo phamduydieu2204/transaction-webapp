@@ -390,12 +390,12 @@ async function handleUpdate() {
 }
 
 async function handleSearch() {
-  console.log("DEBUG: userInfo khi tìm kiếm:", JSON.stringify(userInfo, null, 2));
+
   if (!userInfo || !userInfo.vaiTro) {
     showResultModal("Thông tin vai trò không hợp lệ. Vui lòng đăng nhập lại.", false);
     return;
   }
-
+  
   showProcessingModal("Đang tìm kiếm giao dịch...");
   const { BACKEND_URL } = getConstants();
   const conditions = {};
@@ -414,6 +414,8 @@ async function handleSearch() {
   const accountName = document.getElementById("accountName").value;
   const revenue = document.getElementById("revenue").value;
   const note = document.getElementById("note").value;
+  const tenNhanVien = userInfo.tenNhanVien;
+  const maNhanVien = userInfo.maNhanVien;
 
   if (transactionType && transactionType !== "") conditions.transactionType = transactionType;
   if (transactionDate && transactionDate !== "yyyy/mm/dd") conditions.transactionDate = transactionDate;
@@ -429,15 +431,17 @@ async function handleSearch() {
   if (accountName && accountName !== "") conditions.accountName = accountName;
   if (revenue && revenue !== "0") conditions.revenue = revenue;
   if (note) conditions.note = note;
+  if (tenNhanVien) conditions.tenNhanVien = tenNhanVien;
+  if (maNhanVien) conditions.maNhanVien = maNhanVien;
 
   const data = {
     action: "searchTransactions",
     maNhanVien: userInfo.maNhanVien,
-    vaiTro: userInfo.vaiTro.toLowerCase(),
+    vaiTro: userInfo.vaiTro ? userInfo.vaiTro.toLowerCase() : "",
     conditions: conditions
   };
 
-  console.log("DEBUG: Dữ liệu tìm kiếm gửi đi:", JSON.stringify(data, null, 2));
+  console.log("📤 Dữ liệu tìm kiếm gửi đi:", JSON.stringify(data, null, 2));
 
   try {
     const response = await fetch(BACKEND_URL, {
@@ -449,7 +453,6 @@ async function handleSearch() {
     });
 
     const result = await response.json();
-    console.log("DEBUG: Kết quả tìm kiếm từ backend:", JSON.stringify(result, null, 2));
     if (result.status === "success") {
       transactionList = result.data;
       transactionList.sort((a, b) => {
