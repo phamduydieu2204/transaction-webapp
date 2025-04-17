@@ -269,9 +269,17 @@ async function handleAdd() {
   const today = new Date();
   const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
 
+  const transactionType = document.getElementById("transactionType").value;
+  let note = document.getElementById("note").value;
+
+  // Nếu là Hoàn Tiền và có currentEditTransactionId, thêm ghi chú liên quan
+  if (transactionType === "Hoàn Tiền" && currentEditTransactionId) {
+    note = note ? `${note}\nHoàn tiền cho đơn hàng có mã giao dịch ${currentEditTransactionId}` : `Hoàn tiền cho đơn hàng có mã giao dịch ${currentEditTransactionId}`;
+  }
+
   const data = {
     action: "addTransaction",
-    transactionType: document.getElementById("transactionType").value,
+    transactionType: transactionType,
     transactionDate: todayFormatted,
     customerName: document.getElementById("customerName").value,
     customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
@@ -284,9 +292,10 @@ async function handleAdd() {
     softwarePackage: document.getElementById("softwarePackage").value,
     accountName: document.getElementById("accountName").value,
     revenue: parseFloat(document.getElementById("revenue").value) || 0,
-    note: document.getElementById("note").value,
+    note: note,
     tenNhanVien: userInfo.tenNhanVien,
-    maNhanVien: userInfo.maNhanVien
+    maNhanVien: userInfo.maNhanVien,
+    originalTransactionId: transactionType === "Hoàn Tiền" ? currentEditTransactionId : null // Gửi mã giao dịch gốc nếu là Hoàn Tiền
   };
 
   console.log("📤 Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
