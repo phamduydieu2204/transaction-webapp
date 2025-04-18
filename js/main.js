@@ -579,7 +579,7 @@ function updateTable() {
     editButton.addEventListener("click", () => editTransaction(startIndex + index));
 
     const deleteButton = row.querySelector(".delete-btn");
-    deleteButton.addEventListener("click", () => (startIndex + index));
+    deleteButton.addEventListener("click", () => deleteTransaction(startIndex + index));
 
     tableBody.appendChild(row);
   });
