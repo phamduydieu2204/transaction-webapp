@@ -474,3 +474,27 @@ body.login-page {
     font-size: 16px;
     margin: 0;
   }
+
+/* Định dạng cho modal xác nhận xóa */
+.modal .modal-content button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  margin: 10px 5px;
+}
+
+.modal .modal-content button:hover {
+  opacity: 0.9;
+}
+
+.modal .modal-content p {
+  font-size: 16px;
+  margin: 20px 0;
+}
+
+.modal .modal-content strong {
+  color: #007bff;
+}
