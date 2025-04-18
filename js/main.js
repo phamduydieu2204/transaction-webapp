@@ -579,7 +579,7 @@ function updateTable() {
     editButton.addEventListener("click", () => editTransaction(startIndex + index));
 
     const deleteButton = row.querySelector(".delete-btn");
-    deleteButton.addEventListener("click", () => deleteTransaction(startIndex + index));
+    deleteButton.addEventListener("click", () => (startIndex + index));
 
     tableBody.appendChild(row);
   });
@@ -808,54 +808,80 @@ function editTransaction(index) {
 }
 
 // Xóa giao dịch
+// Trong main.js, thay thế hàm deleteTransaction bằng đoạn code sau:
 async function deleteTransaction(index) {
-  // Lấy giao dịch tại chỉ số index từ transactionList
   const transaction = transactionList[index];
   if (!transaction) {
     showResultModal("Giao dịch không tồn tại. Vui lòng thử lại.", false);
     return;
   }
 
-  // Hiển thị modal xác nhận trước khi xóa
-  if (!confirm("Bạn có chắc muốn xóa giao dịch này?")) return;
+  // Hiển thị modal xác nhận với tùy chọn hủy chia sẻ
+  const modal = document.createElement("div");
+  modal.className = "modal";
+  modal.innerHTML = `
+    <div class="modal-content">
+      <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+      <h2>Xác nhận xóa</h2>
+      <p>Bạn có muốn hủy chia sẻ tệp với email <strong>${transaction.customerEmail}</strong> không?</p>
+      <div style="display: flex; justify-content: center; gap: 10px;">
+        <button id="confirmRemoveViewer" style="background-color: #dc3545;">Có</button>
+        <button id="confirmNoRemoveViewer" style="background-color: #007bff;">Không</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  modal.style.display = "block";
 
-  // Hiển thị modal xử lý
-  showProcessingModal("Đang xóa giao dịch...");
+  // Hàm xử lý xóa giao dịch
+  const handleDelete = async (removeViewer) => {
+    showProcessingModal("Đang xóa giao dịch...");
+    const { BACKEND_URL } = getConstants();
+    const data = {
+      action: "deleteTransaction",
+      transactionId: transaction.transactionId,
+      maNhanVien: userInfo.maNhanVien,
+      vaiTro: userInfo.vaiTro ? userInfo.vaiTro.toLowerCase() : "",
+      removeViewer: removeViewer, // Thêm tham số này
+      customerEmail: transaction.customerEmail, // Gửi email khách hàng
+      accountSheetId: transaction.accountSheetId // Gửi ID sheet
+    };
 
-  const { BACKEND_URL } = getConstants();
-  const data = {
-    action: "deleteTransaction",
-    transactionId: transaction.transactionId, // Gửi transactionId của giao dịch
-    maNhanVien: userInfo.maNhanVien, // Gửi mã nhân viên của người dùng
-    vaiTro: userInfo.vaiTro ? userInfo.vaiTro.toLowerCase() : "" // Gửi vai trò của người dùng
+    try {
+      const response = await fetch(BACKEND_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+      if (result.status === "success") {
+        showResultModal("Giao dịch đã được xóa!" + (removeViewer ? " Quyền truy cập tệp đã được hủy." : ""), true);
+        await loadTransactions();
+        handleReset();
+      } else {
+        showResultModal(result.message || "Không thể xóa giao dịch!", false);
+      }
+    } catch (err) {
+      showResultModal(`Lỗi kết nối server: ${err.message}`, false);
+      console.error("Lỗi khi xóa giao dịch:", err);
+    }
+
+    modal.remove(); // Đóng modal xác nhận
   };
 
-  try {
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
-    });
+  // Gắn sự kiện cho các nút trong modal
+  document.getElementById("confirmRemoveViewer").addEventListener("click", () => handleDelete(true));
+  document.getElementById("confirmNoRemoveViewer").addEventListener("click", () => handleDelete(false));
 
-    const result = await response.json();
-    if (result.status === "success") {
-      // Hiển thị thông báo thành công
-      showResultModal("Giao dịch đã được xóa!", true);
-      // Cập nhật danh sách giao dịch
-      await loadTransactions();
-      // Reset form và trạng thái chỉnh sửa
-      handleReset();
-    } else {
-      // Hiển thị thông báo lỗi
-      showResultModal(result.message || "Không thể xóa giao dịch!", false);
+  // Đóng modal khi nhấp ra ngoài
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) {
+      modal.remove();
     }
-  } catch (err) {
-    // Hiển thị thông báo lỗi nếu có vấn đề kết nối
-    showResultModal(`Lỗi kết nối server: ${err.message}`, false);
-    console.error("Lỗi khi xóa giao dịch:", err);
-  }
+  });
 }
 
 // Tải danh sách phần mềm
