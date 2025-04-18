@@ -579,7 +579,7 @@ function updateTable() {
     editButton.addEventListener("click", () => editTransaction(startIndex + index));
 
     const deleteButton = row.querySelector(".delete-btn");
-    deleteButton.addEventListener("click", () => deleteTransaction(startIndex + index));
+    deleteButton.addEventListener("click", () => (startIndex + index));
 
     tableBody.appendChild(row);
   });
@@ -808,16 +808,22 @@ function editTransaction(index) {
 }
 
 // Xóa giao dịch
+// Xóa giao dịch
 async function deleteTransaction(index) {
-  // Lấy giao dịch tại chỉ số index từ transactionList
   const transaction = transactionList[index];
   if (!transaction) {
     showResultModal("Giao dịch không tồn tại. Vui lòng thử lại.", false);
     return;
   }
 
-  // Hiển thị modal xác nhận trước khi xóa
-  if (!confirm("Bạn có chắc muốn xóa giao dịch này?")) return;
+  // Hiển thị bảng xác nhận với tùy chọn hủy chia sẻ
+  const confirmMessage = transaction.accountSheetId && transaction.customerEmail
+    ? `Bạn có muốn xóa giao dịch ${transaction.transactionId} và đồng thời hủy chia sẻ tệp với email ${transaction.customerEmail}?`
+    : `Bạn có chắc muốn xóa giao dịch ${transaction.transactionId}?`;
+
+  const shouldRemoveSharing = transaction.accountSheetId && transaction.customerEmail
+    ? confirm(confirmMessage + "\nNhấn OK để hủy chia sẻ, Cancel để chỉ xóa giao dịch.")
+    : false;
 
   // Hiển thị modal xử lý
   showProcessingModal("Đang xóa giao dịch...");
@@ -825,9 +831,12 @@ async function deleteTransaction(index) {
   const { BACKEND_URL } = getConstants();
   const data = {
     action: "deleteTransaction",
-    transactionId: transaction.transactionId, // Gửi transactionId của giao dịch
-    maNhanVien: userInfo.maNhanVien, // Gửi mã nhân viên của người dùng
-    vaiTro: userInfo.vaiTro ? userInfo.vaiTro.toLowerCase() : "" // Gửi vai trò của người dùng
+    transactionId: transaction.transactionId,
+    maNhanVien: userInfo.maNhanVien,
+    vaiTro: userInfo.vaiTro ? userInfo.vaiTro.toLowerCase() : "",
+    removeSharing: shouldRemoveSharing, // Gửi lựa chọn hủy chia sẻ
+    customerEmail: shouldRemoveSharing ? transaction.customerEmail : null, // Gửi email nếu cần hủy chia sẻ
+    accountSheetId: shouldRemoveSharing ? transaction.accountSheetId : null // Gửi ID sheet nếu cần hủy chia sẻ
   };
 
   try {
@@ -841,18 +850,15 @@ async function deleteTransaction(index) {
 
     const result = await response.json();
     if (result.status === "success") {
-      // Hiển thị thông báo thành công
-      showResultModal("Giao dịch đã được xóa!", true);
-      // Cập nhật danh sách giao dịch
+      showResultModal(shouldRemoveSharing
+        ? "Giao dịch đã được xóa và quyền chia sẻ đã được hủy!"
+        : "Giao dịch đã được xóa!", true);
       await loadTransactions();
-      // Reset form và trạng thái chỉnh sửa
       handleReset();
     } else {
-      // Hiển thị thông báo lỗi
       showResultModal(result.message || "Không thể xóa giao dịch!", false);
     }
   } catch (err) {
-    // Hiển thị thông báo lỗi nếu có vấn đề kết nối
     showResultModal(`Lỗi kết nối server: ${err.message}`, false);
     console.error("Lỗi khi xóa giao dịch:", err);
   }
