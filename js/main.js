@@ -7,6 +7,7 @@ let todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padS
 let currentPage = 1;
 const itemsPerPage = 10;
 let softwareData = [];
+let confirmCallback = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   // Lấy thông tin người dùng từ localStorage
@@ -1006,4 +1007,112 @@ function formatDateTime(isoDate) {
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
   return `${day}/${month}/${year} ${hours}:${minutes}`;
+}
+
+// Mở modal xác nhận
+function openConfirmModal(message, callback) {
+  console.log("Mở modal xác nhận:", message);
+  const modal = document.getElementById("confirmDeleteModal");
+  const messageEl = document.getElementById("confirmMessage");
+  messageEl.textContent = message;
+  confirmCallback = callback;
+  modal.style.display = "block";
+}
+
+// Đóng modal xác nhận
+function closeConfirmModal() {
+  console.log("Đóng modal xác nhận");
+  const modal = document.getElementById("confirmDeleteModal");
+  modal.style.display = "none";
+  confirmCallback = null;
+}
+
+// Xử lý xác nhận
+function confirmDelete(result) {
+  console.log("Kết quả xác nhận:", result);
+  if (confirmCallback) {
+    confirmCallback(result);
+  }
+  closeConfirmModal();
+}
+
+// Hàm deleteTransaction
+async function deleteTransaction(index) {
+  console.log("deleteTransaction được gọi, index:", index);
+  const transaction = transactionList[index];
+  console.log("Transaction chi tiết:", JSON.stringify(transaction, null, 2));
+  if (!transaction) {
+    console.error("Giao dịch không tồn tại, index:", index);
+    showResultModal("Giao dịch không tồn tại. Vui lòng thử lại.", false);
+    return;
+  }
+
+  console.log("accountSheetId:", transaction.accountSheetId);
+  console.log("customerEmail:", transaction.customerEmail);
+
+  let confirmMessage = `Bạn có chắc muốn xóa giao dịch ${transaction.transactionId}?`;
+  let shouldRemoveSharing = false;
+
+  // Dùng Promise để chờ kết quả từ modal
+  const getConfirmation = (message) => {
+    return new Promise((resolve) => {
+      openConfirmModal(message, resolve);
+    });
+  };
+
+  if (transaction.accountSheetId && transaction.customerEmail) {
+    confirmMessage = `Bạn có muốn xóa giao dịch ${transaction.transactionId} và đồng thời hủy chia sẻ tệp với email ${transaction.customerEmail}? Nhấn OK để hủy chia sẻ, Cancel để chỉ xóa giao dịch.`;
+    console.log("Hiển thị modal hủy chia sẻ:", confirmMessage);
+    shouldRemoveSharing = await getConfirmation(confirmMessage);
+  } else {
+    console.log("Hiển thị modal xóa cơ bản:", confirmMessage);
+    const confirmDelete = await getConfirmation(confirmMessage);
+    if (!confirmDelete) {
+      console.log("Người dùng hủy xóa giao dịch");
+      return;
+    }
+  }
+
+  console.log("shouldRemoveSharing sau xác nhận:", shouldRemoveSharing);
+
+  showProcessingModal("Đang xóa giao dịch...");
+
+  const { BACKEND_URL } = getConstants();
+  const data = {
+    action: "deleteTransaction",
+    transactionId: transaction.transactionId,
+    maNhanVien: userInfo.maNhanVien,
+    vaiTro: userInfo.vaiTro ? userInfo.vaiTro.toLowerCase() : "",
+    removeSharing: shouldRemoveSharing,
+    customerEmail: shouldRemoveSharing ? transaction.customerEmail : null,
+    accountSheetId: shouldRemoveSharing ? transaction.accountSheetId : null
+  };
+
+  console.log("Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
+
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    console.log("Kết quả từ server:", result);
+    if (result.status === "success") {
+      showResultModal(shouldRemoveSharing
+        ? "Giao dịch đã được xóa và quyền chia sẻ đã được hủy!"
+        : "Giao dịch đã được xóa!", true);
+      await loadTransactions();
+      handleReset();
+    } else {
+      console.error("Lỗi từ server:", result.message);
+      showResultModal(result.message || "Không thể xóa giao dịch!", false);
+    }
+  } catch (err) {
+    console.error("Lỗi trong deleteTransaction:", err);
+    showResultModal(`Lỗi kết nối server: ${err.message}`, false);
+  }
 }
