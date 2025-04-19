@@ -475,13 +475,14 @@ body.login-page {
     margin: 0;
   }
 
-#confirmDeleteModal .modal-content {
-  max-width: 400px;
-  padding: 20px;
-  text-align: center;
-}
+  /* CSS cho modal xác nhận xóa - Giữ nguyên vì đã phù hợp với yêu cầu */
+  #confirmDeleteModal .modal-content {
+    max-width: 400px;
+    padding: 20px;
+    text-align: center;
+  }
 
-#confirmDeleteModal button {
-  margin: 0 10px;
-  padding: 8px 16px;
-}
+  #confirmDeleteModal button {
+    margin: 0 10px;
+    padding: 8px 16px;
+  }
