@@ -10,6 +10,7 @@ function editTransaction(index) {
   const softwarePackageValue = transaction.softwarePackage || "";
   const accountNameValue = transaction.accountName || "";
 
+  // Điền các trường input
   document.getElementById("transactionDate").value = transaction.transactionDate;
   document.getElementById("transactionType").value = transaction.transactionType;
   document.getElementById("customerName").value = transaction.customerName;
@@ -22,14 +23,28 @@ function editTransaction(index) {
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 
-  fetchSoftwareList(softwareNameValue);
-  softwareNameSelect.value = softwareNameValue;
+  // Tạm thời vô hiệu hóa sự kiện change để tránh cập nhật không mong muốn
+  const softwareNameChangeHandler = softwareNameSelect.onchange;
+  const softwarePackageChangeHandler = softwarePackageSelect.onchange;
+  softwareNameSelect.onchange = null;
+  softwarePackageSelect.onchange = null;
 
-  updatePackageList(softwarePackageValue);
-  softwarePackageSelect.value = softwarePackageValue;
+  // Tải danh sách phần mềm và chờ hoàn tất
+  fetchSoftwareList(softwareNameValue).then(() => {
+    softwareNameSelect.value = softwareNameValue;
 
-  updateAccountList(accountNameValue);
-  accountNameSelect.value = accountNameValue;
+    // Cập nhật danh sách gói phần mềm
+    updatePackageList(softwarePackageValue);
+    softwarePackageSelect.value = softwarePackageValue;
+
+    // Cập nhật danh sách tài khoản
+    updateAccountList(accountNameValue);
+    accountNameSelect.value = accountNameValue;
+
+    // Khôi phục sự kiện change
+    softwareNameSelect.onchange = softwareNameChangeHandler;
+    softwarePackageSelect.onchange = softwarePackageChangeHandler;
+  });
 }
 
 // Hàm chỉnh sửa dòng (hỗ trợ tương thích cũ)
