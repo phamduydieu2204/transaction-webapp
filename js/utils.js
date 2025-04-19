@@ -288,23 +288,23 @@ function updateTable() {
 
 // Tải danh sách phần mềm
 async function fetchSoftwareList(softwareNameToKeep) {
+  console.log("fetchSoftwareList called with softwareNameToKeep:", softwareNameToKeep);
   const { BACKEND_URL } = getConstants();
-  const data = {
-    action: "getSoftwareList"
-  };
+  const data = { action: "getSoftwareList" };
 
   try {
     const response = await fetch(BACKEND_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
     });
 
     const result = await response.json();
+    console.log("fetchSoftwareList response:", result);
+
     if (result.status === "success") {
       softwareData = result.data;
+      console.log("softwareData:", softwareData);
 
       const softwareNames = [...new Set(softwareData.map(item => item.softwareName))];
       const softwareNameSelect = document.getElementById("softwareName");
@@ -327,7 +327,13 @@ async function fetchSoftwareList(softwareNameToKeep) {
       }
 
       softwareNameSelect.value = softwareNameToKeep || "";
-      updatePackageList(softwareNameToKeep ? softwareData.find(item => item.softwareName === softwareNameToKeep)?.softwarePackage : "");
+      console.log("fetchSoftwareList set softwareNameSelect.value:", softwareNameSelect.value);
+      console.log("fetchSoftwareList options:", softwareNameSelect.innerHTML);
+
+      // Truyền softwarePackageToKeep từ giao dịch
+      const softwarePackageToKeep = softwareNameToKeep ? softwareData.find(item => item.softwareName === softwareNameToKeep)?.softwarePackage : "";
+      console.log("Calling updatePackageList with softwarePackageToKeep:", softwarePackageToKeep);
+      updatePackageList(softwarePackageToKeep);
     } else {
       console.error("Lỗi khi lấy danh sách phần mềm:", result.message);
     }
@@ -338,6 +344,7 @@ async function fetchSoftwareList(softwareNameToKeep) {
 
 // Cập nhật danh sách gói phần mềm
 function updatePackageList(softwarePackageToKeep) {
+  console.log("updatePackageList called with softwarePackageToKeep:", softwarePackageToKeep);
   const softwareName = document.getElementById("softwareName").value;
   const softwarePackageSelect = document.getElementById("softwarePackage");
 
@@ -348,6 +355,8 @@ function updatePackageList(softwarePackageToKeep) {
       .map(item => item.softwareName === softwareName ? item.softwarePackage : null)
       .filter(item => item !== null)
     )];
+
+    console.log("allPackages for softwareName", softwareName, ":", allPackages);
 
     const availablePackages = [...new Set(softwareData
       .filter(item => item.softwareName === softwareName)
@@ -380,11 +389,18 @@ function updatePackageList(softwarePackageToKeep) {
     }
 
     softwarePackageSelect.value = softwarePackageToKeep || "";
-    updateAccountList(softwarePackageToKeep ? softwareData.find(item => item.softwareName === softwareName && item.softwarePackage === softwarePackageToKeep)?.accountName : "");
+    console.log("updatePackageList set softwarePackageSelect.value:", softwarePackageSelect.value);
+    console.log("updatePackageList options:", softwarePackageSelect.innerHTML);
+
+    // Truyền accountNameToKeep từ giao dịch
+    const accountNameToKeep = softwarePackageToKeep ? softwareData.find(item => item.softwareName === softwareName && item.softwarePackage === softwarePackageToKeep)?.accountName : "";
+    console.log("Calling updateAccountList with accountNameToKeep:", accountNameToKeep);
+    updateAccountList(accountNameToKeep);
 }
 
 // Cập nhật danh sách tài khoản dựa trên phần mềm và gói phần mềm
 function updateAccountList(accountNameToKeep) {
+  console.log("updateAccountList called with accountNameToKeep:", accountNameToKeep);
   const softwareName = document.getElementById("softwareName").value;
   const softwarePackage = document.getElementById("softwarePackage").value;
   const accountNameSelect = document.getElementById("accountName");
@@ -393,19 +409,14 @@ function updateAccountList(accountNameToKeep) {
 
   if (softwareName && softwarePackage) {
     const allAccounts = [...new Set(softwareData
-      .filter(item =>
-        item.softwareName === softwareName &&
-        item.softwarePackage === softwarePackage
-      )
+      .filter(item => item.softwareName === softwareName && item.softwarePackage === softwarePackage)
       .map(item => item.accountName)
     )];
 
+    console.log("allAccounts for softwareName", softwareName, "and softwarePackage", softwarePackage, ":", allAccounts);
+
     const availableAccounts = [...new Set(softwareData
-      .filter(item =>
-        item.softwareName === softwareName &&
-        item.softwarePackage === softwarePackage &&
-        item.activeUsers < item.allowedUsers
-      )
+      .filter(item => item.softwareName === softwareName && item.softwarePackage === softwarePackage && item.activeUsers < item.allowedUsers)
       .map(item => item.accountName)
     )];
 
@@ -435,5 +446,6 @@ function updateAccountList(accountNameToKeep) {
     }
 
     accountNameSelect.value = accountNameToKeep || "";
-  }
+    console.log("updateAccountList set accountNameSelect.value:", accountNameSelect.value);
+    console.log("updateAccountList options:", accountNameSelect.innerHTML);
 }
