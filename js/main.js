@@ -11,7 +11,7 @@ let confirmCallback = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   // Lấy thông tin người dùng từ localStorage
-  const userData = localStorage.getItem("employeeInfo");
+  const userData = sessionStorage.getItem("employeeInfo");
   try {
     userInfo = userData ? JSON.parse(userData) : null;
   } catch (e) {
