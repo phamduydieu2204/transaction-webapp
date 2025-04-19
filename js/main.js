@@ -869,6 +869,103 @@ function confirmDelete(result) {
   if (confirmCallback) confirmCallback(result);
   closeConfirmModal();
 }
+// Xuất các hàm để kiểm thử (đã loại bỏ để tương thích trình duyệt)
+// Thay vào đó, gắn các hàm vào window để kiểm thử nếu cần
+window.testUtils = {
+  updateTable,
+  validateTransactionData,
+  populateSelect,
+  refreshTransactionList,
+  handleAdd,
+  handleDelete,
+  checkServerHealth
+};
 
-// Xuất các hàm để kiểm thử
-export { updateTable, validateTransactionData, populateSelect };
+// Hàm hỗ trợ kiểm tra kết nối server
+async function checkServerHealth() {
+  const { BACKEND_URL } = getConstants();
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "ping" })
+    });
+    const result = await response.json();
+    return result.status === "success";
+  } catch (err) {
+    console.error("Lỗi kiểm tra server:", err);
+    return false;
+  }
+}
+
+// Hàm kiểm tra phiên người dùng
+function checkUserSession() {
+  if (!userInfo) {
+    showResultModal("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.", false);
+    setTimeout(() => window.location.href = "index.html", 2000);
+    return false;
+  }
+  return true;
+}
+
+// Hàm định dạng ngày giờ
+function formatDateTime(isoDate) {
+  if (!isoDate) return "";
+  const date = new Date(isoDate);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
+}
+
+// Hàm hỗ trợ tương thích cũ
+window.editRow = function(index) {
+  editTransaction(index);
+};
+
+window.deleteRow = function(index) {
+  deleteTransaction(index);
+};
+
+// Hàm xử lý lỗi mạng
+function handleNetworkError(err) {
+  showResultModal("Lỗi kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.", false);
+  console.error("Lỗi mạng:", err);
+}
+
+// Hàm retry cho các yêu cầu API
+async function retryFetch(url, options, retries = 3, delay = 1000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url, options);
+      return await response.json();
+    } catch (err) {
+      if (i < retries - 1) {
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+
+// Hàm khởi tạo lại giao diện
+async function resetUI() {
+  await handleReset();
+  await refreshTransactionList();
+  updateTable();
+}
+
+// Hàm debug để ghi log chi tiết
+function debugLog(message, data) {
+  console.log(`[DEBUG] ${message}`, JSON.stringify(data, null, 2));
+}
+
+// Gắn sự kiện kiểm tra kết nối định kỳ
+setInterval(async () => {
+  if (!(await checkServerHealth())) {
+    showResultModal("Mất kết nối với server. Vui lòng kiểm tra lại.", false);
+  }
+}, 60000); // Kiểm tra mỗi 60 giây
