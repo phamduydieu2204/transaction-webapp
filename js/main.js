@@ -22,6 +22,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const durationInput = document.getElementById("duration");
   const transactionDateInput = document.getElementById("transactionDate");
 
+  // Định nghĩa todayFormatted trong trường hợp utils.js chưa tải
+  const today = new Date();
+  const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
+
   startDateInput.value = todayFormatted;
   transactionDateInput.value = todayFormatted;
 
