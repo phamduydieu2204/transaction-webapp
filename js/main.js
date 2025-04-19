@@ -1,3 +1,7 @@
+/**
+ * Quản lý giao dịch trên giao diện người dùng
+ * Tải danh sách giao dịch, thêm, sửa, xóa, tìm kiếm giao dịch, và hiển thị chi tiết
+ */
 let userInfo = null;
 let currentEditIndex = -1;
 let currentEditTransactionId = null;
@@ -56,14 +60,16 @@ document.addEventListener("DOMContentLoaded", () => {
   durationInput.addEventListener("input", calculateEndDate);
 
   // Tải danh sách phần mềm và giao dịch
-  fetchSoftwareList(null);
-  document.getElementById("softwareName").addEventListener("change", updatePackageList);
-  document.getElementById("softwarePackage").addEventListener("change", updateAccountList);
+  fetchSoftwareList(null).then(() => {
+    loadTransactions();
+  });
 
-  loadTransactions();
+  // Gắn sự kiện cho select phần mềm và gói
+  document.getElementById("softwareName").addEventListener("change", () => updatePackageList());
+  document.getElementById("softwarePackage").addEventListener("change", () => updateAccountList());
 });
 
-// Đăng xuất, xóa sessionStorage và chuyển hướng
+// Đăng xuất
 function logout() {
   sessionStorage.removeItem("employeeInfo");
   window.location.href = "index.html";
@@ -89,7 +95,24 @@ function populateSelect(element, items, defaultOption, selectedValue, unavailabl
   element.value = selectedValue || "";
 }
 
-// Cập nhật danh sách tài khoản dựa trên phần mềm và gói
+// Cập nhật danh sách gói phần mềm
+function updatePackageList(softwarePackageToKeep) {
+  const softwareName = document.getElementById("softwareName").value;
+  const softwarePackageSelect = document.getElementById("softwarePackage");
+
+  if (softwareName) {
+    const allPackages = [...new Set(softwareData
+      .filter(item => item.softwareName === softwareName)
+      .map(item => item.softwarePackage)
+    )];
+    populateSelect(softwarePackageSelect, allPackages, "-- Chọn gói --", softwarePackageToKeep);
+  } else {
+    softwarePackageSelect.innerHTML = '<option value="">-- Chọn gói --</option>';
+  }
+  updateAccountList();
+}
+
+// Cập nhật danh sách tài khoản
 function updateAccountList(accountNameToKeep) {
   const softwareName = document.getElementById("softwareName").value;
   const softwarePackage = document.getElementById("softwarePackage").value;
@@ -164,7 +187,7 @@ function showProcessingModal(message = "Hệ thống đang thực thi...") {
   });
 }
 
-// Hiển thị kết quả và tự động đóng modal
+// Hiển thị modal kết quả
 function showResultModal(message, isSuccess) {
   const modal = document.getElementById("processingModal");
   const modalMessage = document.getElementById("modalMessage");
@@ -188,14 +211,7 @@ function showResultModal(message, isSuccess) {
     element.disabled = false;
   });
 
-  setTimeout(closeProcessingModal, 3000); // Tự động đóng sau 3 giây
-
-  modal.addEventListener("click", function handler(event) {
-    if (event.target === modal) {
-      closeProcessingModal();
-      modal.removeEventListener("click", handler);
-    }
-  });
+  setTimeout(closeProcessingModal, 3000);
 }
 
 // Đóng modal xử lý
@@ -207,58 +223,50 @@ function closeProcessingModal() {
 
 // Xác thực dữ liệu giao dịch
 function validateTransactionData(data) {
-  const errors = [];
-  if (!data.transactionType) errors.push("Vui lòng chọn loại giao dịch.");
-  if (!data.customerEmail || !/\S+@\S+\.\S+/.test(data.customerEmail)) errors.push("Email không hợp lệ.");
-  if (!data.customerName) errors.push("Vui lòng nhập tên khách hàng.");
-  if (!data.softwareName) errors.push("Vui lòng chọn tên phần mềm.");
-  if (!data.softwarePackage) errors.push("Vui lòng chọn gói phần mềm.");
-  if (data.duration < 0) errors.push("Số tháng đăng ký không thể âm.");
-  if (data.deviceCount < 0) errors.push("Số thiết bị không thể âm.");
-  if (data.revenue < 0) errors.push("Doanh thu không thể âm.");
-  return errors.length ? errors.join(" ") : null;
+  if (!data.transactionType) return "Vui lòng chọn loại giao dịch.";
+  if (!data.customerEmail || !/\S+@\S+\.\S+/.test(data.customerEmail)) return "Email không hợp lệ.";
+  if (!data.customerName) return "Vui lòng nhập tên khách hàng.";
+  if (!data.softwareName) return "Vui lòng chọn tên phần mềm.";
+  if (!data.softwarePackage) return "Vui lòng chọn gói phần mềm.";
+  if (data.duration < 0) return "Số tháng đăng ký không thể âm.";
+  if (data.deviceCount < 0) return "Số thiết bị không thể âm.";
+  if (data.revenue < 0) return "Doanh thu không thể âm.";
+  return null;
 }
 
 // Reset form
-function handleReset() {
+async function handleReset() {
   showProcessingModal("Đang làm mới dữ liệu...");
-  const startDateInput = document.getElementById("startDate");
-  const transactionDateInput = document.getElementById("transactionDate");
+  try {
+    const startDateInput = document.getElementById("startDate");
+    const transactionDateInput = document.getElementById("transactionDate");
 
-  startDateInput.value = todayFormatted;
-  transactionDateInput.value = todayFormatted;
+    startDateInput.value = todayFormatted;
+    transactionDateInput.value = todayFormatted;
 
-  document.getElementById("transactionForm").reset();
+    document.getElementById("transactionForm").reset();
+    document.getElementById("transactionType").value = "";
+    document.getElementById("softwareName").value = "";
+    document.getElementById("softwarePackage").value = "";
+    document.getElementById("accountName").value = "";
+    document.getElementById("customerName").value = "";
+    document.getElementById("customerEmail").value = "";
+    document.getElementById("customerPhone").value = "";
+    document.getElementById("duration").value = "";
+    document.getElementById("endDate").value = "";
+    document.getElementById("deviceCount").value = "";
+    document.getElementById("note").value = "";
+    document.getElementById("revenue").value = "";
 
-  const softwareNameSelect = document.getElementById("softwareName");
-  const softwarePackageSelect = document.getElementById("softwarePackage");
-  const accountNameSelect = document.getElementById("accountName");
+    currentEditIndex = -1;
+    currentEditTransactionId = null;
 
-  softwareNameSelect.removeEventListener("focus", softwareNameSelect.focusHandler);
-  softwarePackageSelect.removeEventListener("focus", softwarePackageSelect.focusHandler);
-  accountNameSelect.removeEventListener("focus", accountNameSelect.focusHandler);
-
-  document.getElementById("transactionType").value = "";
-  document.getElementById("softwareName").value = "";
-  document.getElementById("softwarePackage").value = "";
-  document.getElementById("accountName").value = "";
-  document.getElementById("customerName").value = "";
-  document.getElementById("customerEmail").value = "";
-  document.getElementById("customerPhone").value = "";
-  document.getElementById("duration").value = "";
-  document.getElementById("endDate").value = "";
-  document.getElementById("deviceCount").value = "";
-  document.getElementById("note").value = "";
-  document.getElementById("revenue").value = "";
-
-  currentEditIndex = -1;
-  currentEditTransactionId = null;
-
-  fetchSoftwareList().then(() => {
+    await fetchSoftwareList();
     showResultModal("Dữ liệu đã được làm mới!", true);
-  }).catch(err => {
+  } catch (err) {
     showResultModal(`Lỗi khi làm mới dữ liệu: ${err.message}`, false);
-  });
+    console.error("Lỗi reset:", err);
+  }
 }
 
 // Định dạng ngày
@@ -278,14 +286,13 @@ async function handleAdd() {
   const transactionType = document.getElementById("transactionType").value;
   let note = document.getElementById("note").value;
 
-  // Thêm ghi chú cho giao dịch Hoàn Tiền
   if (transactionType === "Hoàn Tiền" && currentEditTransactionId) {
     note = note ? `${note}\nHoàn tiền cho đơn hàng có mã giao dịch ${currentEditTransactionId}` : `Hoàn tiền cho đơn hàng có mã giao dịch ${currentEditTransactionId}`;
   }
 
   const data = {
     action: "addTransaction",
-    transactionType: transactionType,
+    transactionType,
     transactionDate: todayFormatted,
     customerName: document.getElementById("customerName").value,
     customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
@@ -298,7 +305,7 @@ async function handleAdd() {
     softwarePackage: document.getElementById("softwarePackage").value,
     accountName: document.getElementById("accountName").value,
     revenue: parseFloat(document.getElementById("revenue").value) || 0,
-    note: note,
+    note,
     tenNhanVien: userInfo.tenNhanVien,
     maNhanVien: userInfo.maNhanVien,
     originalTransactionId: transactionType === "Hoàn Tiền" ? currentEditTransactionId : null
@@ -321,17 +328,16 @@ async function handleAdd() {
 
     const result = await response.json();
     if (result.status === "success") {
-      document.getElementById("successMessage").textContent = "Giao dịch đã được lưu!";
-      handleReset();
-      await loadTransactions();
-      updatePackageList();
+      await refreshTransactionList();
+      updateTable();
+      await handleReset();
       showResultModal("Giao dịch đã được lưu!", true);
     } else {
       showResultModal(result.message || "Không thể lưu giao dịch!", false);
     }
   } catch (err) {
     showResultModal(`Lỗi kết nối server: ${err.message}`, false);
-    console.error("Lỗi:", err);
+    console.error("Lỗi thêm giao dịch:", err);
   }
 }
 
@@ -349,25 +355,10 @@ async function handleUpdate() {
     return;
   }
 
-  const loadResult = await loadTransactions();
-  if (loadResult.status === "error") {
-    showResultModal(loadResult.message, false);
-    return;
-  }
-
   const transaction = transactionList.find(t => t.transactionId === currentEditTransactionId);
   if (!transaction) {
     showResultModal("Giao dịch không tồn tại hoặc đã bị xóa. Vui lòng thử lại!", false);
-    handleReset();
-    return;
-  }
-
-  const softwareNameElement = document.getElementById("softwareName");
-  const softwarePackageElement = document.getElementById("softwarePackage");
-  const accountNameElement = document.getElementById("accountName");
-
-  if (!softwareNameElement || !softwarePackageElement || !accountNameElement) {
-    showResultModal("Không tìm thấy các trường dữ liệu trên form. Vui lòng thử lại!", false);
+    await handleReset();
     return;
   }
 
@@ -383,9 +374,9 @@ async function handleUpdate() {
     startDate: document.getElementById("startDate").value,
     endDate: document.getElementById("endDate").value,
     deviceCount: parseInt(document.getElementById("deviceCount").value) || 0,
-    softwareName: softwareNameElement.value,
-    softwarePackage: softwarePackageElement.value,
-    accountName: accountNameElement.value,
+    softwareName: document.getElementById("softwareName").value,
+    softwarePackage: document.getElementById("softwarePackage").value,
+    accountName: document.getElementById("accountName").value,
     revenue: parseFloat(document.getElementById("revenue").value) || 0,
     note: document.getElementById("note").value,
     tenNhanVien: transaction.tenNhanVien,
@@ -411,16 +402,16 @@ async function handleUpdate() {
 
     const result = await response.json();
     if (result.status === "success") {
-      document.getElementById("successMessage").textContent = "Giao dịch đã được cập nhật!";
-      handleReset();
-      await loadTransactions();
+      await refreshTransactionList();
+      updateTable();
+      await handleReset();
       showResultModal("Giao dịch đã được cập nhật!", true);
     } else {
       showResultModal(result.message || "Không thể cập nhật giao dịch!", false);
     }
   } catch (err) {
     showResultModal(`Lỗi kết nối server: ${err.message}`, false);
-    console.error("Lỗi:", err);
+    console.error("Lỗi cập nhật giao dịch:", err);
   }
 }
 
@@ -435,43 +426,35 @@ async function handleSearch() {
   const { BACKEND_URL } = getConstants();
   const conditions = {};
 
-  const transactionType = document.getElementById("transactionType").value;
-  const transactionDate = document.getElementById("transactionDate").value;
-  const customerName = document.getElementById("customerName").value;
-  const customerEmail = document.getElementById("customerEmail").value.toLowerCase();
-  const customerPhone = document.getElementById("customerPhone").value;
-  const duration = document.getElementById("duration").value;
-  const startDate = document.getElementById("startDate").value;
-  const endDate = document.getElementById("endDate").value;
-  const deviceCount = document.getElementById("deviceCount").value;
-  const softwareName = document.getElementById("softwareName").value;
-  const softwarePackage = document.getElementById("softwarePackage").value;
-  const accountName = document.getElementById("accountName").value;
-  const revenue = document.getElementById("revenue").value;
-  const note = document.getElementById("note").value;
-  const maNhanVien = userInfo.maNhanVien;
+  const fields = [
+    { id: "transactionType", key: "transactionType", check: val => val && val !== "" },
+    { id: "transactionDate", key: "transactionDate", check: val => val && val !== "yyyy/mm/dd" },
+    { id: "customerName", key: "customerName", check: val => val },
+    { id: "customerEmail", key: "customerEmail", check: val => val },
+    { id: "customerPhone", key: "customerPhone", check: val => val },
+    { id: "duration", key: "duration", check: val => val && val !== "0" },
+    { id: "startDate", key: "startDate", check: val => val && val !== "yyyy/mm/dd" },
+    { id: "endDate", key: "endDate", check: val => val && val !== "yyyy/mm/dd" },
+    { id: "deviceCount", key: "deviceCount", check: val => val && val !== "0" },
+    { id: "softwareName", key: "softwareName", check: val => val && val !== "" },
+    { id: "softwarePackage", key: "softwarePackage", check: val => val && val !== "" },
+    { id: "accountName", key: "accountName", check: val => val && val !== "" },
+    { id: "revenue", key: "revenue", check: val => val && val !== "0" },
+    { id: "note", key: "note", check: val => val }
+  ];
 
-  if (transactionType && transactionType !== "") conditions.transactionType = transactionType;
-  if (transactionDate && transactionDate !== "yyyy/mm/dd") conditions.transactionDate = transactionDate;
-  if (customerName) conditions.customerName = customerName;
-  if (customerEmail) conditions.customerEmail = customerEmail;
-  if (customerPhone) conditions.customerPhone = customerPhone;
-  if (duration && duration !== "0") conditions.duration = duration;
-  if (startDate && startDate !== "yyyy/mm/dd") conditions.startDate = startDate;
-  if (endDate && endDate !== "yyyy/mm/dd") conditions.endDate = endDate;
-  if (deviceCount && deviceCount !== "0") conditions.deviceCount = deviceCount;
-  if (softwareName && softwareName !== "") conditions.softwareName = softwareName;
-  if (softwarePackage && softwarePackage !== "") conditions.softwarePackage = softwarePackage;
-  if (accountName && accountName !== "") conditions.accountName = accountName;
-  if (revenue && revenue !== "0") conditions.revenue = revenue;
-  if (note) conditions.note = note;
-  if (maNhanVien) conditions.maNhanVien = maNhanVien;
+  fields.forEach(field => {
+    const value = document.getElementById(field.id).value;
+    if (field.check(value)) conditions[field.key] = value;
+  });
+
+  conditions.maNhanVien = userInfo.maNhanVien;
 
   const data = {
     action: "searchTransactions",
     maNhanVien: userInfo.maNhanVien,
-    vaiTro: userInfo.vaiTro ? userInfo.vaiTro.toLowerCase() : "",
-    conditions: conditions
+    vaiTro: userInfo.vaiTro.toLowerCase(),
+    conditions
   };
 
   console.log("📤 Dữ liệu tìm kiếm gửi đi:", JSON.stringify(data, null, 2));
@@ -486,11 +469,7 @@ async function handleSearch() {
     const result = await response.json();
     if (result.status === "success") {
       transactionList = result.data;
-      transactionList.sort((a, b) => {
-        const idA = parseInt(a.transactionId.replace("GD", ""));
-        const idB = parseInt(b.transactionId.replace("GD", ""));
-        return idB - idA;
-      });
+      transactionList.sort((a, b) => parseInt(b.transactionId.replace("GD", "")) - parseInt(a.transactionId.replace("GD", "")));
       currentPage = 1;
       updateTable();
       showResultModal(`Tìm kiếm thành công! Tìm thấy ${result.data.length} giao dịch.`, true);
@@ -499,26 +478,23 @@ async function handleSearch() {
     }
   } catch (err) {
     showResultModal(`Lỗi khi tìm kiếm giao dịch: ${err.message}`, false);
-    console.error("Lỗi khi tìm kiếm giao dịch", err);
+    console.error("Lỗi tìm kiếm:", err);
   }
 }
 
-// Tải danh sách giao dịch
-async function loadTransactions() {
+// Làm mới danh sách giao dịch
+async function refreshTransactionList() {
   if (!userInfo) {
     console.error("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.");
-    return { status: "error", message: "Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại." };
+    return { status: "error", message: "Không tìm thấy thông tin nhân viên." };
   }
 
   const { BACKEND_URL } = getConstants();
-  const vaiTro = userInfo.vaiTro ? userInfo.vaiTro.toLowerCase() : "";
   const data = {
     action: "getTransactions",
     maNhanVien: userInfo.maNhanVien,
-    vaiTro: vaiTro
+    vaiTro: userInfo.vaiTro.toLowerCase()
   };
-
-  console.log("Dữ liệu gửi lên backend:", data);
 
   try {
     const response = await fetch(BACKEND_URL, {
@@ -528,27 +504,29 @@ async function loadTransactions() {
     });
 
     const result = await response.json();
-    console.log("Dữ liệu trả về từ backend:", result);
-
     if (result.status === "success") {
       transactionList = result.data;
-      transactionList.sort((a, b) => {
-        const idA = parseInt(a.transactionId.replace("GD", ""));
-        const idB = parseInt(b.transactionId.replace("GD", ""));
-        return idB - idA;
-      });
-      currentPage = 1;
-      updateTable();
+      transactionList.sort((a, b) => parseInt(b.transactionId.replace("GD", "")) - parseInt(a.transactionId.replace("GD", "")));
       return { status: "success", data: result.data };
     } else {
-      document.getElementById("errorMessage").textContent = result.message || "Không thể tải danh sách giao dịch!";
+      console.error("Lỗi tải giao dịch:", result.message);
       return { status: "error", message: result.message || "Không thể tải danh sách giao dịch!" };
     }
   } catch (err) {
-    document.getElementById("errorMessage").textContent = `Lỗi khi tải danh sách giao dịch: ${err.message}`;
-    console.error("Lỗi khi tải danh sách giao dịch", err);
-    return { status: "error", message: `Lỗi khi tải danh sách giao dịch: ${err.message}` };
+    console.error("Lỗi tải giao dịch:", err);
+    return { status: "error", message: `Lỗi kết nối server: ${err.message}` };
   }
+}
+
+// Tải danh sách giao dịch
+async function loadTransactions() {
+  const result = await refreshTransactionList();
+  if (result.status === "success") {
+    updateTable();
+  } else {
+    showResultModal(result.message, false);
+  }
+  return result;
 }
 
 // Cập nhật bảng giao dịch
@@ -585,10 +563,7 @@ function updateTable() {
       </tr>`;
   });
 
-  if (tableBody.innerHTML !== newContent) {
-    tableBody.innerHTML = newContent;
-  }
-
+  tableBody.innerHTML = newContent;
   updatePagination(totalPages);
 }
 
@@ -599,7 +574,7 @@ function viewTransaction(index) {
   const detailContent = document.getElementById("transactionDetailContent");
 
   if (!modal || !detailContent) {
-    console.error("Lỗi: Không tìm thấy modal hoặc nội dung chi tiết");
+    showResultModal("Lỗi giao diện. Vui lòng thử lại.", false);
     return;
   }
 
@@ -644,9 +619,10 @@ function viewTransaction(index) {
 
   modal.style.display = "block";
 
-  modal.addEventListener("click", function(event) {
+  modal.addEventListener("click", function handler(event) {
     if (event.target === modal) {
       closeModal();
+      modal.removeEventListener("click", handler);
     }
   });
 }
@@ -659,21 +635,13 @@ function copyToClipboard(text, iconElement) {
       message.className = "copy-message";
       message.textContent = "Đã copy";
       iconElement.appendChild(message);
-
       message.classList.add("show");
-
       setTimeout(() => {
         message.classList.remove("show");
-        setTimeout(() => {
-          if (message.parentNode) {
-            message.parentNode.removeChild(message);
-          }
-        }, 300);
+        setTimeout(() => message.remove(), 300);
       }, 1000);
     })
-    .catch(err => {
-      console.error("Lỗi khi copy nội dung: ", err);
-    });
+    .catch(err => console.error("Lỗi khi copy:", err));
 }
 
 // Đóng modal chi tiết
@@ -689,20 +657,19 @@ function updatePagination(totalPages) {
 
   const firstButton = document.createElement("button");
   firstButton.textContent = "«";
-  firstButton.onclick = () => firstPage();
+  firstButton.onclick = firstPage;
   firstButton.disabled = currentPage === 1;
   pagination.appendChild(firstButton);
 
   const prevButton = document.createElement("button");
   prevButton.textContent = "‹";
-  prevButton.onclick = () => prevPage();
+  prevButton.onclick = prevPage;
   prevButton.disabled = currentPage === 1;
   pagination.appendChild(prevButton);
 
   const maxVisiblePages = 5;
   let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
   let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
   if (endPage - startPage + 1 < maxVisiblePages) {
     startPage = Math.max(1, endPage - maxVisiblePages + 1);
   }
@@ -718,9 +685,7 @@ function updatePagination(totalPages) {
     const pageButton = document.createElement("button");
     pageButton.textContent = i;
     pageButton.onclick = () => goToPage(i);
-    if (i === currentPage) {
-      pageButton.classList.add("active");
-    }
+    if (i === currentPage) pageButton.classList.add("active");
     pagination.appendChild(pageButton);
   }
 
@@ -733,13 +698,13 @@ function updatePagination(totalPages) {
 
   const nextButton = document.createElement("button");
   nextButton.textContent = "›";
-  nextButton.onclick = () => nextPage();
+  nextButton.onclick = nextPage;
   nextButton.disabled = currentPage === totalPages;
   pagination.appendChild(nextButton);
 
   const lastButton = document.createElement("button");
   lastButton.textContent = "»";
-  lastButton.onclick = () => lastPage();
+  lastButton.onclick = lastPage;
   lastButton.disabled = currentPage === totalPages;
   pagination.appendChild(lastButton);
 }
@@ -780,14 +745,7 @@ function goToPage(page) {
 function editTransaction(index) {
   const transaction = transactionList[index];
   currentEditTransactionId = transaction.transactionId;
-
-  const softwareNameSelect = document.getElementById("softwareName");
-  const softwarePackageSelect = document.getElementById("softwarePackage");
-  const accountNameSelect = document.getElementById("accountName");
-
-  const softwareNameValue = transaction.softwareName || "";
-  const softwarePackageValue = transaction.softwarePackage || "";
-  const accountNameValue = transaction.accountName || "";
+  currentEditIndex = index;
 
   document.getElementById("transactionDate").value = transaction.transactionDate;
   document.getElementById("transactionType").value = transaction.transactionType;
@@ -801,40 +759,32 @@ function editTransaction(index) {
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 
-  fetchSoftwareList(softwareNameValue);
-  softwareNameSelect.value = softwareNameValue;
-  updatePackageList(softwarePackageValue);
-  softwarePackageSelect.value = softwarePackageValue;
-  updateAccountList(accountNameValue);
-  accountNameSelect.value = accountNameValue;
+  fetchSoftwareList(transaction.softwareName).then(() => {
+    document.getElementById("softwareName").value = transaction.softwareName;
+    updatePackageList(transaction.softwarePackage);
+    document.getElementById("softwarePackage").value = transaction.softwarePackage;
+    updateAccountList(transaction.accountName);
+    document.getElementById("accountName").value = transaction.accountName;
+  });
 }
 
 // Xóa giao dịch
 async function deleteTransaction(index) {
-  console.log("deleteTransaction được gọi, index:", index);
   const transaction = transactionList[index];
-  console.log("Transaction chi tiết:", JSON.stringify(transaction, null, 2));
   if (!transaction) {
-    console.error("Giao dịch không tồn tại, index:", index);
     showResultModal("Giao dịch không tồn tại. Vui lòng thử lại.", false);
     return;
   }
 
-  // Hiển thị modal xác nhận
   const confirmMessage = `Bạn có chắc muốn xóa giao dịch ${transaction.transactionId}? ${
     transaction.accountSheetId && transaction.customerEmail
       ? "Giao dịch này sẽ được xóa và quyền chia sẻ tệp với email " + transaction.customerEmail + " sẽ bị hủy."
       : ""
   }`;
 
-  const confirmDelete = await new Promise((resolve) => {
-    openConfirmModal(confirmMessage, resolve);
-  });
+  const confirmDelete = await new Promise(resolve => openConfirmModal(confirmMessage, resolve));
 
-  if (!confirmDelete) {
-    console.log("Người dùng hủy xóa giao dịch");
-    return;
-  }
+  if (!confirmDelete) return;
 
   showProcessingModal("Đang xóa giao dịch...");
 
@@ -843,10 +793,8 @@ async function deleteTransaction(index) {
     action: "deleteTransaction",
     transactionId: transaction.transactionId,
     maNhanVien: userInfo.maNhanVien,
-    vaiTro: userInfo.vaiTro ? userInfo.vaiTro.toLowerCase() : ""
+    vaiTro: userInfo.vaiTro.toLowerCase()
   };
-
-  console.log("Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
 
   try {
     const response = await fetch(BACKEND_URL, {
@@ -856,23 +804,21 @@ async function deleteTransaction(index) {
     });
 
     const result = await response.json();
-    console.log("Kết quả từ server:", result);
     if (result.status === "success") {
+      await refreshTransactionList();
+      updateTable();
       showResultModal(
         transaction.accountSheetId && transaction.customerEmail
           ? "Giao dịch đã được xóa và quyền chia sẻ đã được hủy!"
           : "Giao dịch đã được xóa!",
         true
       );
-      await loadTransactions();
-      handleReset();
     } else {
-      console.error("Lỗi từ server:", result.message);
       showResultModal(result.message || "Không thể xóa giao dịch!", false);
     }
   } catch (err) {
-    console.error("Lỗi trong deleteTransaction:", err);
     showResultModal(`Lỗi kết nối server: ${err.message}`, false);
+    console.error("Lỗi xóa giao dịch:", err);
   }
 }
 
@@ -891,79 +837,19 @@ async function fetchSoftwareList(softwareNameToKeep) {
     const result = await response.json();
     if (result.status === "success") {
       softwareData = result.data;
-
       const softwareNames = [...new Set(softwareData.map(item => item.softwareName))];
-      const softwareNameSelect = document.getElementById("softwareName");
-
-      populateSelect(softwareNameSelect, softwareNames, "-- Chọn phần mềm --", softwareNameToKeep);
-
+      populateSelect(document.getElementById("softwareName"), softwareNames, "-- Chọn phần mềm --", softwareNameToKeep);
       updatePackageList();
     } else {
-      console.error("Lỗi khi lấy danh sách phần mềm:", result.message);
+      console.error("Lỗi tải danh sách phần mềm:", result.message);
     }
   } catch (err) {
-    console.error("Lỗi khi lấy danh sách phần mềm:", err);
+    console.error("Lỗi tải danh sách phần mềm:", err);
   }
-}
-
-// Cập nhật danh sách gói phần mềm
-function updatePackageList(softwarePackageToKeep) {
-  const softwareName = document.getElementById("softwareName").value;
-  const softwarePackageSelect = document.getElementById("softwarePackage");
-
-  if (softwareName) {
-    const allPackages = [...new Set(softwareData
-      .filter(item => item.softwareName === softwareName)
-      .map(item => item.softwarePackage)
-    )];
-    const availablePackages = allPackages; // Giả định tất cả gói đều khả dụng
-    const unavailablePackages = [];
-
-    populateSelect(softwarePackageSelect, availablePackages, "-- Chọn gói --", softwarePackageToKeep, unavailablePackages);
-  } else {
-    softwarePackageSelect.innerHTML = '<option value="">-- Chọn gói --</option>';
-  }
-
-  updateAccountList();
-}
-
-// Hỗ trợ tương thích cũ
-window.editRow = function (index) {
-  const t = transactionList[index];
-  document.getElementById("transactionType").value = t.transactionType || '';
-  document.getElementById("customerName").value = t.customerName || '';
-  document.getElementById("customerEmail").value = t.customerEmail || '';
-  document.getElementById("customerPhone").value = t.customerPhone || '';
-  document.getElementById("softwareName").value = t.softwareName || '';
-  document.getElementById("softwarePackage").value = t.softwarePackage || '';
-  document.getElementById("duration").value = t.duration || '';
-  document.getElementById("startDate").value = t.startDate || '';
-  document.getElementById("endDate").value = t.endDate || '';
-  document.getElementById("revenue").value = t.revenue || '';
-  document.getElementById("deviceCount").value = t.deviceCount || '';
-  document.getElementById("note").value = t.note || '';
-  currentEditIndex = index;
-};
-
-// Hỗ trợ tương thích cũ
-window.deleteRow = function (index) {
-  deleteTransaction(index);
-};
-
-// Định dạng ngày giờ
-function formatDateTime(isoDate) {
-  const date = new Date(isoDate);
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  return `${day}/${month}/${year} ${hours}:${minutes}`;
 }
 
 // Mở modal xác nhận
 function openConfirmModal(message, callback) {
-  console.log("Mở modal xác nhận:", message);
   const modal = document.getElementById("confirmDeleteModal");
   const messageEl = document.getElementById("confirmMessage");
   messageEl.textContent = message;
@@ -973,7 +859,6 @@ function openConfirmModal(message, callback) {
 
 // Đóng modal xác nhận
 function closeConfirmModal() {
-  console.log("Đóng modal xác nhận");
   const modal = document.getElementById("confirmDeleteModal");
   modal.style.display = "none";
   confirmCallback = null;
@@ -981,9 +866,9 @@ function closeConfirmModal() {
 
 // Xử lý xác nhận
 function confirmDelete(result) {
-  console.log("Kết quả xác nhận:", result);
-  if (confirmCallback) {
-    confirmCallback(result);
-  }
+  if (confirmCallback) confirmCallback(result);
   closeConfirmModal();
 }
+
+// Xuất các hàm để kiểm thử
+export { updateTable, validateTransactionData, populateSelect };
