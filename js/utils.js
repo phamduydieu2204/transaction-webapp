@@ -327,8 +327,7 @@ async function fetchSoftwareList(softwareNameToKeep) {
       }
 
       softwareNameSelect.value = softwareNameToKeep || "";
-
-      updatePackageList();
+      updatePackageList(softwareNameToKeep ? softwareData.find(item => item.softwareName === softwareNameToKeep)?.softwarePackage : "");
     } else {
       console.error("Lỗi khi lấy danh sách phần mềm:", result.message);
     }
@@ -381,13 +380,11 @@ function updatePackageList(softwarePackageToKeep) {
     }
 
     softwarePackageSelect.value = softwarePackageToKeep || "";
-  }
-
-  updateAccountList();
+    updateAccountList(softwarePackageToKeep ? softwareData.find(item => item.softwareName === softwareName && item.softwarePackage === softwarePackageToKeep)?.accountName : "");
 }
 
 // Cập nhật danh sách tài khoản dựa trên phần mềm và gói phần mềm
-async function updateAccountList(accountNameToKeep) {
+function updateAccountList(accountNameToKeep) {
   const softwareName = document.getElementById("softwareName").value;
   const softwarePackage = document.getElementById("softwarePackage").value;
   const accountNameSelect = document.getElementById("accountName");
