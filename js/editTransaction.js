@@ -1,4 +1,5 @@
 function editTransaction(index) {
+  console.log("editTransaction called with index:", index);
   const transaction = transactionList[index];
   currentEditTransactionId = transaction.transactionId;
 
@@ -9,6 +10,8 @@ function editTransaction(index) {
   const softwareNameValue = transaction.softwareName || "";
   const softwarePackageValue = transaction.softwarePackage || "";
   const accountNameValue = transaction.accountName || "";
+
+  console.log("Transaction values:", { softwareNameValue, softwarePackageValue, accountNameValue });
 
   // Điền các trường input
   document.getElementById("transactionDate").value = transaction.transactionDate;
@@ -31,19 +34,33 @@ function editTransaction(index) {
 
   // Tải danh sách phần mềm và chờ hoàn tất
   fetchSoftwareList(softwareNameValue).then(() => {
+    console.log("After fetchSoftwareList, softwareNameSelect options:", softwareNameSelect.innerHTML);
     softwareNameSelect.value = softwareNameValue;
+    console.log("softwareNameSelect.value set to:", softwareNameSelect.value);
 
     // Cập nhật danh sách gói phần mềm
     updatePackageList(softwarePackageValue);
+    console.log("After updatePackageList, softwarePackageSelect options:", softwarePackageSelect.innerHTML);
     softwarePackageSelect.value = softwarePackageValue;
+    console.log("softwarePackageSelect.value set to:", softwarePackageSelect.value);
 
     // Cập nhật danh sách tài khoản
     updateAccountList(accountNameValue);
+    console.log("After updateAccountList, accountNameSelect options:", accountNameSelect.innerHTML);
     accountNameSelect.value = accountNameValue;
+    console.log("accountNameSelect.value set to:", accountNameSelect.value);
 
     // Khôi phục sự kiện change
     softwareNameSelect.onchange = softwareNameChangeHandler;
     softwarePackageSelect.onchange = softwarePackageChangeHandler;
+
+    // Kiểm tra lại giá trị sau khi hoàn tất
+    setTimeout(() => {
+      console.log("Final check after 100ms:");
+      console.log("softwareNameSelect.value:", softwareNameSelect.value);
+      console.log("softwarePackageSelect.value:", softwarePackageSelect.value);
+      console.log("accountNameSelect.value:", accountNameSelect.value);
+    }, 100);
   });
 }
 
