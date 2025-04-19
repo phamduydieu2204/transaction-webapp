@@ -877,7 +877,7 @@ window.testUtils = {
   populateSelect,
   refreshTransactionList,
   handleAdd,
-  handleDelete,
+  deleteTransaction,
   checkServerHealth
 };
 
