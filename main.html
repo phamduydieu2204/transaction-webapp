@@ -3,16 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <title>Trang chính</title>
+  <!-- Liên kết tới CSS chính -->
   <link rel="stylesheet" href="css/style.css" />
-  <!-- Thêm Flatpickr CSS -->
+  <!-- Thêm Flatpickr CSS cho lịch -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <!-- Thêm Font Awesome cho icon lịch, icon copy, icon đăng xuất và icon kính lúp -->
+  <!-- Thêm Font Awesome cho các icon (lịch, copy, đăng xuất, kính lúp) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Tải script JavaScript -->
   <script defer src="js/constants.js"></script>
   <script defer src="js/main.js"></script>
   <!-- Thêm Flatpickr JS -->
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <style>
+    /* Container cho trường nhập ngày với icon lịch */
     .date-input-container {
       position: relative;
       display: flex;
@@ -29,6 +32,7 @@
       color: #007bff;
     }
 
+    /* Modal cơ bản */
     .modal {
       display: none;
       position: fixed;
@@ -66,6 +70,7 @@
       text-decoration: none;
     }
 
+    /* Nội dung chi tiết trong modal */
     .detail-content {
       margin-top: 20px;
       font-size: 14px;
@@ -116,11 +121,13 @@
       opacity: 1;
     }
 
+    /* Container chính */
     .container {
       padding-bottom: 20px;
       position: relative;
     }
 
+    /* Header cố định */
     .fixed-header {
       position: sticky;
       top: 0;
@@ -128,6 +135,7 @@
       background-color: #fff;
     }
 
+    /* Bảng giao dịch */
     #transactionTable {
       width: 100%;
       border-collapse: collapse;
@@ -166,6 +174,7 @@
       background-color: #f9f9f9;
     }
 
+    /* Nút đăng xuất */
     .logout-btn {
       position: absolute;
       top: 10px;
@@ -189,13 +198,13 @@
       margin-right: 5px;
     }
 
-    /* CSS để in nghiêng các tùy chọn không khả dụng */
+    /* Tùy chọn không khả dụng trong select */
     option.unavailable {
       font-style: italic;
       color: #888;
     }
 
-    /* CSS cho icon kính lúp */
+    /* Container cho trường tìm kiếm với icon kính lúp */
     .search-icon-container {
       position: relative;
       display: flex;
@@ -212,14 +221,14 @@
       color: #007bff;
     }
 
-    /* CSS cho placeholder "Đang tìm kiếm..." */
+    /* Placeholder cho trường tìm kiếm */
     input[placeholder="Đang tìm kiếm..."] {
       font-style: italic;
       color: #888;
       opacity: 0.7;
     }
 
-    /* Định dạng mặc định cho các trường input */
+    /* Định dạng mặc định cho input */
     input[type="text"],
     input[type="email"],
     input[type="number"],
@@ -229,7 +238,7 @@
       opacity: 1;
     }
 
-    /* CSS cho thông báo */
+    /* Khu vực thông báo */
     #notification {
       margin: 10px 0;
       padding: 10px;
@@ -247,21 +256,25 @@
   </style>
 </head>
 <body>
+  <!-- Container chính cho trang quản lý -->
   <div class="container">
+    <!-- Nút đăng xuất -->
     <button class="logout-btn" onclick="logout()">
       <i class="fas fa-sign-out-alt"></i> Đăng xuất
     </button>
 
     <h1>Hệ thống quản lý</h1>
+    <!-- Khu vực hiển thị thông tin chào mừng -->
     <p id="welcome"></p>
     <hr>
 
+    <!-- Form nhập thông tin giao dịch -->
     <form id="transactionForm" class="form-grid fixed-header" onreset="handleReset()">
       <!-- Dòng 1 -->
       <div>
         <label>Ngày giao dịch:</label>
         <div class="date-input-container">
-          <input type="text" id="transactionDate" placeholder="yyyy/mm/dd">
+          <input type="text" id="transactionDate" placeholder="Chọn ngày (yyyy/mm/dd)">
           <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('transactionDate')"></i>
         </div>
       </div>
@@ -279,32 +292,32 @@
 
       <div>
         <label>Email:</label>
-        <input type="email" id="customerEmail">
+        <input type="email" id="customerEmail" placeholder="Nhập email khách hàng">
       </div>
 
       <div>
         <label>Tên khách hàng:</label>
         <div class="search-icon-container">
-          <input type="text" id="customerName">
+          <input type="text" id="customerName" placeholder="Nhập tên khách hàng">
           <i class="fas fa-search search-icon" onclick="updateCustomerInfo()"></i>
         </div>
       </div>
 
       <div>
         <label>Liên hệ:</label>
-        <input type="text" id="customerPhone">
+        <input type="text" id="customerPhone" placeholder="Nhập số điện thoại">
       </div>
 
       <!-- Dòng 2 -->
       <div>
         <label>Số tháng đăng ký:</label>
-        <input type="number" id="duration">
+        <input type="number" id="duration" placeholder="Nhập số tháng">
       </div>
 
       <div>
         <label>Ngày bắt đầu:</label>
         <div class="date-input-container">
-          <input type="text" id="startDate" placeholder="yyyy/mm/dd">
+          <input type="text" id="startDate" placeholder="Chọn ngày (yyyy/mm/dd)">
           <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('startDate')"></i>
         </div>
       </div>
@@ -312,19 +325,19 @@
       <div>
         <label>Ngày kết thúc:</label>
         <div class="date-input-container">
-          <input type="text" id="endDate" placeholder="yyyy/mm/dd">
+          <input type="text" id="endDate" placeholder="Chọn ngày (yyyy/mm/dd)">
           <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('endDate')"></i>
         </div>
       </div>
 
       <div>
         <label>Số thiết bị:</label>
-        <input type="number" id="deviceCount">
+        <input type="number" id="deviceCount" placeholder="Nhập số thiết bị">
       </div>
 
       <div>
         <label>Ghi chú:</label>
-        <textarea id="note" rows="2"></textarea>
+        <textarea id="note" rows="2" placeholder="Nhập ghi chú (nếu có)"></textarea>
       </div>
 
       <!-- Dòng 3 -->
@@ -351,10 +364,10 @@
 
       <div>
         <label>Doanh thu:</label>
-        <input type="number" id="revenue">
+        <input type="number" id="revenue" placeholder="Nhập doanh thu">
       </div>
 
-      <!-- Dòng 4: Các nút -->
+      <!-- Dòng 4: Các nút thao tác -->
       <div class="button-row">
         <button type="button" onclick="handleAdd()">Thêm</button>
         <button type="button" onclick="handleUpdate()">Cập nhật</button>
@@ -363,13 +376,15 @@
       </div>
     </form>
 
-    <!-- Khu vực thông báo -->
+    <!-- Khu vực hiển thị thông báo -->
     <div id="notification"></div>
 
+    <!-- Tiêu đề danh sách giao dịch -->
     <h2 class="fixed-header">Danh sách giao dịch</h2>
-    <div class="pagination fixed-header" id="pagination">
-    </div>
+    <!-- Phân trang -->
+    <div class="pagination fixed-header" id="pagination"></div>
 
+    <!-- Bảng hiển thị danh sách giao dịch -->
     <table id="transactionTable">
       <thead>
         <tr>
@@ -390,11 +405,10 @@
           <th>Hành động</th>
         </tr>
       </thead>
-      <tbody>
-      </tbody>
+      <tbody></tbody>
     </table>
 
-    <!-- Modal để hiển thị chi tiết giao dịch -->
+    <!-- Modal hiển thị chi tiết giao dịch -->
     <div id="transactionDetailModal" class="modal">
       <div class="modal-content">
         <span class="close" onclick="closeModal()">×</span>
@@ -403,7 +417,7 @@
       </div>
     </div>
 
-    <!-- Modal để hiển thị thông báo xử lý -->
+    <!-- Modal thông báo xử lý -->
     <div id="processingModal" class="modal">
       <div class="modal-content">
         <h2 id="modalTitle">Thông báo</h2>
@@ -412,7 +426,7 @@
       </div>
     </div>
 
-    <!-- Modal xác nhận xóa - Giữ nguyên vì đã phù hợp với yêu cầu -->
+    <!-- Modal xác nhận xóa -->
     <div id="confirmDeleteModal" class="modal">
       <div class="modal-content">
         <span class="close" onclick="closeConfirmModal()">×</span>
@@ -425,8 +439,11 @@
       </div>
     </div>
 
+    <!-- Khu vực thông báo thành công/lỗi (dự phòng) -->
     <p id="successMessage"></p>
     <p id="errorMessage"></p>
   </div>
+
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'932b031f997e44d9',t:'MTc0NTA1MTEzNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
