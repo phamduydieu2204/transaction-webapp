@@ -812,26 +812,32 @@ function editTransaction(index) {
 }
 
 // Xóa giao dịch
-// Xóa giao dịch
 async function deleteTransaction(index) {
   console.log("deleteTransaction được gọi, index:", index);
   const transaction = transactionList[index];
-  console.log("Transaction:", transaction);
+  console.log("Transaction chi tiết:", JSON.stringify(transaction, null, 2));
   if (!transaction) {
     console.error("Giao dịch không tồn tại, index:", index);
     showResultModal("Giao dịch không tồn tại. Vui lòng thử lại.", false);
     return;
   }
 
-  const confirmMessage = transaction.accountSheetId && transaction.customerEmail
-    ? `Bạn có muốn xóa giao dịch ${transaction.transactionId} và đồng thời hủy chia sẻ tệp với email ${transaction.customerEmail}?`
-    : `Bạn có chắc muốn xóa giao dịch ${transaction.transactionId}?`;
+  // Hiển thị modal xác nhận
+  const confirmMessage = `Bạn có chắc muốn xóa giao dịch ${transaction.transactionId}? ${
+    transaction.accountSheetId && transaction.customerEmail
+      ? "Giao dịch này sẽ được xóa và quyền chia sẻ tệp với email " + transaction.customerEmail + " sẽ bị hủy."
+      : ""
+  }`;
 
-  const shouldRemoveSharing = transaction.accountSheetId && transaction.customerEmail
-    ? confirm(confirmMessage + "\nNhấn OK để hủy chia sẻ, Cancel để chỉ xóa giao dịch.")
-    : false;
+  const confirmDelete = await new Promise((resolve) => {
+    openConfirmModal(confirmMessage, resolve);
+  });
 
-  console.log("shouldRemoveSharing:", shouldRemoveSharing);
+  // Nếu người dùng nhấn Cancel, thoát hàm mà không làm gì
+  if (!confirmDelete) {
+    console.log("Người dùng hủy xóa giao dịch");
+    return;
+  }
 
   showProcessingModal("Đang xóa giao dịch...");
 
@@ -841,12 +847,10 @@ async function deleteTransaction(index) {
     transactionId: transaction.transactionId,
     maNhanVien: userInfo.maNhanVien,
     vaiTro: userInfo.vaiTro ? userInfo.vaiTro.toLowerCase() : "",
-    removeSharing: shouldRemoveSharing,
-    customerEmail: shouldRemoveSharing ? transaction.customerEmail : null,
-    accountSheetId: shouldRemoveSharing ? transaction.accountSheetId : null
+    // Server sẽ tự động hủy chia sẻ nếu có accountSheetId và customerEmail trong sheet
   };
 
-  console.log("Dữ liệu gửi đi:", data);
+  console.log("Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
 
   try {
     const response = await fetch(BACKEND_URL, {
@@ -860,9 +864,12 @@ async function deleteTransaction(index) {
     const result = await response.json();
     console.log("Kết quả từ server:", result);
     if (result.status === "success") {
-      showResultModal(shouldRemoveSharing
-        ? "Giao dịch đã được xóa và quyền chia sẻ đã được hủy!"
-        : "Giao dịch đã được xóa!", true);
+      showResultModal(
+        transaction.accountSheetId && transaction.customerEmail
+          ? "Giao dịch đã được xóa và quyền chia sẻ đã được hủy!"
+          : "Giao dịch đã được xóa!",
+        true
+      );
       await loadTransactions();
       handleReset();
     } else {
@@ -1034,85 +1041,4 @@ function confirmDelete(result) {
     confirmCallback(result);
   }
   closeConfirmModal();
-}
-
-// Hàm deleteTransaction
-async function deleteTransaction(index) {
-  console.log("deleteTransaction được gọi, index:", index);
-  const transaction = transactionList[index];
-  console.log("Transaction chi tiết:", JSON.stringify(transaction, null, 2));
-  if (!transaction) {
-    console.error("Giao dịch không tồn tại, index:", index);
-    showResultModal("Giao dịch không tồn tại. Vui lòng thử lại.", false);
-    return;
-  }
-
-  console.log("accountSheetId:", transaction.accountSheetId);
-  console.log("customerEmail:", transaction.customerEmail);
-
-  let confirmMessage = `Bạn có chắc muốn xóa giao dịch ${transaction.transactionId}?`;
-  let shouldRemoveSharing = false;
-
-  // Dùng Promise để chờ kết quả từ modal
-  const getConfirmation = (message) => {
-    return new Promise((resolve) => {
-      openConfirmModal(message, resolve);
-    });
-  };
-
-  if (transaction.accountSheetId && transaction.customerEmail) {
-    confirmMessage = `Bạn có muốn xóa giao dịch ${transaction.transactionId} và đồng thời hủy chia sẻ tệp với email ${transaction.customerEmail}? Nhấn OK để hủy chia sẻ, Cancel để chỉ xóa giao dịch.`;
-    console.log("Hiển thị modal hủy chia sẻ:", confirmMessage);
-    shouldRemoveSharing = await getConfirmation(confirmMessage);
-  } else {
-    console.log("Hiển thị modal xóa cơ bản:", confirmMessage);
-    const confirmDelete = await getConfirmation(confirmMessage);
-    if (!confirmDelete) {
-      console.log("Người dùng hủy xóa giao dịch");
-      return;
-    }
-  }
-
-  console.log("shouldRemoveSharing sau xác nhận:", shouldRemoveSharing);
-
-  showProcessingModal("Đang xóa giao dịch...");
-
-  const { BACKEND_URL } = getConstants();
-  const data = {
-    action: "deleteTransaction",
-    transactionId: transaction.transactionId,
-    maNhanVien: userInfo.maNhanVien,
-    vaiTro: userInfo.vaiTro ? userInfo.vaiTro.toLowerCase() : "",
-    removeSharing: shouldRemoveSharing,
-    customerEmail: shouldRemoveSharing ? transaction.customerEmail : null,
-    accountSheetId: shouldRemoveSharing ? transaction.accountSheetId : null
-  };
-
-  console.log("Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
-
-  try {
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
-    });
-
-    const result = await response.json();
-    console.log("Kết quả từ server:", result);
-    if (result.status === "success") {
-      showResultModal(shouldRemoveSharing
-        ? "Giao dịch đã được xóa và quyền chia sẻ đã được hủy!"
-        : "Giao dịch đã được xóa!", true);
-      await loadTransactions();
-      handleReset();
-    } else {
-      console.error("Lỗi từ server:", result.message);
-      showResultModal(result.message || "Không thể xóa giao dịch!", false);
-    }
-  } catch (err) {
-    console.error("Lỗi trong deleteTransaction:", err);
-    showResultModal(`Lỗi kết nối server: ${err.message}`, false);
-  }
 }
