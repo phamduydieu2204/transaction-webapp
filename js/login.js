@@ -35,6 +35,7 @@ async function handleLogin() {
   };
 
   try {
+    console.log("🟢 Gửi login tới Heroku với body:", body);
     const response = await fetch(BACKEND_URL, {
       method: 'POST',
       headers: {
