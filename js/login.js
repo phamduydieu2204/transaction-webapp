@@ -64,7 +64,7 @@ async function handleLogin() {
       errorEl.textContent = friendlyMessages[result.message] || result.message || 'Đăng nhập thất bại!';
     }
   } catch (error) {
+    console.error("🔴 [Frontend] Lỗi đăng nhập:", error);
     errorEl.textContent = 'Không thể kết nối tới server. Vui lòng kiểm tra mạng và thử lại.';
-    console.error("Lỗi đăng nhập:", error);
   }
 }
