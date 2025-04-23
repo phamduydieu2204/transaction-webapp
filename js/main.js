@@ -1,40 +1,3 @@
-<<<<<<< HEAD
-import { initAdd } from './add.js';
-import { initDelete } from './delete.js';
-import { initEdit } from './edit.js';
-import { initSearch } from './search.js';
-import { initList } from './list.js';
-import { initSoftwareList } from './software.js';
-import { getCurrentUser } from './auth.js';
-
-document.addEventListener('DOMContentLoaded', () => {
-  const user = getCurrentUser();
-  if (!user) {
-    window.location.href = 'index.html';
-    return;
-  }
-
-  const welcomeEl = document.getElementById('welcome');
-  if (welcomeEl) {
-    welcomeEl.textContent = `Xin chào ${user.tenNhanVien} (${user.maNhanVien}) - ${user.vaiTro}`;
-  }
-
-  const logoutBtn = document.getElementById('logoutBtn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
-      localStorage.removeItem('employeeInfo');
-      window.location.href = 'index.html';
-    });
-  }
-
-  initAdd();
-  initEdit();
-  initDelete();
-  initSearch();
-  initList();
-  initSoftwareList();
-});
-=======
 /**
  * Quản lý giao dịch trên giao diện người dùng
  * Tải danh sách giao dịch, thêm, sửa, xóa, tìm kiếm giao dịch, và hiển thị chi tiết
@@ -104,6 +67,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // Gắn sự kiện cho select phần mềm và gói
   document.getElementById("softwareName").addEventListener("change", () => updatePackageList());
   document.getElementById("softwarePackage").addEventListener("change", () => updateAccountList());
+
+  // Gắn sự kiện đăng xuất
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', logout);
+  }
 });
 
 // Đăng xuất
@@ -906,19 +875,8 @@ function confirmDelete(result) {
   if (confirmCallback) confirmCallback(result);
   closeConfirmModal();
 }
-// Xuất các hàm để kiểm thử (đã loại bỏ để tương thích trình duyệt)
-// Thay vào đó, gắn các hàm vào window để kiểm thử nếu cần
-window.testUtils = {
-  updateTable,
-  validateTransactionData,
-  populateSelect,
-  refreshTransactionList,
-  handleAdd,
-  deleteTransaction,
-  checkServerHealth
-};
 
-// Hàm hỗ trợ kiểm tra kết nối server
+// Hàm kiểm tra kết nối server
 async function checkServerHealth() {
   const { BACKEND_URL } = getConstants();
   try {
@@ -957,53 +915,9 @@ function formatDateTime(isoDate) {
   return `${day}/${month}/${year} ${hours}:${minutes}`;
 }
 
-// Hàm hỗ trợ tương thích cũ
-window.editRow = function(index) {
-  editTransaction(index);
-};
-
-window.deleteRow = function(index) {
-  deleteTransaction(index);
-};
-
-// Hàm xử lý lỗi mạng
-function handleNetworkError(err) {
-  showResultModal("Lỗi kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.", false);
-  console.error("Lỗi mạng:", err);
-}
-
-// Hàm retry cho các yêu cầu API
-async function retryFetch(url, options, retries = 3, delay = 1000) {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const response = await fetch(url, options);
-      return await response.json();
-    } catch (err) {
-      if (i < retries - 1) {
-        await new Promise(resolve => setTimeout(resolve, delay));
-        continue;
-      }
-      throw err;
-    }
-  }
-}
-
-// Hàm khởi tạo lại giao diện
-async function resetUI() {
-  await handleReset();
-  await refreshTransactionList();
-  updateTable();
-}
-
-// Hàm debug để ghi log chi tiết
-function debugLog(message, data) {
-  console.log(`[DEBUG] ${message}`, JSON.stringify(data, null, 2));
-}
-
 // Gắn sự kiện kiểm tra kết nối định kỳ
 setInterval(async () => {
   if (!(await checkServerHealth())) {
     showResultModal("Mất kết nối với server. Vui lòng kiểm tra lại.", false);
   }
 }, 60000); // Kiểm tra mỗi 60 giây
->>>>>>> ac47a461625a53a6b9eeca560f0c5385c0dbd876

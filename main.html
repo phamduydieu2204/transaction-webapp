@@ -1,53 +1,16 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-<<<<<<< HEAD
-  <title>Hệ thống quản lý</title>
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-</head>
-<body>
-  <div id="headerContainer"></div>
-  <div id="formContainer"></div>
-  <div id="paginationContainer"></div>
-  <div id="listContainer"></div>
-  <div id="modalsContainer"></div>
-  <div id="messagesContainer"></div>
-
-  <script type="module">
-    async function loadHTML(id, file) {
-      const res = await fetch(file);
-      const html = await res.text();
-      document.getElementById(id).innerHTML = html;
-    }
-
-    loadHTML("headerContainer", "header.html");
-    loadHTML("formContainer", "form.html");
-    loadHTML("paginationContainer", "pagination.html");
-    loadHTML("listContainer", "list.html");
-    loadHTML("modalsContainer", "modals.html");
-    loadHTML("messagesContainer", "messages.html");
-  </script>
-
-  <script type="module" src="js/main.js"></script>
-</body>
-</html>
-=======
-  <title>Trang chính</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; connect-src 'self'">
+  <title>Quản lý giao dịch</title>
   <!-- Liên kết tới CSS chính -->
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css">
   <!-- Thêm Flatpickr CSS cho lịch -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <!-- Thêm Font Awesome cho các icon (lịch, copy, đăng xuất, kính lúp) -->
+  <!-- Thêm Font Awesome cho các icon -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <!-- Tải script JavaScript -->
-  <script defer src="js/constants.js"></script>
-  <script src="js/main.js"></script>
-  <!-- Thêm Flatpickr JS -->
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <style>
     /* Container cho trường nhập ngày với icon lịch */
     .date-input-container {
@@ -293,7 +256,7 @@
   <!-- Container chính cho trang quản lý -->
   <div class="container">
     <!-- Nút đăng xuất -->
-    <button class="logout-btn" onclick="logout()">
+    <button class="logout-btn" id="logoutBtn">
       <i class="fas fa-sign-out-alt"></i> Đăng xuất
     </button>
 
@@ -476,8 +439,11 @@
     <!-- Khu vực thông báo thành công/lỗi (dự phòng) -->
     <p id="successMessage"></p>
     <p id="errorMessage"></p>
-  </div>
 
+  <!-- Tải script JavaScript -->
+  <script defer src="js/constants.js"></script>
+  <script src="js/main.js"></script>
+  <!-- Thêm Flatpickr JS -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </body>
 </html>
->>>>>>> ac47a461625a53a6b9eeca560f0c5385c0dbd876
