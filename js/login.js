@@ -3,8 +3,7 @@ function togglePassword() {
   passwordInput.type = (passwordInput.type === 'password') ? 'text' : 'password';
 }
 
-async function handleLogin(event) {
-  event.preventDefault();
+async function handleLogin() {
   console.log("Bắt đầu đăng nhập...");
 
   const { BACKEND_URL } = getConstants();
@@ -26,7 +25,9 @@ async function handleLogin(event) {
   try {
     const response = await fetch(BACKEND_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json' // Thêm header này
+      },
       body: JSON.stringify(body)
     });
 
@@ -47,7 +48,3 @@ async function handleLogin(event) {
     console.error(error);
   }
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('loginForm').addEventListener('submit', handleLogin);
-});
