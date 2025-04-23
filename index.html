@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -23,3 +24,37 @@
   <script type="module" src="js/login.js"></script>
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Đăng nhập</title>
+  <!-- Liên kết tới file CSS cho giao diện -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="login-page">
+  <!-- Container chính cho form đăng nhập -->
+  <div class="login-container">
+    <h2>Đăng nhập hệ thống</h2>
+    <!-- Trường nhập mã nhân viên với placeholder rõ ràng -->
+    <input type="text" id="employeeCode" placeholder="Nhập mã nhân viên">
+
+    <!-- Container cho trường mật khẩu với nút toggle hiển thị -->
+    <div class="password-container">
+      <input type="password" id="password" placeholder="Nhập mật khẩu">
+      <span class="toggle-password" onclick="togglePassword()">👁️</span>
+    </div>
+
+    <!-- Nút đăng nhập -->
+    <button onclick="handleLogin()">Đăng nhập</button>
+    <!-- Khu vực hiển thị thông báo lỗi -->
+    <p id="errorMessage" class="error"></p>
+  </div>
+
+  <!-- Tải các script JavaScript -->
+  <script src="js/constants.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>
+>>>>>>> ac47a461625a53a6b9eeca560f0c5385c0dbd876
