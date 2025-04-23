@@ -2,24 +2,23 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; connect-src 'self'">
   <title>Đăng nhập</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="login-page">
   <div class="login-container">
     <h2>Đăng nhập hệ thống</h2>
-    <form id="loginForm">
-      <input type="text" id="employeeCode" placeholder="Mã nhân viên" required>
-      <div class="password-container">
-        <input type="password" id="password" placeholder="Mật khẩu" required>
-        <span class="toggle-password" onclick="togglePassword()">👁️</span>
-      </div>
-      <button type="submit">Đăng nhập</button>
-      <p id="errorMessage" class="error"></p>
-    </form>
+    <input type="text" id="employeeCode" placeholder="Mã nhân viên">
+
+    <div class="password-container">
+      <input type="password" id="password" placeholder="Mật khẩu">
+      <span class="toggle-password" onclick="togglePassword()">👁️</span>
+    </div>
+
+    <button onclick="handleLogin()">Đăng nhập</button>
+    <p id="errorMessage" class="error"></p>
   </div>
+
   <script src="js/constants.js"></script>
   <script src="js/login.js"></script>
 </body>
