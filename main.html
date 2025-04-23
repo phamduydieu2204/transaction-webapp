@@ -3,16 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; connect-src 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; connect-src 'self'; script-src 'self' https://cdn.jsdelivr.net">
   <title>Quản lý giao dịch</title>
-  <!-- Liên kết tới CSS chính -->
   <link rel="stylesheet" href="css/style.css">
-  <!-- Thêm Flatpickr CSS cho lịch -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <!-- Thêm Font Awesome cho các icon -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    /* Container cho trường nhập ngày với icon lịch */
     .date-input-container {
       position: relative;
       display: flex;
@@ -28,8 +24,6 @@
       cursor: pointer;
       color: #007bff;
     }
-
-    /* Modal cơ bản */
     .modal {
       display: none;
       position: fixed;
@@ -41,7 +35,6 @@
       overflow: auto;
       background-color: rgba(0, 0, 0, 0.4);
     }
-
     .modal-content {
       background-color: #fefefe;
       margin: 5% auto;
@@ -52,7 +45,6 @@
       border-radius: 10px;
       position: relative;
     }
-
     .close {
       color: #aaa;
       float: right;
@@ -60,50 +52,40 @@
       font-weight: bold;
       cursor: pointer;
     }
-
     .close:hover,
     .close:focus {
       color: black;
       text-decoration: none;
     }
-
-    /* Nội dung chi tiết trong modal */
     .detail-content {
       margin-top: 20px;
       font-size: 14px;
     }
-
     .detail-content .detail-row {
       display: flex;
       align-items: center;
       padding: 8px 0;
       border-bottom: 1px solid #ddd;
     }
-
     .detail-content .detail-row:last-child {
       border-bottom: none;
     }
-
     .detail-content .detail-label {
       font-weight: bold;
       margin-right: 10px;
     }
-
     .detail-content .detail-value {
       flex: 1;
     }
-
     .detail-content .copy-icon {
       margin-left: 10px;
       cursor: pointer;
       color: #007bff;
       position: relative;
     }
-
     .detail-content .copy-icon:hover {
       color: #0056b3;
     }
-
     .copy-message {
       position: absolute;
       left: 100%;
@@ -113,32 +95,24 @@
       opacity: 0;
       transition: opacity 0.3s ease;
     }
-
     .copy-message.show {
       opacity: 1;
     }
-
-    /* Container chính */
     .container {
       padding-bottom: 20px;
       position: relative;
     }
-
-    /* Header cố định */
     .fixed-header {
       position: sticky;
       top: 0;
       z-index: 10;
       background-color: #fff;
     }
-
-    /* Bảng giao dịch */
     #transactionTable {
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
     }
-
     #transactionTable thead {
       position: sticky;
       top: 0;
@@ -146,32 +120,26 @@
       background-color: #007bff;
       color: white;
     }
-
     #transactionTable th,
     #transactionTable td {
       border: 1px solid #ddd;
       padding: 8px;
       text-align: left;
     }
-
     #transactionTable tbody {
       display: block;
       max-height: 400px;
       overflow-y: auto;
     }
-
     #transactionTable thead,
     #transactionTable tbody tr {
       display: table;
       width: 100%;
       table-layout: fixed;
     }
-
     #transactionTable tbody tr:nth-child(even) {
       background-color: #f9f9f9;
     }
-
-    /* Nút đăng xuất */
     .logout-btn {
       position: absolute;
       top: 10px;
@@ -186,22 +154,16 @@
       align-items: center;
       z-index: 20;
     }
-
     .logout-btn:hover {
       background-color: #c82333;
     }
-
     .logout-btn i {
       margin-right: 5px;
     }
-
-    /* Tùy chọn không khả dụng trong select */
     option.unavailable {
       font-style: italic;
       color: #888;
     }
-
-    /* Container cho trường tìm kiếm với icon kính lúp */
     .search-icon-container {
       position: relative;
       display: flex;
@@ -217,15 +179,11 @@
       cursor: pointer;
       color: #007bff;
     }
-
-    /* Placeholder cho trường tìm kiếm */
     input[placeholder="Đang tìm kiếm..."] {
       font-style: italic;
       color: #888;
       opacity: 0.7;
     }
-
-    /* Định dạng mặc định cho input */
     input[type="text"],
     input[type="email"],
     input[type="number"],
@@ -234,8 +192,6 @@
       color: #000;
       opacity: 1;
     }
-
-    /* Khu vực thông báo */
     #notification {
       margin: 10px 0;
       padding: 10px;
@@ -253,29 +209,21 @@
   </style>
 </head>
 <body>
-  <!-- Container chính cho trang quản lý -->
   <div class="container">
-    <!-- Nút đăng xuất -->
     <button class="logout-btn" id="logoutBtn">
       <i class="fas fa-sign-out-alt"></i> Đăng xuất
     </button>
-
     <h1>Hệ thống quản lý</h1>
-    <!-- Khu vực hiển thị thông tin chào mừng -->
     <p id="welcome"></p>
     <hr>
-
-    <!-- Form nhập thông tin giao dịch -->
     <form id="transactionForm" class="form-grid fixed-header" onreset="handleReset()">
-      <!-- Dòng 1 -->
       <div>
         <label>Ngày giao dịch:</label>
         <div class="date-input-container">
-          <input type="text" id="transactionDate" placeholder="Chọn ngày (yyyy/mm/dd)">
+          <input type="text" id="transactionDate" placeholder="yyyy/mm/dd">
           <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('transactionDate')"></i>
         </div>
       </div>
-
       <div>
         <label>Loại giao dịch:</label>
         <select id="transactionType" required>
@@ -286,85 +234,69 @@
           <option value="Nhập hàng">Nhập hàng</option>
         </select>
       </div>
-
       <div>
         <label>Email:</label>
-        <input type="email" id="customerEmail" placeholder="Nhập email khách hàng">
+        <input type="email" id="customerEmail">
       </div>
-
       <div>
         <label>Tên khách hàng:</label>
         <div class="search-icon-container">
-          <input type="text" id="customerName" placeholder="Nhập tên khách hàng">
+          <input type="text" id="customerName">
           <i class="fas fa-search search-icon" onclick="updateCustomerInfo()"></i>
         </div>
       </div>
-
       <div>
         <label>Liên hệ:</label>
-        <input type="text" id="customerPhone" placeholder="Nhập số điện thoại">
+        <input type="text" id="customerPhone">
       </div>
-
-      <!-- Dòng 2 -->
       <div>
         <label>Số tháng đăng ký:</label>
-        <input type="number" id="duration" placeholder="Nhập số tháng">
+        <input type="number" id="duration">
       </div>
-
       <div>
         <label>Ngày bắt đầu:</label>
         <div class="date-input-container">
-          <input type="text" id="startDate" placeholder="Chọn ngày (yyyy/mm/dd)">
+          <input type="text" id="startDate" placeholder="yyyy/mm/dd">
           <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('startDate')"></i>
         </div>
       </div>
-
       <div>
         <label>Ngày kết thúc:</label>
         <div class="date-input-container">
-          <input type="text" id="endDate" placeholder="Chọn ngày (yyyy/mm/dd)">
+          <input type="text" id="endDate" placeholder="yyyy/mm/dd">
           <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('endDate')"></i>
         </div>
       </div>
-
       <div>
         <label>Số thiết bị:</label>
-        <input type="number" id="deviceCount" placeholder="Nhập số thiết bị">
+        <input type="number" id="deviceCount">
       </div>
-
       <div>
         <label>Ghi chú:</label>
-        <textarea id="note" rows="2" placeholder="Nhập ghi chú (nếu có)"></textarea>
+        <textarea id="note" rows="2"></textarea>
       </div>
-
-      <!-- Dòng 3 -->
       <div>
         <label>Tên phần mềm:</label>
         <select id="softwareName">
           <option value="">-- Chọn phần mềm --</option>
         </select>
       </div>
-
       <div>
         <label>Gói phần mềm:</label>
         <select id="softwarePackage">
           <option value="">-- Chọn gói --</option>
         </select>
       </div>
-
       <div>
         <label>Tên tài khoản:</label>
         <select id="accountName">
           <option value="">-- Chọn tài khoản --</option>
         </select>
       </div>
-
       <div>
         <label>Doanh thu:</label>
-        <input type="number" id="revenue" placeholder="Nhập doanh thu">
+        <input type="number" id="revenue">
       </div>
-
-      <!-- Dòng 4: Các nút thao tác -->
       <div class="button-row">
         <button type="button" onclick="handleAdd()">Thêm</button>
         <button type="button" onclick="handleUpdate()">Cập nhật</button>
@@ -372,16 +304,9 @@
         <button type="reset">Làm mới</button>
       </div>
     </form>
-
-    <!-- Khu vực hiển thị thông báo -->
     <div id="notification"></div>
-
-    <!-- Tiêu đề danh sách giao dịch -->
     <h2 class="fixed-header">Danh sách giao dịch</h2>
-    <!-- Phân trang -->
     <div class="pagination fixed-header" id="pagination"></div>
-
-    <!-- Bảng hiển thị danh sách giao dịch -->
     <table id="transactionTable">
       <thead>
         <tr>
@@ -404,8 +329,6 @@
       </thead>
       <tbody></tbody>
     </table>
-
-    <!-- Modal hiển thị chi tiết giao dịch -->
     <div id="transactionDetailModal" class="modal">
       <div class="modal-content">
         <span class="close" onclick="closeModal()">×</span>
@@ -413,8 +336,6 @@
         <div class="detail-content" id="transactionDetailContent"></div>
       </div>
     </div>
-
-    <!-- Modal thông báo xử lý -->
     <div id="processingModal" class="modal">
       <div class="modal-content">
         <h2 id="modalTitle">Thông báo</h2>
@@ -422,8 +343,6 @@
         <span id="modalClose" class="close" style="display: none;" onclick="closeProcessingModal()">×</span>
       </div>
     </div>
-
-    <!-- Modal xác nhận xóa -->
     <div id="confirmDeleteModal" class="modal">
       <div class="modal-content">
         <span class="close" onclick="closeConfirmModal()">×</span>
@@ -435,15 +354,10 @@
         </div>
       </div>
     </div>
-
-    <!-- Khu vực thông báo thành công/lỗi (dự phòng) -->
     <p id="successMessage"></p>
     <p id="errorMessage"></p>
-
-  <!-- Tải script JavaScript -->
-  <script defer src="js/constants.js"></script>
-  <script src="js/main.js"></script>
-  <!-- Thêm Flatpickr JS -->
+  </div>
+  <script type="module" src="js/main.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </body>
 </html>

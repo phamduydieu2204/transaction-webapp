@@ -50,23 +50,4 @@ export function viewTransaction(index) {
     `;
     detailContent.appendChild(row);
 
-    if (field.showCopy) {
-      const copyIcon = row.querySelector(".copy-icon");
-      copyIcon.addEventListener("click", () => copyToClipboard(field.value, copyIcon));
-    }
-  });
-
-  modal.style.display = "block";
-
-  modal.addEventListener("click", function handler(event) {
-    if (event.target === modal) {
-      closeModal();
-      modal.removeEventListener("click", handler);
-    }
-  });
-}
-
-export function closeModal() {
-  const modal = document.getElementById("transactionDetailModal");
-  modal.style.display = "none";
-}
+    if (field
