@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-import { callProxyAPI } from './utils.js';
-
-function togglePassword() {
-  const passwordInput = document.getElementById('password');
-  passwordInput.type = (passwordInput.type === 'password') ? 'text' : 'password';
-}
-
-async function handleLogin() {
-=======
 // Chuyển đổi hiển thị mật khẩu
 function togglePassword() {
   const passwordInput = document.getElementById('password');
@@ -27,20 +17,14 @@ async function handleLogin() {
   console.log("Bắt đầu đăng nhập...");
 
   const { BACKEND_URL } = getConstants();
->>>>>>> ac47a461625a53a6b9eeca560f0c5385c0dbd876
   const employeeCode = document.getElementById('employeeCode').value.trim().toUpperCase();
   const password = document.getElementById('password').value.trim();
   const errorEl = document.getElementById('errorMessage');
 
-<<<<<<< HEAD
-  if (!employeeCode || !password) {
-    errorEl.textContent = 'Vui lòng nhập đầy đủ thông tin!';
-=======
   // Xác thực dữ liệu đầu vào
   const validationError = validateLoginData(employeeCode, password);
   if (validationError) {
     errorEl.textContent = validationError;
->>>>>>> ac47a461625a53a6b9eeca560f0c5385c0dbd876
     return;
   }
 
@@ -51,25 +35,6 @@ async function handleLogin() {
   };
 
   try {
-<<<<<<< HEAD
-    const result = await callProxyAPI(body);
-    if (result.status === 'success') {
-      localStorage.setItem('employeeInfo', JSON.stringify(result));
-      window.location.href = 'main.html';
-    } else {
-      errorEl.textContent = result.message || 'Đăng nhập thất bại!';
-    }
-  } catch (error) {
-    errorEl.textContent = 'Lỗi kết nối máy chủ: ' + error.message;
-  }
-}
-
-// Gắn sự kiện khi DOM đã sẵn sàng
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('loginButton').addEventListener('click', handleLogin);
-  document.getElementById('togglePassword').addEventListener('click', togglePassword);
-});
-=======
     console.log("🟢 Gửi login tới Heroku với body:", body);
     const response = await fetch(BACKEND_URL, {
       method: 'POST',
@@ -103,4 +68,12 @@ document.addEventListener('DOMContentLoaded', () => {
     errorEl.textContent = 'Không thể kết nối tới server. Vui lòng kiểm tra mạng và thử lại.';
   }
 }
->>>>>>> ac47a461625a53a6b9eeca560f0c5385c0dbd876
+
+// Gắn sự kiện khi DOM đã sẵn sàng
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('loginForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    handleLogin();
+  });
+  document.getElementById('togglePassword').addEventListener('click', togglePassword);
+});
