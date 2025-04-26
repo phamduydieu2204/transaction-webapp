@@ -14,31 +14,32 @@ window.currentSoftwarePackage = "";
 window.currentAccountName = "";
 
 // Nhập các tác vụ
-import { calculateEndDate } from './scripts/calculateEndDate.js';
-import { logout } from './scripts/logout.js';
-import { updateAccountList } from './scripts/updateAccountList.js';
-import { openCalendar } from './scripts/openCalendar.js';
-import { updateCustomerInfo } from './scripts/updateCustomerInfo.js';
-import { showProcessingModal } from './scripts/showProcessingModal.js';
-import { showResultModal } from './scripts/showResultModal.js';
-import { closeProcessingModal } from './scripts/closeProcessingModal.js';
-import { handleReset } from './scripts/handleReset.js';
-import { formatDate } from './scripts/formatDate.js';
-import { handleAdd } from './scripts/handleAdd.js';
-import { handleUpdate } from './scripts/handleUpdate.js';
-import { handleSearch } from './scripts/handleSearch.js';
-import { loadTransactions } from './scripts/loadTransactions.js';
-import { updateTable } from './scripts/updateTable.js';
-import { viewTransaction } from './scripts/viewTransaction.js';
-import { copyToClipboard } from './scripts/copyToClipboard.js';
-import { closeModal } from './scripts/closeModal.js';
-import { updatePagination, firstPage, prevPage, nextPage, lastPage, goToPage } from './scripts/pagination.js';
-import { editTransaction } from './scripts/editTransaction.js';
-import { deleteTransaction } from './scripts/deleteTransaction.js';
-import { fetchSoftwareList } from './scripts/fetchSoftwareList.js';
-import { updatePackageList } from './scripts/updatePackageList.js';
-import { editRow, deleteRow } from './scripts/legacy.js';
-import { formatDateTime, openConfirmModal, closeConfirmModal, confirmDelete } from './scripts/confirmModal.js';
+import { calculateEndDate } from './calculateEndDate.js';
+import { logout } from './logout.js';
+import { updateAccountList } from './updateAccountList.js';
+import { openCalendar } from './openCalendar.js';
+import { updateCustomerInfo } from './updateCustomerInfo.js';
+import { showProcessingModal } from './showProcessingModal.js';
+import { showResultModal } from './showResultModal.js';
+import { closeProcessingModal } from './closeProcessingModal.js';
+import { handleReset } from './handleReset.js';
+import { formatDate } from './formatDate.js';
+import { handleAdd } from './handleAdd.js';
+import { handleUpdate } from './handleUpdate.js';
+import { handleSearch } from './handleSearch.js';
+import { loadTransactions } from './loadTransactions.js';
+import { updateTable } from './updateTable.js';
+import { viewTransaction } from './viewTransaction.js';
+import { copyToClipboard } from './copyToClipboard.js';
+import { closeModal } from './closeModal.js';
+import { updatePagination, firstPage, prevPage, nextPage, lastPage, goToPage } from './pagination.js';
+import { editTransaction } from './editTransaction.js';
+import { deleteTransaction } from './deleteTransaction.js';
+import { fetchSoftwareList } from './fetchSoftwareList.js';
+import { updatePackageList } from './updatePackageList.js';
+import { editRow, deleteRow } from './legacy.js';
+import { formatDateTime } from './formatDateTime.js';
+import { openConfirmModal, closeConfirmModal, confirmDelete } from './confirmModal.js';
 
 // Hàm khởi tạo
 document.addEventListener("DOMContentLoaded", () => {
