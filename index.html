@@ -2,75 +2,24 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quản lý giao dịch</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Đăng nhập</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
-  <div class="container">
-    <h1>Quản lý giao dịch</h1>
-    <form id="transactionForm">
-      <h2 id="formTitle">Thêm Giao Dịch</h2>
-      <select id="transactionType" required>
-        <option value="">Chọn loại giao dịch</option>
-        <option value="Bán Hàng">Bán Hàng</option>
-        <option value="Dùng thử">Dùng thử</option>
-        <option value="Hoàn Tiền">Hoàn Tiền</option>
-      </select>
-      <input type="text" id="customerName" placeholder="Tên khách hàng" required>
-      <input type="email" id="customerEmail" placeholder="Email" required>
-      <input type="text" id="customerPhone" placeholder="Liên hệ" required>
-      <input type="number" id="duration" placeholder="Số tháng đăng ký" required>
-      <input type="date" id="startDate" placeholder="Ngày bắt đầu" required>
-      <input type="date" id="endDate" placeholder="Ngày kết thúc" required>
-      <input type="number" id="deviceCount" placeholder="Số thiết bị" required>
-      <select id="softwareName" required>
-        <option value="">Chọn phần mềm</option>
-      </select>
-      <select id="softwarePackage" required>
-        <option value="">Chọn gói phần mềm</option>
-      </select>
-      <select id="accountName" required>
-        <option value="">Chọn tài khoản</option>
-      </select>
-      <input type="number" id="revenue" placeholder="Doanh thu" required>
-      <textarea id="note" placeholder="Ghi chú"></textarea>
-      <button type="submit" id="submitButton">Thêm</button>
-    </form>
-    <table id="transactionTable">
-      <thead>
-        <tr>
-          <th>Mã giao dịch</th>
-          <th>Ngày giao dịch</th>
-          <th>Loại giao dịch</th>
-          <th>Tên khách hàng</th>
-          <th>Email</th>
-          <th>Liên hệ</th>
-          <th>Số tháng</th>
-          <th>Ngày bắt đầu</th>
-          <th>Ngày kết thúc</th>
-          <th>Số thiết bị</th>
-          <th>Tên phần mềm</th>
-          <th>Gói phần mềm</th>
-          <th>Tên tài khoản</th>
-          <th>Doanh thu</th>
-          <th>Ghi chú</th>
-          <th>Hành động</th>
-        </tr>
-      </thead>
-      <tbody id="transactionTableBody"></tbody>
-    </table>
-  </div>
-  <div id="processingModal" class="modal">
-    <div class="modal-content">
-      <p id="processingMessage">Đang xử lý...</p>
+<body class="login-page">
+  <div class="login-container">
+    <h2>Đăng nhập hệ thống</h2>
+    <input type="text" id="employeeCode" placeholder="Mã nhân viên">
+
+    <div class="password-container">
+      <input type="password" id="password" placeholder="Mật khẩu">
+      <span class="toggle-password" onclick="togglePassword()">👁️</span>
     </div>
+
+    <button onclick="handleLogin()">Đăng nhập</button>
+    <p id="errorMessage" class="error"></p>
   </div>
-  <div id="resultModal" class="modal">
-    <div class="modal-content">
-      <p id="resultMessage"></p>
-    </div>
-  </div>
-  <script type="module" src="main.js"></script>
+
+  <script src="js/constants.js"></script>
+  <script src="js/login.js"></script>
 </body>
 </html>
