@@ -42,6 +42,6 @@ export function editTransaction(index, transactionList, fetchSoftwareList, updat
   updatePackageList(window.softwareData, softwarePackageValue, updateAccountList);
   softwarePackageSelect.value = softwarePackageValue;
 
-  updateAccountList(accountNameValue);
+  updateAccountList(window.softwareData, accountNameValue);
   accountNameSelect.value = accountNameValue;
 }
