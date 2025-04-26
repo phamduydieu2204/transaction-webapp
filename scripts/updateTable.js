@@ -1,6 +1,9 @@
-import { updatePagination, firstPage, prevPage, nextPage, lastPage, goToPage } from './pagination.js';
+import { fetchSoftwareList } from './fetchSoftwareList.js';
+import { updatePackageList } from './updatePackageList.js';
+import { updateAccountList } from './updateAccountList.js';
+import { updatePagination } from './pagination.js';
 
-export function updateTable(transactionList, currentPage, itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction, updatePaginationFn) {
+export function updateTable(transactionList, currentPage, itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction) {
   const tableBody = document.querySelector("#transactionTable tbody");
   tableBody.innerHTML = "";
 
@@ -34,7 +37,7 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     `;
 
     const editButton = row.querySelector(".edit-btn");
-    editButton.addEventListener("click", () => editTransaction(startIndex + index));
+    editButton.addEventListener("click", () => editTransaction(startIndex + index, transactionList, fetchSoftwareList, updatePackageList, updateAccountList));
 
     const deleteButton = row.querySelector(".delete-btn");
     deleteButton.addEventListener("click", () => {
@@ -45,5 +48,5 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     tableBody.appendChild(row);
   });
 
-  updatePagination(totalPages, currentPage, firstPage, prevPage, nextPage, lastPage, goToPage);
+  updatePagination(totalPages);
 }
