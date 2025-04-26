@@ -54,7 +54,7 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
     if (result.status === "success") {
       document.getElementById("successMessage").textContent = "Giao dịch đã được lưu!";
       handleReset();
-      await loadTransactions(userInfo, updateTable, getConstants);
+      await loadTransactions(userInfo, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction);
       updatePackageList();
       showResultModal("Giao dịch đã được lưu!", true);
     } else {
