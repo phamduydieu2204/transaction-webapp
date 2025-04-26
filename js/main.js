@@ -260,6 +260,25 @@ function formatDate(dateString) {
 
 // Thêm giao dịch mới
 async function handleAdd() {
+  if (currentEditTransactionId !== null) {
+    const choice = await showChoiceModal(
+      "Bạn đang trong tiến trình sửa giao dịch. Bạn muốn thêm giao dịch mới hay cập nhật giao dịch hiện có?",
+      [
+        { label: "Thêm giao dịch mới", value: "add" },
+        { label: "Cập nhật giao dịch hiện có", value: "update" },
+        { label: "Hủy bỏ", value: "cancel" }
+      ]
+    );
+
+    if (choice === "update") {
+      handleUpdate();
+      return;
+    } else if (choice === "cancel" || choice === null) {
+      closeProcessingModal();
+      return;
+    }
+  }
+
   showProcessingModal("Đang thêm giao dịch...");
   const { BACKEND_URL } = getConstants();
   if (!userInfo) {
@@ -296,7 +315,7 @@ async function handleAdd() {
     note: note,
     tenNhanVien: userInfo.tenNhanVien,
     maNhanVien: userInfo.maNhanVien,
-    originalTransactionId: transactionType === "Hoàn Tiền" ? currentEditTransactionId : null // Gửi mã giao dịch gốc nếu là Hoàn Tiền
+    originalTransactionId: transactionType === "Hoàn Tiền" ? currentEditTransactionId : null
   };
 
   console.log("📤 Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
@@ -1041,4 +1060,44 @@ function confirmDelete(result) {
     confirmCallback(result);
   }
   closeConfirmModal();
+}
+// Tác vụ: Hiển thị modal lựa chọn
+async function showChoiceModal(message, options) {
+  return new Promise((resolve) => {
+    const modal = document.getElementById("processingModal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalMessage = document.getElementById("modalMessage");
+    const modalClose = document.getElementById("modalClose");
+
+    modalTitle.textContent = "Thông báo";
+    modalMessage.innerHTML = `<p>${message}</p>`;
+    modalClose.style.display = "none";
+
+    // Xóa các nút cũ nếu có
+    const existingButtons = modalMessage.querySelectorAll("button");
+    existingButtons.forEach(btn => btn.remove());
+
+    // Tạo các nút lựa chọn
+    options.forEach(option => {
+      const button = document.createElement("button");
+      button.textContent = option.label;
+      button.style.margin = "5px";
+      button.onclick = () => {
+        modal.style.display = "none";
+        resolve(option.value);
+      };
+      modalMessage.appendChild(button);
+    });
+
+    modal.style.display = "block";
+
+    // Đóng modal khi nhấn ngoài
+    modal.addEventListener("click", function handler(event) {
+      if (event.target === modal) {
+        modal.style.display = "none";
+        resolve(null);
+        modal.removeEventListener("click", handler);
+      }
+    });
+  });
 }
