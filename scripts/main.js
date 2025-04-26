@@ -14,6 +14,7 @@ window.currentSoftwarePackage = "";
 window.currentAccountName = "";
 
 // Nhập các tác vụ
+import { getConstants } from './constants.js';
 import { calculateEndDate } from './calculateEndDate.js';
 import { logout } from './logout.js';
 import { updateAccountList } from './updateAccountList.js';
@@ -75,11 +76,11 @@ document.addEventListener("DOMContentLoaded", () => {
   durationInput.addEventListener("input", () => calculateEndDate(startDateInput, durationInput, endDateInput));
 
   // Tải danh sách phần mềm và giao dịch
-  fetchSoftwareList(null);
+  fetchSoftwareList(null, window.softwareData, updatePackageList);
   document.getElementById("softwareName").addEventListener("change", () => updatePackageList());
   document.getElementById("softwarePackage").addEventListener("change", () => updateAccountList());
 
-  loadTransactions();
+  loadTransactions(window.userInfo, updateTable, getConstants);
 });
 
 // Xuất các hàm để sử dụng trong HTML

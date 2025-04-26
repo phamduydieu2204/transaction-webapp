@@ -1,3 +1,5 @@
+import { getConstants } from './constants.js';
+
 function togglePassword() {
   const passwordInput = document.getElementById('password');
   passwordInput.type = (passwordInput.type === 'password') ? 'text' : 'password';
@@ -26,7 +28,7 @@ async function handleLogin() {
     const response = await fetch(BACKEND_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json' // Thêm header này
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(body)
     });
@@ -38,7 +40,13 @@ async function handleLogin() {
     const result = await response.json();
 
     if (result.status === 'success') {
-      localStorage.setItem('employeeInfo', JSON.stringify(result));
+      // Lưu chỉ các trường cần thiết
+      const employeeInfo = {
+        tenNhanVien: result.tenNhanVien,
+        maNhanVien: result.maNhanVien,
+        vaiTro: result.vaiTro
+      };
+      localStorage.setItem('employeeInfo', JSON.stringify(employeeInfo));
       window.location.href = 'main.html';
     } else {
       errorEl.textContent = result.message || 'Đăng nhập thất bại!';
