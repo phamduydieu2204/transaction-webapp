@@ -1,6 +1,6 @@
 import { getConstants } from './constants.js';
 
-export async function handleSearch(userInfo, transactionList, showProcessingModal, showResultModal, updateTable) {
+export async function handleSearch(userInfo, transactionList, showProcessingModal, showResultModal, updateTable, updatePagination, firstPage, prevPage, nextPage, lastPage, goToPage, formatDate, editTransaction, deleteTransaction, viewTransaction) {
   if (!userInfo || !userInfo.vaiTro) {
     showResultModal("Thông tin vai trò không hợp lệ. Vui lòng đăng nhập lại.", false);
     return;
@@ -69,7 +69,7 @@ export async function handleSearch(userInfo, transactionList, showProcessingModa
         return idB - idA;
       });
       window.currentPage = 1;
-      updateTable();
+      updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction, updatePagination, firstPage, prevPage, nextPage, lastPage, goToPage);
       showResultModal(`Tìm kiếm thành công! Tìm thấy ${result.data.length} giao dịch.`, true);
     } else {
       showResultModal(result.message || "Không thể tìm kiếm giao dịch!", false);

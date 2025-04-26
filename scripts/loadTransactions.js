@@ -1,6 +1,6 @@
 import { getConstants } from './constants.js';
 
-export async function loadTransactions(userInfo, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction) {
+export async function loadTransactions(userInfo, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction, updatePagination, firstPage, prevPage, nextPage, lastPage, goToPage) {
   if (!userInfo) {
     console.error("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.");
     return { status: "error", message: "Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại." };
@@ -36,7 +36,7 @@ export async function loadTransactions(userInfo, updateTable, formatDate, editTr
         return idB - idA;
       });
       window.currentPage = 1;
-      updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
+      updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction, updatePagination, firstPage, prevPage, nextPage, lastPage, goToPage);
       return { status: "success", data: result.data };
     } else {
       document.getElementById("errorMessage").textContent = result.message || "Không thể tải danh sách giao dịch!";
