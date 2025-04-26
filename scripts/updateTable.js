@@ -1,4 +1,6 @@
-export function updateTable(transactionList, currentPage, itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction, updatePagination) {
+import { updatePagination, firstPage, prevPage, nextPage, lastPage, goToPage } from './pagination.js';
+
+export function updateTable(transactionList, currentPage, itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction, updatePaginationFn) {
   const tableBody = document.querySelector("#transactionTable tbody");
   tableBody.innerHTML = "";
 

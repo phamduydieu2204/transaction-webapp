@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("softwareName").addEventListener("change", () => updatePackageList(window.softwareData, null, updateAccountList));
   document.getElementById("softwarePackage").addEventListener("change", () => updateAccountList(window.softwareData, null));
 
-  loadTransactions(window.userInfo, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction, updatePagination, firstPage, prevPage, nextPage, lastPage, goToPage);
+  loadTransactions(window.userInfo, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction);
 });
 
 // Xuất các hàm để sử dụng trong HTML
@@ -90,7 +90,7 @@ window.updateCustomerInfo = () => updateCustomerInfo(window.transactionList);
 window.handleReset = () => handleReset(fetchSoftwareList, showProcessingModal, showResultModal, window.todayFormatted);
 window.handleAdd = () => handleAdd(window.userInfo, window.currentEditTransactionId, loadTransactions, handleReset, updatePackageList, showProcessingModal, showResultModal);
 window.handleUpdate = () => handleUpdate(window.userInfo, window.currentEditTransactionId, window.transactionList, loadTransactions, handleReset, showProcessingModal, showResultModal, getConstants);
-window.handleSearch = () => handleSearch(window.userInfo, window.transactionList, showProcessingModal, showResultModal, updateTable, updatePagination, firstPage, prevPage, nextPage, lastPage, goToPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
+window.handleSearch = () => handleSearch(window.userInfo, window.transactionList, showProcessingModal, showResultModal, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction);
 window.viewTransaction = (index) => viewTransaction(index, window.transactionList, formatDate, copyToClipboard, closeModal);
 window.editTransaction = (index) => editTransaction(index, window.transactionList, fetchSoftwareList, updatePackageList, updateAccountList);
 window.deleteTransaction = (index) => deleteTransaction(index, window.transactionList, window.userInfo, loadTransactions, handleReset, showProcessingModal, showResultModal, openConfirmModal, getConstants);
