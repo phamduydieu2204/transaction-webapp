@@ -1,11 +1,11 @@
 import { getConstants } from './constants.js';
 
-function togglePassword() {
+export function togglePassword() {
   const passwordInput = document.getElementById('password');
   passwordInput.type = (passwordInput.type === 'password') ? 'text' : 'password';
 }
 
-async function handleLogin() {
+export async function handleLogin() {
   console.log("Bắt đầu đăng nhập...");
 
   const { BACKEND_URL } = getConstants();
@@ -40,7 +40,6 @@ async function handleLogin() {
     const result = await response.json();
 
     if (result.status === 'success') {
-      // Lưu chỉ các trường cần thiết
       const employeeInfo = {
         tenNhanVien: result.tenNhanVien,
         maNhanVien: result.maNhanVien,
@@ -56,3 +55,7 @@ async function handleLogin() {
     console.error(error);
   }
 }
+
+// Gắn các hàm vào window để sử dụng trong sự kiện onclick
+window.togglePassword = togglePassword;
+window.handleLogin = handleLogin;
