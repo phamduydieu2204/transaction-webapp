@@ -1,6 +1,6 @@
 import { getConstants } from './constants.js';
 
-export async function fetchSoftwareList(softwareNameToKeep, softwareData, updatePackageList) {
+export async function fetchSoftwareList(softwareNameToKeep, softwareData, updatePackageList, updateAccountList) {
   const { BACKEND_URL } = getConstants();
   const data = {
     action: "getSoftwareList"
@@ -41,7 +41,7 @@ export async function fetchSoftwareList(softwareNameToKeep, softwareData, update
 
       softwareNameSelect.value = softwareNameToKeep || window.currentSoftwareName || "";
 
-      updatePackageList();
+      updatePackageList(window.softwareData, null, updateAccountList);
     } else {
       console.error("Lỗi khi lấy danh sách phần mềm:", result.message);
     }
