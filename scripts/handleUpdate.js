@@ -1,6 +1,6 @@
 import { getConstants } from './constants.js';
 
-export async function handleUpdate(userInfo, currentEditTransactionId, transactionList, loadTransactions, handleReset, showProcessingModal, showResultModal, getConstants) {
+export async function handleUpdate(userInfo, currentEditTransactionId, transactionList, loadTransactions, handleReset, showProcessingModal, showResultModal, getConstants, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction) {
   showProcessingModal("Đang cập nhật giao dịch...");
   const { BACKEND_URL } = getConstants();
   if (!userInfo) {
