@@ -48,6 +48,11 @@ export function editTransaction(index, transactionList, fetchSoftwareList, updat
   updateAccountList(window.softwareData, accountNameValue);
   accountNameSelect.value = accountNameValue;
 
+  // Thêm sự kiện 'change' cho dropdown tài khoản để cập nhật tài khoản hiện tại
+  accountNameSelect.addEventListener('change', () => {
+    window.currentAccountName = accountNameSelect.value;
+  });
+
   // Gán transactionType, xử lý không phân biệt chữ hoa - chữ thường
   if (!transactionTypeSelect) {
     console.error("Không tìm thấy trường transactionType trong DOM");
