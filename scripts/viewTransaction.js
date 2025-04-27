@@ -1,3 +1,5 @@
+import { closeModal } from './closeModal.js';
+
 export function viewTransaction(index, transactionList, formatDate, copyToClipboard, closeModal) {
     const transaction = transactionList[index];
     const modal = document.getElementById("transactionDetailModal");

@@ -98,5 +98,6 @@ window.editTransaction = (index) => editTransaction(index, window.transactionLis
 window.deleteTransaction = (index) => deleteTransaction(index, window.transactionList, window.userInfo, loadTransactions, handleReset, showProcessingModal, showResultModal, openConfirmModal, getConstants);
 window.editRow = (index) => editRow(index, window.transactionList);
 window.deleteRow = (index) => deleteRow(index, deleteTransaction);
+window.closeModal = closeModal;
 window.confirmDelete = confirmDelete;
 window.closeProcessingModal = closeProcessingModal;
