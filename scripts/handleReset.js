@@ -19,7 +19,7 @@ export async function handleReset(fetchSoftwareList, showProcessingModal, showRe
   softwarePackageSelect.removeEventListener("focus", softwarePackageSelect.focusHandler);
   accountNameSelect.removeEventListener("focus", accountNameSelect.focusHandler);
 
-  document.getElementById("transactionType").value = "";
+  // Không đặt lại transactionType trực tiếp, để form.reset() xử lý
   document.getElementById("softwareName").value = "";
   document.getElementById("softwarePackage").value = "";
   document.getElementById("accountName").value = "";
