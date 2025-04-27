@@ -26,16 +26,7 @@ export function editTransaction(index, transactionList, fetchSoftwareList, updat
   window.currentSoftwarePackage = softwarePackageValue;
   window.currentAccountName = accountNameValue;
 
-  // Log để kiểm tra transactionType
-  console.log("Giá trị transactionType:", transactionTypeValue);
-  if (!transactionTypeSelect) {
-    console.error("Không tìm thấy trường transactionType trong DOM");
-  } else {
-    console.log("Các giá trị tùy chọn transactionType:", Array.from(transactionTypeSelect.options).map(opt => opt.value));
-    transactionTypeSelect.value = transactionTypeValue;
-    console.log("Giá trị transactionType sau khi gán:", transactionTypeSelect.value);
-  }
-
+  // Điền các trường khác trước
   document.getElementById("transactionDate").value = transaction.transactionDate;
   document.getElementById("customerName").value = transaction.customerName;
   document.getElementById("customerEmail").value = transaction.customerEmail;
@@ -47,6 +38,7 @@ export function editTransaction(index, transactionList, fetchSoftwareList, updat
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 
+  // Cập nhật danh sách phần mềm, gói, và tài khoản
   fetchSoftwareList(softwareNameValue, window.softwareData, updatePackageList, updateAccountList);
   softwareNameSelect.value = softwareNameValue;
 
@@ -55,4 +47,19 @@ export function editTransaction(index, transactionList, fetchSoftwareList, updat
 
   updateAccountList(window.softwareData, accountNameValue);
   accountNameSelect.value = accountNameValue;
+
+  // Gán transactionType sau cùng để tránh bị ghi đè
+  if (!transactionTypeSelect) {
+    console.error("Không tìm thấy trường transactionType trong DOM");
+  } else {
+    console.log("Giá trị transactionType trước khi gán:", transactionTypeValue);
+    console.log("Các giá trị tùy chọn transactionType:", Array.from(transactionTypeSelect.options).map(opt => opt.value));
+    transactionTypeSelect.value = transactionTypeValue;
+    console.log("Giá trị transactionType sau khi gán:", transactionTypeSelect.value);
+    // Kiểm tra xem giá trị có được gán đúng không
+    if (transactionTypeSelect.value !== transactionTypeValue) {
+      console.warn("Giá trị transactionType không được gán đúng, thử gán lại:", transactionTypeValue);
+      transactionTypeSelect.value = transactionTypeValue;
+    }
+  }
 }
