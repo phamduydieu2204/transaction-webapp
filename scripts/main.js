@@ -87,11 +87,11 @@ document.addEventListener("DOMContentLoaded", () => {
 window.logout = logout;
 window.openCalendar = (inputId) => openCalendar(inputId, calculateEndDate, document.getElementById("startDate"), document.getElementById("duration"), document.getElementById("endDate"));
 window.updateCustomerInfo = () => updateCustomerInfo(window.transactionList);
-window.handleReset = () => handleReset(fetchSoftwareList, showProcessingModal, showResultModal, window.todayFormatted);
+window.handleReset = () => handleReset(fetchSoftwareList, showProcessingModal, showResultModal, window.todayFormatted, updatePackageList, updateAccountList);
 window.handleAdd = () => handleAdd(window.userInfo, window.currentEditTransactionId, loadTransactions, handleReset, updatePackageList, showProcessingModal, showResultModal);
-window.handleUpdate = () => handleUpdate(window.userInfo, window.currentEditTransactionId, window.transactionList, loadTransactions, handleReset, showProcessingModal, showResultModal, getConstants, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction, fetchSoftwareList);
+window.handleUpdate = () => handleUpdate(window.userInfo, window.currentEditTransactionId, window.transactionList, loadTransactions, handleReset, showProcessingModal, showResultModal, getConstants, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction, fetchSoftwareList, updatePackageList, updateAccountList);
 window.handleSearch = () => handleSearch(window.userInfo, window.transactionList, showProcessingModal, showResultModal, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction);
-window.viewTransaction = (index) => viewTransaction(index, window.transactionList, formatDate, copyToClipboard, closeModal);
+window.viewTransaction = (index) => viewTransaction(index, window.transactionList, formatDate, copyToClusteringModal);
 window.editTransaction = (index) => editTransaction(index, window.transactionList, fetchSoftwareList, updatePackageList, updateAccountList);
 window.deleteTransaction = (index) => deleteTransaction(index, window.transactionList, window.userInfo, loadTransactions, handleReset, showProcessingModal, showResultModal, openConfirmModal, getConstants);
 window.editRow = (index) => editRow(index, window.transactionList);
