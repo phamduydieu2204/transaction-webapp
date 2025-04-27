@@ -1,3 +1,5 @@
+// handleAdd.js
+
 import { getConstants } from './constants.js';
 import { showProcessingModal } from './showProcessingModal.js';
 import { showResultModal } from './showResultModal.js';
@@ -10,7 +12,12 @@ import { editTransaction } from './editTransaction.js';
 import { deleteTransaction } from './deleteTransaction.js';
 import { viewTransaction } from './viewTransaction.js';
 import { openAddOrUpdateModal } from './handleAddOrUpdateModal.js';
+import { fetchSoftwareList } from './fetchSoftwareList.js'; // <<== thêm
+import { updateAccountList } from './updateAccountList.js'; // <<== thêm
 
+// Hàm lấy todayFormatted vì không lấy được trực tiếp từ main.js
+const today = new Date();
+const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
 
 export async function handleAdd(userInfo, currentEditTransactionId, loadTransactions, handleReset, updatePackageList, showProcessingModal, showResultModal) {
   // Nếu đang trong tiến trình sửa thì mở modal xác nhận
@@ -27,9 +34,6 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
     showResultModal("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.", false);
     return;
   }
-
-  const today = new Date();
-  const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
 
   const transactionType = document.getElementById("transactionType").value;
   let note = document.getElementById("note").value;
@@ -73,7 +77,7 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
     const result = await response.json();
     if (result.status === "success") {
       document.getElementById("successMessage").textContent = "Giao dịch đã được lưu!";
-      await handleReset();
+      await handleReset(fetchSoftwareList, showProcessingModal, showResultModal, todayFormatted, updatePackageList, updateAccountList);
       await loadTransactions(userInfo, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction);
       updatePackageList();
       showResultModal("Giao dịch đã được lưu!", true);
