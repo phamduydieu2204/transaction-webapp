@@ -427,5 +427,18 @@
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script type="module" src="scripts/main.js"></script>
+
+  <!-- Modal xác nhận thêm hoặc cập nhật giao dịch -->
+<div id="addOrUpdateModal" class="modal">
+  <div class="modal-content">
+    <h2>Bạn đang trong tiến trình sửa giao dịch</h2>
+    <p>Bạn muốn thêm giao dịch mới hay cập nhật giao dịch hiện có?</p>
+    <div style="text-align: center; margin-top: 20px;">
+      <button id="confirmAddNew" style="margin: 5px;">Thêm giao dịch mới</button>
+      <button id="confirmUpdate" style="margin: 5px;">Cập nhật giao dịch</button>
+      <button id="confirmCancel" style="margin: 5px;">Hủy bỏ</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

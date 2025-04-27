@@ -1,8 +1,28 @@
 import { getConstants } from './constants.js';
+import { showProcessingModal } from './showProcessingModal.js';
+import { showResultModal } from './showResultModal.js';
+import { loadTransactions } from './loadTransactions.js';
+import { updatePackageList } from './updatePackageList.js';
+import { handleReset } from './handleReset.js';
+import { updateTable } from './updateTable.js';
+import { formatDate } from './formatDate.js';
+import { editTransaction } from './editTransaction.js';
+import { deleteTransaction } from './deleteTransaction.js';
+import { viewTransaction } from './viewTransaction.js';
+import { openAddOrUpdateModal } from './handleAddOrUpdateModal.js';
+
 
 export async function handleAdd(userInfo, currentEditTransactionId, loadTransactions, handleReset, updatePackageList, showProcessingModal, showResultModal) {
+  // Nếu đang trong tiến trình sửa thì mở modal xác nhận
+  if (window.currentEditTransactionId !== null) {
+    console.log("Đang trong tiến trình sửa, mở modal lựa chọn thêm/cập nhật...");
+    openAddOrUpdateModal();
+    return;
+  }
+  
   showProcessingModal("Đang thêm giao dịch...");
   const { BACKEND_URL } = getConstants();
+
   if (!userInfo) {
     showResultModal("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.", false);
     return;
@@ -53,7 +73,7 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
     const result = await response.json();
     if (result.status === "success") {
       document.getElementById("successMessage").textContent = "Giao dịch đã được lưu!";
-      handleReset();
+      await handleReset();
       await loadTransactions(userInfo, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction);
       updatePackageList();
       showResultModal("Giao dịch đã được lưu!", true);

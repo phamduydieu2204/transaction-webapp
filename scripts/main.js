@@ -41,6 +41,8 @@ import { updatePackageList } from './updatePackageList.js';
 import { editRow, deleteRow } from './legacy.js';
 import { formatDateTime } from './formatDateTime.js';
 import { openConfirmModal, closeConfirmModal, confirmDelete } from './confirmModal.js';
+import { openAddOrUpdateModal, closeAddOrUpdateModal, handleAddNewTransaction, handleUpdateTransactionFromModal, handleCancelModal } from './handleAddOrUpdateModal.js';
+
 
 // Hàm khởi tạo
 document.addEventListener("DOMContentLoaded", () => {
@@ -91,7 +93,7 @@ window.handleReset = () => handleReset(fetchSoftwareList, showProcessingModal, s
 window.handleAdd = () => handleAdd(window.userInfo, window.currentEditTransactionId, loadTransactions, handleReset, updatePackageList, showProcessingModal, showResultModal);
 window.handleUpdate = () => handleUpdate(window.userInfo, window.currentEditTransactionId, window.transactionList, loadTransactions, handleReset, showProcessingModal, showResultModal, getConstants, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction, fetchSoftwareList, updatePackageList, updateAccountList);
 window.handleSearch = () => handleSearch(window.userInfo, window.transactionList, showProcessingModal, showResultModal, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction);
-window.viewTransaction = (index) => viewTransaction(index, window.transactionList, formatDate, copyToClusteringModal);
+window.viewTransaction = (index) => viewTransaction(index, window.transactionList, formatDate, copyToClipboard);
 window.editTransaction = (index) => editTransaction(index, window.transactionList, fetchSoftwareList, updatePackageList, updateAccountList);
 window.deleteTransaction = (index) => deleteTransaction(index, window.transactionList, window.userInfo, loadTransactions, handleReset, showProcessingModal, showResultModal, openConfirmModal, getConstants);
 window.editRow = (index) => editRow(index, window.transactionList);
