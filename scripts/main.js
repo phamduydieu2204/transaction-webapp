@@ -95,7 +95,21 @@ window.handleUpdate = () => handleUpdate(window.userInfo, window.currentEditTran
 window.handleSearch = () => handleSearch(window.userInfo, window.transactionList, showProcessingModal, showResultModal, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction);
 window.viewTransaction = (index) => viewTransaction(index, window.transactionList, formatDate, copyToClipboard);
 window.editTransaction = (index) => editTransaction(index, window.transactionList, fetchSoftwareList, updatePackageList, updateAccountList);
-window.deleteTransaction = (index) => deleteTransaction(index, window.transactionList, window.userInfo, loadTransactions, handleReset, showProcessingModal, showResultModal, openConfirmModal, getConstants);
+// Bọc deleteTransaction thành 1 "safe" function
+window.deleteTransaction = (index) => {
+  deleteTransaction(
+    index,
+    window.transactionList,
+    window.userInfo,
+    loadTransactions,
+    handleReset,
+    showProcessingModal,
+    showResultModal,
+    openConfirmModal,
+    getConstants
+  );
+};
+
 window.editRow = (index) => editRow(index, window.transactionList);
 window.deleteRow = (index) => deleteRow(index, deleteTransaction);
 window.closeModal = closeModal;
