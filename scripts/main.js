@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("softwareName").addEventListener("change", () => updatePackageList(window.softwareData, null, updateAccountList));
   document.getElementById("softwarePackage").addEventListener("change", () => updateAccountList(window.softwareData, null));
 
-  loadTransactions(window.userInfo, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction);
+  loadTransactions(window.userInfo, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction);
 });
 
 // Xuất các hàm để sử dụng trong HTML
