@@ -5,11 +5,19 @@ export async function handleReset(fetchSoftwareList, showProcessingModal, showRe
   showProcessingModal("Đang làm mới dữ liệu...");
   const startDateInput = document.getElementById("startDate");
   const transactionDateInput = document.getElementById("transactionDate");
+  const form = document.getElementById("transactionForm");
 
   startDateInput.value = todayFormatted;
   transactionDateInput.value = todayFormatted;
 
+  // Tạm thời vô hiệu hóa sự kiện onreset để tránh vòng lặp
+  const originalOnReset = form.onreset;
+  form.onreset = null;
+
   document.getElementById("transactionForm").reset();
+
+  // Khôi phục sự kiện onreset
+  form.onreset = originalOnReset;
 
   const softwareNameSelect = document.getElementById("softwareName");
   const softwarePackageSelect = document.getElementById("softwarePackage");
@@ -19,7 +27,6 @@ export async function handleReset(fetchSoftwareList, showProcessingModal, showRe
   softwarePackageSelect.removeEventListener("focus", softwarePackageSelect.focusHandler);
   accountNameSelect.removeEventListener("focus", accountNameSelect.focusHandler);
 
-  // Không đặt lại transactionType trực tiếp, để form.reset() xử lý
   document.getElementById("softwareName").value = "";
   document.getElementById("softwarePackage").value = "";
   document.getElementById("accountName").value = "";

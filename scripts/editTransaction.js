@@ -48,21 +48,25 @@ export function editTransaction(index, transactionList, fetchSoftwareList, updat
   updateAccountList(window.softwareData, accountNameValue);
   accountNameSelect.value = accountNameValue;
 
-  // Gán transactionType sau cùng, sử dụng setTimeout để tránh bị ghi đè
+  // Gán transactionType sau cùng, với độ trễ lớn hơn để tránh bị ghi đè
   if (!transactionTypeSelect) {
     console.error("Không tìm thấy trường transactionType trong DOM");
   } else {
     console.log("Giá trị transactionType trước khi gán:", transactionTypeValue);
     console.log("Các giá trị tùy chọn transactionType:", Array.from(transactionTypeSelect.options).map(opt => opt.value));
     setTimeout(() => {
-      transactionTypeSelect.value = transactionTypeValue;
-      console.log("Giá trị transactionType sau khi gán:", transactionTypeSelect.value);
-      // Kiểm tra xem giá trị có được gán đúng không
-      if (transactionTypeSelect.value !== transactionTypeValue) {
-        console.warn("Giá trị transactionType không được gán đúng, thử gán lại:", transactionTypeValue);
+      // Kiểm tra xem form có đang được reset không
+      const form = document.getElementById("transactionForm");
+      if (form && form.querySelector('select[id="transactionType"]').value === "") {
+        console.log("Form có thể đang được reset, thử gán transactionType...");
         transactionTypeSelect.value = transactionTypeValue;
-        console.log("Giá trị transactionType sau khi gán lại:", transactionTypeSelect.value);
+        console.log("Giá trị transactionType sau khi gán:", transactionTypeSelect.value);
+        if (transactionTypeSelect.value !== transactionTypeValue) {
+          console.warn("Giá trị transactionType không được gán đúng, thử gán lại:", transactionTypeValue);
+          transactionTypeSelect.value = transactionTypeValue;
+          console.log("Giá trị transactionType sau khi gán lại:", transactionTypeSelect.value);
+        }
       }
-    }, 0); // setTimeout với độ trễ 0ms để đảm bảo chạy sau các sự kiện reset
+    }, 100); // Tăng độ trễ lên 100ms để đảm bảo chạy sau tất cả các sự kiện reset
   }
 }
