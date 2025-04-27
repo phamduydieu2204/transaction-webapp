@@ -15,17 +15,28 @@ export function editTransaction(index, transactionList, fetchSoftwareList, updat
   const softwareNameSelect = document.getElementById("softwareName");
   const softwarePackageSelect = document.getElementById("softwarePackage");
   const accountNameSelect = document.getElementById("accountName");
+  const transactionTypeSelect = document.getElementById("transactionType");
 
   const softwareNameValue = transaction.softwareName || "";
   const softwarePackageValue = transaction.softwarePackage || "";
   const accountNameValue = transaction.accountName || "";
+  const transactionTypeValue = transaction.transactionType || "";
 
   window.currentSoftwareName = softwareNameValue;
   window.currentSoftwarePackage = softwarePackageValue;
   window.currentAccountName = accountNameValue;
 
+  // Log để kiểm tra transactionType
+  console.log("Giá trị transactionType:", transactionTypeValue);
+  if (!transactionTypeSelect) {
+    console.error("Không tìm thấy trường transactionType trong DOM");
+  } else {
+    console.log("Các giá trị tùy chọn transactionType:", Array.from(transactionTypeSelect.options).map(opt => opt.value));
+    transactionTypeSelect.value = transactionTypeValue;
+    console.log("Giá trị transactionType sau khi gán:", transactionTypeSelect.value);
+  }
+
   document.getElementById("transactionDate").value = transaction.transactionDate;
-  document.getElementById("transactionType").value = transaction.transactionType || "";
   document.getElementById("customerName").value = transaction.customerName;
   document.getElementById("customerEmail").value = transaction.customerEmail;
   document.getElementById("customerPhone").value = transaction.customerPhone;
