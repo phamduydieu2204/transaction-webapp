@@ -3,7 +3,8 @@ import { updatePackageList } from './updatePackageList.js';
 import { updateAccountList } from './updateAccountList.js';
 import { updatePagination } from './pagination.js';
 
-export function updateTable(transactionList, currentPage, itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction) {
+export function updateTable(transactionList, currentPage, itemsPerPage,
+                             formatDate, editTransaction, deleteTransaction, viewTransaction) {
   const tableBody = document.querySelector("#transactionTable tbody");
   tableBody.innerHTML = "";
 
@@ -35,18 +36,21 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
         <button class="view-btn" onclick="viewTransaction(${startIndex + index})">Xem</button>
       </td>
     `;
-
+    // Gắn sự kiện cho nút Sửa
     const editButton = row.querySelector(".edit-btn");
-    editButton.addEventListener("click", () => editTransaction(startIndex + index, transactionList, fetchSoftwareList, updatePackageList, updateAccountList));
-
+    editButton.addEventListener("click", () =>
+      editTransaction(startIndex + index, transactionList,
+                     fetchSoftwareList, updatePackageList, updateAccountList)
+    );
+    // Gắn sự kiện cho nút Xóa (dùng hàm window.deleteTransaction toàn cục)
     const deleteButton = row.querySelector(".delete-btn");
     deleteButton.addEventListener("click", () => {
       console.log("Nút xóa được nhấn, index:", startIndex + index);
-      deleteTransaction(startIndex + index);
+      window.deleteTransaction(startIndex + index);
     });
-
     tableBody.appendChild(row);
   });
 
+  // Cập nhật thanh phân trang
   updatePagination(totalPages);
 }

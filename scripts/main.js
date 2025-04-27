@@ -13,7 +13,7 @@ window.currentSoftwareName = "";
 window.currentSoftwarePackage = "";
 window.currentAccountName = "";
 
-// Nhập các tác vụ
+// Nhập các tác vụ (import các module cần thiết)
 import { getConstants } from './constants.js';
 import { calculateEndDate } from './calculateEndDate.js';
 import { logout } from './logout.js';
@@ -43,8 +43,7 @@ import { formatDateTime } from './formatDateTime.js';
 import { openConfirmModal, closeConfirmModal, confirmDelete } from './confirmModal.js';
 import { openAddOrUpdateModal, closeAddOrUpdateModal, handleAddNewTransaction, handleUpdateTransactionFromModal, handleCancelModal } from './handleAddOrUpdateModal.js';
 
-
-// Hàm khởi tạo
+// Hàm khởi tạo – Thực thi sau khi DOM load xong
 document.addEventListener("DOMContentLoaded", () => {
   // Lấy thông tin người dùng từ localStorage
   const userData = localStorage.getItem("employeeInfo");
@@ -53,65 +52,98 @@ document.addEventListener("DOMContentLoaded", () => {
   } catch (e) {
     window.userInfo = null;
   }
-
   // Nếu không có thông tin người dùng, chuyển hướng về trang đăng nhập
   if (!window.userInfo) {
     window.location.href = "index.html";
     return;
   }
 
-  // Hiển thị thông tin chào mừng
+  // Hiển thị thông tin chào mừng lên giao diện
   document.getElementById("welcome").textContent =
     `Xin chào ${window.userInfo.tenNhanVien} (${window.userInfo.maNhanVien}) - ${window.userInfo.vaiTro}`;
 
-  // Khởi tạo các trường ngày
+  // Khởi tạo các trường ngày mặc định là hôm nay
   const startDateInput = document.getElementById("startDate");
   const durationInput = document.getElementById("duration");
   const endDateInput = document.getElementById("endDate");
   const transactionDateInput = document.getElementById("transactionDate");
-
   startDateInput.value = window.todayFormatted;
   transactionDateInput.value = window.todayFormatted;
 
-  // Gắn sự kiện thay đổi để tự động tính ngày kết thúc
-  startDateInput.addEventListener("change", () => calculateEndDate(startDateInput, durationInput, endDateInput));
-  durationInput.addEventListener("input", () => calculateEndDate(startDateInput, durationInput, endDateInput));
+  // Gắn sự kiện để tự động tính endDate khi thay đổi startDate hoặc duration
+  startDateInput.addEventListener("change", () =>
+    calculateEndDate(startDateInput, durationInput, endDateInput));
+  durationInput.addEventListener("input", () =>
+    calculateEndDate(startDateInput, durationInput, endDateInput));
 
-  // Tải danh sách phần mềm và giao dịch
+  // Tải danh sách phần mềm (softwareData) và danh sách giao dịch ban đầu
   fetchSoftwareList(null, window.softwareData, updatePackageList, updateAccountList);
-  document.getElementById("softwareName").addEventListener("change", () => updatePackageList(window.softwareData, null, updateAccountList));
-  document.getElementById("softwarePackage").addEventListener("change", () => updateAccountList(window.softwareData, null));
-
-  loadTransactions(window.userInfo, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction);
+  document.getElementById("softwareName").addEventListener("change", () =>
+    updatePackageList(window.softwareData, null, updateAccountList));
+  document.getElementById("softwarePackage").addEventListener("change", () =>
+    updateAccountList(window.softwareData, null));
+  // Gọi hàm loadTransactions để lấy danh sách giao dịch và hiển thị bảng
+  window.loadTransactions();  // gọi hàm bọc để tự động truyền tham số
 });
 
-// Xuất các hàm để sử dụng trong HTML
+// Xuất các hàm để có thể gọi từ HTML (onclick, onsubmit,...)
 window.logout = logout;
-window.openCalendar = (inputId) => openCalendar(inputId, calculateEndDate, document.getElementById("startDate"), document.getElementById("duration"), document.getElementById("endDate"));
+window.openCalendar = (inputId) => openCalendar(
+  inputId, calculateEndDate,
+  document.getElementById("startDate"),
+  document.getElementById("duration"),
+  document.getElementById("endDate")
+);
 window.updateCustomerInfo = () => updateCustomerInfo(window.transactionList);
-window.handleReset = () => handleReset(fetchSoftwareList, showProcessingModal, showResultModal, window.todayFormatted, updatePackageList, updateAccountList);
-window.handleAdd = () => handleAdd(window.userInfo, window.currentEditTransactionId, loadTransactions, handleReset, updatePackageList, showProcessingModal, showResultModal);
-window.handleUpdate = () => handleUpdate(window.userInfo, window.currentEditTransactionId, window.transactionList, loadTransactions, handleReset, showProcessingModal, showResultModal, getConstants, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction, fetchSoftwareList, updatePackageList, updateAccountList);
-window.handleSearch = () => handleSearch(window.userInfo, window.transactionList, showProcessingModal, showResultModal, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction);
-window.viewTransaction = (index) => viewTransaction(index, window.transactionList, formatDate, copyToClipboard);
-window.editTransaction = (index) => editTransaction(index, window.transactionList, fetchSoftwareList, updatePackageList, updateAccountList);
-// Bọc deleteTransaction thành 1 "safe" function
+window.handleReset = () => handleReset(
+  fetchSoftwareList, showProcessingModal, showResultModal,
+  window.todayFormatted, updatePackageList, updateAccountList
+);
+window.loadTransactions = () => loadTransactions(
+  window.userInfo, updateTable, formatDate, editTransaction,
+  window.deleteTransaction, viewTransaction
+);
+window.handleAdd = () => handleAdd(
+  window.userInfo, window.currentEditTransactionId,
+  loadTransactions, handleReset, updatePackageList,
+  showProcessingModal, showResultModal
+);
+window.handleUpdate = () => handleUpdate(
+  window.userInfo, window.currentEditTransactionId, window.transactionList,
+  loadTransactions, handleReset, showProcessingModal, showResultModal,
+  getConstants, updateTable, formatDate, editTransaction,
+  window.deleteTransaction, viewTransaction,
+  fetchSoftwareList, updatePackageList, updateAccountList
+);
+window.handleSearch = () => handleSearch(
+  window.userInfo, window.transactionList,
+  showProcessingModal, showResultModal,
+  updateTable, formatDate, editTransaction,
+  window.deleteTransaction, viewTransaction
+);
+window.viewTransaction = (index) => viewTransaction(
+  index, window.transactionList, formatDate, copyToClipboard
+);
+window.editTransaction = (index) => editTransaction(
+  index, window.transactionList, fetchSoftwareList,
+  updatePackageList, updateAccountList
+);
+// Hàm xóa giao dịch an toàn (đã bọc tham số cần thiết)
 window.deleteTransaction = (index) => {
   deleteTransaction(
     index,
     window.transactionList,
     window.userInfo,
-    loadTransactions,
-    handleReset,
+    window.loadTransactions,  // gọi loadTransactions sau khi xóa xong
+    window.handleReset,       // reset form sau khi xóa xong
     showProcessingModal,
     showResultModal,
     openConfirmModal,
     getConstants
   );
 };
-
 window.editRow = (index) => editRow(index, window.transactionList);
-window.deleteRow = (index) => deleteRow(index, deleteTransaction);
+window.deleteRow = (index) => deleteRow(index, window.deleteTransaction);
 window.closeModal = closeModal;
 window.confirmDelete = confirmDelete;
 window.closeProcessingModal = closeProcessingModal;
