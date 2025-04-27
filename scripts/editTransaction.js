@@ -48,25 +48,31 @@ export function editTransaction(index, transactionList, fetchSoftwareList, updat
   updateAccountList(window.softwareData, accountNameValue);
   accountNameSelect.value = accountNameValue;
 
-  // Gán transactionType sau cùng, với độ trễ lớn hơn để tránh bị ghi đè
+  // Gán transactionType, xử lý không phân biệt chữ hoa - chữ thường
   if (!transactionTypeSelect) {
     console.error("Không tìm thấy trường transactionType trong DOM");
   } else {
     console.log("Giá trị transactionType trước khi gán:", transactionTypeValue);
     console.log("Các giá trị tùy chọn transactionType:", Array.from(transactionTypeSelect.options).map(opt => opt.value));
-    setTimeout(() => {
-      // Kiểm tra xem form có đang được reset không
-      const form = document.getElementById("transactionForm");
-      if (form && form.querySelector('select[id="transactionType"]').value === "") {
-        console.log("Form có thể đang được reset, thử gán transactionType...");
-        transactionTypeSelect.value = transactionTypeValue;
-        console.log("Giá trị transactionType sau khi gán:", transactionTypeSelect.value);
-        if (transactionTypeSelect.value !== transactionTypeValue) {
-          console.warn("Giá trị transactionType không được gán đúng, thử gán lại:", transactionTypeValue);
-          transactionTypeSelect.value = transactionTypeValue;
-          console.log("Giá trị transactionType sau khi gán lại:", transactionTypeSelect.value);
-        }
+
+    // Tìm giá trị phù hợp không phân biệt chữ hoa - chữ thường
+    const normalizedTypeValue = transactionTypeValue.toLowerCase();
+    const matchingOption = Array.from(transactionTypeSelect.options).find(
+      option => option.value.toLowerCase() === normalizedTypeValue
+    );
+
+    if (matchingOption) {
+      transactionTypeSelect.value = matchingOption.value;
+      console.log("Giá trị transactionType sau khi gán:", transactionTypeSelect.value);
+      // Kiểm tra xem giá trị có được gán đúng không
+      if (transactionTypeSelect.value.toLowerCase() !== normalizedTypeValue) {
+        console.warn("Giá trị transactionType không được gán đúng, thử gán lại:", matchingOption.value);
+        transactionTypeSelect.value = matchingOption.value;
+        console.log("Giá trị transactionType sau khi gán lại:", transactionTypeSelect.value);
       }
-    }, 100); // Tăng độ trễ lên 100ms để đảm bảo chạy sau tất cả các sự kiện reset
+    } else {
+      console.warn("Không tìm thấy tùy chọn khớp với transactionType:", transactionTypeValue);
+      transactionTypeSelect.value = "";
+    }
   }
 }
