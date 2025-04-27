@@ -1,6 +1,6 @@
 import { getConstants } from './constants.js';
 
-export async function handleUpdate(userInfo, currentEditTransactionId, transactionList, loadTransactions, handleReset, showProcessingModal, showResultModal, getConstants, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction) {
+export async function handleUpdate(userInfo, currentEditTransactionId, transactionList, loadTransactions, handleReset, showProcessingModal, showResultModal, getConstants, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction, fetchSoftwareList) {
   showProcessingModal("Đang cập nhật giao dịch...");
   const { BACKEND_URL } = getConstants();
   if (!userInfo) {
@@ -22,7 +22,7 @@ export async function handleUpdate(userInfo, currentEditTransactionId, transacti
   const transaction = transactionList.find(t => t.transactionId === currentEditTransactionId);
   if (!transaction) {
     showResultModal("Giao dịch không tồn tại hoặc đã bị xóa. Vui lòng thử lại!", false);
-    handleReset();
+    handleReset(fetchSoftwareList, showProcessingModal, showResultModal, window.todayFormatted);
     return;
   }
 
@@ -72,7 +72,7 @@ export async function handleUpdate(userInfo, currentEditTransactionId, transacti
     const result = await response.json();
     if (result.status === "success") {
       document.getElementById("successMessage").textContent = "Giao dịch đã được cập nhật!";
-      handleReset();
+      handleReset(fetchSoftwareList, showProcessingModal, showResultModal, window.todayFormatted);
       await loadTransactions(userInfo, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction);
       showResultModal("Giao dịch đã được cập nhật!", true);
     } else {
