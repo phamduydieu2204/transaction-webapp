@@ -1,61 +1,81 @@
-import { updateTable } from './updateTable.js';
+import { getConstants } from './constants.js';
 
-export function handleSearch(userInfo, transactionList, showProcessingModal, showResultModal, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction) {
-  const searchInput = document.getElementById("searchInput").value.trim().toLowerCase();
-
-  if (!searchInput) {
-    window.isSearching = false;
-    updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
+export async function handleSearch(userInfo, transactionList, showProcessingModal, showResultModal, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction) {
+  if (!userInfo || !userInfo.vaiTro) {
+    showResultModal("Thông tin vai trò không hợp lệ. Vui lòng đăng nhập lại.", false);
     return;
   }
 
-  window.isSearching = true;
+  showProcessingModal("Đang tìm kiếm giao dịch...");
+  const { BACKEND_URL } = getConstants();
+  const conditions = {};
 
-  const isDateSearch = /^\d{4}(\/\d{2})?(\/\d{2})?$/.test(searchInput);
+  const transactionType = document.getElementById("transactionType").value;
+  const transactionDate = document.getElementById("transactionDate").value;
+  const customerName = document.getElementById("customerName").value;
+  const customerEmail = document.getElementById("customerEmail").value.toLowerCase();
+  const customerPhone = document.getElementById("customerPhone").value;
+  const duration = document.getElementById("duration").value;
+  const startDate = document.getElementById("startDate").value;
+  const endDate = document.getElementById("endDate").value;
+  const deviceCount = document.getElementById("deviceCount").value;
+  const softwareName = document.getElementById("softwareName").value;
+  const softwarePackage = document.getElementById("softwarePackage").value;
+  const accountName = document.getElementById("accountName").value;
+  const revenue = document.getElementById("revenue").value;
+  const note = document.getElementById("note").value;
+  const maNhanVien = userInfo.maNhanVien;
 
-  const filtered = transactionList.filter(transaction => {
-    const fieldsToSearch = [
-      transaction.transactionId,
-      transaction.transactionType,
-      transaction.customerName,
-      transaction.customerEmail,
-      transaction.customerPhone,
-      transaction.duration,
-      transaction.deviceCount,
-      transaction.softwareName,
-      transaction.softwarePackage,
-      transaction.accountName,
-      transaction.revenue,
-      transaction.note,
-      transaction.tenNhanVien,
-      transaction.maNhanVien
-    ];
+  if (transactionType && transactionType !== "") conditions.transactionType = transactionType;
+  if (transactionDate && transactionDate !== "yyyy/mm/dd") conditions.transactionDate = transactionDate;
+  if (customerName) conditions.customerName = customerName;
+  if (customerEmail) conditions.customerEmail = customerEmail;
+  if (customerPhone) conditions.customerPhone = customerPhone;
+  if (duration && duration !== "0") conditions.duration = duration;
+  if (startDate && startDate !== "yyyy/mm/dd") conditions.startDate = startDate;
+  if (endDate && endDate !== "yyyy/mm/dd") conditions.endDate = endDate;
+  if (deviceCount && deviceCount !== "0") conditions.deviceCount = deviceCount;
+  if (softwareName && softwareName !== "") conditions.softwareName = softwareName;
+  if (softwarePackage && softwarePackage !== "") conditions.softwarePackage = softwarePackage;
+  if (accountName && accountName !== "") conditions.accountName = accountName;
+  if (revenue && revenue !== "0") conditions.revenue = revenue;
+  if (note) conditions.note = note;
+  if (maNhanVien) conditions.maNhanVien = maNhanVien;
 
-    const basicMatch = fieldsToSearch.some(field => {
-      if (field !== undefined && field !== null) {
-        return String(field).toLowerCase().includes(searchInput);
-      }
-      return false;
+  const data = {
+    action: "searchTransactions",
+    maNhanVien: userInfo.maNhanVien,
+    vaiTro: userInfo.vaiTro ? userInfo.vaiTro.toLowerCase() : "",
+    conditions: conditions
+  };
+
+  console.log("📤 Dữ liệu tìm kiếm gửi đi:", JSON.stringify(data, null, 2));
+
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
     });
 
-    if (isDateSearch) {
-      const transactionDate = (transaction.transactionDate || "").toLowerCase();
-      const startDate = (transaction.startDate || "").toLowerCase();
-      const endDate = (transaction.endDate || "").toLowerCase();
-
-      // Tất cả các trường ngày phải cùng khớp điều kiện nhập vào
-      const dateMatch =
-        transactionDate.startsWith(searchInput) &&
-        startDate.startsWith(searchInput) &&
-        endDate.startsWith(searchInput);
-
-      return basicMatch && dateMatch;
+    const result = await response.json();
+    if (result.status === "success") {
+      window.transactionList = result.data;
+      window.transactionList.sort((a, b) => {
+        const idA = parseInt(a.transactionId.replace("GD", ""));
+        const idB = parseInt(b.transactionId.replace("GD", ""));
+        return idB - idA;
+      });
+      window.currentPage = 1;
+      updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
+      showResultModal(`Tìm kiếm thành công! Tìm thấy ${result.data.length} giao dịch.`, true);
     } else {
-      return basicMatch;
+      showResultModal(result.message || "Không thể tìm kiếm giao dịch!", false);
     }
-  });
-
-  window.transactionList = filtered;
-  window.currentPage = 1;
-  updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
+  } catch (err) {
+    showResultModal(`Lỗi khi tìm kiếm giao dịch: ${err.message}`, false);
+    console.error("Lỗi khi tìm kiếm giao dịch", err);
+  }
 }
