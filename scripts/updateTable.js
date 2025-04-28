@@ -1,10 +1,6 @@
-import { fetchSoftwareList } from './fetchSoftwareList.js';
-import { updatePackageList } from './updatePackageList.js';
-import { updateAccountList } from './updateAccountList.js';
 import { updatePagination } from './pagination.js';
 
-export function updateTable(transactionList, currentPage, itemsPerPage,
-                             formatDate, editTransaction, deleteTransaction, viewTransaction) {
+export function updateTable(transactionList, currentPage, itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction) {
   const tableBody = document.querySelector("#transactionTable tbody");
   tableBody.innerHTML = "";
 
@@ -12,6 +8,10 @@ export function updateTable(transactionList, currentPage, itemsPerPage,
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedItems = transactionList.slice(startIndex, endIndex);
+
+  let totalRevenue = 0;
+  const today = new Date();
+  const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
 
   paginatedItems.forEach((transaction, index) => {
     const row = document.createElement("tr");
@@ -36,34 +36,25 @@ export function updateTable(transactionList, currentPage, itemsPerPage,
         <button class="view-btn" onclick="viewTransaction(${startIndex + index})">Xem</button>
       </td>
     `;
-    // Gắn sự kiện cho nút Sửa
+
     const editButton = row.querySelector(".edit-btn");
-    editButton.addEventListener("click", () =>
-      editTransaction(startIndex + index, transactionList,
-                     fetchSoftwareList, updatePackageList, updateAccountList)
-    );
-    // Gắn sự kiện cho nút Xóa (dùng hàm window.deleteTransaction toàn cục)
+    editButton.addEventListener("click", () => editTransaction(startIndex + index));
+
     const deleteButton = row.querySelector(".delete-btn");
-    deleteButton.addEventListener("click", () => {
-      console.log("Nút xóa được nhấn, index:", startIndex + index);
-      window.deleteTransaction(startIndex + index);
-    });
+    deleteButton.addEventListener("click", () => deleteTransaction(startIndex + index));
+
     tableBody.appendChild(row);
+
+    // Tính doanh thu
+    if (transaction.transactionDate && (window.isSearching || transaction.transactionDate.startsWith(todayFormatted))) {
+      totalRevenue += parseFloat(transaction.revenue) || 0;
+    }
   });
 
-  // Cập nhật thanh phân trang
   updatePagination(totalPages);
 
-  // Tính tổng doanh thu
-let totalRevenue = paginatedItems.reduce((sum, transaction) => {
-  const revenue = parseFloat(transaction.revenue) || 0;
-  return sum + revenue;
-}, 0);
-
-// Cập nhật tổng doanh thu lên giao diện
-const todayRevenueElement = document.getElementById("todayRevenue");
-if (todayRevenueElement) {
-  todayRevenueElement.textContent = `Tổng doanh thu: ${totalRevenue.toLocaleString()} VNĐ`;
-}
-
+  const todayRevenueElement = document.getElementById("todayRevenue");
+  if (todayRevenueElement) {
+    todayRevenueElement.textContent = `Tổng doanh thu: ${totalRevenue.toLocaleString()} VNĐ`;
+  }
 }
