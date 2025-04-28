@@ -43,7 +43,9 @@ export async function handleLogin() {
       const employeeInfo = {
         tenNhanVien: result.tenNhanVien,
         maNhanVien: result.maNhanVien,
-        vaiTro: result.vaiTro
+        vaiTro: result.vaiTro,
+        giaoDichNhinThay: result.giaoDichNhinThay || "",  // thêm dòng này
+        nhinThayGiaoDichCuaAi: result.nhinThayGiaoDichCuaAi || "" // thêm dòng này
       };
       localStorage.setItem('employeeInfo', JSON.stringify(employeeInfo));
       window.location.href = 'main.html';

@@ -29,12 +29,36 @@ export async function loadTransactions(userInfo, updateTable, formatDate, editTr
     console.log("Dữ liệu trả về từ backend:", result);
 
     if (result.status === "success") {
-      window.transactionList = result.data;
+      // Bắt đầu lọc dữ liệu dựa trên quyền
+      const storedInfo = JSON.parse(localStorage.getItem('employeeInfo')) || {};
+      const allowedTypes = (storedInfo.giaoDichNhinThay || "").split(",").map(type => type.trim().toLowerCase());
+      const scope = (storedInfo.nhinThayGiaoDichCuaAi || "").toLowerCase();
+
+      let filteredTransactions = result.data;
+
+      // Lọc theo loại giao dịch nếu có cấu hình
+      if (allowedTypes.length > 0 && allowedTypes[0] !== "") {
+        filteredTransactions = filteredTransactions.filter(tran =>
+          allowedTypes.includes((tran.transactionType || "").toLowerCase())
+        );
+      }
+
+      // Lọc theo người tạo nếu chỉ được xem bản thân
+      if (scope === "chỉ bản thân") {
+        filteredTransactions = filteredTransactions.filter(tran =>
+          tran.maNhanVien && tran.maNhanVien.toUpperCase() === userInfo.maNhanVien.toUpperCase()
+        );
+      }
+
+      // Gán vào window.transactionList sau khi lọc
+      window.transactionList = filteredTransactions;
+
       window.transactionList.sort((a, b) => {
         const idA = parseInt(a.transactionId.replace("GD", ""));
         const idB = parseInt(b.transactionId.replace("GD", ""));
         return idB - idA;
       });
+
       window.currentPage = 1;
       updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
       return { status: "success", data: result.data };
