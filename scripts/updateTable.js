@@ -53,4 +53,17 @@ export function updateTable(transactionList, currentPage, itemsPerPage,
 
   // Cập nhật thanh phân trang
   updatePagination(totalPages);
+
+  // Tính tổng doanh thu
+let totalRevenue = paginatedItems.reduce((sum, transaction) => {
+  const revenue = parseFloat(transaction.revenue) || 0;
+  return sum + revenue;
+}, 0);
+
+// Cập nhật tổng doanh thu lên giao diện
+const todayRevenueElement = document.getElementById("todayRevenue");
+if (todayRevenueElement) {
+  todayRevenueElement.textContent = `Tổng doanh thu: ${totalRevenue.toLocaleString()} VNĐ`;
+}
+
 }

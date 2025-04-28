@@ -59,8 +59,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // Hiển thị tên nhân viên
-  document.getElementById("welcome").textContent =
+  document.getElementById("userWelcome").textContent =
     `Xin chào ${window.userInfo.tenNhanVien} (${window.userInfo.maNhanVien}) - ${window.userInfo.vaiTro}`;
+  
 
   // Setup ngày tháng ban đầu
   const startDateInput = document.getElementById("startDate");
