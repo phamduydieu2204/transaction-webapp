@@ -2,6 +2,7 @@ import { updateTable } from './updateTable.js';
 
 export function handleSearch(userInfo, transactionList, showProcessingModal, showResultModal, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction) {
   const searchInput = document.getElementById("searchInput").value.trim().toLowerCase();
+
   if (!searchInput) {
     window.isSearching = false;
     updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
@@ -9,21 +10,49 @@ export function handleSearch(userInfo, transactionList, showProcessingModal, sho
   }
 
   window.isSearching = true;
-  
-  const giaoDichNhinThay = (userInfo.giaoDichNhinThay || "").toLowerCase().split(",").map(t => t.trim());
-  const nhinThayGiaoDichCuaAi = (userInfo.nhinThayGiaoDichCuaAi || "chỉ bản thân").toLowerCase();
+
+  const isDateSearch = /^\d{4}(\/\d{2})?(\/\d{2})?$/.test(searchInput);
 
   const filtered = transactionList.filter(transaction => {
-    const customerName = (transaction.customerName || "").toLowerCase();
-    const transactionType = (transaction.transactionType || "").toLowerCase();
-    const maNhanVien = (transaction.maNhanVien || "").toLowerCase();
-    const searchMatch = customerName.includes(searchInput);
+    const fieldsToSearch = [
+      transaction.transactionId,
+      transaction.transactionType,
+      transaction.customerName,
+      transaction.customerEmail,
+      transaction.customerPhone,
+      transaction.duration,
+      transaction.deviceCount,
+      transaction.softwareName,
+      transaction.softwarePackage,
+      transaction.accountName,
+      transaction.revenue,
+      transaction.note,
+      transaction.tenNhanVien,
+      transaction.maNhanVien
+    ];
 
-    const transactionTypeAllowed = giaoDichNhinThay.length === 0 || giaoDichNhinThay.includes(transactionType);
+    const basicMatch = fieldsToSearch.some(field => {
+      if (field !== undefined && field !== null) {
+        return String(field).toLowerCase().includes(searchInput);
+      }
+      return false;
+    });
 
-    const scopeAllowed = nhinThayGiaoDichCuaAi === "tất cả" || (userInfo.maNhanVien && userInfo.maNhanVien.toLowerCase() === maNhanVien);
+    if (isDateSearch) {
+      const transactionDate = (transaction.transactionDate || "").toLowerCase();
+      const startDate = (transaction.startDate || "").toLowerCase();
+      const endDate = (transaction.endDate || "").toLowerCase();
 
-    return searchMatch && transactionTypeAllowed && scopeAllowed;
+      // Tất cả các trường ngày phải cùng khớp điều kiện nhập vào
+      const dateMatch =
+        transactionDate.startsWith(searchInput) &&
+        startDate.startsWith(searchInput) &&
+        endDate.startsWith(searchInput);
+
+      return basicMatch && dateMatch;
+    } else {
+      return basicMatch;
+    }
   });
 
   window.transactionList = filtered;
