@@ -38,7 +38,10 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     `;
 
     const editButton = row.querySelector(".edit-btn");
-    editButton.addEventListener("click", () => editTransaction(startIndex + index));
+    editButton.addEventListener("click", () => {
+      // ✅ Gọi đúng editTransaction với đủ tham số
+      editTransaction(startIndex + index, window.transactionList, window.fetchSoftwareList, window.updatePackageList, window.updateAccountList);
+    });
 
     const deleteButton = row.querySelector(".delete-btn");
     deleteButton.addEventListener("click", () => deleteTransaction(startIndex + index));
@@ -53,13 +56,12 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
   updatePagination(totalPages);
 
-  // ✅ Chỉ Admin mới hiển thị tổng doanh thu
   const todayRevenueElement = document.getElementById("todayRevenue");
   if (todayRevenueElement) {
     if (window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin") {
       todayRevenueElement.textContent = `Tổng doanh thu: ${totalRevenue.toLocaleString()} VNĐ`;
     } else {
-      todayRevenueElement.textContent = ""; // Nếu không phải Admin, không hiển thị gì
+      todayRevenueElement.textContent = "";
     }
   }
 }
