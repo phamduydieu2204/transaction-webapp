@@ -127,25 +127,28 @@ function makeColumnsResizable(table) {
   thElements.forEach((th, index) => {
     const resizer = document.createElement("div");
     resizer.classList.add("resizer");
+    th.style.position = "relative";
     th.appendChild(resizer);
 
-    let startX, startWidth;
+    let startX, startWidth, nextStartWidth;
+    let nextTh = th.nextElementSibling;
 
     resizer.addEventListener("mousedown", (e) => {
       startX = e.pageX;
       startWidth = th.offsetWidth;
+      nextStartWidth = nextTh ? nextTh.offsetWidth : 0;
 
       const onMouseMove = (e) => {
-        const newWidth = startWidth + (e.pageX - startX);
-        th.style.width = `${newWidth}px`;
+        const diff = e.pageX - startX;
+        if (startWidth + diff > 50) th.style.width = `${startWidth + diff}px`;
+        if (nextTh && nextStartWidth - diff > 50) nextTh.style.width = `${nextStartWidth - diff}px`;
 
-        // 🔥 Resize luôn tất cả <td> trong cùng cột
+        // Đồng bộ width cho tất cả các <td>
         const rows = table.querySelectorAll("tbody tr");
         rows.forEach(row => {
-          const cell = row.children[index];
-          if (cell) {
-            cell.style.width = `${newWidth}px`;
-          }
+          const cells = row.children;
+          if (cells[index]) cells[index].style.width = th.style.width;
+          if (cells[index + 1] && nextTh) cells[index + 1].style.width = nextTh.style.width;
         });
       };
 
