@@ -486,3 +486,13 @@ body.login-page {
     margin: 0 10px;
     padding: 8px 16px;
   }
+  /* Cho phép cột bảng giao dịch resize và nội dung tự động xuống dòng */
+#transactionTable th,
+#transactionTable td {
+  white-space: normal; /* Cho phép xuống dòng */
+  overflow-wrap: break-word;
+  word-break: break-word;
+  resize: horizontal; /* Cho phép kéo thay đổi chiều rộng */
+  min-width: 100px; /* Cài đặt chiều rộng tối thiểu để tránh co quá nhỏ */
+  max-width: 600px; /* Giới hạn max-width nếu cần */
+}
