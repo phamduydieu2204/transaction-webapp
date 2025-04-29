@@ -122,10 +122,9 @@ window.closeModal = closeModal;
 window.confirmDelete = confirmDelete;
 window.closeProcessingModal = closeProcessingModal;
 
-// === Kéo thay đổi độ rộng cột bảng ===
 function makeColumnsResizable(table) {
   const thElements = table.querySelectorAll("thead th");
-  thElements.forEach(th => {
+  thElements.forEach((th, index) => {
     const resizer = document.createElement("div");
     resizer.classList.add("resizer");
     th.appendChild(resizer);
@@ -139,6 +138,15 @@ function makeColumnsResizable(table) {
       const onMouseMove = (e) => {
         const newWidth = startWidth + (e.pageX - startX);
         th.style.width = `${newWidth}px`;
+
+        // 🔥 Resize luôn tất cả <td> trong cùng cột
+        const rows = table.querySelectorAll("tbody tr");
+        rows.forEach(row => {
+          const cell = row.children[index];
+          if (cell) {
+            cell.style.width = `${newWidth}px`;
+          }
+        });
       };
 
       const onMouseUp = () => {
