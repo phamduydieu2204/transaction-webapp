@@ -53,8 +53,13 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
   updatePagination(totalPages);
 
+  // ✅ Chỉ Admin mới hiển thị tổng doanh thu
   const todayRevenueElement = document.getElementById("todayRevenue");
   if (todayRevenueElement) {
-    todayRevenueElement.textContent = `Tổng doanh thu: ${totalRevenue.toLocaleString()} VNĐ`;
+    if (window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin") {
+      todayRevenueElement.textContent = `Tổng doanh thu: ${totalRevenue.toLocaleString()} VNĐ`;
+    } else {
+      todayRevenueElement.textContent = ""; // Nếu không phải Admin, không hiển thị gì
+    }
   }
 }
