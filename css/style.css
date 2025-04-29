@@ -496,3 +496,16 @@ body.login-page {
   min-width: 100px; /* Cài đặt chiều rộng tối thiểu để tránh co quá nhỏ */
   max-width: 600px; /* Giới hạn max-width nếu cần */
 }
+#transactionTable th {
+  position: relative;
+}
+
+#transactionTable th .resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 5px;
+  cursor: col-resize;
+  user-select: none;
+  height: 100%;
+}
