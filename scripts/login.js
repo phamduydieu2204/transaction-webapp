@@ -44,9 +44,13 @@ export async function handleLogin() {
         tenNhanVien: result.tenNhanVien,
         maNhanVien: result.maNhanVien,
         vaiTro: result.vaiTro,
-        giaoDichNhinThay: result.giaoDichNhinThay || "",  // thêm dòng này
-        nhinThayGiaoDichCuaAi: result.nhinThayGiaoDichCuaAi || "" // thêm dòng này
+        giaoDichNhinThay: result.giaoDichNhinThay || "",
+        nhinThayGiaoDichCuaAi: result.nhinThayGiaoDichCuaAi || "",
+        duocSuaGiaoDichCuaAi: result.duocSuaGiaoDichCuaAi || "chỉ bản thân",
+        duocXoaGiaoDichCuaAi: result.duocXoaGiaoDichCuaAi || "chỉ bản thân",
+        duocTimKiemGiaoDichCuaAi: result.duocTimKiemGiaoDichCuaAi || "chỉ bản thân"
       };
+
       localStorage.setItem('employeeInfo', JSON.stringify(employeeInfo));
       window.location.href = 'main.html';
     } else {
