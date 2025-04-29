@@ -1,8 +1,26 @@
 import { getConstants } from './constants.js';
 
-export async function handleUpdate(userInfo, currentEditTransactionId, transactionList, loadTransactions, handleReset, showProcessingModal, showResultModal, getConstants, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction, fetchSoftwareList, updatePackageList, updateAccountList) {
+export async function handleUpdate(
+  userInfo,
+  currentEditTransactionId,
+  transactionList,
+  loadTransactions,
+  handleReset,
+  showProcessingModal,
+  showResultModal,
+  getConstants,
+  updateTable,
+  formatDate,
+  editTransaction,
+  deleteTransaction,
+  viewTransaction,
+  fetchSoftwareList,
+  updatePackageList,
+  updateAccountList
+) {
   showProcessingModal("Đang cập nhật giao dịch...");
   const { BACKEND_URL } = getConstants();
+
   if (!userInfo) {
     showResultModal("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.", false);
     return;
@@ -55,7 +73,10 @@ export async function handleUpdate(userInfo, currentEditTransactionId, transacti
     tenNhanVien: transaction.tenNhanVien,
     maNhanVien: transaction.maNhanVien,
     editorTenNhanVien: userInfo.tenNhanVien,
-    editorMaNhanVien: userInfo.maNhanVien
+    editorMaNhanVien: userInfo.maNhanVien,
+
+    // ✅ Truyền quyền mới
+    duocSuaGiaoDichCuaAi: userInfo.duocSuaGiaoDichCuaAi || "chỉ bản thân"
   };
 
   console.log("📤 Dữ liệu cập nhật gửi đi:", JSON.stringify(data, null, 2));
@@ -63,13 +84,12 @@ export async function handleUpdate(userInfo, currentEditTransactionId, transacti
   try {
     const response = await fetch(BACKEND_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
     });
 
     const result = await response.json();
+
     if (result.status === "success") {
       document.getElementById("successMessage").textContent = "Giao dịch đã được cập nhật!";
       handleReset(fetchSoftwareList, showProcessingModal, showResultModal, window.todayFormatted, updatePackageList, updateAccountList);
@@ -79,7 +99,7 @@ export async function handleUpdate(userInfo, currentEditTransactionId, transacti
       showResultModal(result.message || "Không thể cập nhật giao dịch!", false);
     }
   } catch (err) {
+    console.error("Lỗi khi cập nhật:", err);
     showResultModal(`Lỗi kết nối server: ${err.message}`, false);
-    console.error("Lỗi:", err);
   }
 }

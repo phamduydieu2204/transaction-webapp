@@ -1,8 +1,18 @@
 import { getConstants } from './constants.js';
 
-export async function handleSearch(userInfo, transactionList, showProcessingModal, showResultModal, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction) {
-  if (!userInfo || !userInfo.vaiTro) {
-    showResultModal("Thông tin vai trò không hợp lệ. Vui lòng đăng nhập lại.", false);
+export async function handleSearch(
+  userInfo,
+  transactionList,
+  showProcessingModal,
+  showResultModal,
+  updateTable,
+  formatDate,
+  editTransaction,
+  deleteTransaction,
+  viewTransaction
+) {
+  if (!userInfo || !userInfo.duocTimKiemGiaoDichCuaAi) {
+    showResultModal("Thiếu thông tin quyền tìm kiếm. Vui lòng đăng nhập lại.", false);
     return;
   }
 
@@ -10,23 +20,25 @@ export async function handleSearch(userInfo, transactionList, showProcessingModa
   const { BACKEND_URL } = getConstants();
   const conditions = {};
 
-  const transactionType = document.getElementById("transactionType").value;
-  const transactionDate = document.getElementById("transactionDate").value;
-  const customerName = document.getElementById("customerName").value;
-  const customerEmail = document.getElementById("customerEmail").value.toLowerCase();
-  const customerPhone = document.getElementById("customerPhone").value;
-  const duration = document.getElementById("duration").value;
-  const startDate = document.getElementById("startDate").value;
-  const endDate = document.getElementById("endDate").value;
-  const deviceCount = document.getElementById("deviceCount").value;
-  const softwareName = document.getElementById("softwareName").value;
-  const softwarePackage = document.getElementById("softwarePackage").value;
-  const accountName = document.getElementById("accountName").value;
-  const revenue = document.getElementById("revenue").value;
-  const note = document.getElementById("note").value;
-  const maNhanVien = userInfo.maNhanVien;
+  // Lấy dữ liệu từ form tìm kiếm
+  const getValue = (id) => document.getElementById(id)?.value?.trim() || "";
 
-  if (transactionType && transactionType !== "") conditions.transactionType = transactionType;
+  const transactionType = getValue("transactionType");
+  const transactionDate = getValue("transactionDate");
+  const customerName = getValue("customerName");
+  const customerEmail = getValue("customerEmail").toLowerCase();
+  const customerPhone = getValue("customerPhone");
+  const duration = getValue("duration");
+  const startDate = getValue("startDate");
+  const endDate = getValue("endDate");
+  const deviceCount = getValue("deviceCount");
+  const softwareName = getValue("softwareName");
+  const softwarePackage = getValue("softwarePackage");
+  const accountName = getValue("accountName");
+  const revenue = getValue("revenue");
+  const note = getValue("note");
+
+  if (transactionType) conditions.transactionType = transactionType;
   if (transactionDate && transactionDate !== "yyyy/mm/dd") conditions.transactionDate = transactionDate;
   if (customerName) conditions.customerName = customerName;
   if (customerEmail) conditions.customerEmail = customerEmail;
@@ -35,17 +47,17 @@ export async function handleSearch(userInfo, transactionList, showProcessingModa
   if (startDate && startDate !== "yyyy/mm/dd") conditions.startDate = startDate;
   if (endDate && endDate !== "yyyy/mm/dd") conditions.endDate = endDate;
   if (deviceCount && deviceCount !== "0") conditions.deviceCount = deviceCount;
-  if (softwareName && softwareName !== "") conditions.softwareName = softwareName;
-  if (softwarePackage && softwarePackage !== "") conditions.softwarePackage = softwarePackage;
-  if (accountName && accountName !== "") conditions.accountName = accountName;
+  if (softwareName) conditions.softwareName = softwareName;
+  if (softwarePackage) conditions.softwarePackage = softwarePackage;
+  if (accountName) conditions.accountName = accountName;
   if (revenue && revenue !== "0") conditions.revenue = revenue;
   if (note) conditions.note = note;
-  if (maNhanVien) conditions.maNhanVien = maNhanVien;
 
+  // 🧠 Build payload gửi backend
   const data = {
     action: "searchTransactions",
     maNhanVien: userInfo.maNhanVien,
-    vaiTro: userInfo.vaiTro ? userInfo.vaiTro.toLowerCase() : "",
+    duocTimKiemGiaoDichCuaAi: userInfo.duocTimKiemGiaoDichCuaAi || "chỉ bản thân",
     conditions: conditions
   };
 
@@ -54,28 +66,37 @@ export async function handleSearch(userInfo, transactionList, showProcessingModa
   try {
     const response = await fetch(BACKEND_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
     });
 
     const result = await response.json();
+
     if (result.status === "success") {
-      window.transactionList = result.data;
+      window.transactionList = result.data || [];
       window.transactionList.sort((a, b) => {
-        const idA = parseInt(a.transactionId.replace("GD", ""));
-        const idB = parseInt(b.transactionId.replace("GD", ""));
+        const idA = parseInt((a.transactionId || "").replace("GD", ""));
+        const idB = parseInt((b.transactionId || "").replace("GD", ""));
         return idB - idA;
       });
+
       window.currentPage = 1;
-      updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
+      updateTable(
+        window.transactionList,
+        window.currentPage,
+        window.itemsPerPage,
+        formatDate,
+        editTransaction,
+        deleteTransaction,
+        viewTransaction
+      );
+
       showResultModal(`Tìm kiếm thành công! Tìm thấy ${result.data.length} giao dịch.`, true);
     } else {
       showResultModal(result.message || "Không thể tìm kiếm giao dịch!", false);
     }
   } catch (err) {
-    showResultModal(`Lỗi khi tìm kiếm giao dịch: ${err.message}`, false);
     console.error("Lỗi khi tìm kiếm giao dịch", err);
+    showResultModal(`Lỗi khi tìm kiếm giao dịch: ${err.message}`, false);
   }
 }
