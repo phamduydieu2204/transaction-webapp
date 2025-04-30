@@ -321,6 +321,7 @@ body.login-page {
     flex: 1;
     white-space: pre-line;
     word-break: break-word;
+    text-align: left; /* ✅ đảm bảo nội dung căn trái */
   }
   
   .detail-content .copy-icon {
