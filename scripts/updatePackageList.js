@@ -2,24 +2,26 @@ export function updatePackageList(softwareData, softwarePackageToKeep, updateAcc
   const softwareName = document.getElementById("softwareName").value;
   const softwarePackageSelect = document.getElementById("softwarePackage");
 
-  // Thiết lập tùy chọn mặc định cho danh sách gói
+  // Thiết lập tùy chọn mặc định
   softwarePackageSelect.innerHTML = '<option value="">-- Chọn gói --</option>';
 
   if (softwareName) {
-    // Lấy tất cả các gói (kể cả đã ngừng cung cấp) cho phần mềm đã chọn
+    // Lấy tất cả các gói có liên quan đến phần mềm
     const allPackages = [...new Set(softwareData
       .map(item => item.softwareName === softwareName ? item.softwarePackage : null)
       .filter(item => item !== null)
     )];
-    // Lấy các gói hiện có sẵn cho phần mềm đã chọn
+
+    // Gói khả dụng (còn hoạt động)
     const availablePackages = [...new Set(softwareData
       .filter(item => item.softwareName === softwareName)
       .map(item => item.softwarePackage)
     )];
-    // Các gói không khả dụng (có trong allPackages nhưng không có trong availablePackages)
+
+    // Gói không còn hoạt động
     const unavailablePackages = allPackages.filter(pkg => !availablePackages.includes(pkg));
 
-    // Thêm các tùy chọn gói khả dụng vào dropdown
+    // Thêm các gói khả dụng
     availablePackages.forEach(pkg => {
       const option = document.createElement("option");
       option.value = pkg;
@@ -27,7 +29,7 @@ export function updatePackageList(softwareData, softwarePackageToKeep, updateAcc
       softwarePackageSelect.appendChild(option);
     });
 
-    // Thêm các tùy chọn gói không khả dụng vào dropdown (nếu có)
+    // Thêm các gói không khả dụng (in nghiêng)
     unavailablePackages.forEach(pkg => {
       const option = document.createElement("option");
       option.value = pkg;
@@ -36,7 +38,7 @@ export function updatePackageList(softwareData, softwarePackageToKeep, updateAcc
       softwarePackageSelect.appendChild(option);
     });
 
-    // Nếu có tên gói cần giữ mà không nằm trong allPackages, thêm vào như tùy chọn không khả dụng
+    // ✅ Nếu gói cần giữ không nằm trong tất cả các gói, thêm nó vào (dạng không khả dụng)
     if (softwarePackageToKeep && !allPackages.includes(softwarePackageToKeep)) {
       const option = document.createElement("option");
       option.value = softwarePackageToKeep;
@@ -45,10 +47,10 @@ export function updatePackageList(softwareData, softwarePackageToKeep, updateAcc
       softwarePackageSelect.appendChild(option);
     }
 
-    // Đặt giá trị được chọn cho dropdown gói (nếu có)
+    // ✅ Đặt giá trị cho dropdown
     softwarePackageSelect.value = softwarePackageToKeep || window.currentSoftwarePackage || "";
   }
 
-  // Cập nhật danh sách tài khoản dựa trên phần mềm & gói đã chọn, truyền giá trị tài khoản cần giữ
+  // ✅ Cập nhật tài khoản liên quan
   updateAccountList(softwareData, accountNameToKeep);
 }

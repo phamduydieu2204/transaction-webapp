@@ -41,7 +41,13 @@ import { updatePackageList } from './updatePackageList.js';
 import { editRow, deleteRow } from './legacy.js';
 import { formatDateTime } from './formatDateTime.js';
 import { openConfirmModal, closeConfirmModal, confirmDelete } from './confirmModal.js';
-import { openAddOrUpdateModal, closeAddOrUpdateModal, handleAddNewTransaction, handleUpdateTransactionFromModal, handleCancelModal } from './handleAddOrUpdateModal.js';
+import {
+  openAddOrUpdateModal,
+  closeAddOrUpdateModal,
+  handleAddNewTransaction,
+  handleUpdateTransactionFromModal,
+  handleCancelModal
+} from './handleAddOrUpdateModal.js';
 
 // Thực hiện khi DOMContentLoaded
 document.addEventListener("DOMContentLoaded", async () => {
@@ -68,10 +74,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const durationInput = document.getElementById("duration");
   const endDateInput = document.getElementById("endDate");
   const transactionDateInput = document.getElementById("transactionDate");
+
   startDateInput.value = window.todayFormatted;
   transactionDateInput.value = window.todayFormatted;
 
-  // Gắn sự kiện tính toán ngày kết thúc khi thay đổi ngày bắt đầu hoặc thời hạn
+  // Gắn sự kiện tính toán ngày kết thúc
   startDateInput.addEventListener("change", () =>
     calculateEndDate(startDateInput, durationInput, endDateInput)
   );
@@ -79,33 +86,43 @@ document.addEventListener("DOMContentLoaded", async () => {
     calculateEndDate(startDateInput, durationInput, endDateInput)
   );
 
-  // Tải danh sách phần mềm trước, sau đó mới load danh sách giao dịch
+  // Tải danh sách phần mềm và sau đó là danh sách giao dịch
   await fetchSoftwareList(null, window.softwareData, updatePackageList, updateAccountList);
 
-  // Gắn sự kiện thay đổi cho dropdown phần mềm và gói để cập nhật danh sách liên quan
+  // Gắn sự kiện thay đổi dropdown phần mềm → cập nhật gói phần mềm
   document.getElementById("softwareName").addEventListener("change", () =>
     updatePackageList(window.softwareData, null, updateAccountList)
   );
+
+  // Gắn sự kiện thay đổi dropdown gói → cập nhật danh sách tài khoản
   document.getElementById("softwarePackage").addEventListener("change", () =>
     updateAccountList(window.softwareData, null)
   );
 
-  // Tải danh sách giao dịch sau khi các danh sách phần mềm/gói đã sẵn sàng
+  // Sau khi tất cả dropdown sẵn sàng, load dữ liệu giao dịch
   window.loadTransactions();
 });
 
-// Gán các hàm tiện ích cho đối tượng window để sử dụng trong HTML
+// Gán các hàm toàn cục (không thay đổi logic)
 window.logout = logout;
-window.openCalendar = (inputId) => openCalendar(inputId, calculateEndDate, document.getElementById("startDate"), document.getElementById("duration"), document.getElementById("endDate"));
+window.openCalendar = (inputId) =>
+  openCalendar(inputId, calculateEndDate, document.getElementById("startDate"), document.getElementById("duration"), document.getElementById("endDate"));
 window.updateCustomerInfo = () => updateCustomerInfo(window.transactionList);
-window.handleReset = () => handleReset(fetchSoftwareList, showProcessingModal, showResultModal, window.todayFormatted, updatePackageList, updateAccountList);
-window.loadTransactions = () => loadTransactions(window.userInfo, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction);
-window.handleAdd = () => handleAdd(window.userInfo, window.currentEditTransactionId, window.loadTransactions, window.handleReset, updatePackageList, showProcessingModal, showResultModal);
-window.handleUpdate = () => handleUpdate(window.userInfo, window.currentEditTransactionId, window.transactionList, window.loadTransactions, window.handleReset, showProcessingModal, showResultModal, getConstants, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction, fetchSoftwareList, updatePackageList, updateAccountList);
-window.handleSearch = () => handleSearch(window.userInfo, window.transactionList, showProcessingModal, showResultModal, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction);
-window.viewTransaction = (index) => viewTransaction(index, window.transactionList, formatDate, copyToClipboard);
-window.editTransaction = (index) => editTransaction(index, window.transactionList, fetchSoftwareList, updatePackageList, updateAccountList);
-window.deleteTransaction = (index) => {
+window.handleReset = () =>
+  handleReset(fetchSoftwareList, showProcessingModal, showResultModal, window.todayFormatted, updatePackageList, updateAccountList);
+window.loadTransactions = () =>
+  loadTransactions(window.userInfo, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction);
+window.handleAdd = () =>
+  handleAdd(window.userInfo, window.currentEditTransactionId, window.loadTransactions, window.handleReset, updatePackageList, showProcessingModal, showResultModal);
+window.handleUpdate = () =>
+  handleUpdate(window.userInfo, window.currentEditTransactionId, window.transactionList, window.loadTransactions, window.handleReset, showProcessingModal, showResultModal, getConstants, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction, fetchSoftwareList, updatePackageList, updateAccountList);
+window.handleSearch = () =>
+  handleSearch(window.userInfo, window.transactionList, showProcessingModal, showResultModal, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction);
+window.viewTransaction = (index) =>
+  viewTransaction(index, window.transactionList, formatDate, copyToClipboard);
+window.editTransaction = (index) =>
+  editTransaction(index, window.transactionList, fetchSoftwareList, updatePackageList, updateAccountList);
+window.deleteTransaction = (index) =>
   deleteTransaction(
     index,
     window.transactionList,
@@ -117,7 +134,6 @@ window.deleteTransaction = (index) => {
     openConfirmModal,
     getConstants
   );
-};
 window.editRow = (index) => editRow(index, window.transactionList);
 window.deleteRow = (index) => deleteRow(index, window.deleteTransaction);
 window.closeModal = closeModal;

@@ -1,4 +1,3 @@
-// Phiên bản mới đã sửa lỗi cho hàm editTransaction
 export async function editTransaction(index, transactionList, fetchSoftwareList, updatePackageList, updateAccountList) {
   // Kiểm tra index hợp lệ và lấy giao dịch tương ứng
   if (!transactionList || !Array.isArray(transactionList) || index < 0 || index >= transactionList.length) {
@@ -31,7 +30,7 @@ export async function editTransaction(index, transactionList, fetchSoftwareList,
   window.currentSoftwarePackage = softwarePackageValue;
   window.currentAccountName = accountNameValue;
 
-  // Điền dữ liệu cho các trường văn bản trước
+  // Điền dữ liệu cho các trường văn bản
   document.getElementById("transactionDate").value = transaction.transactionDate;
   document.getElementById("customerName").value = transaction.customerName;
   document.getElementById("customerEmail").value = transaction.customerEmail;
@@ -43,25 +42,22 @@ export async function editTransaction(index, transactionList, fetchSoftwareList,
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 
-    // **Cập nhật danh sách phần mềm, gói và tài khoản như phiên bản cũ:**
-    fetchSoftwareList(softwareNameValue, window.softwareData, updatePackageList, updateAccountList);
-    // Gán giá trị dropdown "Tên phần mềm"
-    document.getElementById("softwareName").value = softwareNameValue;
-    // Cập nhật danh sách gói phần mềm với gói hiện tại, và danh sách tài khoản (truyền hàm updateAccountList)
-    updatePackageList(window.softwareData, softwarePackageValue, updateAccountList);
-    // Gán giá trị dropdown "Gói phần mềm"
-    document.getElementById("softwarePackage").value = softwarePackageValue;
-    // Cập nhật danh sách tài khoản với tài khoản hiện tại
-    updateAccountList(window.softwareData, accountNameValue);
-    // Gán giá trị dropdown "Tên tài khoản"
-    document.getElementById("accountName").value = accountNameValue;
+  // ✅ Cập nhật danh sách dropdown với các giá trị gốc cần giữ lại
+  await fetchSoftwareList(
+    softwareNameValue,
+    window.softwareData,
+    updatePackageList,
+    updateAccountList,
+    softwarePackageValue,
+    accountNameValue
+  );
 
-    // Gán loại giao dịch (không phân biệt hoa/thường)
-    if (transactionTypeSelect) {
-      const normalizedType = transactionTypeValue.toLowerCase();
-      const matchedOption = Array.from(transactionTypeSelect.options)
-                                 .find(opt => opt.value.toLowerCase() === normalizedType);
-      transactionTypeSelect.value = matchedOption ? matchedOption.value : "";
+  // Gán loại giao dịch (không phân biệt hoa/thường)
+  if (transactionTypeSelect) {
+    const normalizedType = transactionTypeValue.toLowerCase();
+    const matchedOption = Array.from(transactionTypeSelect.options)
+                               .find(opt => opt.value.toLowerCase() === normalizedType);
+    transactionTypeSelect.value = matchedOption ? matchedOption.value : "";
   }
 
   // Gắn sự kiện 'change' cho dropdown tài khoản để cập nhật biến toàn cục tương ứng
