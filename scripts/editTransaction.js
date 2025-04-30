@@ -38,29 +38,27 @@ export function editTransaction(index, transactionList, fetchSoftwareList, updat
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 
-  // Cập nhật danh sách phần mềm, gói, và tài khoản
-  fetchSoftwareList(softwareNameValue, window.softwareData, updatePackageList, updateAccountList);
-  softwareNameSelect.value = softwareNameValue;
+  // ✅ Gọi fetchSoftwareList rồi gán lại sau khi dropdown cập nhật
+  fetchSoftwareList(softwareNameValue, window.softwareData, (softwareData, _, updateAccountListCallback) => {
+    updatePackageList(softwareData, softwarePackageValue, updateAccountListCallback);
 
-  updatePackageList(window.softwareData, softwarePackageValue, updateAccountList);
-  softwarePackageSelect.value = softwarePackageValue;
+    // Gán lại value sau khi dropdown được render
+    softwareNameSelect.value = softwareNameValue;
+    softwarePackageSelect.value = softwarePackageValue;
 
-  updateAccountList(window.softwareData, accountNameValue);
-  accountNameSelect.value = accountNameValue;
+    updateAccountList(softwareData, accountNameValue);
+    accountNameSelect.value = accountNameValue;
+  });
 
-  // Thêm sự kiện 'change' cho dropdown tài khoản để cập nhật tài khoản hiện tại
+  // Cập nhật currentAccountName khi thay đổi
   accountNameSelect.addEventListener('change', () => {
     window.currentAccountName = accountNameSelect.value;
   });
 
-  // Gán transactionType, xử lý không phân biệt chữ hoa - chữ thường
+  // Loại giao dịch (Dropdown loại giao dịch)
   if (!transactionTypeSelect) {
     console.error("Không tìm thấy trường transactionType trong DOM");
   } else {
-    console.log("Giá trị transactionType trước khi gán:", transactionTypeValue);
-    console.log("Các giá trị tùy chọn transactionType:", Array.from(transactionTypeSelect.options).map(opt => opt.value));
-
-    // Tìm giá trị phù hợp không phân biệt chữ hoa - chữ thường
     const normalizedTypeValue = transactionTypeValue.toLowerCase();
     const matchingOption = Array.from(transactionTypeSelect.options).find(
       option => option.value.toLowerCase() === normalizedTypeValue
@@ -68,13 +66,6 @@ export function editTransaction(index, transactionList, fetchSoftwareList, updat
 
     if (matchingOption) {
       transactionTypeSelect.value = matchingOption.value;
-      console.log("Giá trị transactionType sau khi gán:", transactionTypeSelect.value);
-      // Kiểm tra xem giá trị có được gán đúng không
-      if (transactionTypeSelect.value.toLowerCase() !== normalizedTypeValue) {
-        console.warn("Giá trị transactionType không được gán đúng, thử gán lại:", matchingOption.value);
-        transactionTypeSelect.value = matchingOption.value;
-        console.log("Giá trị transactionType sau khi gán lại:", transactionTypeSelect.value);
-      }
     } else {
       console.warn("Không tìm thấy tùy chọn khớp với transactionType:", transactionTypeValue);
       transactionTypeSelect.value = "";
