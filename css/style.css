@@ -301,7 +301,7 @@ body.login-page {
   
   .detail-content .detail-row {
     display: flex;
-    align-items: flex-start; /* đảm bảo căn trên khi nhiều dòng */
+    align-items: flex-start;
     padding: 8px 0;
     border-bottom: 1px solid #ddd;
   }
@@ -312,12 +312,9 @@ body.login-page {
   
   .detail-content .detail-label {
     font-weight: bold;
-    width: 180px;
-    padding-right: 10px;
-    text-align: right;
-    border-right: 2px solid #ccc;  /* 💡 đường kẻ phân cách */
-    margin-right: 10px;
-    flex-shrink: 0;
+    min-width: 150px;   /* hoặc 160–180 nếu bạn muốn label thẳng hàng */
+    margin-right: 10px; /* tạo khoảng cách nhỏ với value */
+    text-align: left;   /* ✅ căn trái thay vì phải */
   }
   
   .detail-content .detail-value {
