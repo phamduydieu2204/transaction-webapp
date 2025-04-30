@@ -38,31 +38,24 @@ export function editTransaction(index, transactionList, fetchSoftwareList, updat
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 
-  // Gọi fetchSoftwareList → gọi tiếp updatePackageList + updateAccountList
-  fetchSoftwareList(softwareNameValue, window.softwareData, (softwareData, _, updateAccountListCallback) => {
-    updatePackageList(softwareData, softwarePackageValue, (data) => {
-      updateAccountList(data || softwareData, accountNameValue);
-    });
+  // Gọi đúng fetchSoftwareList với updatePackageList + updateAccountList gốc
+  fetchSoftwareList(softwareNameValue, window.softwareData, updatePackageList, updateAccountList);
 
-    // ⚠️ Delay 100ms để chờ DOM render, sau đó gán lại value
-    setTimeout(() => {
-      softwareNameSelect.value = softwareNameValue;
-      softwarePackageSelect.value = softwarePackageValue;
-      accountNameSelect.value = accountNameValue;
-    }, 100);
-  });
+  // Gán lại dropdown sau khi DOM đã render
+  setTimeout(() => {
+    softwareNameSelect.value = softwareNameValue;
+    softwarePackageSelect.value = softwarePackageValue;
+    accountNameSelect.value = accountNameValue;
+  }, 200);
 
-  // Gán transactionType chính xác
+  // Gán loại giao dịch
   if (transactionTypeSelect) {
     const normalizedType = transactionTypeValue.toLowerCase();
     const matchedOption = Array.from(transactionTypeSelect.options).find(opt => opt.value.toLowerCase() === normalizedType);
     transactionTypeSelect.value = matchedOption ? matchedOption.value : "";
   }
 
-  // Cập nhật tài khoản hiện tại
-  if (accountNameSelect) {
-    accountNameSelect.addEventListener('change', () => {
-      window.currentAccountName = accountNameSelect.value;
-    });
-  }
+  accountNameSelect.addEventListener('change', () => {
+    window.currentAccountName = accountNameSelect.value;
+  });
 }
