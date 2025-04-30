@@ -39,9 +39,12 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
     const editButton = row.querySelector(".edit-btn");
     editButton.addEventListener("click", () => {
+      console.log("🛠️ Gọi window.editTransaction từ updateTable với index:", startIndex + index);
+      console.log("window.editTransaction =", typeof window.editTransaction);
       if (typeof window.editTransaction === "function") {
         window.editTransaction(startIndex + index, transactionList, window.fetchSoftwareList, window.updatePackageList, window.updateAccountList);
       } else {
+        console.error("❌ window.editTransaction chưa được khởi tạo hoặc không phải là hàm.");
         console.error("editTransaction chưa được khởi tạo đúng.");
       }
     });

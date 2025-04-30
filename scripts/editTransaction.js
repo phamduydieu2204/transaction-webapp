@@ -42,6 +42,13 @@ export async function editTransaction(index, transactionList, fetchSoftwareList,
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 
+console.log("📥 editTransaction - gọi fetchSoftwareList với:", {
+  softwareNameValue,
+  softwarePackageValue,
+  accountNameValue
+});
+console.log("🔎 typeof fetchSoftwareList =", typeof fetchSoftwareList);
+
   // ✅ Cập nhật danh sách dropdown với các giá trị gốc cần giữ lại
   await fetchSoftwareList(
     softwareNameValue,
@@ -51,6 +58,7 @@ export async function editTransaction(index, transactionList, fetchSoftwareList,
     softwarePackageValue,
     accountNameValue
   );
+  
 
   // Gán loại giao dịch (không phân biệt hoa/thường)
   if (transactionTypeSelect) {

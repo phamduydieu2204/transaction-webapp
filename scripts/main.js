@@ -120,8 +120,13 @@ window.handleSearch = () =>
   handleSearch(window.userInfo, window.transactionList, showProcessingModal, showResultModal, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction);
 window.viewTransaction = (index) =>
   viewTransaction(index, window.transactionList, formatDate, copyToClipboard);
-window.editTransaction = (index) =>
+window.editTransaction = (index) => {
+  console.log("✅ Gọi editTransaction từ main.js với index =", index);
+  console.log("▶️ fetchSoftwareList =", typeof fetchSoftwareList);
+  console.log("▶️ updatePackageList =", typeof updatePackageList);
+  console.log("▶️ updateAccountList =", typeof updateAccountList);
   editTransaction(index, window.transactionList, fetchSoftwareList, updatePackageList, updateAccountList);
+};
 window.deleteTransaction = (index) =>
   deleteTransaction(
     index,
