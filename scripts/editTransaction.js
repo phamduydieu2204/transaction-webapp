@@ -1,3 +1,7 @@
+import { showProcessingModal } from './showProcessingModal.js';
+import { closeProcessingModal } from './closeProcessingModal.js';
+
+
 export async function editTransaction(index, transactionList, fetchSoftwareList, updatePackageList, updateAccountList) {
   // Kiểm tra index hợp lệ và lấy giao dịch tương ứng
   if (!transactionList || !Array.isArray(transactionList) || index < 0 || index >= transactionList.length) {
@@ -48,6 +52,8 @@ console.log("📥 editTransaction - gọi fetchSoftwareList với:", {
   accountNameValue
 });
 console.log("🔎 typeof fetchSoftwareList =", typeof fetchSoftwareList);
+  // ✅ Hiển thị modal "Đang tải"
+  showProcessingModal("Đang tải dữ liệu giao dịch...");
 
   // ✅ Cập nhật danh sách dropdown với các giá trị gốc cần giữ lại
   await fetchSoftwareList(
@@ -59,6 +65,8 @@ console.log("🔎 typeof fetchSoftwareList =", typeof fetchSoftwareList);
     accountNameValue
   );
   
+    // ✅ Đóng modal sau khi load xong
+    closeProcessingModal();
 
   // Gán loại giao dịch (không phân biệt hoa/thường)
   if (transactionTypeSelect) {
