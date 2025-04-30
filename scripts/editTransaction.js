@@ -26,7 +26,7 @@ export function editTransaction(index, transactionList, fetchSoftwareList, updat
   window.currentSoftwarePackage = softwarePackageValue;
   window.currentAccountName = accountNameValue;
 
-  // Điền các trường khác trước
+  // Điền các trường dữ liệu trước
   document.getElementById("transactionDate").value = transaction.transactionDate;
   document.getElementById("customerName").value = transaction.customerName;
   document.getElementById("customerEmail").value = transaction.customerEmail;
@@ -38,37 +38,31 @@ export function editTransaction(index, transactionList, fetchSoftwareList, updat
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 
-  // ✅ Gọi fetchSoftwareList rồi gán lại sau khi dropdown cập nhật
+  // Gọi fetchSoftwareList → gọi tiếp updatePackageList + updateAccountList
   fetchSoftwareList(softwareNameValue, window.softwareData, (softwareData, _, updateAccountListCallback) => {
-    updatePackageList(softwareData, softwarePackageValue, updateAccountListCallback);
+    updatePackageList(softwareData, softwarePackageValue, (data) => {
+      updateAccountList(data || softwareData, accountNameValue);
+    });
 
-    // Gán lại value sau khi dropdown được render
-    softwareNameSelect.value = softwareNameValue;
-    softwarePackageSelect.value = softwarePackageValue;
-
-    updateAccountList(softwareData, accountNameValue);
-    accountNameSelect.value = accountNameValue;
+    // ⚠️ Delay 100ms để chờ DOM render, sau đó gán lại value
+    setTimeout(() => {
+      softwareNameSelect.value = softwareNameValue;
+      softwarePackageSelect.value = softwarePackageValue;
+      accountNameSelect.value = accountNameValue;
+    }, 100);
   });
 
-  // Cập nhật currentAccountName khi thay đổi
-  accountNameSelect.addEventListener('change', () => {
-    window.currentAccountName = accountNameSelect.value;
-  });
+  // Gán transactionType chính xác
+  if (transactionTypeSelect) {
+    const normalizedType = transactionTypeValue.toLowerCase();
+    const matchedOption = Array.from(transactionTypeSelect.options).find(opt => opt.value.toLowerCase() === normalizedType);
+    transactionTypeSelect.value = matchedOption ? matchedOption.value : "";
+  }
 
-  // Loại giao dịch (Dropdown loại giao dịch)
-  if (!transactionTypeSelect) {
-    console.error("Không tìm thấy trường transactionType trong DOM");
-  } else {
-    const normalizedTypeValue = transactionTypeValue.toLowerCase();
-    const matchingOption = Array.from(transactionTypeSelect.options).find(
-      option => option.value.toLowerCase() === normalizedTypeValue
-    );
-
-    if (matchingOption) {
-      transactionTypeSelect.value = matchingOption.value;
-    } else {
-      console.warn("Không tìm thấy tùy chọn khớp với transactionType:", transactionTypeValue);
-      transactionTypeSelect.value = "";
-    }
+  // Cập nhật tài khoản hiện tại
+  if (accountNameSelect) {
+    accountNameSelect.addEventListener('change', () => {
+      window.currentAccountName = accountNameSelect.value;
+    });
   }
 }
