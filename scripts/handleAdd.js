@@ -79,6 +79,7 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
       document.getElementById("successMessage").textContent = "Giao dịch đã được lưu!";
       await handleReset(fetchSoftwareList, showProcessingModal, showResultModal, todayFormatted, updatePackageList, updateAccountList);
       await loadTransactions(userInfo, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction);
+      window.loadTransactions();
       showResultModal("Giao dịch đã được lưu!", true);
     } else {
       showResultModal(result.message || "Không thể lưu giao dịch!", false);

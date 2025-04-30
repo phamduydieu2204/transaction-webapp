@@ -94,6 +94,7 @@ export async function handleUpdate(
       document.getElementById("successMessage").textContent = "Giao dịch đã được cập nhật!";
       handleReset(fetchSoftwareList, showProcessingModal, showResultModal, window.todayFormatted, updatePackageList, updateAccountList);
       await loadTransactions(userInfo, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction);
+      window.loadTransactions();
       showResultModal("Giao dịch đã được cập nhật!", true);
     } else {
       showResultModal(result.message || "Không thể cập nhật giao dịch!", false);
