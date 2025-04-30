@@ -43,28 +43,25 @@ export async function editTransaction(index, transactionList, fetchSoftwareList,
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 
-  // Cập nhật danh sách phần mềm, gói và tài khoản một cách tuần tự
-  try {
-    // Gọi hàm fetchSoftwareList và chờ hoàn tất, truyền vào giá trị phần mềm, gói và tài khoản cần giữ
-    await fetchSoftwareList(softwareNameValue, window.softwareData, updatePackageList, updateAccountList, softwarePackageValue, accountNameValue);
+    // **Cập nhật danh sách phần mềm, gói và tài khoản như phiên bản cũ:**
+    fetchSoftwareList(softwareNameValue, window.softwareData, updatePackageList, updateAccountList);
+    // Gán giá trị dropdown "Tên phần mềm"
+    document.getElementById("softwareName").value = softwareNameValue;
+    // Cập nhật danh sách gói phần mềm với gói hiện tại, và danh sách tài khoản (truyền hàm updateAccountList)
+    updatePackageList(window.softwareData, softwarePackageValue, updateAccountList);
+    // Gán giá trị dropdown "Gói phần mềm"
+    document.getElementById("softwarePackage").value = softwarePackageValue;
+    // Cập nhật danh sách tài khoản với tài khoản hiện tại
+    updateAccountList(window.softwareData, accountNameValue);
+    // Gán giá trị dropdown "Tên tài khoản"
+    document.getElementById("accountName").value = accountNameValue;
 
-    // Đảm bảo các dropdown được gán đúng giá trị từ giao dịch hiện tại
-    softwareNameSelect.value = softwareNameValue;
-    softwarePackageSelect.value = softwarePackageValue;
-    accountNameSelect.value = accountNameValue;
-  } catch (err) {
-    console.error("Lỗi khi cập nhật danh sách phần mềm/gói/tài khoản:", err);
-  }
-
-  // Thiết lập loại giao dịch (transactionType) không phân biệt hoa thường
-  if (transactionTypeSelect) {
-    const normalizedType = transactionTypeValue.toLowerCase();
-    const matchedOption = Array.from(transactionTypeSelect.options).find(option =>
-      option.value.toLowerCase() === normalizedType
-    );
-    transactionTypeSelect.value = matchedOption ? matchedOption.value : "";
-  } else {
-    console.error("Không tìm thấy trường transactionType trong DOM");
+    // Gán loại giao dịch (không phân biệt hoa/thường)
+    if (transactionTypeSelect) {
+      const normalizedType = transactionTypeValue.toLowerCase();
+      const matchedOption = Array.from(transactionTypeSelect.options)
+                                 .find(opt => opt.value.toLowerCase() === normalizedType);
+      transactionTypeSelect.value = matchedOption ? matchedOption.value : "";
   }
 
   // Gắn sự kiện 'change' cho dropdown tài khoản để cập nhật biến toàn cục tương ứng
