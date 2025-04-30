@@ -1,11 +1,10 @@
-// Phiên bản mới của hàm editTransaction
+// Phiên bản mới đã sửa lỗi cho hàm editTransaction
 export async function editTransaction(index, transactionList, fetchSoftwareList, updatePackageList, updateAccountList) {
-  // Kiểm tra index hợp lệ
+  // Kiểm tra index hợp lệ và lấy giao dịch tương ứng
   if (!transactionList || !Array.isArray(transactionList) || index < 0 || index >= transactionList.length) {
     console.error("Danh sách giao dịch không hợp lệ hoặc chỉ số không hợp lệ:", { index, transactionList });
     return;
   }
-
   const transaction = transactionList[index];
   if (!transaction) {
     console.error("Giao dịch không tồn tại tại chỉ số:", index);
@@ -15,7 +14,7 @@ export async function editTransaction(index, transactionList, fetchSoftwareList,
   // Lưu ID giao dịch hiện tại đang sửa
   window.currentEditTransactionId = transaction.transactionId;
 
-  // Lấy các phần tử dropdown từ DOM
+  // Lấy các phần tử dropdown và input từ DOM
   const softwareNameSelect = document.getElementById("softwareName");
   const softwarePackageSelect = document.getElementById("softwarePackage");
   const accountNameSelect = document.getElementById("accountName");
@@ -27,7 +26,7 @@ export async function editTransaction(index, transactionList, fetchSoftwareList,
   const accountNameValue = transaction.accountName || "";
   const transactionTypeValue = transaction.transactionType || "";
 
-  // Thiết lập biến toàn cục tạm để giữ giá trị dropdown hiện tại
+  // Thiết lập các biến toàn cục tạm để giữ giá trị dropdown hiện tại
   window.currentSoftwareName = softwareNameValue;
   window.currentSoftwarePackage = softwarePackageValue;
   window.currentAccountName = accountNameValue;
@@ -46,29 +45,21 @@ export async function editTransaction(index, transactionList, fetchSoftwareList,
 
   // Cập nhật danh sách phần mềm, gói và tài khoản một cách tuần tự
   try {
-    // Gọi hàm fetchSoftwareList và chờ hoàn tất
-    await fetchSoftwareList(softwareNameValue, window.softwareData, updatePackageList, updateAccountList);
-    // Sau khi fetchSoftwareList hoàn tất, dropdown softwareName đã được điền.
-    // Gán giá trị phần mềm hiện tại vào dropdown (đảm bảo đúng phần mềm được chọn)
+    // Gọi hàm fetchSoftwareList và chờ hoàn tất, truyền vào giá trị phần mềm, gói và tài khoản cần giữ
+    await fetchSoftwareList(softwareNameValue, window.softwareData, updatePackageList, updateAccountList, softwarePackageValue, accountNameValue);
+
+    // Đảm bảo các dropdown được gán đúng giá trị từ giao dịch hiện tại
     softwareNameSelect.value = softwareNameValue;
-
-    // Cập nhật danh sách gói dựa trên phần mềm đã chọn, và truyền giá trị gói cần giữ
-    updatePackageList(window.softwareData, softwarePackageValue, updateAccountList);
-    // Gán giá trị gói hiện tại vào dropdown gói
     softwarePackageSelect.value = softwarePackageValue;
-
-    // Cập nhật danh sách tài khoản dựa trên phần mềm & gói đã chọn, truyền giá trị tài khoản cần giữ
-    await updateAccountList(window.softwareData, accountNameValue);
-    // Gán giá trị tài khoản hiện tại vào dropdown tài khoản
     accountNameSelect.value = accountNameValue;
   } catch (err) {
     console.error("Lỗi khi cập nhật danh sách phần mềm/gói/tài khoản:", err);
   }
 
-  // Thiết lập loại giao dịch (transactionType) một cách không phân biệt hoa thường
+  // Thiết lập loại giao dịch (transactionType) không phân biệt hoa thường
   if (transactionTypeSelect) {
     const normalizedType = transactionTypeValue.toLowerCase();
-    const matchedOption = Array.from(transactionTypeSelect.options).find(option => 
+    const matchedOption = Array.from(transactionTypeSelect.options).find(option =>
       option.value.toLowerCase() === normalizedType
     );
     transactionTypeSelect.value = matchedOption ? matchedOption.value : "";

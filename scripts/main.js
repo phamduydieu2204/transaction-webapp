@@ -1,4 +1,4 @@
-// Khai báo biến toàn cục
+// Khai báo các biến và thiết lập ban đầu
 window.userInfo = null;
 window.currentEditIndex = -1;
 window.currentEditTransactionId = null;
@@ -43,9 +43,9 @@ import { formatDateTime } from './formatDateTime.js';
 import { openConfirmModal, closeConfirmModal, confirmDelete } from './confirmModal.js';
 import { openAddOrUpdateModal, closeAddOrUpdateModal, handleAddNewTransaction, handleUpdateTransactionFromModal, handleCancelModal } from './handleAddOrUpdateModal.js';
 
-// Khi DOMContentLoaded xong
+// Thực hiện khi DOMContentLoaded
 document.addEventListener("DOMContentLoaded", async () => {
-  // Lấy thông tin người dùng
+  // Lấy thông tin người dùng từ localStorage
   const userData = localStorage.getItem("employeeInfo");
   try {
     window.userInfo = userData ? JSON.parse(userData) : null;
@@ -53,25 +53,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.userInfo = null;
   }
 
+  // Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
   if (!window.userInfo) {
     window.location.href = "index.html";
     return;
   }
 
-  // Hiển thị tên nhân viên
-  document.getElementById("userWelcome").textContent =
+  // Hiển thị thông tin chào mừng
+  document.getElementById("welcome").textContent =
     `Xin chào ${window.userInfo.tenNhanVien} (${window.userInfo.maNhanVien}) - ${window.userInfo.vaiTro}`;
-  
 
-  // Setup ngày tháng ban đầu
+  // Thiết lập giá trị ngày mặc định cho các input ngày tháng
   const startDateInput = document.getElementById("startDate");
   const durationInput = document.getElementById("duration");
   const endDateInput = document.getElementById("endDate");
   const transactionDateInput = document.getElementById("transactionDate");
-
   startDateInput.value = window.todayFormatted;
   transactionDateInput.value = window.todayFormatted;
 
+  // Gắn sự kiện tính toán ngày kết thúc khi thay đổi ngày bắt đầu hoặc thời hạn
   startDateInput.addEventListener("change", () =>
     calculateEndDate(startDateInput, durationInput, endDateInput)
   );
@@ -79,9 +79,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     calculateEndDate(startDateInput, durationInput, endDateInput)
   );
 
-  // Tải danh sách phần mềm trước, sau đó mới load giao dịch
+  // Tải danh sách phần mềm trước, sau đó mới load danh sách giao dịch
   await fetchSoftwareList(null, window.softwareData, updatePackageList, updateAccountList);
 
+  // Gắn sự kiện thay đổi cho dropdown phần mềm và gói để cập nhật danh sách liên quan
   document.getElementById("softwareName").addEventListener("change", () =>
     updatePackageList(window.softwareData, null, updateAccountList)
   );
@@ -89,10 +90,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     updateAccountList(window.softwareData, null)
   );
 
+  // Tải danh sách giao dịch sau khi các danh sách phần mềm/gói đã sẵn sàng
   window.loadTransactions();
 });
 
-// Hàm tiện ích cho các thao tác
+// Gán các hàm tiện ích cho đối tượng window để sử dụng trong HTML
 window.logout = logout;
 window.openCalendar = (inputId) => openCalendar(inputId, calculateEndDate, document.getElementById("startDate"), document.getElementById("duration"), document.getElementById("endDate"));
 window.updateCustomerInfo = () => updateCustomerInfo(window.transactionList);
@@ -121,53 +123,3 @@ window.deleteRow = (index) => deleteRow(index, window.deleteTransaction);
 window.closeModal = closeModal;
 window.confirmDelete = confirmDelete;
 window.closeProcessingModal = closeProcessingModal;
-window.fetchSoftwareList = fetchSoftwareList;
-
-
-function makeColumnsResizable(table) {
-  const thElements = table.querySelectorAll("thead th");
-  thElements.forEach((th, index) => {
-    const resizer = document.createElement("div");
-    resizer.classList.add("resizer");
-    th.style.position = "relative";
-    th.appendChild(resizer);
-
-    let startX, startWidth, nextStartWidth;
-    let nextTh = th.nextElementSibling;
-
-    resizer.addEventListener("mousedown", (e) => {
-      startX = e.pageX;
-      startWidth = th.offsetWidth;
-      nextStartWidth = nextTh ? nextTh.offsetWidth : 0;
-
-      const onMouseMove = (e) => {
-        const diff = e.pageX - startX;
-        if (startWidth + diff > 50) th.style.width = `${startWidth + diff}px`;
-        if (nextTh && nextStartWidth - diff > 50) nextTh.style.width = `${nextStartWidth - diff}px`;
-
-        // Đồng bộ width cho tất cả các <td>
-        const rows = table.querySelectorAll("tbody tr");
-        rows.forEach(row => {
-          const cells = row.children;
-          if (cells[index]) cells[index].style.width = th.style.width;
-          if (cells[index + 1] && nextTh) cells[index + 1].style.width = nextTh.style.width;
-        });
-      };
-
-      const onMouseUp = () => {
-        document.removeEventListener("mousemove", onMouseMove);
-        document.removeEventListener("mouseup", onMouseUp);
-      };
-
-      document.addEventListener("mousemove", onMouseMove);
-      document.addEventListener("mouseup", onMouseUp);
-    });
-  });
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const transactionTable = document.getElementById("transactionTable");
-  if (transactionTable) {
-    makeColumnsResizable(transactionTable);
-  }
-});
