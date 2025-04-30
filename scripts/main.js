@@ -121,6 +121,8 @@ window.deleteRow = (index) => deleteRow(index, window.deleteTransaction);
 window.closeModal = closeModal;
 window.confirmDelete = confirmDelete;
 window.closeProcessingModal = closeProcessingModal;
+window.fetchSoftwareList = fetchSoftwareList;
+
 
 function makeColumnsResizable(table) {
   const thElements = table.querySelectorAll("thead th");
