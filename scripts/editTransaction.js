@@ -53,7 +53,7 @@ console.log("📥 editTransaction - gọi fetchSoftwareList với:", {
 });
 console.log("🔎 typeof fetchSoftwareList =", typeof fetchSoftwareList);
   // ✅ Hiển thị modal "Đang tải"
-  //showProcessingModal("Đang tải dữ liệu giao dịch...");
+  showProcessingModal("Đang tải dữ liệu giao dịch...");
 
   // ✅ Cập nhật danh sách dropdown với các giá trị gốc cần giữ lại
   await fetchSoftwareList(
@@ -66,7 +66,7 @@ console.log("🔎 typeof fetchSoftwareList =", typeof fetchSoftwareList);
   );
   
     // ✅ Đóng modal sau khi load xong
-   // closeProcessingModal();
+    closeProcessingModal();
 
   // Gán loại giao dịch (không phân biệt hoa/thường)
   if (transactionTypeSelect) {
