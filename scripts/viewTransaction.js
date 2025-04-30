@@ -39,18 +39,28 @@ export function viewTransaction(index, transactionList, formatDate, copyToClipbo
   fields.forEach(field => {
     const row = document.createElement("div");
     row.className = "detail-row";
-    row.innerHTML = `
-      <span class="detail-label">${field.label}:</span>
-      <span class="detail-value">${field.value}</span>
-      ${field.showCopy ? '<i class="fas fa-copy copy-icon"></i>' : ''}
-    `;
-    detailContent.appendChild(row);
-
+  
+    const labelEl = document.createElement("span");
+    labelEl.className = "detail-label";
+    labelEl.textContent = `${field.label}:`;
+  
+    const valueEl = document.createElement("span");
+    valueEl.className = "detail-value";
+    valueEl.textContent = field.value;  // 👉 dùng textContent để giữ \n xuống dòng
+  
+    row.appendChild(labelEl);
+    row.appendChild(valueEl);
+  
     if (field.showCopy) {
-      const copyIcon = row.querySelector(".copy-icon");
+      const copyIcon = document.createElement("i");
+      copyIcon.className = "fas fa-copy copy-icon";
       copyIcon.addEventListener("click", () => copyToClipboard(field.value, copyIcon));
+      row.appendChild(copyIcon);
     }
+  
+    detailContent.appendChild(row);
   });
+  
 
   modal.style.display = "block";
 

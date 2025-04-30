@@ -509,3 +509,8 @@ body.login-page {
   user-select: none;
   height: 100%;
 }
+.detail-value {
+  white-space: pre-line; /* Cho phép xuống dòng từ \n */
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
