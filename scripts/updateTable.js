@@ -39,9 +39,13 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
     const editButton = row.querySelector(".edit-btn");
     editButton.addEventListener("click", () => {
-      // ✅ Gọi đúng editTransaction với đủ tham số
-      editTransaction(startIndex + index, transactionList, window.fetchSoftwareList, window.updatePackageList, window.updateAccountList);
+      if (typeof window.editTransaction === "function") {
+        window.editTransaction(startIndex + index, transactionList, window.fetchSoftwareList, window.updatePackageList, window.updateAccountList);
+      } else {
+        console.error("editTransaction chưa được khởi tạo đúng.");
+      }
     });
+    
 
     const deleteButton = row.querySelector(".delete-btn");
     deleteButton.addEventListener("click", () => deleteTransaction(startIndex + index));
