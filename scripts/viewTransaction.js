@@ -29,6 +29,7 @@ export function viewTransaction(index, transactionList, formatDate, copyToClipbo
     { label: "Gói phần mềm", value: transaction.softwarePackage, showCopy: false },
     { label: "Tên tài khoản", value: transaction.accountName || "", showCopy: false },
     { label: "ID Sheet Tài Khoản", value: transaction.accountSheetId || "", showCopy: false },
+    { label: "Secret", value: transaction.secret || "", showCopy: true },
     { label: "Thông tin đơn hàng", value: transaction.orderInfo || "", showCopy: true },
     { label: "Doanh thu", value: transaction.revenue, showCopy: false },
     { label: "Ghi chú", value: transaction.note, showCopy: false },
