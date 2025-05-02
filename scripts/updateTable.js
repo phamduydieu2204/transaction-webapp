@@ -14,6 +14,7 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
   const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
 
   paginatedItems.forEach((transaction, index) => {
+    const globalIndex = startIndex + index;
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${transaction.transactionId}</td>
@@ -44,13 +45,13 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     actionSelect.addEventListener("change", (e) => {
       const selected = e.target.value;
       if (selected === "edit") {
-        window.editTransaction(startIndex + index);
+        window.editTransaction(globalIndex, transactionList, window.fetchSoftwareList, window.updatePackageList, window.updateAccountList);
       } else if (selected === "delete") {
-        deleteTransaction(startIndex + index);
+        window.deleteTransaction(globalIndex);
       } else if (selected === "view") {
-        viewTransaction(startIndex + index);
+        window.viewTransaction(globalIndex, transactionList, window.formatDate, window.copyToClipboard);
       }
-      e.target.value = ""; // Reset lại select sau khi chọn
+      e.target.value = "";
     });
 
     tableBody.appendChild(row);
