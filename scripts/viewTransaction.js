@@ -29,7 +29,7 @@ export async function viewTransaction(index, transactionList, formatDate, copyTo
     { label: "Tên phần mềm", value: transaction.softwareName, showCopy: false },
     { label: "Gói phần mềm", value: transaction.softwarePackage, showCopy: false },
     { label: "Tên tài khoản", value: transaction.accountName || "", showCopy: false },
-    { label: "ID Sheet Tài Khoản", value: transaction.accountSheetId || "", showCopy: false },
+    { label: "ID Sheet Tài Khoản", value: transaction.accountSheetId || "", showCopy: false, showLink: true },
     { label: "Thông tin đơn hàng", value: transaction.orderInfo || "", showCopy: true },
     { label: "Doanh thu", value: transaction.revenue, showCopy: false },
     { label: "Ghi chú", value: transaction.note, showCopy: false },
@@ -37,7 +37,6 @@ export async function viewTransaction(index, transactionList, formatDate, copyTo
     { label: "Mã nhân viên", value: transaction.maNhanVien, showCopy: false }
   ];
 
-  // Gọi API lấy thêm thông tin tài khoản từ PhanMem
   try {
     const { BACKEND_URL } = getConstants();
     const res = await fetch(BACKEND_URL, {
@@ -70,7 +69,16 @@ export async function viewTransaction(index, transactionList, formatDate, copyTo
 
     const valueEl = document.createElement("span");
     valueEl.className = "detail-value";
-    valueEl.textContent = field.value;
+
+    if (field.showLink && field.value) {
+      const link = document.createElement("a");
+      link.href = `https://docs.google.com/${field.value.length > 40 ? 'document' : 'spreadsheets'}/d/${field.value}`;
+      link.target = "_blank";
+      link.innerHTML = `<i class="fas fa-external-link-alt"></i> Mở tệp`;
+      valueEl.appendChild(link);
+    } else {
+      valueEl.textContent = field.value;
+    }
 
     row.appendChild(labelEl);
     row.appendChild(valueEl);
