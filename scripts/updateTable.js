@@ -16,6 +16,25 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
   paginatedItems.forEach((transaction, index) => {
     const globalIndex = startIndex + index;
     const row = document.createElement("tr");
+
+    // Xây dựng menu động dựa theo phần mềm
+    const software = (transaction.softwareName || '').toLowerCase();
+    const actions = [
+      { value: "", label: "-- Chọn --" },
+      { value: "view", label: "Xem" },
+      { value: "edit", label: "Sửa" },
+      { value: "delete", label: "Xóa" }
+    ];
+
+    if (software === "helium10" || software === "netflix") {
+      actions.push({ value: "updateCookie", label: "Cập nhật Cookie" });
+    }
+    if (software === "netflix" || software !== "helium10") {
+      actions.push({ value: "changePassword", label: "Đổi mật khẩu" });
+    }
+
+    const actionOptions = actions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join("\n");
+
     row.innerHTML = `
       <td>${transaction.transactionId}</td>
       <td>${formatDate(transaction.transactionDate)}</td>
@@ -33,10 +52,7 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
       <td>${transaction.tenNhanVien}</td>
       <td>
         <select class="action-select">
-          <option value="">-- Chọn --</option>
-          <option value="view">Xem</option>
-          <option value="edit">Sửa</option>
-          <option value="delete">Xóa</option>
+          ${actionOptions}
         </select>
       </td>
     `;
@@ -50,6 +66,12 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
         window.deleteTransaction(globalIndex);
       } else if (selected === "view") {
         window.viewTransaction(globalIndex, transactionList, window.formatDate, window.copyToClipboard);
+      } else if (selected === "updateCookie") {
+        if (typeof window.handleUpdateCookie === 'function') window.handleUpdateCookie(globalIndex);
+        else alert("Chức năng Cập nhật Cookie chưa được triển khai.");
+      } else if (selected === "changePassword") {
+        if (typeof window.handleChangePassword === 'function') window.handleChangePassword(globalIndex);
+        else alert("Chức năng Đổi mật khẩu chưa được triển khai.");
       }
       e.target.value = "";
     });

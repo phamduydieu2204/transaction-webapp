@@ -139,6 +139,13 @@ window.deleteTransaction = (index) =>
     openConfirmModal,
     getConstants
   );
+window.handleUpdateCookie = (index) => {
+    alert("🛠️ Chức năng cập nhật cookie đang được phát triển cho index: " + index);
+  };
+  
+window.handleChangePassword = (index) => {
+    alert("🔐 Chức năng đổi mật khẩu đang được phát triển cho index: " + index);
+};
 window.editRow = (index) => editRow(index, window.transactionList);
 window.deleteRow = (index) => deleteRow(index, window.deleteTransaction);
 window.closeModal = closeModal;
