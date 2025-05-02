@@ -519,3 +519,28 @@ body.login-page {
   overflow-wrap: break-word;
   word-break: break-word;
 }
+#updateCookieModal .modal-content {
+  max-width: 600px;
+  text-align: left;
+}
+
+#updateCookieModal label {
+  font-weight: bold;
+  margin-top: 10px;
+  display: block;
+}
+
+#updateCookieModal textarea {
+  width: 100%;
+  font-family: monospace;
+  padding: 10px;
+  margin-bottom: 10px;
+  resize: vertical;
+  white-space: pre-line;
+}
+
+#updateCookieModal .button-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}

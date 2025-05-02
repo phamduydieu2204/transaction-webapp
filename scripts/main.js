@@ -48,6 +48,14 @@ import {
   handleUpdateTransactionFromModal,
   handleCancelModal
 } from './handleAddOrUpdateModal.js';
+import {
+  handleUpdateCookie,
+  confirmUpdateCookie,
+  cancelUpdateCookie,
+  copyCurrentCookie,
+  closeUpdateCookieModal
+} from './handleUpdateCookie.js';
+
 
 // Thực hiện khi DOMContentLoaded
 document.addEventListener("DOMContentLoaded", async () => {
@@ -146,6 +154,12 @@ window.handleUpdateCookie = (index) => {
 window.handleChangePassword = (index) => {
     alert("🔐 Chức năng đổi mật khẩu đang được phát triển cho index: " + index);
 };
+window.handleUpdateCookie = (index) =>
+  handleUpdateCookie(index, window.transactionList);
+window.confirmUpdateCookie = confirmUpdateCookie;
+window.cancelUpdateCookie = cancelUpdateCookie;
+window.copyCurrentCookie = copyCurrentCookie;
+window.closeUpdateCookieModal = closeUpdateCookieModal;
 window.editRow = (index) => editRow(index, window.transactionList);
 window.deleteRow = (index) => deleteRow(index, window.deleteTransaction);
 window.closeModal = closeModal;
