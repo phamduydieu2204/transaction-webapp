@@ -1,8 +1,9 @@
 // viewTransaction.js
 
 import { closeModal } from './closeModal.js';
+import { getConstants } from './constants.js';
 
-export function viewTransaction(index, transactionList, formatDate, copyToClipboard) {
+export async function viewTransaction(index, transactionList, formatDate, copyToClipboard) {
   const transaction = transactionList[index];
   const modal = document.getElementById("transactionDetailModal");
   const detailContent = document.getElementById("transactionDetailContent");
@@ -29,7 +30,6 @@ export function viewTransaction(index, transactionList, formatDate, copyToClipbo
     { label: "Gói phần mềm", value: transaction.softwarePackage, showCopy: false },
     { label: "Tên tài khoản", value: transaction.accountName || "", showCopy: false },
     { label: "ID Sheet Tài Khoản", value: transaction.accountSheetId || "", showCopy: false },
-    { label: "Secret", value: transaction.secret || "", showCopy: true },
     { label: "Thông tin đơn hàng", value: transaction.orderInfo || "", showCopy: true },
     { label: "Doanh thu", value: transaction.revenue, showCopy: false },
     { label: "Ghi chú", value: transaction.note, showCopy: false },
@@ -37,42 +37,62 @@ export function viewTransaction(index, transactionList, formatDate, copyToClipbo
     { label: "Mã nhân viên", value: transaction.maNhanVien, showCopy: false }
   ];
 
+  // Gọi API lấy thêm thông tin tài khoản từ PhanMem
+  try {
+    const { BACKEND_URL } = getConstants();
+    const res = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "getAccountInfoBySheetId",
+        sheetId: transaction.accountSheetId
+      })
+    });
+    const result = await res.json();
+    if (result.status === "success") {
+      fields.push({ label: "Tên đăng nhập", value: result.username || "", showCopy: true });
+      fields.push({ label: "Mật khẩu đăng nhập", value: result.password || "", showCopy: true });
+      fields.push({ label: "Secret", value: result.secret || "", showCopy: true });
+    } else {
+      console.warn("Không thể lấy thông tin tài khoản:", result.message);
+    }
+  } catch (error) {
+    console.error("Lỗi khi lấy thông tin tài khoản từ PhanMem:", error);
+  }
+
   fields.forEach(field => {
     const row = document.createElement("div");
     row.className = "detail-row";
-  
+
     const labelEl = document.createElement("span");
     labelEl.className = "detail-label";
     labelEl.textContent = `${field.label}:`;
-  
+
     const valueEl = document.createElement("span");
     valueEl.className = "detail-value";
-    valueEl.textContent = field.value;  // 👉 dùng textContent để giữ \n xuống dòng
-  
+    valueEl.textContent = field.value;
+
     row.appendChild(labelEl);
     row.appendChild(valueEl);
-  
+
     if (field.showCopy) {
       const copyIcon = document.createElement("i");
       copyIcon.className = "fas fa-copy copy-icon";
       copyIcon.addEventListener("click", () => copyToClipboard(field.value, copyIcon));
       row.appendChild(copyIcon);
     }
-  
+
     detailContent.appendChild(row);
   });
-  
 
   modal.style.display = "block";
 
-  // Xử lý click ra ngoài để đóng modal
   modal.addEventListener("click", function(event) {
     if (event.target === modal) {
       closeModal();
     }
   });
 
-  // Gán luôn sự kiện cho nút X nếu chưa có
   const closeButton = modal.querySelector(".close");
   if (closeButton) {
     closeButton.onclick = () => closeModal();
