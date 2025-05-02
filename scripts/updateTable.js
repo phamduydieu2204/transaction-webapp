@@ -31,27 +31,27 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
       <td>${transaction.revenue}</td>
       <td>${transaction.tenNhanVien}</td>
       <td>
-        <button class="edit-btn">Sửa</button>
-        <button class="delete-btn">Xóa</button>
-        <button class="view-btn" onclick="viewTransaction(${startIndex + index})">Xem</button>
+        <select class="action-select">
+          <option value="">-- Chọn --</option>
+          <option value="view">Xem</option>
+          <option value="edit">Sửa</option>
+          <option value="delete">Xóa</option>
+        </select>
       </td>
     `;
 
-    const editButton = row.querySelector(".edit-btn");
-    editButton.addEventListener("click", () => {
-      console.log("🛠️ Gọi window.editTransaction từ updateTable với index:", startIndex + index);
-      console.log("window.editTransaction =", typeof window.editTransaction);
-      if (typeof window.editTransaction === "function") {
-        window.editTransaction(startIndex + index, transactionList, window.fetchSoftwareList, window.updatePackageList, window.updateAccountList);
-      } else {
-        console.error("❌ window.editTransaction chưa được khởi tạo hoặc không phải là hàm.");
-        console.error("editTransaction chưa được khởi tạo đúng.");
+    const actionSelect = row.querySelector(".action-select");
+    actionSelect.addEventListener("change", (e) => {
+      const selected = e.target.value;
+      if (selected === "edit") {
+        window.editTransaction(startIndex + index);
+      } else if (selected === "delete") {
+        deleteTransaction(startIndex + index);
+      } else if (selected === "view") {
+        viewTransaction(startIndex + index);
       }
+      e.target.value = ""; // Reset lại select sau khi chọn
     });
-    
-
-    const deleteButton = row.querySelector(".delete-btn");
-    deleteButton.addEventListener("click", () => deleteTransaction(startIndex + index));
 
     tableBody.appendChild(row);
 
