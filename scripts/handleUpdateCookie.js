@@ -44,6 +44,7 @@ export function copyCurrentCookie() {
 }
 
 export async function confirmUpdateCookie() {
+disableInteraction();
   const transaction = window.currentCookieTransaction;
   const newCookie = document.getElementById("newCookie").value.trim();
 
@@ -75,11 +76,13 @@ export async function confirmUpdateCookie() {
     closeProcessingModal();
     showResultModal("Lỗi khi cập nhật cookie: " + err.message, false);
   } finally {
+    enableInteraction();
     closeUpdateCookieModal();
   }
 }
 
 export async function cancelUpdateCookie() {
+    disableInteraction();
   const transaction = window.currentCookieTransaction;
   if (!transaction?.transactionId) return;
 
@@ -97,6 +100,7 @@ export async function cancelUpdateCookie() {
   } catch (err) {
     console.warn("Không thể gửi log hủy cập nhật cookie:", err.message);
   } finally {
+    enableInteraction();
     closeUpdateCookieModal();
   }
 }
@@ -104,3 +108,11 @@ export async function cancelUpdateCookie() {
 export function closeUpdateCookieModal() {
   document.getElementById("updateCookieModal").style.display = "none";
 }
+
+function disableInteraction() {
+    document.getElementById("formOverlay").style.display = "block";
+  }
+  function enableInteraction() {
+    document.getElementById("formOverlay").style.display = "none";
+  }
+  
