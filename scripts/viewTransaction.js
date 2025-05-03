@@ -67,7 +67,6 @@ export async function viewTransaction(index, transactionList, formatDate, copyTo
   fields.forEach(field => {
     const row = document.createElement("div");
     row.className = "detail-row";
-    row.style.justifyContent = "space-between";
 
     const labelEl = document.createElement("span");
     labelEl.className = "detail-label";
@@ -88,11 +87,21 @@ export async function viewTransaction(index, transactionList, formatDate, copyTo
     valueEl.style.maxWidth = field.label === "Liên hệ" ? "300px" : "100%";
 
     if (field.showLink && field.value) {
-      const link = document.createElement("a");
-      link.href = `https://docs.google.com/${field.value.length > 40 ? 'document' : 'spreadsheets'}/d/${field.value}`;
-      link.target = "_blank";
-      link.innerHTML = `<i class="fas fa-external-link-alt"></i> Mở tệp`;
-      valueEl.appendChild(link);
+      const sheetLink = document.createElement("a");
+      sheetLink.href = `https://docs.google.com/spreadsheets/d/${field.value}`;
+      sheetLink.target = "_blank";
+      sheetLink.style.marginRight = "12px";
+      sheetLink.innerHTML = `<i class="fas fa-table" style="color: #1a73e8"></i> Sheet`;
+      sheetLink.title = "Mở Google Sheet";
+
+      const docLink = document.createElement("a");
+      docLink.href = `https://docs.google.com/document/d/${field.value}`;
+      docLink.target = "_blank";
+      docLink.innerHTML = `<i class="fas fa-file-alt" style="color: #d93025"></i> Docs`;
+      docLink.title = "Mở Google Docs";
+
+      valueEl.appendChild(sheetLink);
+      valueEl.appendChild(docLink);
     } else {
       valueEl.textContent = field.value;
     }
@@ -101,6 +110,8 @@ export async function viewTransaction(index, transactionList, formatDate, copyTo
 
     const iconContainer = document.createElement("span");
     iconContainer.style.display = "flex";
+    iconContainer.style.marginLeft = "auto";
+    iconContainer.style.justifyContent = "flex-end";
     iconContainer.style.gap = "8px";
 
     if (field.showExternalLink && field.value && typeof field.value === "string" && field.value.startsWith("http")) {
@@ -124,7 +135,6 @@ export async function viewTransaction(index, transactionList, formatDate, copyTo
     }
 
     valueWrapper.appendChild(iconContainer);
-
     row.appendChild(labelEl);
     row.appendChild(valueWrapper);
     detailContent.appendChild(row);
