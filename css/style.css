@@ -544,3 +544,23 @@ body.login-page {
   justify-content: flex-end;
   gap: 10px;
 }
+.detail-row i.copy-icon {
+  color: #007bff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+  margin-left: 10px;
+}
+
+.detail-row i.copy-icon:hover {
+  color: #0056b3;
+  transform: scale(1.2);
+}
+
+.detail-row i.copy-icon:active {
+  transform: scale(0.95);
+}
+
+.detail-row i.copy-icon::before {
+  vertical-align: middle;
+}
