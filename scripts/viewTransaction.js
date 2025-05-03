@@ -21,7 +21,12 @@ export async function viewTransaction(index, transactionList, formatDate, copyTo
     { label: "Loại giao dịch", value: transaction.transactionType, showCopy: false },
     { label: "Tên khách hàng", value: transaction.customerName, showCopy: false },
     { label: "Email", value: transaction.customerEmail, showCopy: true },
-    { label: "Liên hệ", value: transaction.customerPhone, showCopy: true },
+    {
+      label: "Liên hệ",
+      value: transaction.customerPhone,
+      showCopy: true,
+      showExternalLink: true
+    },
     { label: "Số tháng đăng ký", value: transaction.duration, showCopy: false },
     { label: "Ngày bắt đầu", value: formatDate(transaction.startDate), showCopy: false },
     { label: "Ngày kết thúc", value: formatDate(transaction.endDate), showCopy: false },
@@ -69,6 +74,11 @@ export async function viewTransaction(index, transactionList, formatDate, copyTo
 
     const valueEl = document.createElement("span");
     valueEl.className = "detail-value";
+    valueEl.style.whiteSpace = field.label === "Liên hệ" ? "nowrap" : "pre-line";
+    valueEl.style.overflow = field.label === "Liên hệ" ? "hidden" : "visible";
+    valueEl.style.textOverflow = field.label === "Liên hệ" ? "ellipsis" : "unset";
+    valueEl.style.display = field.label === "Liên hệ" ? "inline-block" : "block";
+    valueEl.style.maxWidth = field.label === "Liên hệ" ? "300px" : "100%";
 
     if (field.showLink && field.value) {
       const link = document.createElement("a");
@@ -82,6 +92,17 @@ export async function viewTransaction(index, transactionList, formatDate, copyTo
 
     row.appendChild(labelEl);
     row.appendChild(valueEl);
+
+    if (field.showExternalLink && field.value && typeof field.value === "string" && field.value.startsWith("http")) {
+      const linkIcon = document.createElement("i");
+      linkIcon.className = "fas fa-external-link-alt copy-icon";
+      linkIcon.title = "Mở liên kết";
+      linkIcon.style.marginLeft = "10px";
+      linkIcon.addEventListener("click", () => {
+        window.open(field.value, "_blank");
+      });
+      row.appendChild(linkIcon);
+    }
 
     if (field.showCopy) {
       const copyIcon = document.createElement("i");
