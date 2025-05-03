@@ -67,10 +67,17 @@ export async function viewTransaction(index, transactionList, formatDate, copyTo
   fields.forEach(field => {
     const row = document.createElement("div");
     row.className = "detail-row";
+    row.style.justifyContent = "space-between";
 
     const labelEl = document.createElement("span");
     labelEl.className = "detail-label";
     labelEl.textContent = `${field.label}:`;
+
+    const valueWrapper = document.createElement("div");
+    valueWrapper.style.display = "flex";
+    valueWrapper.style.flex = "1";
+    valueWrapper.style.justifyContent = "space-between";
+    valueWrapper.style.alignItems = "center";
 
     const valueEl = document.createElement("span");
     valueEl.className = "detail-value";
@@ -90,27 +97,36 @@ export async function viewTransaction(index, transactionList, formatDate, copyTo
       valueEl.textContent = field.value;
     }
 
-    row.appendChild(labelEl);
-    row.appendChild(valueEl);
+    valueWrapper.appendChild(valueEl);
+
+    const iconContainer = document.createElement("span");
+    iconContainer.style.display = "flex";
+    iconContainer.style.gap = "8px";
 
     if (field.showExternalLink && field.value && typeof field.value === "string" && field.value.startsWith("http")) {
       const linkIcon = document.createElement("i");
       linkIcon.className = "fas fa-external-link-alt copy-icon";
       linkIcon.title = "Mở liên kết";
-      linkIcon.style.marginLeft = "10px";
+      linkIcon.style.cursor = "pointer";
       linkIcon.addEventListener("click", () => {
         window.open(field.value, "_blank");
       });
-      row.appendChild(linkIcon);
+      iconContainer.appendChild(linkIcon);
     }
 
     if (field.showCopy) {
       const copyIcon = document.createElement("i");
       copyIcon.className = "fas fa-copy copy-icon";
+      copyIcon.title = "Sao chép";
+      copyIcon.style.cursor = "pointer";
       copyIcon.addEventListener("click", () => copyToClipboard(field.value, copyIcon));
-      row.appendChild(copyIcon);
+      iconContainer.appendChild(copyIcon);
     }
 
+    valueWrapper.appendChild(iconContainer);
+
+    row.appendChild(labelEl);
+    row.appendChild(valueWrapper);
     detailContent.appendChild(row);
   });
 
