@@ -87,6 +87,10 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
   const refreshTable = () =>
     updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
 
+  if (!window.firstPage || !window.prevPage || !window.nextPage || !window.lastPage || !window.goToPage) {
+    console.warn("⚠️ Một hoặc nhiều hàm phân trang chưa được gán vào window.");
+  }
+
   updatePagination(
     totalPages,
     window.currentPage,

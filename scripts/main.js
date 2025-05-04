@@ -56,10 +56,8 @@ import {
   closeUpdateCookieModal
 } from './handleUpdateCookie.js';
 
-
 // Thực hiện khi DOMContentLoaded
 document.addEventListener("DOMContentLoaded", async () => {
-  // Lấy thông tin người dùng từ localStorage
   const userData = localStorage.getItem("employeeInfo");
   try {
     window.userInfo = userData ? JSON.parse(userData) : null;
@@ -67,17 +65,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.userInfo = null;
   }
 
-  // Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
   if (!window.userInfo) {
     window.location.href = "index.html";
     return;
   }
 
-  // Hiển thị thông tin chào mừng
   document.getElementById("welcome").textContent =
     `Xin chào ${window.userInfo.tenNhanVien} (${window.userInfo.maNhanVien}) - ${window.userInfo.vaiTro}`;
 
-  // Thiết lập giá trị ngày mặc định cho các input ngày tháng
   const startDateInput = document.getElementById("startDate");
   const durationInput = document.getElementById("duration");
   const endDateInput = document.getElementById("endDate");
@@ -86,7 +81,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   startDateInput.value = window.todayFormatted;
   transactionDateInput.value = window.todayFormatted;
 
-  // Gắn sự kiện tính toán ngày kết thúc
   startDateInput.addEventListener("change", () =>
     calculateEndDate(startDateInput, durationInput, endDateInput)
   );
@@ -94,24 +88,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     calculateEndDate(startDateInput, durationInput, endDateInput)
   );
 
-  // Tải danh sách phần mềm và sau đó là danh sách giao dịch
   await fetchSoftwareList(null, window.softwareData, updatePackageList, updateAccountList);
 
-  // Gắn sự kiện thay đổi dropdown phần mềm → cập nhật gói phần mềm
   document.getElementById("softwareName").addEventListener("change", () =>
     updatePackageList(window.softwareData, null, updateAccountList)
   );
-
-  // Gắn sự kiện thay đổi dropdown gói → cập nhật danh sách tài khoản
   document.getElementById("softwarePackage").addEventListener("change", () =>
     updateAccountList(window.softwareData, null)
   );
 
-  // Sau khi tất cả dropdown sẵn sàng, load dữ liệu giao dịch
   window.loadTransactions();
 });
 
-// Gán các hàm toàn cục (không thay đổi logic)
 window.logout = logout;
 window.openCalendar = (inputId) =>
   openCalendar(inputId, calculateEndDate, document.getElementById("startDate"), document.getElementById("duration"), document.getElementById("endDate"));
@@ -129,10 +117,6 @@ window.handleSearch = () =>
 window.viewTransaction = (index) =>
   viewTransaction(index, window.transactionList, formatDate, copyToClipboard);
 window.editTransaction = (index) => {
-  console.log("✅ Gọi editTransaction từ main.js với index =", index);
-  console.log("▶️ fetchSoftwareList =", typeof fetchSoftwareList);
-  console.log("▶️ updatePackageList =", typeof updatePackageList);
-  console.log("▶️ updateAccountList =", typeof updateAccountList);
   editTransaction(index, window.transactionList, fetchSoftwareList, updatePackageList, updateAccountList);
 };
 window.deleteTransaction = (index) =>
@@ -147,15 +131,10 @@ window.deleteTransaction = (index) =>
     openConfirmModal,
     getConstants
   );
-window.handleUpdateCookie = (index) => {
-    alert("🛠️ Chức năng cập nhật cookie đang được phát triển cho index: " + index);
-  };
-  
-window.handleChangePassword = (index) => {
-    alert("🔐 Chức năng đổi mật khẩu đang được phát triển cho index: " + index);
-};
 window.handleUpdateCookie = (index) =>
   handleUpdateCookie(index, window.transactionList);
+window.handleChangePassword = (index) =>
+  alert("🔐 Chức năng đổi mật khẩu đang được phát triển cho index: " + index);
 window.confirmUpdateCookie = confirmUpdateCookie;
 window.cancelUpdateCookie = cancelUpdateCookie;
 window.copyCurrentCookie = copyCurrentCookie;
@@ -165,3 +144,8 @@ window.deleteRow = (index) => deleteRow(index, window.deleteTransaction);
 window.closeModal = closeModal;
 window.confirmDelete = confirmDelete;
 window.closeProcessingModal = closeProcessingModal;
+window.firstPage = firstPage;
+window.prevPage = prevPage;
+window.nextPage = nextPage;
+window.lastPage = lastPage;
+window.goToPage = goToPage;
