@@ -84,7 +84,18 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     }
   });
 
-  updatePagination(totalPages);
+  const refreshTable = () =>
+    updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
+
+  updatePagination(
+    totalPages,
+    window.currentPage,
+    () => window.firstPage(refreshTable),
+    () => window.prevPage(refreshTable),
+    () => window.nextPage(refreshTable, window.itemsPerPage),
+    () => window.lastPage(refreshTable, window.itemsPerPage),
+    (page) => window.goToPage(page, refreshTable)
+  );
 
   const todayRevenueElement = document.getElementById("todayRevenue");
   if (todayRevenueElement) {
