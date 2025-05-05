@@ -75,6 +75,7 @@ export async function handleSearch(
         "transactionId",
         "transactionDate",
         "transactionType",
+        "customerName",
         "customerEmail",
         "duration",
         "startDate",
