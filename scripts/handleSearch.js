@@ -69,32 +69,9 @@ export async function handleSearch(
     });
 
     const result = await response.json();
-    console.log("📥 Dữ liệu trả về từ backend:", JSON.stringify(result.data?.[0], null, 2));
 
     if (result.status === "success") {
-      const allowedFields = [
-        "transactionId",
-        "transactionDate",
-        "transactionType",
-        "customerName",
-        "customerEmail",
-        "duration",
-        "startDate",
-        "endDate",
-        "deviceCount",
-        "softwareName",
-        "softwarePackage",
-        "accountName",
-        "revenue",
-        "tenNhanVien"
-      ];
-
-      window.transactionList = (result.data || []).map(t => {
-        const filtered = {};
-        allowedFields.forEach(f => filtered[f] = t[f]);
-        return filtered;
-      });
-
+      window.transactionList = result.data || [];
       window.transactionList.sort((a, b) => {
         const idA = parseInt((a.transactionId || "").replace("GD", ""));
         const idB = parseInt((b.transactionId || "").replace("GD", ""));
