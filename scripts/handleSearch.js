@@ -69,6 +69,7 @@ export async function handleSearch(
     });
 
     const result = await response.json();
+    console.log("📥 Dữ liệu trả về từ backend:", JSON.stringify(result.data?.[0], null, 2));
 
     if (result.status === "success") {
       const allowedFields = [
