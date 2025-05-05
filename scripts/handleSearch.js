@@ -20,7 +20,6 @@ export async function handleSearch(
   const { BACKEND_URL } = getConstants();
   const conditions = {};
 
-  // Lấy dữ liệu từ form tìm kiếm
   const getValue = (id) => document.getElementById(id)?.value?.trim() || "";
 
   const transactionType = getValue("transactionType");
@@ -53,7 +52,6 @@ export async function handleSearch(
   if (revenue && revenue !== "0") conditions.revenue = revenue;
   if (note) conditions.note = note;
 
-  // 🧠 Build payload gửi backend
   const data = {
     action: "searchTransactions",
     maNhanVien: userInfo.maNhanVien,
@@ -73,7 +71,28 @@ export async function handleSearch(
     const result = await response.json();
 
     if (result.status === "success") {
-      window.transactionList = result.data || [];
+      const allowedFields = [
+        "transactionId",
+        "transactionDate",
+        "transactionType",
+        "customerEmail",
+        "duration",
+        "startDate",
+        "endDate",
+        "deviceCount",
+        "softwareName",
+        "softwarePackage",
+        "accountName",
+        "revenue",
+        "tenNhanVien"
+      ];
+
+      window.transactionList = (result.data || []).map(t => {
+        const filtered = {};
+        allowedFields.forEach(f => filtered[f] = t[f]);
+        return filtered;
+      });
+
       window.transactionList.sort((a, b) => {
         const idA = parseInt((a.transactionId || "").replace("GD", ""));
         const idB = parseInt((b.transactionId || "").replace("GD", ""));
