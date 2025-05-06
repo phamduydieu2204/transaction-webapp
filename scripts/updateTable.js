@@ -19,6 +19,16 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     const globalIndex = startIndex + index;
     const row = document.createElement("tr");
 
+    const parseDate = (str) => {
+      const [y, m, d] = (str || "").split("/").map(Number);
+      return new Date(y, m - 1, d);
+    };
+    const endDate = parseDate(transaction.endDate);
+    if (endDate < today) {
+      row.classList.add("expired-row");
+    }
+    
+
     const software = (transaction.softwareName || '').toLowerCase();
     const actions = [
       { value: "", label: "-- Chọn --" },

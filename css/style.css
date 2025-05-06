@@ -564,3 +564,45 @@ body.login-page {
 .detail-row i.copy-icon::before {
   vertical-align: middle;
 }
+
+/* Thêm CSS bảng Thông tin khác */
+.info-other {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.info-row strong {
+  font-weight: 500;
+}
+
+.order-info {
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.copy-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #007bff;
+  padding: 2px;
+}
+
+.copy-btn:hover {
+  color: #0056b3;
+}
+/* Dòng đã hết hạn (ngày kết thúc < hôm nay) */
+#transactionTable tr.expired-row {
+  font-style: italic;
+  color: #888;
+}
