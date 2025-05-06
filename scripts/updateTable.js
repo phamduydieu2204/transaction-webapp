@@ -13,11 +13,12 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
   const today = new Date();
   const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
 
+  const isLink = (text) => /^https?:\/\//i.test(text);
+
   paginatedItems.forEach((transaction, index) => {
     const globalIndex = startIndex + index;
     const row = document.createElement("tr");
 
-    // Xây dựng menu động dựa theo phần mềm
     const software = (transaction.softwareName || '').toLowerCase();
     const actions = [
       { value: "", label: "-- Chọn --" },
@@ -26,14 +27,26 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
       { value: "delete", label: "Xóa" }
     ];
 
-    if (software === "helium10" || software === "netflix") {
+    if (software === "helium10") {
       actions.push({ value: "updateCookie", label: "Cập nhật Cookie" });
     }
-    if (software === "netflix" || software !== "helium10") {
+    if (software !== "helium10") {
       actions.push({ value: "changePassword", label: "Đổi mật khẩu" });
     }
 
     const actionOptions = actions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join("\n");
+
+    const linkHtml = isLink(transaction.customerPhone)
+      ? `<a href="${transaction.customerPhone}" target="_blank" title="${transaction.customerPhone}">Liên hệ 🔗</a>`
+      : transaction.customerPhone || "";
+
+    const infoCell = `
+      <div>${linkHtml}</div>
+      <div>
+        Thông tin đơn hàng
+        <button class="copy-btn" data-content="${(transaction.orderInfo || "").replace(/"/g, '&quot;')}">📋</button>
+      </div>
+    `;
 
     row.innerHTML = `
       <td>${transaction.transactionId}</td>
@@ -45,11 +58,9 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
       <td>${formatDate(transaction.startDate)}</td>
       <td>${formatDate(transaction.endDate)}</td>
       <td>${transaction.deviceCount}</td>
-      <td>${transaction.softwareName}</td>
-      <td>${transaction.softwarePackage}</td>
-      <td>${transaction.accountName || ""}</td>
+      <td>${transaction.softwareName} - ${transaction.softwarePackage} - ${transaction.accountName || ""}</td>
       <td>${transaction.revenue}</td>
-      <td>${transaction.tenNhanVien}</td>
+      <td>${infoCell}</td>
       <td>
         <select class="action-select">
           ${actionOptions}
@@ -76,9 +87,17 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
       e.target.value = "";
     });
 
+    const copyBtn = row.querySelector(".copy-btn");
+    if (copyBtn) {
+      copyBtn.addEventListener("click", () => {
+        const content = copyBtn.getAttribute("data-content") || "";
+        navigator.clipboard.writeText(content);
+        alert("Đã sao chép thông tin đơn hàng.");
+      });
+    }
+
     tableBody.appendChild(row);
 
-    // Tính doanh thu
     if (transaction.transactionDate && (window.isSearching || transaction.transactionDate.startsWith(todayFormatted))) {
       totalRevenue += parseFloat(transaction.revenue) || 0;
     }
@@ -86,10 +105,6 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
   const refreshTable = () =>
     updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
-
-  if (!window.firstPage || !window.prevPage || !window.nextPage || !window.lastPage || !window.goToPage) {
-    console.warn("⚠️ Một hoặc nhiều hàm phân trang chưa được gán vào window.");
-  }
 
   updatePagination(
     totalPages,
