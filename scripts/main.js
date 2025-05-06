@@ -39,6 +39,7 @@ import { deleteTransaction } from './deleteTransaction.js';
 import { fetchSoftwareList } from './fetchSoftwareList.js';
 import { updatePackageList } from './updatePackageList.js';
 import { editRow, deleteRow } from './legacy.js';
+import { handleChangePassword, closeChangePasswordModal, confirmChangePassword } from './handleChangePassword.js';
 import { formatDateTime } from './formatDateTime.js';
 import { openConfirmModal, closeConfirmModal, confirmDelete } from './confirmModal.js';
 import {
@@ -55,6 +56,7 @@ import {
   copyCurrentCookie,
   closeUpdateCookieModal
 } from './handleUpdateCookie.js';
+
 
 // Thực hiện khi DOMContentLoaded
 document.addEventListener("DOMContentLoaded", async () => {
@@ -135,6 +137,9 @@ window.handleUpdateCookie = (index) =>
   handleUpdateCookie(index, window.transactionList);
 window.handleChangePassword = (index) =>
   alert("🔐 Chức năng đổi mật khẩu đang được phát triển cho index: " + index);
+window.handleChangePassword = handleChangePassword;
+window.closeChangePasswordModal = closeChangePasswordModal;
+window.confirmChangePassword = confirmChangePassword;
 window.confirmUpdateCookie = confirmUpdateCookie;
 window.cancelUpdateCookie = cancelUpdateCookie;
 window.copyCurrentCookie = copyCurrentCookie;
