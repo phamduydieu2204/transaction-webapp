@@ -604,5 +604,5 @@ body.login-page {
 /* Dòng đã hết hạn (ngày kết thúc < hôm nay) */
 #transactionTable tr.expired-row {
   font-style: italic;
-  color: #9c904a;
+  color: #ff0202a2;
 }
