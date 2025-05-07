@@ -72,8 +72,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  document.getElementById("welcome").textContent =
-    `Xin chào ${window.userInfo.tenNhanVien} (${window.userInfo.maNhanVien}) - ${window.userInfo.vaiTro}`;
+  document.getElementById("userWelcome").textContent =
+  `Xin chào ${window.userInfo.tenNhanVien} (${window.userInfo.maNhanVien}) - ${window.userInfo.vaiTro}`;
 
   const startDateInput = document.getElementById("startDate");
   const durationInput = document.getElementById("duration");
