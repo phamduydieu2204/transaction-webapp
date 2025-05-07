@@ -55,6 +55,7 @@ export async function viewTransaction(index, transactionList, formatDate, copyTo
       })      
     });
     const result = await res.json();
+    console.log("✅ Kết quả lấy thông tin tài khoản:", result);
     if (result.status === "success") {
       fields.push({ label: "Tên đăng nhập", value: result.username || "", showCopy: true });
       fields.push({ label: "Mật khẩu đăng nhập", value: result.password || "", showCopy: true });
