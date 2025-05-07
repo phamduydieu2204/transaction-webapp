@@ -69,7 +69,7 @@ export async function handleSearch(
     });
 
     const result = await response.json();
-
+    window.isSearching = true;
     if (result.status === "success") {
       window.transactionList = result.data || [];
       window.transactionList.sort((a, b) => {
