@@ -51,7 +51,7 @@ export async function viewTransaction(index, transactionList, formatDate, copyTo
         action: "getAccountInfoBySoftware",
         softwareName: transaction.softwareName,
         softwarePackage: transaction.softwarePackage,
-        accountN: transaction.accountName
+        accountName: transaction.accountName
       })      
     });
     const result = await res.json();
