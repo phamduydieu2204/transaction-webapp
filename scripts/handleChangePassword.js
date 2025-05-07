@@ -106,7 +106,7 @@ async function fetchAccountInfo(softwareName, softwarePackage, accountName) {
     const result = await response.json();
     if (result.status === "success") {
       return {
-        email: result.email || "",
+        email: result.username || "",
         password: result.password || "",
         secret: result.secret || ""
       };
