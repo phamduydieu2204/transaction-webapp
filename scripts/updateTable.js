@@ -14,7 +14,7 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
   const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
 
   const isLink = (text) => /^https?:\/\//i.test(text);
-  
+
   console.log("🧾 Ngày hôm nay:", todayFormatted);
   console.log("🧾 Ngày giao dịch của từng dòng:", transactionList.map(t => t.transactionDate));
   
@@ -111,7 +111,7 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
     tableBody.appendChild(row);
 
-    if (transaction.transactionDate && (window.isSearching || transaction.transactionDate.startsWith(todayFormatted))) {
+    if (transaction.transactionDate && transaction.transactionDate.startsWith(todayFormatted)) {
       totalRevenue += parseFloat(transaction.revenue) || 0;
     }
   });
