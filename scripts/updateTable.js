@@ -111,10 +111,10 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
     tableBody.appendChild(row);
 
-    if (transaction.transactionDate && transaction.transactionDate.startsWith(todayFormatted)) {
+    if (transaction.transactionDate) {
       totalRevenue += parseFloat(transaction.revenue) || 0;
     }
-  });
+    
 
   const refreshTable = () =>
     updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
