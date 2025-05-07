@@ -113,8 +113,8 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
     if (transaction.transactionDate) {
       totalRevenue += parseFloat(transaction.revenue) || 0;
-    }
-    
+    }    
+  });
 
   const refreshTable = () =>
     updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
