@@ -114,9 +114,15 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
     tableBody.appendChild(row);
 
-    if (transaction.transactionDate) {
+    if (
+      transaction.transactionDate &&
+      (
+        window.isSearching === true ||
+        transaction.transactionDate.startsWith(todayFormatted)
+      )
+    ) {
       totalRevenue += parseFloat(transaction.revenue) || 0;
-    }    
+    }       
   });
 
   const refreshTable = () =>
