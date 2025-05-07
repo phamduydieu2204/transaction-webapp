@@ -48,9 +48,11 @@ export async function viewTransaction(index, transactionList, formatDate, copyTo
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        action: "getAccountInfoBySheetId",
-        sheetId: transaction.accountSheetId
-      })
+        action: "getAccountInfoBySoftware",
+        softwareName: transaction.softwareName,
+        softwarePackage: transaction.softwarePackage,
+        accountN: transaction.accountName
+      })      
     });
     const result = await res.json();
     if (result.status === "success") {
