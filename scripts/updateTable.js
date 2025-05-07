@@ -15,8 +15,11 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
   const isLink = (text) => /^https?:\/\//i.test(text);
 
-  console.log("🧾 Ngày hôm nay:", todayFormatted);
-  console.log("🧾 Ngày giao dịch của từng dòng:", transactionList.map(t => t.transactionDate));
+  console.log("📌 BẮT ĐẦU HIỂN THỊ GIAO DỊCH");
+  console.log("🟢 Vai trò:", window.userInfo?.vaiTro);
+  console.log("🟢 isSearching:", window.isSearching);
+  console.log("🟢 todayFormatted:", todayFormatted);
+  
   
   paginatedItems.forEach((transaction, index) => {
     const globalIndex = startIndex + index;
@@ -112,8 +115,11 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     tableBody.appendChild(row);
 
     if (transaction.transactionDate) {
-      totalRevenue += parseFloat(transaction.revenue) || 0;
-    }    
+      const rev = parseFloat(transaction.revenue) || 0;
+      totalRevenue += rev;
+      console.log(`➕ ${transaction.transactionId} | ${transaction.transactionDate} | Doanh thu: ${rev}`);
+    }
+       
   });
 
   const refreshTable = () =>
@@ -130,6 +136,9 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
   );
 
   const todayRevenueElement = document.getElementById("todayRevenue");
+  console.log("✅ Tổng doanh thu cuối cùng:", totalRevenue);
+console.log("📌 Gán text vào #todayRevenue nếu vai trò là admin");
+
   if (todayRevenueElement) {
     if (window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin") {
       todayRevenueElement.textContent = `Tổng doanh thu: ${totalRevenue.toLocaleString()} VNĐ`;
