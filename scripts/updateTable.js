@@ -114,11 +114,9 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
     tableBody.appendChild(row);
 
-    if (transaction.transactionDate) {
-      const rev = parseFloat(transaction.revenue) || 0;
-      totalRevenue += rev;
-      console.log(`➕ ${transaction.transactionId} | ${transaction.transactionDate} | Doanh thu: ${rev}`);
-    }
+    if (transaction.transactionDate && (window.isSearching || transaction.transactionDate.startsWith(todayFormatted))) {
+      totalRevenue += parseFloat(transaction.revenue) || 0;
+    }    
        
   });
 
