@@ -56,7 +56,6 @@ import {
   copyCurrentCookie,
   closeUpdateCookieModal
 } from './handleUpdateCookie.js';
-import { handleAddChiPhi } from './handleAddChiPhi.js';
 
 
 // Thực hiện khi DOMContentLoaded
@@ -101,48 +100,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   );
 
   window.loadTransactions();
-
-    // Tạo nút chuyển đổi giữa giao dịch và chi phí (chỉ hiển thị với admin)
-    if (window.userInfo?.vaiTro?.toLowerCase() === "admin") {
-      const toggleButton = document.createElement("button");
-      toggleButton.textContent = "→ Nhập chi phí";
-      toggleButton.id = "toggleFormMode";
-      toggleButton.style.cssText = `
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 5px;
-        cursor: pointer;
-        z-index: 20;
-      `;
-  
-      let isChiPhiMode = false;
-  
-      toggleButton.addEventListener("click", () => {
-        isChiPhiMode = !isChiPhiMode;
-        const transactionForm = document.getElementById("transactionForm");
-        const chiPhiForm = document.getElementById("chiPhiForm");
-  
-        if (isChiPhiMode) {
-          toggleButton.textContent = "← Nhập giao dịch";
-          transactionForm.style.display = "none";
-          chiPhiForm.style.display = "block";
-          document.getElementById("tenNhanVienChiPhi").value = window.userInfo.tenNhanVien;
-          document.getElementById("maNhanVienChiPhi").value = window.userInfo.maNhanVien;
-        } else {
-          toggleButton.textContent = "→ Nhập chi phí";
-          transactionForm.style.display = "block";
-          chiPhiForm.style.display = "none";
-        }
-      });
-  
-      document.body.appendChild(toggleButton);
-    }
-  
 });
 
 window.logout = logout;
@@ -155,7 +112,6 @@ window.loadTransactions = () =>
   loadTransactions(window.userInfo, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction);
 window.handleAdd = () =>
   handleAdd(window.userInfo, window.currentEditTransactionId, window.loadTransactions, window.handleReset, updatePackageList, showProcessingModal, showResultModal);
-window.handleAddChiPhi = () => handleAddChiPhi(window.userInfo);
 window.handleUpdate = () =>
   handleUpdate(window.userInfo, window.currentEditTransactionId, window.transactionList, window.loadTransactions, window.handleReset, showProcessingModal, showResultModal, getConstants, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction, fetchSoftwareList, updatePackageList, updateAccountList);
 window.handleSearch = () =>
