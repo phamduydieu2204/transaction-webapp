@@ -1,0 +1,169 @@
+<form id="chiPhiForm" class="form-grid fixed-header" style="display: none;" onreset="document.getElementById('chiPhiForm').reset()">
+    <!-- Dòng 1 -->
+    <div>
+      <label>Mã chi phí:</label>
+      <input type="text" id="maChiPhi">
+    </div>
+    <div>
+      <label>Ngày chi:</label>
+      <input type="text" id="ngayChi" placeholder="yyyy/mm/dd">
+    </div>
+    <div>
+      <label>Loại chi phí:</label>
+      <input type="text" id="loaiChiPhi">
+    </div>
+    <div>
+      <label>Tên phần mềm / Danh mục phụ:</label>
+      <input type="text" id="tenPhanMemChiPhi">
+    </div>
+  
+    <!-- Dòng 2 -->
+    <div>
+      <label>Gói phần mềm:</label>
+      <input type="text" id="goiPhanMemChiPhi">
+    </div>
+    <div>
+      <label>Tên tài khoản:</label>
+      <input type="text" id="tenTaiKhoanChiPhi">
+    </div>
+    <div>
+      <label>Mô tả chi tiết:</label>
+      <textarea id="moTaChiTiet" rows="2"></textarea>
+    </div>
+    <div>
+      <label>Số tiền:</label>
+      <input type="number" id="soTien">
+    </div>
+  
+    <!-- Dòng 3 -->
+    <div>
+      <label>Định kỳ:</label>
+      <input type="checkbox" id="dinhKy">
+    </div>
+    <div>
+      <label>Chu kỳ:</label>
+      <input type="text" id="chuKy">
+    </div>
+    <div>
+      <label>Ngày bắt đầu:</label>
+      <input type="text" id="ngayBatDauChiPhi" placeholder="yyyy/mm/dd">
+    </div>
+    <div>
+      <label>Ngày kết thúc:</label>
+      <input type="text" id="ngayKetThucChiPhi" placeholder="yyyy/mm/dd">
+    </div>
+  
+    <!-- Dòng 4 -->
+    <div>
+      <label>Ngày tái tục:</label>
+      <input type="text" id="ngayTaiTuc" placeholder="yyyy/mm/dd">
+    </div>
+    <div>
+      <label>Trạng thái:</label>
+      <input type="text" id="trangThaiChiPhi">
+    </div>
+    <div>
+      <label>Phương thức thanh toán:</label>
+      <input type="text" id="phuongThucThanhToanChiPhi">
+    </div>
+    <div>
+      <label>Ghi chú:</label>
+      <textarea id="ghiChuChiPhi" rows="2"></textarea>
+    </div>
+  
+    <!-- Dòng 5 -->
+    <div>
+      <label>Tên nhân viên:</label>
+      <input type="text" id="tenNhanVienChiPhi" disabled>
+    </div>
+    <div>
+      <label>Mã nhân viên:</label>
+      <input type="text" id="maNhanVienChiPhi" disabled>
+    </div>
+  
+    <div class="button-row">
+      <button type="button" onclick="handleAddChiPhi(window.userInfo)">Thêm chi phí</button>
+      <button type="reset">Làm mới</button>
+    </div>
+  </form>
+  
+  <!-- Form nhập chi phí -->
+  <form id="chiPhiForm" class="form-grid fixed-header" style="display: none;" onreset="document.getElementById('chiPhiForm').reset()">
+    <div>
+      <label>Mã chi phí:</label>
+      <input type="text" id="maChiPhi">
+    </div>
+    <div>
+      <label>Ngày chi:</label>
+      <input type="text" id="ngayChi" placeholder="yyyy/mm/dd">
+    </div>
+    <div>
+      <label>Loại chi phí:</label>
+      <input type="text" id="loaiChiPhi">
+    </div>
+    <div>
+      <label>Tên phần mềm / Danh mục phụ:</label>
+      <input type="text" id="tenPhanMemChiPhi">
+    </div>
+    <div>
+      <label>Gói phần mềm:</label>
+      <input type="text" id="goiPhanMemChiPhi">
+    </div>
+    <div>
+      <label>Tên tài khoản:</label>
+      <input type="text" id="tenTaiKhoanChiPhi">
+    </div>
+    <div>
+      <label>Mô tả chi tiết:</label>
+      <textarea id="moTaChiTiet" rows="2"></textarea>
+    </div>
+    <div>
+      <label>Số tiền:</label>
+      <input type="number" id="soTien">
+    </div>
+    <div>
+      <label>Định kỳ:</label>
+      <input type="checkbox" id="dinhKy">
+    </div>
+    <div>
+      <label>Chu kỳ:</label>
+      <input type="text" id="chuKy">
+    </div>
+    <div>
+      <label>Ngày bắt đầu:</label>
+      <input type="text" id="ngayBatDauChiPhi" placeholder="yyyy/mm/dd">
+    </div>
+    <div>
+      <label>Ngày kết thúc:</label>
+      <input type="text" id="ngayKetThucChiPhi" placeholder="yyyy/mm/dd">
+    </div>
+    <div>
+      <label>Ngày tái tục:</label>
+      <input type="text" id="ngayTaiTuc" placeholder="yyyy/mm/dd">
+    </div>
+    <div>
+      <label>Trạng thái:</label>
+      <input type="text" id="trangThaiChiPhi">
+    </div>
+    <div>
+      <label>Phương thức thanh toán:</label>
+      <input type="text" id="phuongThucThanhToanChiPhi">
+    </div>
+    <div>
+      <label>Ghi chú:</label>
+      <textarea id="ghiChuChiPhi" rows="2"></textarea>
+    </div>
+    <div>
+      <label>Tên nhân viên:</label>
+      <input type="text" id="tenNhanVienChiPhi" disabled>
+    </div>
+    <div>
+      <label>Mã nhân viên:</label>
+      <input type="text" id="maNhanVienChiPhi" disabled>
+    </div>
+    <div class="button-row">
+      <button type="button" onclick="handleAddChiPhi(window.userInfo)">Thêm chi phí</button>
+      <button type="reset">Làm mới</button>
+    </div>
+  </form>
+  
