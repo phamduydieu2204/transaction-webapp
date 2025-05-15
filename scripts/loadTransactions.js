@@ -30,8 +30,8 @@ export async function loadTransactions(userInfo, updateTable, formatDate, editTr
 
       // Sắp xếp giao dịch mới nhất lên đầu (ID lớn hơn trước)
       window.transactionList.sort((a, b) => {
-        const idA = parseInt((a.transactionId || "").replace("GD", ""));
-        const idB = parseInt((b.transactionId || "").replace("GD", ""));
+        const idA = parseInt((a.transactionId || "").replace(/\D/g, ""));
+        const idB = parseInt((b.transactionId || "").replace(/\D/g, ""));
         return idB - idA;
       });
 
