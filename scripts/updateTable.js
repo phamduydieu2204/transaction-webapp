@@ -36,17 +36,22 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     
 
     const software = (transaction.softwareName || '').toLowerCase();
+    const softwarePackage = (transaction.softwarePackage || '').trim().toLowerCase();
     const actions = [
       { value: "", label: "-- Chọn --" },
       { value: "view", label: "Xem" },
       { value: "edit", label: "Sửa" },
       { value: "delete", label: "Xóa" }
     ];
+    const shouldShowCookie = (
+      software === "helium10 diamon".toLowerCase() ||
+      software === "helium10 platinum".toLowerCase() ||
+      (software === "netflix" && softwarePackage === "share")
+    );
 
-    if (software === "helium10") {
+    if (shouldShowCookie) {
       actions.push({ value: "updateCookie", label: "Cập nhật Cookie" });
-    }
-    if (software !== "helium10") {
+    } else {
       actions.push({ value: "changePassword", label: "Đổi mật khẩu" });
     }
 
