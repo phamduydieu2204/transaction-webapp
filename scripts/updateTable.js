@@ -119,16 +119,32 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
     tableBody.appendChild(row);
 
-    if (
-      transaction.transactionDate &&
-      (
-        window.isSearching === true ||
-        transaction.transactionDate.startsWith(todayFormatted)
-      )
-    ) {
-      totalRevenue += parseFloat(transaction.revenue) || 0;
-    }       
+    //if (
+     // transaction.transactionDate &&
+      //(
+     //   window.isSearching === true ||
+     //   transaction.transactionDate.startsWith(todayFormatted)
+    //  )
+    //) {
+    //  totalRevenue += parseFloat(transaction.revenue) || 0;
+   // }       
   });
+
+  if (window.isSearching === true) {
+  // Cộng doanh thu toàn bộ kết quả tìm kiếm
+  totalRevenue = transactionList.reduce((sum, t) => {
+    return sum + (parseFloat(t.revenue) || 0);
+  }, 0);
+} else {
+  // Chỉ cộng giao dịch có ngày hôm nay
+  totalRevenue = transactionList.reduce((sum, t) => {
+    if (t.transactionDate && t.transactionDate.startsWith(todayFormatted)) {
+      return sum + (parseFloat(t.revenue) || 0);
+    }
+    return sum;
+  }, 0);
+}
+
 
   const refreshTable = () =>
     updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
