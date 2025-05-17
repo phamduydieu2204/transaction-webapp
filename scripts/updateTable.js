@@ -20,6 +20,19 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
   console.log("🟢 isSearching:", window.isSearching);
   console.log("🟢 todayFormatted:", todayFormatted);
   
+  if (window.isSearching === true) {
+  totalRevenue = transactionList.reduce((sum, t) => {
+    return sum + (parseFloat(t.revenue) || 0);
+  }, 0);
+} else {
+  totalRevenue = transactionList.reduce((sum, t) => {
+    if (t.transactionDate && t.transactionDate.startsWith(todayFormatted)) {
+      return sum + (parseFloat(t.revenue) || 0);
+    }
+    return sum;
+  }, 0);
+}
+
   
   paginatedItems.forEach((transaction, index) => {
     const globalIndex = startIndex + index;
@@ -129,21 +142,6 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     //  totalRevenue += parseFloat(transaction.revenue) || 0;
    // }       
   });
-
-  if (window.isSearching === true) {
-  // Cộng doanh thu toàn bộ kết quả tìm kiếm
-  totalRevenue = transactionList.reduce((sum, t) => {
-    return sum + (parseFloat(t.revenue) || 0);
-  }, 0);
-} else {
-  // Chỉ cộng giao dịch có ngày hôm nay
-  totalRevenue = transactionList.reduce((sum, t) => {
-    if (t.transactionDate && t.transactionDate.startsWith(todayFormatted)) {
-      return sum + (parseFloat(t.revenue) || 0);
-    }
-    return sum;
-  }, 0);
-}
 
 
   const refreshTable = () =>
