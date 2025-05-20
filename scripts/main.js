@@ -100,9 +100,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   );
 
   window.loadTransactions();
-});
-
-document.querySelectorAll(".tab-button").forEach(button => {
+  
+  // Xử lý chuyển tab menu
+  document.querySelectorAll(".tab-button").forEach(button => {
   button.addEventListener("click", () => {
     const selectedTab = button.dataset.tab;
 
@@ -119,6 +119,8 @@ document.querySelectorAll(".tab-button").forEach(button => {
     document.getElementById(selectedTab).classList.add("active");
   });
 });
+});
+
 
 
 window.logout = logout;
