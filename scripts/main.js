@@ -40,6 +40,7 @@ import { fetchSoftwareList } from './fetchSoftwareList.js';
 import { updatePackageList } from './updatePackageList.js';
 import { editRow, deleteRow } from './legacy.js';
 import { handleAddExpense } from './handleAddExpense.js';
+import { initExpenseDropdowns } from './initExpenseDropdowns.js';
 import { handleChangePassword, closeChangePasswordModal, confirmChangePassword } from './handleChangePassword.js';
 import { formatDateTime } from './formatDateTime.js';
 import { openConfirmModal, closeConfirmModal, confirmDelete } from './confirmModal.js';
@@ -92,6 +93,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   );
 
   await fetchSoftwareList(null, window.softwareData, updatePackageList, updateAccountList);
+  await initExpenseDropdowns();
 
   document.getElementById("softwareName").addEventListener("change", () =>
     updatePackageList(window.softwareData, null, updateAccountList)
