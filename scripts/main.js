@@ -100,25 +100,30 @@ document.addEventListener("DOMContentLoaded", async () => {
   );
 
   window.loadTransactions();
-  
-  // Xử lý chuyển tab menu
-  document.querySelectorAll(".tab-button").forEach(button => {
-  button.addEventListener("click", () => {
-    const selectedTab = button.dataset.tab;
 
-    // Toggle button active
-    document.querySelectorAll(".tab-button").forEach(btn =>
-      btn.classList.remove("active")
-    );
-    button.classList.add("active");
+    // 👉 Thêm xử lý tab tại đây
+    document.querySelectorAll(".tab-button").forEach(button => {
+      button.addEventListener("click", () => {
+        const selectedTab = button.dataset.tab;
 
-    // Toggle tab content
-    document.querySelectorAll(".tab-content").forEach(content =>
-      content.classList.remove("active")
-    );
-    document.getElementById(selectedTab).classList.add("active");
-  });
-});
+        // 1. Kích hoạt nút
+        document.querySelectorAll(".tab-button").forEach(btn =>
+          btn.classList.remove("active")
+        );
+        button.classList.add("active");
+
+        // 2. Ẩn tất cả tab content
+        document.querySelectorAll(".tab-content").forEach(content =>
+          content.classList.remove("active")
+        );
+
+        // 3. Hiện tab tương ứng
+        const target = document.getElementById(selectedTab);
+        if (target) {
+          target.classList.add("active");
+        }
+      });
+    });
 });
 
 
