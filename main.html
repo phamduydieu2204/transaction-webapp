@@ -244,6 +244,12 @@
 </head>
 <body>
   <div class="container">
+    <div class="tab-menu">
+      <button class="tab-button active" data-tab="tab-giao-dich">Nhập giao dịch</button>
+      <button class="tab-button" data-tab="tab-chi-phi">Nhập chi phí</button>
+      <button class="tab-button" data-tab="tab-thong-ke">Thống kê</button>
+    </div>
+
     <button class="logout-btn" onclick="logout()">
       <i class="fas fa-sign-out-alt"></i> Đăng xuất
     </button>
@@ -256,112 +262,123 @@
     
     <hr>
 
-    <form id="transactionForm" class="form-grid fixed-header" onreset="handleReset()">
-      <!-- Dòng 1 -->
-      <div>
-        <label>Ngày giao dịch:</label>
-        <div class="date-input-container">
-          <input type="text" id="transactionDate" placeholder="yyyy/mm/dd">
-          <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('transactionDate')"></i>
-        </div>
-      </div>
+    <div id="tab-giao-dich" class="tab-content active"></div>
+        <form id="transactionForm" class="form-grid fixed-header" onreset="handleReset()">
+          <!-- Dòng 1 -->
+          <div>
+            <label>Ngày giao dịch:</label>
+            <div class="date-input-container">
+              <input type="text" id="transactionDate" placeholder="yyyy/mm/dd">
+              <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('transactionDate')"></i>
+            </div>
+          </div>
 
-      <div>
-        <label>Loại giao dịch:</label>
-        <select id="transactionType" required>
-          <option value="">-- Chọn loại --</option>
-          <option value="Bán hàng">Bán hàng</option>
-          <option value="Hoàn Tiền">Hoàn Tiền</option>
-          <option value="Dùng thử">Dùng thử</option>
-          <option value="Nhập hàng">Nhập hàng</option>
-        </select>
-      </div>
+          <div>
+            <label>Loại giao dịch:</label>
+            <select id="transactionType" required>
+              <option value="">-- Chọn loại --</option>
+              <option value="Bán hàng">Bán hàng</option>
+              <option value="Hoàn Tiền">Hoàn Tiền</option>
+              <option value="Dùng thử">Dùng thử</option>
+              <option value="Nhập hàng">Nhập hàng</option>
+            </select>
+          </div>
 
-      <div>
-        <label>Email:</label>
-        <input type="email" id="customerEmail">
-      </div>
+          <div>
+            <label>Email:</label>
+            <input type="email" id="customerEmail">
+          </div>
 
-      <div>
-        <label>Tên khách hàng:</label>
-        <div class="search-icon-container">
-          <input type="text" id="customerName">
-          <i class="fas fa-search search-icon" onclick="updateCustomerInfo()"></i>
-        </div>
-      </div>
+          <div>
+            <label>Tên khách hàng:</label>
+            <div class="search-icon-container">
+              <input type="text" id="customerName">
+              <i class="fas fa-search search-icon" onclick="updateCustomerInfo()"></i>
+            </div>
+          </div>
 
-      <div>
-        <label>Liên hệ:</label>
-        <input type="text" id="customerPhone">
-      </div>
+          <div>
+            <label>Liên hệ:</label>
+            <input type="text" id="customerPhone">
+          </div>
 
-      <!-- Dòng 2 -->
-      <div>
-        <label>Số tháng đăng ký:</label>
-        <input type="number" id="duration">
-      </div>
+          <!-- Dòng 2 -->
+          <div>
+            <label>Số tháng đăng ký:</label>
+            <input type="number" id="duration">
+          </div>
 
-      <div>
-        <label>Ngày bắt đầu:</label>
-        <div class="date-input-container">
-          <input type="text" id="startDate" placeholder="yyyy/mm/dd">
-          <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('startDate')"></i>
-        </div>
-      </div>
+          <div>
+            <label>Ngày bắt đầu:</label>
+            <div class="date-input-container">
+              <input type="text" id="startDate" placeholder="yyyy/mm/dd">
+              <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('startDate')"></i>
+            </div>
+          </div>
 
-      <div>
-        <label>Ngày kết thúc:</label>
-        <div class="date-input-container">
-          <input type="text" id="endDate" placeholder="yyyy/mm/dd">
-          <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('endDate')"></i>
-        </div>
-      </div>
+          <div>
+            <label>Ngày kết thúc:</label>
+            <div class="date-input-container">
+              <input type="text" id="endDate" placeholder="yyyy/mm/dd">
+              <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('endDate')"></i>
+            </div>
+          </div>
 
-      <div>
-        <label>Số thiết bị:</label>
-        <input type="number" id="deviceCount">
-      </div>
+          <div>
+            <label>Số thiết bị:</label>
+            <input type="number" id="deviceCount">
+          </div>
 
-      <div>
-        <label>Ghi chú:</label>
-        <textarea id="note" rows="2"></textarea>
-      </div>
+          <div>
+            <label>Ghi chú:</label>
+            <textarea id="note" rows="2"></textarea>
+          </div>
 
-      <!-- Dòng 3 -->
-      <div>
-        <label>Tên phần mềm:</label>
-        <select id="softwareName">
-          <option value="">-- Chọn phần mềm --</option>
-        </select>
-      </div>
+          <!-- Dòng 3 -->
+          <div>
+            <label>Tên phần mềm:</label>
+            <select id="softwareName">
+              <option value="">-- Chọn phần mềm --</option>
+            </select>
+          </div>
 
-      <div>
-        <label>Gói phần mềm:</label>
-        <select id="softwarePackage">
-          <option value="">-- Chọn gói --</option>
-        </select>
-      </div>
+          <div>
+            <label>Gói phần mềm:</label>
+            <select id="softwarePackage">
+              <option value="">-- Chọn gói --</option>
+            </select>
+          </div>
 
-      <div>
-        <label>Tên tài khoản:</label>
-        <select id="accountName">
-          <option value="">-- Chọn tài khoản --</option>
-        </select>
-      </div>
+          <div>
+            <label>Tên tài khoản:</label>
+            <select id="accountName">
+              <option value="">-- Chọn tài khoản --</option>
+            </select>
+          </div>
 
-      <div>
-        <label>Doanh thu:</label>
-        <input type="number" id="revenue">
-      </div>
+          <div>
+            <label>Doanh thu:</label>
+            <input type="number" id="revenue">
+          </div>
 
-      <!-- Dòng 4: Các nút -->
-      <div class="button-row">
-        <button type="button" onclick="handleAdd()">Thêm</button>
-        <button type="button" onclick="handleUpdate()">Cập nhật</button>
-        <button type="button" onclick="handleSearch()">Tìm kiếm</button>
-        <button type="reset">Làm mới</button>
-      </div>
-    </form>
+          <!-- Dòng 4: Các nút -->
+          <div class="button-row">
+            <button type="button" onclick="handleAdd()">Thêm</button>
+            <button type="button" onclick="handleUpdate()">Cập nhật</button>
+            <button type="button" onclick="handleSearch()">Tìm kiếm</button>
+            <button type="reset">Làm mới</button>
+          </div>
+        </form>
+    </div>
+
+    <div id="tab-chi-phi" class="tab-content" style="display: none;">
+      <h3>Nhập chi phí (đang phát triển)</h3>
+    </div>
+
+    <div id="tab-thong-ke" class="tab-content" style="display: none;">
+      <h3>Thống kê (đang phát triển)</h3>
+    </div>
+
 
     <!-- Khu vực thông báo -->
     <div id="notification"></div>

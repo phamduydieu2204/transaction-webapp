@@ -102,6 +102,25 @@ document.addEventListener("DOMContentLoaded", async () => {
   window.loadTransactions();
 });
 
+document.querySelectorAll(".tab-button").forEach(button => {
+  button.addEventListener("click", () => {
+    const selectedTab = button.dataset.tab;
+
+    // Toggle button active
+    document.querySelectorAll(".tab-button").forEach(btn =>
+      btn.classList.remove("active")
+    );
+    button.classList.add("active");
+
+    // Toggle tab content
+    document.querySelectorAll(".tab-content").forEach(content =>
+      content.classList.remove("active")
+    );
+    document.getElementById(selectedTab).classList.add("active");
+  });
+});
+
+
 window.logout = logout;
 window.openCalendar = (inputId) =>
   openCalendar(inputId, calculateEndDate, document.getElementById("startDate"), document.getElementById("duration"), document.getElementById("endDate"));

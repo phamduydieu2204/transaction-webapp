@@ -606,3 +606,32 @@ body.login-page {
   font-style: italic;
   color: #ff0202a2;
 }
+
+.tab-menu {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tab-button {
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 5px 5px 0 0;
+  outline: none;
+}
+
+.tab-button.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
