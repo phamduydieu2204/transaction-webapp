@@ -373,25 +373,53 @@
 
 <div id="tab-chi-phi" class="tab-content">
   <form id="expenseForm" class="form-grid">
+    
+    <!-- PHẦN 1: Thông tin khoản chi -->
     <div>
-      <label>Ngày chi phí:</label>
-      <input type="text" id="expenseDate" placeholder="yyyy/mm/dd">
+      <label>Ngày chi:</label>
+      <div class="date-input-container">
+        <input type="text" id="expenseDate" placeholder="yyyy/mm/dd">
+        <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseDate')"></i>
+      </div>
     </div>
 
     <div>
-      <label>Loại chi phí:</label>
-      <select id="expenseType">
+      <label>Loại khoản chi:</label>
+      <select id="expenseCategory" onchange="handleCategoryChange()">
         <option value="">-- Chọn loại --</option>
-        <option value="Phần mềm">Phần mềm</option>
-        <option value="Quảng cáo">Quảng cáo</option>
-        <option value="Nhân sự">Nhân sự</option>
-        <option value="Khác">Khác</option>
       </select>
     </div>
 
     <div>
-      <label>Nội dung:</label>
-      <input type="text" id="expenseDescription" placeholder="Mô tả chi phí">
+      <label>Danh mục chung:</label>
+      <select id="expenseSubCategory" onchange="handleSubCategoryChange()">
+        <option value="">-- Chọn danh mục --</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Tên sản phẩm/Dịch vụ:</label>
+      <select id="expenseProduct" onchange="handleProductChange()">
+        <option value="">-- Chọn sản phẩm --</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Phiên bản/Gói dịch vụ:</label>
+      <select id="expensePackage">
+        <option value="">-- Chọn gói --</option>
+      </select>
+    </div>
+
+    <div class="full-row">
+      <label>Mô tả khoản chi:</label>
+      <textarea id="expenseDescription" rows="2" placeholder="Chi tiết, rõ ràng..."></textarea>
+    </div>
+
+    <!-- PHẦN 2: Chi tiết thanh toán -->
+    <div>
+      <label>Tài khoản sử dụng:</label>
+      <input type="text" id="expenseAccount">
     </div>
 
     <div>
@@ -400,11 +428,84 @@
     </div>
 
     <div>
-      <label>Người ghi:</label>
-      <input type="text" id="expenseRecorder" readonly>
+      <label>Đơn vị tiền tệ:</label>
+      <select id="expenseCurrency">
+        <option value="VND">VND</option>
+        <option value="USD">USD</option>
+        <option value="NGN">NGN</option>
+      </select>
     </div>
 
     <div>
+      <label>Hình thức thanh toán:</label>
+      <select id="expensePaymentMethod">
+        <option value="">-- Chọn hình thức --</option>
+        <option>Tiền mặt</option>
+        <option>Chuyển khoản</option>
+        <option>Thẻ tín dụng</option>
+        <option>Ví điện tử</option>
+        <option>Paypal</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Ngân hàng/Ví:</label>
+      <select id="expenseBank" onchange="handleBankChange()">
+        <option value="">-- Chọn ngân hàng/ví --</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Thông tin thẻ/Tài khoản:</label>
+      <select id="expenseCard">
+        <option value="">-- Chọn tài khoản --</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Phương thức chi:</label>
+      <select id="expenseRecurring" onchange="handleRecurringChange()">
+        <option value="Chi một lần">Chi một lần</option>
+        <option value="Hàng tháng">Định kỳ hàng tháng</option>
+        <option value="Hàng quý">Định kỳ hàng quý</option>
+        <option value="Hàng năm">Định kỳ hàng năm</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Ngày tái tục:</label>
+      <div class="date-input-container">
+        <input type="text" id="expenseRenewDate" placeholder="yyyy/mm/dd">
+        <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseRenewDate')"></i>
+      </div>
+    </div>
+
+    <!-- PHẦN 3: Khác -->
+    <div>
+      <label>Người nhận / Nhà cung cấp:</label>
+      <input type="text" id="expenseSupplier">
+    </div>
+
+    <div>
+      <label>Nguồn tiền chi:</label>
+      <select id="expenseSource">
+        <option>Tiền cá nhân</option>
+        <option>Tiền từ doanh thu Amazon</option>
+        <option>Tiền từ doanh thu phần mềm</option>
+        <option>Tiền vay</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Trạng thái:</label>
+      <select id="expenseStatus">
+        <option>Đã thanh toán</option>
+        <option>Chưa thanh toán</option>
+        <option>Đã hủy</option>
+      </select>
+    </div>
+
+    <div class="full-row">
       <label>Ghi chú:</label>
       <textarea id="expenseNote" rows="2"></textarea>
     </div>
@@ -415,6 +516,7 @@
     </div>
   </form>
 </div>
+
 
 
     <div id="tab-thong-ke" class="tab-content" style="display: none;">
