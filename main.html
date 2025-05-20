@@ -371,9 +371,51 @@
         </form>
     </div>
 
-    <div id="tab-chi-phi" class="tab-content" style="display: none;">
-      <h3>Nhập chi phí (đang phát triển)</h3>
+<div id="tab-chi-phi" class="tab-content">
+  <form id="expenseForm" class="form-grid">
+    <div>
+      <label>Ngày chi phí:</label>
+      <input type="text" id="expenseDate" placeholder="yyyy/mm/dd">
     </div>
+
+    <div>
+      <label>Loại chi phí:</label>
+      <select id="expenseType">
+        <option value="">-- Chọn loại --</option>
+        <option value="Phần mềm">Phần mềm</option>
+        <option value="Quảng cáo">Quảng cáo</option>
+        <option value="Nhân sự">Nhân sự</option>
+        <option value="Khác">Khác</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Nội dung:</label>
+      <input type="text" id="expenseDescription" placeholder="Mô tả chi phí">
+    </div>
+
+    <div>
+      <label>Số tiền:</label>
+      <input type="number" id="expenseAmount">
+    </div>
+
+    <div>
+      <label>Người ghi:</label>
+      <input type="text" id="expenseRecorder" readonly>
+    </div>
+
+    <div>
+      <label>Ghi chú:</label>
+      <textarea id="expenseNote" rows="2"></textarea>
+    </div>
+
+    <div class="button-row">
+      <button type="button" onclick="handleAddExpense()">Thêm chi phí</button>
+      <button type="reset">Làm mới</button>
+    </div>
+  </form>
+</div>
+
 
     <div id="tab-thong-ke" class="tab-content" style="display: none;">
       <h3>Thống kê (đang phát triển)</h3>
