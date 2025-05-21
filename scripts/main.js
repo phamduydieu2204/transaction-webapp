@@ -41,6 +41,7 @@ import { updatePackageList } from './updatePackageList.js';
 import { editRow, deleteRow } from './legacy.js';
 import { handleAddExpense } from './handleAddExpense.js';
 import { initExpenseDropdowns } from './initExpenseDropdowns.js';
+import { renderExpenseStats } from './renderExpenseStats.js';
 import { handleChangePassword, closeChangePasswordModal, confirmChangePassword } from './handleChangePassword.js';
 import { formatDateTime } from './formatDateTime.js';
 import { openConfirmModal, closeConfirmModal, confirmDelete } from './confirmModal.js';
@@ -124,6 +125,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         const target = document.getElementById(selectedTab);
         if (target) {
           target.classList.add("active");
+        }
+
+        // Nếu chuyển sang tab thống kê → gọi render
+        if (selectedTab === "tab-thong-ke") {
+          renderExpenseStats();
         }
       });
     });
