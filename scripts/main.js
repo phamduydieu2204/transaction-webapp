@@ -127,6 +127,15 @@ document.addEventListener("DOMContentLoaded", async () => {
           target.classList.add("active");
         }
 
+        const transactionSection = document.getElementById("transactionSection");
+        if (transactionSection) {
+          if (selectedTab === "tab-giao-dich") {
+            transactionSection.style.display = "block";
+          } else {
+            transactionSection.style.display = "none";
+          }
+        }
+
         // Nếu chuyển sang tab thống kê → gọi render
         if (selectedTab === "tab-chi-phi" || selectedTab === "tab-thong-ke") {
           renderExpenseStats(); // cập nhật cả bảng chi tiết và tổng hợp
