@@ -22,6 +22,8 @@ export async function renderExpenseStats() {
 
       result.data.forEach(e => {
         const row = table1.insertRow();
+
+        // Dữ liệu từng dòng chi phí
         row.innerHTML = `
           <td>${e.date}</td>
           <td>${e.type}</td>
@@ -31,7 +33,36 @@ export async function renderExpenseStats() {
           <td>${e.currency}</td>
           <td>${e.status}</td>
           <td>${e.note || ""}</td>
+          <td>
+            <select class="action-select">
+              <option value="">-- Chọn --</option>
+              <option value="edit">Sửa</option>
+              <option value="delete">Xóa</option>
+            </select>
+          </td>
         `;
+
+        // Gán sự kiện khi chọn hành động
+        const actionSelect = row.querySelector(".action-select");
+        actionSelect.addEventListener("change", () => {
+          const selected = actionSelect.value;
+
+          if (selected === "edit") {
+            if (typeof window.editExpenseRow === "function") {
+              window.editExpenseRow(e);
+            } else {
+              alert("⚠️ Chức năng sửa chưa được triển khai.");
+            }
+          } else if (selected === "delete") {
+            if (typeof window.handleDeleteExpense === "function") {
+              window.handleDeleteExpense(e.expenseId);
+            } else {
+              alert("⚠️ Chức năng xóa chưa được triển khai.");
+            }
+          }
+
+          actionSelect.value = ""; // reset lại chọn
+        });
       });
     }
 
