@@ -38,6 +38,7 @@ export async function renderExpenseStats() {
               <option value="">-- Chọn --</option>
               <option value="edit">Sửa</option>
               <option value="delete">Xóa</option>
+              <option value="view">Xem</option>
             </select>
           </td>
         `;
@@ -59,8 +60,13 @@ export async function renderExpenseStats() {
             } else {
               alert("⚠️ Chức năng xóa chưa được triển khai.");
             }
-          }
-
+          } else if (selected === "view") {
+            if (typeof window.viewExpenseRow === "function") {
+                window.viewExpenseRow(e);
+            } else {
+                alert("⚠️ Chức năng xem chưa được triển khai.");
+            }
+            }
           actionSelect.value = ""; // reset lại chọn
         });
       });
