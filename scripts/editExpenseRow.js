@@ -1,8 +1,8 @@
-window.editExpenseRow = (e) => {
+export function editExpenseRow(e) {
   document.getElementById("expenseId").value = e.expenseId;
   document.getElementById("expenseDate").value = e.date;
   document.getElementById("expenseCategory").value = e.type;
-  handleCategoryChange(); // gọi để đổ danh mục
+  handleCategoryChange();
   setTimeout(() => {
     document.getElementById("expenseSubCategory").value = e.category;
     handleSubCategoryChange();
@@ -33,4 +33,4 @@ window.editExpenseRow = (e) => {
   document.getElementById("expenseNote").value = e.note || "";
 
   alert("✅ Đã tải dữ liệu lên form. Bạn có thể chỉnh sửa và bấm Cập nhật.");
-};
+}
