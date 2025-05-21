@@ -127,6 +127,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       });
     });
+  document.getElementById("expenseDate").value = window.todayFormatted;
+  document.getElementById("expenseRecorder").value = window.userInfo?.tenNhanVien || "";
+  handleRecurringChange(); // tự tính ngay nếu có định kỳ mặc định
+
 });
 
 
