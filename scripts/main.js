@@ -128,8 +128,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         // Nếu chuyển sang tab thống kê → gọi render
-        if (selectedTab === "tab-thong-ke") {
-          renderExpenseStats();
+        if (selectedTab === "tab-chi-phi" || selectedTab === "tab-thong-ke") {
+          renderExpenseStats(); // cập nhật cả bảng chi tiết và tổng hợp
         }
       });
     });

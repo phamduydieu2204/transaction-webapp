@@ -11,44 +11,55 @@ export async function renderExpenseStats() {
     const result = await res.json();
     if (result.status !== "success") return;
 
-    const table1 = document.querySelector("#expenseStatsTable tbody");
-    const table2 = document.querySelector("#monthlySummaryTable tbody");
-    table1.innerHTML = "";
-    table2.innerHTML = "";
+    // Kiểm tra tab nào đang active
+    const isChiPhiTab = document.getElementById("tab-chi-phi")?.classList.contains("active");
+    const isThongKeTab = document.getElementById("tab-thong-ke")?.classList.contains("active");
 
-    const summaryMap = {};
+    // 1. Nếu đang ở tab chi phí → hiển thị bảng danh sách chi tiết
+    if (isChiPhiTab) {
+      const table1 = document.querySelector("#expenseListTable tbody");
+      table1.innerHTML = "";
 
-    result.data.forEach(e => {
-      // Chi tiết bảng 1
-      const row = table1.insertRow();
-      row.innerHTML = `
-        <td>${e.date}</td>
-        <td>${e.type}</td>
-        <td>${e.category}</td>
-        <td>${e.product}</td>
-        <td>${e.amount.toLocaleString()}</td>
-        <td>${e.currency}</td>
-        <td>${e.source}</td>
-        <td>${e.status}</td>
-      `;
+      result.data.forEach(e => {
+        const row = table1.insertRow();
+        row.innerHTML = `
+          <td>${e.date}</td>
+          <td>${e.type}</td>
+          <td>${e.category}</td>
+          <td>${e.product}</td>
+          <td>${e.amount.toLocaleString()}</td>
+          <td>${e.currency}</td>
+          <td>${e.status}</td>
+          <td>${e.note || ""}</td>
+        `;
+      });
+    }
 
-      // Tổng hợp bảng 2
-      if (e.currency === "VND") {
-        const month = e.date?.slice(0, 7); // yyyy/mm
-        const key = `${month}|${e.type}`;
-        summaryMap[key] = (summaryMap[key] || 0) + e.amount;
-      }
-    });
+    // 2. Nếu đang ở tab thống kê → hiển thị bảng tổng hợp theo tháng
+    if (isThongKeTab) {
+      const table2 = document.querySelector("#monthlySummaryTable tbody");
+      table2.innerHTML = "";
 
-    Object.entries(summaryMap).forEach(([key, value]) => {
-      const [month, type] = key.split("|");
-      const row = table2.insertRow();
-      row.innerHTML = `
-        <td>${month}</td>
-        <td>${type}</td>
-        <td>${value.toLocaleString()} VND</td>
-      `;
-    });
+      const summaryMap = {};
+      result.data.forEach(e => {
+        if (e.currency === "VND") {
+          const month = e.date?.slice(0, 7); // yyyy/mm
+          const key = `${month}|${e.type}`;
+          summaryMap[key] = (summaryMap[key] || 0) + e.amount;
+        }
+      });
+
+      Object.entries(summaryMap).forEach(([key, value]) => {
+        const [month, type] = key.split("|");
+        const row = table2.insertRow();
+        row.innerHTML = `
+          <td>${month}</td>
+          <td>${type}</td>
+          <td>${value.toLocaleString()} VND</td>
+        `;
+      });
+    }
+
   } catch (err) {
     console.error("Lỗi khi thống kê chi phí:", err);
   }
