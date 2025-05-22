@@ -44,14 +44,23 @@ export async function renderExpenseStats() {
 paginatedItems.forEach(e => {
   const row = table1.insertRow();
 
+  const format = val => val || "";
+
   row.insertCell().textContent = formatDate(e.date);
-  row.insertCell().textContent = e.type;
-  row.insertCell().textContent = e.category;
-  row.insertCell().textContent = e.product;
-  row.insertCell().textContent = e.amount.toLocaleString();
-  row.insertCell().textContent = e.currency;
-  row.insertCell().textContent = e.status;
-  row.insertCell().textContent = e.note || "";
+  row.insertCell().textContent = format(e.type);
+  row.insertCell().textContent = format(e.category);
+  row.insertCell().textContent = format(e.product);
+  row.insertCell().textContent = format(e.package);
+  row.insertCell().textContent = e.amount?.toLocaleString() || "0";
+  row.insertCell().textContent = format(e.currency);
+  row.insertCell().textContent = format(e.bank);
+  row.insertCell().textContent = format(e.card);
+  row.insertCell().textContent = format(e.recurring);
+  row.insertCell().textContent = formatDate(e.renew);
+  row.insertCell().textContent = format(e.supplier);
+  row.insertCell().textContent = format(e.source);
+  row.insertCell().textContent = format(e.status);
+  row.insertCell().textContent = format(e.note);
 
   const actionCell = row.insertCell();
   const select = document.createElement("select");
@@ -80,11 +89,12 @@ paginatedItems.forEach(e => {
     } else if (selected === "view" && typeof window.viewExpenseRow === "function") {
       window.viewExpenseRow(e);
     }
-    select.value = ""; // reset lại chọn
+    select.value = ""; // reset
   });
 
   actionCell.appendChild(select);
 });
+
 
 
     // Cập nhật phân trang
