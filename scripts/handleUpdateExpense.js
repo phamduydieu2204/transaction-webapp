@@ -18,7 +18,6 @@ export async function handleUpdateExpense() {
     expenseRecurring: getValue("expenseRecurring"),
     expenseRenewDate: getValue("expenseRenewDate"),
     expenseSupplier: getValue("expenseSupplier"),
-    expenseSource: getValue("expenseSource"),
     expenseStatus: getValue("expenseStatus"),
     expenseNote: getValue("expenseNote"),
     tenNhanVien: window.userInfo?.tenNhanVien || "",
