@@ -10,8 +10,6 @@ export async function handleAddExpense() {
     expenseSubCategory: getValue("expenseSubCategory"),
     expenseProduct: getValue("expenseProduct"),
     expensePackage: getValue("expensePackage"),
-    expenseDescription: getValue("expenseDescription"),
-    expenseAccount: getValue("expenseAccount"),
     expenseAmount: parseFloat(getValue("expenseAmount")) || 0,
     expenseCurrency: getValue("expenseCurrency"),
     expenseBank: getValue("expenseBank"),
