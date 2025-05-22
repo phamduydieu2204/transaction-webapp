@@ -201,6 +201,7 @@ window.editExpenseRow = editExpenseRow;
 window.handleDeleteExpense = handleDeleteExpense;
 window.handleUpdateExpense = handleUpdateExpense;
 window.viewExpenseRow = viewExpenseRow;
+window.currentExpensePage = 1;
 window.editRow = (index) => editRow(index, window.transactionList);
 window.deleteRow = (index) => deleteRow(index, window.deleteTransaction);
 window.closeModal = closeModal;

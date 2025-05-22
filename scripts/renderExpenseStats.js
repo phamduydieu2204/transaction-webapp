@@ -17,60 +17,68 @@ export async function renderExpenseStats() {
 
     // 1. Nếu đang ở tab chi phí → hiển thị bảng danh sách chi tiết
     if (isChiPhiTab) {
-      const table1 = document.querySelector("#expenseListTable tbody");
-      table1.innerHTML = "";
+    const table1 = document.querySelector("#expenseListTable tbody");
+    const paginationContainer = document.getElementById("expensePagination");
 
-      result.data.forEach(e => {
+    const allData = result.data || [];
+    const itemsPerPage = 10;
+    const totalPages = Math.ceil(allData.length / itemsPerPage);
+    const currentPage = window.currentExpensePage || 1;
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedItems = allData.slice(startIndex, startIndex + itemsPerPage);
+
+    table1.innerHTML = "";
+
+    paginatedItems.forEach(e => {
         const row = table1.insertRow();
-
-        // Dữ liệu từng dòng chi phí
         row.innerHTML = `
-          <td>${e.date}</td>
-          <td>${e.type}</td>
-          <td>${e.category}</td>
-          <td>${e.product}</td>
-          <td>${e.amount.toLocaleString()}</td>
-          <td>${e.currency}</td>
-          <td>${e.status}</td>
-          <td>${e.note || ""}</td>
-          <td>
+        <td>${e.date}</td>
+        <td>${e.type}</td>
+        <td>${e.category}</td>
+        <td>${e.product}</td>
+        <td>${e.amount.toLocaleString()}</td>
+        <td>${e.currency}</td>
+        <td>${e.status}</td>
+        <td>${e.note || ""}</td>
+        <td>
             <select class="action-select">
-              <option value="">-- Chọn --</option>
-              <option value="edit">Sửa</option>
-              <option value="delete">Xóa</option>
-              <option value="view">Xem</option>
+            <option value="">-- Chọn --</option>
+            <option value="view">Xem</option>
+            <option value="edit">Sửa</option>
+            <option value="delete">Xóa</option>
             </select>
-          </td>
+        </td>
         `;
 
-        // Gán sự kiện khi chọn hành động
         const actionSelect = row.querySelector(".action-select");
         actionSelect.addEventListener("change", () => {
-          const selected = actionSelect.value;
-
-          if (selected === "edit") {
-            if (typeof window.editExpenseRow === "function") {
-              window.editExpenseRow(e);
-            } else {
-              alert("⚠️ Chức năng sửa chưa được triển khai.");
-            }
-          } else if (selected === "delete") {
-            if (typeof window.handleDeleteExpense === "function") {
-              window.handleDeleteExpense(e.expenseId);
-            } else {
-              alert("⚠️ Chức năng xóa chưa được triển khai.");
-            }
-          } else if (selected === "view") {
-            if (typeof window.viewExpenseRow === "function") {
-                window.viewExpenseRow(e);
-            } else {
-                alert("⚠️ Chức năng xem chưa được triển khai.");
-            }
-            }
-          actionSelect.value = ""; // reset lại chọn
+        const selected = actionSelect.value;
+        if (selected === "edit" && typeof window.editExpenseRow === "function") {
+            window.editExpenseRow(e);
+        } else if (selected === "delete" && typeof window.handleDeleteExpense === "function") {
+            window.handleDeleteExpense(e.expenseId);
+        } else if (selected === "view" && typeof window.viewExpenseRow === "function") {
+            window.viewExpenseRow(e);
+        }
+        actionSelect.value = "";
         });
-      });
+    });
+
+    // Cập nhật phân trang
+    paginationContainer.innerHTML = "";
+    for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        if (i === currentPage) btn.classList.add("active");
+        btn.addEventListener("click", () => {
+        window.currentExpensePage = i;
+        renderExpenseStats();
+        });
+        paginationContainer.appendChild(btn);
     }
+    }
+
 
     // 2. Nếu đang ở tab thống kê → hiển thị bảng tổng hợp theo tháng
     if (isThongKeTab) {
