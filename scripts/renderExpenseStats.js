@@ -41,40 +41,51 @@ export async function renderExpenseStats() {
 
     table1.innerHTML = "";
 
-    paginatedItems.forEach(e => {
-        const row = table1.insertRow();
-row.innerHTML = `
-<td>${formatDate(e.date)}</td>
-<td>${e.type}</td>
-<td>${e.category}</td>
-<td>${e.product}</td>
-<td>${e.amount.toLocaleString()}</td>
-<td>${e.currency}</td>
-<td>${e.status}</td>
-<td>${e.note || ""}</td>
-<td>
-  <select class="action-select">
-    <option value="">-- Chọn --</option>
-    <option value="view">Xem</option>
-    <option value="edit">Sửa</option>
-    <option value="delete">Xóa</option>
-  </select>
-</td>
-`;
+paginatedItems.forEach(e => {
+  const row = table1.insertRow();
 
-        const actionSelect = row.querySelector(".action-select");
-        actionSelect.addEventListener("change", () => {
-        const selected = actionSelect.value;
-        if (selected === "edit" && typeof window.editExpenseRow === "function") {
-            window.editExpenseRow(e);
-        } else if (selected === "delete" && typeof window.handleDeleteExpense === "function") {
-            window.handleDeleteExpense(e.expenseId);
-        } else if (selected === "view" && typeof window.viewExpenseRow === "function") {
-            window.viewExpenseRow(e);
-        }
-        actionSelect.value = "";
-        });
-    });
+  row.insertCell().textContent = formatDate(e.date);
+  row.insertCell().textContent = e.type;
+  row.insertCell().textContent = e.category;
+  row.insertCell().textContent = e.product;
+  row.insertCell().textContent = e.amount.toLocaleString();
+  row.insertCell().textContent = e.currency;
+  row.insertCell().textContent = e.status;
+  row.insertCell().textContent = e.note || "";
+
+  const actionCell = row.insertCell();
+  const select = document.createElement("select");
+  select.className = "action-select";
+
+  const actions = [
+    { value: "", label: "-- Chọn --" },
+    { value: "view", label: "Xem" },
+    { value: "edit", label: "Sửa" },
+    { value: "delete", label: "Xóa" }
+  ];
+
+  actions.forEach(a => {
+    const opt = document.createElement("option");
+    opt.value = a.value;
+    opt.textContent = a.label;
+    select.appendChild(opt);
+  });
+
+  select.addEventListener("change", () => {
+    const selected = select.value;
+    if (selected === "edit" && typeof window.editExpenseRow === "function") {
+      window.editExpenseRow(e);
+    } else if (selected === "delete" && typeof window.handleDeleteExpense === "function") {
+      window.handleDeleteExpense(e.expenseId);
+    } else if (selected === "view" && typeof window.viewExpenseRow === "function") {
+      window.viewExpenseRow(e);
+    }
+    select.value = ""; // reset lại chọn
+  });
+
+  actionCell.appendChild(select);
+});
+
 
     // Cập nhật phân trang
     paginationContainer.innerHTML = "";
