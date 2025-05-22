@@ -9,6 +9,17 @@ export async function renderExpenseStats() {
       body: JSON.stringify({ action: "getExpenseStats" })
     });
     const result = await res.json();
+
+    const formatDate = (isoStr) => {
+    const d = new Date(isoStr);
+    if (isNaN(d)) return "";
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}/${mm}/${dd}`;
+    };
+
+
     if (result.status !== "success") return;
 
     // Kiểm tra tab nào đang active
@@ -33,7 +44,7 @@ export async function renderExpenseStats() {
     paginatedItems.forEach(e => {
         const row = table1.insertRow();
         row.innerHTML = `
-        <td>${e.date}</td>
+        <td>${formatDate(e.date)}</td>
         <td>${e.type}</td>
         <td>${e.category}</td>
         <td>${e.product}</td>
