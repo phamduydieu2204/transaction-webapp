@@ -1,7 +1,15 @@
 import { getConstants } from './constants.js';
-import { renderExpenseStats } from './renderExpenseStats.js';
+import { showProcessingModal } from './showProcessingModal.js';
+import { showResultModal } from './showResultModal.js';
+import { updateTable } from './updateTable.js';
 
-export async function handleSearchExpense() {
+export async function handleSearchExpense(userInfo, transactionList, formatDate, editTransaction, deleteTransaction, viewTransaction) {
+  if (!userInfo || !userInfo.duocTimKiemGiaoDichCuaAi) {
+    showResultModal("Thiếu thông tin quyền tìm kiếm. Vui lòng đăng nhập lại.", false);
+    return;
+  }
+
+  showProcessingModal("Đang tìm kiếm chi phí...");
   const { BACKEND_URL } = getConstants();
   const getValue = (id) => document.getElementById(id)?.value?.trim() || "";
 
@@ -24,6 +32,7 @@ export async function handleSearchExpense() {
   const data = {
     action: "searchExpenses",
     maNhanVien: window.userInfo?.maNhanVien || "",
+    duocTimKiemGiaoDichCuaAi: userInfo.duocTimKiemGiaoDichCuaAi || "chỉ bản thân",
     conditions
   };
 
@@ -38,9 +47,48 @@ export async function handleSearchExpense() {
 
     const result = await res.json();
     window.currentExpensePage = 1;
-    window.expenseList = result.data || [];
-    renderExpenseStats(); // dùng lại để hiển thị bảng
+    window.isSearching = true;
+    
+    if (result.status === "success") {
+      window.expenseList = result.data || [];
+      // Ánh xạ dữ liệu chi phí sang định dạng giao dịch
+      const mappedTransactionList = window.expenseList.map(expense => ({
+        transactionId: expense.expenseId || "",
+        transactionDate: expense.date || "",
+        transactionType: expense.type || "",
+        customerName: expense.supplier || "",
+        customerEmail: "",
+        customerPhone: "",
+        duration: "",
+        startDate: "",
+        endDate: expense.renew || "",
+        deviceCount: "",
+        softwareName: expense.product || "",
+        softwarePackage: expense.package || "",
+        accountName: "",
+        revenue: expense.amount ? `${expense.amount} ${expense.currency}` : "",
+        note: expense.note || "",
+        tenNhanVien: "",
+        maNhanVien: data.maNhanVien || ""
+      }));
+
+      window.transactionList = mappedTransactionList;
+      window.currentPage = 1;
+      updateTable(
+        window.transactionList,
+        window.currentPage,
+        window.itemsPerPage || 10,
+        formatDate,
+        editTransaction,
+        deleteTransaction,
+        viewTransaction
+      );
+
+      showResultModal(`Tìm kiếm thành công! Tìm thấy ${result.data.length} chi phí.`, true);
+    } else {
+      showResultModal(result.message || "Không thể tìm kiếm chi phí!", false);
+    }
   } catch (err) {
-    alert("❌ Lỗi khi tìm kiếm chi phí: " + err.message);
+    showResultModal(`Lỗi khi tìm kiếm chi phí: ${err.message}`, false);
   }
 }
