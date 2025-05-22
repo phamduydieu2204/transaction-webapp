@@ -45,54 +45,37 @@ paginatedItems.forEach(e => {
   const row = table1.insertRow();
 
   const format = val => val || "";
+row.insertCell().textContent = formatDate(e.date);
+row.insertCell().textContent = e.type || "";
+row.insertCell().textContent = e.category || "";
+row.insertCell().textContent = e.product || "";
+row.insertCell().textContent = e.package || "";
+row.insertCell().textContent = `${(e.amount || 0).toLocaleString()} ${e.currency || ""}`;
+row.insertCell().textContent = formatDate(e.renew);
+row.insertCell().textContent = e.status || "";
 
-  row.insertCell().textContent = formatDate(e.date);
-  row.insertCell().textContent = format(e.type);
-  row.insertCell().textContent = format(e.category);
-  row.insertCell().textContent = format(e.product);
-  row.insertCell().textContent = format(e.package);
-  row.insertCell().textContent = e.amount?.toLocaleString() || "0";
-  row.insertCell().textContent = format(e.currency);
-  row.insertCell().textContent = format(e.bank);
-  row.insertCell().textContent = format(e.card);
-  row.insertCell().textContent = format(e.recurring);
-  row.insertCell().textContent = formatDate(e.renew);
-  row.insertCell().textContent = format(e.supplier);
-  row.insertCell().textContent = format(e.source);
-  row.insertCell().textContent = format(e.status);
-  row.insertCell().textContent = format(e.note);
+const actionCell = row.insertCell();
+const select = document.createElement("select");
+select.className = "action-select";
+["", "view", "edit", "delete"].forEach(value => {
+  const opt = document.createElement("option");
+  opt.value = value;
+  opt.textContent = value === "" ? "-- Chọn --" : value[0].toUpperCase() + value.slice(1);
+  select.appendChild(opt);
+});
+select.addEventListener("change", () => {
+  const selected = select.value;
+  if (selected === "edit" && typeof window.editExpenseRow === "function") {
+    window.editExpenseRow(e);
+  } else if (selected === "delete" && typeof window.handleDeleteExpense === "function") {
+    window.handleDeleteExpense(e.expenseId);
+  } else if (selected === "view" && typeof window.viewExpenseRow === "function") {
+    window.viewExpenseRow(e);
+  }
+  select.value = "";
+});
+actionCell.appendChild(select);
 
-  const actionCell = row.insertCell();
-  const select = document.createElement("select");
-  select.className = "action-select";
-
-  const actions = [
-    { value: "", label: "-- Chọn --" },
-    { value: "view", label: "Xem" },
-    { value: "edit", label: "Sửa" },
-    { value: "delete", label: "Xóa" }
-  ];
-
-  actions.forEach(a => {
-    const opt = document.createElement("option");
-    opt.value = a.value;
-    opt.textContent = a.label;
-    select.appendChild(opt);
-  });
-
-  select.addEventListener("change", () => {
-    const selected = select.value;
-    if (selected === "edit" && typeof window.editExpenseRow === "function") {
-      window.editExpenseRow(e);
-    } else if (selected === "delete" && typeof window.handleDeleteExpense === "function") {
-      window.handleDeleteExpense(e.expenseId);
-    } else if (selected === "view" && typeof window.viewExpenseRow === "function") {
-      window.viewExpenseRow(e);
-    }
-    select.value = ""; // reset
-  });
-
-  actionCell.appendChild(select);
 });
 
 
