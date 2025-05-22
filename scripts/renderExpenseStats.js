@@ -43,24 +43,24 @@ export async function renderExpenseStats() {
 
     paginatedItems.forEach(e => {
         const row = table1.insertRow();
-        row.innerHTML = `
-        <td>${formatDate(e.date)}</td>
-        <td>${e.type}</td>
-        <td>${e.category}</td>
-        <td>${e.product}</td>
-        <td>${e.amount.toLocaleString()}</td>
-        <td>${e.currency}</td>
-        <td>${e.status}</td>
-        <td>${e.note || ""}</td>
-        <td>
-            <select class="action-select">
-            <option value="">-- Chọn --</option>
-            <option value="view">Xem</option>
-            <option value="edit">Sửa</option>
-            <option value="delete">Xóa</option>
-            </select>
-        </td>
-        `;
+row.innerHTML = `
+<td>${formatDate(e.date)}</td>
+<td>${e.type}</td>
+<td>${e.category}</td>
+<td>${e.product}</td>
+<td>${e.amount.toLocaleString()}</td>
+<td>${e.currency}</td>
+<td>${e.status}</td>
+<td>${e.note || ""}</td>
+<td>
+  <select class="action-select">
+    <option value="">-- Chọn --</option>
+    <option value="view">Xem</option>
+    <option value="edit">Sửa</option>
+    <option value="delete">Xóa</option>
+  </select>
+</td>
+`;
 
         const actionSelect = row.querySelector(".action-select");
         actionSelect.addEventListener("change", () => {
