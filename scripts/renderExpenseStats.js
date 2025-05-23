@@ -1,5 +1,7 @@
 import { getConstants } from './constants.js';
 import { updateTotalDisplay } from './updateTotalDisplay.js';
+import { updateExpensePagination } from './expensePagination.js';
+import { sortByTimestampDesc } from './sortByTimestamp.js';
 
 export async function renderExpenseStats() {
   const { BACKEND_URL } = getConstants();
@@ -128,42 +130,48 @@ function renderExpenseData(data) {
     updateTotalDisplay();
   } else if (typeof window.updateTotalDisplay === 'function') {
     window.updateTotalDisplay();
-  } else {
-    // Fallback nếu hàm chưa load
-    console.warn("⚠️ updateTotalDisplay chưa sẵn sàng, sử dụng fallback");
-    const todayExpenseTotalElement = document.getElementById("todayExpenseTotal");
-    if (todayExpenseTotalElement && window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin") {
-      const displayText = window.isExpenseSearching 
-        ? `Tổng chi phí (kết quả tìm kiếm): ${totalExpense.toLocaleString()} VNĐ`
-        : `Tổng chi phí hôm nay: ${totalExpense.toLocaleString()} VNĐ`;
-      todayExpenseTotalElement.textContent = displayText;
-      console.log("💸 Fallback - Hiển thị chi phí:", displayText);
-    }
   }
 
-  // ✅ Hiển thị bảng chi phí (nếu đang ở tab chi phí)
+  // ✅ Hiển thị bảng chi phí (nếu đang ở tab chi phí) - LOGIC GIỐNG TAB GIAO DỊCH
   if (isChiPhiTab) {
     const table1 = document.querySelector("#expenseListTable tbody");
-    const paginationContainer = document.getElementById("expensePagination");
 
     if (!table1) {
       console.error("❌ Không tìm thấy table #expenseListTable tbody");
       return;
     }
 
-    const allData = data || [];
-    const itemsPerPage = 10;
-    const totalPages = Math.ceil(allData.length / itemsPerPage);
+    // ✅ Sắp xếp chi phí mới nhất lên đầu (timestamp giảm dần)
+    const sortedData = sortByTimestampDesc(data || [], 'expenseId');
+
+    // ✅ Logic phân trang giống tab giao dịch
+    const itemsPerPage = window.itemsPerPage || 50;
+    const totalPages = Math.ceil(sortedData.length / itemsPerPage);
     const currentPage = window.currentExpensePage || 1;
 
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const paginatedItems = allData.slice(startIndex, startIndex + itemsPerPage);
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedItems = sortedData.slice(startIndex, endIndex);
 
     table1.innerHTML = "";
 
-    paginatedItems.forEach(e => {
+    paginatedItems.forEach((e, index) => {
+      const globalIndex = startIndex + index;
       const row = table1.insertRow();
 
+      // ✅ Thêm style cho dòng đã hết hạn tái tục (giống giao dịch hết hạn)
+      if (e.renew) {
+        const parseDate = (str) => {
+          const [y, m, d] = (str || "").split("/").map(Number);
+          return new Date(y, m - 1, d);
+        };
+        const renewDate = parseDate(e.renew);
+        if (renewDate < today) {
+          row.classList.add("expired-row");
+        }
+      }
+
+      row.insertCell().textContent = e.expenseId || "";
       row.insertCell().textContent = formatDate(e.date);
       row.insertCell().textContent = e.type || "";
       row.insertCell().textContent = e.category || "";
@@ -173,14 +181,22 @@ function renderExpenseData(data) {
       row.insertCell().textContent = formatDate(e.renew);
       row.insertCell().textContent = e.status || "";
 
+      // ✅ Action dropdown giống giao dịch
       const actionCell = row.insertCell();
       const select = document.createElement("select");
       select.className = "action-select";
 
-      ["", "view", "edit", "delete"].forEach(value => {
+      const actions = [
+        { value: "", label: "-- Chọn --" },
+        { value: "view", label: "Xem" },
+        { value: "edit", label: "Sửa" },
+        { value: "delete", label: "Xóa" }
+      ];
+
+      actions.forEach(action => {
         const opt = document.createElement("option");
-        opt.value = value;
-        opt.textContent = value === "" ? "-- Chọn --" : value[0].toUpperCase() + value.slice(1);
+        opt.value = action.value;
+        opt.textContent = action.label;
         select.appendChild(opt);
       });
 
@@ -199,34 +215,18 @@ function renderExpenseData(data) {
       actionCell.appendChild(select);
     });
 
-    // ✅ Cập nhật phân trang
-    if (paginationContainer) {
-      paginationContainer.innerHTML = "";
-      
-      // Thêm nút "Tất cả" nếu đang trong trạng thái tìm kiếm
-      if (window.isExpenseSearching) {
-        const allBtn = document.createElement("button");
-        allBtn.textContent = "Tất cả";
-        allBtn.style.marginRight = "10px";
-        allBtn.addEventListener("click", () => {
-          window.isExpenseSearching = false;
-          window.currentExpensePage = 1;
-          renderExpenseStats();
-        });
-        paginationContainer.appendChild(allBtn);
-      }
-      
-      for (let i = 1; i <= totalPages; i++) {
-        const btn = document.createElement("button");
-        btn.textContent = i;
-        if (i === currentPage) btn.classList.add("active");
-        btn.addEventListener("click", () => {
-          window.currentExpensePage = i;
-          renderExpenseStats();
-        });
-        paginationContainer.appendChild(btn);
-      }
-    }
+    // ✅ Cập nhật phân trang giống tab giao dịch
+    const refreshExpenseTable = () => renderExpenseStats();
+    
+    updateExpensePagination(
+      totalPages,
+      window.currentExpensePage || 1,
+      () => { window.currentExpensePage = 1; refreshExpenseTable(); },
+      () => { if (window.currentExpensePage > 1) { window.currentExpensePage--; refreshExpenseTable(); } },
+      () => { if (window.currentExpensePage < totalPages) { window.currentExpensePage++; refreshExpenseTable(); } },
+      () => { window.currentExpensePage = totalPages; refreshExpenseTable(); },
+      (page) => { window.currentExpensePage = page; refreshExpenseTable(); }
+    );
   }
 
   // ✅ Hiển thị bảng thống kê (nếu đang ở tab thống kê)
