@@ -114,49 +114,50 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   window.loadTransactions();
 
-    // 👉 Thêm xử lý tab tại đây
-    document.querySelectorAll(".tab-button").forEach(button => {
-      button.addEventListener("click", () => {
-        const selectedTab = button.dataset.tab;
+  // Thay thế phần xử lý tab trong main.js:
 
-        // 1. Kích hoạt nút
-        document.querySelectorAll(".tab-button").forEach(btn =>
-          btn.classList.remove("active")
-        );
-        button.classList.add("active");
+  document.querySelectorAll(".tab-button").forEach(button => {
+    button.addEventListener("click", () => {
+      const selectedTab = button.dataset.tab;
 
-        // 2. Ẩn tất cả tab content
-        document.querySelectorAll(".tab-content").forEach(content =>
-          content.classList.remove("active")
-        );
+      // 1. Kích hoạt nút
+      document.querySelectorAll(".tab-button").forEach(btn =>
+        btn.classList.remove("active")
+      );
+      button.classList.add("active");
 
-        // 3. Hiện tab tương ứng
-        const target = document.getElementById(selectedTab);
-        if (target) {
-          target.classList.add("active");
-        }
+      // 2. Ẩn tất cả tab content
+      document.querySelectorAll(".tab-content").forEach(content =>
+        content.classList.remove("active")
+      );
 
-        const transactionSection = document.getElementById("transactionSection");
-        if (transactionSection) {
-          if (selectedTab === "tab-giao-dich") {
-            transactionSection.style.display = "block";
-          } else {
-            transactionSection.style.display = "none";
-          }
-        }
+      // 3. Hiện tab tương ứng
+      const target = document.getElementById(selectedTab);
+      if (target) {
+        target.classList.add("active");
+      }
 
-        // Nếu chuyển sang tab thống kê → gọi render
-        if (selectedTab === "tab-chi-phi" || selectedTab === "tab-thong-ke") {
-          renderExpenseStats(); // cập nhật cả bảng chi tiết và tổng hợp
-        }
-
-            // Nếu chuyển sang tab giao dịch → cập nhật lại bảng giao dịch
+      const transactionSection = document.getElementById("transactionSection");
+      if (transactionSection) {
         if (selectedTab === "tab-giao-dich") {
-          // Cập nhật lại bảng giao dịch để hiển thị tổng doanh thu
-          window.loadTransactions();
+          transactionSection.style.display = "block";
+        } else {
+          transactionSection.style.display = "none";
         }
-      });
+      }
+
+      // ✅ Xử lý logic riêng cho từng tab
+      if (selectedTab === "tab-giao-dich") {
+        // Refresh bảng giao dịch để hiển thị đúng tổng doanh thu
+        console.log("🔄 Chuyển sang tab giao dịch - refresh bảng");
+        window.loadTransactions();
+      } else if (selectedTab === "tab-chi-phi" || selectedTab === "tab-thong-ke") {
+        // Refresh bảng chi phí để hiển thị đúng tổng chi phí  
+        console.log("🔄 Chuyển sang tab chi phí/thống kê - refresh bảng");
+        renderExpenseStats();
+      }
     });
+  });
   document.getElementById("expenseDate").value = window.todayFormatted;
   document.getElementById("expenseRecorder").value = window.userInfo?.tenNhanVien || "";
   handleRecurringChange(); // tự tính ngay nếu có định kỳ mặc định

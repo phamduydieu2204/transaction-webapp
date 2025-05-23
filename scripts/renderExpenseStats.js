@@ -29,6 +29,8 @@ export async function renderExpenseStats() {
 }
 
 function renderExpenseData(data) {
+  console.log("🔍 DEBUG: Dữ liệu chi phí nhận được:", data);
+  
   const formatDate = (isoStr) => {
     const d = new Date(isoStr);
     if (isNaN(d)) return "";
@@ -51,11 +53,13 @@ function renderExpenseData(data) {
   console.log("🟢 Vai trò:", window.userInfo?.vaiTro);
   console.log("🟢 isExpenseSearching:", window.isExpenseSearching);
   console.log("🟢 todayFormatted:", todayFormatted);
+  console.log("🟢 Số lượng bản ghi chi phí:", data?.length);
 
   // Logic tính tổng giống như doanh thu
   if (window.isExpenseSearching === true) {
     // Nếu đang tìm kiếm, tính tổng tất cả kết quả tìm kiếm (chỉ VND)
     totalExpense = data.reduce((sum, e) => {
+      console.log("🔍 Chi phí tìm kiếm:", e.amount, e.currency);
       if (e.currency === "VND") {
         return sum + (parseFloat(e.amount) || 0);
       }
@@ -65,8 +69,17 @@ function renderExpenseData(data) {
   } else {
     // Nếu không tìm kiếm, chỉ tính chi phí hôm nay (chỉ VND)
     totalExpense = data.reduce((sum, e) => {
+      console.log("📅 Chi phí hôm nay check:", {
+        date: e.date,
+        startsWith: e.date?.startsWith(todayFormatted),
+        currency: e.currency,
+        amount: e.amount
+      });
+      
       if (e.date && e.date.startsWith(todayFormatted) && e.currency === "VND") {
-        return sum + (parseFloat(e.amount) || 0);
+        const amount = parseFloat(e.amount) || 0;
+        console.log("✅ Thêm vào tổng:", amount);
+        return sum + amount;
       }
       return sum;
     }, 0);
@@ -77,6 +90,8 @@ function renderExpenseData(data) {
   const todayExpenseTotalElement = document.getElementById("todayExpenseTotal");
   console.log("✅ Tổng chi phí cuối cùng:", totalExpense);
   console.log("📌 Kiểm tra hiển thị tổng chi phí");
+  console.log("🔍 Element todayExpenseTotal:", todayExpenseTotalElement);
+  console.log("🔍 isChiPhiTab:", isChiPhiTab);
 
   if (todayExpenseTotalElement) {
     // Chỉ hiển thị khi:
@@ -92,12 +107,19 @@ function renderExpenseData(data) {
       todayExpenseTotalElement.textContent = "";
       console.log("🚫 Không hiển thị tổng chi phí (không phải admin hoặc không ở tab chi phí)");
     }
+  } else {
+    console.error("❌ Không tìm thấy element #todayExpenseTotal");
   }
 
   // 1. Nếu đang ở tab chi phí → hiển thị bảng danh sách chi tiết
   if (isChiPhiTab) {
     const table1 = document.querySelector("#expenseListTable tbody");
     const paginationContainer = document.getElementById("expensePagination");
+
+    if (!table1) {
+      console.error("❌ Không tìm thấy table #expenseListTable tbody");
+      return;
+    }
 
     const allData = data || [];
     const itemsPerPage = 10;
@@ -148,55 +170,59 @@ function renderExpenseData(data) {
     });
 
     // Cập nhật phân trang
-    paginationContainer.innerHTML = "";
-    
-    // Thêm nút "Tất cả" nếu đang trong trạng thái tìm kiếm
-    if (window.isExpenseSearching) {
-      const allBtn = document.createElement("button");
-      allBtn.textContent = "Tất cả";
-      allBtn.style.marginRight = "10px";
-      allBtn.addEventListener("click", () => {
-        window.isExpenseSearching = false;
-        window.currentExpensePage = 1;
-        renderExpenseStats();
-      });
-      paginationContainer.appendChild(allBtn);
-    }
-    
-    for (let i = 1; i <= totalPages; i++) {
-      const btn = document.createElement("button");
-      btn.textContent = i;
-      if (i === currentPage) btn.classList.add("active");
-      btn.addEventListener("click", () => {
-        window.currentExpensePage = i;
-        renderExpenseStats();
-      });
-      paginationContainer.appendChild(btn);
+    if (paginationContainer) {
+      paginationContainer.innerHTML = "";
+      
+      // Thêm nút "Tất cả" nếu đang trong trạng thái tìm kiếm
+      if (window.isExpenseSearching) {
+        const allBtn = document.createElement("button");
+        allBtn.textContent = "Tất cả";
+        allBtn.style.marginRight = "10px";
+        allBtn.addEventListener("click", () => {
+          window.isExpenseSearching = false;
+          window.currentExpensePage = 1;
+          renderExpenseStats();
+        });
+        paginationContainer.appendChild(allBtn);
+      }
+      
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        if (i === currentPage) btn.classList.add("active");
+        btn.addEventListener("click", () => {
+          window.currentExpensePage = i;
+          renderExpenseStats();
+        });
+        paginationContainer.appendChild(btn);
+      }
     }
   }
 
   // 2. Nếu đang ở tab thống kê → hiển thị bảng tổng hợp theo tháng
   if (isThongKeTab) {
     const table2 = document.querySelector("#monthlySummaryTable tbody");
-    table2.innerHTML = "";
+    if (table2) {
+      table2.innerHTML = "";
 
-    const summaryMap = {};
-    data.forEach(e => {
-      if (e.currency === "VND") {
-        const month = e.date?.slice(0, 7); // yyyy/mm
-        const key = `${month}|${e.type}`;
-        summaryMap[key] = (summaryMap[key] || 0) + e.amount;
-      }
-    });
+      const summaryMap = {};
+      data.forEach(e => {
+        if (e.currency === "VND") {
+          const month = e.date?.slice(0, 7); // yyyy/mm
+          const key = `${month}|${e.type}`;
+          summaryMap[key] = (summaryMap[key] || 0) + e.amount;
+        }
+      });
 
-    Object.entries(summaryMap).forEach(([key, value]) => {
-      const [month, type] = key.split("|");
-      const row = table2.insertRow();
-      row.innerHTML = `
-        <td>${month}</td>
-        <td>${type}</td>
-        <td>${value.toLocaleString()} VND</td>
-      `;
-    });
+      Object.entries(summaryMap).forEach(([key, value]) => {
+        const [month, type] = key.split("|");
+        const row = table2.insertRow();
+        row.innerHTML = `
+          <td>${month}</td>
+          <td>${type}</td>
+          <td>${value.toLocaleString()} VND</td>
+        `;
+      });
+    }
   }
 }
