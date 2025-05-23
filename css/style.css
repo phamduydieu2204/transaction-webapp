@@ -697,6 +697,8 @@ body.login-page {
 /* Thêm vào file style.css: */
 
 /* CSS cho hiển thị tổng doanh thu và chi phí */
+/* Thêm/sửa CSS trong style.css: */
+
 #welcome {
   text-align: center;
   font-style: italic;
@@ -705,41 +707,46 @@ body.login-page {
   position: relative;
 }
 
+#totalSummary {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
 #todayRevenue {
-  background-color: #f0f8f0;
-  padding: 8px 16px;
-  border-radius: 6px;
-  border: 1px solid #c3e6c3;
   color: #2d7d2d !important;
   font-weight: bold !important;
   font-size: 16px !important;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 4px;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
 }
 
 #todayExpenseTotal {
-  background-color: #fff5f5;
-  padding: 8px 16px;
-  border-radius: 6px;
-  border: 1px solid #fed7d7;
   color: #c53030 !important;
   font-weight: bold !important;
   font-size: 16px !important;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
 }
 
 /* Responsive cho mobile */
 @media (max-width: 768px) {
-  #welcome span[style*="float: right"] {
+  #totalSummary {
     float: none !important;
     display: block;
-    text-align: center;
+    text-align: center !important;
     margin-top: 10px;
   }
   
   #todayRevenue, #todayExpenseTotal {
     font-size: 14px !important;
-    padding: 6px 12px;
-    margin: 5px;
-    display: inline-block;
+    display: block;
+    margin: 2px 0;
   }
 }

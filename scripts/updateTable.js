@@ -1,4 +1,5 @@
 import { updatePagination } from './pagination.js';
+import { updateTotalDisplay } from './updateTotalDisplay.js';
 
 export function updateTable(transactionList, currentPage, itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction) {
   const tableBody = document.querySelector("#transactionTable tbody");
@@ -20,20 +21,23 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
   console.log("🟢 isSearching:", window.isSearching);
   console.log("🟢 todayFormatted:", todayFormatted);
   
+  // ✅ Tính tổng doanh thu
   if (window.isSearching === true) {
-  totalRevenue = transactionList.reduce((sum, t) => {
-    return sum + (parseFloat(t.revenue) || 0);
-  }, 0);
-} else {
-  totalRevenue = transactionList.reduce((sum, t) => {
-    if (t.transactionDate && t.transactionDate.startsWith(todayFormatted)) {
+    totalRevenue = transactionList.reduce((sum, t) => {
       return sum + (parseFloat(t.revenue) || 0);
-    }
-    return sum;
-  }, 0);
-}
+    }, 0);
+    console.log("🔍 Đang tìm kiếm - Tổng doanh thu:", totalRevenue);
+  } else {
+    totalRevenue = transactionList.reduce((sum, t) => {
+      if (t.transactionDate && t.transactionDate.startsWith(todayFormatted)) {
+        return sum + (parseFloat(t.revenue) || 0);
+      }
+      return sum;
+    }, 0);
+    console.log("📅 Không tìm kiếm - Tổng doanh thu hôm nay:", totalRevenue);
+  }
 
-  
+  // ✅ Hiển thị dữ liệu bảng
   paginatedItems.forEach((transaction, index) => {
     const globalIndex = startIndex + index;
     const row = document.createElement("tr");
@@ -46,7 +50,6 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     if (endDate < today) {
       row.classList.add("expired-row");
     }
-    
 
     const software = (transaction.softwareName || '').toLowerCase();
     const softwarePackage = (transaction.softwarePackage || '').trim().toLowerCase();
@@ -131,10 +134,9 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     }
 
     tableBody.appendChild(row);
-  
   });
 
-
+  // ✅ Cập nhật phân trang
   const refreshTable = () =>
     updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
 
@@ -148,21 +150,25 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     (page) => window.goToPage(page, refreshTable)
   );
 
-  const todayRevenueElement = document.getElementById("todayRevenue");
-  console.log("✅ Tổng doanh thu cuối cùng:", totalRevenue);
-  console.log("📌 Kiểm tra hiển thị tổng doanh thu");
+  // ✅ Lưu tổng doanh thu vào biến global và cập nhật hiển thị
+  window.totalRevenue = totalRevenue;
+  console.log("✅ Đã lưu totalRevenue:", totalRevenue);
 
-  if (todayRevenueElement) {
-    // Chỉ kiểm tra admin, không cần kiểm tra tab nào đang active
-    if (window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin") {
+  // Gọi hàm cập nhật hiển thị tổng số
+  if (typeof updateTotalDisplay === 'function') {
+    updateTotalDisplay();
+  } else if (typeof window.updateTotalDisplay === 'function') {
+    window.updateTotalDisplay();
+  } else {
+    // Fallback nếu hàm chưa load
+    console.warn("⚠️ updateTotalDisplay chưa sẵn sàng, sử dụng fallback");
+    const todayRevenueElement = document.getElementById("todayRevenue");
+    if (todayRevenueElement && window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin") {
       const displayText = window.isSearching 
         ? `Tổng doanh thu (kết quả tìm kiếm): ${totalRevenue.toLocaleString()} VNĐ`
         : `Tổng doanh thu hôm nay: ${totalRevenue.toLocaleString()} VNĐ`;
       todayRevenueElement.textContent = displayText;
-      console.log("💰 Hiển thị tổng doanh thu:", displayText);
-    } else {
-      todayRevenueElement.textContent = "";
-      console.log("🚫 Không hiển thị tổng doanh thu (không phải admin)");
+      console.log("💰 Fallback - Hiển thị doanh thu:", displayText);
     }
   }
 }

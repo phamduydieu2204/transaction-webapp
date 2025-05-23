@@ -47,6 +47,7 @@ import { handleDeleteExpense } from './handleDeleteExpense.js';
 import { handleUpdateExpense } from './handleUpdateExpense.js';
 import { viewExpenseRow } from './viewExpenseRow.js';
 import { handleSearchExpense } from './handleSearchExpense.js';
+import { initTotalDisplay } from './updateTotalDisplay.js';
 import { handleChangePassword, closeChangePasswordModal, confirmChangePassword } from './handleChangePassword.js';
 import { formatDateTime } from './formatDateTime.js';
 import { openConfirmModal, closeConfirmModal, confirmDelete } from './confirmModal.js';
@@ -83,6 +84,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.location.href = "index.html";
     return;
   }
+
+  // ✅ Khởi tạo hệ thống hiển thị tổng số
+  initTotalDisplay();
 
   document.getElementById("userWelcome").textContent =
   `Xin chào ${window.userInfo.tenNhanVien} (${window.userInfo.maNhanVien}) - ${window.userInfo.vaiTro}`;

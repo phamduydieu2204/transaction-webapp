@@ -257,8 +257,11 @@
     <h1>Hệ thống quản lý</h1>
     <p id="welcome">
       <span id="userWelcome"></span>
-      <span id="todayRevenue" style="float: right; font-weight: bold; color: green;"></span>
-      <span id="todayExpenseTotal" style="color: red; margin-left: 15px;"></span>
+      <!-- ✅ Tổng hợp cả doanh thu và chi phí trong 1 khối -->
+      <span id="totalSummary" style="float: right; font-weight: bold; text-align: right; line-height: 1.4;">
+        <div id="todayRevenue" style="color: green; margin-bottom: 2px;"></div>
+        <div id="todayExpenseTotal" style="color: red;"></div>
+      </span>
     </p>
     
     <hr>

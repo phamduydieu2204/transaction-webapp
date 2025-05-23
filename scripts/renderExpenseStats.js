@@ -1,4 +1,5 @@
 import { getConstants } from './constants.js';
+import { updateTotalDisplay } from './updateTotalDisplay.js';
 
 export async function renderExpenseStats() {
   const { BACKEND_URL } = getConstants();
@@ -118,29 +119,29 @@ function renderExpenseData(data) {
     console.log("📅 Không tìm kiếm - Tổng chi phí hôm nay:", totalExpense);
   }
 
-    // ✅ HIỂN THỊ TỔNG CHI PHÍ (luôn hiển thị nếu là admin, không phân biệt tab)
-    const todayExpenseTotalElement = document.getElementById("todayExpenseTotal");
-    console.log("✅ Tổng chi phí cuối cùng:", totalExpense);
-    console.log("📌 Kiểm tra hiển thị tổng chi phí");
-    console.log("🔍 Element todayExpenseTotal:", todayExpenseTotalElement);
+  // ✅ Lưu tổng chi phí vào biến global và cập nhật hiển thị
+  window.totalExpense = totalExpense;
+  console.log("✅ Đã lưu totalExpense:", totalExpense);
 
-    if (todayExpenseTotalElement) {
-    // Chỉ kiểm tra admin, không cần kiểm tra tab nào đang active
-    if (window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin") {
-        const displayText = window.isExpenseSearching 
+  // Gọi hàm cập nhật hiển thị tổng số
+  if (typeof updateTotalDisplay === 'function') {
+    updateTotalDisplay();
+  } else if (typeof window.updateTotalDisplay === 'function') {
+    window.updateTotalDisplay();
+  } else {
+    // Fallback nếu hàm chưa load
+    console.warn("⚠️ updateTotalDisplay chưa sẵn sàng, sử dụng fallback");
+    const todayExpenseTotalElement = document.getElementById("todayExpenseTotal");
+    if (todayExpenseTotalElement && window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin") {
+      const displayText = window.isExpenseSearching 
         ? `Tổng chi phí (kết quả tìm kiếm): ${totalExpense.toLocaleString()} VNĐ`
         : `Tổng chi phí hôm nay: ${totalExpense.toLocaleString()} VNĐ`;
-        todayExpenseTotalElement.textContent = displayText;
-        console.log("💰 Hiển thị tổng chi phí:", displayText);
-    } else {
-        todayExpenseTotalElement.textContent = "";
-        console.log("🚫 Không hiển thị tổng chi phí (không phải admin)");
+      todayExpenseTotalElement.textContent = displayText;
+      console.log("💸 Fallback - Hiển thị chi phí:", displayText);
     }
-    } else {
-    console.error("❌ Không tìm thấy element #todayExpenseTotal");
-    }
+  }
 
-  // 1. Nếu đang ở tab chi phí → hiển thị bảng danh sách chi tiết
+  // ✅ Hiển thị bảng chi phí (nếu đang ở tab chi phí)
   if (isChiPhiTab) {
     const table1 = document.querySelector("#expenseListTable tbody");
     const paginationContainer = document.getElementById("expensePagination");
@@ -198,7 +199,7 @@ function renderExpenseData(data) {
       actionCell.appendChild(select);
     });
 
-    // Cập nhật phân trang
+    // ✅ Cập nhật phân trang
     if (paginationContainer) {
       paginationContainer.innerHTML = "";
       
@@ -228,7 +229,7 @@ function renderExpenseData(data) {
     }
   }
 
-  // 2. Nếu đang ở tab thống kê → hiển thị bảng tổng hợp theo tháng
+  // ✅ Hiển thị bảng thống kê (nếu đang ở tab thống kê)
   if (isThongKeTab) {
     const table2 = document.querySelector("#monthlySummaryTable tbody");
     if (table2) {
