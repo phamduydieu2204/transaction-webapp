@@ -31,13 +31,39 @@ export async function renderExpenseStats() {
 function renderExpenseData(data) {
   console.log("🔍 DEBUG: Dữ liệu chi phí nhận được:", data);
   
-  const formatDate = (isoStr) => {
-    const d = new Date(isoStr);
-    if (isNaN(d)) return "";
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
+  // ✅ Hàm chuẩn hóa ngày từ nhiều format khác nhau
+  const normalizeDate = (dateInput) => {
+    if (!dateInput) return "";
+    
+    let date;
+    if (typeof dateInput === 'string') {
+      // Nếu là ISO string như "2025-05-21T17:00:00.000Z"
+      if (dateInput.includes('T')) {
+        date = new Date(dateInput);
+      } 
+      // Nếu là format "2025/05/23"
+      else if (dateInput.includes('/')) {
+        const [y, m, d] = dateInput.split('/');
+        date = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+      }
+      // Các format khác
+      else {
+        date = new Date(dateInput);
+      }
+    } else {
+      date = new Date(dateInput);
+    }
+    
+    if (isNaN(date.getTime())) return "";
+    
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
     return `${yyyy}/${mm}/${dd}`;
+  };
+
+  const formatDate = (isoStr) => {
+    return normalizeDate(isoStr);
   };
 
   // Kiểm tra tab nào đang active
@@ -69,14 +95,20 @@ function renderExpenseData(data) {
   } else {
     // Nếu không tìm kiếm, chỉ tính chi phí hôm nay (chỉ VND)
     totalExpense = data.reduce((sum, e) => {
+      // ✅ Chuẩn hóa ngày từ server về format yyyy/mm/dd
+      const normalizedDate = normalizeDate(e.date);
+      const isToday = normalizedDate === todayFormatted;
+      
       console.log("📅 Chi phí hôm nay check:", {
-        date: e.date,
-        startsWith: e.date?.startsWith(todayFormatted),
+        originalDate: e.date,
+        normalizedDate: normalizedDate,
+        todayFormatted: todayFormatted,
+        isToday: isToday,
         currency: e.currency,
         amount: e.amount
       });
       
-      if (e.date && e.date.startsWith(todayFormatted) && e.currency === "VND") {
+      if (isToday && e.currency === "VND") {
         const amount = parseFloat(e.amount) || 0;
         console.log("✅ Thêm vào tổng:", amount);
         return sum + amount;
@@ -208,9 +240,10 @@ function renderExpenseData(data) {
       const summaryMap = {};
       data.forEach(e => {
         if (e.currency === "VND") {
-          const month = e.date?.slice(0, 7); // yyyy/mm
+          const normalizedDate = normalizeDate(e.date);
+          const month = normalizedDate.slice(0, 7); // yyyy/mm
           const key = `${month}|${e.type}`;
-          summaryMap[key] = (summaryMap[key] || 0) + e.amount;
+          summaryMap[key] = (summaryMap[key] || 0) + (parseFloat(e.amount) || 0);
         }
       });
 
