@@ -240,6 +240,69 @@
       background-color: #f8d7da;
       color: #721c24;
     }
+
+    /* ✅ CSS cho header layout mới */
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .header-container h1 {
+      margin: 0;
+      flex: 1;
+      text-align: center;
+      font-size: 28px;
+    }
+
+    .totals-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      min-width: 250px;
+    }
+
+    .total-item {
+      font-weight: bold;
+      font-size: 14px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      background: transparent;
+      white-space: nowrap;
+    }
+
+    .total-item.revenue {
+      color: #2d7d2d !important;
+    }
+
+    .total-item.expense {
+      color: #c53030 !important;
+    }
+
+    /* Responsive cho mobile */
+    @media (max-width: 768px) {
+      .header-container {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .header-container h1 {
+        margin-bottom: 10px;
+        font-size: 24px;
+      }
+      
+      .totals-container {
+        align-items: center;
+        min-width: auto;
+      }
+      
+      .total-item {
+        font-size: 13px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -254,14 +317,20 @@
       <i class="fas fa-sign-out-alt"></i> Đăng xuất
     </button>
 
-    <h1>Hệ thống quản lý</h1>
+    <!-- ✅ Header với layout mới -->
+    <div class="header-container">
+      <h1>Hệ thống quản lý</h1>
+      
+      <!-- ✅ Tổng doanh thu và chi phí ở góc phải, cùng hàng với h1 -->
+      <div class="totals-container">
+        <div id="todayRevenue" class="total-item revenue"></div>
+        <div id="todayExpenseTotal" class="total-item expense"></div>
+      </div>
+    </div>
+
+    <!-- ✅ Dòng chào mừng ở dưới -->
     <p id="welcome">
       <span id="userWelcome"></span>
-      <!-- ✅ Tổng hợp cả doanh thu và chi phí trong 1 khối -->
-      <span id="totalSummary" style="float: right; font-weight: bold; text-align: right; line-height: 1.4;">
-        <div id="todayRevenue" style="color: green; margin-bottom: 2px;"></div>
-        <div id="todayExpenseTotal" style="color: red;"></div>
-      </span>
     </p>
     
     <hr>
@@ -528,9 +597,6 @@
   </table>
 </div>
 
-
-
-
     <!-- Khu vực thông báo -->
     <div id="notification"></div>
 
@@ -661,7 +727,6 @@
     </div>
   </div>
 </div>
-
 
 <!-- Lớp phủ ngăn tương tác -->
 <div id="formOverlay" style="
