@@ -1,55 +1,759 @@
-/* ===== TRANG ĐĂNG NHẬP ===== */
+/* Căn giữa trang đăng nhập */
 body.login-page {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: #f2f2f2;
-  margin: 0;
-  font-family: Arial, sans-serif;
-}
-
-.login-container {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.1);
-  width: 320px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #f2f2f2;
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Login container */
+  .login-container {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.1);
+    width: 320px;
+    text-align: center;
+  }
+  
+  .password-container {
+    position: relative;
+    width: 100%;
+  }
+  
+  .toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+  
+  input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-size: 15px;
+  }
+  
+  /* Trang chính */
+  body {
+    margin: 0;
+    background: #f2f2f2;
+    font-family: Arial, sans-serif;
+  }
+  
+  .container {
+    max-width: 95%;
+    margin: 30px auto 0 auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  h1 {
+    text-align: center;
+    margin-bottom: 5px;
+  }
+  
+/* Welcome message */
+#welcome {
   text-align: center;
+  font-style: italic;
+  color: #666;
+  margin-bottom: 20px;
+  margin-top: 0;
 }
+  
+  button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+    width: auto;
+    display: inline-block;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  .extra-wide {
+    grid-column: span 3;
+  }
+  
+  #errorMessage, #successMessage {
+    text-align: center;
+    font-weight: bold;
+  }
+  
+  #errorMessage {
+    color: red;
+  }
+  
+  #successMessage {
+    color: green;
+  }
+  
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+  }
+  
+  .form-grid div {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Loại bỏ flex-direction: column cho button-row */
+  .form-grid .button-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 5px;
+    margin-top: 10px;
+    flex-wrap: nowrap;
+  }
+  
+  /* Đảm bảo kích thước đồng đều cho các trường trong form */
+  .form-grid input,
+  .form-grid select,
+  .form-grid textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-size: 15px;
+    height: 40px; /* Đặt chiều cao đồng đều */
+  }
+  
+  /* Điều chỉnh chiều cao của textarea */
+  .form-grid textarea {
+    resize: none; /* Ngăn thay đổi kích thước */
+    height: 40px; /* Đặt chiều cao giống các trường khác */
+  }
+  
+  .full-row {
+    grid-column: span 5;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 10px;
+  }
+  
+  /* CSS cho các nút trong button-row */
+  .button-row {
+    grid-column: span 5; /* Chiếm toàn bộ chiều rộng của form-grid */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end; /* Căn phải */
+    gap: 5px; /* Khoảng cách giữa các nút */
+    margin-top: 10px;
+    flex-wrap: nowrap;
+  }
+  
+  .button-row button {
+    width: auto; /* Đảm bảo nút chỉ rộng vừa nội dung */
+    min-width: 0; /* Bỏ min-width để nút chỉ vừa nội dung */
+    padding: 4px 10px; /* Đồng bộ với kích thước nút trong pagination */
+    font-size: 13px; /* Đồng bộ với font-size của nút trong pagination */
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    box-sizing: border-box;
+  }
+  
+  .button-row button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* CSS cho pagination */
+  .pagination {
+    display: flex;
+    justify-content: flex-end; /* Căn phải */
+    gap: 5px;
+    margin-top: 5px; /* Khoảng cách nhỏ giữa "Danh sách giao dịch" và pagination */
+  }
+  
+  .pagination button {
+    padding: 4px 8px;
+    font-size: 13px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    box-sizing: border-box;
+  }
+  
+  .pagination button:hover {
+    background-color: #0056b3;
+  }
+  
+  .pagination button.active {
+    background-color: #0056b3; /* Màu nền cho trang hiện tại */
+    font-weight: bold;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px; /* Giảm khoảng cách giữa pagination và table */
+  }
+  
+  table thead {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  table th, table td {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+    font-size: 14px;
+  }
+  
+  table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  table button {
+    padding: 4px 10px;
+    margin: 0 2px;
+    font-size: 13px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    color: white;
+  }
+  
+  table .edit-btn {
+    background-color: #28a745;
+  }
+  
+  table .delete-btn {
+    background-color: #dc3545;
+  }
+  
+  /* Modal styles */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+  
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* Căn giữa theo chiều dọc */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 400px; /* Modal nhỏ gọn hơn */
+    border-radius: 10px;
+    position: relative;
+    text-align: center;
+  }
+  
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+  }
+  
+  .detail-content {
+    margin-top: 20px;
+    font-size: 14px;
+  }
+  
+  .detail-content .detail-row {
+    display: flex;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+  }
 
-.password-container {
-  position: relative;
-  width: 100%;
-}
-
-.toggle-password {
+  .detail-content .detail-row:last-child {
+    border-bottom: none;
+  }
+  
+  .detail-content .detail-label {
+    font-weight: bold;
+    min-width: 150px;   /* hoặc 160–180 nếu bạn muốn label thẳng hàng */
+    margin-right: 10px; /* tạo khoảng cách nhỏ với value */
+    text-align: left;   /* ✅ căn trái thay vì phải */
+  }
+  
+  .detail-content .detail-value {
+    flex: 1;
+    white-space: pre-line;
+    word-break: break-word;
+    text-align: left; /* ✅ đảm bảo nội dung căn trái */
+  }
+  
+  .detail-content .copy-icon {
+    margin-left: 10px;
+    cursor: pointer;
+    color: #007bff;
+    position: relative;
+  }
+  
+  .detail-content .copy-icon:hover {
+    color: #0056b3;
+  }
+  
+  .copy-message {
+    position: absolute;
+    left: 100%;
+    margin-left: 10px;
+    color: #28a745;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .copy-message.show {
+    opacity: 1;
+  }
+  
+  .container {
+    padding-bottom: 20px;
+    position: relative;
+  }
+  
+  .fixed-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #fff;
+  }
+  
+  #transactionTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  #transactionTable thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #007bff;
+    color: white;
+  }
+  
+  #transactionTable th,
+  #transactionTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  #transactionTable tbody {
+    display: block;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  
+  #transactionTable thead,
+  #transactionTable tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+  
+  #transactionTable tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+/* Logout button adjustment */
+.logout-btn {
   position: absolute;
-  top: 50%;
-  right: 12px;
-  transform: translateY(-50%);
+  top: 10px;
+  right: 10px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  z-index: 20;
 }
+  
+  .logout-btn:hover {
+    background-color: #c82333;
+  }
+  
+  .logout-btn i {
+    margin-right: 5px;
+  }
+  
+  /* CSS để in nghiêng các tùy chọn không khả dụng */
+  option.unavailable {
+    font-style: italic;
+    color: #888;
+  }
+  
+  /* CSS cho icon kính lúp */
+  .search-icon-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .search-icon-container input {
+    width: 100%;
+    padding-right: 30px;
+  }
+  
+  .search-icon-container .search-icon {
+    position: absolute;
+    right: 5px;
+    cursor: pointer;
+    color: #007bff;
+  }
+  
+  /* CSS cho placeholder "Đang tìm kiếm..." */
+  input[placeholder="Đang tìm kiếm..."] {
+    font-style: italic;
+    color: #888;
+    opacity: 0.7;
+  }
+  
+  /* Định dạng mặc định cho các trường input */
+  input[type="text"],
+  input[type="email"],
+  input[type="number"],
+  textarea {
+    font-style: normal;
+    color: #000;
+    opacity: 1;
+  }
+  
+  /* CSS cho modal xử lý */
+  #processingModal .modal-content {
+    max-width: 400px;
+    padding: 30px;
+  }
+  
+  #processingModal h2 {
+    margin-bottom: 20px;
+    font-size: 20px;
+  }
+  
+  #processingModal p {
+    font-size: 16px;
+    margin: 0;
+  }
 
-/* ===== TRANG CHÍNH ===== */
-body {
-  margin: 0;
-  background: #f2f2f2;
-  font-family: Arial, sans-serif;
+  /* CSS cho modal xác nhận xóa - Giữ nguyên vì đã phù hợp với yêu cầu */
+  #confirmDeleteModal .modal-content {
+    max-width: 400px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  #confirmDeleteModal button {
+    margin: 0 10px;
+    padding: 8px 16px;
+  }
+  /* Cho phép cột bảng giao dịch resize và nội dung tự động xuống dòng */
+#transactionTable th,
+#transactionTable td {
+  white-space: normal; /* Cho phép xuống dòng */
+  overflow-wrap: break-word;
+  word-break: break-word;
+  resize: horizontal; /* Cho phép kéo thay đổi chiều rộng */
+  min-width: 100px; /* Cài đặt chiều rộng tối thiểu để tránh co quá nhỏ */
+  max-width: 600px; /* Giới hạn max-width nếu cần */
 }
-
-.container {
-  max-width: 95%;
-  margin: 30px auto 0 auto;
-  background: white;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+#transactionTable th {
   position: relative;
-  padding-bottom: 20px;
 }
 
-/* ===== HEADER LAYOUT ===== */
+#transactionTable th .resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 5px;
+  cursor: col-resize;
+  user-select: none;
+  height: 100%;
+}
+.detail-value {
+  white-space: pre-line; /* Cho phép xuống dòng từ \n */
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+#updateCookieModal .modal-content {
+  max-width: 600px;
+  text-align: left;
+}
+
+#updateCookieModal label {
+  font-weight: bold;
+  margin-top: 10px;
+  display: block;
+}
+
+#updateCookieModal textarea {
+  width: 100%;
+  font-family: monospace;
+  padding: 10px;
+  margin-bottom: 10px;
+  resize: vertical;
+  white-space: pre-line;
+}
+
+#updateCookieModal .button-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.detail-row i.copy-icon {
+  color: #007bff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+  margin-left: 10px;
+}
+
+.detail-row i.copy-icon:hover {
+  color: #0056b3;
+  transform: scale(1.2);
+}
+
+.detail-row i.copy-icon:active {
+  transform: scale(0.95);
+}
+
+.detail-row i.copy-icon::before {
+  vertical-align: middle;
+}
+
+/* Thêm CSS bảng Thông tin khác */
+.info-other {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.info-row strong {
+  font-weight: 500;
+}
+
+.order-info {
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.copy-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #007bff;
+  padding: 2px;
+}
+
+.copy-btn:hover {
+  color: #0056b3;
+}
+/* Dòng đã hết hạn (ngày kết thúc < hôm nay) */
+#transactionTable tr.expired-row {
+  font-style: italic;
+  color: #ff0202a2;
+}
+
+.tab-menu {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tab-button {
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 5px 5px 0 0;
+  outline: none;
+}
+
+.tab-button.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+#expenseListTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+#expenseListTable thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #007bff;
+  color: white;
+}
+
+#expenseListTable tbody {
+  display: block;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+#expenseListTable thead,
+#expenseListTable tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+#expenseListTable th,
+#expenseListTable td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+  font-size: 14px;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+/* CSS cho hiển thị tổng chi phí */
+#todayExpenseTotal {
+  background-color: #fff5f5;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #fed7d7;
+  color: #c53030 !important;
+  font-weight: bold !important;
+  font-size: 16px !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Responsive cho mobile */
+@media (max-width: 768px) {
+  #todayExpenseTotal {
+    font-size: 14px !important;
+    padding: 6px 12px;
+  }
+  
+  .tab-content h2 {
+    margin-bottom: 10px;
+  }
+}
+/* Thêm vào file style.css: */
+
+/* CSS cho hiển thị tổng doanh thu và chi phí */
+/* Thêm/sửa CSS trong style.css: */
+
+#welcome {
+  text-align: center;
+  font-style: italic;
+  color: #666;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+#totalSummary {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+#todayRevenue {
+  color: #2d7d2d !important;
+  font-weight: bold !important;
+  font-size: 16px !important;
+  margin-bottom: 4px;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+#todayExpenseTotal {
+  color: #c53030 !important;
+  font-weight: bold !important;
+  font-size: 16px !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Responsive cho mobile */
+@media (max-width: 768px) {
+  #totalSummary {
+    float: none !important;
+    display: block;
+    text-align: center !important;
+    margin-top: 10px;
+  }
+  
+  #todayRevenue, #todayExpenseTotal {
+    font-size: 14px !important;
+    display: block;
+    margin: 2px 0;
+  }
+}
+/* Header container - flexbox layout */
 .header-container {
   display: flex;
   justify-content: space-between;
@@ -90,657 +794,4 @@ body {
 
 .total-item.expense {
   color: #c53030 !important;
-}
-
-/* Welcome message */
-#welcome {
-  text-align: center;
-  font-style: italic;
-  color: #666;
-  margin-bottom: 20px;
-  margin-top: 0;
-}
-
-/* Logout button */
-.logout-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  z-index: 20;
-}
-
-.logout-btn:hover {
-  background-color: #c82333;
-}
-
-.logout-btn i {
-  margin-right: 5px;
-}
-
-/* ===== INPUT, SELECT, TEXTAREA ===== */
-input, select, textarea {
-  width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-  margin-bottom: 16px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-  font-size: 15px;
-}
-
-input[type="text"],
-input[type="email"],
-input[type="number"],
-textarea {
-  font-style: normal;
-  color: #000;
-  opacity: 1;
-}
-
-input[placeholder="Đang tìm kiếm..."] {
-  font-style: italic;
-  color: #888;
-  opacity: 0.7;
-}
-
-/* ===== BUTTONS ===== */
-button {
-  background: #007bff;
-  color: white;
-  border: none;
-  padding: 12px 16px;
-  border-radius: 6px;
-  font-weight: bold;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.3s;
-  width: auto;
-  display: inline-block;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-/* ===== FORM GRID ===== */
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 20px;
-}
-
-.form-grid div {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-grid input,
-.form-grid select,
-.form-grid textarea {
-  width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-  margin-bottom: 16px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-  font-size: 15px;
-  height: 40px;
-}
-
-.form-grid textarea {
-  resize: none;
-  height: 40px;
-}
-
-.button-row {
-  grid-column: span 5;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  gap: 5px;
-  margin-top: 10px;
-  flex-wrap: nowrap;
-}
-
-.button-row button {
-  width: auto;
-  min-width: 0;
-  padding: 4px 10px;
-  font-size: 13px;
-  border: none;
-  border-radius: 4px;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  box-sizing: border-box;
-}
-
-.button-row button:hover {
-  background-color: #0056b3;
-}
-
-.full-row {
-  grid-column: span 5;
-  display: flex;
-  gap: 12px;
-  justify-content: flex-start;
-  align-items: center;
-  margin-top: 10px;
-}
-
-.extra-wide {
-  grid-column: span 3;
-}
-
-/* ===== PAGINATION ===== */
-.pagination {
-  display: flex;
-  justify-content: flex-end;
-  gap: 5px;
-  margin-top: 5px;
-}
-
-.pagination button {
-  padding: 4px 8px;
-  font-size: 13px;
-  border: none;
-  border-radius: 4px;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  box-sizing: border-box;
-}
-
-.pagination button:hover {
-  background-color: #0056b3;
-}
-
-.pagination button.active {
-  background-color: #0056b3;
-  font-weight: bold;
-}
-
-/* ===== TABLES ===== */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-table thead {
-  background-color: #007bff;
-  color: white;
-}
-
-table th, table td {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  text-align: left;
-  font-size: 14px;
-}
-
-table tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-table button {
-  padding: 4px 10px;
-  margin: 0 2px;
-  font-size: 13px;
-  cursor: pointer;
-  border: none;
-  border-radius: 4px;
-  color: white;
-}
-
-table .edit-btn {
-  background-color: #28a745;
-}
-
-table .delete-btn {
-  background-color: #dc3545;
-}
-
-/* ===== TRANSACTION TABLE ===== */
-#transactionTable {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-#transactionTable thead {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background-color: #007bff;
-  color: white;
-}
-
-#transactionTable th,
-#transactionTable td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-  white-space: normal;
-  overflow-wrap: break-word;
-  word-break: break-word;
-  resize: horizontal;
-  min-width: 100px;
-  max-width: 600px;
-}
-
-#transactionTable tbody {
-  display: block;
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-#transactionTable thead,
-#transactionTable tbody tr {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-}
-
-#transactionTable tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-#transactionTable tr.expired-row {
-  font-style: italic;
-  color: #ff0202a2;
-}
-
-#transactionTable th {
-  position: relative;
-}
-
-#transactionTable th .resizer {
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 5px;
-  cursor: col-resize;
-  user-select: none;
-  height: 100%;
-}
-
-/* ===== EXPENSE TABLE ===== */
-#expenseListTable {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-#expenseListTable thead {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background-color: #007bff;
-  color: white;
-}
-
-#expenseListTable tbody {
-  display: block;
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-#expenseListTable thead,
-#expenseListTable tbody tr {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-}
-
-#expenseListTable th,
-#expenseListTable td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-  font-size: 14px;
-  white-space: normal;
-  overflow-wrap: break-word;
-}
-
-/* ===== TABS ===== */
-.tab-menu {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.tab-button {
-  background-color: #f1f1f1;
-  border: 1px solid #ccc;
-  padding: 10px 16px;
-  cursor: pointer;
-  font-weight: bold;
-  border-radius: 5px 5px 0 0;
-  outline: none;
-}
-
-.tab-button.active {
-  background-color: #007bff;
-  color: white;
-}
-
-.tab-content {
-  display: none;
-}
-
-.tab-content.active {
-  display: block;
-}
-
-/* ===== MODALS ===== */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 100;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.4);
-}
-
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 90%;
-  max-width: 400px;
-  border-radius: 10px;
-  position: relative;
-  text-align: center;
-}
-
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-}
-
-/* Processing Modal */
-#processingModal .modal-content {
-  max-width: 400px;
-  padding: 30px;
-}
-
-#processingModal h2 {
-  margin-bottom: 20px;
-  font-size: 20px;
-}
-
-#processingModal p {
-  font-size: 16px;
-  margin: 0;
-}
-
-/* Confirm Delete Modal */
-#confirmDeleteModal .modal-content {
-  max-width: 400px;
-  padding: 20px;
-  text-align: center;
-}
-
-#confirmDeleteModal button {
-  margin: 0 10px;
-  padding: 8px 16px;
-}
-
-/* Update Cookie Modal */
-#updateCookieModal .modal-content {
-  max-width: 600px;
-  text-align: left;
-}
-
-#updateCookieModal label {
-  font-weight: bold;
-  margin-top: 10px;
-  display: block;
-}
-
-#updateCookieModal textarea {
-  width: 100%;
-  font-family: monospace;
-  padding: 10px;
-  margin-bottom: 10px;
-  resize: vertical;
-  white-space: pre-line;
-}
-
-#updateCookieModal .button-row {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-/* ===== DETAIL CONTENT ===== */
-.detail-content {
-  margin-top: 20px;
-  font-size: 14px;
-}
-
-.detail-content .detail-row {
-  display: flex;
-  align-items: flex-start;
-  padding: 8px 0;
-  border-bottom: 1px solid #ddd;
-}
-
-.detail-content .detail-row:last-child {
-  border-bottom: none;
-}
-
-.detail-content .detail-label {
-  font-weight: bold;
-  min-width: 150px;
-  margin-right: 10px;
-  text-align: left;
-}
-
-.detail-content .detail-value {
-  flex: 1;
-  white-space: pre-line;
-  word-break: break-word;
-  text-align: left;
-}
-
-.detail-content .copy-icon {
-  margin-left: 10px;
-  cursor: pointer;
-  color: #007bff;
-  position: relative;
-}
-
-.detail-content .copy-icon:hover {
-  color: #0056b3;
-}
-
-.detail-row i.copy-icon {
-  color: #007bff;
-  font-size: 14px;
-  cursor: pointer;
-  transition: color 0.2s, transform 0.2s;
-  margin-left: 10px;
-}
-
-.detail-row i.copy-icon:hover {
-  color: #0056b3;
-  transform: scale(1.2);
-}
-
-.detail-row i.copy-icon:active {
-  transform: scale(0.95);
-}
-
-.detail-row i.copy-icon::before {
-  vertical-align: middle;
-}
-
-.copy-message {
-  position: absolute;
-  left: 100%;
-  margin-left: 10px;
-  color: #28a745;
-  font-size: 12px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.copy-message.show {
-  opacity: 1;
-}
-
-/* ===== ICONS & INTERACTIVE ELEMENTS ===== */
-.search-icon-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.search-icon-container input {
-  width: 100%;
-  padding-right: 30px;
-}
-
-.search-icon-container .search-icon {
-  position: absolute;
-  right: 5px;
-  cursor: pointer;
-  color: #007bff;
-}
-
-.copy-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  color: #007bff;
-  padding: 2px;
-}
-
-.copy-btn:hover {
-  color: #0056b3;
-}
-
-option.unavailable {
-  font-style: italic;
-  color: #888;
-}
-
-/* ===== UTILITY CLASSES ===== */
-.fixed-header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background-color: #fff;
-}
-
-.info-other {
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.info-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 4px;
-}
-
-.info-row strong {
-  font-weight: 500;
-}
-
-.order-info {
-  max-width: 160px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* ===== MESSAGES ===== */
-#errorMessage, #successMessage {
-  text-align: center;
-  font-weight: bold;
-}
-
-#errorMessage {
-  color: red;
-}
-
-#successMessage {
-  color: green;
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-  .header-container {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .header-container h1 {
-    margin-bottom: 10px;
-    font-size: 24px;
-  }
-  
-  .totals-container {
-    align-items: center;
-    min-width: auto;
-  }
-  
-  .total-item {
-    font-size: 13px;
-  }
-  
-  .logout-btn {
-    position: relative;
-    top: auto;
-    right: auto;
-    margin-bottom: 15px;
-  }
-
-  .tab-content h2 {
-    margin-bottom: 10px;
-  }
-
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .button-row {
-    justify-content: center;
-  }
-
-  table th,
-  table td {
-    font-size: 12px;
-    padding: 6px;
-  }
 }
