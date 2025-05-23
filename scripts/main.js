@@ -161,6 +161,37 @@ document.addEventListener("DOMContentLoaded", async () => {
         renderExpenseStats();
       }
     });
+
+  // ✅ Thêm logic ẩn/hiện tab dựa trên quyền
+  const tabNhinThay = window.userInfo.tabNhinThay || "tất cả";
+  const allowedTabs = tabNhinThay.toLowerCase().split(",").map(t => t.trim());
+  
+  if (tabNhinThay !== "tất cả") {
+    document.querySelectorAll(".tab-button").forEach(button => {
+      const tabName = button.dataset.tab;
+      let tabKey = "";
+      
+      if (tabName === "tab-giao-dich") tabKey = "giao dịch";
+      else if (tabName === "tab-chi-phi") tabKey = "chi phí";
+      else if (tabName === "tab-thong-ke") tabKey = "thống kê";
+      
+      if (tabKey && !allowedTabs.includes(tabKey)) {
+        button.style.display = "none";
+      }
+    });
+    
+    // Chuyển đến tab đầu tiên được phép nếu tab hiện tại bị ẩn
+    const activeTab = document.querySelector(".tab-button.active");
+    if (activeTab && activeTab.style.display === "none") {
+      const firstVisibleTab = document.querySelector(".tab-button:not([style*='display: none'])");
+      if (firstVisibleTab) {
+        activeTab.classList.remove("active");
+        firstVisibleTab.classList.add("active");
+        firstVisibleTab.click();
+      }
+    }
+  }
+
   });
   document.getElementById("expenseDate").value = window.todayFormatted;
   document.getElementById("expenseRecorder").value = window.userInfo?.tenNhanVien || "";

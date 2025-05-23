@@ -40,17 +40,17 @@ export async function handleLogin() {
     const result = await response.json();
 
     if (result.status === 'success') {
-      const employeeInfo = {
-        tenNhanVien: result.tenNhanVien,
-        maNhanVien: result.maNhanVien,
-        vaiTro: result.vaiTro,
-        giaoDichNhinThay: result.giaoDichNhinThay || "",
-        nhinThayGiaoDichCuaAi: result.nhinThayGiaoDichCuaAi || "",
-        duocSuaGiaoDichCuaAi: result.duocSuaGiaoDichCuaAi || "chỉ bản thân",
-        duocXoaGiaoDichCuaAi: result.duocXoaGiaoDichCuaAi || "chỉ bản thân",
-        duocTimKiemGiaoDichCuaAi: result.duocTimKiemGiaoDichCuaAi || "chỉ bản thân"
-      };
-
+    const employeeInfo = {
+      tenNhanVien: result.tenNhanVien,
+      maNhanVien: result.maNhanVien,
+      vaiTro: result.vaiTro,
+      tabNhinThay: result.tabNhinThay || "giao dịch",  // Thêm mới
+      giaoDichNhinThay: result.giaoDichNhinThay || "",
+      nhinThayGiaoDichCuaAi: result.nhinThayGiaoDichCuaAi || "",
+      duocSuaGiaoDichCuaAi: result.duocSuaGiaoDichCuaAi || "chỉ bản thân",
+      duocXoaGiaoDichCuaAi: result.duocXoaGiaoDichCuaAi || "chỉ bản thân",
+      duocTimKiemGiaoDichCuaAi: result.duocTimKiemGiaoDichCuaAi || "chỉ bản thân"
+    };
       localStorage.setItem('employeeInfo', JSON.stringify(employeeInfo));
       window.location.href = 'main.html';
     } else {
