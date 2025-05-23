@@ -241,68 +241,83 @@
       color: #721c24;
     }
 
-    /* ✅ CSS cho header layout mới */
-    .header-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      position: relative;
-    }
+/* ✅ CSS mới cho header layout căn giữa hoàn hảo */
+.header-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  width: 100%;
+  min-height: 60px;
+}
 
-    .header-container h1 {
-      margin: 0;
-      flex: 1;
-      text-align: center;
-      font-size: 28px;
-    }
+.header-container h1 {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-size: 28px;
+  z-index: 1;
+  white-space: nowrap;
+}
 
-    .totals-container {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 4px;
-      min-width: 250px;
-    }
+.totals-container {
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 250px;
+  z-index: 2;
+}
 
-    .total-item {
-      font-weight: bold;
-      font-size: 14px;
-      padding: 4px 8px;
-      border-radius: 4px;
-      background: transparent;
-      white-space: nowrap;
-    }
+.total-item {
+  font-weight: bold;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: transparent;
+  white-space: nowrap;
+}
 
-    .total-item.revenue {
-      color: #2d7d2d !important;
-    }
+.total-item.revenue {
+  color: #2d7d2d !important;
+}
 
-    .total-item.expense {
-      color: #c53030 !important;
-    }
+.total-item.expense {
+  color: #c53030 !important;
+}
 
-    /* Responsive cho mobile */
-    @media (max-width: 768px) {
-      .header-container {
-        flex-direction: column;
-        text-align: center;
-      }
-      
-      .header-container h1 {
-        margin-bottom: 10px;
-        font-size: 24px;
-      }
-      
-      .totals-container {
-        align-items: center;
-        min-width: auto;
-      }
-      
-      .total-item {
-        font-size: 13px;
-      }
-    }
+/* Responsive cho mobile */
+@media (max-width: 768px) {
+  .header-container {
+    flex-direction: column;
+    text-align: center;
+    min-height: auto;
+  }
+  
+  .header-container h1 {
+    position: relative;
+    left: auto;
+    transform: none;
+    margin-bottom: 10px;
+    font-size: 24px;
+  }
+  
+  .totals-container {
+    position: relative;
+    right: auto;
+    align-items: center;
+    min-width: auto;
+  }
+  
+  .total-item {
+    font-size: 13px;
+  }
+}
+
   </style>
 </head>
 <body>
