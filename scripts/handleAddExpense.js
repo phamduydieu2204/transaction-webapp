@@ -1,4 +1,5 @@
 import { getConstants } from './constants.js';
+import { renderExpenseStats } from './renderExpenseStats.js';
 
 export async function handleAddExpense() {
   const getValue = (id) => document.getElementById(id)?.value?.trim() || "";
@@ -38,6 +39,9 @@ export async function handleAddExpense() {
       document.getElementById("expenseForm").reset();
       document.getElementById("expenseDate").value = window.todayFormatted;
       document.getElementById("expenseRecorder").value = window.userInfo?.tenNhanVien || "";
+      
+      // ✅ Refresh danh sách và tổng chi phí sau khi thêm thành công
+      renderExpenseStats();
     } else {
       alert("❌ Không thể lưu chi phí: " + result.message);
     }

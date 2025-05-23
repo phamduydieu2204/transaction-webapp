@@ -372,6 +372,12 @@
     </div>
 
 <div id="tab-chi-phi" class="tab-content">
+    <!-- Thêm phần hiển thị tổng chi phí ở đầu tab -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2>Quản lý chi phí</h2>
+    <span id="todayExpenseTotal" style="font-weight: bold; color: red; font-size: 16px;"></span>
+  </div>
+
   <form id="expenseForm" class="form-grid">
     
     <!-- PHẦN 1: Thông tin khoản chi -->
@@ -489,22 +495,22 @@
     </div>
   </form>
       <h3 style="margin-top: 20px;">Danh sách chi phí</h3>
-<table id="expenseListTable">
-  <thead>
-    <tr>
-      <th>Ngày chi</th>
-      <th>Loại khoản chi</th>
-      <th>Danh mục</th>
-      <th>Sản phẩm</th>
-      <th>Gói</th>
-      <th>Số tiền</th>
-      <th>Ngày tái tục</th>
-      <th>Trạng thái</th>
-      <th>Hành động</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
+  <table id="expenseListTable">
+    <thead>
+      <tr>
+        <th>Ngày chi</th>
+        <th>Loại khoản chi</th>
+        <th>Danh mục</th>
+        <th>Sản phẩm</th>
+        <th>Gói</th>
+        <th>Số tiền</th>
+        <th>Ngày tái tục</th>
+        <th>Trạng thái</th>
+        <th>Hành động</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
   <div class="pagination" id="expensePagination"></div>
 </div>

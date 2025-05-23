@@ -42,6 +42,47 @@ function renderExpenseData(data) {
   const isChiPhiTab = document.getElementById("tab-chi-phi")?.classList.contains("active");
   const isThongKeTab = document.getElementById("tab-thong-ke")?.classList.contains("active");
 
+  // ✅ TÍNH TỔNG CHI PHÍ (tương tự logic tính tổng doanh thu)
+  let totalExpense = 0;
+  const today = new Date();
+  const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
+
+  console.log("📌 BẮT ĐẦU TÍNH TỔNG CHI PHÍ");
+  console.log("🟢 Vai trò:", window.userInfo?.vaiTro);
+  console.log("🟢 isExpenseSearching:", window.isExpenseSearching);
+  console.log("🟢 todayFormatted:", todayFormatted);
+
+  if (window.isExpenseSearching === true) {
+    // Nếu đang tìm kiếm, tính tổng tất cả kết quả tìm kiếm
+    totalExpense = data.reduce((sum, e) => {
+      if (e.currency === "VND") { // Chỉ tính VND
+        return sum + (parseFloat(e.amount) || 0);
+      }
+      return sum;
+    }, 0);
+  } else {
+    // Nếu không tìm kiếm, chỉ tính chi phí hôm nay
+    totalExpense = data.reduce((sum, e) => {
+      if (e.date && e.date.startsWith(todayFormatted) && e.currency === "VND") {
+        return sum + (parseFloat(e.amount) || 0);
+      }
+      return sum;
+    }, 0);
+  }
+
+  // ✅ HIỂN THỊ TỔNG CHI PHÍ (chỉ với vai trò admin)
+  const todayExpenseTotalElement = document.getElementById("todayExpenseTotal");
+  console.log("✅ Tổng chi phí cuối cùng:", totalExpense);
+  console.log("📌 Gán text vào #todayExpenseTotal nếu vai trò là admin");
+
+  if (todayExpenseTotalElement) {
+    if (window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin") {
+      todayExpenseTotalElement.textContent = `Tổng chi phí: ${totalExpense.toLocaleString()} VNĐ`;
+    } else {
+      todayExpenseTotalElement.textContent = "";
+    }
+  }
+
   // 1. Nếu đang ở tab chi phí → hiển thị bảng danh sách chi tiết
   if (isChiPhiTab) {
     const table1 = document.querySelector("#expenseListTable tbody");
