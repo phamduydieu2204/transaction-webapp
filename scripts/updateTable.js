@@ -150,21 +150,21 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
   const todayRevenueElement = document.getElementById("todayRevenue");
   console.log("✅ Tổng doanh thu cuối cùng:", totalRevenue);
-console.log("📌 Gán text vào #todayRevenue nếu vai trò là admin");
-
-if (todayRevenueElement) {
-  // Kiểm tra xem có đang ở tab giao dịch không
-  const isTransactionTab = document.getElementById("tab-giao-dich")?.classList.contains("active");
-  
-  // Chỉ hiển thị tổng doanh thu khi:
-  // 1. Đang ở tab giao dịch
-  // 2. Người dùng có vai trò admin
-  if (isTransactionTab && window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin") {
-    const displayText = window.isSearching 
-      ? `Tổng doanh thu (kết quả tìm kiếm): ${totalRevenue.toLocaleString()} VNĐ`
-      : `Tổng doanh thu hôm nay: ${totalRevenue.toLocaleString()} VNĐ`;
-    todayRevenueElement.textContent = displayText;
-  } else {
-    todayRevenueElement.textContent = "";
+  console.log("📌 Gán text vào #todayRevenue nếu vai trò là admin");
+  if (todayRevenueElement) {
+    // Kiểm tra xem có đang ở tab giao dịch không
+    const isTransactionTab = document.getElementById("tab-giao-dich")?.classList.contains("active");
+    
+    // Chỉ hiển thị tổng doanh thu khi:
+    // 1. Đang ở tab giao dịch
+    // 2. Người dùng có vai trò admin
+    if (isTransactionTab && window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin") {
+      const displayText = window.isSearching 
+        ? `Tổng doanh thu (kết quả tìm kiếm): ${totalRevenue.toLocaleString()} VNĐ`
+        : `Tổng doanh thu hôm nay: ${totalRevenue.toLocaleString()} VNĐ`;
+      todayRevenueElement.textContent = displayText;
+    } else {
+      todayRevenueElement.textContent = "";
+    }
   }
 }
