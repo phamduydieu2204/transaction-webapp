@@ -2,7 +2,7 @@
 
 /**
  * Hàm cập nhật hiển thị tổng doanh thu và chi phí
- * Hiển thị cùng 1 khối: doanh thu ở trên (xanh), chi phí ở dưới (đỏ)
+ * Hiển thị ở header: doanh thu ở trên (xanh), chi phí ở dưới (đỏ)
  */
 export function updateTotalDisplay() {
   const revenueEl = document.getElementById("todayRevenue");
@@ -24,7 +24,7 @@ export function updateTotalDisplay() {
   // Hiển thị doanh thu
   if (revenueEl && window.totalRevenue !== undefined) {
     const revenueText = window.isSearching 
-      ? `Tổng doanh thu (kết quả tìm kiếm): ${window.totalRevenue.toLocaleString()} VNĐ`
+      ? `Tổng doanh thu (tìm kiếm): ${window.totalRevenue.toLocaleString()} VNĐ`
       : `Tổng doanh thu hôm nay: ${window.totalRevenue.toLocaleString()} VNĐ`;
     revenueEl.textContent = revenueText;
     console.log("💰 Hiển thị doanh thu:", revenueText);
@@ -33,7 +33,7 @@ export function updateTotalDisplay() {
   // Hiển thị chi phí  
   if (expenseEl && window.totalExpense !== undefined) {
     const expenseText = window.isExpenseSearching 
-      ? `Tổng chi phí (kết quả tìm kiếm): ${window.totalExpense.toLocaleString()} VNĐ`
+      ? `Tổng chi phí (tìm kiếm): ${window.totalExpense.toLocaleString()} VNĐ`
       : `Tổng chi phí hôm nay: ${window.totalExpense.toLocaleString()} VNĐ`;
     expenseEl.textContent = expenseText;
     console.log("💸 Hiển thị chi phí:", expenseText);
