@@ -694,3 +694,52 @@ body.login-page {
     margin-bottom: 10px;
   }
 }
+/* Thêm vào file style.css: */
+
+/* CSS cho hiển thị tổng doanh thu và chi phí */
+#welcome {
+  text-align: center;
+  font-style: italic;
+  color: #666;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+#todayRevenue {
+  background-color: #f0f8f0;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #c3e6c3;
+  color: #2d7d2d !important;
+  font-weight: bold !important;
+  font-size: 16px !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#todayExpenseTotal {
+  background-color: #fff5f5;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #fed7d7;
+  color: #c53030 !important;
+  font-weight: bold !important;
+  font-size: 16px !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Responsive cho mobile */
+@media (max-width: 768px) {
+  #welcome span[style*="float: right"] {
+    float: none !important;
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+  }
+  
+  #todayRevenue, #todayExpenseTotal {
+    font-size: 14px !important;
+    padding: 6px 12px;
+    margin: 5px;
+    display: inline-block;
+  }
+}

@@ -118,30 +118,27 @@ function renderExpenseData(data) {
     console.log("📅 Không tìm kiếm - Tổng chi phí hôm nay:", totalExpense);
   }
 
-  // ✅ HIỂN THỊ TỔNG CHI PHÍ (chỉ với vai trò admin và chỉ ở tab chi phí)
-  const todayExpenseTotalElement = document.getElementById("todayExpenseTotal");
-  console.log("✅ Tổng chi phí cuối cùng:", totalExpense);
-  console.log("📌 Kiểm tra hiển thị tổng chi phí");
-  console.log("🔍 Element todayExpenseTotal:", todayExpenseTotalElement);
-  console.log("🔍 isChiPhiTab:", isChiPhiTab);
+    // ✅ HIỂN THỊ TỔNG CHI PHÍ (luôn hiển thị nếu là admin, không phân biệt tab)
+    const todayExpenseTotalElement = document.getElementById("todayExpenseTotal");
+    console.log("✅ Tổng chi phí cuối cùng:", totalExpense);
+    console.log("📌 Kiểm tra hiển thị tổng chi phí");
+    console.log("🔍 Element todayExpenseTotal:", todayExpenseTotalElement);
 
-  if (todayExpenseTotalElement) {
-    // Chỉ hiển thị khi:
-    // 1. Đang ở tab chi phí
-    // 2. Người dùng có vai trò admin
-    if (isChiPhiTab && window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin") {
-      const displayText = window.isExpenseSearching 
+    if (todayExpenseTotalElement) {
+    // Chỉ kiểm tra admin, không cần kiểm tra tab nào đang active
+    if (window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin") {
+        const displayText = window.isExpenseSearching 
         ? `Tổng chi phí (kết quả tìm kiếm): ${totalExpense.toLocaleString()} VNĐ`
         : `Tổng chi phí hôm nay: ${totalExpense.toLocaleString()} VNĐ`;
-      todayExpenseTotalElement.textContent = displayText;
-      console.log("💰 Hiển thị tổng chi phí:", displayText);
+        todayExpenseTotalElement.textContent = displayText;
+        console.log("💰 Hiển thị tổng chi phí:", displayText);
     } else {
-      todayExpenseTotalElement.textContent = "";
-      console.log("🚫 Không hiển thị tổng chi phí (không phải admin hoặc không ở tab chi phí)");
+        todayExpenseTotalElement.textContent = "";
+        console.log("🚫 Không hiển thị tổng chi phí (không phải admin)");
     }
-  } else {
+    } else {
     console.error("❌ Không tìm thấy element #todayExpenseTotal");
-  }
+    }
 
   // 1. Nếu đang ở tab chi phí → hiển thị bảng danh sách chi tiết
   if (isChiPhiTab) {
