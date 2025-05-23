@@ -149,6 +149,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (selectedTab === "tab-chi-phi" || selectedTab === "tab-thong-ke") {
           renderExpenseStats(); // cập nhật cả bảng chi tiết và tổng hợp
         }
+
+            // Nếu chuyển sang tab giao dịch → cập nhật lại bảng giao dịch
+        if (selectedTab === "tab-giao-dich") {
+          // Cập nhật lại bảng giao dịch để hiển thị tổng doanh thu
+          window.loadTransactions();
+        }
       });
     });
   document.getElementById("expenseDate").value = window.todayFormatted;

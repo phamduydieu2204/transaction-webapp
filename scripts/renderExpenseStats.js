@@ -42,7 +42,7 @@ function renderExpenseData(data) {
   const isChiPhiTab = document.getElementById("tab-chi-phi")?.classList.contains("active");
   const isThongKeTab = document.getElementById("tab-thong-ke")?.classList.contains("active");
 
-  // ✅ TÍNH TỔNG CHI PHÍ (tương tự logic tính tổng doanh thu)
+  // ✅ TÍNH TỔNG CHI PHÍ (logic giống như tính tổng doanh thu)
   let totalExpense = 0;
   const today = new Date();
   const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
@@ -52,34 +52,45 @@ function renderExpenseData(data) {
   console.log("🟢 isExpenseSearching:", window.isExpenseSearching);
   console.log("🟢 todayFormatted:", todayFormatted);
 
+  // Logic tính tổng giống như doanh thu
   if (window.isExpenseSearching === true) {
-    // Nếu đang tìm kiếm, tính tổng tất cả kết quả tìm kiếm
+    // Nếu đang tìm kiếm, tính tổng tất cả kết quả tìm kiếm (chỉ VND)
     totalExpense = data.reduce((sum, e) => {
-      if (e.currency === "VND") { // Chỉ tính VND
+      if (e.currency === "VND") {
         return sum + (parseFloat(e.amount) || 0);
       }
       return sum;
     }, 0);
+    console.log("🔍 Đang tìm kiếm - Tổng chi phí tìm kiếm:", totalExpense);
   } else {
-    // Nếu không tìm kiếm, chỉ tính chi phí hôm nay
+    // Nếu không tìm kiếm, chỉ tính chi phí hôm nay (chỉ VND)
     totalExpense = data.reduce((sum, e) => {
       if (e.date && e.date.startsWith(todayFormatted) && e.currency === "VND") {
         return sum + (parseFloat(e.amount) || 0);
       }
       return sum;
     }, 0);
+    console.log("📅 Không tìm kiếm - Tổng chi phí hôm nay:", totalExpense);
   }
 
-  // ✅ HIỂN THỊ TỔNG CHI PHÍ (chỉ với vai trò admin)
+  // ✅ HIỂN THỊ TỔNG CHI PHÍ (chỉ với vai trò admin và chỉ ở tab chi phí)
   const todayExpenseTotalElement = document.getElementById("todayExpenseTotal");
   console.log("✅ Tổng chi phí cuối cùng:", totalExpense);
-  console.log("📌 Gán text vào #todayExpenseTotal nếu vai trò là admin");
+  console.log("📌 Kiểm tra hiển thị tổng chi phí");
 
   if (todayExpenseTotalElement) {
-    if (window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin") {
-      todayExpenseTotalElement.textContent = `Tổng chi phí: ${totalExpense.toLocaleString()} VNĐ`;
+    // Chỉ hiển thị khi:
+    // 1. Đang ở tab chi phí
+    // 2. Người dùng có vai trò admin
+    if (isChiPhiTab && window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin") {
+      const displayText = window.isExpenseSearching 
+        ? `Tổng chi phí (kết quả tìm kiếm): ${totalExpense.toLocaleString()} VNĐ`
+        : `Tổng chi phí hôm nay: ${totalExpense.toLocaleString()} VNĐ`;
+      todayExpenseTotalElement.textContent = displayText;
+      console.log("💰 Hiển thị tổng chi phí:", displayText);
     } else {
       todayExpenseTotalElement.textContent = "";
+      console.log("🚫 Không hiển thị tổng chi phí (không phải admin hoặc không ở tab chi phí)");
     }
   }
 
