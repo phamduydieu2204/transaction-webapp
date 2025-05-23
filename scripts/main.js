@@ -12,6 +12,8 @@ window.confirmCallback = null;
 window.currentSoftwareName = "";
 window.currentSoftwarePackage = "";
 window.currentAccountName = "";
+window.isExpenseSearching = false;
+window.expenseList = [];
 
 // Import các module cần thiết
 import { getConstants } from './constants.js';
@@ -186,6 +188,7 @@ window.deleteTransaction = (index) =>
     openConfirmModal,
     getConstants
   );
+  
 window.handleUpdateCookie = (index) =>
   handleUpdateCookie(index, window.transactionList);
 window.handleChangePassword = (index) =>
