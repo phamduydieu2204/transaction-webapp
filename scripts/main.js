@@ -12,8 +12,6 @@ window.confirmCallback = null;
 window.currentSoftwareName = "";
 window.currentSoftwarePackage = "";
 window.currentAccountName = "";
-window.isExpenseSearching = false;
-window.expenseList = [];
 
 // Import các module cần thiết
 import { getConstants } from './constants.js';
@@ -70,6 +68,10 @@ import {
 
 // Thực hiện khi DOMContentLoaded
 document.addEventListener("DOMContentLoaded", async () => {
+
+  window.isExpenseSearching = false;
+  window.expenseList = [];
+
   const userData = localStorage.getItem("employeeInfo");
   try {
     window.userInfo = userData ? JSON.parse(userData) : null;
@@ -205,7 +207,7 @@ window.editExpenseRow = editExpenseRow;
 window.handleDeleteExpense = handleDeleteExpense;
 window.handleUpdateExpense = handleUpdateExpense;
 window.viewExpenseRow = viewExpenseRow;
-window.handleSearchExpense = handleSearchExpense;
+window.handleSearchExpense = () => handleSearchExpense();
 window.currentExpensePage = 1;
 window.editRow = (index) => editRow(index, window.transactionList);
 window.deleteRow = (index) => deleteRow(index, window.deleteTransaction);
