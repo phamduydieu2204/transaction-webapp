@@ -20,6 +20,14 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
   console.log("🟢 Vai trò:", window.userInfo?.vaiTro);
   console.log("🟢 isSearching:", window.isSearching);
   console.log("🟢 todayFormatted:", todayFormatted);
+
+  
+      // ✅ Sắp xếp giao dịch mới nhất lên đầu (timestamp giảm dần)
+      window.transactionList.sort((a, b) => {
+        const timestampA = (a.transactionId || "").replace(/[^0-9]/g, "");
+        const timestampB = (b.transactionId || "").replace(/[^0-9]/g, "");
+        return timestampB.localeCompare(timestampA);
+      });
   
   // ✅ Tính tổng doanh thu
   if (window.isSearching === true) {

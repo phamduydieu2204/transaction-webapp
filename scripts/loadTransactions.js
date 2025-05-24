@@ -28,11 +28,12 @@ export async function loadTransactions(userInfo, updateTable, formatDate, editTr
     if (result.status === "success") {
       window.transactionList = result.data || [];
 
-      // Sắp xếp giao dịch mới nhất lên đầu (ID lớn hơn trước)
+
+      // ✅ Sắp xếp giao dịch mới nhất lên đầu (timestamp giảm dần)
       window.transactionList.sort((a, b) => {
-        const idA = parseInt((a.transactionId || "").replace(/\D/g, ""));
-        const idB = parseInt((b.transactionId || "").replace(/\D/g, ""));
-        return idB - idA;
+        const timestampA = (a.transactionId || "").replace(/[^0-9]/g, "");
+        const timestampB = (b.transactionId || "").replace(/[^0-9]/g, "");
+        return timestampB.localeCompare(timestampA);
       });
 
       window.currentPage = 1;
