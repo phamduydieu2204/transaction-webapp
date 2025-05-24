@@ -1062,10 +1062,49 @@ function updateKPICardsFallback(transactions, expenses) {
   updateElement('profitMargin', profitMargin.toFixed(1) + '%');
 }
 
+// Thay thế function updateChartsFallback trong statisticsHandler.js
 function updateChartsFallback(transactions, expenses) {
   console.log('📈 Updating charts (fallback)...');
   
-  // Revenue trend chart
+  // Đợi DOM sẵn sàng
+  setTimeout(() => {
+    createRevenueChartRobust(transactions);
+    createProductChartRobust(transactions);
+  }, 100);
+}
+
+function createRevenueChartRobust(transactions) {
+  console.log('📊 Creating revenue chart...');
+  
+  // Check prerequisites
+  if (typeof Chart === 'undefined') {
+    console.error('❌ Chart.js not loaded');
+    return;
+  }
+  
+  const ctx = document.getElementById('revenueTrendChart');
+  if (!ctx) {
+    console.error('❌ Revenue chart canvas not found');
+    return;
+  }
+  
+  // Check if canvas is visible
+  const rect = ctx.getBoundingClientRect();
+  console.log('📐 Canvas dimensions:', rect);
+  
+  if (rect.width === 0 || rect.height === 0) {
+    console.warn('⚠️ Canvas has zero dimensions, trying to fix...');
+    
+    // Force canvas size
+    ctx.style.width = '400px';
+    ctx.style.height = '200px';
+    ctx.width = 400;
+    ctx.height = 200;
+    
+    console.log('📐 Canvas size after fix:', ctx.getBoundingClientRect());
+  }
+  
+  // Prepare data
   const revenueByDate = {};
   transactions.forEach(t => {
     const date = t.transactionDate;
@@ -1075,41 +1114,85 @@ function updateChartsFallback(transactions, expenses) {
   
   console.log('📊 Revenue by date:', revenueByDate);
   
-  const ctx = document.getElementById('revenueTrendChart');
-  if (ctx && typeof Chart !== 'undefined') {
-    const sortedDates = Object.keys(revenueByDate).sort();
-    const labels = sortedDates.map(date => formatDateLabel(date));
-    const data = sortedDates.map(date => revenueByDate[date]);
-    
-    console.log('📊 Chart data prepared:', { labels, data });
-    
+  if (Object.keys(revenueByDate).length === 0) {
+    console.warn('⚠️ No revenue data to display');
+    return;
+  }
+  
+  const sortedDates = Object.keys(revenueByDate).sort();
+  const labels = sortedDates.map(date => formatDateLabel(date));
+  const data = sortedDates.map(date => revenueByDate[date]);
+  
+  console.log('📊 Chart data prepared:', { 
+    labels: labels.slice(0, 5), // Show first 5 for brevity
+    data: data.slice(0, 5),
+    totalPoints: labels.length 
+  });
+  
+  try {
+    // Destroy existing chart
     if (window.revenueChart) {
+      console.log('🗑️ Destroying existing revenue chart');
       window.revenueChart.destroy();
+      window.revenueChart = null;
     }
     
+    // Create new chart
+    console.log('🎨 Creating new revenue chart...');
     window.revenueChart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: labels,
         datasets: [{
-          label: 'Doanh thu',
+          label: 'Doanh thu (VNĐ)',
           data: data,
           borderColor: '#007bff',
           backgroundColor: 'rgba(0, 123, 255, 0.1)',
           borderWidth: 2,
           fill: true,
-          tension: 0.1
+          tension: 0.1,
+          pointRadius: 3,
+          pointHoverRadius: 5
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        },
         scales: {
+          x: {
+            display: true,
+            title: {
+              display: true,
+              text: 'Ngày'
+            }
+          },
           y: {
             beginAtZero: true,
+            display: true,
+            title: {
+              display: true,
+              text: 'Doanh thu (VNĐ)'
+            },
             ticks: {
               callback: function(value) {
                 return formatCurrency(value);
+              }
+            }
+          }
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: 'Xu hướng doanh thu theo ngày'
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return 'Doanh thu: ' + formatCurrency(context.parsed.y);
               }
             }
           }
@@ -1117,14 +1200,157 @@ function updateChartsFallback(transactions, expenses) {
       }
     });
     
-    console.log('✅ Revenue chart created');
-  } else {
-    console.error('❌ Cannot create revenue chart');
+    console.log('✅ Revenue chart created successfully');
+    
+  } catch (error) {
+    console.error('❌ Error creating revenue chart:', error);
+    
+    // Fallback: Show chart data in table format
+    console.log('📋 Fallback - showing data in console table:');
+    console.table(sortedDates.map((date, i) => ({
+      date: date,
+      revenue: formatCurrency(data[i])
+    })));
+  }
+}
+
+function createProductChartRobust(transactions) {
+  console.log('📊 Creating product chart...');
+  
+  if (typeof Chart === 'undefined') {
+    console.error('❌ Chart.js not loaded');
+    return;
   }
   
-  // Product performance chart
-  updateProductChartFallback(transactions);
+  const ctx = document.getElementById('productPerfChart');
+  if (!ctx) {
+    console.error('❌ Product chart canvas not found');
+    return;
+  }
+  
+  // Check canvas dimensions
+  const rect = ctx.getBoundingClientRect();
+  if (rect.width === 0 || rect.height === 0) {
+    ctx.style.width = '400px';
+    ctx.style.height = '200px';
+    ctx.width = 400;
+    ctx.height = 200;
+  }
+  
+  // Prepare data
+  const productRevenue = {};
+  transactions.forEach(t => {
+    const product = `${t.softwareName} - ${t.softwarePackage}`;
+    if (!productRevenue[product]) productRevenue[product] = 0;
+    productRevenue[product] += parseFloat(t.revenue) || 0;
+  });
+  
+  console.log('📊 Product revenue:', productRevenue);
+  
+  if (Object.keys(productRevenue).length === 0) {
+    console.warn('⚠️ No product data to display');
+    return;
+  }
+  
+  // Get top 8 products
+  const sorted = Object.entries(productRevenue)
+    .sort(([,a], [,b]) => b - a)
+    .slice(0, 8);
+  
+  const labels = sorted.map(([product,]) => {
+    // Truncate long product names
+    return product.length > 25 ? product.substring(0, 25) + '...' : product;
+  });
+  const data = sorted.map(([, revenue]) => revenue);
+  const colors = [
+    '#007bff', '#28a745', '#ffc107', '#dc3545', 
+    '#6f42c1', '#fd7e14', '#20c997', '#e83e8c'
+  ];
+  
+  try {
+    // Destroy existing chart
+    if (window.productChart) {
+      console.log('🗑️ Destroying existing product chart');
+      window.productChart.destroy();
+      window.productChart = null;
+    }
+    
+    // Create new chart
+    console.log('🎨 Creating new product chart...');
+    window.productChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: colors,
+          borderWidth: 2,
+          borderColor: '#fff',
+          hoverBorderWidth: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Top sản phẩm theo doanh thu'
+          },
+          legend: {
+            position: 'bottom',
+            labels: {
+              boxWidth: 12,
+              padding: 10,
+              usePointStyle: true
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = ((context.parsed / total) * 100).toFixed(1);
+                return `${context.label}: ${formatCurrency(context.parsed)} (${percentage}%)`;
+              }
+            }
+          }
+        }
+      }
+    });
+    
+    console.log('✅ Product chart created successfully');
+    
+  } catch (error) {
+    console.error('❌ Error creating product chart:', error);
+    
+    // Fallback
+    console.log('📋 Fallback - showing product data:');
+    console.table(sorted.map(([product, revenue]) => ({
+      product: product,
+      revenue: formatCurrency(revenue)
+    })));
+  }
 }
+
+// Helper function for currency formatting
+function formatCurrency(amount) {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    minimumFractionDigits: 0
+  }).format(amount || 0);
+}
+
+// Helper function for date formatting
+function formatDateLabel(dateStr) {
+  if (!dateStr) return '';
+  const [year, month, day] = dateStr.split('/');
+  return `${day}/${month}`;
+}
+
+// Export for testing
+window.createRevenueChartRobust = createRevenueChartRobust;
+window.createProductChartRobust = createProductChartRobust;
 
 function updateProductChartFallback(transactions) {
   const productRevenue = {};
