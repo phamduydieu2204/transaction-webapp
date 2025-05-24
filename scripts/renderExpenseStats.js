@@ -130,100 +130,102 @@ function renderExpenseData(data) {
     window.updateTotalDisplay();
   }
 
-  // ✅ Hiển thị bảng chi phí (nếu đang ở tab chi phí) - LOGIC GIỐNG TAB GIAO DỊCH
-  if (isChiPhiTab) {
-    const table1 = document.querySelector("#expenseListTable tbody");
+// ✅ Hiển thị bảng chi phí (nếu đang ở tab chi phí) - LOGIC GIỐNG TAB GIAO DỊCH
+if (isChiPhiTab) {
+  const table1 = document.querySelector("#expenseListTable tbody");
 
-    if (!table1) {
-      console.error("❌ Không tìm thấy table #expenseListTable tbody");
-      return;
-    }
+  if (!table1) {
+    console.error("❌ Không tìm thấy table #expenseListTable tbody");
+    return;
+  }
 
-    // ✅ Sắp xếp chi phí mới nhất lên đầu (timestamp giảm dần) - với fallback
-    let sortedData;
-    try {
-      sortedData = typeof sortByTimestampDesc === 'function' 
-        ? sortByTimestampDesc(data || [], 'expenseId')
-        : [...(data || [])].sort((a, b) => {
-            const timestampA = (a.expenseId || "").replace(/[^0-9]/g, "");
-            const timestampB = (b.expenseId || "").replace(/[^0-9]/g, "");
-            return timestampB.localeCompare(timestampA);
-          });
-    } catch (err) {
-      console.warn("Fallback sorting:", err);
-      sortedData = [...(data || [])];
-    }
+  // ✅ Sắp xếp chi phí mới nhất lên đầu (timestamp giảm dần) - với fallback
+  let sortedData;
+  try {
+    sortedData = typeof sortByTimestampDesc === 'function' 
+      ? sortByTimestampDesc(data || [], 'expenseId')
+      : [...(data || [])].sort((a, b) => {
+          const timestampA = (a.expenseId || "").replace(/[^0-9]/g, "");
+          const timestampB = (b.expenseId || "").replace(/[^0-9]/g, "");
+          return timestampB.localeCompare(timestampA);
+        });
+  } catch (err) {
+    console.warn("Fallback sorting:", err);
+    sortedData = [...(data || [])];
+  }
 
-    // ✅ Logic phân trang giống tab giao dịch
-    const itemsPerPage = window.itemsPerPage || 50;
-    const totalPages = Math.ceil(sortedData.length / itemsPerPage);
-    const currentPage = window.currentExpensePage || 1;
+  // ✅ Logic phân trang giống tab giao dịch
+  const itemsPerPage = window.itemsPerPage || 50;
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+  const currentPage = window.currentExpensePage || 1;
 
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const paginatedItems = sortedData.slice(startIndex, endIndex);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedItems = sortedData.slice(startIndex, endIndex);
 
-    table1.innerHTML = "";
+  table1.innerHTML = "";
 
-    paginatedItems.forEach((e, index) => {
-      const globalIndex = startIndex + index;
-      const row = table1.insertRow();
+  paginatedItems.forEach((e, index) => {
+    const globalIndex = startIndex + index;
+    const row = table1.insertRow();
 
-      // ✅ Thêm style cho dòng đã hết hạn tái tục (giống giao dịch hết hạn)
-      if (e.renew) {
-        const parseDate = (str) => {
-          const [y, m, d] = (str || "").split("/").map(Number);
-          return new Date(y, m - 1, d);
-        };
-        const renewDate = parseDate(e.renew);
-        if (renewDate < today) {
-          row.classList.add("expired-row");
-        }
+    // ✅ Thêm style cho dòng đã hết hạn tái tục (giống giao dịch hết hạn)
+    if (e.renew) {
+      const parseDate = (str) => {
+        const [y, m, d] = (str || "").split("/").map(Number);
+        return new Date(y, m - 1, d);
+      };
+      const renewDate = parseDate(e.renew);
+      if (renewDate < today) {
+        row.classList.add("expired-row");
       }
+    }
 
-      row.insertCell().textContent = e.expenseId || "";
-      row.insertCell().textContent = formatDate(e.date);
-      row.insertCell().textContent = e.type || "";
-      row.insertCell().textContent = e.category || "";
-      row.insertCell().textContent = e.product || "";
-      row.insertCell().textContent = e.package || "";
-      row.insertCell().textContent = `${(e.amount || 0).toLocaleString()} ${e.currency || ""}`;
-      row.insertCell().textContent = formatDate(e.renew);
-      row.insertCell().textContent = e.status || "";
+    // ✅ THÊM CỘT MÃ CHI PHÍ VÀO ĐẦU
+    row.insertCell().textContent = e.expenseId || "";  // ✅ THÊM DÒNG NÀY
+    row.insertCell().textContent = formatDate(e.date);
+    row.insertCell().textContent = e.type || "";
+    row.insertCell().textContent = e.category || "";
+    row.insertCell().textContent = e.product || "";
+    row.insertCell().textContent = e.package || "";
+    row.insertCell().textContent = `${(e.amount || 0).toLocaleString()} ${e.currency || ""}`;
+    row.insertCell().textContent = formatDate(e.renew);
+    row.insertCell().textContent = e.status || "";
 
-      // ✅ Action dropdown giống giao dịch
-      const actionCell = row.insertCell();
-      const select = document.createElement("select");
-      select.className = "action-select";
+    // ✅ Action dropdown giống giao dịch
+    const actionCell = row.insertCell();
+    const select = document.createElement("select");
+    select.className = "action-select";
 
-      const actions = [
-        { value: "", label: "-- Chọn --" },
-        { value: "view", label: "Xem" },
-        { value: "edit", label: "Sửa" },
-        { value: "delete", label: "Xóa" }
-      ];
+    const actions = [
+      { value: "", label: "-- Chọn --" },
+      { value: "view", label: "Xem" },
+      { value: "edit", label: "Sửa" },
+      { value: "delete", label: "Xóa" }
+    ];
 
-      actions.forEach(action => {
-        const opt = document.createElement("option");
-        opt.value = action.value;
-        opt.textContent = action.label;
-        select.appendChild(opt);
-      });
-
-      select.addEventListener("change", () => {
-        const selected = select.value;
-        if (selected === "edit" && typeof window.editExpenseRow === "function") {
-          window.editExpenseRow(e);
-        } else if (selected === "delete" && typeof window.handleDeleteExpense === "function") {
-          window.handleDeleteExpense(e.expenseId);
-        } else if (selected === "view" && typeof window.viewExpenseRow === "function") {
-          window.viewExpenseRow(e);
-        }
-        select.value = "";
-      });
-
-      actionCell.appendChild(select);
+    actions.forEach(action => {
+      const opt = document.createElement("option");
+      opt.value = action.value;
+      opt.textContent = action.label;
+      select.appendChild(opt);
     });
+
+    select.addEventListener("change", () => {
+      const selected = select.value;
+      if (selected === "edit" && typeof window.editExpenseRow === "function") {
+        window.editExpenseRow(e);
+      } else if (selected === "delete" && typeof window.handleDeleteExpense === "function") {
+        window.handleDeleteExpense(e.expenseId);
+      } else if (selected === "view" && typeof window.viewExpenseRow === "function") {
+        window.viewExpenseRow(e);
+      }
+      select.value = "";
+    });
+
+    actionCell.appendChild(select);
+  });
+ 
 
     // ✅ Cập nhật phân trang giống tab giao dịch
     const refreshExpenseTable = () => renderExpenseStats();
