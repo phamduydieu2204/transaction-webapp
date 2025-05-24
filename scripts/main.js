@@ -48,8 +48,6 @@ import { handleUpdateExpense } from './handleUpdateExpense.js';
 import { viewExpenseRow } from './viewExpenseRow.js';
 import { handleSearchExpense } from './handleSearchExpense.js';
 import { initTotalDisplay } from './updateTotalDisplay.js';
-import { updateExpensePagination } from './expensePagination.js';
-import { sortByTimestampDesc } from './sortByTimestamp.js';
 import { handleChangePassword, closeChangePasswordModal, confirmChangePassword } from './handleChangePassword.js';
 import { formatDateTime } from './formatDateTime.js';
 import { openConfirmModal, closeConfirmModal, confirmDelete } from './confirmModal.js';

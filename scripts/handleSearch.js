@@ -1,5 +1,4 @@
 import { getConstants } from './constants.js';
-import { sortByTimestampDesc } from './sortByTimestamp.js';
 
 export async function handleSearch(
   userInfo,
