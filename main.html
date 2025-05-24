@@ -8,6 +8,20 @@
   <link rel="stylesheet" href="css/statistics.css" />
   <!-- Thêm Flatpickr CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <!-- Chart.js for statistics charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
+  <!-- Script để kiểm tra Chart.js đã load -->
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof Chart !== 'undefined') {
+      console.log('✅ Chart.js loaded successfully');
+      Chart.defaults.font.family = 'Arial, sans-serif';
+      Chart.defaults.font.size = 12;
+    } else {
+      console.error('❌ Chart.js failed to load');
+    }
+  });
+  </script>
   <!-- Thêm Font Awesome cho icon lịch, icon copy, icon đăng xuất và icon kính lúp -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>

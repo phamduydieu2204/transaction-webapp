@@ -858,3 +858,86 @@ export async function loadEmployeeFilter() {
 window.updateStatistics = updateStatistics;
 window.exportStatistics = exportStatistics;
 window.changeChartType = changeChartType;
+
+// Thêm vào statisticsHandler.js để debug
+
+/**
+ * Debug function để test các API endpoints
+ */
+export async function debugStatisticsAPI() {
+  const { BACKEND_URL } = getConstants();
+  
+  console.log('🔍 Testing statistics endpoints...');
+  
+  // Test 1: getStatisticsData - transactions
+  try {
+    console.log('📊 Testing transactions data...');
+    const transResponse = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'getStatisticsData',
+        type: 'transactions',
+        filters: { timeRange: 'month' },
+        maNhanVien: window.userInfo?.maNhanVien || ''
+      })
+    });
+    const transResult = await transResponse.json();
+    console.log('✅ Transactions result:', transResult);
+  } catch (error) {
+    console.error('❌ Transactions API error:', error);
+  }
+  
+  // Test 2: getStatisticsData - expenses  
+  try {
+    console.log('📊 Testing expenses data...');
+    const expResponse = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'getStatisticsData',
+        type: 'expenses',
+        filters: { timeRange: 'month' }
+      })
+    });
+    const expResult = await expResponse.json();
+    console.log('✅ Expenses result:', expResult);
+  } catch (error) {
+    console.error('❌ Expenses API error:', error);
+  }
+  
+  // Test 3: getAccountUtilization
+  try {
+    console.log('📊 Testing account utilization...');
+    const accResponse = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'getAccountUtilization'
+      })
+    });
+    const accResult = await accResponse.json();
+    console.log('✅ Account utilization result:', accResult);
+  } catch (error) {
+    console.error('❌ Account utilization API error:', error);
+  }
+  
+  // Test 4: getEmployeeList
+  try {
+    console.log('📊 Testing employee list...');
+    const empResponse = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'getEmployeeList'
+      })
+    });
+    const empResult = await empResponse.json();
+    console.log('✅ Employee list result:', empResult);
+  } catch (error) {
+    console.error('❌ Employee list API error:', error);
+  }
+}
+
+// Gán vào window để có thể gọi từ console
+window.debugStatisticsAPI = debugStatisticsAPI;
