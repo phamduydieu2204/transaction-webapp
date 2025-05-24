@@ -941,3 +941,246 @@ export async function debugStatisticsAPI() {
 
 // Gán vào window để có thể gọi từ console
 window.debugStatisticsAPI = debugStatisticsAPI;
+
+// Thêm vào statisticsHandler.js - fallback implementation
+export async function updateStatisticsFallback() {
+  console.log('🔄 Cập nhật thống kê (fallback mode)...');
+  
+  try {
+    // Sử dụng API getTransactions đơn giản thay vì getStatisticsData
+    const { BACKEND_URL } = getConstants();
+    
+    // Get transactions data
+    const transResponse = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'getTransactions',
+        maNhanVien: window.userInfo?.maNhanVien || '',
+        vaiTro: window.userInfo?.vaiTro || '',
+        giaoDichNhinThay: window.userInfo?.giaoDichNhinThay || '',
+        nhinThayGiaoDichCuaAi: window.userInfo?.nhinThayGiaoDichCuaAi || ''
+      })
+    });
+    
+    const transResult = await transResponse.json();
+    console.log('📈 Transactions result:', transResult);
+    
+    if (transResult.status !== 'success') {
+      throw new Error('Cannot get transactions: ' + transResult.message);
+    }
+    
+    const transactions = transResult.data || [];
+    console.log('✅ Got', transactions.length, 'transactions');
+    
+    // Get expenses data
+    let expenses = [];
+    try {
+      const expResponse = await fetch(BACKEND_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'getExpenseStats'
+        })
+      });
+      
+      const expResult = await expResponse.json();
+      if (expResult.status === 'success') {
+        expenses = expResult.data || [];
+        console.log('✅ Got', expenses.length, 'expenses');
+      }
+    } catch (expError) {
+      console.warn('⚠️ Could not get expenses:', expError);
+    }
+    
+    // Filter data by current time range
+    const filters = getFilterValues();
+    const filteredTransactions = filterTransactionsByDate(transactions, filters);
+    const filteredExpenses = filterExpensesByDate(expenses, filters);
+    
+    console.log('📊 Filtered transactions:', filteredTransactions.length);
+    console.log('📊 Filtered expenses:', filteredExpenses.length);
+    
+    // Update KPI cards
+    updateKPICardsFallback(filteredTransactions, filteredExpenses);
+    
+    // Update charts
+    updateChartsFallback(filteredTransactions, filteredExpenses);
+    
+    // Update tables
+    updateTablesFallback(filteredTransactions, filteredExpenses);
+    
+    console.log('✅ Statistics updated successfully (fallback mode)');
+    
+  } catch (error) {
+    console.error('❌ Error in fallback statistics:', error);
+    showErrorState(error.message);
+  }
+}
+
+function filterTransactionsByDate(transactions, filters) {
+  if (!filters.startDate || !filters.endDate) return transactions;
+  
+  const startDate = new Date(filters.startDate.replace(/\//g, '-'));
+  const endDate = new Date(filters.endDate.replace(/\//g, '-'));
+  
+  return transactions.filter(t => {
+    if (!t.transactionDate) return false;
+    const tDate = new Date(t.transactionDate.replace(/\//g, '-'));
+    return tDate >= startDate && tDate <= endDate;
+  });
+}
+
+function filterExpensesByDate(expenses, filters) {
+  if (!filters.startDate || !filters.endDate) return expenses;
+  
+  const startDate = new Date(filters.startDate.replace(/\//g, '-'));
+  const endDate = new Date(filters.endDate.replace(/\//g, '-'));
+  
+  return expenses.filter(e => {
+    if (!e.date) return false;
+    const eDate = new Date(e.date.replace(/\//g, '-'));
+    return eDate >= startDate && eDate <= endDate;
+  });
+}
+
+function updateKPICardsFallback(transactions, expenses) {
+  const revenue = transactions.reduce((sum, t) => sum + (parseFloat(t.revenue) || 0), 0);
+  const expense = expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+  const profit = revenue - expense;
+  const transactionCount = transactions.length;
+  const aov = transactionCount > 0 ? revenue / transactionCount : 0;
+  const profitMargin = revenue > 0 ? (profit / revenue) * 100 : 0;
+  
+  console.log('📊 KPI Data:', { revenue, expense, profit, transactionCount, aov, profitMargin });
+  
+  updateElement('totalRevenue', formatCurrency(revenue));
+  updateElement('totalExpense', formatCurrency(expense));
+  updateElement('totalProfit', formatCurrency(profit));
+  updateElement('totalTransactions', transactionCount.toLocaleString());
+  updateElement('averageOrderValue', formatCurrency(aov));
+  updateElement('profitMargin', profitMargin.toFixed(1) + '%');
+}
+
+function updateChartsFallback(transactions, expenses) {
+  console.log('📈 Updating charts (fallback)...');
+  
+  // Revenue trend chart
+  const revenueByDate = {};
+  transactions.forEach(t => {
+    const date = t.transactionDate;
+    if (!revenueByDate[date]) revenueByDate[date] = 0;
+    revenueByDate[date] += parseFloat(t.revenue) || 0;
+  });
+  
+  console.log('📊 Revenue by date:', revenueByDate);
+  
+  const ctx = document.getElementById('revenueTrendChart');
+  if (ctx && typeof Chart !== 'undefined') {
+    const sortedDates = Object.keys(revenueByDate).sort();
+    const labels = sortedDates.map(date => formatDateLabel(date));
+    const data = sortedDates.map(date => revenueByDate[date]);
+    
+    console.log('📊 Chart data prepared:', { labels, data });
+    
+    if (window.revenueChart) {
+      window.revenueChart.destroy();
+    }
+    
+    window.revenueChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Doanh thu',
+          data: data,
+          borderColor: '#007bff',
+          backgroundColor: 'rgba(0, 123, 255, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return formatCurrency(value);
+              }
+            }
+          }
+        }
+      }
+    });
+    
+    console.log('✅ Revenue chart created');
+  } else {
+    console.error('❌ Cannot create revenue chart');
+  }
+  
+  // Product performance chart
+  updateProductChartFallback(transactions);
+}
+
+function updateProductChartFallback(transactions) {
+  const productRevenue = {};
+  transactions.forEach(t => {
+    const product = `${t.softwareName} - ${t.softwarePackage}`;
+    if (!productRevenue[product]) productRevenue[product] = 0;
+    productRevenue[product] += parseFloat(t.revenue) || 0;
+  });
+  
+  console.log('📊 Product revenue:', productRevenue);
+  
+  const ctx = document.getElementById('productPerfChart');
+  if (ctx && typeof Chart !== 'undefined') {
+    const sorted = Object.entries(productRevenue)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 5);
+    
+    const labels = sorted.map(([product,]) => product);
+    const data = sorted.map(([, revenue]) => revenue);
+    const colors = ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1'];
+    
+    if (window.productChart) {
+      window.productChart.destroy();
+    }
+    
+    window.productChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: colors,
+          borderWidth: 2,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+    
+    console.log('✅ Product chart created');
+  }
+}
+
+function updateTablesFallback(transactions, expenses) {
+  // Implement simple table updates
+  console.log('📋 Updating tables (fallback)...');
+  // You can implement basic table updates here
+}
+
+// Gán vào window để test
+window.updateStatisticsFallback = updateStatisticsFallback;
