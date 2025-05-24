@@ -1,14 +1,644 @@
-<!-- Tab Thống Kê -->
+<!-- Tab Thống Kê Nâng Cao -->
 <div id="tab-thong-ke" class="tab-content">
-  <h3>Tổng hợp chi phí theo tháng</h3>
-  <table id="monthlySummaryTable">
-    <thead>
-      <tr>
-        <th>Tháng</th>
-        <th>Loại khoản chi</th>
-        <th>Tổng tiền (VND)</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <!-- Filter Section -->
+  <div class="statistics-filters">
+    <div class="filter-group">
+      <label for="statsTimeRange">Thời gian:</label>
+      <select id="statsTimeRange" onchange="updateStatistics()">
+        <option value="today">Hôm nay</option>
+        <option value="yesterday">Hôm qua</option>
+        <option value="week">7 ngày qua</option>
+        <option value="month" selected>Tháng này</option>
+        <option value="lastMonth">Tháng trước</option>
+        <option value="quarter">Quý này</option>
+        <option value="year">Năm này</option>
+        <option value="custom">Tùy chọn</option>
+      </select>
+    </div>
+    
+    <div class="filter-group" id="customDateRange" style="display: none;">
+      <label for="startDate">Từ ngày:</label>
+      <input type="date" id="statsStartDate" onchange="updateStatistics()">
+      <label for="endDate">Đến ngày:</label>
+      <input type="date" id="statsEndDate" onchange="updateStatistics()">
+    </div>
+
+    <div class="filter-group">
+      <label for="statsEmployee">Nhân viên:</label>
+      <select id="statsEmployee" onchange="updateStatistics()">
+        <option value="all">Tất cả</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <button onclick="exportStatistics()" class="export-btn">
+        <i class="fas fa-download"></i> Xuất báo cáo
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-container">
+    <div class="kpi-card revenue">
+      <div class="kpi-header">
+        <h3>Tổng Doanh Thu</h3>
+        <i class="fas fa-chart-line"></i>
+      </div>
+      <div class="kpi-value" id="totalRevenue">0 ₫</div>
+      <div class="kpi-change" id="revenueChange">
+        <i class="fas fa-arrow-up"></i> 0%
+      </div>
+      <div class="kpi-detail">So với kỳ trước</div>
+    </div>
+
+    <div class="kpi-card expense">
+      <div class="kpi-header">
+        <h3>Tổng Chi Phí</h3>
+        <i class="fas fa-money-bill-wave"></i>
+      </div>
+      <div class="kpi-value" id="totalExpense">0 ₫</div>
+      <div class="kpi-change" id="expenseChange">
+        <i class="fas fa-arrow-up"></i> 0%
+      </div>
+      <div class="kpi-detail">So với kỳ trước</div>
+    </div>
+
+    <div class="kpi-card profit">
+      <div class="kpi-header">
+        <h3>Lợi Nhuận</h3>
+        <i class="fas fa-piggy-bank"></i>
+      </div>
+      <div class="kpi-value" id="totalProfit">0 ₫</div>
+      <div class="kpi-change" id="profitChange">
+        <i class="fas fa-arrow-up"></i> 0%
+      </div>
+      <div class="kpi-detail">Biên lợi nhuận: <span id="profitMargin">0%</span></div>
+    </div>
+
+    <div class="kpi-card transactions">
+      <div class="kpi-header">
+        <h3>Số Giao Dịch</h3>
+        <i class="fas fa-exchange-alt"></i>
+      </div>
+      <div class="kpi-value" id="totalTransactions">0</div>
+      <div class="kpi-change" id="transactionChange">
+        <i class="fas fa-arrow-up"></i> 0%
+      </div>
+      <div class="kpi-detail">AOV: <span id="averageOrderValue">0 ₫</span></div>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="charts-container">
+    <!-- Revenue Trend Chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Xu Hướng Doanh Thu</h3>
+        <div class="chart-controls">
+          <button onclick="changeChartType('revenueTrend', 'line')" class="chart-btn active">Line</button>
+          <button onclick="changeChartType('revenueTrend', 'bar')" class="chart-btn">Bar</button>
+        </div>
+      </div>
+      <canvas id="revenueTrendChart" width="400" height="200"></canvas>
+    </div>
+
+    <!-- Product Performance Chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Hiệu Suất Sản Phẩm</h3>
+        <div class="chart-controls">
+          <button onclick="changeChartType('productPerf', 'doughnut')" class="chart-btn active">Pie</button>
+          <button onclick="changeChartType('productPerf', 'bar')" class="chart-btn">Bar</button>
+        </div>
+      </div>
+      <canvas id="productPerfChart" width="400" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- Data Tables -->
+  <div class="tables-container">
+    <!-- Top Products Table -->
+    <div class="table-card">
+      <div class="table-header">
+        <h3>Top Sản Phẩm</h3>
+        <span class="table-subtitle">Theo doanh thu</span>
+      </div>
+      <table id="topProductsTable" class="stats-table">
+        <thead>
+          <tr>
+            <th>Sản phẩm</th>
+            <th>Gói</th>
+            <th>Số bán</th>
+            <th>Doanh thu</th>
+            <th>%</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Data will be populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Employee Performance Table -->
+    <div class="table-card">
+      <div class="table-header">
+        <h3>Hiệu Suất Nhân Viên</h3>
+        <span class="table-subtitle">Theo doanh thu</span>
+      </div>
+      <table id="employeePerfTable" class="stats-table">
+        <thead>
+          <tr>
+            <th>Nhân viên</th>
+            <th>Số GD</th>
+            <th>Doanh thu</th>
+            <th>AOV</th>
+            <th>Hoa hồng</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Data will be populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Monthly Summary Table -->
+    <div class="table-card full-width">
+      <div class="table-header">
+        <h3>Tổng Hợp Chi Phí Theo Tháng</h3>
+        <span class="table-subtitle">Chi tiết theo danh mục</span>
+      </div>
+      <table id="monthlySummaryTable" class="stats-table">
+        <thead>
+          <tr>
+            <th>Tháng</th>
+            <th>Loại khoản chi</th>
+            <th>Số lượng</th>
+            <th>Tổng tiền (VND)</th>
+            <th>Trung bình</th>
+            <th>% tổng</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Data will be populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Account Utilization Section -->
+  <div class="utilization-container">
+    <div class="util-card">
+      <div class="util-header">
+        <h3>Tình Trạng Tài Khoản</h3>
+        <span class="util-subtitle">Tỷ lệ sử dụng</span>
+      </div>
+      <div id="accountUtilization">
+        <!-- Will be populated by JavaScript -->
+      </div>
+    </div>
+
+    <div class="util-card">
+      <div class="util-header">
+        <h3>Cảnh Báo Hết Hạn</h3>
+        <span class="util-subtitle">7 ngày tới</span>
+      </div>
+      <div id="expiryAlerts">
+        <!-- Will be populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Financial Summary -->
+  <div class="financial-summary">
+    <h3>Báo Cáo Tài Chính Tóm Tắt</h3>
+    <div class="financial-grid">
+      <div class="financial-item">
+        <label>Doanh thu thuần:</label>
+        <span id="netRevenue" class="amount positive">0 ₫</span>
+      </div>
+      <div class="financial-item">
+        <label>Tổng chi phí:</label>
+        <span id="totalCost" class="amount negative">0 ₫</span>
+      </div>
+      <div class="financial-item">
+        <label>EBITDA:</label>
+        <span id="ebitda" class="amount">0 ₫</span>
+      </div>
+      <div class="financial-item">
+        <label>ROI:</label>
+        <span id="roi" class="percentage">0%</span>
+      </div>
+      <div class="financial-item">
+        <label>Burn Rate (tháng):</label>
+        <span id="burnRate" class="amount">0 ₫</span>
+      </div>
+      <div class="financial-item">
+        <label>Runway:</label>
+        <span id="runway" class="duration">0 tháng</span>
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- CSS cho Statistics Tab -->
+<style>
+.statistics-filters {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-group label {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.filter-group select,
+.filter-group input {
+  min-width: 120px;
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.export-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.export-btn:hover {
+  background: #218838;
+}
+
+.kpi-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.kpi-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.financial-summary h3 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  color: #333;
+  text-align: center;
+}
+
+.financial-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.financial-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.financial-item label {
+  font-weight: 500;
+  color: #495057;
+}
+
+.amount.positive { color: #28a745; font-weight: bold; }
+.amount.negative { color: #dc3545; font-weight: bold; }
+.amount { color: #007bff; font-weight: bold; }
+.percentage { color: #6f42c1; font-weight: bold; }
+.duration { color: #fd7e14; font-weight: bold; }
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 5px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #28a745, #ffc107, #dc3545);
+  transition: width 0.3s ease;
+}
+
+.account-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.account-item:last-child {
+  border-bottom: none;
+}
+
+.account-info {
+  flex: 1;
+}
+
+.account-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.account-detail {
+  font-size: 12px;
+  color: #666;
+}
+
+.utilization-rate {
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+.utilization-rate.low { background: #d4edda; color: #155724; }
+.utilization-rate.medium { background: #fff3cd; color: #856404; }
+.utilization-rate.high { background: #f8d7da; color: #721c24; }
+
+.alert-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-left: 3px solid #ffc107;
+  background: #fff3cd;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+
+.alert-icon {
+  color: #856404;
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-title {
+  font-weight: 500;
+  color: #856404;
+}
+
+.alert-subtitle {
+  font-size: 12px;
+  color: #856404;
+  opacity: 0.8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .statistics-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 5px;
+  }
+  
+  .kpi-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .charts-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .tables-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .utilization-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .financial-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>px rgba(0,0,0,0.1);
+  border-left: 4px solid #007bff;
+}
+
+.kpi-card.revenue { border-left-color: #28a745; }
+.kpi-card.expense { border-left-color: #dc3545; }
+.kpi-card.profit { border-left-color: #007bff; }
+.kpi-card.transactions { border-left-color: #ffc107; }
+
+.kpi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.kpi-header h3 {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.kpi-header i {
+  font-size: 18px;
+  color: #007bff;
+}
+
+.kpi-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.kpi-change {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.kpi-change.positive { color: #28a745; }
+.kpi-change.negative { color: #dc3545; }
+
+.kpi-detail {
+  font-size: 11px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.charts-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.chart-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.chart-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.chart-controls {
+  display: flex;
+  gap: 5px;
+}
+
+.chart-btn {
+  padding: 4px 12px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.chart-btn.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.tables-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.table-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.table-card.full-width {
+  grid-column: 1 / -1;
+}
+
+.table-header {
+  padding: 15px 20px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.table-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.table-subtitle {
+  font-size: 12px;
+  color: #666;
+}
+
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.stats-table th,
+.stats-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.stats-table th {
+  background: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.stats-table tr:hover {
+  background: #f8f9fa;
+}
+
+.utilization-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.util-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.util-header {
+  margin-bottom: 15px;
+}
+
+.util-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.util-subtitle {
+  font-size: 12px;
+  color: #666;
+}
+
+.financial-summary {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10
