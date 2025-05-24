@@ -68,8 +68,9 @@ import {
 
 
 // Thực hiện khi DOMContentLoaded
-document.addEventListener("DOMContentLoaded", async () => {
+// CÁCH 1: Sửa trong file main.js - Di chuyển phần khởi tạo tab lên trước
 
+document.addEventListener("DOMContentLoaded", async () => {
   window.isExpenseSearching = false;
   window.expenseList = [];
 
@@ -85,41 +86,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // ✅ Khởi tạo hệ thống hiển thị tổng số
+  // ✅ KHỞI TẠO HỆ THỐNG HIỂN THỊ TỔNG SỐ NGAY LẬP TỨC
   initTotalDisplay();
 
+  // ✅ HIỂN THỊ THÔNG TIN NGƯỜI DÙNG NGAY LẬP TỨC
   document.getElementById("userWelcome").textContent =
-  `Xin chào ${window.userInfo.tenNhanVien} (${window.userInfo.maNhanVien}) - ${window.userInfo.vaiTro}`;
+    `Xin chào ${window.userInfo.tenNhanVien} (${window.userInfo.maNhanVien}) - ${window.userInfo.vaiTro}`;
 
-  const startDateInput = document.getElementById("startDate");
-  const durationInput = document.getElementById("duration");
-  const endDateInput = document.getElementById("endDate");
-  const transactionDateInput = document.getElementById("transactionDate");
-
-  startDateInput.value = window.todayFormatted;
-  transactionDateInput.value = window.todayFormatted;
-
-  startDateInput.addEventListener("change", () =>
-    calculateEndDate(startDateInput, durationInput, endDateInput)
-  );
-  durationInput.addEventListener("input", () =>
-    calculateEndDate(startDateInput, durationInput, endDateInput)
-  );
-
-  await fetchSoftwareList(null, window.softwareData, updatePackageList, updateAccountList);
-  await initExpenseDropdowns();
-
-  document.getElementById("softwareName").addEventListener("change", () =>
-    updatePackageList(window.softwareData, null, updateAccountList)
-  );
-  document.getElementById("softwarePackage").addEventListener("change", () =>
-    updateAccountList(window.softwareData, null)
-  );
-
-  window.loadTransactions();
-
-  // Thay thế phần xử lý tab trong main.js:
-
+  // ✅ THIẾT LẬP CÁC SỰ KIỆN TAB NGAY LẬP TỨC (TRƯỚC KHI LOAD DỮ LIỆU)
   document.querySelectorAll(".tab-button").forEach(button => {
     button.addEventListener("click", () => {
       const selectedTab = button.dataset.tab;
@@ -152,17 +126,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // ✅ Xử lý logic riêng cho từng tab
       if (selectedTab === "tab-giao-dich") {
-        // Refresh bảng giao dịch để hiển thị đúng tổng doanh thu
-        console.log("🔄 Chuyển sang tab giao dịch - refresh bảng");
-        window.loadTransactions();
+        // Chỉ refresh nếu dữ liệu đã được load
+        if (window.transactionList && window.transactionList.length >= 0) {
+          console.log("🔄 Chuyển sang tab giao dịch - refresh bảng");
+          window.loadTransactions();
+        }
       } else if (selectedTab === "tab-chi-phi" || selectedTab === "tab-thong-ke") {
-        // Refresh bảng chi phí để hiển thị đúng tổng chi phí  
+        // Refresh bảng chi phí
         console.log("🔄 Chuyển sang tab chi phí/thống kê - refresh bảng");
         renderExpenseStats();
       }
     });
+  });
 
-  // ✅ Thêm logic ẩn/hiện tab dựa trên quyền
+  // ✅ XỬ LÝ LOGIC ẨN/HIỆN TAB DỰA TRÊN QUYỀN (NGAY LẬP TỨC)
   const tabNhinThay = window.userInfo.tabNhinThay || "tất cả";
   const allowedTabs = tabNhinThay.toLowerCase().split(",").map(t => t.trim());
   
@@ -192,11 +169,53 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  });
+  // ✅ THIẾT LẬP CÁC INPUT NGÀY THÁNG
+  const startDateInput = document.getElementById("startDate");
+  const durationInput = document.getElementById("duration");
+  const endDateInput = document.getElementById("endDate");
+  const transactionDateInput = document.getElementById("transactionDate");
+
+  startDateInput.value = window.todayFormatted;
+  transactionDateInput.value = window.todayFormatted;
+
+  startDateInput.addEventListener("change", () =>
+    calculateEndDate(startDateInput, durationInput, endDateInput)
+  );
+  durationInput.addEventListener("input", () =>
+    calculateEndDate(startDateInput, durationInput, endDateInput)
+  );
+
+  // ✅ THIẾT LẬP CÁC SỰ KIỆN DROPDOWN
+  document.getElementById("softwareName").addEventListener("change", () =>
+    updatePackageList(window.softwareData, null, updateAccountList)
+  );
+  document.getElementById("softwarePackage").addEventListener("change", () =>
+    updateAccountList(window.softwareData, null)
+  );
+
+  // ✅ THIẾT LẬP CHI PHÍ
   document.getElementById("expenseDate").value = window.todayFormatted;
   document.getElementById("expenseRecorder").value = window.userInfo?.tenNhanVien || "";
-  handleRecurringChange(); // tự tính ngay nếu có định kỳ mặc định
 
+  // ✅ BẮT ĐẦU LOAD DỮ LIỆU (KHÔNG ĐỒNG BỘ - KHÔNG BLOCK UI)
+  console.log("🚀 Bắt đầu load dữ liệu không đồng bộ...");
+  
+  // Load dữ liệu phần mềm
+  fetchSoftwareList(null, window.softwareData, updatePackageList, updateAccountList)
+    .catch(err => console.error("Lỗi khi load danh sách phần mềm:", err));
+  
+  // Load dropdown chi phí
+  initExpenseDropdowns()
+    .catch(err => console.error("Lỗi khi load dropdown chi phí:", err));
+  
+  // Load giao dịch (chỉ khi đang ở tab giao dịch)
+  const currentActiveTab = document.querySelector(".tab-button.active");
+  if (currentActiveTab && currentActiveTab.dataset.tab === "tab-giao-dich") {
+    window.loadTransactions()
+      .catch(err => console.error("Lỗi khi load giao dịch:", err));
+  }
+
+  console.log("✅ Khởi tạo hoàn tất - UI có thể tương tác ngay lập tức");
 });
 
 

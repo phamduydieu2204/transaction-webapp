@@ -1,8 +1,20 @@
+// CÁCH 3: Cải thiện renderExpenseStats trong file renderExpenseStats.js
+
 import { getConstants } from './constants.js';
 import { updateTotalDisplay } from './updateTotalDisplay.js';
 
 export async function renderExpenseStats() {
   const { BACKEND_URL } = getConstants();
+  
+  // ✅ KIỂM TRA XEM CÓ ĐANG Ở TAB CHI PHÍ KHÔNG
+  const currentTab = document.querySelector(".tab-button.active");
+  const isChiPhiTab = currentTab && currentTab.dataset.tab === "tab-chi-phi";
+  const isThongKeTab = currentTab && currentTab.dataset.tab === "tab-thong-ke";
+  
+  if (!isChiPhiTab && !isThongKeTab) {
+    console.log("⏭️ Không ở tab chi phí/thống kê, bỏ qua render");
+    return;
+  }
   
   // Nếu đang trong trạng thái tìm kiếm, sử dụng dữ liệu đã tìm
   if (window.isExpenseSearching && window.expenseList) {
@@ -10,27 +22,52 @@ export async function renderExpenseStats() {
     return;
   }
   
-  // Nếu không, lấy toàn bộ dữ liệu
+  console.log("🔄 Bắt đầu load expense data...");
+  
   try {
+    // ✅ SỬ DỤNG TIMEOUT ĐỂ TRÁNH BLOCK UI
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 giây timeout
+    
     const res = await fetch(BACKEND_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "getExpenseStats" })
+      body: JSON.stringify({ action: "getExpenseStats" }),
+      signal: controller.signal
     });
+
+    clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+
     const result = await res.json();
 
     if (result.status === "success") {
       window.expenseList = result.data || [];
       window.isExpenseSearching = false;
       renderExpenseData(result.data);
+      console.log("✅ Load expense data thành công:", result.data.length, "chi phí");
+    } else {
+      console.error("❌ Lỗi từ server:", result.message);
     }
   } catch (err) {
-    console.error("Lỗi khi thống kê chi phí:", err);
+    if (err.name === 'AbortError') {
+      console.warn("⚠️ Load expense data bị timeout sau 15 giây");
+    } else {
+      console.error("❌ Lỗi khi thống kê chi phí:", err);
+    }
   }
 }
 
 function renderExpenseData(data) {
   console.log("🔍 DEBUG: Dữ liệu chi phí nhận được:", data);
+  
+  // ✅ KIỂM TRA LẠI TAB HIỆN TẠI TRƯỚC KHI RENDER
+  const currentTab = document.querySelector(".tab-button.active");
+  const isChiPhiTab = currentTab && currentTab.dataset.tab === "tab-chi-phi";
+  const isThongKeTab = currentTab && currentTab.dataset.tab === "tab-thong-ke";
   
   // ✅ Hàm chuẩn hóa ngày từ nhiều format khác nhau
   const normalizeDate = (dateInput) => {
@@ -66,10 +103,6 @@ function renderExpenseData(data) {
   const formatDate = (isoStr) => {
     return normalizeDate(isoStr);
   };
-
-  // Kiểm tra tab nào đang active
-  const isChiPhiTab = document.getElementById("tab-chi-phi")?.classList.contains("active");
-  const isThongKeTab = document.getElementById("tab-thong-ke")?.classList.contains("active");
 
   // ✅ TÍNH TỔNG CHI PHÍ (logic giống như tính tổng doanh thu)
   let totalExpense = 0;
@@ -130,31 +163,35 @@ function renderExpenseData(data) {
     window.updateTotalDisplay();
   }
 
-// ✅ Hiển thị bảng chi phí (nếu đang ở tab chi phí) - LOGIC GIỐNG TAB GIAO DỊCH
-if (isChiPhiTab) {
-  const table1 = document.querySelector("#expenseListTable tbody");
+  // ✅ CHỈ RENDER BẢNG NẾU ĐANG Ở TAB TƯƠNG ỨNG
+  if (isChiPhiTab) {
+    renderExpenseTable(data, formatDate);
+  }
 
+  if (isThongKeTab) {
+    renderExpenseSummary(data, normalizeDate);
+  }
+}
+
+// ✅ TÁCH RIÊNG HÀM RENDER BẢNG CHI PHÍ
+function renderExpenseTable(data, formatDate) {
+  const table1 = document.querySelector("#expenseListTable tbody");
+  
   if (!table1) {
     console.error("❌ Không tìm thấy table #expenseListTable tbody");
     return;
   }
 
-  // ✅ Sắp xếp chi phí mới nhất lên đầu (timestamp giảm dần) - với fallback
-  let sortedData;
-  try {
-    sortedData = typeof sortByTimestampDesc === 'function' 
-      ? sortByTimestampDesc(data || [], 'expenseId')
-      : [...(data || [])].sort((a, b) => {
-          const timestampA = (a.expenseId || "").replace(/[^0-9]/g, "");
-          const timestampB = (b.expenseId || "").replace(/[^0-9]/g, "");
-          return timestampB.localeCompare(timestampA);
-        });
-  } catch (err) {
-    console.warn("Fallback sorting:", err);
-    sortedData = [...(data || [])];
-  }
+  const today = new Date();
 
-  // ✅ Logic phân trang giống tab giao dịch
+  // ✅ Sắp xếp chi phí mới nhất lên đầu (timestamp giảm dần)
+  const sortedData = [...(data || [])].sort((a, b) => {
+    const timestampA = (a.expenseId || "").replace(/[^0-9]/g, "");
+    const timestampB = (b.expenseId || "").replace(/[^0-9]/g, "");
+    return timestampB.localeCompare(timestampA);
+  });
+
+  // ✅ Logic phân trang
   const itemsPerPage = window.itemsPerPage || 50;
   const totalPages = Math.ceil(sortedData.length / itemsPerPage);
   const currentPage = window.currentExpensePage || 1;
@@ -169,7 +206,7 @@ if (isChiPhiTab) {
     const globalIndex = startIndex + index;
     const row = table1.insertRow();
 
-    // ✅ Thêm style cho dòng đã hết hạn tái tục (giống giao dịch hết hạn)
+    // ✅ Thêm style cho dòng đã hết hạn tái tục
     if (e.renew) {
       const parseDate = (str) => {
         const [y, m, d] = (str || "").split("/").map(Number);
@@ -181,8 +218,8 @@ if (isChiPhiTab) {
       }
     }
 
-    // ✅ THÊM CỘT MÃ CHI PHÍ VÀO ĐẦU
-    row.insertCell().textContent = e.expenseId || "";  // ✅ THÊM DÒNG NÀY
+    // ✅ HIỂN THỊ CÁC CELL
+    row.insertCell().textContent = e.expenseId || "";
     row.insertCell().textContent = formatDate(e.date);
     row.insertCell().textContent = e.type || "";
     row.insertCell().textContent = e.category || "";
@@ -192,7 +229,7 @@ if (isChiPhiTab) {
     row.insertCell().textContent = formatDate(e.renew);
     row.insertCell().textContent = e.status || "";
 
-    // ✅ Action dropdown giống giao dịch
+    // ✅ Action dropdown
     const actionCell = row.insertCell();
     const select = document.createElement("select");
     select.className = "action-select";
@@ -225,127 +262,75 @@ if (isChiPhiTab) {
 
     actionCell.appendChild(select);
   });
- 
 
-    // ✅ Cập nhật phân trang giống tab giao dịch
-    const refreshExpenseTable = () => renderExpenseStats();
-    
-    // Inline pagination function để tránh import error
-    const updateExpensePagination = (totalPages, currentPage, firstPage, prevPage, nextPage, lastPage, goToPage) => {
-      const pagination = document.getElementById("expensePagination");
-      if (!pagination) return;
+  // ✅ Cập nhật phân trang (giống như code cũ)
+  updateExpensePagination(totalPages, currentPage);
+}
 
-      pagination.innerHTML = "";
+// ✅ TÁCH RIÊNG HÀM RENDER BẢNG THỐNG KÊ
+function renderExpenseSummary(data, normalizeDate) {
+  const table2 = document.querySelector("#monthlySummaryTable tbody");
+  if (table2) {
+    table2.innerHTML = "";
 
-      // Thêm nút "Tất cả" nếu đang trong trạng thái tìm kiếm
-      if (window.isExpenseSearching) {
-        const allBtn = document.createElement("button");
-        allBtn.textContent = "Tất cả";
-        allBtn.style.marginRight = "10px";
-        allBtn.style.backgroundColor = "#28a745";
-        allBtn.addEventListener("click", () => {
-          window.isExpenseSearching = false;
-          window.currentExpensePage = 1;
-          renderExpenseStats();
-        });
-        pagination.appendChild(allBtn);
+    const summaryMap = {};
+    data.forEach(e => {
+      if (e.currency === "VND") {
+        const normalizedDate = normalizeDate(e.date);
+        const month = normalizedDate.slice(0, 7); // yyyy/mm
+        const key = `${month}|${e.type}`;
+        summaryMap[key] = (summaryMap[key] || 0) + (parseFloat(e.amount) || 0);
       }
+    });
 
-      if (totalPages <= 1) return;
+    Object.entries(summaryMap).forEach(([key, value]) => {
+      const [month, type] = key.split("|");
+      const row = table2.insertRow();
+      row.innerHTML = `
+        <td>${month}</td>
+        <td>${type}</td>
+        <td>${value.toLocaleString()} VND</td>
+      `;
+    });
+  }
+}
 
-      const firstButton = document.createElement("button");
-      firstButton.textContent = "«";
-      firstButton.onclick = firstPage;
-      firstButton.disabled = currentPage === 1;
-      pagination.appendChild(firstButton);
+// ✅ HÀM PHÂN TRANG ĐƠN GIẢN
+function updateExpensePagination(totalPages, currentPage) {
+  const pagination = document.getElementById("expensePagination");
+  if (!pagination) return;
 
-      const prevButton = document.createElement("button");
-      prevButton.textContent = "‹";
-      prevButton.onclick = prevPage;
-      prevButton.disabled = currentPage === 1;
-      pagination.appendChild(prevButton);
+  pagination.innerHTML = "";
 
-      const maxVisiblePages = 5;
-      let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-      if (endPage - startPage + 1 < maxVisiblePages) {
-        startPage = Math.max(1, endPage - maxVisiblePages + 1);
-      }
-
-      if (startPage > 1) {
-        const dots = document.createElement("span");
-        dots.textContent = "...";
-        dots.style.padding = "4px 8px";
-        pagination.appendChild(dots);
-      }
-
-      for (let i = startPage; i <= endPage; i++) {
-        const pageButton = document.createElement("button");
-        pageButton.textContent = i;
-        pageButton.onclick = () => goToPage(i);
-        if (i === currentPage) {
-          pageButton.classList.add("active");
-        }
-        pagination.appendChild(pageButton);
-      }
-
-      if (endPage < totalPages) {
-        const dots = document.createElement("span");
-        dots.textContent = "...";
-        dots.style.padding = "4px 8px";
-        pagination.appendChild(dots);
-      }
-
-      const nextButton = document.createElement("button");
-      nextButton.textContent = "›";
-      nextButton.onclick = nextPage;
-      nextButton.disabled = currentPage === totalPages;
-      pagination.appendChild(nextButton);
-
-      const lastButton = document.createElement("button");
-      lastButton.textContent = "»";
-      lastButton.onclick = lastPage;
-      lastButton.disabled = currentPage === totalPages;
-      pagination.appendChild(lastButton);
-    };
-    
-    updateExpensePagination(
-      totalPages,
-      window.currentExpensePage || 1,
-      () => { window.currentExpensePage = 1; refreshExpenseTable(); },
-      () => { if (window.currentExpensePage > 1) { window.currentExpensePage--; refreshExpenseTable(); } },
-      () => { if (window.currentExpensePage < totalPages) { window.currentExpensePage++; refreshExpenseTable(); } },
-      () => { window.currentExpensePage = totalPages; refreshExpenseTable(); },
-      (page) => { window.currentExpensePage = page; refreshExpenseTable(); }
-    );
+  // Thêm nút "Tất cả" nếu đang trong trạng thái tìm kiếm
+  if (window.isExpenseSearching) {
+    const allBtn = document.createElement("button");
+    allBtn.textContent = "Tất cả";
+    allBtn.style.marginRight = "10px";
+    allBtn.style.backgroundColor = "#28a745";
+    allBtn.addEventListener("click", () => {
+      window.isExpenseSearching = false;
+      window.currentExpensePage = 1;
+      renderExpenseStats();
+    });
+    pagination.appendChild(allBtn);
   }
 
-  // ✅ Hiển thị bảng thống kê (nếu đang ở tab thống kê)
-  if (isThongKeTab) {
-    const table2 = document.querySelector("#monthlySummaryTable tbody");
-    if (table2) {
-      table2.innerHTML = "";
+  if (totalPages <= 1) return;
 
-      const summaryMap = {};
-      data.forEach(e => {
-        if (e.currency === "VND") {
-          const normalizedDate = normalizeDate(e.date);
-          const month = normalizedDate.slice(0, 7); // yyyy/mm
-          const key = `${month}|${e.type}`;
-          summaryMap[key] = (summaryMap[key] || 0) + (parseFloat(e.amount) || 0);
-        }
-      });
+  const refreshExpenseTable = () => renderExpenseStats();
 
-      Object.entries(summaryMap).forEach(([key, value]) => {
-        const [month, type] = key.split("|");
-        const row = table2.insertRow();
-        row.innerHTML = `
-          <td>${month}</td>
-          <td>${type}</td>
-          <td>${value.toLocaleString()} VND</td>
-        `;
-      });
+  // Tạo các nút phân trang
+  for (let i = 1; i <= Math.min(totalPages, 10); i++) {
+    const pageButton = document.createElement("button");
+    pageButton.textContent = i;
+    pageButton.onclick = () => {
+      window.currentExpensePage = i;
+      refreshExpenseTable();
+    };
+    if (i === currentPage) {
+      pageButton.classList.add("active");
     }
+    pagination.appendChild(pageButton);
   }
 }
