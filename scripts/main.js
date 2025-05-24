@@ -48,7 +48,6 @@ import { handleUpdateExpense } from './handleUpdateExpense.js';
 import { viewExpenseRow } from './viewExpenseRow.js';
 import { handleSearchExpense } from './handleSearchExpense.js';
 import { initTotalDisplay } from './updateTotalDisplay.js';
-import { initStatistics, updateStatistics, loadEmployeeFilter } from './statisticsHandler.js';
 import { handleChangePassword, closeChangePasswordModal, confirmChangePassword } from './handleChangePassword.js';
 import { formatDateTime } from './formatDateTime.js';
 import { openConfirmModal, closeConfirmModal, confirmDelete } from './confirmModal.js';
@@ -67,8 +66,6 @@ import {
   closeUpdateCookieModal
 } from './handleUpdateCookie.js';
 
-// ✅ Import module load tab content
-import { loadTabContent, waitForTabsLoaded } from './loadTabContent.js';
 
 // Thực hiện khi DOMContentLoaded
 document.addEventListener("DOMContentLoaded", async () => {
@@ -88,14 +85,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // ✅ Load nội dung các tab từ file riêng TRƯỚC KHI khởi tạo
-  console.log('🔄 Bắt đầu load tab content...');
-  await loadTabContent();
-  
-  // ✅ Chờ cho đến khi các tab được load xong
-  await waitForTabsLoaded();
-  console.log('✅ Tab content đã sẵn sàng');
-
   // ✅ Khởi tạo hệ thống hiển thị tổng số
   initTotalDisplay();
 
@@ -107,44 +96,30 @@ document.addEventListener("DOMContentLoaded", async () => {
   const endDateInput = document.getElementById("endDate");
   const transactionDateInput = document.getElementById("transactionDate");
 
-  // ✅ Kiểm tra xem các element có tồn tại không trước khi sử dụng
-  if (startDateInput && durationInput && endDateInput && transactionDateInput) {
-    startDateInput.value = window.todayFormatted;
-    transactionDateInput.value = window.todayFormatted;
+  startDateInput.value = window.todayFormatted;
+  transactionDateInput.value = window.todayFormatted;
 
-    startDateInput.addEventListener("change", () =>
-      calculateEndDate(startDateInput, durationInput, endDateInput)
-    );
-    durationInput.addEventListener("input", () =>
-      calculateEndDate(startDateInput, durationInput, endDateInput)
-    );
-  } else {
-    console.warn('⚠️ Một số element của form giao dịch chưa sẵn sàng');
-  }
+  startDateInput.addEventListener("change", () =>
+    calculateEndDate(startDateInput, durationInput, endDateInput)
+  );
+  durationInput.addEventListener("input", () =>
+    calculateEndDate(startDateInput, durationInput, endDateInput)
+  );
 
   await fetchSoftwareList(null, window.softwareData, updatePackageList, updateAccountList);
   await initExpenseDropdowns();
 
-  // ✅ Kiểm tra element tồn tại trước khi add event listener
-  const softwareNameSelect = document.getElementById("softwareName");
-  const softwarePackageSelect = document.getElementById("softwarePackage");
-  
-  if (softwareNameSelect && softwarePackageSelect) {
-    softwareNameSelect.addEventListener("change", () =>
-      updatePackageList(window.softwareData, null, updateAccountList)
-    );
-    softwarePackageSelect.addEventListener("change", () =>
-      updateAccountList(window.softwareData, null)
-    );
-  }
+  document.getElementById("softwareName").addEventListener("change", () =>
+    updatePackageList(window.softwareData, null, updateAccountList)
+  );
+  document.getElementById("softwarePackage").addEventListener("change", () =>
+    updateAccountList(window.softwareData, null)
+  );
 
   window.loadTransactions();
 
-  // ✅ Thêm phần khởi tạo tab thống kê
-  console.log('🔄 Khởi tạo tab thống kê...');
-  await loadEmployeeFilter();
-    
-  // ✅ Xử lý tab switching với kiểm tra element tồn tại
+  // Thay thế phần xử lý tab trong main.js:
+
   document.querySelectorAll(".tab-button").forEach(button => {
     button.addEventListener("click", () => {
       const selectedTab = button.dataset.tab;
@@ -177,24 +152,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // ✅ Xử lý logic riêng cho từng tab
       if (selectedTab === "tab-giao-dich") {
+        // Refresh bảng giao dịch để hiển thị đúng tổng doanh thu
         console.log("🔄 Chuyển sang tab giao dịch - refresh bảng");
         window.loadTransactions();
-      } else if (selectedTab === "tab-chi-phi") {
-        console.log("🔄 Chuyển sang tab chi phí - refresh bảng");
+      } else if (selectedTab === "tab-chi-phi" || selectedTab === "tab-thong-ke") {
+        // Refresh bảng chi phí để hiển thị đúng tổng chi phí  
+        console.log("🔄 Chuyển sang tab chi phí/thống kê - refresh bảng");
         renderExpenseStats();
-      } else if (selectedTab === "tab-thong-ke") {
-        // ✅ QUAN TRỌNG: Khởi tạo thống kê khi chuyển sang tab
-        console.log("🔄 Chuyển sang tab thống kê - khởi tạo thống kê");
-        initStatistics();
-        updateStatistics();
       }
     });
 
-    // ✅ Thêm logic ẩn/hiện tab dựa trên quyền (di chuyển vào trong forEach)
-    const tabNhinThay = window.userInfo.tabNhinThay || "tất cả";
-    const allowedTabs = tabNhinThay.toLowerCase().split(",").map(t => t.trim());
-    
-    if (tabNhinThay !== "tất cả") {
+  // ✅ Thêm logic ẩn/hiện tab dựa trên quyền
+  const tabNhinThay = window.userInfo.tabNhinThay || "tất cả";
+  const allowedTabs = tabNhinThay.toLowerCase().split(",").map(t => t.trim());
+  
+  if (tabNhinThay !== "tất cả") {
+    document.querySelectorAll(".tab-button").forEach(button => {
       const tabName = button.dataset.tab;
       let tabKey = "";
       
@@ -205,12 +178,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (tabKey && !allowedTabs.includes(tabKey)) {
         button.style.display = "none";
       }
-    }
-  });
-  
-  // ✅ Chuyển đến tab đầu tiên được phép nếu tab hiện tại bị ẩn
-  const tabNhinThay = window.userInfo.tabNhinThay || "tất cả";
-  if (tabNhinThay !== "tất cả") {
+    });
+    
+    // Chuyển đến tab đầu tiên được phép nếu tab hiện tại bị ẩn
     const activeTab = document.querySelector(".tab-button.active");
     if (activeTab && activeTab.style.display === "none") {
       const firstVisibleTab = document.querySelector(".tab-button:not([style*='display: none'])");
@@ -222,34 +192,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // ✅ Nếu tab thống kê active ngay từ đầu
-  const activeTab = document.querySelector(".tab-button.active");
-  if (activeTab && activeTab.dataset.tab === "tab-thong-ke") {
-    console.log("🔄 Tab thống kê active từ đầu - khởi tạo");
-    setTimeout(() => {
-      initStatistics();
-      updateStatistics();
-    }, 1000);
-  }
+  });
+  document.getElementById("expenseDate").value = window.todayFormatted;
+  document.getElementById("expenseRecorder").value = window.userInfo?.tenNhanVien || "";
+  handleRecurringChange(); // tự tính ngay nếu có định kỳ mặc định
 
-  // ✅ Khởi tạo giá trị cho tab chi phí nếu element tồn tại
-  const expenseDateInput = document.getElementById("expenseDate");
-  const expenseRecorderInput = document.getElementById("expenseRecorder");
-  
-  if (expenseDateInput) {
-    expenseDateInput.value = window.todayFormatted;
-  }
-  if (expenseRecorderInput) {
-    expenseRecorderInput.value = window.userInfo?.tenNhanVien || "";
-  }
-  
-  // ✅ Gọi handleRecurringChange nếu hàm tồn tại
-  if (typeof window.handleRecurringChange === 'function') {
-    window.handleRecurringChange();
-  }
 });
 
-// ✅ Gán các hàm vào window object (di chuyển ra ngoài DOMContentLoaded)
+
+
 window.logout = logout;
 window.openCalendar = (inputId) =>
   openCalendar(inputId, calculateEndDate, document.getElementById("startDate"), document.getElementById("duration"), document.getElementById("endDate"));
@@ -284,7 +235,9 @@ window.deleteTransaction = (index) =>
   
 window.handleUpdateCookie = (index) =>
   handleUpdateCookie(index, window.transactionList);
-window.handleChangePassword = handleChangePassword; // ✅ Sửa: bỏ dòng duplicate
+window.handleChangePassword = (index) =>
+  alert("🔐 Chức năng đổi mật khẩu đang được phát triển cho index: " + index);
+window.handleChangePassword = handleChangePassword;
 window.handleAddExpense = handleAddExpense;
 window.closeChangePasswordModal = closeChangePasswordModal;
 window.confirmChangePassword = confirmChangePassword;
