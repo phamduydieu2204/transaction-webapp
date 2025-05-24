@@ -66,6 +66,8 @@ import {
   closeUpdateCookieModal
 } from './handleUpdateCookie.js';
 
+// ✅ Import module load tab content
+import { loadTabContent, waitForTabsLoaded } from './loadTabContent.js';
 
 // Thực hiện khi DOMContentLoaded
 document.addEventListener("DOMContentLoaded", async () => {
@@ -85,6 +87,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
+  // ✅ Load nội dung các tab từ file riêng TRƯỚC KHI khởi tạo
+  console.log('🔄 Bắt đầu load tab content...');
+  await loadTabContent();
+  
+  // ✅ Chờ cho đến khi các tab được load xong
+  await waitForTabsLoaded();
+  console.log('✅ Tab content đã sẵn sàng');
+
   // ✅ Khởi tạo hệ thống hiển thị tổng số
   initTotalDisplay();
 
@@ -96,30 +106,40 @@ document.addEventListener("DOMContentLoaded", async () => {
   const endDateInput = document.getElementById("endDate");
   const transactionDateInput = document.getElementById("transactionDate");
 
-  startDateInput.value = window.todayFormatted;
-  transactionDateInput.value = window.todayFormatted;
+  // ✅ Kiểm tra xem các element có tồn tại không trước khi sử dụng
+  if (startDateInput && durationInput && endDateInput && transactionDateInput) {
+    startDateInput.value = window.todayFormatted;
+    transactionDateInput.value = window.todayFormatted;
 
-  startDateInput.addEventListener("change", () =>
-    calculateEndDate(startDateInput, durationInput, endDateInput)
-  );
-  durationInput.addEventListener("input", () =>
-    calculateEndDate(startDateInput, durationInput, endDateInput)
-  );
+    startDateInput.addEventListener("change", () =>
+      calculateEndDate(startDateInput, durationInput, endDateInput)
+    );
+    durationInput.addEventListener("input", () =>
+      calculateEndDate(startDateInput, durationInput, endDateInput)
+    );
+  } else {
+    console.warn('⚠️ Một số element của form giao dịch chưa sẵn sàng');
+  }
 
   await fetchSoftwareList(null, window.softwareData, updatePackageList, updateAccountList);
   await initExpenseDropdowns();
 
-  document.getElementById("softwareName").addEventListener("change", () =>
-    updatePackageList(window.softwareData, null, updateAccountList)
-  );
-  document.getElementById("softwarePackage").addEventListener("change", () =>
-    updateAccountList(window.softwareData, null)
-  );
+  // ✅ Kiểm tra element tồn tại trước khi add event listener
+  const softwareNameSelect = document.getElementById("softwareName");
+  const softwarePackageSelect = document.getElementById("softwarePackage");
+  
+  if (softwareNameSelect && softwarePackageSelect) {
+    softwareNameSelect.addEventListener("change", () =>
+      updatePackageList(window.softwareData, null, updateAccountList)
+    );
+    softwarePackageSelect.addEventListener("change", () =>
+      updateAccountList(window.softwareData, null)
+    );
+  }
 
   window.loadTransactions();
 
-  // Thay thế phần xử lý tab trong main.js:
-
+  // ✅ Xử lý tab switching với kiểm tra element tồn tại
   document.querySelectorAll(".tab-button").forEach(button => {
     button.addEventListener("click", () => {
       const selectedTab = button.dataset.tab;
@@ -162,45 +182,55 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
 
-  // ✅ Thêm logic ẩn/hiện tab dựa trên quyền
-  const tabNhinThay = window.userInfo.tabNhinThay || "tất cả";
-  const allowedTabs = tabNhinThay.toLowerCase().split(",").map(t => t.trim());
-  
-  if (tabNhinThay !== "tất cả") {
-    document.querySelectorAll(".tab-button").forEach(button => {
-      const tabName = button.dataset.tab;
-      let tabKey = "";
-      
-      if (tabName === "tab-giao-dich") tabKey = "giao dịch";
-      else if (tabName === "tab-chi-phi") tabKey = "chi phí";
-      else if (tabName === "tab-thong-ke") tabKey = "thống kê";
-      
-      if (tabKey && !allowedTabs.includes(tabKey)) {
-        button.style.display = "none";
-      }
-    });
+    // ✅ Thêm logic ẩn/hiện tab dựa trên quyền
+    const tabNhinThay = window.userInfo.tabNhinThay || "tất cả";
+    const allowedTabs = tabNhinThay.toLowerCase().split(",").map(t => t.trim());
     
-    // Chuyển đến tab đầu tiên được phép nếu tab hiện tại bị ẩn
-    const activeTab = document.querySelector(".tab-button.active");
-    if (activeTab && activeTab.style.display === "none") {
-      const firstVisibleTab = document.querySelector(".tab-button:not([style*='display: none'])");
-      if (firstVisibleTab) {
-        activeTab.classList.remove("active");
-        firstVisibleTab.classList.add("active");
-        firstVisibleTab.click();
+    if (tabNhinThay !== "tất cả") {
+      document.querySelectorAll(".tab-button").forEach(button => {
+        const tabName = button.dataset.tab;
+        let tabKey = "";
+        
+        if (tabName === "tab-giao-dich") tabKey = "giao dịch";
+        else if (tabName === "tab-chi-phi") tabKey = "chi phí";
+        else if (tabName === "tab-thong-ke") tabKey = "thống kê";
+        
+        if (tabKey && !allowedTabs.includes(tabKey)) {
+          button.style.display = "none";
+        }
+      });
+      
+      // Chuyển đến tab đầu tiên được phép nếu tab hiện tại bị ẩn
+      const activeTab = document.querySelector(".tab-button.active");
+      if (activeTab && activeTab.style.display === "none") {
+        const firstVisibleTab = document.querySelector(".tab-button:not([style*='display: none'])");
+        if (firstVisibleTab) {
+          activeTab.classList.remove("active");
+          firstVisibleTab.classList.add("active");
+          firstVisibleTab.click();
+        }
       }
     }
-  }
-
   });
-  document.getElementById("expenseDate").value = window.todayFormatted;
-  document.getElementById("expenseRecorder").value = window.userInfo?.tenNhanVien || "";
-  handleRecurringChange(); // tự tính ngay nếu có định kỳ mặc định
 
+  // ✅ Khởi tạo giá trị cho tab chi phí nếu element tồn tại
+  const expenseDateInput = document.getElementById("expenseDate");
+  const expenseRecorderInput = document.getElementById("expenseRecorder");
+  
+  if (expenseDateInput) {
+    expenseDateInput.value = window.todayFormatted;
+  }
+  if (expenseRecorderInput) {
+    expenseRecorderInput.value = window.userInfo?.tenNhanVien || "";
+  }
+  
+  // ✅ Gọi handleRecurringChange nếu hàm tồn tại
+  if (typeof window.handleRecurringChange === 'function') {
+    window.handleRecurringChange();
+  }
 });
 
-
-
+// ✅ Gán các hàm vào window object
 window.logout = logout;
 window.openCalendar = (inputId) =>
   openCalendar(inputId, calculateEndDate, document.getElementById("startDate"), document.getElementById("duration"), document.getElementById("endDate"));

@@ -353,267 +353,10 @@
     
     <hr>
 
-    <div id="tab-giao-dich" class="tab-content active">
-        <form id="transactionForm" class="form-grid fixed-header" onreset="handleReset()">
-          <!-- Dòng 1 -->
-          <div>
-            <label>Ngày giao dịch:</label>
-            <div class="date-input-container">
-              <input type="text" id="transactionDate" placeholder="yyyy/mm/dd">
-              <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('transactionDate')"></i>
-            </div>
-          </div>
-
-          <div>
-            <label>Loại giao dịch:</label>
-            <select id="transactionType" required>
-              <option value="">-- Chọn loại --</option>
-              <option value="Bán hàng">Bán hàng</option>
-              <option value="Hoàn Tiền">Hoàn Tiền</option>
-              <option value="Dùng thử">Dùng thử</option>
-              <option value="Nhập hàng">Nhập hàng</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Email:</label>
-            <input type="email" id="customerEmail">
-          </div>
-
-          <div>
-            <label>Tên khách hàng:</label>
-            <div class="search-icon-container">
-              <input type="text" id="customerName">
-              <i class="fas fa-search search-icon" onclick="updateCustomerInfo()"></i>
-            </div>
-          </div>
-
-          <div>
-            <label>Liên hệ:</label>
-            <input type="text" id="customerPhone">
-          </div>
-
-          <!-- Dòng 2 -->
-          <div>
-            <label>Số tháng đăng ký:</label>
-            <input type="number" id="duration">
-          </div>
-
-          <div>
-            <label>Ngày bắt đầu:</label>
-            <div class="date-input-container">
-              <input type="text" id="startDate" placeholder="yyyy/mm/dd">
-              <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('startDate')"></i>
-            </div>
-          </div>
-
-          <div>
-            <label>Ngày kết thúc:</label>
-            <div class="date-input-container">
-              <input type="text" id="endDate" placeholder="yyyy/mm/dd">
-              <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('endDate')"></i>
-            </div>
-          </div>
-
-          <div>
-            <label>Số thiết bị:</label>
-            <input type="number" id="deviceCount">
-          </div>
-
-          <div>
-            <label>Ghi chú:</label>
-            <textarea id="note" rows="2"></textarea>
-          </div>
-
-          <!-- Dòng 3 -->
-          <div>
-            <label>Tên phần mềm:</label>
-            <select id="softwareName">
-              <option value="">-- Chọn phần mềm --</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Gói phần mềm:</label>
-            <select id="softwarePackage">
-              <option value="">-- Chọn gói --</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Tên tài khoản:</label>
-            <select id="accountName">
-              <option value="">-- Chọn tài khoản --</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Doanh thu:</label>
-            <input type="number" id="revenue">
-          </div>
-
-          <!-- Dòng 4: Các nút -->
-          <div class="button-row">
-            <button type="button" onclick="handleAdd()">Thêm</button>
-            <button type="button" onclick="handleUpdate()">Cập nhật</button>
-            <button type="button" onclick="handleSearch()">Tìm kiếm</button>
-            <button type="reset">Làm mới</button>
-          </div>
-        </form>
+    <!-- ============ CÁC TAB CONTENT ĐƯỢC LOAD TỪ FILE RIÊNG ============ -->
+    <div id="tab-content-container">
+      <!-- Content của các tab sẽ được load vào đây -->
     </div>
-
-<div id="tab-chi-phi" class="tab-content">
-  <form id="expenseForm" class="form-grid">
-    
-    <!-- PHẦN 1: Thông tin khoản chi -->
-    <input type="hidden" id="expenseId">
-    <div>
-      <label>Ngày chi:</label>
-      <div class="date-input-container">
-        <input type="text" id="expenseDate" placeholder="yyyy/mm/dd">
-        <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseDate')"></i>
-      </div>
-    </div>
-
-    <input type="hidden" id="expenseRecorder">
-
-    <div>
-      <label>Loại khoản chi:</label>
-      <select id="expenseCategory" onchange="handleCategoryChange()">
-        <option value="">-- Chọn loại --</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Danh mục chung:</label>
-      <select id="expenseSubCategory" onchange="handleSubCategoryChange()">
-        <option value="">-- Chọn danh mục --</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Tên sản phẩm/Dịch vụ:</label>
-      <select id="expenseProduct" onchange="handleProductChange()">
-        <option value="">-- Chọn sản phẩm --</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Phiên bản/Gói dịch vụ:</label>
-      <select id="expensePackage">
-        <option value="">-- Chọn gói --</option>
-      </select>
-    </div>
-
-    <!-- PHẦN 2: Chi tiết thanh toán -->
-    <div>
-      <label>Số tiền:</label>
-      <input type="number" id="expenseAmount">
-    </div>
-
-    <div>
-      <label>Đơn vị tiền tệ:</label>
-      <select id="expenseCurrency">
-        <option value="VND">VND</option>
-        <option value="USD">USD</option>
-        <option value="NGN">NGN</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Ngân hàng/Ví:</label>
-      <select id="expenseBank" onchange="handleBankChange()">
-        <option value="">-- Chọn ngân hàng/ví --</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Thông tin thẻ/Tài khoản:</label>
-      <select id="expenseCard">
-        <option value="">-- Chọn tài khoản --</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Phương thức chi:</label>
-      <select id="expenseRecurring" onchange="handleRecurringChange()">
-        <option value="Chi một lần">Chi một lần</option>
-        <option value="Hàng tháng">Định kỳ hàng tháng</option>
-        <option value="Hàng quý">Định kỳ hàng quý</option>
-        <option value="Hàng năm">Định kỳ hàng năm</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Ngày tái tục:</label>
-      <div class="date-input-container">
-        <input type="text" id="expenseRenewDate" placeholder="yyyy/mm/dd">
-        <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseRenewDate')"></i>
-      </div>
-    </div>
-
-    <!-- PHẦN 3: Khác -->
-    <div>
-      <label>Người nhận / Nhà cung cấp:</label>
-      <input type="text" id="expenseSupplier">
-    </div>
-
-    <div>
-      <label>Trạng thái:</label>
-      <select id="expenseStatus">
-        <option>Đã thanh toán</option>
-        <option>Chưa thanh toán</option>
-        <option>Đã hủy</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Ghi chú:</label>
-      <textarea id="expenseNote" rows="2"></textarea>
-    </div>
-
-    <div class="button-row">
-      <button type="button" onclick="handleAddExpense()">Thêm chi phí</button>
-      <button type="button" onclick="handleUpdateExpense()">Cập nhật chi phí</button>
-      <button type="button" onclick="handleSearchExpense()">Tìm kiếm chi phí</button>
-      <button type="reset">Làm mới</button>
-    </div>
-  </form>
-      <h3 style="margin-top: 20px;">Danh sách chi phí</h3>
-  <table id="expenseListTable">
-    <thead>
-      <tr>
-        <th>Mã chi phí</th>
-        <th>Ngày chi</th>
-        <th>Loại khoản chi</th>
-        <th>Danh mục</th>
-        <th>Sản phẩm</th>
-        <th>Gói</th>
-        <th>Số tiền</th>
-        <th>Ngày tái tục</th>
-        <th>Trạng thái</th>
-        <th>Hành động</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <div class="pagination" id="expensePagination"></div>
-</div>
-
-<div id="tab-thong-ke" class="tab-content">
-  <h3>Tổng hợp chi phí theo tháng</h3>
-  <table id="monthlySummaryTable">
-    <thead>
-      <tr>
-        <th>Tháng</th>
-        <th>Loại khoản chi</th>
-        <th>Tổng tiền (VND)</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</div>
 
     <!-- Khu vực thông báo -->
     <div id="notification"></div>
@@ -755,5 +498,46 @@
   z-index: 9999;
   cursor: not-allowed;
 "></div>
-</body>
-</html>
+
+<script>
+// ✅ Hàm load nội dung tab từ file riêng
+async function loadTabContent() {
+  const tabContainer = document.getElementById('tab-content-container');
+  
+  try {
+    // Load tất cả các tab
+    const [giaoResponse, phiResponse, keResponse] = await Promise.all([
+      fetch('tab-giao-dich.html'),
+      fetch('tab-chi-phi.html'), 
+      fetch('tab-thong-ke.html')
+    ]);
+    
+    const giaoContent = await giaoResponse.text();
+    const phiContent = await phiResponse.text();
+    const keContent = await keResponse.text();
+    
+    // Thêm tất cả nội dung vào container
+    tabContainer.innerHTML = giaoContent + phiContent + keContent;
+    
+    console.log('✅ Đã load thành công tất cả tab content');
+  } catch (error) {
+    console.error('❌ Lỗi khi load tab content:', error);
+    // Fallback: nếu không load được file riêng, sử dụng nội dung mặc định
+    tabContainer.innerHTML = `
+      <!-- Fallback content - nội dung gốc từ main.html -->
+      <div id="tab-giao-dich" class="tab-content active">
+        <p>Đang tải nội dung tab giao dịch...</p>
+      </div>
+      <div id="tab-chi-phi" class="tab-content">
+        <p>Đang tải nội dung tab chi phí...</p>
+      </div>
+      <div id="tab-thong-ke" class="tab-content">
+        <p>Đang tải nội dung tab thống kê...</p>
+      </div>
+    `;
+  }
+}
+
+// ✅ Load tab content khi trang được tải
+document.addEventListener('DOMContentLoaded', loadTabContent);
+</script>
