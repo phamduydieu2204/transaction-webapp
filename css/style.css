@@ -795,3 +795,13 @@ body.login-page {
 .total-item.expense {
   color: #c53030 !important;
 }
+
+/* Style cho chi phí chưa thanh toán */
+#expenseListTable tr.unpaid-row {
+  background-color: #fff9c4 !important; /* Màu vàng nhạt */
+}
+
+/* Đảm bảo màu vàng nhạt vẫn hiển thị khi hover */
+#expenseListTable tr.unpaid-row:hover {
+  background-color: #fff3a0 !important; /* Màu vàng đậm hơn một chút khi hover */
+}

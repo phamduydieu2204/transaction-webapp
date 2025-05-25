@@ -174,6 +174,7 @@ function renderExpenseData(data) {
 }
 
 // ✅ TÁCH RIÊNG HÀM RENDER BẢNG CHI PHÍ
+// ✅ TÁCH RIÊNG HÀM RENDER BẢNG CHI PHÍ
 function renderExpenseTable(data, formatDate) {
   const table1 = document.querySelector("#expenseListTable tbody");
   
@@ -218,6 +219,11 @@ function renderExpenseTable(data, formatDate) {
       }
     }
 
+    // ✅ Thêm style cho dòng chưa thanh toán (màu vàng nhạt)
+    if (e.status && e.status.toLowerCase().includes("chưa thanh toán")) {
+      row.style.backgroundColor = "#fff9c4"; // Màu vàng nhạt
+    }
+
     // ✅ HIỂN THỊ CÁC CELL - GỘP 4 CỘT THÀNH 1
     row.insertCell().textContent = e.expenseId || "";
     row.insertCell().textContent = formatDate(e.date);
@@ -233,7 +239,7 @@ function renderExpenseTable(data, formatDate) {
     row.insertCell().textContent = thongTinKhoanChi;
     row.insertCell().textContent = `${(e.amount || 0).toLocaleString()} ${e.currency || ""}`;
     row.insertCell().textContent = formatDate(e.renew);
-    row.insertCell().textContent = e.status || "";
+    row.insertCell().textContent = e.note || ""; // Hiển thị ghi chú thay vì trạng thái
 
     // ✅ Action dropdown
     const actionCell = row.insertCell();
