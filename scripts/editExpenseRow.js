@@ -120,6 +120,4 @@ export function editExpenseRow(e) {
     status: e.status,
     note: e.note
   });
-
-  alert("✅ Đã tải dữ liệu lên form. Bạn có thể chỉnh sửa và bấm 'Cập nhật chi phí'.");
 }
