@@ -1,4 +1,4 @@
-// statistics-utils.js - Các hàm tiện ích cho thống kê
+// ==== scripts/statistics-utils.js ====
 
 // Format tiền tệ
 export function formatCurrency(amount, currency = 'VNĐ') {
@@ -47,25 +47,6 @@ export function generateColors(count) {
   return result;
 }
 
-// Tạo màu gradient
-export function generateGradients(count) {
-  const gradients = [
-    ['#FF6384', '#FF9F40'],
-    ['#36A2EB', '#4BC0C0'],
-    ['#FFCE56', '#FF6384'],
-    ['#9966FF', '#36A2EB'],
-    ['#FF9F40', '#FFCE56'],
-    ['#4BC0C0', '#9966FF']
-  ];
-  
-  const result = [];
-  for (let i = 0; i < count; i++) {
-    result.push(gradients[i % gradients.length]);
-  }
-  
-  return result;
-}
-
 // Normalize date từ nhiều format
 export function normalizeDate(dateInput) {
   if (!dateInput) return "";
@@ -92,28 +73,6 @@ export function normalizeDate(dateInput) {
   return `${yyyy}/${mm}/${dd}`;
 }
 
-// Kiểm tra ngày có trong khoảng không
-export function isDateInRange(dateStr, fromDate, toDate) {
-  if (!dateStr || !fromDate || !toDate) return true;
-  
-  const date = dateStr.replace(/\//g, '');
-  const from = fromDate.replace(/\//g, '');
-  const to = toDate.replace(/\//g, '');
-  
-  return date >= from && date <= to;
-}
-
-// Lấy tên tháng
-export function getMonthName(monthIndex) {
-  const months = [
-    'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4',
-    'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8',
-    'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
-  ];
-  
-  return months[monthIndex] || '';
-}
-
 // Group data theo tháng
 export function groupByMonth(data, dateField) {
   const grouped = {};
@@ -127,28 +86,6 @@ export function groupByMonth(data, dateField) {
       grouped[monthKey] = [];
     }
     grouped[monthKey].push(item);
-  });
-  
-  return grouped;
-}
-
-// Group data theo tuần
-export function groupByWeek(data, dateField) {
-  const grouped = {};
-  
-  data.forEach(item => {
-    const date = normalizeDate(item[dateField]);
-    if (!date) return;
-    
-    const dateObj = new Date(date);
-    const weekStart = new Date(dateObj);
-    weekStart.setDate(dateObj.getDate() - dateObj.getDay());
-    
-    const weekKey = normalizeDate(weekStart);
-    if (!grouped[weekKey]) {
-      grouped[weekKey] = [];
-    }
-    grouped[weekKey].push(item);
   });
   
   return grouped;
@@ -181,26 +118,6 @@ export function calculateExpense(expenses) {
   }, 0);
 }
 
-// Tạo dữ liệu cho time series chart
-export function createTimeSeriesData(data, dateField, valueField, groupBy = 'month') {
-  let grouped;
-  
-  if (groupBy === 'week') {
-    grouped = groupByWeek(data, dateField);
-  } else {
-    grouped = groupByMonth(data, dateField);
-  }
-  
-  const labels = Object.keys(grouped).sort();
-  const values = labels.map(key => {
-    return grouped[key].reduce((sum, item) => {
-      return sum + (parseFloat(item[valueField]) || 0);
-    }, 0);
-  });
-  
-  return { labels, values };
-}
-
 // Sắp xếp object theo value giảm dần
 export function sortObjectByValue(obj, limit = null) {
   const sorted = Object.entries(obj)
@@ -213,22 +130,40 @@ export function sortObjectByValue(obj, limit = null) {
   return sorted;
 }
 
-// Debounce function cho search/filter
-export function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
+// Tạo dữ liệu cho time series chart
+export function createTimeSeriesData(data, dateField, valueField, groupBy = 'month') {
+  const grouped = groupByMonth(data, dateField);
+  
+  const labels = Object.keys(grouped).sort();
+  const values = labels.map(key => {
+    return grouped[key].reduce((sum, item) => {
+      return sum + (parseFloat(item[valueField]) || 0);
+    }, 0);
+  });
+  
+  return { labels, values };
 }
 
-// Tạo ID duy nhất
-export function generateId() {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+// Kiểm tra ngày có trong khoảng không
+export function isDateInRange(dateStr, fromDate, toDate) {
+  if (!dateStr || !fromDate || !toDate) return true;
+  
+  const date = dateStr.replace(/\//g, '');
+  const from = fromDate.replace(/\//g, '');
+  const to = toDate.replace(/\//g, '');
+  
+  return date >= from && date <= to;
+}
+
+// Lấy tên tháng
+export function getMonthName(monthIndex) {
+  const months = [
+    'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4',
+    'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8',
+    'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
+  ];
+  
+  return months[monthIndex] || '';
 }
 
 // Deep clone object
