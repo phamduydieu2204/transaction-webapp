@@ -1,4 +1,4 @@
-// ==== scripts/statistics-core-debug.js ====
+// ==== scripts/statistics-core.js ====
 import { getConstants } from './constants.js';
 import { updateKPICards } from './statistics-kpi.js';
 import { renderCharts } from './statistics-charts.js';
@@ -17,25 +17,9 @@ window.statisticsData = {
   toDate: null
 };
 
-// Khởi tạo tab thống kê với debug
+// Khởi tạo tab thống kê
 export async function initStatistics() {
-  console.log("🚀 [DEBUG] Bắt đầu khởi tạo tab thống kê...");
-  
-  // Kiểm tra HTML elements
-  const tabElement = document.getElementById('tab-thong-ke');
-  if (!tabElement) {
-    console.error("❌ [DEBUG] Không tìm thấy element #tab-thong-ke");
-    return;
-  }
-  console.log("✅ [DEBUG] Tìm thấy tab-thong-ke element");
-  
-  // Kiểm tra các elements con
-  const kpiCards = document.querySelector('.kpi-cards');
-  const timeFilter = document.getElementById('statsTimeFilter');
-  
-  console.log("🔍 [DEBUG] Kiểm tra elements:");
-  console.log("- kpi-cards:", !!kpiCards);
-  console.log("- timeFilter:", !!timeFilter);
+  console.log("📊 Khởi tạo tab thống kê...");
   
   setupStatisticsEventListeners();
   await loadStatisticsData();
@@ -44,20 +28,13 @@ export async function initStatistics() {
 }
 
 function setupStatisticsEventListeners() {
-  console.log("🔧 [DEBUG] Setup event listeners...");
-  
   const timeFilterSelect = document.getElementById('statsTimeFilter');
   if (timeFilterSelect) {
     timeFilterSelect.addEventListener('change', handleTimeFilterChange);
-    console.log("✅ [DEBUG] Event listener đã được gắn cho timeFilter");
-  } else {
-    console.warn("⚠️ [DEBUG] Không tìm thấy #statsTimeFilter");
   }
 }
 
 function handleTimeFilterChange(event) {
-  console.log("📅 [DEBUG] Time filter changed:", event.target.value);
-  
   const value = event.target.value;
   window.statisticsData.timeFilter = value;
   
@@ -73,12 +50,8 @@ function handleTimeFilterChange(event) {
 }
 
 window.applyCustomDateFilter = function() {
-  console.log("📅 [DEBUG] Applying custom date filter...");
-  
   const fromDate = document.getElementById('statsFromDate').value;
   const toDate = document.getElementById('statsToDate').value;
-  
-  console.log("📅 [DEBUG] Custom dates:", { fromDate, toDate });
   
   if (fromDate && toDate) {
     window.statisticsData.fromDate = fromDate;
@@ -88,8 +61,6 @@ window.applyCustomDateFilter = function() {
 };
 
 function setTimeFilter(period) {
-  console.log("📅 [DEBUG] Setting time filter:", period);
-  
   const today = new Date();
   let fromDate, toDate;
   
@@ -118,27 +89,13 @@ function setTimeFilter(period) {
   
   window.statisticsData.fromDate = fromDate;
   window.statisticsData.toDate = toDate;
-  
-  console.log("📅 [DEBUG] Date range set:", { fromDate, toDate });
 }
 
 async function loadStatisticsData() {
   try {
-    console.log("📊 [DEBUG] Bắt đầu tải dữ liệu thống kê...");
-    
     const { BACKEND_URL } = getConstants();
-    console.log("🔗 [DEBUG] Backend URL:", BACKEND_URL);
-    
-    // Kiểm tra userInfo
-    console.log("👤 [DEBUG] User info:", window.userInfo);
-    
-    if (!window.userInfo) {
-      console.error("❌ [DEBUG] Không có thông tin user");
-      return;
-    }
     
     // Load transactions
-    console.log("📊 [DEBUG] Loading transactions...");
     const transactionsResponse = await fetch(BACKEND_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -152,17 +109,11 @@ async function loadStatisticsData() {
     });
     
     const transactionsResult = await transactionsResponse.json();
-    console.log("📊 [DEBUG] Transactions response:", transactionsResult);
-    
     if (transactionsResult.status === "success") {
       window.statisticsData.transactions = transactionsResult.data || [];
-      console.log("✅ [DEBUG] Loaded transactions:", window.statisticsData.transactions.length);
-    } else {
-      console.error("❌ [DEBUG] Failed to load transactions:", transactionsResult.message);
     }
     
     // Load expenses
-    console.log("💸 [DEBUG] Loading expenses...");
     const expensesResponse = await fetch(BACKEND_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -172,102 +123,40 @@ async function loadStatisticsData() {
     });
     
     const expensesResult = await expensesResponse.json();
-    console.log("💸 [DEBUG] Expenses response:", expensesResult);
-    
     if (expensesResult.status === "success") {
       window.statisticsData.expenses = expensesResult.data || [];
-      console.log("✅ [DEBUG] Loaded expenses:", window.statisticsData.expenses.length);
-    } else {
-      console.error("❌ [DEBUG] Failed to load expenses:", expensesResult.message);
     }
     
-    console.log("✅ [DEBUG] Hoàn tất tải dữ liệu thống kê");
-    
   } catch (error) {
-    console.error("❌ [DEBUG] Lỗi khi tải dữ liệu thống kê:", error);
+    console.error("❌ Lỗi khi tải dữ liệu thống kê:", error);
   }
 }
 
 function filterAndRenderData() {
-  console.log("🔄 [DEBUG] Filtering and rendering data...");
-  
   const { transactions, expenses, fromDate, toDate } = window.statisticsData;
-  
-  console.log("📊 [DEBUG] Raw data:", {
-    transactions: transactions.length,
-    expenses: expenses.length,
-    fromDate,
-    toDate
-  });
   
   // Filter transactions
   window.statisticsData.filteredData.transactions = transactions.filter(t => {
     const transactionDate = t.transactionDate;
-    const inRange = isDateInRange(transactionDate, fromDate, toDate);
-    return inRange;
+    return isDateInRange(transactionDate, fromDate, toDate);
   });
   
   // Filter expenses
   window.statisticsData.filteredData.expenses = expenses.filter(e => {
     const expenseDate = normalizeDate(e.date);
-    const inRange = isDateInRange(expenseDate, fromDate, toDate);
-    return inRange;
-  });
-  
-  console.log("📊 [DEBUG] Filtered data:", {
-    transactions: window.statisticsData.filteredData.transactions.length,
-    expenses: window.statisticsData.filteredData.expenses.length
+    return isDateInRange(expenseDate, fromDate, toDate);
   });
   
   renderStatistics();
 }
 
 function renderStatistics() {
-  console.log("🎨 [DEBUG] Rendering statistics...");
-  
   try {
-    // Kiểm tra các elements trước khi render
-    const elements = {
-      totalRevenue: document.getElementById('totalRevenue'),
-      totalExpense: document.getElementById('totalExpense'),
-      totalProfit: document.getElementById('totalProfit'),
-      totalTransactions: document.getElementById('totalTransactions')
-    };
-    
-    console.log("🔍 [DEBUG] KPI Elements found:", {
-      totalRevenue: !!elements.totalRevenue,
-      totalExpense: !!elements.totalExpense,
-      totalProfit: !!elements.totalProfit,
-      totalTransactions: !!elements.totalTransactions
-    });
-    
-    // Render từng phần với error handling
-    try {
-      console.log("📊 [DEBUG] Updating KPI cards...");
-      updateKPICards(window.statisticsData.filteredData);
-      console.log("✅ [DEBUG] KPI cards updated");
-    } catch (error) {
-      console.error("❌ [DEBUG] Error updating KPI cards:", error);
-    }
-    
-    try {
-      console.log("📈 [DEBUG] Rendering charts...");
-      renderCharts(window.statisticsData.filteredData);
-      console.log("✅ [DEBUG] Charts rendered");
-    } catch (error) {
-      console.error("❌ [DEBUG] Error rendering charts:", error);
-    }
-    
-    try {
-      console.log("📋 [DEBUG] Updating tables...");
-      updateStatsTables(window.statisticsData.filteredData);
-      console.log("✅ [DEBUG] Tables updated");
-    } catch (error) {
-      console.error("❌ [DEBUG] Error updating tables:", error);
-    }
-    
+    updateKPICards(window.statisticsData.filteredData);
+    renderCharts(window.statisticsData.filteredData);
+    updateStatsTables(window.statisticsData.filteredData);
   } catch (error) {
-    console.error("❌ [DEBUG] Lỗi khi render thống kê:", error);
+    console.error("❌ Lỗi khi render thống kê:", error);
   }
 }
 
@@ -310,16 +199,3 @@ function isDateInRange(dateStr, fromDate, toDate) {
   
   return date >= from && date <= to;
 }
-
-// Export debug function
-window.debugStatistics = function() {
-  console.log("🔍 [DEBUG] Statistics Debug Info:");
-  console.log("- statisticsData:", window.statisticsData);
-  console.log("- tab element:", document.getElementById('tab-thong-ke'));
-  console.log("- KPI elements:", {
-    totalRevenue: document.getElementById('totalRevenue'),
-    totalExpense: document.getElementById('totalExpense'),
-    totalProfit: document.getElementById('totalProfit'),
-    totalTransactions: document.getElementById('totalTransactions')
-  });
-};
