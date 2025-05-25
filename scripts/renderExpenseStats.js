@@ -174,7 +174,6 @@ function renderExpenseData(data) {
 }
 
 // ✅ TÁCH RIÊNG HÀM RENDER BẢNG CHI PHÍ
-// ✅ TÁCH RIÊNG HÀM RENDER BẢNG CHI PHÍ
 function renderExpenseTable(data, formatDate) {
   const table1 = document.querySelector("#expenseListTable tbody");
   
@@ -221,7 +220,7 @@ function renderExpenseTable(data, formatDate) {
 
     // ✅ Thêm style cho dòng chưa thanh toán (màu vàng nhạt)
     if (e.status && e.status.toLowerCase().includes("chưa thanh toán")) {
-      row.style.backgroundColor = "#fff9c4"; // Màu vàng nhạt
+      row.classList.add("unpaid-row");
     }
 
     // ✅ HIỂN THỊ CÁC CELL - GỘP 4 CỘT THÀNH 1
@@ -263,6 +262,7 @@ function renderExpenseTable(data, formatDate) {
     select.addEventListener("change", () => {
       const selected = select.value;
       if (selected === "edit" && typeof window.editExpenseRow === "function") {
+        console.log("🔧 Gọi editExpenseRow với dữ liệu:", e);
         window.editExpenseRow(e);
       } else if (selected === "delete" && typeof window.handleDeleteExpense === "function") {
         window.handleDeleteExpense(e.expenseId);
