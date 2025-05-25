@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <!-- Thêm Font Awesome cho icon lịch, icon copy, icon đăng xuất và icon kính lúp -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Statistics CSS -->
+  <link rel="stylesheet" href="css/statistics.css">
   <style>
     .date-input-container {
       position: relative;
@@ -599,17 +601,7 @@
 </div>
 
 <div id="tab-thong-ke" class="tab-content">
-  <h3>Tổng hợp chi phí theo tháng</h3>
-  <table id="monthlySummaryTable">
-    <thead>
-      <tr>
-        <th>Tháng</th>
-        <th>Loại khoản chi</th>
-        <th>Tổng tiền (VND)</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <!-- Nội dung sẽ được load từ tab-thong-ke.html -->
 </div>
 
     <!-- Khu vực thông báo -->
@@ -680,6 +672,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script type="module" src="scripts/main.js"></script>
+  <!-- Chart.js for statistics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Modal xác nhận thêm hoặc cập nhật giao dịch -->
 <div id="addOrUpdateModal" class="modal">
@@ -752,5 +746,12 @@
   z-index: 9999;
   cursor: not-allowed;
 "></div>
+<!-- Statistics JavaScript modules -->
+<script type="module" src="scripts/statistics-core.js"></script>
+<script type="module" src="scripts/statistics-utils.js"></script>
+<script type="module" src="scripts/statistics-kpi.js"></script>
+<script type="module" src="scripts/statistics-charts.js"></script>
+<script type="module" src="scripts/statistics-tables.js"></script>
+<script type="module" src="scripts/statistics-export.js"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-// CÁCH 3: Cải thiện renderExpenseStats trong file renderExpenseStats.js
+// renderExpenseStats.js - Cải thiện và loại bỏ tab thống kê cũ
 
 import { getConstants } from './constants.js';
 import { updateTotalDisplay } from './updateTotalDisplay.js';
@@ -6,13 +6,12 @@ import { updateTotalDisplay } from './updateTotalDisplay.js';
 export async function renderExpenseStats() {
   const { BACKEND_URL } = getConstants();
   
-  // ✅ KIỂM TRA XEM CÓ ĐANG Ở TAB CHI PHÍ KHÔNG
+  // ✅ CHỈ KIỂM TRA TAB CHI PHÍ (loại bỏ tab thống kê)
   const currentTab = document.querySelector(".tab-button.active");
   const isChiPhiTab = currentTab && currentTab.dataset.tab === "tab-chi-phi";
-  const isThongKeTab = currentTab && currentTab.dataset.tab === "tab-thong-ke";
   
-  if (!isChiPhiTab && !isThongKeTab) {
-    console.log("⏭️ Không ở tab chi phí/thống kê, bỏ qua render");
+  if (!isChiPhiTab) {
+    console.log("⏭️ Không ở tab chi phí, bỏ qua render");
     return;
   }
   
@@ -64,10 +63,9 @@ export async function renderExpenseStats() {
 function renderExpenseData(data) {
   console.log("🔍 DEBUG: Dữ liệu chi phí nhận được:", data);
   
-  // ✅ KIỂM TRA LẠI TAB HIỆN TẠI TRƯỚC KHI RENDER
+  // ✅ CHỈ KIỂM TRA TAB CHI PHÍ (đã loại bỏ tab thống kê)
   const currentTab = document.querySelector(".tab-button.active");
   const isChiPhiTab = currentTab && currentTab.dataset.tab === "tab-chi-phi";
-  const isThongKeTab = currentTab && currentTab.dataset.tab === "tab-thong-ke";
   
   // ✅ Hàm chuẩn hóa ngày từ nhiều format khác nhau
   const normalizeDate = (dateInput) => {
@@ -163,17 +161,13 @@ function renderExpenseData(data) {
     window.updateTotalDisplay();
   }
 
-  // ✅ CHỈ RENDER BẢNG NẾU ĐANG Ở TAB TƯƠNG ỨNG
+  // ✅ CHỈ RENDER BẢNG CHI PHÍ
   if (isChiPhiTab) {
     renderExpenseTable(data, formatDate);
   }
-
-  if (isThongKeTab) {
-    renderExpenseSummary(data, normalizeDate);
-  }
 }
 
-// ✅ TÁCH RIÊNG HÀM RENDER BẢNG CHI PHÍ
+// ✅ HÀM RENDER BẢNG CHI PHÍ
 function renderExpenseTable(data, formatDate) {
   const table1 = document.querySelector("#expenseListTable tbody");
   
@@ -238,7 +232,7 @@ function renderExpenseTable(data, formatDate) {
     row.insertCell().textContent = thongTinKhoanChi;
     row.insertCell().textContent = `${(e.amount || 0).toLocaleString()} ${e.currency || ""}`;
     row.insertCell().textContent = formatDate(e.renew);
-    row.insertCell().textContent = e.note || ""; // Hiển thị ghi chú thay vì trạng thái
+    row.insertCell().textContent = e.note || "";
 
     // ✅ Action dropdown
     const actionCell = row.insertCell();
@@ -275,36 +269,8 @@ function renderExpenseTable(data, formatDate) {
     actionCell.appendChild(select);
   });
 
-  // ✅ Cập nhật phân trang (giống như code cũ)
+  // ✅ Cập nhật phân trang
   updateExpensePagination(totalPages, currentPage);
-}
-
-// ✅ TÁCH RIÊNG HÀM RENDER BẢNG THỐNG KÊ
-function renderExpenseSummary(data, normalizeDate) {
-  const table2 = document.querySelector("#monthlySummaryTable tbody");
-  if (table2) {
-    table2.innerHTML = "";
-
-    const summaryMap = {};
-    data.forEach(e => {
-      if (e.currency === "VND") {
-        const normalizedDate = normalizeDate(e.date);
-        const month = normalizedDate.slice(0, 7); // yyyy/mm
-        const key = `${month}|${e.type}`;
-        summaryMap[key] = (summaryMap[key] || 0) + (parseFloat(e.amount) || 0);
-      }
-    });
-
-    Object.entries(summaryMap).forEach(([key, value]) => {
-      const [month, type] = key.split("|");
-      const row = table2.insertRow();
-      row.innerHTML = `
-        <td>${month}</td>
-        <td>${type}</td>
-        <td>${value.toLocaleString()} VND</td>
-      `;
-    });
-  }
 }
 
 // ✅ HÀM PHÂN TRANG ĐƠN GIẢN
