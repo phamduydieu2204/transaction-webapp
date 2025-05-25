@@ -166,6 +166,7 @@ function renderStatistics() {
   }
 }
 
+// Utility functions - CHỈ ĐỊNH NGHĨA ở đây, không duplicate
 function formatDate(date) {
   const yyyy = date.getFullYear();
   const mm = String(date.getMonth() + 1).padStart(2, '0');
@@ -173,7 +174,6 @@ function formatDate(date) {
   return `${yyyy}/${mm}/${dd}`;
 }
 
-// ✅ Chỉ khai báo normalizeDate MỘT LẦN duy nhất
 function normalizeDate(dateInput) {
   if (!dateInput) return "";
   
