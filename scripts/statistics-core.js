@@ -294,30 +294,6 @@ export function sortObjectByValue(obj, limit = null) {
   return sorted;
 }
 
-function normalizeDate(dateInput) {
-  if (!dateInput) return "";
-  
-  let date;
-  if (typeof dateInput === 'string') {
-    if (dateInput.includes('T')) {
-      date = new Date(dateInput);
-    } else if (dateInput.includes('/')) {
-      const [y, m, d] = dateInput.split('/');
-      date = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
-    } else {
-      date = new Date(dateInput);
-    }
-  } else {
-    date = new Date(dateInput);
-  }
-  
-  if (isNaN(date.getTime())) return "";
-  
-  const yyyy = date.getFullYear();
-  const mm = String(date.getMonth() + 1).padStart(2, '0');
-  const dd = String(date.getDate()).padStart(2, '0');
-  return `${yyyy}/${mm}/${dd}`;
-}
 
 // ==== scripts/statistics-kpi.js ====
 import { formatCurrency, formatNumber } from './statistics-utils.js';
