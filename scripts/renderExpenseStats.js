@@ -218,13 +218,19 @@ function renderExpenseTable(data, formatDate) {
       }
     }
 
-    // ✅ HIỂN THỊ CÁC CELL
+    // ✅ HIỂN THỊ CÁC CELL - GỘP 4 CỘT THÀNH 1
     row.insertCell().textContent = e.expenseId || "";
     row.insertCell().textContent = formatDate(e.date);
-    row.insertCell().textContent = e.type || "";
-    row.insertCell().textContent = e.category || "";
-    row.insertCell().textContent = e.product || "";
-    row.insertCell().textContent = e.package || "";
+    
+    // ✅ Gộp thông tin khoản chi
+    const thongTinKhoanChi = [
+      e.type || "",
+      e.category || "", 
+      e.product || "",
+      e.package || ""
+    ].filter(item => item.trim() !== "").join(" - ");
+    
+    row.insertCell().textContent = thongTinKhoanChi;
     row.insertCell().textContent = `${(e.amount || 0).toLocaleString()} ${e.currency || ""}`;
     row.insertCell().textContent = formatDate(e.renew);
     row.insertCell().textContent = e.status || "";
