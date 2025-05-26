@@ -44,6 +44,9 @@ const uiState = {
 export function initializeStatisticsUI() {
   console.log("🎮 Initializing statistics UI controller");
   
+  // Set flag to indicate UI controller is active
+  window.statisticsUIControllerActive = true;
+  
   setupTabListeners();
   setupFilterControls();
   setupDateRangeControls();
@@ -371,6 +374,7 @@ async function loadStatisticsData() {
     window.expenseList = data.expenses;
     window.transactionList = data.transactions;
     
+    console.log("🎯 About to call refreshStatistics from loadStatisticsData");
     await refreshStatistics();
     
     // ✅ DEBUG: Check data loading completion
@@ -437,6 +441,21 @@ async function refreshStatistics() {
   try {
     console.log("🔄 Refreshing statistics display...");
     
+    // ✅ DEBUG: Check if we're in statistics tab
+    const currentTab = document.querySelector(".tab-button.active");
+    const isThongKeTab = currentTab && currentTab.dataset.tab === "tab-thong-ke";
+    
+    console.log("🔍 DEBUG refreshStatistics:", {
+      currentTab: currentTab ? currentTab.dataset.tab : "null",
+      isThongKeTab: isThongKeTab,
+      shouldRenderEnhanced: isThongKeTab
+    });
+    
+    if (!isThongKeTab) {
+      console.log("⏭️ Not in statistics tab, skipping enhanced render");
+      return;
+    }
+    
     const expenseData = window.expenseList || [];
     const transactionData = window.transactionList || [];
     
@@ -463,6 +482,12 @@ async function refreshStatistics() {
     const financialAnalysis = calculateFinancialAnalysis(revenueTotals, expenseTotals);
     
     // Render based on current tab with enhanced features
+    console.log("🎯 About to call renderEnhancedStatistics with data:", {
+      expenseCount: expenseData.length,
+      transactionCount: transactionData.length,
+      hasFinancialAnalysis: !!financialAnalysis
+    });
+    
     await renderEnhancedStatistics(expenseData, transactionData, financialAnalysis);
     
     // ✅ DEBUG: Check final UI state and loading indicators

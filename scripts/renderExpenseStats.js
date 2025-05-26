@@ -22,6 +22,12 @@ export async function renderExpenseStats() {
     return;
   }
   
+  // ✅ SKIP THỐNG KÊ NẾU UI CONTROLLER ĐÃ XỬ LÝ
+  if (isThongKeTab && window.statisticsUIControllerActive) {
+    console.log("⏭️ Statistics UI Controller đang xử lý, bỏ qua renderExpenseStats");
+    return;
+  }
+  
   // Nếu đang trong trạng thái tìm kiếm, sử dụng dữ liệu đã tìm
   if (window.isExpenseSearching && window.expenseList) {
     renderExpenseData(window.expenseList);
