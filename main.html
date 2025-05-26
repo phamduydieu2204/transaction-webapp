@@ -585,10 +585,13 @@
       <tr>
         <th>Mã chi phí</th>
         <th>Ngày chi</th>
-        <th>Thông tin khoản chi</th>
+        <th>Loại khoản chi</th>
+        <th>Danh mục</th>
+        <th>Sản phẩm</th>
+        <th>Gói</th>
         <th>Số tiền</th>
         <th>Ngày tái tục</th>
-        <th>Ghi chú</th>
+        <th>Trạng thái</th>
         <th>Hành động</th>
       </tr>
     </thead>
@@ -599,7 +602,17 @@
 </div>
 
 <div id="tab-thong-ke" class="tab-content">
-  <!-- Nội dung sẽ được load từ tab-thong-ke.html -->
+  <h3>Tổng hợp chi phí theo tháng</h3>
+  <table id="monthlySummaryTable">
+    <thead>
+      <tr>
+        <th>Tháng</th>
+        <th>Loại khoản chi</th>
+        <th>Tổng tiền (VND)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 </div>
 
     <!-- Khu vực thông báo -->
@@ -670,8 +683,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script type="module" src="scripts/main.js"></script>
-  <!-- Chart.js for statistics -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Modal xác nhận thêm hoặc cập nhật giao dịch -->
 <div id="addOrUpdateModal" class="modal">
@@ -744,12 +755,5 @@
   z-index: 9999;
   cursor: not-allowed;
 "></div>
-<!-- Statistics JavaScript modules -->
-<script type="module" src="scripts/statistics-core.js"></script>
-<script type="module" src="scripts/statistics-utils.js"></script>
-<script type="module" src="scripts/statistics-kpi.js"></script>
-<script type="module" src="scripts/statistics-charts.js"></script>
-<script type="module" src="scripts/statistics-tables.js"></script>
-<script type="module" src="scripts/statistics-export.js"></script>
 </body>
 </html>

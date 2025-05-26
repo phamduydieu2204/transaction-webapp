@@ -1,4 +1,4 @@
-// renderExpenseStats.js - Cải thiện và loại bỏ tab thống kê cũ
+// CÁCH 3: Cải thiện renderExpenseStats trong file renderExpenseStats.js
 
 import { getConstants } from './constants.js';
 import { updateTotalDisplay } from './updateTotalDisplay.js';
@@ -6,12 +6,13 @@ import { updateTotalDisplay } from './updateTotalDisplay.js';
 export async function renderExpenseStats() {
   const { BACKEND_URL } = getConstants();
   
-  // ✅ CHỈ KIỂM TRA TAB CHI PHÍ (loại bỏ tab thống kê)
+  // ✅ KIỂM TRA XEM CÓ ĐANG Ở TAB CHI PHÍ KHÔNG
   const currentTab = document.querySelector(".tab-button.active");
   const isChiPhiTab = currentTab && currentTab.dataset.tab === "tab-chi-phi";
+  const isThongKeTab = currentTab && currentTab.dataset.tab === "tab-thong-ke";
   
-  if (!isChiPhiTab) {
-    console.log("⏭️ Không ở tab chi phí, bỏ qua render");
+  if (!isChiPhiTab && !isThongKeTab) {
+    console.log("⏭️ Không ở tab chi phí/thống kê, bỏ qua render");
     return;
   }
   
@@ -63,9 +64,10 @@ export async function renderExpenseStats() {
 function renderExpenseData(data) {
   console.log("🔍 DEBUG: Dữ liệu chi phí nhận được:", data);
   
-  // ✅ CHỈ KIỂM TRA TAB CHI PHÍ (đã loại bỏ tab thống kê)
+  // ✅ KIỂM TRA LẠI TAB HIỆN TẠI TRƯỚC KHI RENDER
   const currentTab = document.querySelector(".tab-button.active");
   const isChiPhiTab = currentTab && currentTab.dataset.tab === "tab-chi-phi";
+  const isThongKeTab = currentTab && currentTab.dataset.tab === "tab-thong-ke";
   
   // ✅ Hàm chuẩn hóa ngày từ nhiều format khác nhau
   const normalizeDate = (dateInput) => {
@@ -161,13 +163,17 @@ function renderExpenseData(data) {
     window.updateTotalDisplay();
   }
 
-  // ✅ CHỈ RENDER BẢNG CHI PHÍ
+  // ✅ CHỈ RENDER BẢNG NẾU ĐANG Ở TAB TƯƠNG ỨNG
   if (isChiPhiTab) {
     renderExpenseTable(data, formatDate);
   }
+
+  if (isThongKeTab) {
+    renderExpenseSummary(data, normalizeDate);
+  }
 }
 
-// ✅ HÀM RENDER BẢNG CHI PHÍ
+// ✅ TÁCH RIÊNG HÀM RENDER BẢNG CHI PHÍ
 function renderExpenseTable(data, formatDate) {
   const table1 = document.querySelector("#expenseListTable tbody");
   
@@ -212,27 +218,16 @@ function renderExpenseTable(data, formatDate) {
       }
     }
 
-    // ✅ Thêm style cho dòng chưa thanh toán (màu vàng nhạt)
-    if (e.status && e.status.toLowerCase().includes("chưa thanh toán")) {
-      row.classList.add("unpaid-row");
-    }
-
-    // ✅ HIỂN THỊ CÁC CELL - GỘP 4 CỘT THÀNH 1
+    // ✅ HIỂN THỊ CÁC CELL
     row.insertCell().textContent = e.expenseId || "";
     row.insertCell().textContent = formatDate(e.date);
-    
-    // ✅ Gộp thông tin khoản chi
-    const thongTinKhoanChi = [
-      e.type || "",
-      e.category || "", 
-      e.product || "",
-      e.package || ""
-    ].filter(item => item.trim() !== "").join(" - ");
-    
-    row.insertCell().textContent = thongTinKhoanChi;
+    row.insertCell().textContent = e.type || "";
+    row.insertCell().textContent = e.category || "";
+    row.insertCell().textContent = e.product || "";
+    row.insertCell().textContent = e.package || "";
     row.insertCell().textContent = `${(e.amount || 0).toLocaleString()} ${e.currency || ""}`;
     row.insertCell().textContent = formatDate(e.renew);
-    row.insertCell().textContent = e.note || "";
+    row.insertCell().textContent = e.status || "";
 
     // ✅ Action dropdown
     const actionCell = row.insertCell();
@@ -256,7 +251,6 @@ function renderExpenseTable(data, formatDate) {
     select.addEventListener("change", () => {
       const selected = select.value;
       if (selected === "edit" && typeof window.editExpenseRow === "function") {
-        console.log("🔧 Gọi editExpenseRow với dữ liệu:", e);
         window.editExpenseRow(e);
       } else if (selected === "delete" && typeof window.handleDeleteExpense === "function") {
         window.handleDeleteExpense(e.expenseId);
@@ -269,8 +263,36 @@ function renderExpenseTable(data, formatDate) {
     actionCell.appendChild(select);
   });
 
-  // ✅ Cập nhật phân trang
+  // ✅ Cập nhật phân trang (giống như code cũ)
   updateExpensePagination(totalPages, currentPage);
+}
+
+// ✅ TÁCH RIÊNG HÀM RENDER BẢNG THỐNG KÊ
+function renderExpenseSummary(data, normalizeDate) {
+  const table2 = document.querySelector("#monthlySummaryTable tbody");
+  if (table2) {
+    table2.innerHTML = "";
+
+    const summaryMap = {};
+    data.forEach(e => {
+      if (e.currency === "VND") {
+        const normalizedDate = normalizeDate(e.date);
+        const month = normalizedDate.slice(0, 7); // yyyy/mm
+        const key = `${month}|${e.type}`;
+        summaryMap[key] = (summaryMap[key] || 0) + (parseFloat(e.amount) || 0);
+      }
+    });
+
+    Object.entries(summaryMap).forEach(([key, value]) => {
+      const [month, type] = key.split("|");
+      const row = table2.insertRow();
+      row.innerHTML = `
+        <td>${month}</td>
+        <td>${type}</td>
+        <td>${value.toLocaleString()} VND</td>
+      `;
+    });
+  }
 }
 
 // ✅ HÀM PHÂN TRANG ĐƠN GIẢN

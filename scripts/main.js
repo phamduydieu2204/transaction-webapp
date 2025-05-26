@@ -66,10 +66,10 @@ import {
   closeUpdateCookieModal
 } from './handleUpdateCookie.js';
 
-// ✅ Import statistics module
-import { initStatistics } from './statistics-core.js';
 
 // Thực hiện khi DOMContentLoaded
+// CÁCH 1: Sửa trong file main.js - Di chuyển phần khởi tạo tab lên trước
+
 document.addEventListener("DOMContentLoaded", async () => {
   window.isExpenseSearching = false;
   window.expenseList = [];
@@ -93,12 +93,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("userWelcome").textContent =
     `Xin chào ${window.userInfo.tenNhanVien} (${window.userInfo.maNhanVien}) - ${window.userInfo.vaiTro}`;
 
-  // ✅ Load tab thống kê HTML
-  await loadStatisticsHTML();
-
   // ✅ THIẾT LẬP CÁC SỰ KIỆN TAB NGAY LẬP TỨC (TRƯỚC KHI LOAD DỮ LIỆU)
   document.querySelectorAll(".tab-button").forEach(button => {
-    button.addEventListener("click", async () => {
+    button.addEventListener("click", () => {
       const selectedTab = button.dataset.tab;
 
       // 1. Kích hoạt nút
@@ -134,14 +131,10 @@ document.addEventListener("DOMContentLoaded", async () => {
           console.log("🔄 Chuyển sang tab giao dịch - refresh bảng");
           window.loadTransactions();
         }
-      } else if (selectedTab === "tab-chi-phi") {
+      } else if (selectedTab === "tab-chi-phi" || selectedTab === "tab-thong-ke") {
         // Refresh bảng chi phí
-        console.log("🔄 Chuyển sang tab chi phí - refresh bảng");
+        console.log("🔄 Chuyển sang tab chi phí/thống kê - refresh bảng");
         renderExpenseStats();
-      } else if (selectedTab === "tab-thong-ke") {
-        // ✅ Khởi tạo tab thống kê
-        console.log("🔄 Chuyển sang tab thống kê - khởi tạo");
-        await initStatistics();
       }
     });
   });
@@ -182,39 +175,27 @@ document.addEventListener("DOMContentLoaded", async () => {
   const endDateInput = document.getElementById("endDate");
   const transactionDateInput = document.getElementById("transactionDate");
 
-  if (startDateInput && transactionDateInput) {
-    startDateInput.value = window.todayFormatted;
-    transactionDateInput.value = window.todayFormatted;
+  startDateInput.value = window.todayFormatted;
+  transactionDateInput.value = window.todayFormatted;
 
-    startDateInput.addEventListener("change", () =>
-      calculateEndDate(startDateInput, durationInput, endDateInput)
-    );
-    durationInput.addEventListener("input", () =>
-      calculateEndDate(startDateInput, durationInput, endDateInput)
-    );
-  }
+  startDateInput.addEventListener("change", () =>
+    calculateEndDate(startDateInput, durationInput, endDateInput)
+  );
+  durationInput.addEventListener("input", () =>
+    calculateEndDate(startDateInput, durationInput, endDateInput)
+  );
 
   // ✅ THIẾT LẬP CÁC SỰ KIỆN DROPDOWN
-  const softwareNameEl = document.getElementById("softwareName");
-  const softwarePackageEl = document.getElementById("softwarePackage");
-  
-  if (softwareNameEl && softwarePackageEl) {
-    softwareNameEl.addEventListener("change", () =>
-      updatePackageList(window.softwareData, null, updateAccountList)
-    );
-    softwarePackageEl.addEventListener("change", () =>
-      updateAccountList(window.softwareData, null)
-    );
-  }
+  document.getElementById("softwareName").addEventListener("change", () =>
+    updatePackageList(window.softwareData, null, updateAccountList)
+  );
+  document.getElementById("softwarePackage").addEventListener("change", () =>
+    updateAccountList(window.softwareData, null)
+  );
 
   // ✅ THIẾT LẬP CHI PHÍ
-  const expenseDateEl = document.getElementById("expenseDate");
-  const expenseRecorderEl = document.getElementById("expenseRecorder");
-  
-  if (expenseDateEl && expenseRecorderEl) {
-    expenseDateEl.value = window.todayFormatted;
-    expenseRecorderEl.value = window.userInfo?.tenNhanVien || "";
-  }
+  document.getElementById("expenseDate").value = window.todayFormatted;
+  document.getElementById("expenseRecorder").value = window.userInfo?.tenNhanVien || "";
 
   // ✅ BẮT ĐẦU LOAD DỮ LIỆU (KHÔNG ĐỒNG BỘ - KHÔNG BLOCK UI)
   console.log("🚀 Bắt đầu load dữ liệu không đồng bộ...");
@@ -237,49 +218,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   console.log("✅ Khởi tạo hoàn tất - UI có thể tương tác ngay lập tức");
 });
 
-// ✅ Function load HTML cho tab thống kê
-async function loadStatisticsHTML() {
-  try {
-    // Kiểm tra xem tab-thong-ke đã có nội dung chưa
-    const tabElement = document.querySelector('#tab-thong-ke');
-    if (!tabElement) {
-      console.error("❌ Không tìm thấy #tab-thong-ke element");
-      return;
-    }
-    
-    // Nếu đã có nội dung (không phải chỉ có text "Nội dung sẽ được load..."), không load lại
-    if (tabElement.innerHTML.trim() && !tabElement.innerHTML.includes('Nội dung sẽ được load')) {
-      console.log("✅ Tab thống kê đã có nội dung, không cần load lại");
-      return;
-    }
 
-    const response = await fetch('tab-thong-ke.html');
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const html = await response.text();
-    
-    // Chỉ cập nhật nội dung, không tạo element mới
-    tabElement.innerHTML = html;
-    console.log("✅ Đã load tab-thong-ke.html thành công");
-    
-  } catch (error) {
-    console.error('❌ Lỗi khi load tab-thong-ke.html:', error);
-    const tabElement = document.querySelector('#tab-thong-ke');
-    if (tabElement) {
-      tabElement.innerHTML = `
-        <div style="text-align: center; padding: 50px; color: #dc3545;">
-          <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 20px;"></i>
-          <p>Không thể tải tab thống kê. Vui lòng thử lại.</p>
-          <button onclick="loadStatisticsHTML()" style="margin-top: 10px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Thử lại</button>
-        </div>
-      `;
-    }
-  }
-}
 
-// ✅ Gán các function vào window
 window.logout = logout;
 window.openCalendar = (inputId) =>
   openCalendar(inputId, calculateEndDate, document.getElementById("startDate"), document.getElementById("duration"), document.getElementById("endDate"));
@@ -314,6 +254,8 @@ window.deleteTransaction = (index) =>
   
 window.handleUpdateCookie = (index) =>
   handleUpdateCookie(index, window.transactionList);
+window.handleChangePassword = (index) =>
+  alert("🔐 Chức năng đổi mật khẩu đang được phát triển cho index: " + index);
 window.handleChangePassword = handleChangePassword;
 window.handleAddExpense = handleAddExpense;
 window.closeChangePasswordModal = closeChangePasswordModal;

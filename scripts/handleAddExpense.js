@@ -24,8 +24,6 @@ export async function handleAddExpense() {
     maNhanVien: window.userInfo?.maNhanVien || ""
   };
 
-  console.log("📤 Dữ liệu thêm chi phí:", data);
-
   const { BACKEND_URL } = getConstants();
 
   try {
@@ -38,8 +36,6 @@ export async function handleAddExpense() {
     const result = await response.json();
     if (result.status === "success") {
       alert("✅ Chi phí đã được lưu! Mã chi phí: " + result.chiPhiId);
-      
-      // ✅ Reset form sau khi thêm thành công
       document.getElementById("expenseForm").reset();
       document.getElementById("expenseDate").value = window.todayFormatted;
       document.getElementById("expenseRecorder").value = window.userInfo?.tenNhanVien || "";
@@ -51,6 +47,5 @@ export async function handleAddExpense() {
     }
   } catch (err) {
     alert("❌ Lỗi khi gửi dữ liệu: " + err.message);
-    console.error("Lỗi handleAddExpense:", err);
   }
 }
