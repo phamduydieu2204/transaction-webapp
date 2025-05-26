@@ -163,7 +163,7 @@ export async function fetchTransactionData(options = {}) {
     const response = await fetch(BACKEND_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "getAllTransactions" }),
+      body: JSON.stringify({ action: "getTransactionStats" }),
       signal: controller.signal
     });
 
