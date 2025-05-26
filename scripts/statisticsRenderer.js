@@ -19,47 +19,28 @@ export function renderMonthlySummaryTable(summaryData, options = {}) {
     maxRows = 100
   } = options;
 
-  // ✅ DEBUG: Check tab state and DOM elements
+  // Check if statistics tab is currently active
   const currentTab = document.querySelector(".tab-button.active");
-  const tabDataset = currentTab ? currentTab.dataset.tab : "null";
   const isThongKeTab = currentTab && currentTab.dataset.tab === "tab-thong-ke";
   
-  console.log(`🔍 DEBUG renderMonthlySummaryTable:`, {
-    currentTab: currentTab ? "found" : "null",
-    tabDataset: tabDataset,
-    isThongKeTab: isThongKeTab,
-    tableId: tableId
-  });
-  
   if (!isThongKeTab) {
-    console.log(`⏭️ Statistics tab not active (${tabDataset}), skipping table render`);
+    console.log(`⏭️ Statistics tab not active, skipping table render`);
     return;
   }
 
-  // ✅ DEBUG: Check if tab content is visible
-  const tabContent = document.getElementById("tab-thong-ke");
-  const tabContentStyle = tabContent ? window.getComputedStyle(tabContent) : null;
-  const tabContentDisplay = tabContentStyle ? tabContentStyle.display : "unknown";
-  
-  console.log(`🔍 DEBUG tab content:`, {
-    tabContent: tabContent ? "found" : "null",
-    display: tabContentDisplay,
-    visible: tabContentDisplay !== "none"
-  });
-
-  // ✅ DEBUG: Check table elements
+  // Get table element and ensure tbody exists
   const tableElement = document.getElementById(tableId);
-  const tableBody = document.querySelector(`#${tableId} tbody`);
-  
-  console.log(`🔍 DEBUG table elements:`, {
-    tableElement: tableElement ? "found" : "null", 
-    tableBody: tableBody ? "found" : "null",
-    querySelector: `#${tableId} tbody`
-  });
+  let tableBody = document.querySelector(`#${tableId} tbody`);
+
+  // Create tbody if it doesn't exist (fix for missing tbody issue)
+  if (!tableBody && tableElement) {
+    console.log(`🔧 Creating missing tbody for table ${tableId}`);
+    tableBody = document.createElement('tbody');
+    tableElement.appendChild(tableBody);
+  }
 
   if (!tableBody) {
-    console.warn(`⚠️ Table #${tableId} tbody not found - debugging info above`);
-    // Store data to render later when tab becomes visible
+    console.error(`❌ Cannot find or create tbody for table ${tableId}`);
     window.pendingStatsData = summaryData;
     window.pendingStatsOptions = options;
     return;
@@ -68,13 +49,13 @@ export function renderMonthlySummaryTable(summaryData, options = {}) {
   console.log("📊 Rendering monthly summary table:", summaryData.length, "entries");
 
   // Clear existing content
-  table.innerHTML = "";
+  tableBody.innerHTML = "";
 
   // Limit data if specified
   const dataToRender = summaryData.slice(0, maxRows);
 
   if (dataToRender.length === 0) {
-    const row = table.insertRow();
+    const row = tableBody.insertRow();
     row.innerHTML = `
       <td colspan="3" style="text-align: center; color: #666; font-style: italic;">
         Không có dữ liệu thống kê
@@ -84,7 +65,7 @@ export function renderMonthlySummaryTable(summaryData, options = {}) {
   }
 
   dataToRender.forEach((item, index) => {
-    const row = table.insertRow();
+    const row = tableBody.insertRow();
     
     // Month column
     const monthCell = row.insertCell();
