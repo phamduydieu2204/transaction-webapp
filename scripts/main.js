@@ -132,6 +132,18 @@ document.addEventListener("DOMContentLoaded", async () => {
           window.loadTransactions();
         }
       } else if (selectedTab === "tab-chi-phi" || selectedTab === "tab-thong-ke") {
+        // ✅ DEBUG: Check tab switching details
+        const activeButton = document.querySelector(".tab-button.active");
+        const tabContent = document.getElementById(selectedTab);
+        const tabStyle = tabContent ? window.getComputedStyle(tabContent) : null;
+        
+        console.log("🔍 DEBUG main.js tab switching:", {
+          selectedTab: selectedTab,
+          activeButtonDataset: activeButton ? activeButton.dataset.tab : "null",
+          tabContent: tabContent ? "found" : "null",
+          tabDisplay: tabStyle ? tabStyle.display : "unknown"
+        });
+        
         // Refresh bảng chi phí
         console.log("🔄 Chuyển sang tab chi phí/thống kê - refresh bảng");
         renderExpenseStats();

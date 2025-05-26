@@ -19,18 +19,46 @@ export function renderMonthlySummaryTable(summaryData, options = {}) {
     maxRows = 100
   } = options;
 
-  // Check if statistics tab is currently active
+  // ✅ DEBUG: Check tab state and DOM elements
   const currentTab = document.querySelector(".tab-button.active");
+  const tabDataset = currentTab ? currentTab.dataset.tab : "null";
   const isThongKeTab = currentTab && currentTab.dataset.tab === "tab-thong-ke";
   
+  console.log(`🔍 DEBUG renderMonthlySummaryTable:`, {
+    currentTab: currentTab ? "found" : "null",
+    tabDataset: tabDataset,
+    isThongKeTab: isThongKeTab,
+    tableId: tableId
+  });
+  
   if (!isThongKeTab) {
-    console.log(`⏭️ Statistics tab not active, skipping table render`);
+    console.log(`⏭️ Statistics tab not active (${tabDataset}), skipping table render`);
     return;
   }
 
-  const table = document.querySelector(`#${tableId} tbody`);
-  if (!table) {
-    console.warn(`⚠️ Table #${tableId} tbody not found - tab may not be visible yet`);
+  // ✅ DEBUG: Check if tab content is visible
+  const tabContent = document.getElementById("tab-thong-ke");
+  const tabContentStyle = tabContent ? window.getComputedStyle(tabContent) : null;
+  const tabContentDisplay = tabContentStyle ? tabContentStyle.display : "unknown";
+  
+  console.log(`🔍 DEBUG tab content:`, {
+    tabContent: tabContent ? "found" : "null",
+    display: tabContentDisplay,
+    visible: tabContentDisplay !== "none"
+  });
+
+  // ✅ DEBUG: Check table elements
+  const tableElement = document.getElementById(tableId);
+  const tableBody = document.querySelector(`#${tableId} tbody`);
+  
+  console.log(`🔍 DEBUG table elements:`, {
+    tableElement: tableElement ? "found" : "null", 
+    tableBody: tableBody ? "found" : "null",
+    querySelector: `#${tableId} tbody`
+  });
+
+  if (!tableBody) {
+    console.warn(`⚠️ Table #${tableId} tbody not found - debugging info above`);
     // Store data to render later when tab becomes visible
     window.pendingStatsData = summaryData;
     window.pendingStatsOptions = options;

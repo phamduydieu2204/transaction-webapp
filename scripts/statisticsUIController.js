@@ -174,12 +174,39 @@ function setupExportControls() {
 function handleStatisticsTabActivation() {
   console.log("📊 Statistics tab activated");
   
+  // ✅ DEBUG: Check initial state
+  const currentTab = document.querySelector(".tab-button.active");
+  const tabContent = document.getElementById("tab-thong-ke");
+  const tabContentStyle = tabContent ? window.getComputedStyle(tabContent) : null;
+  
+  console.log("🔍 DEBUG handleStatisticsTabActivation initial state:", {
+    currentTab: currentTab ? currentTab.dataset.tab : "null",
+    tabContent: tabContent ? "found" : "null",
+    tabDisplay: tabContentStyle ? tabContentStyle.display : "unknown",
+    windowExpenseList: window.expenseList ? window.expenseList.length : "null"
+  });
+  
   // Wait for tab to be fully displayed before rendering
   setTimeout(() => {
+    // ✅ DEBUG: Check state after timeout
+    const currentTabAfter = document.querySelector(".tab-button.active");
+    const tabContentAfter = document.getElementById("tab-thong-ke");
+    const tabContentStyleAfter = tabContentAfter ? window.getComputedStyle(tabContentAfter) : null;
+    
+    console.log("🔍 DEBUG handleStatisticsTabActivation after timeout:", {
+      currentTab: currentTabAfter ? currentTabAfter.dataset.tab : "null",
+      tabContent: tabContentAfter ? "found" : "null",
+      tabDisplay: tabContentStyleAfter ? tabContentStyleAfter.display : "unknown",
+      tableExists: document.querySelector("#monthlySummaryTable") ? "found" : "null",
+      tbodyExists: document.querySelector("#monthlySummaryTable tbody") ? "found" : "null"
+    });
+    
     // Check if we need to refresh data
     if (!window.expenseList || window.expenseList.length === 0) {
+      console.log("🔄 Loading statistics data (no existing data)");
       loadStatisticsData();
     } else {
+      console.log("🔄 Refreshing statistics (using existing data)");
       refreshStatistics();
     }
     
@@ -190,7 +217,7 @@ function handleStatisticsTabActivation() {
       window.pendingStatsData = null;
       window.pendingStatsOptions = null;
     }
-  }, 100); // Small delay to ensure tab is visible
+  }, 200); // Increased delay to ensure tab is visible
 }
 
 /**
