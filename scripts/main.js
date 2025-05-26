@@ -237,20 +237,34 @@ document.addEventListener("DOMContentLoaded", async () => {
   console.log("✅ Khởi tạo hoàn tất - UI có thể tương tác ngay lập tức");
 });
 
-// ✅ Function load HTML cho tab thống kê
+// ✅ Function load HTML cho tab thống kê - SỬA LỖI DUPLICATE
 async function loadStatisticsHTML() {
   try {
+    // Xóa tất cả duplicate trước khi load
+    const existingTabs = document.querySelectorAll('#tab-thong-ke');
+    existingTabs.forEach((el, index) => {
+      if (index > 0) { // Giữ lại cái đầu tiên, xóa các duplicate
+        el.remove();
+        console.log(`🗑️ Đã xóa duplicate tab-thong-ke ${index}`);
+      }
+    });
+
     const response = await fetch('tab-thong-ke.html');
     const html = await response.text();
-    const tabElement = document.getElementById('tab-thong-ke');
+    
+    // Lấy element tab đầu tiên (đúng)
+    const tabElement = document.querySelector('#tab-thong-ke');
     if (tabElement) {
+      // Chỉ load nội dung, không tạo element mới
       tabElement.innerHTML = html;
-      console.log("✅ Đã load tab-thong-ke.html thành công");
+      console.log("✅ Đã load tab-thong-ke.html vào element hiện có");
+    } else {
+      console.error("❌ Không tìm thấy #tab-thong-ke element");
     }
   } catch (error) {
     console.error('❌ Lỗi khi load tab-thong-ke.html:', error);
     // Fallback: hiển thị message lỗi
-    const tabElement = document.getElementById('tab-thong-ke');
+    const tabElement = document.querySelector('#tab-thong-ke');
     if (tabElement) {
       tabElement.innerHTML = '<p style="text-align: center; color: red;">Không thể tải tab thống kê. Vui lòng thử lại.</p>';
     }
