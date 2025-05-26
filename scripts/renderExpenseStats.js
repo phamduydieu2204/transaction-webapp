@@ -218,6 +218,11 @@ function renderExpenseTable(data, formatDate) {
       }
     }
 
+    // ✅ Thêm style màu vàng nhạt cho trạng thái "chưa thanh toán"
+    if (e.status && e.status.toLowerCase().includes("chưa thanh toán")) {
+      row.style.backgroundColor = "#fff9c4"; // Màu vàng nhạt
+    }
+
     // ✅ HIỂN THỊ CÁC CELL
     row.insertCell().textContent = e.expenseId || "";
     row.insertCell().textContent = formatDate(e.date);
@@ -235,7 +240,7 @@ function renderExpenseTable(data, formatDate) {
     
     row.insertCell().textContent = `${(e.amount || 0).toLocaleString()} ${e.currency || ""}`;
     row.insertCell().textContent = formatDate(e.renew);
-    row.insertCell().textContent = e.status || "";
+    row.insertCell().textContent = e.note || ""; // Hiển thị ghi chú thay vì trạng thái
 
     // ✅ Action dropdown
     const actionCell = row.insertCell();
