@@ -94,17 +94,19 @@ function setTimeFilter(period) {
 async function loadStatisticsData() {
   try {
     const { BACKEND_URL } = getConstants();
+    const userRole = window.userInfo?.vaiTro || "user";
+    const userPermissions = getUserPermissions(userRole);
     
-    // Load transactions
+// Load transactions - lấy tất cả giao dịch cho admin
     const transactionsResponse = await fetch(BACKEND_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         action: "getTransactions",
         maNhanVien: window.userInfo?.maNhanVien || "",
-        vaiTro: "admin",
+        vaiTro: window.userInfo?.vaiTro || "",
         giaoDichNhinThay: "bán hàng,hoàn tiền,dùng thử,nhập hàng",
-        nhinThayGiaoDichCuaAi: "tất cả"
+        nhinThayGiaoDichCuaAi: window.userInfo?.vaiTro?.toLowerCase() === "admin" ? "tất cả" : "chỉ bản thân"
       })
     });
     

@@ -237,36 +237,44 @@ document.addEventListener("DOMContentLoaded", async () => {
   console.log("✅ Khởi tạo hoàn tất - UI có thể tương tác ngay lập tức");
 });
 
-// ✅ Function load HTML cho tab thống kê - SỬA LỖI DUPLICATE
+// ✅ Function load HTML cho tab thống kê
 async function loadStatisticsHTML() {
   try {
-    // Xóa tất cả duplicate trước khi load
-    const existingTabs = document.querySelectorAll('#tab-thong-ke');
-    existingTabs.forEach((el, index) => {
-      if (index > 0) { // Giữ lại cái đầu tiên, xóa các duplicate
-        el.remove();
-        console.log(`🗑️ Đã xóa duplicate tab-thong-ke ${index}`);
-      }
-    });
+    // Kiểm tra xem tab-thong-ke đã có nội dung chưa
+    const tabElement = document.querySelector('#tab-thong-ke');
+    if (!tabElement) {
+      console.error("❌ Không tìm thấy #tab-thong-ke element");
+      return;
+    }
+    
+    // Nếu đã có nội dung (không phải chỉ có text "Nội dung sẽ được load..."), không load lại
+    if (tabElement.innerHTML.trim() && !tabElement.innerHTML.includes('Nội dung sẽ được load')) {
+      console.log("✅ Tab thống kê đã có nội dung, không cần load lại");
+      return;
+    }
 
     const response = await fetch('tab-thong-ke.html');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
     const html = await response.text();
     
-    // Lấy element tab đầu tiên (đúng)
-    const tabElement = document.querySelector('#tab-thong-ke');
-    if (tabElement) {
-      // Chỉ load nội dung, không tạo element mới
-      tabElement.innerHTML = html;
-      console.log("✅ Đã load tab-thong-ke.html vào element hiện có");
-    } else {
-      console.error("❌ Không tìm thấy #tab-thong-ke element");
-    }
+    // Chỉ cập nhật nội dung, không tạo element mới
+    tabElement.innerHTML = html;
+    console.log("✅ Đã load tab-thong-ke.html thành công");
+    
   } catch (error) {
     console.error('❌ Lỗi khi load tab-thong-ke.html:', error);
-    // Fallback: hiển thị message lỗi
     const tabElement = document.querySelector('#tab-thong-ke');
     if (tabElement) {
-      tabElement.innerHTML = '<p style="text-align: center; color: red;">Không thể tải tab thống kê. Vui lòng thử lại.</p>';
+      tabElement.innerHTML = `
+        <div style="text-align: center; padding: 50px; color: #dc3545;">
+          <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 20px;"></i>
+          <p>Không thể tải tab thống kê. Vui lòng thử lại.</p>
+          <button onclick="loadStatisticsHTML()" style="margin-top: 10px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Thử lại</button>
+        </div>
+      `;
     }
   }
 }
