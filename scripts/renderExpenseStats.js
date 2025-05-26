@@ -1,11 +1,17 @@
-// CÁCH 3: Cải thiện renderExpenseStats trong file renderExpenseStats.js
+// REFACTORED: renderExpenseStats.js now uses modular statistics system
 
 import { getConstants } from './constants.js';
 import { updateTotalDisplay } from './updateTotalDisplay.js';
+import { fetchExpenseData, getCombinedStatistics } from './statisticsDataManager.js';
+import { 
+  normalizeDate, 
+  calculateTotalExpenses, 
+  groupExpensesByMonth,
+  calculateFinancialAnalysis 
+} from './statisticsCore.js';
+import { renderMonthlySummaryTable } from './statisticsRenderer.js';
 
 export async function renderExpenseStats() {
-  const { BACKEND_URL } = getConstants();
-  
   // ✅ KIỂM TRA XEM CÓ ĐANG Ở TAB CHI PHÍ KHÔNG
   const currentTab = document.querySelector(".tab-button.active");
   const isChiPhiTab = currentTab && currentTab.dataset.tab === "tab-chi-phi";
@@ -22,12 +28,32 @@ export async function renderExpenseStats() {
     return;
   }
   
-  console.log("🔄 Bắt đầu load expense data...");
+  console.log("🔄 Bắt đầu load expense data bằng module mới...");
   
   try {
-    // ✅ SỬ DỤNG TIMEOUT ĐỂ TRÁNH BLOCK UI
+    // ✅ SỬ DỤNG MODULE MỚI ĐỂ FETCH DATA
+    const expenseData = await fetchExpenseData({ forceRefresh: false });
+    
+    window.expenseList = expenseData || [];
+    window.isExpenseSearching = false;
+    renderExpenseData(expenseData);
+    console.log("✅ Load expense data thành công:", expenseData.length, "chi phí");
+    
+  } catch (err) {
+    console.error("❌ Lỗi khi thống kê chi phí:", err);
+    // Fallback to old method if new module fails
+    console.log("🔄 Thử phương pháp cũ...");
+    await renderExpenseStatsLegacy();
+  }
+}
+
+// ✅ LEGACY METHOD FOR BACKWARD COMPATIBILITY
+async function renderExpenseStatsLegacy() {
+  const { BACKEND_URL } = getConstants();
+  
+  try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 giây timeout
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
     
     const res = await fetch(BACKEND_URL, {
       method: "POST",
@@ -48,7 +74,7 @@ export async function renderExpenseStats() {
       window.expenseList = result.data || [];
       window.isExpenseSearching = false;
       renderExpenseData(result.data);
-      console.log("✅ Load expense data thành công:", result.data.length, "chi phí");
+      console.log("✅ Legacy load expense data thành công:", result.data.length, "chi phí");
     } else {
       console.error("❌ Lỗi từ server:", result.message);
     }
@@ -56,7 +82,7 @@ export async function renderExpenseStats() {
     if (err.name === 'AbortError') {
       console.warn("⚠️ Load expense data bị timeout sau 15 giây");
     } else {
-      console.error("❌ Lỗi khi thống kê chi phí:", err);
+      console.error("❌ Lỗi khi thống kê chi phí (legacy):", err);
     }
   }
 }
@@ -69,92 +95,28 @@ function renderExpenseData(data) {
   const isChiPhiTab = currentTab && currentTab.dataset.tab === "tab-chi-phi";
   const isThongKeTab = currentTab && currentTab.dataset.tab === "tab-thong-ke";
   
-  // ✅ Hàm chuẩn hóa ngày từ nhiều format khác nhau
-  const normalizeDate = (dateInput) => {
-    if (!dateInput) return "";
-    
-    let date;
-    if (typeof dateInput === 'string') {
-      // Nếu là ISO string như "2025-05-21T17:00:00.000Z"
-      if (dateInput.includes('T')) {
-        date = new Date(dateInput);
-      } 
-      // Nếu là format "2025/05/23"
-      else if (dateInput.includes('/')) {
-        const [y, m, d] = dateInput.split('/');
-        date = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
-      }
-      // Các format khác
-      else {
-        date = new Date(dateInput);
-      }
-    } else {
-      date = new Date(dateInput);
-    }
-    
-    if (isNaN(date.getTime())) return "";
-    
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
-    return `${yyyy}/${mm}/${dd}`;
-  };
-
-  const formatDate = (isoStr) => {
-    return normalizeDate(isoStr);
-  };
-
-  // ✅ TÍNH TỔNG CHI PHÍ (logic giống như tính tổng doanh thu)
-  let totalExpense = 0;
+  // ✅ SỬ DỤNG MODULE MỚI ĐỂ TÍNH TỔNG CHI PHÍ
   const today = new Date();
-  const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
+  const todayFormatted = normalizeDate(today);
 
-  console.log("📌 BẮT ĐẦU TÍNH TỔNG CHI PHÍ");
+  console.log("📌 BẮT ĐẦU TÍNH TỔNG CHI PHÍ VỚI MODULE MỚI");
   console.log("🟢 Vai trò:", window.userInfo?.vaiTro);
   console.log("🟢 isExpenseSearching:", window.isExpenseSearching);
   console.log("🟢 todayFormatted:", todayFormatted);
   console.log("🟢 Số lượng bản ghi chi phí:", data?.length);
 
-  // Logic tính tổng giống như doanh thu
-  if (window.isExpenseSearching === true) {
-    // Nếu đang tìm kiếm, tính tổng tất cả kết quả tìm kiếm (chỉ VND)
-    totalExpense = data.reduce((sum, e) => {
-      console.log("🔍 Chi phí tìm kiếm:", e.amount, e.currency);
-      if (e.currency === "VND") {
-        return sum + (parseFloat(e.amount) || 0);
-      }
-      return sum;
-    }, 0);
-    console.log("🔍 Đang tìm kiếm - Tổng chi phí tìm kiếm:", totalExpense);
-  } else {
-    // Nếu không tìm kiếm, chỉ tính chi phí hôm nay (chỉ VND)
-    totalExpense = data.reduce((sum, e) => {
-      // ✅ Chuẩn hóa ngày từ server về format yyyy/mm/dd
-      const normalizedDate = normalizeDate(e.date);
-      const isToday = normalizedDate === todayFormatted;
-      
-      console.log("📅 Chi phí hôm nay check:", {
-        originalDate: e.date,
-        normalizedDate: normalizedDate,
-        todayFormatted: todayFormatted,
-        isToday: isToday,
-        currency: e.currency,
-        amount: e.amount
-      });
-      
-      if (isToday && e.currency === "VND") {
-        const amount = parseFloat(e.amount) || 0;
-        console.log("✅ Thêm vào tổng:", amount);
-        return sum + amount;
-      }
-      return sum;
-    }, 0);
-    console.log("📅 Không tìm kiếm - Tổng chi phí hôm nay:", totalExpense);
-  }
+  // ✅ SỬ DỤNG FUNCTION MỚI ĐỂ TÍNH TỔNG
+  const totalExpenses = calculateTotalExpenses(data, {
+    isSearching: window.isExpenseSearching === true,
+    targetDate: window.isExpenseSearching ? null : todayFormatted,
+    currency: "VND"
+  });
+
+  const totalExpense = totalExpenses.VND || 0;
+  console.log("✅ Tổng chi phí tính được:", totalExpense);
 
   // ✅ Lưu tổng chi phí vào biến global và cập nhật hiển thị
   window.totalExpense = totalExpense;
-  console.log("✅ Đã lưu totalExpense:", totalExpense);
 
   // Gọi hàm cập nhật hiển thị tổng số
   if (typeof updateTotalDisplay === 'function') {
@@ -165,10 +127,32 @@ function renderExpenseData(data) {
 
   // ✅ CHỈ RENDER BẢNG NẾU ĐANG Ở TAB TƯƠNG ỨNG
   if (isChiPhiTab) {
-    renderExpenseTable(data, formatDate);
+    renderExpenseTable(data, normalizeDate);
   }
 
   if (isThongKeTab) {
+    renderExpenseSummaryModular(data);
+  }
+}
+
+// ✅ SỬ DỤNG MODULE MỚI ĐỂ RENDER BẢNG THỐNG KÊ
+function renderExpenseSummaryModular(data) {
+  try {
+    const summaryData = groupExpensesByMonth(data, {
+      currency: "VND",
+      sortBy: "month",
+      sortOrder: "desc"
+    });
+
+    renderMonthlySummaryTable(summaryData, {
+      tableId: "monthlySummaryTable",
+      showGrowthRate: false
+    });
+
+    console.log("✅ Statistics summary rendered with new modules");
+  } catch (error) {
+    console.error("❌ Error rendering modular summary:", error);
+    // Fallback to legacy method
     renderExpenseSummary(data, normalizeDate);
   }
 }
@@ -347,3 +331,16 @@ function updateExpensePagination(totalPages, currentPage) {
     pagination.appendChild(pageButton);
   }
 }
+
+// ✅ KHỞI TẠO STATISTICS UI CONTROLLER KHI MODULE ĐƯỢC LOAD
+document.addEventListener('DOMContentLoaded', () => {
+  // Lazy load UI controller to avoid circular imports
+  import('./statisticsUIController.js').then(module => {
+    if (module.initializeStatisticsUI) {
+      console.log("🎮 Initializing statistics UI controller...");
+      module.initializeStatisticsUI();
+    }
+  }).catch(error => {
+    console.warn("⚠️ Could not load statistics UI controller:", error);
+  });
+});
