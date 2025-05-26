@@ -806,12 +806,14 @@ body.login-page {
   background-color: #fff3a0 !important; /* Màu vàng đậm hơn một chút khi hover */
 }
 
-/* ================ THÊM VÀO CUỐI FILE style.css ================ */
+/* ================ SỬA PHẦN STATISTICS CSS TRONG style.css ================ */
 
-/* =================== STATISTICS TAB STYLES =================== */
+/* XÓA TẤT CẢ CSS STATISTICS CŨ VÀ THAY BẰNG CODE NÀY */
 
-/* Header Section */
-.statistics-header {
+/* =================== STATISTICS TAB STYLES (CHỈ ÁP DỤNG CHO TAB THỐNG KÊ) =================== */
+
+/* Header Section - CHỈ TRONG TAB THỐNG KÊ */
+#tab-thong-ke .statistics-header {
   display: flex !important;
   justify-content: space-between;
   align-items: center;
@@ -822,24 +824,24 @@ body.login-page {
   color: white;
 }
 
-.statistics-header h2 {
+#tab-thong-ke .statistics-header h2 {
   margin: 0;
   font-size: 24px;
   font-weight: 600;
 }
 
-.time-filter {
+#tab-thong-ke .time-filter {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.time-filter label {
+#tab-thong-ke .time-filter label {
   font-weight: 500;
 }
 
-.time-filter select,
-.time-filter input {
+#tab-thong-ke .time-filter select,
+#tab-thong-ke .time-filter input {
   padding: 8px 12px;
   border: none;
   border-radius: 6px;
@@ -847,14 +849,14 @@ body.login-page {
   background: rgba(255, 255, 255, 0.9);
 }
 
-#customDateRange {
+#tab-thong-ke #customDateRange {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-left: 10px;
 }
 
-#customDateRange button {
+#tab-thong-ke #customDateRange button {
   padding: 8px 16px;
   background: #28a745;
   color: white;
@@ -864,8 +866,8 @@ body.login-page {
   font-size: 14px;
 }
 
-/* KPI Cards - FORCE VISIBLE */
-.kpi-cards {
+/* KPI Cards - CHỈ TRONG TAB THỐNG KÊ */
+#tab-thong-ke .kpi-cards {
   display: grid !important;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
   gap: 20px !important;
@@ -874,7 +876,7 @@ body.login-page {
   opacity: 1 !important;
 }
 
-.kpi-card {
+#tab-thong-ke .kpi-card {
   background: white !important;
   border-radius: 12px !important;
   padding: 24px !important;
@@ -887,41 +889,41 @@ body.login-page {
   position: relative !important;
 }
 
-.kpi-card:hover {
+#tab-thong-ke .kpi-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
 }
 
-.kpi-card.revenue {
+#tab-thong-ke .kpi-card.revenue {
   border-left: 4px solid #28a745;
 }
 
-.kpi-card.expense {
+#tab-thong-ke .kpi-card.expense {
   border-left: 4px solid #dc3545;
 }
 
-.kpi-card.profit {
+#tab-thong-ke .kpi-card.profit {
   border-left: 4px solid #007bff;
 }
 
-.kpi-card.transactions {
+#tab-thong-ke .kpi-card.transactions {
   border-left: 4px solid #ffc107;
 }
 
-.kpi-icon {
+#tab-thong-ke .kpi-icon {
   font-size: 48px !important;
   margin-right: 20px !important;
   opacity: 0.8 !important;
   display: block !important;
 }
 
-.kpi-content {
+#tab-thong-ke .kpi-content {
   display: block !important;
   visibility: visible !important;
   opacity: 1 !important;
 }
 
-.kpi-content h3 {
+#tab-thong-ke .kpi-content h3 {
   margin: 0 0 8px 0 !important;
   font-size: 14px !important;
   color: #666 !important;
@@ -931,7 +933,7 @@ body.login-page {
   display: block !important;
 }
 
-.kpi-value {
+#tab-thong-ke .kpi-value {
   font-size: 28px !important;
   font-weight: 700 !important;
   color: #333 !important;
@@ -941,26 +943,26 @@ body.login-page {
   opacity: 1 !important;
 }
 
-.kpi-change {
+#tab-thong-ke .kpi-change {
   font-size: 14px !important;
   font-weight: 500 !important;
   display: block !important;
 }
 
-.kpi-change.positive {
+#tab-thong-ke .kpi-change.positive {
   color: #28a745 !important;
 }
 
-.kpi-change.negative {
+#tab-thong-ke .kpi-change.negative {
   color: #dc3545 !important;
 }
 
-.kpi-change.neutral {
+#tab-thong-ke .kpi-change.neutral {
   color: #6c757d !important;
 }
 
-/* Charts Layout - FORCE VISIBLE */
-.charts-row {
+/* Charts Layout - CHỈ TRONG TAB THỐNG KÊ */
+#tab-thong-ke .charts-row {
   display: grid !important;
   grid-template-columns: 1fr 1fr !important;
   gap: 20px !important;
@@ -969,7 +971,7 @@ body.login-page {
   opacity: 1 !important;
 }
 
-.chart-container {
+#tab-thong-ke .chart-container {
   background: white !important;
   border-radius: 12px !important;
   padding: 20px !important;
@@ -981,8 +983,8 @@ body.login-page {
   min-height: 300px !important;
 }
 
-.chart-container h3,
-.chart-container h4 {
+#tab-thong-ke .chart-container h3,
+#tab-thong-ke .chart-container h4 {
   margin: 0 0 20px 0 !important;
   font-size: 16px !important;
   color: #333 !important;
@@ -990,7 +992,7 @@ body.login-page {
   display: block !important;
 }
 
-.chart-container canvas {
+#tab-thong-ke .chart-container canvas {
   max-width: 100% !important;
   height: auto !important;
   display: block !important;
@@ -998,8 +1000,8 @@ body.login-page {
   opacity: 1 !important;
 }
 
-/* Statistics Tables - FORCE VISIBLE */
-.statistics-tables {
+/* Statistics Tables - CHỈ TRONG TAB THỐNG KÊ */
+#tab-thong-ke .statistics-tables {
   display: grid !important;
   grid-template-columns: 1fr 1fr !important;
   gap: 20px !important;
@@ -1008,7 +1010,7 @@ body.login-page {
   opacity: 1 !important;
 }
 
-.stats-table-container {
+#tab-thong-ke .stats-table-container {
   background: white !important;
   border-radius: 12px !important;
   padding: 20px !important;
@@ -1019,7 +1021,7 @@ body.login-page {
   position: relative !important;
 }
 
-.stats-table-container h3 {
+#tab-thong-ke .stats-table-container h3 {
   margin: 0 0 16px 0 !important;
   font-size: 16px !important;
   color: #333 !important;
@@ -1027,7 +1029,7 @@ body.login-page {
   display: block !important;
 }
 
-.stats-table {
+#tab-thong-ke .stats-table {
   width: 100% !important;
   border-collapse: collapse !important;
   font-size: 14px !important;
@@ -1036,12 +1038,12 @@ body.login-page {
   opacity: 1 !important;
 }
 
-.stats-table thead {
+#tab-thong-ke .stats-table thead {
   background: #f8f9fa !important;
   display: table-header-group !important;
 }
 
-.stats-table th {
+#tab-thong-ke .stats-table th {
   padding: 12px 8px !important;
   text-align: left !important;
   font-weight: 600 !important;
@@ -1050,43 +1052,43 @@ body.login-page {
   display: table-cell !important;
 }
 
-.stats-table td {
+#tab-thong-ke .stats-table td {
   padding: 10px 8px !important;
   border-bottom: 1px solid #dee2e6 !important;
   color: #333 !important;
   display: table-cell !important;
 }
 
-.stats-table tbody {
+#tab-thong-ke .stats-table tbody {
   display: table-row-group !important;
 }
 
-.stats-table tr {
+#tab-thong-ke .stats-table tr {
   display: table-row !important;
 }
 
-.stats-table tbody tr:hover {
+#tab-thong-ke .stats-table tbody tr:hover {
   background: #f8f9fa !important;
 }
 
-.stats-table .rank {
+#tab-thong-ke .stats-table .rank {
   text-align: center !important;
   font-weight: 600 !important;
 }
 
-.stats-table .currency {
+#tab-thong-ke .stats-table .currency {
   text-align: right !important;
   font-weight: 500 !important;
 }
 
-.stats-table .percentage {
+#tab-thong-ke .stats-table .percentage {
   text-align: right !important;
   color: #007bff !important;
   font-weight: 500 !important;
 }
 
-/* Customer Analytics */
-.customer-analytics {
+/* Customer Analytics - CHỈ TRONG TAB THỐNG KÊ */
+#tab-thong-ke .customer-analytics {
   background: white !important;
   border-radius: 12px !important;
   padding: 20px !important;
@@ -1097,7 +1099,7 @@ body.login-page {
   opacity: 1 !important;
 }
 
-.customer-analytics h3 {
+#tab-thong-ke .customer-analytics h3 {
   margin: 0 0 20px 0 !important;
   font-size: 18px !important;
   color: #333 !important;
@@ -1105,12 +1107,12 @@ body.login-page {
   display: block !important;
 }
 
-.customer-analytics .charts-row {
+#tab-thong-ke .customer-analytics .charts-row {
   grid-template-columns: 1fr 1fr 1fr !important;
 }
 
-/* Export Controls */
-.export-controls {
+/* Export Controls - CHỈ TRONG TAB THỐNG KÊ */
+#tab-thong-ke .export-controls {
   background: white !important;
   border-radius: 12px !important;
   padding: 20px !important;
@@ -1120,7 +1122,7 @@ body.login-page {
   opacity: 1 !important;
 }
 
-.export-controls h3 {
+#tab-thong-ke .export-controls h3 {
   margin: 0 0 16px 0 !important;
   font-size: 16px !important;
   color: #333 !important;
@@ -1128,13 +1130,13 @@ body.login-page {
   display: block !important;
 }
 
-.export-buttons {
+#tab-thong-ke .export-buttons {
   display: flex !important;
   gap: 12px !important;
   flex-wrap: wrap !important;
 }
 
-.export-btn {
+#tab-thong-ke .export-btn {
   padding: 10px 20px !important;
   border: none !important;
   border-radius: 8px !important;
@@ -1147,32 +1149,32 @@ body.login-page {
   gap: 8px !important;
 }
 
-.export-btn.pdf {
+#tab-thong-ke .export-btn.pdf {
   background: #dc3545 !important;
   color: white !important;
 }
 
-.export-btn.excel {
+#tab-thong-ke .export-btn.excel {
   background: #28a745 !important;
   color: white !important;
 }
 
-.export-btn.csv {
+#tab-thong-ke .export-btn.csv {
   background: #007bff !important;
   color: white !important;
 }
 
-.export-btn.print {
+#tab-thong-ke .export-btn.print {
   background: #6c757d !important;
   color: white !important;
 }
 
-.export-btn:hover {
+#tab-thong-ke .export-btn:hover {
   transform: translateY(-1px) !important;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
 }
 
-/* FORCE TAB THONG KE VISIBLE */
+/* FORCE CHỈ TAB THỐNG KÊ VISIBLE */
 #tab-thong-ke {
   display: block !important;
   visibility: visible !important;
@@ -1186,54 +1188,64 @@ body.login-page {
   display: block !important;
 }
 
-/* FORCE ALL STATISTICS CHILDREN VISIBLE */
-#tab-thong-ke * {
-  visibility: visible !important;
-  opacity: 1 !important;
+/* ẨN CÁC STATISTICS ELEMENTS Ở TAB KHÁC */
+#tab-giao-dich .kpi-cards,
+#tab-giao-dich .charts-row,
+#tab-giao-dich .statistics-tables,
+#tab-giao-dich .customer-analytics,
+#tab-giao-dich .export-controls,
+#tab-chi-phi .kpi-cards,
+#tab-chi-phi .charts-row,
+#tab-chi-phi .statistics-tables,
+#tab-chi-phi .customer-analytics,
+#tab-chi-phi .export-controls {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
 }
 
-/* Responsive Design */
+/* Responsive Design - CHỈ TRONG TAB THỐNG KÊ */
 @media (max-width: 768px) {
-  .statistics-header {
+  #tab-thong-ke .statistics-header {
     flex-direction: column !important;
     gap: 16px !important;
   }
 
-  .kpi-cards {
+  #tab-thong-ke .kpi-cards {
     grid-template-columns: 1fr !important;
   }
 
-  .charts-row {
+  #tab-thong-ke .charts-row {
     grid-template-columns: 1fr !important;
   }
 
-  .statistics-tables {
+  #tab-thong-ke .statistics-tables {
     grid-template-columns: 1fr !important;
   }
 
-  .customer-analytics .charts-row {
+  #tab-thong-ke .customer-analytics .charts-row {
     grid-template-columns: 1fr !important;
   }
 
-  .export-buttons {
+  #tab-thong-ke .export-buttons {
     justify-content: center !important;
   }
 
-  .stats-table {
+  #tab-thong-ke .stats-table {
     font-size: 12px !important;
   }
 
-  .stats-table th,
-  .stats-table td {
+  #tab-thong-ke .stats-table th,
+  #tab-thong-ke .stats-table td {
     padding: 8px 4px !important;
   }
 
-  .kpi-card {
+  #tab-thong-ke .kpi-card {
     flex-direction: column !important;
     text-align: center !important;
   }
 
-  .kpi-icon {
+  #tab-thong-ke .kpi-icon {
     margin-right: 0 !important;
     margin-bottom: 12px !important;
   }
