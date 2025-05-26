@@ -462,8 +462,8 @@ async function refreshStatistics() {
     // Calculate financial analysis
     const financialAnalysis = calculateFinancialAnalysis(revenueTotals, expenseTotals);
     
-    // Render based on current tab - simplified to avoid errors
-    await renderDefaultTab(expenseData, financialAnalysis);
+    // Render based on current tab with enhanced features
+    await renderEnhancedStatistics(expenseData, transactionData, financialAnalysis);
     
     // ✅ DEBUG: Check final UI state and loading indicators
     const finalUIState = {
@@ -555,6 +555,67 @@ async function renderRevenueTab(transactionData) {
 }
 
 /**
+ * Renders enhanced statistics with all features
+ */
+async function renderEnhancedStatistics(expenseData, transactionData, financialAnalysis) {
+  try {
+    console.log("🎨 Rendering enhanced statistics dashboard...");
+    
+    // 1. Render Financial Overview Dashboard
+    renderFinancialOverview(financialAnalysis, {
+      containerId: "financialOverview",
+      showDetails: true
+    });
+    console.log("✅ Financial overview rendered");
+    
+    // 2. Render Expense Chart
+    const chartData = groupExpensesByMonth(expenseData, {
+      currency: uiState.currency,
+      sortBy: "month",
+      sortOrder: "desc"
+    }).slice(0, 12); // Last 12 months
+    
+    renderSimpleChart(chartData, {
+      containerId: "overviewChart",
+      chartType: "bar",
+      title: "Chi Phí Theo Tháng (12 tháng gần nhất)",
+      xLabel: "Tháng",
+      yLabel: "Số Tiền (VND)",
+      maxBars: 12
+    });
+    console.log("✅ Expense chart rendered");
+    
+    // 3. Render Export Controls
+    renderExportControls({
+      containerId: "statisticsExportControls",
+      formats: ["csv", "json"],
+      onExport: handleDataExport
+    });
+    console.log("✅ Export controls rendered");
+    
+    // 4. Render Monthly Summary Table
+    const summaryData = groupExpensesByMonth(expenseData, {
+      currency: uiState.currency,
+      sortBy: uiState.sortBy,
+      sortOrder: uiState.sortOrder
+    });
+    
+    renderMonthlySummaryTable(summaryData, {
+      tableId: "monthlySummaryTable",
+      showGrowthRate: false
+    });
+    console.log("✅ Monthly summary table rendered");
+    
+    console.log("🎉 Enhanced statistics dashboard complete!");
+    
+  } catch (error) {
+    console.error("❌ Error rendering enhanced statistics:", error);
+    // Fallback to simple table
+    await renderDefaultTab(expenseData, financialAnalysis);
+  }
+}
+
+/**
  * Renders default tab content (backward compatibility)
  */
 async function renderDefaultTab(expenseData, financialAnalysis) {
@@ -567,7 +628,7 @@ async function renderDefaultTab(expenseData, financialAnalysis) {
     
     renderMonthlySummaryTable(summaryData, {
       tableId: "monthlySummaryTable",
-      showGrowthRate: false // Simplified for now
+      showGrowthRate: false
     });
   } catch (error) {
     console.error("❌ Error rendering default tab:", error);
