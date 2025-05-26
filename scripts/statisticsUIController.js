@@ -174,12 +174,23 @@ function setupExportControls() {
 function handleStatisticsTabActivation() {
   console.log("📊 Statistics tab activated");
   
-  // Check if we need to refresh data
-  if (!window.expenseList || window.expenseList.length === 0) {
-    loadStatisticsData();
-  } else {
-    refreshStatistics();
-  }
+  // Wait for tab to be fully displayed before rendering
+  setTimeout(() => {
+    // Check if we need to refresh data
+    if (!window.expenseList || window.expenseList.length === 0) {
+      loadStatisticsData();
+    } else {
+      refreshStatistics();
+    }
+    
+    // Render any pending data that was stored
+    if (window.pendingStatsData && window.pendingStatsOptions) {
+      console.log("📊 Rendering pending statistics data...");
+      renderMonthlySummaryTable(window.pendingStatsData, window.pendingStatsOptions);
+      window.pendingStatsData = null;
+      window.pendingStatsOptions = null;
+    }
+  }, 100); // Small delay to ensure tab is visible
 }
 
 /**

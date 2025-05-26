@@ -19,9 +19,21 @@ export function renderMonthlySummaryTable(summaryData, options = {}) {
     maxRows = 100
   } = options;
 
+  // Check if statistics tab is currently active
+  const currentTab = document.querySelector(".tab-button.active");
+  const isThongKeTab = currentTab && currentTab.dataset.tab === "tab-thong-ke";
+  
+  if (!isThongKeTab) {
+    console.log(`⏭️ Statistics tab not active, skipping table render`);
+    return;
+  }
+
   const table = document.querySelector(`#${tableId} tbody`);
   if (!table) {
-    console.error(`❌ Table #${tableId} tbody not found`);
+    console.warn(`⚠️ Table #${tableId} tbody not found - tab may not be visible yet`);
+    // Store data to render later when tab becomes visible
+    window.pendingStatsData = summaryData;
+    window.pendingStatsOptions = options;
     return;
   }
 

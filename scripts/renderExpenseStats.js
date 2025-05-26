@@ -138,6 +138,15 @@ function renderExpenseData(data) {
 // ✅ SỬ DỤNG MODULE MỚI ĐỂ RENDER BẢNG THỐNG KÊ
 function renderExpenseSummaryModular(data) {
   try {
+    // Check if statistics tab is active before processing
+    const currentTab = document.querySelector(".tab-button.active");
+    const isThongKeTab = currentTab && currentTab.dataset.tab === "tab-thong-ke";
+    
+    if (!isThongKeTab) {
+      console.log("⏭️ Not on statistics tab, skipping modular summary");
+      return;
+    }
+
     const summaryData = groupExpensesByMonth(data, {
       currency: "VND",
       sortBy: "month",
