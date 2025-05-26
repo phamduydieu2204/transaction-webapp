@@ -221,10 +221,18 @@ function renderExpenseTable(data, formatDate) {
     // ✅ HIỂN THỊ CÁC CELL
     row.insertCell().textContent = e.expenseId || "";
     row.insertCell().textContent = formatDate(e.date);
-    row.insertCell().textContent = e.type || "";
-    row.insertCell().textContent = e.category || "";
-    row.insertCell().textContent = e.product || "";
-    row.insertCell().textContent = e.package || "";
+    
+    // ✅ Gộp 4 cột thành 1 cột "Thông tin khoản chi"
+    const expenseInfoParts = [
+      e.type || "",
+      e.category || "",
+      e.product || "",
+      e.package || ""
+    ].filter(part => part.trim() !== ""); // Loại bỏ các phần rỗng
+    
+    const expenseInfoCell = row.insertCell();
+    expenseInfoCell.textContent = expenseInfoParts.join(" - ");
+    
     row.insertCell().textContent = `${(e.amount || 0).toLocaleString()} ${e.currency || ""}`;
     row.insertCell().textContent = formatDate(e.renew);
     row.insertCell().textContent = e.status || "";
