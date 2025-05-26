@@ -373,6 +373,17 @@ async function loadStatisticsData() {
     
     await refreshStatistics();
     
+    // ✅ DEBUG: Check data loading completion
+    const dataLoadState = {
+      expenseCount: data.expenses ? data.expenses.length : 0,
+      transactionCount: data.transactions ? data.transactions.length : 0,
+      windowExpenseList: window.expenseList ? window.expenseList.length : 0,
+      windowTransactionList: window.transactionList ? window.transactionList.length : 0,
+      isLoadingFlag: uiState.isLoading
+    };
+    
+    console.log("🔍 DEBUG data loading state:", dataLoadState);
+    
     console.log("✅ Statistics data loaded successfully");
     
   } catch (error) {
@@ -382,6 +393,38 @@ async function loadStatisticsData() {
     showErrorMessage("Không thể tải dữ liệu thống kê");
   } finally {
     uiState.isLoading = false;
+    
+    // ✅ DEBUG: Ensure any processing modals are closed
+    if (typeof window.closeProcessingModal === 'function') {
+      console.log("🚫 Force closing any processing modals");
+      window.closeProcessingModal();
+    }
+    
+    // Check for any modal elements that might be stuck
+    const modalElements = [
+      document.querySelector('#processingModal'),
+      document.querySelector('.modal'),
+      document.querySelector('[class*="modal"]'),
+      document.querySelector('#loading-modal')
+    ].filter(el => el !== null);
+    
+    console.log("🔍 DEBUG modal elements:", {
+      foundModals: modalElements.length,
+      modals: modalElements.map(el => ({
+        id: el.id,
+        className: el.className,
+        display: window.getComputedStyle(el).display,
+        visibility: window.getComputedStyle(el).visibility
+      }))
+    });
+    
+    // Force hide any visible modals
+    modalElements.forEach(el => {
+      if (window.getComputedStyle(el).display !== 'none') {
+        console.log(`🚫 Force hiding modal:`, el.id || el.className);
+        el.style.display = 'none';
+      }
+    });
   }
 }
 
@@ -421,6 +464,22 @@ async function refreshStatistics() {
     
     // Render based on current tab - simplified to avoid errors
     await renderDefaultTab(expenseData, financialAnalysis);
+    
+    // ✅ DEBUG: Check final UI state and loading indicators
+    const finalUIState = {
+      isLoading: uiState.isLoading,
+      lastError: uiState.lastError,
+      tabVisible: document.getElementById("tab-thong-ke") ? 
+        window.getComputedStyle(document.getElementById("tab-thong-ke")).display : "unknown",
+      tableVisible: document.querySelector("#monthlySummaryTable tbody") ? "found" : "null",
+      loadingElements: document.querySelectorAll('[class*="loading"], [class*="spinner"]').length
+    };
+    
+    console.log("🔍 DEBUG final UI state:", finalUIState);
+    
+    // Ensure loading state is cleared
+    uiState.isLoading = false;
+    uiState.lastError = null;
     
     console.log("✅ Statistics refreshed successfully");
     
