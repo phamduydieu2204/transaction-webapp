@@ -6,6 +6,16 @@ export async function editExpenseRow(e) {
   // Lưu ID expense hiện tại đang sửa
   window.currentEditExpenseId = e.expenseId;
 
+  // Hàm format ngày từ ISO string sang yyyy/mm/dd cho input date
+  const formatDateForInput = (isoDate) => {
+    if (!isoDate) return "";
+    const date = new Date(isoDate);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}/${month}/${day}`;
+  };
+
   // Lưu các giá trị dropdown cần giữ lại
   const currentType = e.type || "";
   const currentCategory = e.category || "";
@@ -32,13 +42,13 @@ export async function editExpenseRow(e) {
     };
 
     setElementValue("expenseId", e.expenseId);
-    setElementValue("expenseDate", e.date);
+    setElementValue("expenseDate", formatDateForInput(e.date));
     setElementValue("expenseDescription", e.description || "");
     setElementValue("expenseAccount", e.account || "");
     setElementValue("expenseAmount", e.amount || "");
     setElementValue("expenseCurrency", e.currency || "VND");
     setElementValue("expenseRecurring", e.recurring || "Chi một lần");
-    setElementValue("expenseRenewDate", e.renew || "");
+    setElementValue("expenseRenewDate", formatDateForInput(e.renew));
     setElementValue("expenseSupplier", e.supplier || "");
     setElementValue("expenseSource", e.source || "");
     setElementValue("expenseStatus", e.status || "Đã thanh toán");
