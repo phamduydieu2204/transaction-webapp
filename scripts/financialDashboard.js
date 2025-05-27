@@ -43,6 +43,10 @@ export function renderFinancialDashboard(transactionData, expenseData, options =
     expenses: expenseData.length,
     globalFilters: globalFilters
   });
+  
+  // Debug: Verify dashboard is rendering
+  console.log("🔍 Dashboard container found:", !!container);
+  console.log("📊 Container ID:", containerId);
 
   // Apply global filters if available
   let filteredTransactionData = transactionData;
@@ -79,14 +83,27 @@ export function renderFinancialDashboard(transactionData, expenseData, options =
           </div>
         </div>
         
+        <!-- Tổng quan Doanh thu / Chi phí / Lợi nhuận -->
         ${renderOverviewCards(metrics)}
+        
+        <!-- Dòng tiền & Thanh khoản -->
         ${renderCashFlowTracker(metrics)}
+        
+        <!-- Chi phí theo danh mục -->
         ${renderCategoryBreakdown(metrics)}
       </div>
     </div>
   `;
 
   container.innerHTML = dashboardHTML;
+  
+  // Debug: Verify components are rendered
+  console.log("✅ Dashboard HTML length:", dashboardHTML.length);
+  console.log("📈 Overview cards present:", !!container.querySelector('.overview-cards'));
+  console.log("🔧 Filter panel present:", !!container.querySelector('.filter-panel'));
+  console.log("💰 Revenue card present:", !!container.querySelector('.revenue-card'));
+  console.log("💸 Expense card present:", !!container.querySelector('.expense-card'));
+  console.log("💵 Profit card present:", !!container.querySelector('.profit-card'));
   
   // Initialize default filters if not set
   if (!window.globalFilters.dateRange) {
@@ -97,6 +114,27 @@ export function renderFinancialDashboard(transactionData, expenseData, options =
   addDashboardInteractivity();
   
   console.log("✅ Financial Dashboard rendered successfully");
+  
+  // Show notification to user
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #48bb78;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 6px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 10000;
+    font-weight: 500;
+  `;
+  notification.textContent = '✅ Dashboard tài chính đã tải xong! Bộ lọc và tổng quan đang hiển thị.';
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
 }
 
 /**
@@ -297,29 +335,31 @@ function calculateExpensesByCategory(expenseData, startDate, endDate, skipDateFi
 }
 
 /**
+ * Get current period label from global filters
+ */
+function getPeriodLabel() {
+  if (!window.globalFilters || !window.globalFilters.dateRange) return "Tháng này";
+  
+  const { start, end } = window.globalFilters.dateRange;
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  
+  // Kiểm tra nếu là tháng đầy đủ
+  const startOfMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+  const endOfMonth = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
+  
+  if (startDate.getTime() === startOfMonth.getTime() && endDate.getTime() === endOfMonth.getTime()) {
+    return `Tháng ${startDate.getMonth() + 1}/${startDate.getFullYear()}`;
+  }
+  
+  // Ngược lại hiển thị khoảng thời gian
+  return `${start} đến ${end}`;
+}
+
+/**
  * Renders overview cards with key metrics
  */
 function renderOverviewCards(metrics) {
-  // Get current period label from actual dateRange
-  const getPeriodLabel = () => {
-    if (!window.globalFilters || !window.globalFilters.dateRange) return "Tháng này";
-    
-    const { start, end } = window.globalFilters.dateRange;
-    const startDate = new Date(start);
-    const endDate = new Date(end);
-    
-    // Kiểm tra nếu là tháng đầy đủ
-    const startOfMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
-    const endOfMonth = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
-    
-    if (startDate.getTime() === startOfMonth.getTime() && endDate.getTime() === endOfMonth.getTime()) {
-      return `Tháng ${startDate.getMonth() + 1}/${startDate.getFullYear()}`;
-    }
-    
-    // Ngược lại hiển thị khoảng thời gian
-    return `${start} đến ${end}`;
-  };
-
   const periodLabel = getPeriodLabel();
 
   return `
@@ -687,6 +727,10 @@ export function addFinancialDashboardStyles() {
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 20px;
       margin-bottom: 30px;
+      padding: 20px;
+      background: #f0f4f8;
+      border-radius: 12px;
+      border: 2px solid #e2e8f0;
     }
     
     .overview-card {
@@ -1210,14 +1254,16 @@ export function addFinancialDashboardStyles() {
       background: #007bff;
       color: white;
       border: none;
-      padding: 8px 12px;
+      padding: 10px 16px;
       border-radius: 6px;
       font-size: 14px;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 6px;
-      transition: background-color 0.2s;
+      transition: all 0.2s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      font-weight: 500;
     }
     
     .filter-toggle-btn:hover {
