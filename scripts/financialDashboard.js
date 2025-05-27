@@ -1580,27 +1580,3 @@ window.setQuickRange = function(range) {
     end: endDateStr
   });
 }
-
-/**
- * Filter data by date range
- * @param {Array} data - Data array (transactions or expenses)
- * @param {Object} dateRange - Date range with start and end
- * @returns {Array} - Filtered data
- */
-export function filterDataByDateRange(data, dateRange) {
-  if (!dateRange || !dateRange.start || !dateRange.end) {
-    return data;
-  }
-  
-  return data.filter(item => {
-    // Support multiple date field names
-    const itemDate = normalizeDate(
-      item.date || 
-      item.transactionDate || 
-      item.ngayGiaoDich || 
-      item.ngayChiPhi
-    );
-    
-    return itemDate >= dateRange.start && itemDate <= dateRange.end;
-  });
-}
