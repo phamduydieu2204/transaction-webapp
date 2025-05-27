@@ -56,6 +56,16 @@ export function initializeStatisticsUI() {
   setupDateRangeControls();
   setupExportControls();
   
+  // Initialize report menu controller
+  import('./reportMenuController.js').then(module => {
+    if (module.initReportMenu) {
+      console.log("🎮 Initializing report menu...");
+      module.initReportMenu();
+    }
+  }).catch(error => {
+    console.warn("⚠️ Could not load report menu controller:", error);
+  });
+  
   // Load initial data
   loadStatisticsData();
   

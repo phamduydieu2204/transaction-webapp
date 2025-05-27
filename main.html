@@ -321,6 +321,160 @@
   }
 }
 
+  /* CSS cho menu báo cáo thống kê */
+  .statistics-container {
+    display: flex;
+    gap: 20px;
+    height: calc(100vh - 200px);
+    min-height: 600px;
+  }
+
+  .report-menu {
+    width: 260px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .menu-title {
+    margin: 0 0 20px 0;
+    color: #2d3748;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .report-menu-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #4a5568;
+    font-size: 14px;
+  }
+
+  .menu-item:hover {
+    background: #e2e8f0;
+    color: #2d3748;
+  }
+
+  .menu-item.active {
+    background: #3182ce;
+    color: white;
+    font-weight: 500;
+  }
+
+  .menu-item i {
+    width: 20px;
+    text-align: center;
+  }
+
+  .report-content {
+    flex: 1;
+    background: white;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow-y: auto;
+  }
+
+  .report-page {
+    display: none;
+  }
+
+  .report-page.active {
+    display: block;
+  }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  .page-header h2 {
+    margin: 0;
+    color: #2d3748;
+    font-size: 24px;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn-refresh, .btn-export {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+
+  .btn-refresh {
+    background: #48bb78;
+    color: white;
+  }
+
+  .btn-refresh:hover {
+    background: #38a169;
+  }
+
+  .btn-export {
+    background: #3182ce;
+    color: white;
+  }
+
+  .btn-export:hover {
+    background: #2c5aa0;
+  }
+
+  /* Responsive cho mobile */
+  @media (max-width: 768px) {
+    .statistics-container {
+      flex-direction: column;
+      height: auto;
+    }
+    
+    .report-menu {
+      width: 100%;
+      padding: 15px;
+    }
+    
+    .report-menu-list {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      padding-bottom: 10px;
+    }
+    
+    .menu-item {
+      white-space: nowrap;
+      margin-bottom: 0;
+    }
+    
+    .report-content {
+      padding: 20px;
+    }
+  }
+
   </style>
 </head>
 <body>
@@ -599,29 +753,149 @@
 </div>
 
 <div id="tab-thong-ke" class="tab-content">
-  <!-- Dashboard Tài Chính Tổng Quan -->
-  <div id="financialDashboard"></div>
+  <div class="statistics-container">
+    <!-- Menu báo cáo bên trái -->
+    <div class="report-menu">
+      <h3 class="menu-title">📊 Báo cáo thống kê</h3>
+      <ul class="report-menu-list">
+        <li class="menu-item active" data-report="overview">
+          <i class="fas fa-chart-line"></i>
+          <span>Tổng quan kinh doanh</span>
+        </li>
+        <li class="menu-item" data-report="revenue">
+          <i class="fas fa-dollar-sign"></i>
+          <span>Phân tích doanh thu</span>
+        </li>
+        <li class="menu-item" data-report="expense">
+          <i class="fas fa-wallet"></i>
+          <span>Phân tích chi phí</span>
+        </li>
+        <li class="menu-item" data-report="customer">
+          <i class="fas fa-users"></i>
+          <span>Quản lý khách hàng</span>
+        </li>
+        <li class="menu-item" data-report="software">
+          <i class="fas fa-laptop-code"></i>
+          <span>Tài khoản phần mềm</span>
+        </li>
+        <li class="menu-item" data-report="employee">
+          <i class="fas fa-user-tie"></i>
+          <span>Báo cáo nhân viên</span>
+        </li>
+        <li class="menu-item" data-report="finance">
+          <i class="fas fa-university"></i>
+          <span>Quản lý tài chính</span>
+        </li>
+      </ul>
+    </div>
+    
+    <!-- Nội dung báo cáo bên phải -->
+    <div class="report-content">
+      <!-- Trang 1: Tổng quan kinh doanh -->
+      <div id="report-overview" class="report-page active">
+        <div class="page-header">
+          <h2>📈 Tổng quan kinh doanh</h2>
+          <div class="header-actions">
+            <button class="btn-refresh" onclick="refreshCurrentReport()">
+              <i class="fas fa-sync-alt"></i> Làm mới
+            </button>
+            <button class="btn-export" onclick="exportCurrentReport()">
+              <i class="fas fa-download"></i> Xuất báo cáo
+            </button>
+          </div>
+        </div>
+        <div id="financialDashboard"></div>
+        <div id="overviewChart"></div>
+        <div id="topProducts"></div>
+        <div id="topCustomers"></div>
+        <div id="alertsSection"></div>
+      </div>
+      
+      <!-- Trang 2: Phân tích doanh thu -->
+      <div id="report-revenue" class="report-page">
+        <div class="page-header">
+          <h2>💰 Phân tích doanh thu</h2>
+        </div>
+        <div id="revenueByProduct"></div>
+        <div id="revenueByPackage"></div>
+        <div id="revenueByEmployee"></div>
+        <div id="revenueComparison"></div>
+        <div id="revenueTrend"></div>
+      </div>
+      
+      <!-- Trang 3: Phân tích chi phí -->
+      <div id="report-expense" class="report-page">
+        <div class="page-header">
+          <h2>💸 Phân tích chi phí</h2>
+        </div>
+        <div id="expenseByCategory"></div>
+        <div id="recurringExpenses"></div>
+        <div id="paymentMethods"></div>
+        <div id="topExpenses"></div>
+        <table id="monthlySummaryTable">
+          <thead>
+            <tr>
+              <th>Tháng</th>
+              <th>Loại khoản chi</th>
+              <th>Tổng tiền (VND)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      
+      <!-- Trang 4: Quản lý khách hàng -->
+      <div id="report-customer" class="report-page">
+        <div class="page-header">
+          <h2>👥 Quản lý khách hàng</h2>
+        </div>
+        <div id="customerOverview"></div>
+        <div id="expiringCustomers"></div>
+        <div id="renewalRate"></div>
+        <div id="transactionTypes"></div>
+        <div id="customerLifetimeValue"></div>
+      </div>
+      
+      <!-- Trang 5: Tài khoản phần mềm -->
+      <div id="report-software" class="report-page">
+        <div class="page-header">
+          <h2>💻 Quản lý tài khoản phần mềm</h2>
+        </div>
+        <div id="softwareOverview"></div>
+        <div id="expiringSoftware"></div>
+        <div id="softwareROI"></div>
+        <div id="softwareCostRevenue"></div>
+        <div id="softwareDetailsList"></div>
+      </div>
+      
+      <!-- Trang 6: Báo cáo nhân viên -->
+      <div id="report-employee" class="report-page">
+        <div class="page-header">
+          <h2>👔 Báo cáo nhân viên</h2>
+        </div>
+        <div id="employeePerformance"></div>
+        <div id="transactionCount"></div>
+        <div id="employeeRanking"></div>
+        <div id="performanceChart"></div>
+        <div id="employeeKPI"></div>
+      </div>
+      
+      <!-- Trang 7: Quản lý tài chính -->
+      <div id="report-finance" class="report-page">
+        <div class="page-header">
+          <h2>🏦 Quản lý tài chính</h2>
+        </div>
+        <div id="bankBalances"></div>
+        <div id="balanceHistory"></div>
+        <div id="cashFlowForecast"></div>
+        <div id="taxReport"></div>
+        <div id="profitLossStatement"></div>
+      </div>
+    </div>
+  </div>
   
-  <!-- Tổng quan tài chính cũ (backup) -->
-  <div id="financialOverview" style="display: none;"></div>
-  
-  <!-- Biểu đồ tổng quan -->
-  <div id="overviewChart"></div>
-  
-  <!-- Controls xuất dữ liệu -->
+  <!-- Controls xuất dữ liệu chung -->
   <div id="statisticsExportControls"></div>
-  
-  <h3>Tổng hợp chi phí theo tháng</h3>
-  <table id="monthlySummaryTable">
-    <thead>
-      <tr>
-        <th>Tháng</th>
-        <th>Loại khoản chi</th>
-        <th>Tổng tiền (VND)</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
 </div>
 
     <!-- Khu vực thông báo -->
