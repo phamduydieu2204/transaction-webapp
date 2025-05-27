@@ -1251,31 +1251,6 @@ export function filterDataByDateRange(data, dateRange) {
   // Đặt endDate về cuối ngày
   endDate.setHours(23, 59, 59, 999);
   
-  // Phân tích tất cả dates để tìm tháng 4
-  const allDates = data.map((item, index) => {
-    const dateValue = item.transactionDate || item.date;
-    return { 
-      index,
-      original: dateValue, 
-      type: typeof dateValue,
-      hasSlash: typeof dateValue === 'string' && dateValue.includes('/'),
-      hasT: typeof dateValue === 'string' && dateValue.includes('T'),
-      month: dateValue ? new Date(dateValue).getMonth() + 1 : 'invalid'
-    };
-  });
-  
-  // Tìm các items tháng 4
-  const april2025Items = allDates.filter(d => d.month === 4);
-  
-  console.log("🔍 Filter Debug:", {
-    dateRange,
-    startDate: startDate.toISOString(),
-    endDate: endDate.toISOString(),
-    dataCount: data.length,
-    sampleDates: allDates.slice(0, 5),
-    april2025Count: april2025Items.length,
-    april2025Items: april2025Items.slice(0, 3)
-  });
   
   const filteredData = data.filter((item, index) => {
     // Sử dụng đúng field names: transactionDate cho transactions, date cho expenses
@@ -1308,26 +1283,10 @@ export function filterDataByDateRange(data, dateRange) {
     
     const inRange = itemDate >= startDate && itemDate <= endDate;
     
-    // Debug log cho một vài items đầu tiên
-    if (index < 5) {
-      console.log(`📅 Item ${index}:`, {
-        original: dateValue,
-        itemDate: itemDate.toISOString(),
-        inRange,
-        comparison: {
-          itemVsStart: itemDate >= startDate,
-          itemVsEnd: itemDate <= endDate
-        }
-      });
-    }
     
     return inRange;
   });
   
-  console.log("✅ Filter result:", {
-    originalCount: data.length,
-    filteredCount: filteredData.length
-  });
   
   return filteredData;
 }
@@ -1424,14 +1383,6 @@ window.updatePeriodFilter = function(period) {
       end: lastDay.toISOString().split('T')[0]
     };
     
-    console.log("🗓️ Last month calculation:", {
-      now: now.toISOString(),
-      currentMonth: now.getMonth() + 1,
-      lastMonth: actualLastMonth + 1,
-      firstDay: firstDay.toISOString(),
-      lastDay: lastDay.toISOString(),
-      dateRange: window.globalFilters.dateRange
-    });
   }
   
   // Save to localStorage
