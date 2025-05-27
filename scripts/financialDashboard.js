@@ -138,7 +138,7 @@ function calculateFinancialMetrics(transactionData, expenseData, globalFilters =
 
   // Expense calculations by category - sử dụng primaryPeriod làm chính
   const expensesToday = calculateExpensesByCategory(expenseData, todayStr, todayStr);
-  const expensesMonth = calculateExpensesByCategory(expenseData, primaryPeriod.start, primaryPeriod.end);
+  const expensesMonth = calculateExpensesByCategory(expenseData, primaryPeriod.start, primaryPeriod.end, isDataFiltered);
   const expensesQuarter = calculateExpensesByCategory(expenseData, thisQuarter.start, thisQuarter.end);
   const expensesYear = calculateExpensesByCategory(expenseData, thisYear.start, thisYear.end);
 
@@ -234,7 +234,7 @@ function calculateRevenue(transactionData, startDate, endDate, skipDateFilter = 
 /**
  * Calculates expenses by category within date range
  */
-function calculateExpensesByCategory(expenseData, startDate, endDate) {
+function calculateExpensesByCategory(expenseData, startDate, endDate, skipDateFilter = false) {
   const expenses = {
     total: 0,
     "Sinh hoạt cá nhân": 0,
@@ -245,10 +245,24 @@ function calculateExpensesByCategory(expenseData, startDate, endDate) {
     byEmployee: {}
   };
 
+  console.log("💸 Calculate Expenses Debug:", {
+    dataCount: expenseData.length,
+    startDate,
+    endDate,
+    skipDateFilter,
+    sampleData: expenseData.slice(0, 2)
+  });
+
   expenseData.forEach(expense => {
-    const expenseDate = normalizeDate(expense.date);
+    let shouldInclude = true;
     
-    if (expenseDate >= startDate && expenseDate <= endDate) {
+    // Chỉ filter theo date nếu không skip
+    if (!skipDateFilter) {
+      const expenseDate = normalizeDate(expense.date);
+      shouldInclude = expenseDate >= startDate && expenseDate <= endDate;
+    }
+    
+    if (shouldInclude) {
       const amount = parseFloat(expense.amount || 0);
       const category = expense.type || "Khác";
       const subCategory = expense.category || "Khác";
@@ -270,6 +284,11 @@ function calculateExpensesByCategory(expenseData, startDate, endDate) {
       expenses.bySubCategory[subCategory] = (expenses.bySubCategory[subCategory] || 0) + amount;
       expenses.byEmployee[employee] = (expenses.byEmployee[employee] || 0) + amount;
     }
+  });
+
+  console.log("✅ Calculate Expenses Result:", {
+    total: expenses.total,
+    recordsProcessed: expenseData.length
   });
 
   return expenses;
@@ -1559,5 +1578,29 @@ window.setQuickRange = function(range) {
   console.log('📅 Quick range set:', range, {
     start: startDateStr,
     end: endDateStr
+  });
+}
+
+/**
+ * Filter data by date range
+ * @param {Array} data - Data array (transactions or expenses)
+ * @param {Object} dateRange - Date range with start and end
+ * @returns {Array} - Filtered data
+ */
+export function filterDataByDateRange(data, dateRange) {
+  if (!dateRange || !dateRange.start || !dateRange.end) {
+    return data;
+  }
+  
+  return data.filter(item => {
+    // Support multiple date field names
+    const itemDate = normalizeDate(
+      item.date || 
+      item.transactionDate || 
+      item.ngayGiaoDich || 
+      item.ngayChiPhi
+    );
+    
+    return itemDate >= dateRange.start && itemDate <= dateRange.end;
   });
 }
