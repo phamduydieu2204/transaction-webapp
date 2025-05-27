@@ -1251,11 +1251,23 @@ export function filterDataByDateRange(data, dateRange) {
   // Đặt endDate về cuối ngày
   endDate.setHours(23, 59, 59, 999);
   
+  // Phân tích dates trong data để debug
+  const allDates = data.slice(0, 10).map(item => {
+    const dateValue = item.transactionDate || item.date;
+    return { 
+      original: dateValue, 
+      type: typeof dateValue,
+      hasSlash: typeof dateValue === 'string' && dateValue.includes('/'),
+      hasT: typeof dateValue === 'string' && dateValue.includes('T')
+    };
+  });
+  
   console.log("🔍 Filter Debug:", {
     dateRange,
     startDate: startDate.toISOString(),
     endDate: endDate.toISOString(),
-    dataCount: data.length
+    dataCount: data.length,
+    sampleDates: allDates
   });
   
   const filteredData = data.filter((item, index) => {
@@ -1392,12 +1404,27 @@ window.updatePeriodFilter = function(period) {
     };
   } else if (period === 'last_month') {
     const now = new Date();
-    const firstDay = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const lastDay = new Date(now.getFullYear(), now.getMonth(), 0);
+    // Tháng trước thực tế
+    const lastMonth = now.getMonth() - 1;
+    const lastMonthYear = lastMonth < 0 ? now.getFullYear() - 1 : now.getFullYear();
+    const actualLastMonth = lastMonth < 0 ? 11 : lastMonth;
+    
+    const firstDay = new Date(lastMonthYear, actualLastMonth, 1);
+    const lastDay = new Date(lastMonthYear, actualLastMonth + 1, 0);
+    
     window.globalFilters.dateRange = {
       start: firstDay.toISOString().split('T')[0],
       end: lastDay.toISOString().split('T')[0]
     };
+    
+    console.log("🗓️ Last month calculation:", {
+      now: now.toISOString(),
+      currentMonth: now.getMonth() + 1,
+      lastMonth: actualLastMonth + 1,
+      firstDay: firstDay.toISOString(),
+      lastDay: lastDay.toISOString(),
+      dateRange: window.globalFilters.dateRange
+    });
   }
   
   // Save to localStorage

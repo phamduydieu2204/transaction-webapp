@@ -615,8 +615,22 @@ async function renderEnhancedStatistics(expenseData, transactionData, financialA
     if (globalFilters && globalFilters.dateRange) {
       // Import filter function from financialDashboard.js
       const { filterDataByDateRange } = await import('./financialDashboard.js');
+      
+      console.log("🔍 Before filtering - data overview:", {
+        expenseData: expenseData.length,
+        transactionData: transactionData.length,
+        dateRange: globalFilters.dateRange
+      });
+      
       filteredExpenseData = filterDataByDateRange(expenseData, globalFilters.dateRange);
       filteredTransactionData = filterDataByDateRange(transactionData, globalFilters.dateRange);
+      
+      console.log("✅ After filtering:", {
+        originalExpenses: expenseData.length,
+        filteredExpenses: filteredExpenseData.length,
+        originalTransactions: transactionData.length,
+        filteredTransactions: filteredTransactionData.length
+      });
     }
     
     // 1. Render NEW Financial Dashboard với global filters
