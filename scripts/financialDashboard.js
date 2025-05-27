@@ -1256,15 +1256,23 @@ function filterDataByDateRange(data, dateRange) {
   endDate.setHours(23, 59, 59, 999);
   
   const filteredData = data.filter(item => {
-    // Thử nhiều field có thể chứa ngày
-    const dateValue = item.ngayGiaoDich || item.ngayChiPhi || item.date || item.timestamp;
+    // Thử nhiều field có thể chứa ngày (sửa lại cho đúng field name)
+    const dateValue = item.transactionDate || item.ngayGiaoDich || item.ngayChiPhi || item.date || item.timestamp;
     
     if (!dateValue) {
       console.log("⚠️ Item without date:", item);
       return false;
     }
     
-    const normalizedDate = normalizeDate(dateValue);
+    // Xử lý date string với format yyyy/mm/dd
+    let normalizedDate;
+    if (typeof dateValue === 'string' && dateValue.includes('/')) {
+      // Format yyyy/mm/dd -> chuyển thành yyyy-mm-dd cho Date constructor
+      normalizedDate = dateValue.replace(/\//g, '-');
+    } else {
+      normalizedDate = normalizeDate(dateValue);
+    }
+    
     const itemDate = new Date(normalizedDate);
     
     // Debug log
