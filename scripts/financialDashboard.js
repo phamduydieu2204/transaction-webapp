@@ -1256,30 +1256,33 @@ function filterDataByDateRange(data, dateRange) {
   endDate.setHours(23, 59, 59, 999);
   
   const filteredData = data.filter(item => {
-    // Thử nhiều field có thể chứa ngày (sửa lại cho đúng field name)
-    const dateValue = item.transactionDate || item.ngayGiaoDich || item.ngayChiPhi || item.date || item.timestamp;
+    // Sử dụng đúng field names: transactionDate cho transactions, date cho expenses
+    const dateValue = item.transactionDate || item.date;
     
     if (!dateValue) {
       console.log("⚠️ Item without date:", item);
       return false;
     }
     
-    // Xử lý date string với format yyyy/mm/dd
-    let normalizedDate;
+    // Xử lý format yyyy/mm/dd thành Date object
+    let itemDate;
     if (typeof dateValue === 'string' && dateValue.includes('/')) {
-      // Format yyyy/mm/dd -> chuyển thành yyyy-mm-dd cho Date constructor
-      normalizedDate = dateValue.replace(/\//g, '-');
+      // Format yyyy/mm/dd -> chuyển thành mm/dd/yyyy cho Date constructor
+      const parts = dateValue.split('/');
+      if (parts.length === 3) {
+        // yyyy/mm/dd -> new Date(yyyy, mm-1, dd)
+        itemDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      } else {
+        itemDate = new Date(dateValue);
+      }
     } else {
-      normalizedDate = normalizeDate(dateValue);
+      itemDate = new Date(dateValue);
     }
     
-    const itemDate = new Date(normalizedDate);
-    
-    // Debug log
-    if (data.indexOf(item) < 3) { // Log first 3 items
-      console.log("📅 Date comparison:", {
+    // Debug log cho item đầu tiên
+    if (data.indexOf(item) === 0) {
+      console.log("📅 Date comparison sample:", {
         original: dateValue,
-        normalized: normalizedDate,
         itemDate: itemDate.toISOString(),
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
