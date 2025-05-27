@@ -130,7 +130,9 @@ function calculateFinancialMetrics(transactionData, expenseData, globalFilters =
 
   // Revenue calculations - sử dụng primaryPeriod làm chính
   const revenueToday = calculateRevenue(transactionData, todayStr, todayStr);
-  const revenueMonth = calculateRevenue(transactionData, primaryPeriod.start, primaryPeriod.end);
+  // Nếu data đã được filter, skip date filter cho primaryPeriod
+  const isDataFiltered = globalFilters && globalFilters.dateRange;
+  const revenueMonth = calculateRevenue(transactionData, primaryPeriod.start, primaryPeriod.end, isDataFiltered);
   const revenueQuarter = calculateRevenue(transactionData, thisQuarter.start, thisQuarter.end);
   const revenueYear = calculateRevenue(transactionData, thisYear.start, thisYear.end);
 
@@ -183,7 +185,7 @@ function calculateFinancialMetrics(transactionData, expenseData, globalFilters =
 /**
  * Calculates revenue within date range
  */
-function calculateRevenue(transactionData, startDate, endDate) {
+function calculateRevenue(transactionData, startDate, endDate, skipDateFilter = false) {
   const revenue = {
     total: 0,
     byType: {},
@@ -191,10 +193,24 @@ function calculateRevenue(transactionData, startDate, endDate) {
     byEmployee: {}
   };
 
+  console.log("💰 Calculate Revenue Debug:", {
+    dataCount: transactionData.length,
+    startDate,
+    endDate,
+    skipDateFilter,
+    sampleData: transactionData.slice(0, 2)
+  });
+
   transactionData.forEach(transaction => {
-    const transactionDate = normalizeDate(transaction.transactionDate || transaction.date);
+    let shouldInclude = true;
     
-    if (transactionDate >= startDate && transactionDate <= endDate) {
+    // Chỉ filter theo date nếu không skip
+    if (!skipDateFilter) {
+      const transactionDate = normalizeDate(transaction.transactionDate || transaction.date);
+      shouldInclude = transactionDate >= startDate && transactionDate <= endDate;
+    }
+    
+    if (shouldInclude) {
       const amount = parseFloat(transaction.revenue || transaction.amount || 0);
       const type = transaction.transactionType || transaction.type || "Khác";
       const software = transaction.softwareName || transaction.software || "Khác";
@@ -205,6 +221,11 @@ function calculateRevenue(transactionData, startDate, endDate) {
       revenue.bySoftware[software] = (revenue.bySoftware[software] || 0) + amount;
       revenue.byEmployee[employee] = (revenue.byEmployee[employee] || 0) + amount;
     }
+  });
+
+  console.log("✅ Calculate Revenue Result:", {
+    total: revenue.total,
+    recordsProcessed: transactionData.length
   });
 
   return revenue;
