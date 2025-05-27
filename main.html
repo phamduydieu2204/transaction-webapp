@@ -475,6 +475,174 @@
     }
   }
 
+  /* Overview page grid layout */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  .charts-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .top-performers {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* Top products & customers cards */
+  .top-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    padding: 24px;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  .top-section.products {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+
+  .top-section.customers {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  }
+
+  .top-section h3 {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .period-selector {
+    margin-left: auto;
+    font-size: 12px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 4px;
+    padding: 4px 8px;
+    color: white;
+    cursor: pointer;
+  }
+
+  .top-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .top-item {
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.1);
+    padding: 12px;
+    border-radius: 8px;
+    transition: all 0.3s;
+  }
+
+  .top-item:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateX(5px);
+  }
+
+  .rank-badge {
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 12px;
+  }
+
+  .rank-badge.gold {
+    background: #ffd700;
+    color: #333;
+  }
+
+  .rank-badge.silver {
+    background: #c0c0c0;
+    color: #333;
+  }
+
+  .rank-badge.bronze {
+    background: #cd7f32;
+    color: white;
+  }
+
+  .item-info {
+    flex: 1;
+  }
+
+  .item-name {
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .item-detail {
+    font-size: 12px;
+    opacity: 0.8;
+  }
+
+  .item-value {
+    font-weight: bold;
+    font-size: 16px;
+  }
+
+  /* Summary stats */
+  #summaryStats {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .stat-card {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .stat-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2d3748;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 14px;
+    color: #718096;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .overview-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
   </style>
 </head>
 <body>
@@ -804,11 +972,27 @@
             </button>
           </div>
         </div>
+        
+        <!-- Financial Dashboard với bộ lọc -->
         <div id="financialDashboard"></div>
-        <div id="overviewChart"></div>
-        <div id="topProducts"></div>
-        <div id="topCustomers"></div>
-        <div id="alertsSection"></div>
+        
+        <!-- Grid layout cho các thành phần -->
+        <div class="overview-grid">
+          <!-- Charts section -->
+          <div class="charts-section">
+            <div id="overviewChart"></div>
+            <div id="revenueChart"></div>
+          </div>
+          
+          <!-- Top performers section -->
+          <div class="top-performers">
+            <div id="topProducts"></div>
+            <div id="topCustomers"></div>
+          </div>
+        </div>
+        
+        <!-- Summary stats -->
+        <div id="summaryStats"></div>
       </div>
       
       <!-- Trang 2: Phân tích doanh thu -->

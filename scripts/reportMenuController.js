@@ -123,7 +123,8 @@ async function loadOverviewReport() {
   await Promise.all([
     loadTopProducts(),
     loadTopCustomers(),
-    loadAlerts()
+    loadSummaryStats(),
+    loadRevenueChart()
   ]);
 }
 
@@ -240,7 +241,14 @@ async function loadTopProducts() {
   const container = document.getElementById('topProducts');
   if (!container) return;
   
-  const transactionData = window.transactionList || [];
+  let transactionData = window.transactionList || [];
+  
+  // Apply date filter if exists
+  if (window.globalFilters && window.globalFilters.dateRange) {
+    const { filterDataByDateRange } = await import('./financialDashboard.js');
+    transactionData = filterDataByDateRange(transactionData, window.globalFilters.dateRange);
+  }
+  
   const productRevenue = {};
   
   // Calculate revenue by product
@@ -255,18 +263,30 @@ async function loadTopProducts() {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5);
   
-  // Render
+  // Get period label
+  const periodLabel = getPeriodLabel();
+  
+  // Render with new design
   container.innerHTML = `
-    <div class="top-products-section">
-      <h3>🏆 Top 5 Phần Mềm Bán Chạy</h3>
-      <div class="product-list">
+    <div class="top-section products">
+      <h3>
+        🏆 Top 5 Phần Mềm Bán Chạy
+        <span class="period-selector">${periodLabel}</span>
+      </h3>
+      <div class="top-list">
         ${topProducts.map(([product, revenue], index) => `
-          <div class="product-item">
-            <span class="rank">#${index + 1}</span>
-            <span class="product-name">${product}</span>
-            <span class="product-revenue">${formatCurrency(revenue)}</span>
+          <div class="top-item">
+            <div class="rank-badge ${index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : ''}">
+              ${index + 1}
+            </div>
+            <div class="item-info">
+              <div class="item-name">${product}</div>
+              <div class="item-detail">Doanh thu ${periodLabel.toLowerCase()}</div>
+            </div>
+            <div class="item-value">${formatCurrency(revenue)}</div>
           </div>
         `).join('')}
+        ${topProducts.length === 0 ? '<p style="text-align: center; opacity: 0.7;">Chưa có dữ liệu</p>' : ''}
       </div>
     </div>
   `;
@@ -279,12 +299,19 @@ async function loadTopCustomers() {
   const container = document.getElementById('topCustomers');
   if (!container) return;
   
-  const transactionData = window.transactionList || [];
+  let transactionData = window.transactionList || [];
+  
+  // Apply date filter if exists
+  if (window.globalFilters && window.globalFilters.dateRange) {
+    const { filterDataByDateRange } = await import('./financialDashboard.js');
+    transactionData = filterDataByDateRange(transactionData, window.globalFilters.dateRange);
+  }
+  
   const customerRevenue = {};
   
   // Calculate revenue by customer
   transactionData.forEach(transaction => {
-    const customer = transaction.customerName || 'Khác';
+    const customer = transaction.customerName || 'Khách lẻ';
     const revenue = parseFloat(transaction.revenue) || 0;
     customerRevenue[customer] = (customerRevenue[customer] || 0) + revenue;
   });
@@ -294,68 +321,127 @@ async function loadTopCustomers() {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5);
   
-  // Render
+  // Get period label
+  const periodLabel = getPeriodLabel();
+  
+  // Render with new design
   container.innerHTML = `
-    <div class="top-customers-section">
-      <h3>👑 Top 5 Khách Hàng VIP</h3>
-      <div class="customer-list">
+    <div class="top-section customers">
+      <h3>
+        👑 Top 5 Khách Hàng VIP
+        <span class="period-selector">${periodLabel}</span>
+      </h3>
+      <div class="top-list">
         ${topCustomers.map(([customer, revenue], index) => `
-          <div class="customer-item">
-            <span class="rank">#${index + 1}</span>
-            <span class="customer-name">${customer}</span>
-            <span class="customer-revenue">${formatCurrency(revenue)}</span>
+          <div class="top-item">
+            <div class="rank-badge ${index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : ''}">
+              ${index + 1}
+            </div>
+            <div class="item-info">
+              <div class="item-name">${customer}</div>
+              <div class="item-detail">Tổng chi tiêu ${periodLabel.toLowerCase()}</div>
+            </div>
+            <div class="item-value">${formatCurrency(revenue)}</div>
           </div>
         `).join('')}
+        ${topCustomers.length === 0 ? '<p style="text-align: center; opacity: 0.7;">Chưa có dữ liệu</p>' : ''}
       </div>
     </div>
   `;
 }
 
 /**
- * Load alerts
+ * Load summary statistics
  */
-async function loadAlerts() {
-  const container = document.getElementById('alertsSection');
+async function loadSummaryStats() {
+  const container = document.getElementById('summaryStats');
   if (!container) return;
   
-  const alerts = [];
-  const today = new Date();
-  const transactionData = window.transactionList || [];
+  let transactionData = window.transactionList || [];
+  let expenseData = window.expenseList || [];
   
-  // Check for expiring customers
-  transactionData.forEach(transaction => {
-    if (transaction.endDate) {
-      const endDate = new Date(transaction.endDate);
-      const daysUntilExpiry = Math.floor((endDate - today) / (1000 * 60 * 60 * 24));
-      
-      if (daysUntilExpiry > 0 && daysUntilExpiry <= 30) {
-        alerts.push({
-          type: 'warning',
-          icon: '⏰',
-          message: `${transaction.customerName} - ${transaction.softwareName} sẽ hết hạn sau ${daysUntilExpiry} ngày`
-        });
-      }
-    }
-  });
+  // Apply date filter if exists
+  if (window.globalFilters && window.globalFilters.dateRange) {
+    const { filterDataByDateRange } = await import('./financialDashboard.js');
+    transactionData = filterDataByDateRange(transactionData, window.globalFilters.dateRange);
+    expenseData = filterDataByDateRange(expenseData, window.globalFilters.dateRange);
+  }
   
-  // Render alerts
+  // Calculate statistics
+  const totalTransactions = transactionData.length;
+  const totalCustomers = new Set(transactionData.map(t => t.customerName)).size;
+  const totalSoftware = new Set(transactionData.map(t => t.softwareName)).size;
+  const totalExpenseItems = expenseData.length;
+  
+  // Render summary stats
   container.innerHTML = `
-    <div class="alerts-section">
-      <h3>🔔 Cảnh Báo Quan Trọng</h3>
-      ${alerts.length > 0 ? `
-        <div class="alert-list">
-          ${alerts.map(alert => `
-            <div class="alert-item ${alert.type}">
-              <span class="alert-icon">${alert.icon}</span>
-              <span class="alert-message">${alert.message}</span>
-            </div>
-          `).join('')}
-        </div>
-      ` : `
-        <p class="no-alerts">✅ Không có cảnh báo nào</p>
-      `}
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-value">${totalTransactions}</div>
+      <div class="stat-label">Giao dịch</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div class="stat-value">${totalCustomers}</div>
+      <div class="stat-label">Khách hàng</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💻</div>
+      <div class="stat-value">${totalSoftware}</div>
+      <div class="stat-label">Phần mềm</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💸</div>
+      <div class="stat-value">${totalExpenseItems}</div>
+      <div class="stat-label">Khoản chi</div>
     </div>
   `;
+}
+
+/**
+ * Load revenue chart
+ */
+async function loadRevenueChart() {
+  const container = document.getElementById('revenueChart');
+  if (!container) return;
+  
+  // This will be implemented later with actual chart
+  container.innerHTML = `
+    <div style="background: #f8f9fa; padding: 40px; border-radius: 8px; text-align: center;">
+      <h3>📈 Biểu đồ doanh thu theo tháng</h3>
+      <p style="color: #718096;">Đang phát triển...</p>
+    </div>
+  `;
+}
+
+/**
+ * Get period label from global filters
+ */
+function getPeriodLabel() {
+  if (!window.globalFilters || !window.globalFilters.dateRange) return "Tất cả";
+  
+  const { start, end } = window.globalFilters.dateRange;
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  
+  // Kiểm tra nếu là tháng đầy đủ
+  const startOfMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+  const endOfMonth = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
+  
+  if (startDate.getDate() === 1 && endDate.getDate() === endOfMonth.getDate() && 
+      startDate.getMonth() === endDate.getMonth() && startDate.getFullYear() === endDate.getFullYear()) {
+    return `Tháng ${startDate.getMonth() + 1}/${startDate.getFullYear()}`;
+  }
+  
+  // Kiểm tra nếu là năm đầy đủ
+  if (startDate.getDate() === 1 && startDate.getMonth() === 0 && 
+      endDate.getDate() === 31 && endDate.getMonth() === 11 && 
+      startDate.getFullYear() === endDate.getFullYear()) {
+    return `Năm ${startDate.getFullYear()}`;
+  }
+  
+  // Ngược lại hiển thị khoảng thời gian
+  return `${start} - ${end}`;
 }
 
 // ========== PLACEHOLDER FUNCTIONS ==========
@@ -586,87 +672,3 @@ function formatCurrency(amount) {
   }).format(amount);
 }
 
-// Add CSS for report components
-const reportStyles = `
-  <style>
-    /* Top products & customers */
-    .top-products-section, .top-customers-section {
-      margin-bottom: 20px;
-      padding: 15px;
-      background: #f8f9fa;
-      border-radius: 8px;
-    }
-    
-    .product-list, .customer-list {
-      margin-top: 15px;
-    }
-    
-    .product-item, .customer-item {
-      display: flex;
-      align-items: center;
-      padding: 10px;
-      margin-bottom: 8px;
-      background: white;
-      border-radius: 4px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    
-    .rank {
-      font-weight: bold;
-      color: #3182ce;
-      margin-right: 15px;
-      width: 30px;
-    }
-    
-    .product-name, .customer-name {
-      flex: 1;
-      font-weight: 500;
-    }
-    
-    .product-revenue, .customer-revenue {
-      font-weight: bold;
-      color: #48bb78;
-    }
-    
-    /* Alerts */
-    .alerts-section {
-      margin-top: 20px;
-      padding: 15px;
-      background: #fff5f5;
-      border-radius: 8px;
-      border: 1px solid #feb2b2;
-    }
-    
-    .alert-list {
-      margin-top: 15px;
-    }
-    
-    .alert-item {
-      display: flex;
-      align-items: center;
-      padding: 10px;
-      margin-bottom: 8px;
-      border-radius: 4px;
-    }
-    
-    .alert-item.warning {
-      background: #fffaf0;
-      border: 1px solid #feb2b2;
-      color: #c53030;
-    }
-    
-    .alert-icon {
-      margin-right: 10px;
-      font-size: 20px;
-    }
-    
-    .no-alerts {
-      text-align: center;
-      color: #48bb78;
-      font-style: italic;
-    }
-  </style>
-`;
-
-// Inject styles
-document.head.insertAdjacentHTML('beforeend', reportStyles);
