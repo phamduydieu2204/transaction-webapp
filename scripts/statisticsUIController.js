@@ -633,10 +633,13 @@ async function renderEnhancedStatistics(expenseData, transactionData, financialA
     // 1. Render NEW Financial Dashboard với global filters
     renderFinancialDashboard(transactionData, expenseData, {
       containerId: "financialDashboard",
-      showAlerts: true,
-      showForecast: true,
       globalFilters: globalFilters
     });
+    
+    // Refresh report menu components if active
+    if (window.refreshCurrentReport && document.querySelector('.report-page.active')) {
+      window.refreshCurrentReport();
+    }
     console.log("✅ Financial Dashboard rendered");
     
     // 2. Render Expense Chart với filtered data

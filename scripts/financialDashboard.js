@@ -29,8 +29,6 @@ function saveFiltersToStorage() {
 export function renderFinancialDashboard(transactionData, expenseData, options = {}) {
   const {
     containerId = "financialDashboard",
-    showAlerts = true,
-    showForecast = true,
     globalFilters = null
   } = options;
 
@@ -65,8 +63,6 @@ export function renderFinancialDashboard(transactionData, expenseData, options =
 
   // Calculate all metrics với dữ liệu đã lọc
   const metrics = calculateFinancialMetrics(filteredTransactionData, filteredExpenseData, globalFilters);
-  const alerts = generateAlerts(filteredTransactionData, filteredExpenseData, metrics);
-  const forecast = generateForecast(filteredTransactionData, filteredExpenseData);
 
   // Render dashboard HTML
   const dashboardHTML = `
@@ -86,8 +82,6 @@ export function renderFinancialDashboard(transactionData, expenseData, options =
         ${renderOverviewCards(metrics)}
         ${renderCashFlowTracker(metrics)}
         ${renderCategoryBreakdown(metrics)}
-        ${showAlerts ? renderAlertSystem(alerts) : ''}
-        ${showForecast ? renderQuickForecast(forecast) : ''}
       </div>
     </div>
   `;
@@ -433,30 +427,92 @@ function renderCashFlowTracker(metrics) {
 function renderCategoryBreakdown(metrics) {
   const total = metrics.month.expenses.total;
   
+  // Get current period label
+  const periodLabel = getPeriodLabel();
+  
+  // Calculate percentages and prepare data
+  const categories = [
+    {
+      name: 'Kinh doanh phần mềm',
+      amount: metrics.month.expenses['Kinh doanh phần mềm'],
+      icon: '💻',
+      color: '#667eea',
+      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+    },
+    {
+      name: 'Sinh hoạt cá nhân',
+      amount: metrics.month.expenses['Sinh hoạt cá nhân'],
+      icon: '🏠',
+      color: '#f093fb',
+      gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+    },
+    {
+      name: 'Kinh doanh Amazon',
+      amount: metrics.month.expenses['Kinh doanh Amazon'],
+      icon: '📦',
+      color: '#4facfe',
+      gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
+    },
+    {
+      name: 'Khác',
+      amount: metrics.month.expenses['Khác'] || 0,
+      icon: '📌',
+      color: '#fa709a',
+      gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
+    }
+  ].filter(cat => cat.amount > 0) // Only show categories with expenses
+    .sort((a, b) => b.amount - a.amount); // Sort by amount descending
+  
   return `
-    <div class="category-breakdown">
-      <h3>📊 Chi Phí Theo Danh Mục (Tháng Này)</h3>
-      <div class="category-bars">
-        <div class="category-bar">
-          <div class="category-label">Kinh doanh phần mềm</div>
-          <div class="category-progress">
-            <div class="progress-bar software" style="width: ${total > 0 ? (metrics.month.expenses['Kinh doanh phần mềm'] / total) * 100 : 0}%"></div>
-          </div>
-          <div class="category-amount">${formatCurrency(metrics.month.expenses['Kinh doanh phần mềm'], "VND")}</div>
-        </div>
-        <div class="category-bar">
-          <div class="category-label">Sinh hoạt cá nhân</div>
-          <div class="category-progress">
-            <div class="progress-bar personal" style="width: ${total > 0 ? (metrics.month.expenses['Sinh hoạt cá nhân'] / total) * 100 : 0}%"></div>
-          </div>
-          <div class="category-amount">${formatCurrency(metrics.month.expenses['Sinh hoạt cá nhân'], "VND")}</div>
-        </div>
-        <div class="category-bar">
-          <div class="category-label">Kinh doanh Amazon</div>
-          <div class="category-progress">
-            <div class="progress-bar amazon" style="width: ${total > 0 ? (metrics.month.expenses['Kinh doanh Amazon'] / total) * 100 : 0}%"></div>
-          </div>
-          <div class="category-amount">${formatCurrency(metrics.month.expenses['Kinh doanh Amazon'], "VND")}</div>
+    <div class="category-breakdown-modern">
+      <h3>📊 Chi Phí Theo Danh Mục 
+        <span class="period-label-inline">${periodLabel}</span>
+      </h3>
+      
+      <div class="category-cards">
+        ${categories.map((cat, index) => {
+          const percentage = total > 0 ? (cat.amount / total) * 100 : 0;
+          return `
+            <div class="category-card" style="background: ${cat.gradient}">
+              <div class="category-icon">${cat.icon}</div>
+              <div class="category-info">
+                <div class="category-name">${cat.name}</div>
+                <div class="category-amount-modern">${formatCurrency(cat.amount, "VND")}</div>
+                <div class="category-percentage">${percentage.toFixed(1)}% tổng chi phí</div>
+              </div>
+              <div class="category-chart">
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                  <path class="circle-bg"
+                    stroke="#ffffff"
+                    stroke-width="2"
+                    fill="none"
+                    stroke-opacity="0.3"
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                  <path class="circle"
+                    stroke="#ffffff"
+                    stroke-width="3"
+                    stroke-dasharray="${percentage}, 100"
+                    stroke-linecap="round"
+                    fill="none"
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                  <text x="18" y="20.35" class="percentage-text">${percentage.toFixed(0)}%</text>
+                </svg>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+      
+      <div class="category-summary">
+        <div class="summary-item">
+          <span class="summary-label">Tổng chi phí ${periodLabel.toLowerCase()}</span>
+          <span class="summary-value">${formatCurrency(total, "VND")}</span>
         </div>
       </div>
     </div>
@@ -1181,6 +1237,132 @@ export function addFinancialDashboardStyles() {
       padding: 4px 8px;
       border-radius: 4px;
       border: 1px solid #e2e8f0;
+    }
+    
+    /* Modern category breakdown styles */
+    .category-breakdown-modern {
+      margin-top: 24px;
+    }
+    
+    .category-breakdown-modern h3 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .period-label-inline {
+      font-size: 14px;
+      background: #e6f7ff;
+      color: #1890ff;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: normal;
+    }
+    
+    .category-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    
+    .category-card {
+      padding: 20px;
+      border-radius: 12px;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .category-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+    
+    .category-icon {
+      font-size: 32px;
+      width: 50px;
+      text-align: center;
+    }
+    
+    .category-info {
+      flex: 1;
+    }
+    
+    .category-name {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 4px;
+    }
+    
+    .category-amount-modern {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
+    
+    .category-percentage {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    
+    .category-chart {
+      width: 60px;
+      height: 60px;
+    }
+    
+    .circular-chart {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+    }
+    
+    .circle-bg,
+    .circle {
+      fill: none;
+      stroke-width: 2.8;
+    }
+    
+    .circle {
+      stroke-dasharray: 0, 100;
+      transition: stroke-dasharray 0.6s ease;
+    }
+    
+    .percentage-text {
+      fill: white;
+      font-size: 10px;
+      font-weight: bold;
+      text-anchor: middle;
+    }
+    
+    .category-summary {
+      background: #f8f9fa;
+      padding: 16px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .summary-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .summary-label {
+      color: #718096;
+      font-size: 14px;
+    }
+    
+    .summary-value {
+      font-size: 20px;
+      font-weight: bold;
+      color: #2d3748;
     }
   `;
   
