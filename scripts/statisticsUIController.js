@@ -603,6 +603,17 @@ async function renderEnhancedStatistics(expenseData, transactionData, financialA
   try {
     console.log("🎨 Rendering enhanced statistics dashboard...");
     
+    // Apply filters to data if available
+    let filteredExpenseData = expenseData;
+    let filteredTransactionData = transactionData;
+    
+    if (globalFilters && globalFilters.dateRange) {
+      // Import filter function from financialDashboard.js
+      const { filterDataByDateRange } = await import('./financialDashboard.js');
+      filteredExpenseData = filterDataByDateRange(expenseData, globalFilters.dateRange);
+      filteredTransactionData = filterDataByDateRange(transactionData, globalFilters.dateRange);
+    }
+    
     // 1. Render NEW Financial Dashboard với global filters
     renderFinancialDashboard(transactionData, expenseData, {
       containerId: "financialDashboard",
@@ -612,8 +623,8 @@ async function renderEnhancedStatistics(expenseData, transactionData, financialA
     });
     console.log("✅ Financial Dashboard rendered");
     
-    // 2. Render Expense Chart
-    const chartData = groupExpensesByMonth(expenseData, {
+    // 2. Render Expense Chart với filtered data
+    const chartData = groupExpensesByMonth(filteredExpenseData, {
       currency: uiState.currency,
       sortBy: "month",
       sortOrder: "desc"
@@ -637,8 +648,8 @@ async function renderEnhancedStatistics(expenseData, transactionData, financialA
     });
     console.log("✅ Export controls rendered");
     
-    // 4. Render Monthly Summary Table
-    const summaryData = groupExpensesByMonth(expenseData, {
+    // 4. Render Monthly Summary Table với filtered data
+    const summaryData = groupExpensesByMonth(filteredExpenseData, {
       currency: uiState.currency,
       sortBy: uiState.sortBy,
       sortOrder: uiState.sortOrder

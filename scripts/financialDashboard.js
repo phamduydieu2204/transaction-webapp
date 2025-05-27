@@ -1238,17 +1238,10 @@ function renderFilterPanel() {
 /**
  * Lọc dữ liệu theo khoảng thời gian
  */
-function filterDataByDateRange(data, dateRange) {
+export function filterDataByDateRange(data, dateRange) {
   if (!dateRange || !dateRange.start || !dateRange.end) {
-    console.log("❌ Missing date range, returning original data:", data.length);
     return data;
   }
-
-  console.log("🔍 Filtering data by date range:", {
-    start: dateRange.start,
-    end: dateRange.end,
-    originalCount: data.length
-  });
 
   const startDate = new Date(dateRange.start);
   const endDate = new Date(dateRange.end);
@@ -1260,43 +1253,31 @@ function filterDataByDateRange(data, dateRange) {
     const dateValue = item.transactionDate || item.date;
     
     if (!dateValue) {
-      console.log("⚠️ Item without date:", item);
       return false;
     }
     
-    // Xử lý format yyyy/mm/dd thành Date object
+    // Xử lý cả format yyyy/mm/dd và ISO format
     let itemDate;
-    if (typeof dateValue === 'string' && dateValue.includes('/')) {
-      // Format yyyy/mm/dd -> chuyển thành mm/dd/yyyy cho Date constructor
-      const parts = dateValue.split('/');
-      if (parts.length === 3) {
-        // yyyy/mm/dd -> new Date(yyyy, mm-1, dd)
-        itemDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-      } else {
+    if (typeof dateValue === 'string') {
+      if (dateValue.includes('/')) {
+        // Format yyyy/mm/dd
+        const parts = dateValue.split('/');
+        if (parts.length === 3) {
+          itemDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        }
+      } else if (dateValue.includes('T') || dateValue.includes('-')) {
+        // ISO format hoặc yyyy-mm-dd
         itemDate = new Date(dateValue);
       }
     } else {
       itemDate = new Date(dateValue);
     }
     
-    // Debug log cho item đầu tiên
-    if (data.indexOf(item) === 0) {
-      console.log("📅 Date comparison sample:", {
-        original: dateValue,
-        itemDate: itemDate.toISOString(),
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
-        inRange: itemDate >= startDate && itemDate <= endDate
-      });
+    if (!itemDate || isNaN(itemDate.getTime())) {
+      return false;
     }
     
     return itemDate >= startDate && itemDate <= endDate;
-  });
-  
-  console.log("✅ Filtered result:", {
-    originalCount: data.length,
-    filteredCount: filteredData.length,
-    sampleItems: filteredData.slice(0, 2)
   });
   
   return filteredData;
