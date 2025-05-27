@@ -884,65 +884,166 @@ export function addFinancialDashboardStyles() {
       font-weight: 600;
     }
     
-    .filter-options {
+    .period-selector {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
     }
     
-    .filter-option {
+    .period-option {
       display: flex;
       align-items: center;
-      gap: 8px;
+      padding: 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
       cursor: pointer;
-      padding: 8px;
-      border-radius: 6px;
-      transition: background-color 0.2s;
+      transition: all 0.3s ease;
+      background: white;
     }
     
-    .filter-option:hover {
-      background-color: #f8f9fa;
+    .period-option:hover {
+      border-color: #3182ce;
+      background: #f7faff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(49, 130, 206, 0.15);
     }
     
-    .filter-option input[type="radio"] {
-      margin: 0;
+    .period-option.selected {
+      border-color: #3182ce;
+      background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
+      box-shadow: 0 4px 12px rgba(49, 130, 206, 0.2);
     }
     
-    .filter-option span {
+    .period-icon {
+      font-size: 24px;
+      margin-right: 12px;
+      min-width: 30px;
+    }
+    
+    .period-content {
+      flex: 1;
+    }
+    
+    .period-title {
+      font-weight: 600;
+      color: #2d3748;
       font-size: 14px;
-      color: #4a5568;
+      margin-bottom: 2px;
+    }
+    
+    .period-subtitle {
+      font-size: 12px;
+      color: #718096;
+    }
+    
+    .period-check {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: white;
+      transition: all 0.3s ease;
+    }
+    
+    .period-check.active {
+      background: #48bb78;
+      border-color: #48bb78;
     }
     
     .custom-date-range {
-      margin-top: 12px;
-      padding: 12px;
+      max-height: 0;
+      overflow: hidden;
+      transition: all 0.4s ease;
       background: #f8f9fa;
-      border-radius: 6px;
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+    
+    .custom-date-range.expanded {
+      max-height: 300px;
+      padding: 16px;
       border: 1px solid #e2e8f0;
     }
     
-    .date-input-group {
-      margin-bottom: 10px;
+    .date-range-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      font-weight: 600;
+      color: #2d3748;
+      font-size: 14px;
     }
     
-    .date-input-group:last-child {
-      margin-bottom: 0;
+    .range-icon {
+      font-size: 16px;
     }
     
-    .date-input-group label {
+    .date-inputs {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .date-input-wrapper {
+      flex: 1;
+    }
+    
+    .date-input-wrapper label {
       display: block;
       font-size: 12px;
       color: #718096;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
       font-weight: 500;
     }
     
-    .date-input-group input[type="date"] {
+    .date-input-wrapper input[type="date"] {
       width: 100%;
-      padding: 8px;
-      border: 1px solid #cbd5e0;
+      padding: 10px;
+      border: 2px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 13px;
+      transition: border-color 0.2s;
+    }
+    
+    .date-input-wrapper input[type="date"]:focus {
+      outline: none;
+      border-color: #3182ce;
+      box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+    }
+    
+    .date-separator {
+      color: #3182ce;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    
+    .date-quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    
+    .quick-btn {
+      padding: 8px 12px;
+      border: 1px solid #e2e8f0;
+      background: white;
       border-radius: 4px;
-      font-size: 14px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #4a5568;
+    }
+    
+    .quick-btn:hover {
+      background: #3182ce;
+      color: white;
+      border-color: #3182ce;
     }
     
     .filter-note {
@@ -1010,6 +1111,15 @@ export function addFinancialDashboardStyles() {
       align-items: center;
       gap: 15px;
     }
+    
+    .period-label {
+      font-size: 12px;
+      color: #718096;
+      background: #f7faff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+    }
   `;
   
   document.head.appendChild(styles);
@@ -1034,43 +1144,74 @@ function renderFilterPanel() {
       
       <div class="filter-section">
         <h4>📅 Chu Kỳ Báo Cáo</h4>
-        <div class="filter-options">
-          <label class="filter-option">
-            <input type="radio" name="period" value="current_month" 
-                   ${window.globalFilters.period === 'current_month' ? 'checked' : ''}
-                   onchange="updatePeriodFilter('current_month')">
-            <span>Tháng này (${currentMonth}/${currentYear})</span>
-          </label>
+        <div class="period-selector">
           
-          <label class="filter-option">
-            <input type="radio" name="period" value="last_month"
-                   ${window.globalFilters.period === 'last_month' ? 'checked' : ''}
-                   onchange="updatePeriodFilter('last_month')">
-            <span>Tháng trước (${lastMonth}/${lastMonthYear})</span>
-          </label>
-          
-          <label class="filter-option">
-            <input type="radio" name="period" value="custom"
-                   ${window.globalFilters.period === 'custom' ? 'checked' : ''}
-                   onchange="updatePeriodFilter('custom')">
-            <span>Tùy chọn</span>
-          </label>
-          
-          <div class="custom-date-range" id="customDateRange" 
-               style="display: ${window.globalFilters.period === 'custom' ? 'block' : 'none'}">
-            <div class="date-input-group">
-              <label>Từ ngày:</label>
-              <input type="date" id="customStartDate" 
-                     value="${window.globalFilters.customStartDate || ''}"
-                     onchange="updateCustomDateRange()">
+          <!-- Tháng này -->
+          <div class="period-option ${window.globalFilters.period === 'current_month' ? 'selected' : ''}" 
+               onclick="selectPeriod('current_month')">
+            <div class="period-icon">📈</div>
+            <div class="period-content">
+              <div class="period-title">Tháng này</div>
+              <div class="period-subtitle">${currentMonth}/${currentYear}</div>
             </div>
-            <div class="date-input-group">
-              <label>Đến ngày:</label>
-              <input type="date" id="customEndDate"
-                     value="${window.globalFilters.customEndDate || ''}"
-                     onchange="updateCustomDateRange()">
+            <div class="period-check ${window.globalFilters.period === 'current_month' ? 'active' : ''}">✓</div>
+          </div>
+          
+          <!-- Tháng trước -->
+          <div class="period-option ${window.globalFilters.period === 'last_month' ? 'selected' : ''}" 
+               onclick="selectPeriod('last_month')">
+            <div class="period-icon">📊</div>
+            <div class="period-content">
+              <div class="period-title">Tháng trước</div>
+              <div class="period-subtitle">${lastMonth}/${lastMonthYear}</div>
+            </div>
+            <div class="period-check ${window.globalFilters.period === 'last_month' ? 'active' : ''}">✓</div>
+          </div>
+          
+          <!-- Tùy chọn -->
+          <div class="period-option ${window.globalFilters.period === 'custom' ? 'selected' : ''}" 
+               onclick="selectPeriod('custom')">
+            <div class="period-icon">🗓️</div>
+            <div class="period-content">
+              <div class="period-title">Tùy chọn</div>
+              <div class="period-subtitle">Chọn khoảng thời gian</div>
+            </div>
+            <div class="period-check ${window.globalFilters.period === 'custom' ? 'active' : ''}">✓</div>
+          </div>
+          
+          <!-- Custom date range -->
+          <div class="custom-date-range ${window.globalFilters.period === 'custom' ? 'expanded' : ''}" id="customDateRange">
+            <div class="date-range-header">
+              <span class="range-icon">🎯</span>
+              <span>Chọn khoảng thời gian</span>
+            </div>
+            
+            <div class="date-inputs">
+              <div class="date-input-wrapper">
+                <label>🚀 Từ ngày</label>
+                <input type="date" id="customStartDate" 
+                       value="${window.globalFilters.customStartDate || ''}"
+                       onchange="updateCustomDateRange()">
+              </div>
+              
+              <div class="date-separator">→</div>
+              
+              <div class="date-input-wrapper">
+                <label>🏁 Đến ngày</label>
+                <input type="date" id="customEndDate"
+                       value="${window.globalFilters.customEndDate || ''}"
+                       onchange="updateCustomDateRange()">
+              </div>
+            </div>
+            
+            <div class="date-quick-actions">
+              <button onclick="setQuickRange('this_week')" class="quick-btn">Tuần này</button>
+              <button onclick="setQuickRange('last_week')" class="quick-btn">Tuần trước</button>
+              <button onclick="setQuickRange('last_7_days')" class="quick-btn">7 ngày qua</button>
+              <button onclick="setQuickRange('last_30_days')" class="quick-btn">30 ngày qua</button>
             </div>
           </div>
+          
         </div>
       </div>
       
@@ -1099,16 +1240,55 @@ function renderFilterPanel() {
  */
 function filterDataByDateRange(data, dateRange) {
   if (!dateRange || !dateRange.start || !dateRange.end) {
+    console.log("❌ Missing date range, returning original data:", data.length);
     return data;
   }
 
+  console.log("🔍 Filtering data by date range:", {
+    start: dateRange.start,
+    end: dateRange.end,
+    originalCount: data.length
+  });
+
   const startDate = new Date(dateRange.start);
   const endDate = new Date(dateRange.end);
+  // Đặt endDate về cuối ngày
+  endDate.setHours(23, 59, 59, 999);
   
-  return data.filter(item => {
-    const itemDate = new Date(normalizeDate(item.ngayGiaoDich || item.ngayChiPhi || item.date));
+  const filteredData = data.filter(item => {
+    // Thử nhiều field có thể chứa ngày
+    const dateValue = item.ngayGiaoDich || item.ngayChiPhi || item.date || item.timestamp;
+    
+    if (!dateValue) {
+      console.log("⚠️ Item without date:", item);
+      return false;
+    }
+    
+    const normalizedDate = normalizeDate(dateValue);
+    const itemDate = new Date(normalizedDate);
+    
+    // Debug log
+    if (data.indexOf(item) < 3) { // Log first 3 items
+      console.log("📅 Date comparison:", {
+        original: dateValue,
+        normalized: normalizedDate,
+        itemDate: itemDate.toISOString(),
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        inRange: itemDate >= startDate && itemDate <= endDate
+      });
+    }
+    
     return itemDate >= startDate && itemDate <= endDate;
   });
+  
+  console.log("✅ Filtered result:", {
+    originalCount: data.length,
+    filteredCount: filteredData.length,
+    sampleItems: filteredData.slice(0, 2)
+  });
+  
+  return filteredData;
 }
 
 /**
@@ -1122,7 +1302,45 @@ window.toggleFilterPanel = function() {
 }
 
 /**
- * Cập nhật bộ lọc chu kỳ
+ * Chọn period với giao diện mới
+ */
+window.selectPeriod = function(period) {
+  // Update global filter
+  window.globalFilters.period = period;
+  
+  // Update UI
+  document.querySelectorAll('.period-option').forEach(option => {
+    option.classList.remove('selected');
+  });
+  
+  document.querySelectorAll('.period-check').forEach(check => {
+    check.classList.remove('active');
+  });
+  
+  // Activate selected option
+  const selectedOption = document.querySelector(`.period-option[onclick*="${period}"]`);
+  if (selectedOption) {
+    selectedOption.classList.add('selected');
+    const check = selectedOption.querySelector('.period-check');
+    if (check) check.classList.add('active');
+  }
+  
+  // Handle custom date range visibility
+  const customDateRange = document.getElementById('customDateRange');
+  if (customDateRange) {
+    if (period === 'custom') {
+      customDateRange.classList.add('expanded');
+    } else {
+      customDateRange.classList.remove('expanded');
+    }
+  }
+  
+  // Calculate date range automatically for predefined periods
+  updatePeriodFilter(period);
+}
+
+/**
+ * Cập nhật bộ lọc chu kỳ (logic cũ)
  */
 window.updatePeriodFilter = function(period) {
   window.globalFilters.period = period;
@@ -1229,4 +1447,66 @@ window.resetFilters = function() {
   
   // Áp dụng ngay sau khi reset
   applyFilters();
+}
+
+/**
+ * Set quick date ranges
+ */
+window.setQuickRange = function(range) {
+  const now = new Date();
+  let startDate, endDate;
+  
+  switch(range) {
+    case 'this_week':
+      const startOfWeek = new Date(now);
+      startOfWeek.setDate(now.getDate() - now.getDay());
+      startDate = startOfWeek;
+      endDate = new Date(now);
+      break;
+      
+    case 'last_week':
+      const lastWeekEnd = new Date(now);
+      lastWeekEnd.setDate(now.getDate() - now.getDay() - 1);
+      const lastWeekStart = new Date(lastWeekEnd);
+      lastWeekStart.setDate(lastWeekEnd.getDate() - 6);
+      startDate = lastWeekStart;
+      endDate = lastWeekEnd;
+      break;
+      
+    case 'last_7_days':
+      startDate = new Date(now);
+      startDate.setDate(now.getDate() - 7);
+      endDate = new Date(now);
+      break;
+      
+    case 'last_30_days':
+      startDate = new Date(now);
+      startDate.setDate(now.getDate() - 30);
+      endDate = new Date(now);
+      break;
+  }
+  
+  // Format dates for input fields
+  const startDateStr = startDate.toISOString().split('T')[0];
+  const endDateStr = endDate.toISOString().split('T')[0];
+  
+  // Update input fields
+  const startInput = document.getElementById('customStartDate');
+  const endInput = document.getElementById('customEndDate');
+  
+  if (startInput) startInput.value = startDateStr;
+  if (endInput) endInput.value = endDateStr;
+  
+  // Update global filters
+  window.globalFilters.customStartDate = startDateStr;
+  window.globalFilters.customEndDate = endDateStr;
+  window.globalFilters.dateRange = {
+    start: startDateStr,
+    end: endDateStr
+  };
+  
+  console.log('📅 Quick range set:', range, {
+    start: startDateStr,
+    end: endDateStr
+  });
 }
