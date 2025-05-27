@@ -59,6 +59,9 @@ export function initializeStatisticsUI() {
   // Load initial data
   loadStatisticsData();
   
+  // Expose refresh function for global filters
+  window.refreshStatisticsWithFilters = refreshStatisticsWithFilters;
+  
   console.log("✅ Statistics UI controller initialized");
 }
 
@@ -596,15 +599,16 @@ async function renderRevenueTab(transactionData) {
 /**
  * Renders enhanced statistics with all features
  */
-async function renderEnhancedStatistics(expenseData, transactionData, financialAnalysis) {
+async function renderEnhancedStatistics(expenseData, transactionData, financialAnalysis, globalFilters = null) {
   try {
     console.log("🎨 Rendering enhanced statistics dashboard...");
     
-    // 1. Render NEW Financial Dashboard
+    // 1. Render NEW Financial Dashboard với global filters
     renderFinancialDashboard(transactionData, expenseData, {
       containerId: "financialDashboard",
       showAlerts: true,
-      showForecast: true
+      showForecast: true,
+      globalFilters: globalFilters
     });
     console.log("✅ Financial Dashboard rendered");
     
@@ -788,4 +792,23 @@ export function resetUI() {
   if (growthToggle) growthToggle.checked = false;
   
   refreshStatistics();
+}
+
+/**
+ * Refresh statistics với global filters
+ */
+async function refreshStatisticsWithFilters(globalFilters) {
+  console.log("🔄 Refreshing statistics with global filters:", globalFilters);
+  
+  try {
+    const expenseData = window.expenseList || [];
+    const transactionData = window.transactionList || [];
+    
+    // Render dashboard với global filters
+    await renderEnhancedStatistics(expenseData, transactionData, null, globalFilters);
+    
+    console.log("✅ Statistics refreshed with filters");
+  } catch (error) {
+    console.error("❌ Error refreshing statistics with filters:", error);
+  }
 }

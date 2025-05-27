@@ -7,6 +7,14 @@
 
 import { normalizeDate, formatCurrency, getDateRange } from './statisticsCore.js';
 
+// Global state cho filter panel
+window.globalFilters = {
+  dateRange: null,
+  period: 'current_month', // current_month, last_month, custom
+  customStartDate: null,
+  customEndDate: null
+};
+
 /**
  * Renders the comprehensive financial dashboard
  * @param {Array} transactionData - Transaction records from GiaoDich sheet
@@ -17,7 +25,8 @@ export function renderFinancialDashboard(transactionData, expenseData, options =
   const {
     containerId = "financialDashboard",
     showAlerts = true,
-    showForecast = true
+    showForecast = true,
+    globalFilters = null
   } = options;
 
   const container = document.getElementById(containerId);
@@ -28,31 +37,62 @@ export function renderFinancialDashboard(transactionData, expenseData, options =
 
   console.log("💰 Rendering Financial Dashboard với dữ liệu:", {
     transactions: transactionData.length,
-    expenses: expenseData.length
+    expenses: expenseData.length,
+    globalFilters: globalFilters
   });
 
-  // Calculate all metrics
-  const metrics = calculateFinancialMetrics(transactionData, expenseData);
-  const alerts = generateAlerts(transactionData, expenseData, metrics);
-  const forecast = generateForecast(transactionData, expenseData);
+  // Apply global filters if available
+  let filteredTransactionData = transactionData;
+  let filteredExpenseData = expenseData;
+  
+  if (globalFilters && globalFilters.dateRange) {
+    filteredTransactionData = filterDataByDateRange(transactionData, globalFilters.dateRange);
+    filteredExpenseData = filterDataByDateRange(expenseData, globalFilters.dateRange);
+    
+    console.log("🔍 Đã áp dụng bộ lọc:", {
+      originalTransactions: transactionData.length,
+      filteredTransactions: filteredTransactionData.length,
+      originalExpenses: expenseData.length,
+      filteredExpenses: filteredExpenseData.length,
+      dateRange: globalFilters.dateRange
+    });
+  }
+
+  // Calculate all metrics với dữ liệu đã lọc
+  const metrics = calculateFinancialMetrics(filteredTransactionData, filteredExpenseData);
+  const alerts = generateAlerts(filteredTransactionData, filteredExpenseData, metrics);
+  const forecast = generateForecast(filteredTransactionData, filteredExpenseData);
 
   // Render dashboard HTML
   const dashboardHTML = `
-    <div class="financial-dashboard">
-      <div class="dashboard-header">
-        <h2>💰 Dashboard Tài Chính Tổng Quan</h2>
-        <div class="last-updated">Cập nhật: ${new Date().toLocaleString('vi-VN')}</div>
+    <div class="dashboard-wrapper">
+      ${renderFilterPanel()}
+      <div class="financial-dashboard">
+        <div class="dashboard-header">
+          <h2>💰 Dashboard Tài Chính Tổng Quan</h2>
+          <div class="dashboard-controls">
+            <button class="filter-toggle-btn" onclick="toggleFilterPanel()">
+              <span class="filter-icon">⚙️</span> Bộ lọc
+            </button>
+            <div class="last-updated">Cập nhật: ${new Date().toLocaleString('vi-VN')}</div>
+          </div>
+        </div>
+        
+        ${renderOverviewCards(metrics)}
+        ${renderCashFlowTracker(metrics)}
+        ${renderCategoryBreakdown(metrics)}
+        ${showAlerts ? renderAlertSystem(alerts) : ''}
+        ${showForecast ? renderQuickForecast(forecast) : ''}
       </div>
-      
-      ${renderOverviewCards(metrics)}
-      ${renderCashFlowTracker(metrics)}
-      ${renderCategoryBreakdown(metrics)}
-      ${showAlerts ? renderAlertSystem(alerts) : ''}
-      ${showForecast ? renderQuickForecast(forecast) : ''}
     </div>
   `;
 
   container.innerHTML = dashboardHTML;
+  
+  // Initialize default filters if not set
+  if (!window.globalFilters.dateRange) {
+    window.updatePeriodFilter('current_month');
+  }
   
   // Add interactive features
   addDashboardInteractivity();
@@ -202,33 +242,43 @@ function calculateExpensesByCategory(expenseData, startDate, endDate) {
  * Renders overview cards with key metrics
  */
 function renderOverviewCards(metrics) {
+  // Get current period label from global filters
+  const getPeriodLabel = () => {
+    if (!window.globalFilters) return "Tháng này";
+    
+    switch (window.globalFilters.period) {
+      case 'current_month':
+        const currentDate = new Date();
+        return `Tháng ${currentDate.getMonth() + 1}/${currentDate.getFullYear()}`;
+      case 'last_month':
+        const lastMonthDate = new Date();
+        lastMonthDate.setMonth(lastMonthDate.getMonth() - 1);
+        return `Tháng ${lastMonthDate.getMonth() + 1}/${lastMonthDate.getFullYear()}`;
+      case 'custom':
+        if (window.globalFilters.dateRange && window.globalFilters.dateRange.start && window.globalFilters.dateRange.end) {
+          return `${window.globalFilters.dateRange.start} đến ${window.globalFilters.dateRange.end}`;
+        }
+        return "Khoảng thời gian tùy chọn";
+      default:
+        return "Tháng này";
+    }
+  };
+
+  const periodLabel = getPeriodLabel();
+
   return `
     <div class="overview-cards">
       <div class="overview-card revenue-card">
         <div class="card-header">
           <h3>📈 Doanh Thu</h3>
-          <div class="period-tabs">
-            <button class="period-tab active" data-period="today">Hôm nay</button>
-            <button class="period-tab" data-period="month">Tháng</button>
-            <button class="period-tab" data-period="quarter">Quý</button>
-            <button class="period-tab" data-period="year">Năm</button>
-          </div>
+          <div class="period-label">${periodLabel}</div>
         </div>
         <div class="card-content">
-          <div class="main-amount revenue-amount" data-period="today">
-            ${formatCurrency(metrics.today.revenue.total, "VND")}
-          </div>
-          <div class="main-amount revenue-amount hidden" data-period="month">
+          <div class="main-amount revenue-amount">
             ${formatCurrency(metrics.month.revenue.total, "VND")}
           </div>
-          <div class="main-amount revenue-amount hidden" data-period="quarter">
-            ${formatCurrency(metrics.quarter.revenue.total, "VND")}
-          </div>
-          <div class="main-amount revenue-amount hidden" data-period="year">
-            ${formatCurrency(metrics.year.revenue.total, "VND")}
-          </div>
           <div class="sub-info">
-            <div>Top phần mềm: ${getTopSoftware(metrics.today.revenue.bySoftware)}</div>
+            <div>Top phần mềm: ${getTopSoftware(metrics.month.revenue.bySoftware)}</div>
           </div>
         </div>
       </div>
@@ -236,59 +286,31 @@ function renderOverviewCards(metrics) {
       <div class="overview-card expense-card">
         <div class="card-header">
           <h3>💸 Chi Phí</h3>
-          <div class="period-tabs">
-            <button class="period-tab active" data-period="today">Hôm nay</button>
-            <button class="period-tab" data-period="month">Tháng</button>
-            <button class="period-tab" data-period="quarter">Quý</button>
-            <button class="period-tab" data-period="year">Năm</button>
-          </div>
+          <div class="period-label">${periodLabel}</div>
         </div>
         <div class="card-content">
-          <div class="main-amount expense-amount" data-period="today">
-            ${formatCurrency(metrics.today.expenses.total, "VND")}
-          </div>
-          <div class="main-amount expense-amount hidden" data-period="month">
+          <div class="main-amount expense-amount">
             ${formatCurrency(metrics.month.expenses.total, "VND")}
           </div>
-          <div class="main-amount expense-amount hidden" data-period="quarter">
-            ${formatCurrency(metrics.quarter.expenses.total, "VND")}
-          </div>
-          <div class="main-amount expense-amount hidden" data-period="year">
-            ${formatCurrency(metrics.year.expenses.total, "VND")}
-          </div>
           <div class="sub-info">
-            <div>Kinh doanh: ${formatCurrency(metrics.today.expenses["Kinh doanh phần mềm"], "VND")}</div>
-            <div>Cá nhân: ${formatCurrency(metrics.today.expenses["Sinh hoạt cá nhân"], "VND")}</div>
+            <div>Kinh doanh: ${formatCurrency(metrics.month.expenses["Kinh doanh phần mềm"], "VND")}</div>
+            <div>Cá nhân: ${formatCurrency(metrics.month.expenses["Sinh hoạt cá nhân"], "VND")}</div>
           </div>
         </div>
       </div>
 
-      <div class="overview-card profit-card ${metrics.today.profit >= 0 ? 'positive' : 'negative'}">
+      <div class="overview-card profit-card ${metrics.month.profit >= 0 ? 'positive' : 'negative'}">
         <div class="card-header">
           <h3>💰 Lợi Nhuận</h3>
-          <div class="period-tabs">
-            <button class="period-tab active" data-period="today">Hôm nay</button>
-            <button class="period-tab" data-period="month">Tháng</button>
-            <button class="period-tab" data-period="quarter">Quý</button>
-            <button class="period-tab" data-period="year">Năm</button>
-          </div>
+          <div class="period-label">${periodLabel}</div>
         </div>
         <div class="card-content">
-          <div class="main-amount profit-amount" data-period="today">
-            ${formatCurrency(metrics.today.profit, "VND")}
-          </div>
-          <div class="main-amount profit-amount hidden" data-period="month">
+          <div class="main-amount profit-amount">
             ${formatCurrency(metrics.month.profit, "VND")}
           </div>
-          <div class="main-amount profit-amount hidden" data-period="quarter">
-            ${formatCurrency(metrics.quarter.profit, "VND")}
-          </div>
-          <div class="main-amount profit-amount hidden" data-period="year">
-            ${formatCurrency(metrics.year.profit, "VND")}
-          </div>
           <div class="sub-info">
-            <div>Margin: ${metrics.today.margin.toFixed(1)}%</div>
-            <div>${metrics.today.profit >= 0 ? '📈 Lãi' : '📉 Lỗ'}</div>
+            <div>Margin: ${metrics.month.margin.toFixed(1)}%</div>
+            <div>${metrics.month.profit >= 0 ? '📈 Lãi' : '📉 Lỗ'}</div>
           </div>
         </div>
       </div>
@@ -492,26 +514,8 @@ function renderQuickForecast(forecast) {
  * Adds interactive features to dashboard
  */
 function addDashboardInteractivity() {
-  // Period tab switching
-  document.querySelectorAll('.period-tab').forEach(tab => {
-    tab.addEventListener('click', (e) => {
-      const period = e.target.dataset.period;
-      const card = e.target.closest('.overview-card');
-      
-      // Update active tab
-      card.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
-      e.target.classList.add('active');
-      
-      // Show corresponding amount
-      card.querySelectorAll('.main-amount').forEach(amount => {
-        if (amount.dataset.period === period) {
-          amount.classList.remove('hidden');
-        } else {
-          amount.classList.add('hidden');
-        }
-      });
-    });
-  });
+  // No interactive features needed for simplified cards
+  console.log("✅ Dashboard interactivity initialized");
 }
 
 /**
@@ -523,11 +527,22 @@ export function addFinancialDashboardStyles() {
   const styles = document.createElement('style');
   styles.id = 'financial-dashboard-styles';
   styles.textContent = `
+    /* Dashboard Wrapper & Layout */
+    .dashboard-wrapper {
+      position: relative;
+      min-height: 500px;
+    }
+    
     .financial-dashboard {
       padding: 20px;
       background: #f8f9fa;
       border-radius: 10px;
       margin: 20px 0;
+      transition: margin-right 0.3s ease;
+    }
+    
+    .financial-dashboard.filter-open {
+      margin-right: 320px;
     }
     
     .dashboard-header {
@@ -593,25 +608,13 @@ export function addFinancialDashboardStyles() {
       color: #495057;
     }
     
-    .period-tabs {
-      display: flex;
-      gap: 5px;
-    }
-    
-    .period-tab {
-      padding: 4px 8px;
-      border: 1px solid #dee2e6;
-      background: white;
-      border-radius: 4px;
+    .period-label {
       font-size: 12px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    
-    .period-tab.active {
-      background: #007bff;
-      color: white;
-      border-color: #007bff;
+      color: #6c757d;
+      background: #f8f9fa;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid #e9ecef;
     }
     
     .main-amount {
@@ -795,8 +798,435 @@ export function addFinancialDashboardStyles() {
       .period-tabs {
         flex-wrap: wrap;
       }
+      
+      /* Mobile Filter Panel */
+      .filter-panel {
+        width: 100%;
+        right: -100%;
+      }
+      
+      .financial-dashboard.filter-open {
+        margin-right: 0;
+      }
+      
+      .dashboard-controls {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 8px;
+      }
+    }
+    
+    /* Filter Panel Styles */
+    .filter-panel {
+      position: fixed;
+      top: 0;
+      right: -320px;
+      width: 300px;
+      height: 100vh;
+      background: #ffffff;
+      box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+      transition: right 0.3s ease;
+      z-index: 1000;
+      overflow-y: auto;
+      border-left: 1px solid #e9ecef;
+    }
+    
+    .filter-panel.open {
+      right: 0;
+    }
+    
+    .filter-panel-header {
+      padding: 20px;
+      background: #007bff;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1001;
+    }
+    
+    .filter-panel-header h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+    
+    .close-filter-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background-color 0.2s;
+    }
+    
+    .close-filter-btn:hover {
+      background-color: rgba(255,255,255,0.2);
+    }
+    
+    .filter-section {
+      padding: 20px;
+      border-bottom: 1px solid #e9ecef;
+    }
+    
+    .filter-section h4 {
+      margin: 0 0 15px 0;
+      color: #2d3748;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .filter-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .filter-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 6px;
+      transition: background-color 0.2s;
+    }
+    
+    .filter-option:hover {
+      background-color: #f8f9fa;
+    }
+    
+    .filter-option input[type="radio"] {
+      margin: 0;
+    }
+    
+    .filter-option span {
+      font-size: 14px;
+      color: #4a5568;
+    }
+    
+    .custom-date-range {
+      margin-top: 12px;
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+    }
+    
+    .date-input-group {
+      margin-bottom: 10px;
+    }
+    
+    .date-input-group:last-child {
+      margin-bottom: 0;
+    }
+    
+    .date-input-group label {
+      display: block;
+      font-size: 12px;
+      color: #718096;
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+    
+    .date-input-group input[type="date"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #cbd5e0;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    .filter-note {
+      color: #718096;
+      font-size: 12px;
+      text-align: center;
+      padding: 20px 0;
+    }
+    
+    .filter-actions {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .apply-filter-btn, .reset-filter-btn {
+      padding: 12px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .apply-filter-btn {
+      background-color: #48bb78;
+      color: white;
+    }
+    
+    .apply-filter-btn:hover {
+      background-color: #38a169;
+    }
+    
+    .reset-filter-btn {
+      background-color: #edf2f7;
+      color: #4a5568;
+    }
+    
+    .reset-filter-btn:hover {
+      background-color: #e2e8f0;
+    }
+    
+    .filter-toggle-btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background-color 0.2s;
+    }
+    
+    .filter-toggle-btn:hover {
+      background: #0056b3;
+    }
+    
+    .dashboard-controls {
+      display: flex;
+      align-items: center;
+      gap: 15px;
     }
   `;
   
   document.head.appendChild(styles);
+}
+
+/**
+ * Render filter panel bên phải
+ */
+function renderFilterPanel() {
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth() + 1;
+  const currentYear = currentDate.getFullYear();
+  const lastMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+  const lastMonthYear = currentMonth === 1 ? currentYear - 1 : currentYear;
+
+  return `
+    <div class="filter-panel" id="filterPanel">
+      <div class="filter-panel-header">
+        <h3>🔧 Bộ Lọc Báo Cáo</h3>
+        <button class="close-filter-btn" onclick="toggleFilterPanel()">×</button>
+      </div>
+      
+      <div class="filter-section">
+        <h4>📅 Chu Kỳ Báo Cáo</h4>
+        <div class="filter-options">
+          <label class="filter-option">
+            <input type="radio" name="period" value="current_month" 
+                   ${window.globalFilters.period === 'current_month' ? 'checked' : ''}
+                   onchange="updatePeriodFilter('current_month')">
+            <span>Tháng này (${currentMonth}/${currentYear})</span>
+          </label>
+          
+          <label class="filter-option">
+            <input type="radio" name="period" value="last_month"
+                   ${window.globalFilters.period === 'last_month' ? 'checked' : ''}
+                   onchange="updatePeriodFilter('last_month')">
+            <span>Tháng trước (${lastMonth}/${lastMonthYear})</span>
+          </label>
+          
+          <label class="filter-option">
+            <input type="radio" name="period" value="custom"
+                   ${window.globalFilters.period === 'custom' ? 'checked' : ''}
+                   onchange="updatePeriodFilter('custom')">
+            <span>Tùy chọn</span>
+          </label>
+          
+          <div class="custom-date-range" id="customDateRange" 
+               style="display: ${window.globalFilters.period === 'custom' ? 'block' : 'none'}">
+            <div class="date-input-group">
+              <label>Từ ngày:</label>
+              <input type="date" id="customStartDate" 
+                     value="${window.globalFilters.customStartDate || ''}"
+                     onchange="updateCustomDateRange()">
+            </div>
+            <div class="date-input-group">
+              <label>Đến ngày:</label>
+              <input type="date" id="customEndDate"
+                     value="${window.globalFilters.customEndDate || ''}"
+                     onchange="updateCustomDateRange()">
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Các bộ lọc khác có thể thêm vào đây -->
+      <div class="filter-section">
+        <h4>🎯 Bộ Lọc Khác</h4>
+        <div class="filter-note">
+          <em>Các bộ lọc khác sẽ được thêm vào sau...</em>
+        </div>
+      </div>
+      
+      <div class="filter-actions">
+        <button class="apply-filter-btn" onclick="applyFilters()">
+          ✅ Áp Dụng Bộ Lọc
+        </button>
+        <button class="reset-filter-btn" onclick="resetFilters()">
+          🔄 Đặt Lại
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Lọc dữ liệu theo khoảng thời gian
+ */
+function filterDataByDateRange(data, dateRange) {
+  if (!dateRange || !dateRange.start || !dateRange.end) {
+    return data;
+  }
+
+  const startDate = new Date(dateRange.start);
+  const endDate = new Date(dateRange.end);
+  
+  return data.filter(item => {
+    const itemDate = new Date(normalizeDate(item.ngayGiaoDich || item.ngayChiPhi || item.date));
+    return itemDate >= startDate && itemDate <= endDate;
+  });
+}
+
+/**
+ * Toggle hiển thị filter panel
+ */
+window.toggleFilterPanel = function() {
+  const panel = document.getElementById('filterPanel');
+  if (panel) {
+    panel.classList.toggle('open');
+  }
+}
+
+/**
+ * Cập nhật bộ lọc chu kỳ
+ */
+window.updatePeriodFilter = function(period) {
+  window.globalFilters.period = period;
+  
+  const customDateRange = document.getElementById('customDateRange');
+  if (customDateRange) {
+    customDateRange.style.display = period === 'custom' ? 'block' : 'none';
+  }
+  
+  // Tự động tính toán dateRange cho current_month và last_month
+  if (period === 'current_month') {
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    window.globalFilters.dateRange = {
+      start: firstDay.toISOString().split('T')[0],
+      end: lastDay.toISOString().split('T')[0]
+    };
+  } else if (period === 'last_month') {
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastDay = new Date(now.getFullYear(), now.getMonth(), 0);
+    window.globalFilters.dateRange = {
+      start: firstDay.toISOString().split('T')[0],
+      end: lastDay.toISOString().split('T')[0]
+    };
+  }
+  
+  console.log('📅 Đã cập nhật period filter:', {
+    period: period,
+    dateRange: window.globalFilters.dateRange
+  });
+}
+
+/**
+ * Cập nhật khoảng thời gian tùy chọn
+ */
+window.updateCustomDateRange = function() {
+  const startInput = document.getElementById('customStartDate');
+  const endInput = document.getElementById('customEndDate');
+  
+  if (startInput && endInput) {
+    window.globalFilters.customStartDate = startInput.value;
+    window.globalFilters.customEndDate = endInput.value;
+    
+    if (startInput.value && endInput.value) {
+      window.globalFilters.dateRange = {
+        start: startInput.value,
+        end: endInput.value
+      };
+    }
+  }
+}
+
+/**
+ * Áp dụng bộ lọc và refresh dashboard
+ */
+window.applyFilters = function() {
+  console.log('🔄 Áp dụng bộ lọc...', window.globalFilters);
+  
+  // Trigger refresh của toàn bộ statistics UI
+  if (window.statisticsUIControllerActive && window.refreshStatisticsWithFilters) {
+    window.refreshStatisticsWithFilters(window.globalFilters);
+  } else {
+    // Fallback: reload statistics
+    if (window.loadStatisticsData) {
+      window.loadStatisticsData();
+    }
+  }
+  
+  // Đóng filter panel sau khi áp dụng
+  toggleFilterPanel();
+}
+
+/**
+ * Reset tất cả bộ lọc về mặc định
+ */
+window.resetFilters = function() {
+  window.globalFilters = {
+    dateRange: null,
+    period: 'current_month',
+    customStartDate: null,
+    customEndDate: null
+  };
+  
+  // Reset UI
+  const currentMonthRadio = document.querySelector('input[value="current_month"]');
+  if (currentMonthRadio) {
+    currentMonthRadio.checked = true;
+  }
+  
+  const customDateRange = document.getElementById('customDateRange');
+  if (customDateRange) {
+    customDateRange.style.display = 'none';
+  }
+  
+  // Reset custom date inputs
+  const startInput = document.getElementById('customStartDate');
+  const endInput = document.getElementById('customEndDate');
+  if (startInput) startInput.value = '';
+  if (endInput) endInput.value = '';
+  
+  console.log('🔄 Đã reset bộ lọc');
+  
+  // Áp dụng ngay sau khi reset
+  applyFilters();
 }
