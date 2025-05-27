@@ -144,9 +144,25 @@ document.addEventListener("DOMContentLoaded", async () => {
           tabDisplay: tabStyle ? tabStyle.display : "unknown"
         });
         
-        // Refresh bảng chi phí
-        console.log("🔄 Chuyển sang tab chi phí/thống kê - refresh bảng");
-        renderExpenseStats();
+        // ✅ Khởi tạo statistics UI controller nếu là tab thống kê
+        if (selectedTab === "tab-thong-ke") {
+          console.log("🎮 Initializing statistics UI for tab-thong-ke...");
+          // Lazy load and initialize statistics UI controller
+          import('./statisticsUIController.js').then(module => {
+            if (module.initializeStatisticsUI) {
+              console.log("✅ Statistics UI Controller loaded, initializing...");
+              module.initializeStatisticsUI();
+            }
+          }).catch(error => {
+            console.warn("⚠️ Could not load statistics UI controller:", error);
+            // Fallback to legacy renderExpenseStats
+            renderExpenseStats();
+          });
+        } else {
+          // Refresh bảng chi phí cho tab chi phí
+          console.log("🔄 Chuyển sang tab chi phí - refresh bảng");
+          renderExpenseStats();
+        }
       }
     });
   });

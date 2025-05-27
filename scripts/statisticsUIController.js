@@ -23,6 +23,7 @@ import {
   renderLoadingState,
   renderErrorState 
 } from './statisticsRenderer.js';
+import { renderFinancialDashboard, addFinancialDashboardStyles } from './financialDashboard.js';
 
 /**
  * UI state management
@@ -46,6 +47,9 @@ export function initializeStatisticsUI() {
   
   // Set flag to indicate UI controller is active
   window.statisticsUIControllerActive = true;
+  
+  // Add dashboard styles
+  addFinancialDashboardStyles();
   
   setupTabListeners();
   setupFilterControls();
@@ -362,13 +366,23 @@ async function loadStatisticsData() {
   try {
     console.log("🔄 Loading statistics data...");
     
-    // Simplified data loading - only expenses for now
+    // Get expense data and create combined data structure
     const expenseData = await fetchExpenseData({ forceRefresh: false });
+    
+    // For now, use existing transaction data from window.transactionList
+    // TODO: Implement proper transaction API when ready
+    const transactionData = window.transactionList || [];
+    
     const data = {
       expenses: expenseData,
-      transactions: [], // Disabled for now to avoid API errors
+      transactions: transactionData,
       timestamp: Date.now()
     };
+    
+    console.log("📊 Combined data prepared:", {
+      expenses: data.expenses.length,
+      transactions: data.transactions.length
+    });
     
     // Store in global variables for compatibility
     window.expenseList = data.expenses;
@@ -586,12 +600,13 @@ async function renderEnhancedStatistics(expenseData, transactionData, financialA
   try {
     console.log("🎨 Rendering enhanced statistics dashboard...");
     
-    // 1. Render Financial Overview Dashboard
-    renderFinancialOverview(financialAnalysis, {
-      containerId: "financialOverview",
-      showDetails: true
+    // 1. Render NEW Financial Dashboard
+    renderFinancialDashboard(transactionData, expenseData, {
+      containerId: "financialDashboard",
+      showAlerts: true,
+      showForecast: true
     });
-    console.log("✅ Financial overview rendered");
+    console.log("✅ Financial Dashboard rendered");
     
     // 2. Render Expense Chart
     const chartData = groupExpensesByMonth(expenseData, {
