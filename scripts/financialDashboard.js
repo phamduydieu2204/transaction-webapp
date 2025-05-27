@@ -64,7 +64,7 @@ export function renderFinancialDashboard(transactionData, expenseData, options =
   }
 
   // Calculate all metrics với dữ liệu đã lọc
-  const metrics = calculateFinancialMetrics(filteredTransactionData, filteredExpenseData);
+  const metrics = calculateFinancialMetrics(filteredTransactionData, filteredExpenseData, globalFilters);
   const alerts = generateAlerts(filteredTransactionData, filteredExpenseData, metrics);
   const forecast = generateForecast(filteredTransactionData, filteredExpenseData);
 
@@ -108,7 +108,7 @@ export function renderFinancialDashboard(transactionData, expenseData, options =
 /**
  * Calculates comprehensive financial metrics
  */
-function calculateFinancialMetrics(transactionData, expenseData) {
+function calculateFinancialMetrics(transactionData, expenseData, globalFilters = null) {
   const today = new Date();
   const todayStr = normalizeDate(today);
   const thisMonth = getDateRange("month");
@@ -116,16 +116,27 @@ function calculateFinancialMetrics(transactionData, expenseData) {
   const thisYear = getDateRange("year");
 
   console.log("🧮 Calculating financial metrics...");
+  
+  // Sử dụng filtered date range nếu có
+  let primaryPeriod;
+  if (globalFilters && globalFilters.dateRange) {
+    primaryPeriod = {
+      start: globalFilters.dateRange.start,
+      end: globalFilters.dateRange.end
+    };
+  } else {
+    primaryPeriod = thisMonth;
+  }
 
-  // Revenue calculations
+  // Revenue calculations - sử dụng primaryPeriod làm chính
   const revenueToday = calculateRevenue(transactionData, todayStr, todayStr);
-  const revenueMonth = calculateRevenue(transactionData, thisMonth.start, thisMonth.end);
+  const revenueMonth = calculateRevenue(transactionData, primaryPeriod.start, primaryPeriod.end);
   const revenueQuarter = calculateRevenue(transactionData, thisQuarter.start, thisQuarter.end);
   const revenueYear = calculateRevenue(transactionData, thisYear.start, thisYear.end);
 
-  // Expense calculations by category
+  // Expense calculations by category - sử dụng primaryPeriod làm chính
   const expensesToday = calculateExpensesByCategory(expenseData, todayStr, todayStr);
-  const expensesMonth = calculateExpensesByCategory(expenseData, thisMonth.start, thisMonth.end);
+  const expensesMonth = calculateExpensesByCategory(expenseData, primaryPeriod.start, primaryPeriod.end);
   const expensesQuarter = calculateExpensesByCategory(expenseData, thisQuarter.start, thisQuarter.end);
   const expensesYear = calculateExpensesByCategory(expenseData, thisYear.start, thisYear.end);
 
