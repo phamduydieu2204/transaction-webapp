@@ -603,6 +603,11 @@ async function renderEnhancedStatistics(expenseData, transactionData, financialA
   try {
     console.log("🎨 Rendering enhanced statistics dashboard...");
     
+    // Use saved filters if no filters provided
+    if (!globalFilters && window.globalFilters) {
+      globalFilters = window.globalFilters;
+    }
+    
     // Apply filters to data if available
     let filteredExpenseData = expenseData;
     let filteredTransactionData = transactionData;

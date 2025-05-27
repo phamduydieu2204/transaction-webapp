@@ -7,13 +7,18 @@
 
 import { normalizeDate, formatCurrency, getDateRange } from './statisticsCore.js';
 
-// Global state cho filter panel
-window.globalFilters = {
+// Global state cho filter panel với persistence
+window.globalFilters = JSON.parse(localStorage.getItem('dashboardFilters')) || {
   dateRange: null,
   period: 'current_month', // current_month, last_month, custom
   customStartDate: null,
   customEndDate: null
 };
+
+// Save filters to localStorage
+function saveFiltersToStorage() {
+  localStorage.setItem('dashboardFilters', JSON.stringify(window.globalFilters));
+}
 
 /**
  * Renders the comprehensive financial dashboard
@@ -242,26 +247,24 @@ function calculateExpensesByCategory(expenseData, startDate, endDate) {
  * Renders overview cards with key metrics
  */
 function renderOverviewCards(metrics) {
-  // Get current period label from global filters
+  // Get current period label from actual dateRange
   const getPeriodLabel = () => {
-    if (!window.globalFilters) return "Tháng này";
+    if (!window.globalFilters || !window.globalFilters.dateRange) return "Tháng này";
     
-    switch (window.globalFilters.period) {
-      case 'current_month':
-        const currentDate = new Date();
-        return `Tháng ${currentDate.getMonth() + 1}/${currentDate.getFullYear()}`;
-      case 'last_month':
-        const lastMonthDate = new Date();
-        lastMonthDate.setMonth(lastMonthDate.getMonth() - 1);
-        return `Tháng ${lastMonthDate.getMonth() + 1}/${lastMonthDate.getFullYear()}`;
-      case 'custom':
-        if (window.globalFilters.dateRange && window.globalFilters.dateRange.start && window.globalFilters.dateRange.end) {
-          return `${window.globalFilters.dateRange.start} đến ${window.globalFilters.dateRange.end}`;
-        }
-        return "Khoảng thời gian tùy chọn";
-      default:
-        return "Tháng này";
+    const { start, end } = window.globalFilters.dateRange;
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    
+    // Kiểm tra nếu là tháng đầy đủ
+    const startOfMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+    const endOfMonth = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
+    
+    if (startDate.getTime() === startOfMonth.getTime() && endDate.getTime() === endOfMonth.getTime()) {
+      return `Tháng ${startDate.getMonth() + 1}/${startDate.getFullYear()}`;
     }
+    
+    // Ngược lại hiển thị khoảng thời gian
+    return `${start} đến ${end}`;
   };
 
   const periodLabel = getPeriodLabel();
@@ -1300,6 +1303,9 @@ window.selectPeriod = function(period) {
   // Update global filter
   window.globalFilters.period = period;
   
+  // Save to localStorage
+  saveFiltersToStorage();
+  
   // Update UI
   document.querySelectorAll('.period-option').forEach(option => {
     option.classList.remove('selected');
@@ -1360,6 +1366,9 @@ window.updatePeriodFilter = function(period) {
       end: lastDay.toISOString().split('T')[0]
     };
   }
+  
+  // Save to localStorage
+  saveFiltersToStorage();
   
   console.log('📅 Đã cập nhật period filter:', {
     period: period,
