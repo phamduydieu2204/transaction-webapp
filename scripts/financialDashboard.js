@@ -1251,7 +1251,14 @@ export function filterDataByDateRange(data, dateRange) {
   // Đặt endDate về cuối ngày
   endDate.setHours(23, 59, 59, 999);
   
-  const filteredData = data.filter(item => {
+  console.log("🔍 Filter Debug:", {
+    dateRange,
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString(),
+    dataCount: data.length
+  });
+  
+  const filteredData = data.filter((item, index) => {
     // Sử dụng đúng field names: transactionDate cho transactions, date cho expenses
     const dateValue = item.transactionDate || item.date;
     
@@ -1280,7 +1287,27 @@ export function filterDataByDateRange(data, dateRange) {
       return false;
     }
     
-    return itemDate >= startDate && itemDate <= endDate;
+    const inRange = itemDate >= startDate && itemDate <= endDate;
+    
+    // Debug log cho một vài items đầu tiên
+    if (index < 5) {
+      console.log(`📅 Item ${index}:`, {
+        original: dateValue,
+        itemDate: itemDate.toISOString(),
+        inRange,
+        comparison: {
+          itemVsStart: itemDate >= startDate,
+          itemVsEnd: itemDate <= endDate
+        }
+      });
+    }
+    
+    return inRange;
+  });
+  
+  console.log("✅ Filter result:", {
+    originalCount: data.length,
+    filteredCount: filteredData.length
   });
   
   return filteredData;
@@ -1346,6 +1373,12 @@ window.updatePeriodFilter = function(period) {
   const customDateRange = document.getElementById('customDateRange');
   if (customDateRange) {
     customDateRange.style.display = period === 'custom' ? 'block' : 'none';
+  }
+  
+  // Clear custom dates when switching to preset periods
+  if (period !== 'custom') {
+    window.globalFilters.customStartDate = null;
+    window.globalFilters.customEndDate = null;
   }
   
   // Tự động tính toán dateRange cho current_month và last_month
