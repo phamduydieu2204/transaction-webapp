@@ -1299,8 +1299,16 @@ export function filterDataByDateRange(data, dateRange) {
 
   const startDate = new Date(dateRange.start);
   const endDate = new Date(dateRange.end);
-  // Đặt endDate về cuối ngày
+  // Đặt startDate về đầu ngày (00:00:00) để bao gồm cả ngày đầu tiên
+  startDate.setHours(0, 0, 0, 0);
+  // Đặt endDate về cuối ngày (23:59:59) để bao gồm cả ngày cuối cùng
   endDate.setHours(23, 59, 59, 999);
+  
+  console.log("🔍 Filter date range:", {
+    original: dateRange,
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString()
+  });
   
   
   const filteredData = data.filter((item, index) => {
@@ -1319,6 +1327,8 @@ export function filterDataByDateRange(data, dateRange) {
         const parts = dateValue.split('/');
         if (parts.length === 3) {
           itemDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+          // Đặt thời gian về đầu ngày để so sánh chính xác
+          itemDate.setHours(0, 0, 0, 0);
         }
       } else if (dateValue.includes('T') || dateValue.includes('-')) {
         // ISO format hoặc yyyy-mm-dd
@@ -1330,6 +1340,17 @@ export function filterDataByDateRange(data, dateRange) {
     
     if (!itemDate || isNaN(itemDate.getTime())) {
       return false;
+    }
+    
+    // Debug cho một vài items đầu tiên
+    if (index < 3) {
+      console.log("🔍 Checking item date:", {
+        originalValue: dateValue,
+        itemDate: itemDate.toISOString(),
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        inRange: itemDate >= startDate && itemDate <= endDate
+      });
     }
     
     const inRange = itemDate >= startDate && itemDate <= endDate;
