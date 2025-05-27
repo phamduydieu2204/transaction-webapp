@@ -198,6 +198,8 @@ function calculateRevenue(transactionData, startDate, endDate, skipDateFilter = 
     startDate,
     endDate,
     skipDateFilter,
+    startDateType: typeof startDate,
+    endDateType: typeof endDate,
     sampleData: transactionData.slice(0, 2)
   });
 
@@ -207,7 +209,10 @@ function calculateRevenue(transactionData, startDate, endDate, skipDateFilter = 
     // Chỉ filter theo date nếu không skip
     if (!skipDateFilter) {
       const transactionDate = normalizeDate(transaction.transactionDate || transaction.date);
-      shouldInclude = transactionDate >= startDate && transactionDate <= endDate;
+      // Đảm bảo so sánh string date format yyyy/mm/dd
+      const normalizedStart = typeof startDate === 'string' ? startDate : normalizeDate(startDate);
+      const normalizedEnd = typeof endDate === 'string' ? endDate : normalizeDate(endDate);
+      shouldInclude = transactionDate >= normalizedStart && transactionDate <= normalizedEnd;
     }
     
     if (shouldInclude) {
@@ -259,7 +264,10 @@ function calculateExpensesByCategory(expenseData, startDate, endDate, skipDateFi
     // Chỉ filter theo date nếu không skip
     if (!skipDateFilter) {
       const expenseDate = normalizeDate(expense.date);
-      shouldInclude = expenseDate >= startDate && expenseDate <= endDate;
+      // Đảm bảo so sánh string date format yyyy/mm/dd
+      const normalizedStart = typeof startDate === 'string' ? startDate : normalizeDate(startDate);
+      const normalizedEnd = typeof endDate === 'string' ? endDate : normalizeDate(endDate);
+      shouldInclude = expenseDate >= normalizedStart && expenseDate <= normalizedEnd;
     }
     
     if (shouldInclude) {
@@ -1437,8 +1445,8 @@ window.updatePeriodFilter = function(period) {
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     window.globalFilters.dateRange = {
-      start: firstDay.toISOString().split('T')[0],
-      end: lastDay.toISOString().split('T')[0]
+      start: normalizeDate(firstDay), // Dùng normalizeDate để có format yyyy/mm/dd
+      end: normalizeDate(lastDay)
     };
   } else if (period === 'last_month') {
     const now = new Date();
@@ -1451,8 +1459,8 @@ window.updatePeriodFilter = function(period) {
     const lastDay = new Date(lastMonthYear, actualLastMonth + 1, 0);
     
     window.globalFilters.dateRange = {
-      start: firstDay.toISOString().split('T')[0],
-      end: lastDay.toISOString().split('T')[0]
+      start: normalizeDate(firstDay), // Dùng normalizeDate để có format yyyy/mm/dd
+      end: normalizeDate(lastDay)
     };
     
   }
@@ -1478,9 +1486,12 @@ window.updateCustomDateRange = function() {
     window.globalFilters.customEndDate = endInput.value;
     
     if (startInput.value && endInput.value) {
+      // Convert từ yyyy-mm-dd sang yyyy/mm/dd
+      const startDate = new Date(startInput.value);
+      const endDate = new Date(endInput.value);
       window.globalFilters.dateRange = {
-        start: startInput.value,
-        end: endInput.value
+        start: normalizeDate(startDate),
+        end: normalizeDate(endDate)
       };
     }
   }
@@ -1592,8 +1603,8 @@ window.setQuickRange = function(range) {
   window.globalFilters.customStartDate = startDateStr;
   window.globalFilters.customEndDate = endDateStr;
   window.globalFilters.dateRange = {
-    start: startDateStr,
-    end: endDateStr
+    start: normalizeDate(startDate), // Convert sang yyyy/mm/dd
+    end: normalizeDate(endDate)
   };
   
   console.log('📅 Quick range set:', range, {
