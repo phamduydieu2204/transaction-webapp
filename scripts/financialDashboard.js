@@ -1251,23 +1251,30 @@ export function filterDataByDateRange(data, dateRange) {
   // Đặt endDate về cuối ngày
   endDate.setHours(23, 59, 59, 999);
   
-  // Phân tích dates trong data để debug
-  const allDates = data.slice(0, 10).map(item => {
+  // Phân tích tất cả dates để tìm tháng 4
+  const allDates = data.map((item, index) => {
     const dateValue = item.transactionDate || item.date;
     return { 
+      index,
       original: dateValue, 
       type: typeof dateValue,
       hasSlash: typeof dateValue === 'string' && dateValue.includes('/'),
-      hasT: typeof dateValue === 'string' && dateValue.includes('T')
+      hasT: typeof dateValue === 'string' && dateValue.includes('T'),
+      month: dateValue ? new Date(dateValue).getMonth() + 1 : 'invalid'
     };
   });
+  
+  // Tìm các items tháng 4
+  const april2025Items = allDates.filter(d => d.month === 4);
   
   console.log("🔍 Filter Debug:", {
     dateRange,
     startDate: startDate.toISOString(),
     endDate: endDate.toISOString(),
     dataCount: data.length,
-    sampleDates: allDates
+    sampleDates: allDates.slice(0, 5),
+    april2025Count: april2025Items.length,
+    april2025Items: april2025Items.slice(0, 3)
   });
   
   const filteredData = data.filter((item, index) => {
