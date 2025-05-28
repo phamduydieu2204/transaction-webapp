@@ -301,7 +301,7 @@ export function calculateLast12MonthsData(transactionData, expenseData) {
  * @param {Array} expenseData - Expense records
  * @param {string} containerId - Container element ID
  */
-export function renderRevenueExpenseChart(transactionData, expenseData, containerId = 'revenueChart') {
+export async function renderRevenueExpenseChart(transactionData, expenseData, containerId = 'revenueChart') {
   console.log('🎯 renderRevenueExpenseChart called with:', {
     containerId,
     transactionCount: transactionData.length,
@@ -332,12 +332,17 @@ export function renderRevenueExpenseChart(transactionData, expenseData, containe
     const allTransactions = window.transactionList || [];
     const allExpenses = window.expenseList || [];
     
-    const { filterDataByDateRange } = await import('./financialDashboard.js');
-    const compareTransactions = filterDataByDateRange(allTransactions, compareRange, window.globalFilters);
-    const compareExpenses = filterDataByDateRange(allExpenses, compareRange, window.globalFilters);
-    
-    compareData = calculateChartData(compareTransactions, compareExpenses, compareRange);
-    console.log('🔄 Compare data calculated:', compareData);
+    // Import filterDataByDateRange function
+    try {
+      const { filterDataByDateRange } = await import('./financialDashboard.js');
+      const compareTransactions = filterDataByDateRange(allTransactions, compareRange, window.globalFilters);
+      const compareExpenses = filterDataByDateRange(allExpenses, compareRange, window.globalFilters);
+      
+      compareData = calculateChartData(compareTransactions, compareExpenses, compareRange);
+      console.log('🔄 Compare data calculated:', compareData);
+    } catch (error) {
+      console.error('❌ Error loading compare data:', error);
+    }
   }
   
   // Find max value for scaling (include compare data if exists)

@@ -457,7 +457,7 @@ async function loadRevenueChart() {
     
     // Render chart
     console.log('🖥️ Rendering chart...');
-    renderRevenueExpenseChart(transactionData, expenseData, 'revenueChart');
+    await renderRevenueExpenseChart(transactionData, expenseData, 'revenueChart');
     
     console.log('✅ Revenue/Expense chart loaded successfully');
   } catch (error) {
@@ -548,7 +548,7 @@ async function renderRevenueTrend(data) {
     const expenseData = window.expenseList || [];
     
     // Render chart
-    renderRevenueExpenseChart(transactionData, expenseData, 'revenueTrend');
+    await renderRevenueExpenseChart(transactionData, expenseData, 'revenueTrend');
     
     console.log('✅ Revenue trend chart loaded successfully');
   } catch (error) {
