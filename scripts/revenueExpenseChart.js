@@ -4,6 +4,8 @@
  * Biểu đồ doanh thu và chi phí 12 tháng gần nhất
  */
 
+console.log('📦 revenueExpenseChart.js module loading...');
+
 import { normalizeDate, formatCurrency } from './statisticsCore.js';
 
 /**
@@ -13,6 +15,11 @@ import { normalizeDate, formatCurrency } from './statisticsCore.js';
  * @returns {Object} Monthly data for chart
  */
 export function calculateLast12MonthsData(transactionData, expenseData) {
+  console.log('📢 calculateLast12MonthsData called with:', {
+    transactions: transactionData.length,
+    expenses: expenseData.length
+  });
+  
   const monthlyData = {};
   const today = new Date();
   
@@ -28,6 +35,8 @@ export function calculateLast12MonthsData(transactionData, expenseData) {
       profit: 0
     };
   }
+  
+  console.log('📅 Initialized months:', Object.keys(monthlyData));
   
   // Calculate revenue by month
   transactionData.forEach(transaction => {
@@ -56,7 +65,10 @@ export function calculateLast12MonthsData(transactionData, expenseData) {
     month.profit = month.revenue - month.expense;
   });
   
-  return Object.values(monthlyData);
+  const result = Object.values(monthlyData);
+  console.log('📊 Final monthly data:', result);
+  
+  return result;
 }
 
 /**
@@ -66,18 +78,27 @@ export function calculateLast12MonthsData(transactionData, expenseData) {
  * @param {string} containerId - Container element ID
  */
 export function renderRevenueExpenseChart(transactionData, expenseData, containerId = 'revenueChart') {
+  console.log('🎯 renderRevenueExpenseChart called with:', {
+    containerId,
+    transactionCount: transactionData.length,
+    expenseCount: expenseData.length
+  });
+  
   const container = document.getElementById(containerId);
   if (!container) {
     console.error(`Container ${containerId} not found`);
     return;
   }
   
+  console.log('📆 Calculating monthly data...');
   const monthlyData = calculateLast12MonthsData(transactionData, expenseData);
+  console.log('📊 Monthly data calculated:', monthlyData);
   
   // Find max value for scaling
   const maxValue = Math.max(
     ...monthlyData.map(d => Math.max(d.revenue, d.expense))
   );
+  console.log('📏 Max value for scaling:', maxValue);
   
   // Create chart HTML
   const chartHTML = `
@@ -187,10 +208,13 @@ export function renderRevenueExpenseChart(transactionData, expenseData, containe
     </div>
   `;
   
+  console.log('🔨 Setting container HTML...');
   container.innerHTML = chartHTML;
+  console.log('✅ Chart HTML rendered, length:', chartHTML.length);
   
   // Add interactivity
   addChartInteractivity(containerId);
+  console.log('🎮 Interactivity added');
 }
 
 /**
@@ -665,3 +689,5 @@ export function addRevenueExpenseChartStyles() {
   
   document.head.appendChild(styles);
 }
+
+console.log('✅ revenueExpenseChart.js module loaded successfully');

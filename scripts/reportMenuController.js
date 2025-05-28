@@ -17,6 +17,14 @@ const reportState = {
 export function initReportMenu() {
   console.log('🎮 Initializing report menu controller');
   
+  // Check if containers exist
+  console.log('🔍 Checking containers:', {
+    revenueChart: !!document.getElementById('revenueChart'),
+    topProducts: !!document.getElementById('topProducts'),
+    topCustomers: !!document.getElementById('topCustomers'),
+    summaryStats: !!document.getElementById('summaryStats')
+  });
+  
   // Setup menu click handlers
   setupMenuHandlers();
   
@@ -112,6 +120,10 @@ async function loadReport(reportType) {
  */
 async function loadOverviewReport() {
   console.log('📈 Loading overview report');
+  console.log('🔍 Checking data availability:', {
+    transactionList: window.transactionList ? window.transactionList.length : 0,
+    expenseList: window.expenseList ? window.expenseList.length : 0
+  });
   
   // Financial dashboard đã được render từ statisticsUIController
   // Chỉ cần trigger refresh nếu cần
@@ -120,12 +132,14 @@ async function loadOverviewReport() {
   }
   
   // Load additional overview components
+  console.log('🚀 Loading overview components...');
   await Promise.all([
     loadTopProducts(),
     loadTopCustomers(),
     loadSummaryStats(),
     loadRevenueChart()
   ]);
+  console.log('✅ Overview components loaded');
 }
 
 /**
@@ -402,26 +416,41 @@ async function loadSummaryStats() {
  * Load revenue chart
  */
 async function loadRevenueChart() {
+  console.log('📈 loadRevenueChart called');
   const container = document.getElementById('revenueChart');
-  if (!container) return;
+  console.log('📦 Container found:', !!container);
+  
+  if (!container) {
+    console.error('❌ Container revenueChart not found');
+    return;
+  }
   
   try {
+    console.log('📥 Importing chart module...');
     // Import chart module
     const { renderRevenueExpenseChart, addRevenueExpenseChartStyles } = await import('./revenueExpenseChart.js');
+    console.log('✅ Chart module imported successfully');
     
     // Add styles
     addRevenueExpenseChartStyles();
+    console.log('🎨 Styles added');
     
     // Get data
     const transactionData = window.transactionList || [];
     const expenseData = window.expenseList || [];
+    console.log('📊 Data loaded:', {
+      transactions: transactionData.length,
+      expenses: expenseData.length
+    });
     
     // Render chart
+    console.log('🖥️ Rendering chart...');
     renderRevenueExpenseChart(transactionData, expenseData, 'revenueChart');
     
     console.log('✅ Revenue/Expense chart loaded successfully');
   } catch (error) {
     console.error('❌ Error loading revenue chart:', error);
+    console.error('🔍 Error details:', error.stack);
     container.innerHTML = `
       <div style="background: #fee; padding: 20px; border-radius: 8px; text-align: center;">
         <p style="color: #c53030;">Lỗi khi tải biểu đồ: ${error.message}</p>
