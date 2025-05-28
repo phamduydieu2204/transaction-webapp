@@ -365,7 +365,7 @@ function renderDashboardHeader(dateRange) {
   return `
     <div class="dashboard-header">
       <div class="header-content">
-        <h1>🏢 Tổng Quan Kinh Doanh</h1>
+        <h1>Tổng Quan Kinh Doanh</h1>
         <div class="period-info">
           <span class="period-label">Kỳ báo cáo: ${periodLabel}</span>
           <div class="last-updated">Cập nhật: ${new Date().toLocaleString('vi-VN')}</div>
