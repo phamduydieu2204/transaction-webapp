@@ -259,14 +259,19 @@ function calculateFinancialMetrics(transactionData, expenseData, globalFilters =
   console.log("📊 Transaction data count:", transactionData.length);
   console.log("📊 Expense data count:", expenseData.length);
 
-  // Tất cả calculations đều sử dụng data đã được filter và primaryPeriod
-  const isDataFiltered = globalFilters && globalFilters.dateRange ? true : false;
+  // Khi data đã được pre-filter trong renderFinancialDashboard, 
+  // chúng ta không cần skip date filter nữa mà chỉ cần tính tất cả data đã được filter
+  const isDataPreFiltered = globalFilters && globalFilters.dateRange ? true : false;
   
-  console.log("📊 Is data pre-filtered?", isDataFiltered);
+  console.log("📊 Is data pre-filtered?", isDataPreFiltered);
   console.log("📊 Global filters:", globalFilters);
   
+  // Nếu data đã được pre-filter, chúng ta không cần filter lại theo date
+  // Ngược lại, nếu chưa được filter, chúng ta cần filter theo primaryPeriod
+  const skipDateFilter = isDataPreFiltered;
+  
   // Revenue calculations - tất cả đều theo primaryPeriod
-  const revenueMain = calculateRevenue(transactionData, primaryPeriod.start, primaryPeriod.end, isDataFiltered);
+  const revenueMain = calculateRevenue(transactionData, primaryPeriod.start, primaryPeriod.end, skipDateFilter);
   
   console.log("📊 Revenue calculation result:", {
     total: revenueMain.total,
@@ -275,7 +280,7 @@ function calculateFinancialMetrics(transactionData, expenseData, globalFilters =
   });
   
   // Expense calculations - tất cả đều theo primaryPeriod  
-  const expensesMain = calculateExpensesByCategory(expenseData, primaryPeriod.start, primaryPeriod.end, isDataFiltered);
+  const expensesMain = calculateExpensesByCategory(expenseData, primaryPeriod.start, primaryPeriod.end, skipDateFilter);
 
   // Profit calculations
   const profitMain = revenueMain.total - expensesMain.total;
