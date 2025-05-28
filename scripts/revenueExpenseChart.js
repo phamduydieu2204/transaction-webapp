@@ -9,27 +9,190 @@ console.log('📦 revenueExpenseChart.js module loading...');
 import { normalizeDate, formatCurrency } from './statisticsCore.js';
 
 /**
- * Calculate revenue and expense data for last 12 months
+ * Determine chart granularity based on date range
+ * @param {Object} dateRange - Date range object with start and end
+ * @returns {string} Granularity type: 'daily', 'weekly', or 'monthly'
+ */
+function determineGranularity(dateRange) {
+  if (!dateRange) return 'monthly'; // Default to monthly for 12 months
+  
+  const start = new Date(dateRange.start);
+  const end = new Date(dateRange.end);
+  const daysDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+  
+  // Standard rules:
+  // <= 31 days: show daily
+  // 32-90 days: show weekly
+  // > 90 days: show monthly
+  if (daysDiff <= 31) {
+    return 'daily';
+  } else if (daysDiff <= 90) {
+    return 'weekly';
+  } else {
+    return 'monthly';
+  }
+}
+
+/**
+ * Calculate revenue and expense data based on date range and granularity
  * @param {Array} transactionData - Transaction records
  * @param {Array} expenseData - Expense records
- * @returns {Object} Monthly data for chart
+ * @param {Object} dateRange - Optional date range filter
+ * @returns {Object} Data for chart
  */
-export function calculateLast12MonthsData(transactionData, expenseData) {
-  console.log('📢 calculateLast12MonthsData called with:', {
+export function calculateChartData(transactionData, expenseData, dateRange = null) {
+  console.log('📢 calculateChartData called with:', {
     transactions: transactionData.length,
-    expenses: expenseData.length
+    expenses: expenseData.length,
+    dateRange
   });
   
+  const granularity = determineGranularity(dateRange);
+  console.log('📅 Granularity:', granularity);
+  
+  if (granularity === 'daily') {
+    return calculateDailyData(transactionData, expenseData, dateRange);
+  } else if (granularity === 'weekly') {
+    return calculateWeeklyData(transactionData, expenseData, dateRange);
+  } else {
+    return calculateMonthlyData(transactionData, expenseData, dateRange);
+  }
+}
+
+/**
+ * Calculate daily data
+ */
+function calculateDailyData(transactionData, expenseData, dateRange) {
+  const dailyData = {};
+  const start = dateRange ? new Date(dateRange.start) : new Date();
+  const end = dateRange ? new Date(dateRange.end) : new Date();
+  
+  // Initialize all days in range
+  for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
+    const dateKey = formatDateKey(date, 'daily');
+    dailyData[dateKey] = {
+      date: dateKey,
+      label: formatDateLabel(date, 'daily'),
+      revenue: 0,
+      expense: 0,
+      profit: 0
+    };
+  }
+  
+  // Process transactions
+  transactionData.forEach(transaction => {
+    const transactionDate = normalizeDate(transaction.transactionDate);
+    const dateKey = formatDateKey(new Date(transactionDate), 'daily');
+    
+    if (dailyData[dateKey]) {
+      const revenue = parseFloat(transaction.revenue) || 0;
+      dailyData[dateKey].revenue += revenue;
+    }
+  });
+  
+  // Process expenses
+  expenseData.forEach(expense => {
+    const expenseDate = normalizeDate(expense.date);
+    const dateKey = formatDateKey(new Date(expenseDate), 'daily');
+    
+    if (dailyData[dateKey]) {
+      const amount = parseFloat(expense.amount) || 0;
+      dailyData[dateKey].expense += amount;
+    }
+  });
+  
+  // Calculate profit
+  Object.values(dailyData).forEach(day => {
+    day.profit = day.revenue - day.expense;
+  });
+  
+  return Object.values(dailyData);
+}
+
+/**
+ * Calculate weekly data
+ */
+function calculateWeeklyData(transactionData, expenseData, dateRange) {
+  const weeklyData = {};
+  const start = dateRange ? new Date(dateRange.start) : new Date();
+  const end = dateRange ? new Date(dateRange.end) : new Date();
+  
+  // Get Monday of start week
+  const startWeek = new Date(start);
+  const startDay = startWeek.getDay();
+  const daysToMonday = startDay === 0 ? 6 : startDay - 1;
+  startWeek.setDate(startWeek.getDate() - daysToMonday);
+  
+  // Initialize all weeks in range
+  for (let weekStart = new Date(startWeek); weekStart <= end; weekStart.setDate(weekStart.getDate() + 7)) {
+    const weekKey = formatDateKey(weekStart, 'weekly');
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    
+    weeklyData[weekKey] = {
+      date: weekKey,
+      label: formatDateLabel(weekStart, 'weekly'),
+      weekStart: new Date(weekStart),
+      weekEnd: weekEnd,
+      revenue: 0,
+      expense: 0,
+      profit: 0
+    };
+  }
+  
+  // Process transactions
+  transactionData.forEach(transaction => {
+    const transactionDate = new Date(normalizeDate(transaction.transactionDate));
+    
+    // Find which week this transaction belongs to
+    Object.values(weeklyData).forEach(week => {
+      if (transactionDate >= week.weekStart && transactionDate <= week.weekEnd) {
+        const revenue = parseFloat(transaction.revenue) || 0;
+        week.revenue += revenue;
+      }
+    });
+  });
+  
+  // Process expenses
+  expenseData.forEach(expense => {
+    const expenseDate = new Date(normalizeDate(expense.date));
+    
+    // Find which week this expense belongs to
+    Object.values(weeklyData).forEach(week => {
+      if (expenseDate >= week.weekStart && expenseDate <= week.weekEnd) {
+        const amount = parseFloat(expense.amount) || 0;
+        week.expense += amount;
+      }
+    });
+  });
+  
+  // Calculate profit and clean up temporary fields
+  Object.values(weeklyData).forEach(week => {
+    week.profit = week.revenue - week.expense;
+    delete week.weekStart;
+    delete week.weekEnd;
+  });
+  
+  return Object.values(weeklyData);
+}
+
+/**
+ * Calculate monthly data
+ */
+function calculateMonthlyData(transactionData, expenseData, dateRange) {
   const monthlyData = {};
   const today = new Date();
+  const start = dateRange ? new Date(dateRange.start) : new Date(today.getFullYear() - 1, today.getMonth(), 1);
+  const end = dateRange ? new Date(dateRange.end) : today;
   
-  // Initialize last 12 months
-  for (let i = 11; i >= 0; i--) {
-    const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
-    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+  // Initialize all months in range
+  for (let date = new Date(start.getFullYear(), start.getMonth(), 1); 
+       date <= end; 
+       date.setMonth(date.getMonth() + 1)) {
+    const monthKey = formatDateKey(date, 'monthly');
     monthlyData[monthKey] = {
-      month: monthKey,
-      monthLabel: `${date.getMonth() + 1}/${date.getFullYear()}`,
+      date: monthKey,
+      label: formatDateLabel(date, 'monthly'),
       revenue: 0,
       expense: 0,
       profit: 0
@@ -38,10 +201,10 @@ export function calculateLast12MonthsData(transactionData, expenseData) {
   
   console.log('📅 Initialized months:', Object.keys(monthlyData));
   
-  // Calculate revenue by month
+  // Process transactions
   transactionData.forEach(transaction => {
     const transactionDate = new Date(normalizeDate(transaction.transactionDate));
-    const monthKey = `${transactionDate.getFullYear()}-${String(transactionDate.getMonth() + 1).padStart(2, '0')}`;
+    const monthKey = formatDateKey(transactionDate, 'monthly');
     
     if (monthlyData[monthKey]) {
       const revenue = parseFloat(transaction.revenue) || 0;
@@ -49,10 +212,10 @@ export function calculateLast12MonthsData(transactionData, expenseData) {
     }
   });
   
-  // Calculate expenses by month
+  // Process expenses
   expenseData.forEach(expense => {
     const expenseDate = new Date(normalizeDate(expense.date));
-    const monthKey = `${expenseDate.getFullYear()}-${String(expenseDate.getMonth() + 1).padStart(2, '0')}`;
+    const monthKey = formatDateKey(expenseDate, 'monthly');
     
     if (monthlyData[monthKey]) {
       const amount = parseFloat(expense.amount) || 0;
@@ -65,10 +228,71 @@ export function calculateLast12MonthsData(transactionData, expenseData) {
     month.profit = month.revenue - month.expense;
   });
   
-  const result = Object.values(monthlyData);
-  console.log('📊 Final monthly data:', result);
+  return Object.values(monthlyData);
+}
+
+/**
+ * Format date key based on granularity
+ */
+function formatDateKey(date, granularity) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
   
-  return result;
+  switch (granularity) {
+    case 'daily':
+      return `${year}-${month}-${day}`;
+    case 'weekly':
+      // Use Monday of the week as key
+      return `${year}-W${getWeekNumber(date)}`;
+    case 'monthly':
+      return `${year}-${month}`;
+    default:
+      return `${year}-${month}`;
+  }
+}
+
+/**
+ * Format date label for display
+ */
+function formatDateLabel(date, granularity) {
+  switch (granularity) {
+    case 'daily':
+      return `${date.getDate()}/${date.getMonth() + 1}`;
+    case 'weekly':
+      const weekEnd = new Date(date);
+      weekEnd.setDate(date.getDate() + 6);
+      return `${date.getDate()}/${date.getMonth() + 1} - ${weekEnd.getDate()}/${weekEnd.getMonth() + 1}`;
+    case 'monthly':
+      return `${date.getMonth() + 1}/${date.getFullYear()}`;
+    default:
+      return `${date.getMonth() + 1}/${date.getFullYear()}`;
+  }
+}
+
+/**
+ * Get ISO week number
+ */
+function getWeekNumber(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+}
+
+/**
+ * Calculate revenue and expense data for last 12 months (backward compatibility)
+ */
+export function calculateLast12MonthsData(transactionData, expenseData) {
+  // Default to last 12 months
+  const today = new Date();
+  const dateRange = {
+    start: new Date(today.getFullYear() - 1, today.getMonth(), 1),
+    end: today
+  };
+  
+  return calculateChartData(transactionData, expenseData, dateRange);
 }
 
 /**
@@ -90,21 +314,26 @@ export function renderRevenueExpenseChart(transactionData, expenseData, containe
     return;
   }
   
-  console.log('📆 Calculating monthly data...');
-  const monthlyData = calculateLast12MonthsData(transactionData, expenseData);
-  console.log('📊 Monthly data calculated:', monthlyData);
+  // Get date range from global filters
+  const dateRange = window.globalFilters && window.globalFilters.dateRange ? window.globalFilters.dateRange : null;
+  
+  console.log('📆 Calculating chart data...');
+  const chartData = calculateChartData(transactionData, expenseData, dateRange);
+  console.log('📊 Chart data calculated:', chartData);
   
   // Find max value for scaling
   const maxValue = Math.max(
-    ...monthlyData.map(d => Math.max(d.revenue, d.expense))
+    ...chartData.map(d => Math.max(d.revenue, d.expense))
   );
   console.log('📏 Max value for scaling:', maxValue);
   
-  // Get period label
+  // Get period label and granularity
   let periodLabel = '12 tháng gần nhất';
-  if (window.globalFilters && window.globalFilters.dateRange) {
-    const { start, end } = window.globalFilters.dateRange;
+  let granularity = 'monthly';
+  if (dateRange) {
+    const { start, end } = dateRange;
     periodLabel = `Từ ${start} đến ${end}`;
+    granularity = determineGranularity(dateRange);
   }
   
   // Create chart HTML
@@ -142,7 +371,7 @@ export function renderRevenueExpenseChart(transactionData, expenseData, containe
             <!-- Revenue line -->
             <polyline
               class="chart-line revenue-line"
-              points="${generateLinePoints(monthlyData, 'revenue', maxValue)}"
+              points="${generateLinePoints(chartData, 'revenue', maxValue)}"
               fill="none"
               stroke="#28a745"
               stroke-width="3"
@@ -151,7 +380,7 @@ export function renderRevenueExpenseChart(transactionData, expenseData, containe
             <!-- Expense line -->
             <polyline
               class="chart-line expense-line"
-              points="${generateLinePoints(monthlyData, 'expense', maxValue)}"
+              points="${generateLinePoints(chartData, 'expense', maxValue)}"
               fill="none"
               stroke="#dc3545"
               stroke-width="3"
@@ -160,13 +389,13 @@ export function renderRevenueExpenseChart(transactionData, expenseData, containe
             <!-- Profit area -->
             <path
               class="profit-area"
-              d="${generateProfitArea(monthlyData, maxValue)}"
+              d="${generateProfitArea(chartData, maxValue)}"
               fill="url(#profitGradient)"
               opacity="0.3"
             />
             
             <!-- Data points -->
-            ${generateDataPoints(monthlyData, maxValue)}
+            ${generateDataPoints(chartData, maxValue)}
             
             <!-- Gradient definitions -->
             <defs>
@@ -179,12 +408,12 @@ export function renderRevenueExpenseChart(transactionData, expenseData, containe
           
           <!-- Tooltips -->
           <div class="chart-tooltips">
-            ${monthlyData.map((data, index) => `
+            ${chartData.map((data, index) => `
               <div class="chart-tooltip" 
-                   style="left: ${(index / 11) * 100}%"
-                   data-month="${data.monthLabel}">
+                   style="left: ${(index / (chartData.length - 1)) * 100}%"
+                   data-period="${data.label}">
                 <div class="tooltip-content">
-                  <div class="tooltip-title">${data.monthLabel}</div>
+                  <div class="tooltip-title">${data.label}</div>
                   <div class="tooltip-row revenue">
                     Doanh thu: ${formatCurrency(data.revenue, 'VND')}
                   </div>
@@ -201,17 +430,13 @@ export function renderRevenueExpenseChart(transactionData, expenseData, containe
         </div>
         
         <div class="chart-x-axis">
-          ${monthlyData.map((data, index) => `
-            <div class="x-label" style="left: ${(index / 11) * 100}%">
-              ${data.monthLabel.split('/')[0]}
-            </div>
-          `).join('')}
+          ${generateXAxisLabels(chartData, granularity)}
         </div>
       </div>
       
       <!-- Summary stats -->
       <div class="chart-summary">
-        ${generateChartSummary(monthlyData)}
+        ${generateChartSummary(chartData, granularity)}
       </div>
     </div>
   `;
@@ -267,12 +492,36 @@ function generateGridLines() {
 }
 
 /**
+ * Generate X-axis labels based on granularity
+ */
+function generateXAxisLabels(data, granularity) {
+  const maxLabels = granularity === 'daily' ? 10 : data.length; // Limit daily labels to avoid crowding
+  const skipInterval = Math.ceil(data.length / maxLabels);
+  
+  return data.map((item, index) => {
+    if (index % skipInterval !== 0 && index !== data.length - 1) return '';
+    
+    const label = granularity === 'daily' 
+      ? item.label.split('/')[0] // Just show day number
+      : item.label.split('/')[0]; // Show month number or week range
+      
+    return `
+      <div class="x-label" style="left: ${(index / (data.length - 1)) * 100}%">
+        ${label}
+      </div>
+    `;
+  }).join('');
+}
+
+/**
  * Generate line points for SVG polyline
  */
 function generateLinePoints(data, type, maxValue) {
-  return data.map((month, index) => {
-    const x = (1000 / 11) * index;
-    const y = 400 - (month[type] / maxValue) * 400;
+  if (data.length === 0) return '';
+  
+  return data.map((item, index) => {
+    const x = data.length === 1 ? 500 : (1000 / (data.length - 1)) * index;
+    const y = 400 - (item[type] / maxValue) * 400;
     return `${x},${y}`;
   }).join(' ');
 }
@@ -281,12 +530,13 @@ function generateLinePoints(data, type, maxValue) {
  * Generate profit area path
  */
 function generateProfitArea(data, maxValue) {
+  if (data.length === 0) return '';
+  
   let path = 'M 0,400';
   
-  data.forEach((month, index) => {
-    const x = (1000 / 11) * index;
-    const revenueY = 400 - (month.revenue / maxValue) * 400;
-    const expenseY = 400 - (month.expense / maxValue) * 400;
+  data.forEach((item, index) => {
+    const x = data.length === 1 ? 500 : (1000 / (data.length - 1)) * index;
+    const revenueY = 400 - (item.revenue / maxValue) * 400;
     
     if (index === 0) {
       path += ` L ${x},${revenueY}`;
@@ -297,7 +547,7 @@ function generateProfitArea(data, maxValue) {
   
   // Close the path
   for (let i = data.length - 1; i >= 0; i--) {
-    const x = (1000 / 11) * i;
+    const x = data.length === 1 ? 500 : (1000 / (data.length - 1)) * i;
     const expenseY = 400 - (data[i].expense / maxValue) * 400;
     path += ` L ${x},${expenseY}`;
   }
@@ -310,12 +560,14 @@ function generateProfitArea(data, maxValue) {
  * Generate data points
  */
 function generateDataPoints(data, maxValue) {
+  if (data.length === 0) return '';
+  
   let points = '';
   
-  data.forEach((month, index) => {
-    const x = (1000 / 11) * index;
-    const revenueY = 400 - (month.revenue / maxValue) * 400;
-    const expenseY = 400 - (month.expense / maxValue) * 400;
+  data.forEach((item, index) => {
+    const x = data.length === 1 ? 500 : (1000 / (data.length - 1)) * index;
+    const revenueY = 400 - (item.revenue / maxValue) * 400;
+    const expenseY = 400 - (item.expense / maxValue) * 400;
     
     // Revenue point
     points += `
@@ -334,38 +586,41 @@ function generateDataPoints(data, maxValue) {
 /**
  * Generate chart summary
  */
-function generateChartSummary(data) {
-  const totalRevenue = data.reduce((sum, month) => sum + month.revenue, 0);
-  const totalExpense = data.reduce((sum, month) => sum + month.expense, 0);
+function generateChartSummary(data, granularity) {
+  const totalRevenue = data.reduce((sum, item) => sum + item.revenue, 0);
+  const totalExpense = data.reduce((sum, item) => sum + item.expense, 0);
   const totalProfit = totalRevenue - totalExpense;
-  const avgMonthlyRevenue = totalRevenue / 12;
-  const avgMonthlyExpense = totalExpense / 12;
+  const avgRevenue = data.length > 0 ? totalRevenue / data.length : 0;
+  const avgExpense = data.length > 0 ? totalExpense / data.length : 0;
   
-  // Find best and worst months
-  const bestMonth = data.reduce((best, month) => 
-    month.profit > best.profit ? month : best
-  );
-  const worstMonth = data.reduce((worst, month) => 
-    month.profit < worst.profit ? month : worst
-  );
+  // Find best and worst periods
+  const bestPeriod = data.reduce((best, item) => 
+    item.profit > best.profit ? item : best
+  , data[0] || { profit: 0 });
+  const worstPeriod = data.reduce((worst, item) => 
+    item.profit < worst.profit ? item : worst
+  , data[0] || { profit: 0 });
+  
+  // Labels based on granularity
+  const periodLabel = granularity === 'daily' ? 'ngày' : granularity === 'weekly' ? 'tuần' : 'tháng';
   
   return `
     <div class="summary-grid">
       <div class="summary-card">
         <div class="summary-icon">💰</div>
         <div class="summary-content">
-          <div class="summary-label">Tổng doanh thu 12 tháng</div>
+          <div class="summary-label">Tổng doanh thu</div>
           <div class="summary-value revenue">${formatCurrency(totalRevenue, 'VND')}</div>
-          <div class="summary-detail">TB: ${formatCurrency(avgMonthlyRevenue, 'VND')}/tháng</div>
+          <div class="summary-detail">TB: ${formatCurrency(avgRevenue, 'VND')}/${periodLabel}</div>
         </div>
       </div>
       
       <div class="summary-card">
         <div class="summary-icon">💸</div>
         <div class="summary-content">
-          <div class="summary-label">Tổng chi phí 12 tháng</div>
+          <div class="summary-label">Tổng chi phí</div>
           <div class="summary-value expense">${formatCurrency(totalExpense, 'VND')}</div>
-          <div class="summary-detail">TB: ${formatCurrency(avgMonthlyExpense, 'VND')}/tháng</div>
+          <div class="summary-detail">TB: ${formatCurrency(avgExpense, 'VND')}/${periodLabel}</div>
         </div>
       </div>
       
@@ -374,16 +629,16 @@ function generateChartSummary(data) {
         <div class="summary-content">
           <div class="summary-label">Lợi nhuận ròng</div>
           <div class="summary-value ${totalProfit >= 0 ? 'profit' : 'loss'}">${formatCurrency(totalProfit, 'VND')}</div>
-          <div class="summary-detail">Margin: ${((totalProfit / totalRevenue) * 100).toFixed(1)}%</div>
+          <div class="summary-detail">Margin: ${totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100).toFixed(1) : 0}%</div>
         </div>
       </div>
       
       <div class="summary-card">
         <div class="summary-icon">🏆</div>
         <div class="summary-content">
-          <div class="summary-label">Tháng tốt nhất</div>
-          <div class="summary-value">${bestMonth.monthLabel}</div>
-          <div class="summary-detail">LN: ${formatCurrency(bestMonth.profit, 'VND')}</div>
+          <div class="summary-label">${periodLabel.charAt(0).toUpperCase() + periodLabel.slice(1)} tốt nhất</div>
+          <div class="summary-value">${bestPeriod.label || 'N/A'}</div>
+          <div class="summary-detail">LN: ${formatCurrency(bestPeriod.profit || 0, 'VND')}</div>
         </div>
       </div>
     </div>
