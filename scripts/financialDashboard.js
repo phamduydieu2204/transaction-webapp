@@ -64,7 +64,9 @@ export function renderFinancialDashboard(transactionData, expenseData, options =
       filteredTransactions: filteredTransactionData.length,
       originalExpenses: expenseData.length,
       filteredExpenses: filteredExpenseData.length,
-      dateRange: globalFilters.dateRange
+      dateRange: globalFilters.dateRange,
+      sampleFilteredTransaction: filteredTransactionData[0],
+      sampleOriginalTransaction: transactionData[0]
     });
   }
 
@@ -357,7 +359,25 @@ function calculateRevenue(transactionData, startDate, endDate, skipDateFilter = 
 
   console.log("✅ Calculate Revenue Result:", {
     total: revenue.total,
-    recordsProcessed: transactionData.length
+    recordsProcessed: transactionData.length,
+    includeCount: transactionData.filter(t => {
+      if (!skipDateFilter) {
+        const transactionDate = normalizeDate(t.transactionDate || t.date);
+        const normalizedStart = typeof startDate === 'string' ? startDate : normalizeDate(startDate);
+        const normalizedEnd = typeof endDate === 'string' ? endDate : normalizeDate(endDate);
+        return transactionDate >= normalizedStart && transactionDate <= normalizedEnd;
+      }
+      return true;
+    }).length,
+    sampleIncludedRecord: transactionData.find(t => {
+      if (!skipDateFilter) {
+        const transactionDate = normalizeDate(t.transactionDate || t.date);
+        const normalizedStart = typeof startDate === 'string' ? startDate : normalizeDate(startDate);
+        const normalizedEnd = typeof endDate === 'string' ? endDate : normalizeDate(endDate);
+        return transactionDate >= normalizedStart && transactionDate <= normalizedEnd;
+      }
+      return true;
+    })
   });
 
   return revenue;
