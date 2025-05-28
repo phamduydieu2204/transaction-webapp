@@ -405,13 +405,29 @@ async function loadRevenueChart() {
   const container = document.getElementById('revenueChart');
   if (!container) return;
   
-  // This will be implemented later with actual chart
-  container.innerHTML = `
-    <div style="background: #f8f9fa; padding: 40px; border-radius: 8px; text-align: center;">
-      <h3>📈 Biểu đồ doanh thu theo tháng</h3>
-      <p style="color: #718096;">Đang phát triển...</p>
-    </div>
-  `;
+  try {
+    // Import chart module
+    const { renderRevenueExpenseChart, addRevenueExpenseChartStyles } = await import('./revenueExpenseChart.js');
+    
+    // Add styles
+    addRevenueExpenseChartStyles();
+    
+    // Get data
+    const transactionData = window.transactionList || [];
+    const expenseData = window.expenseList || [];
+    
+    // Render chart
+    renderRevenueExpenseChart(transactionData, expenseData, 'revenueChart');
+    
+    console.log('✅ Revenue/Expense chart loaded successfully');
+  } catch (error) {
+    console.error('❌ Error loading revenue chart:', error);
+    container.innerHTML = `
+      <div style="background: #fee; padding: 20px; border-radius: 8px; text-align: center;">
+        <p style="color: #c53030;">Lỗi khi tải biểu đồ: ${error.message}</p>
+      </div>
+    `;
+  }
 }
 
 /**
@@ -477,15 +493,47 @@ async function renderRevenueComparison(data) {
 
 async function renderRevenueTrend(data) {
   const container = document.getElementById('revenueTrend');
-  if (container) {
-    container.innerHTML = '<p>📉 Xu hướng doanh thu đang được phát triển...</p>';
+  if (!container) return;
+  
+  try {
+    // Import chart module
+    const { renderRevenueExpenseChart, addRevenueExpenseChartStyles } = await import('./revenueExpenseChart.js');
+    
+    // Add styles
+    addRevenueExpenseChartStyles();
+    
+    // Get data
+    const transactionData = window.transactionList || [];
+    const expenseData = window.expenseList || [];
+    
+    // Render chart
+    renderRevenueExpenseChart(transactionData, expenseData, 'revenueTrend');
+    
+    console.log('✅ Revenue trend chart loaded successfully');
+  } catch (error) {
+    console.error('❌ Error loading revenue trend:', error);
+    container.innerHTML = `<p style="color: #c53030;">Lỗi khi tải biểu đồ xu hướng: ${error.message}</p>`;
   }
 }
 
 async function renderExpenseByCategory(data) {
   const container = document.getElementById('expenseByCategory');
-  if (container) {
-    container.innerHTML = '<p>📊 Chi phí theo danh mục đang được phát triển...</p>';
+  if (!container) return;
+  
+  try {
+    // Import chart module
+    const { renderExpenseCategoryChart, addExpenseCategoryChartStyles } = await import('./expenseCategoryChart.js');
+    
+    // Add styles
+    addExpenseCategoryChartStyles();
+    
+    // Render chart
+    renderExpenseCategoryChart(data, 'expenseByCategory');
+    
+    console.log('✅ Expense category chart loaded successfully');
+  } catch (error) {
+    console.error('❌ Error loading expense category chart:', error);
+    container.innerHTML = `<p style="color: #c53030;">Lỗi khi tải biểu đồ: ${error.message}</p>`;
   }
 }
 
