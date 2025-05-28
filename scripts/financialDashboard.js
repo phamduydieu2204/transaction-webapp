@@ -138,6 +138,98 @@ export function renderFinancialDashboard(transactionData, expenseData, options =
 }
 
 /**
+ * Set quick date range
+ * @param {string} rangeType - Type of quick range
+ */
+window.setQuickRange = function(rangeType) {
+  const today = new Date();
+  let startDate, endDate;
+  
+  switch (rangeType) {
+    case 'this_week':
+      // Get Monday of current week
+      const dayOfWeek = today.getDay();
+      const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+      startDate = new Date(today);
+      startDate.setDate(today.getDate() - daysToMonday);
+      endDate = new Date(today);
+      break;
+      
+    case 'last_week':
+      // Get Monday to Sunday of last week
+      const lastWeekDay = today.getDay();
+      const daysToLastMonday = lastWeekDay === 0 ? 13 : lastWeekDay + 6;
+      startDate = new Date(today);
+      startDate.setDate(today.getDate() - daysToLastMonday);
+      endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + 6);
+      break;
+      
+    case 'last_7_days':
+      startDate = new Date(today);
+      startDate.setDate(today.getDate() - 6);
+      endDate = new Date(today);
+      break;
+      
+    case 'last_30_days':
+      startDate = new Date(today);
+      startDate.setDate(today.getDate() - 29);
+      endDate = new Date(today);
+      break;
+      
+    case 'last_90_days':
+      startDate = new Date(today);
+      startDate.setDate(today.getDate() - 89);
+      endDate = new Date(today);
+      break;
+      
+    case 'last_12_months':
+      startDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate() + 1);
+      endDate = new Date(today);
+      break;
+      
+    case 'this_quarter':
+      const currentQuarter = Math.floor(today.getMonth() / 3);
+      startDate = new Date(today.getFullYear(), currentQuarter * 3, 1);
+      endDate = new Date(today.getFullYear(), currentQuarter * 3 + 3, 0);
+      break;
+      
+    case 'last_quarter':
+      const lastQuarter = Math.floor(today.getMonth() / 3) - 1;
+      const year = lastQuarter < 0 ? today.getFullYear() - 1 : today.getFullYear();
+      const quarter = lastQuarter < 0 ? 3 : lastQuarter;
+      startDate = new Date(year, quarter * 3, 1);
+      endDate = new Date(year, quarter * 3 + 3, 0);
+      break;
+  }
+  
+  // Update custom date inputs
+  const startInput = document.getElementById('customStartDate');
+  const endInput = document.getElementById('customEndDate');
+  if (startInput && endInput) {
+    startInput.value = formatDateForInput(startDate);
+    endInput.value = formatDateForInput(endDate);
+  }
+  
+  // Update filters
+  window.globalFilters.period = 'custom';
+  window.globalFilters.customStartDate = formatDateForInput(startDate);
+  window.globalFilters.customEndDate = formatDateForInput(endDate);
+  
+  updateCustomDateRange();
+}
+
+/**
+ * Format date for input field
+ */
+function formatDateForInput(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/**
  * Calculates comprehensive financial metrics
  */
 function calculateFinancialMetrics(transactionData, expenseData, globalFilters = null) {
@@ -1189,6 +1281,7 @@ export function addFinancialDashboardStyles() {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
+      margin-top: 12px;
     }
     
     .quick-btn {
@@ -1499,6 +1592,10 @@ function renderFilterPanel() {
               <button onclick="setQuickRange('last_week')" class="quick-btn">Tuần trước</button>
               <button onclick="setQuickRange('last_7_days')" class="quick-btn">7 ngày qua</button>
               <button onclick="setQuickRange('last_30_days')" class="quick-btn">30 ngày qua</button>
+              <button onclick="setQuickRange('last_90_days')" class="quick-btn">90 ngày qua</button>
+              <button onclick="setQuickRange('last_12_months')" class="quick-btn">12 tháng qua</button>
+              <button onclick="setQuickRange('this_quarter')" class="quick-btn">Quý này</button>
+              <button onclick="setQuickRange('last_quarter')" class="quick-btn">Quý trước</button>
             </div>
           </div>
           

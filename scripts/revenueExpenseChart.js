@@ -100,11 +100,19 @@ export function renderRevenueExpenseChart(transactionData, expenseData, containe
   );
   console.log('📏 Max value for scaling:', maxValue);
   
+  // Get period label
+  let periodLabel = '12 tháng gần nhất';
+  if (window.globalFilters && window.globalFilters.dateRange) {
+    const { start, end } = window.globalFilters.dateRange;
+    periodLabel = `Từ ${start} đến ${end}`;
+  }
+  
   // Create chart HTML
   const chartHTML = `
     <div class="revenue-expense-chart">
       <div class="chart-header">
-        <h3>📊 Biểu đồ Doanh thu & Chi phí 12 tháng gần nhất</h3>
+        <h3>📊 Biểu đồ Doanh thu & Chi phí</h3>
+        <div class="period-badge">${periodLabel}</div>
         <div class="chart-legend">
           <div class="legend-item">
             <span class="legend-color revenue"></span>
@@ -450,8 +458,9 @@ export function addRevenueExpenseChartStyles() {
     
     .chart-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
       margin-bottom: 24px;
     }
     
@@ -459,11 +468,23 @@ export function addRevenueExpenseChartStyles() {
       margin: 0;
       color: #2d3748;
       font-size: 20px;
+      flex: 0 0 auto;
+    }
+    
+    .period-badge {
+      background: #e6f3ff;
+      color: #2563eb;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid #93c5fd;
     }
     
     .chart-legend {
       display: flex;
       gap: 20px;
+      margin-left: auto;
     }
     
     .legend-item {

@@ -436,11 +436,21 @@ async function loadRevenueChart() {
     console.log('🎨 Styles added');
     
     // Get data
-    const transactionData = window.transactionList || [];
-    const expenseData = window.expenseList || [];
+    let transactionData = window.transactionList || [];
+    let expenseData = window.expenseList || [];
+    
+    // Apply date filter if exists
+    if (window.globalFilters && window.globalFilters.dateRange) {
+      console.log('🔍 Applying date filter:', window.globalFilters.dateRange);
+      const { filterDataByDateRange } = await import('./financialDashboard.js');
+      transactionData = filterDataByDateRange(transactionData, window.globalFilters.dateRange);
+      expenseData = filterDataByDateRange(expenseData, window.globalFilters.dateRange);
+    }
+    
     console.log('📊 Data loaded:', {
       transactions: transactionData.length,
-      expenses: expenseData.length
+      expenses: expenseData.length,
+      filtered: !!(window.globalFilters && window.globalFilters.dateRange)
     });
     
     // Render chart

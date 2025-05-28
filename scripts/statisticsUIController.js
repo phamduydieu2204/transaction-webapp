@@ -642,22 +642,9 @@ async function renderEnhancedStatistics(expenseData, transactionData, financialA
     }
     console.log("✅ Financial Dashboard rendered");
     
-    // 2. Render Expense Chart với filtered data
-    const chartData = groupExpensesByMonth(filteredExpenseData, {
-      currency: uiState.currency,
-      sortBy: "month",
-      sortOrder: "desc"
-    }).slice(0, 12); // Last 12 months
-    
-    renderSimpleChart(chartData, {
-      containerId: "overviewChart",
-      chartType: "bar",
-      title: "Chi Phí Theo Tháng (12 tháng gần nhất)",
-      xLabel: "Tháng",
-      yLabel: "Số Tiền (VND)",
-      maxBars: 12
-    });
-    console.log("✅ Expense chart rendered");
+    // 2. Expense chart removed - now using combined revenue/expense chart
+    // renderSimpleChart is no longer needed here
+    console.log("✅ Using combined revenue/expense chart instead");
     
     // 3. Render Export Controls
     renderExportControls({
