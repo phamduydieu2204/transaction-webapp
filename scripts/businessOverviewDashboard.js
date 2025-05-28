@@ -100,6 +100,9 @@ function calculateBusinessMetrics(transactionData, expenseData, dateRange) {
   const operatingExpenses = calculateOperatingExpenses(expenseData);
   const costOfRevenue = calculateCostOfRevenue(expenseData);
   
+  // Accounting type breakdown
+  const accountingBreakdown = calculateAccountingBreakdown(expenseData);
+  
   // Growth metrics
   const growthMetrics = calculateGrowthMetrics(transactionData, expenseData, dateRange);
   
@@ -128,7 +131,8 @@ function calculateBusinessMetrics(transactionData, expenseData, dateRange) {
       byCategory: expensesByCategory,
       operating: operatingExpenses,
       costOfRevenue,
-      costPerTransaction: transactionData.length > 0 ? totalExpenses / transactionData.length : 0
+      costPerTransaction: transactionData.length > 0 ? totalExpenses / transactionData.length : 0,
+      accountingBreakdown: accountingBreakdown
     },
     growth: growthMetrics,
     efficiency: efficiencyMetrics,
@@ -211,6 +215,12 @@ function calculateExpensesByCategory(expenseData) {
   };
   
   expenseData.forEach(expense => {
+    // Skip non-related expenses if accounting type is available
+    if (expense.accountingType && expense.accountingType === 'Không liên quan') {
+      categories['Sinh hoạt cá nhân'] += parseFloat(expense.amount || 0);
+      return;
+    }
+    
     const amount = parseFloat(expense.amount || 0);
     const type = expense.type || 'Khác';
     const category = expense.category || 'Khác';
@@ -242,6 +252,12 @@ function calculateExpensesByCategory(expenseData) {
 function calculateOperatingExpenses(expenseData) {
   return expenseData
     .filter(expense => {
+      // Use accounting type if available
+      if (expense.accountingType) {
+        return expense.accountingType === 'OPEX';
+      }
+      
+      // Fallback to old logic if no accounting type
       const type = expense.type || '';
       const category = expense.category || '';
       return !type.includes('cá nhân') && !type.includes('Sinh hoạt');
@@ -255,10 +271,62 @@ function calculateOperatingExpenses(expenseData) {
 function calculateCostOfRevenue(expenseData) {
   return expenseData
     .filter(expense => {
+      // Use accounting type if available
+      if (expense.accountingType) {
+        return expense.accountingType === 'COGS';
+      }
+      
+      // Fallback to old logic if no accounting type
       const category = expense.category || '';
       return category.includes('phần mềm') || category.includes('Amazon') || category.includes('COGS');
     })
     .reduce((total, expense) => total + parseFloat(expense.amount || 0), 0);
+}
+
+/**
+ * Calculate accounting type breakdown
+ */
+function calculateAccountingBreakdown(expenseData) {
+  const breakdown = {
+    'COGS': 0,
+    'OPEX': 0,
+    'Không liên quan': 0
+  };
+  
+  expenseData.forEach(expense => {
+    const amount = parseFloat(expense.amount || 0);
+    const accountingType = expense.accountingType || determineAccountingTypeFromData(expense);
+    
+    if (breakdown.hasOwnProperty(accountingType)) {
+      breakdown[accountingType] += amount;
+    } else {
+      // Default to OPEX if unknown
+      breakdown['OPEX'] += amount;
+    }
+  });
+  
+  return breakdown;
+}
+
+/**
+ * Determine accounting type from expense data (fallback)
+ */
+function determineAccountingTypeFromData(expense) {
+  const type = expense.type || '';
+  const category = expense.category || '';
+  
+  // Non-related
+  if (type.includes('cá nhân') || type.includes('Sinh hoạt')) {
+    return 'Không liên quan';
+  }
+  
+  // COGS
+  if (category.includes('phần mềm') || category.includes('Amazon') || category.includes('COGS')) {
+    return 'COGS';
+  }
+  
+  // Default to OPEX
+  return 'OPEX';
 }
 
 /**
@@ -466,7 +534,7 @@ function renderFinancialPerformance(metrics) {
               <span class="value positive">${formatCurrency(metrics.financial.totalRevenue, 'VND')}</span>
             </div>
             <div class="pnl-item cogs">
-              <span class="label">Giá vốn hàng bán</span>
+              <span class="label">Giá vốn hàng bán (COGS)</span>
               <span class="value negative">-${formatCurrency(metrics.costs.costOfRevenue, 'VND')}</span>
             </div>
             <div class="pnl-item gross-profit">
@@ -476,7 +544,7 @@ function renderFinancialPerformance(metrics) {
               </span>
             </div>
             <div class="pnl-item operating">
-              <span class="label">Chi phí vận hành</span>
+              <span class="label">Chi phí vận hành (OPEX)</span>
               <span class="value negative">-${formatCurrency(metrics.costs.operating, 'VND')}</span>
             </div>
             <div class="pnl-item net-profit">
@@ -642,6 +710,31 @@ function renderCostManagement(metrics) {
               <div class="efficiency-label">Burn Rate (hàng ngày)</div>
               <div class="efficiency-value">${formatCurrency(metrics.kpis.burnRate, 'VND')}</div>
               <div class="efficiency-status neutral">📊 Theo dõi</div>
+            </div>
+          </div>
+          
+          <!-- Accounting Type Breakdown -->
+          <div class="accounting-breakdown">
+            <h4>📊 Phân loại kế toán</h4>
+            <div class="breakdown-items">
+              <div class="breakdown-item">
+                <span class="breakdown-label">COGS</span>
+                <span class="breakdown-value">${formatCurrency(metrics.costs.accountingBreakdown.COGS, 'VND')}</span>
+                <span class="breakdown-percent">${metrics.financial.totalExpenses > 0 ? 
+                  ((metrics.costs.accountingBreakdown.COGS / metrics.financial.totalExpenses) * 100).toFixed(1) : 0}%</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="breakdown-label">OPEX</span>
+                <span class="breakdown-value">${formatCurrency(metrics.costs.accountingBreakdown.OPEX, 'VND')}</span>
+                <span class="breakdown-percent">${metrics.financial.totalExpenses > 0 ? 
+                  ((metrics.costs.accountingBreakdown.OPEX / metrics.financial.totalExpenses) * 100).toFixed(1) : 0}%</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="breakdown-label">Không liên quan</span>
+                <span class="breakdown-value">${formatCurrency(metrics.costs.accountingBreakdown['Không liên quan'], 'VND')}</span>
+                <span class="breakdown-percent">${metrics.financial.totalExpenses > 0 ? 
+                  ((metrics.costs.accountingBreakdown['Không liên quan'] / metrics.financial.totalExpenses) * 100).toFixed(1) : 0}%</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1546,6 +1639,55 @@ export function addBusinessDashboardStyles() {
       border-radius: 4px;
       text-transform: uppercase;
       font-weight: 600;
+    }
+    
+    /* Accounting Breakdown */
+    .accounting-breakdown {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    .accounting-breakdown h4 {
+      font-size: 14px;
+      color: #4a5568;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+    
+    .breakdown-items {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .breakdown-item {
+      display: flex;
+      align-items: center;
+      padding: 8px;
+      background: white;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+    }
+    
+    .breakdown-label {
+      font-weight: 600;
+      color: #2d3748;
+      min-width: 120px;
+    }
+    
+    .breakdown-value {
+      flex: 1;
+      color: #4a5568;
+      font-weight: 500;
+    }
+    
+    .breakdown-percent {
+      font-size: 14px;
+      color: #718096;
+      background: #f7fafc;
+      padding: 2px 8px;
+      border-radius: 4px;
     }
     
     /* Responsive Design */

@@ -1,12 +1,25 @@
 import { getConstants } from './constants.js';
+import { determineAccountingType } from './accountingTypeManager.js';
 
 export async function handleUpdateExpense() {
   const getValue = (id) => document.getElementById(id)?.value?.trim() || "";
+
+  // Prepare expense data for accounting type
+  const expenseData = {
+    expenseCategory: getValue("expenseCategory"),
+    expenseSubCategory: getValue("expenseSubCategory"),
+    expenseProduct: getValue("expenseProduct"),
+    expensePackage: getValue("expensePackage")
+  };
+  
+  // Determine accounting type
+  const accountingType = await determineAccountingType(expenseData);
 
   const data = {
     action: "updateExpense",
     expenseId: getValue("expenseId"), // ✅ Bạn cần có 1 input ẩn hoặc field nào chứa mã chi phí gốc để cập nhật
     expenseDate: getValue("expenseDate"),
+    accountingType: accountingType, // New field
     expenseCategory: getValue("expenseCategory"),
     expenseSubCategory: getValue("expenseSubCategory"),
     expenseProduct: getValue("expenseProduct"),
