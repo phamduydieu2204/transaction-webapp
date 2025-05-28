@@ -24,6 +24,7 @@ import {
   renderErrorState 
 } from './statisticsRenderer.js';
 import { renderFinancialDashboard, addFinancialDashboardStyles } from './financialDashboard.js';
+import { renderBusinessOverviewDashboard, addBusinessDashboardStyles } from './businessOverviewDashboard.js';
 
 /**
  * UI state management
@@ -50,6 +51,7 @@ export function initializeStatisticsUI() {
   
   // Add dashboard styles
   addFinancialDashboardStyles();
+  addBusinessDashboardStyles();
   
   setupTabListeners();
   setupFilterControls();
@@ -613,43 +615,35 @@ async function renderRevenueTab(transactionData) {
  */
 async function renderEnhancedStatistics(expenseData, transactionData, financialAnalysis, globalFilters = null) {
   try {
-    console.log("🎨 Rendering enhanced statistics dashboard...");
+    console.log("🎨 Rendering Business Overview Dashboard...");
     
     // Use saved filters if no filters provided
     if (!globalFilters && window.globalFilters) {
       globalFilters = window.globalFilters;
     }
     
-    // Apply filters to data if available
-    let filteredExpenseData = expenseData;
-    let filteredTransactionData = transactionData;
-    
+    // Prepare date range for business dashboard
+    let dateRange = null;
     if (globalFilters && globalFilters.dateRange) {
-      // Import filter function from financialDashboard.js
-      const { filterDataByDateRange } = await import('./financialDashboard.js');
-      
-      filteredExpenseData = filterDataByDateRange(expenseData, globalFilters.dateRange);
-      filteredTransactionData = filterDataByDateRange(transactionData, globalFilters.dateRange);
+      dateRange = {
+        start: globalFilters.dateRange.start,
+        end: globalFilters.dateRange.end
+      };
     }
     
-    // 1. Render NEW Financial Dashboard với data đã lọc
-    // Truyền data gốc vì renderFinancialDashboard sẽ tự lọc dựa trên globalFilters
-    renderFinancialDashboard(transactionData, expenseData, {
+    // 1. Render NEW Business Overview Dashboard
+    renderBusinessOverviewDashboard(transactionData, expenseData, {
       containerId: "financialDashboard",
-      globalFilters: globalFilters
+      dateRange: dateRange
     });
     
     // Refresh report menu components if active
     if (window.refreshCurrentReport && document.querySelector('.report-page.active')) {
       window.refreshCurrentReport();
     }
-    console.log("✅ Financial Dashboard rendered");
+    console.log("✅ Business Overview Dashboard rendered");
     
-    // 2. Expense chart removed - now using combined revenue/expense chart
-    // renderSimpleChart is no longer needed here
-    console.log("✅ Using combined revenue/expense chart instead");
-    
-    // 3. Render Export Controls
+    // 2. Render Export Controls
     renderExportControls({
       containerId: "statisticsExportControls",
       formats: ["csv", "json"],
@@ -657,7 +651,14 @@ async function renderEnhancedStatistics(expenseData, transactionData, financialA
     });
     console.log("✅ Export controls rendered");
     
-    // 4. Render Monthly Summary Table với filtered data
+    // 3. Render Monthly Summary Table với filtered data
+    let filteredExpenseData = expenseData;
+    if (globalFilters && globalFilters.dateRange) {
+      // Import filter function from financialDashboard.js
+      const { filterDataByDateRange } = await import('./financialDashboard.js');
+      filteredExpenseData = filterDataByDateRange(expenseData, globalFilters.dateRange);
+    }
+    
     const summaryData = groupExpensesByMonth(filteredExpenseData, {
       currency: uiState.currency,
       sortBy: uiState.sortBy,
@@ -670,12 +671,21 @@ async function renderEnhancedStatistics(expenseData, transactionData, financialA
     });
     console.log("✅ Monthly summary table rendered");
     
-    console.log("🎉 Enhanced statistics dashboard complete!");
+    console.log("🎉 Business Overview Dashboard complete!");
     
   } catch (error) {
-    console.error("❌ Error rendering enhanced statistics:", error);
-    // Fallback to simple table
-    await renderDefaultTab(expenseData, financialAnalysis);
+    console.error("❌ Error rendering business overview:", error);
+    // Fallback to old financial dashboard
+    try {
+      renderFinancialDashboard(transactionData, expenseData, {
+        containerId: "financialDashboard",
+        globalFilters: globalFilters
+      });
+      console.log("✅ Fallback to old financial dashboard");
+    } catch (fallbackError) {
+      console.error("❌ Fallback failed:", fallbackError);
+      await renderDefaultTab(expenseData, financialAnalysis);
+    }
   }
 }
 
