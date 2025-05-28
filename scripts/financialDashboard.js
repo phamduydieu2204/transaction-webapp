@@ -44,7 +44,9 @@ export function renderFinancialDashboard(transactionData, expenseData, options =
   console.log("💰 Rendering Financial Dashboard với dữ liệu:", {
     transactions: transactionData.length,
     expenses: expenseData.length,
-    globalFilters: globalFilters
+    globalFilters: globalFilters,
+    sampleTransaction: transactionData[0],
+    sampleExpense: expenseData[0]
   });
   
   // Debug: Verify dashboard is rendering
@@ -254,12 +256,23 @@ function calculateFinancialMetrics(transactionData, expenseData, globalFilters =
   }
 
   console.log("📊 Using primary period for all metrics:", primaryPeriod);
+  console.log("📊 Transaction data count:", transactionData.length);
+  console.log("📊 Expense data count:", expenseData.length);
 
   // Tất cả calculations đều sử dụng data đã được filter và primaryPeriod
   const isDataFiltered = globalFilters && globalFilters.dateRange ? true : false;
   
+  console.log("📊 Is data pre-filtered?", isDataFiltered);
+  console.log("📊 Global filters:", globalFilters);
+  
   // Revenue calculations - tất cả đều theo primaryPeriod
   const revenueMain = calculateRevenue(transactionData, primaryPeriod.start, primaryPeriod.end, isDataFiltered);
+  
+  console.log("📊 Revenue calculation result:", {
+    total: revenueMain.total,
+    byType: Object.keys(revenueMain.byType).length,
+    bySoftware: Object.keys(revenueMain.bySoftware).length
+  });
   
   // Expense calculations - tất cả đều theo primaryPeriod  
   const expensesMain = calculateExpensesByCategory(expenseData, primaryPeriod.start, primaryPeriod.end, isDataFiltered);
@@ -320,7 +333,10 @@ function calculateRevenue(transactionData, startDate, endDate, skipDateFilter = 
     sampleData: transactionData.slice(0, 2)
   });
 
-  transactionData.forEach(transaction => {
+  let includedCount = 0;
+  let excludedCount = 0;
+  
+  transactionData.forEach((transaction, index) => {
     let shouldInclude = true;
     
     // Chỉ filter theo date nếu không skip
@@ -330,9 +346,21 @@ function calculateRevenue(transactionData, startDate, endDate, skipDateFilter = 
       const normalizedStart = typeof startDate === 'string' ? startDate : normalizeDate(startDate);
       const normalizedEnd = typeof endDate === 'string' ? endDate : normalizeDate(endDate);
       shouldInclude = transactionDate >= normalizedStart && transactionDate <= normalizedEnd;
+      
+      // Debug first few items
+      if (index < 3) {
+        console.log(`💰 Transaction ${index}:`, {
+          date: transactionDate,
+          start: normalizedStart,
+          end: normalizedEnd,
+          shouldInclude,
+          amount: transaction.revenue || transaction.amount || 0
+        });
+      }
     }
     
     if (shouldInclude) {
+      includedCount++;
       const amount = parseFloat(transaction.revenue || transaction.amount || 0);
       const type = transaction.transactionType || transaction.type || "Khác";
       const software = transaction.softwareName || transaction.software || "Khác";
@@ -342,7 +370,16 @@ function calculateRevenue(transactionData, startDate, endDate, skipDateFilter = 
       revenue.byType[type] = (revenue.byType[type] || 0) + amount;
       revenue.bySoftware[software] = (revenue.bySoftware[software] || 0) + amount;
       revenue.byEmployee[employee] = (revenue.byEmployee[employee] || 0) + amount;
+    } else {
+      excludedCount++;
     }
+  });
+  
+  console.log("💰 Revenue filtering result:", {
+    totalRecords: transactionData.length,
+    includedCount,
+    excludedCount,
+    skipDateFilter
   });
 
   console.log("✅ Calculate Revenue Result:", {
