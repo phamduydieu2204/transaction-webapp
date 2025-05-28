@@ -12,7 +12,10 @@ window.globalFilters = JSON.parse(localStorage.getItem('dashboardFilters')) || {
   dateRange: null,
   period: 'current_month', // current_month, last_month, custom
   customStartDate: null,
-  customEndDate: null
+  customEndDate: null,
+  selectedSoftware: [], // Array of selected software names
+  compareMode: 'none', // none, previous_period, same_period_last_year
+  showAllSoftware: true // Toggle to show all or selected software
 };
 
 // Save filters to localStorage
@@ -764,7 +767,8 @@ function renderQuickForecast(forecast) {
  * Adds interactive features to dashboard
  */
 function addDashboardInteractivity() {
-  // No interactive features needed for simplified cards
+  // Load software list for filter
+  loadSoftwareList();
   console.log("✅ Dashboard interactivity initialized");
 }
 
@@ -1503,6 +1507,163 @@ export function addFinancialDashboardStyles() {
       font-weight: bold;
       color: #2d3748;
     }
+    
+    /* Software filter styles */
+    .software-filter {
+      margin-top: 12px;
+    }
+    
+    .filter-toggle {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 24px;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #cbd5e0;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .toggle-slider {
+      background-color: #48bb78;
+    }
+    
+    input:checked + .toggle-slider:before {
+      transform: translateX(24px);
+    }
+    
+    .toggle-label {
+      font-size: 14px;
+      color: #4a5568;
+    }
+    
+    .software-list {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 12px;
+      background: #f7fafc;
+    }
+    
+    .software-list.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    
+    .checkbox-option {
+      display: flex;
+      align-items: center;
+      padding: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      border-radius: 4px;
+    }
+    
+    .checkbox-option:hover {
+      background-color: #e6f3ff;
+    }
+    
+    .checkbox-option input[type="checkbox"] {
+      margin-right: 8px;
+    }
+    
+    .checkbox-label {
+      font-size: 13px;
+      color: #2d3748;
+    }
+    
+    /* Compare mode styles */
+    .compare-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    
+    .radio-option {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .radio-option:hover {
+      border-color: #3182ce;
+      background-color: #f0f7ff;
+    }
+    
+    .radio-option.selected {
+      border-color: #3182ce;
+      background-color: #e6f3ff;
+    }
+    
+    .radio-option input[type="radio"] {
+      margin-right: 8px;
+    }
+    
+    .radio-label {
+      font-size: 14px;
+      color: #2d3748;
+      font-weight: 500;
+    }
+    
+    .compare-note {
+      margin-top: 12px;
+      padding: 8px 12px;
+      background: #f7fafc;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #718096;
+      text-align: center;
+    }
+    
+    .no-data, .loading-spinner, .error {
+      text-align: center;
+      padding: 20px;
+      color: #718096;
+      font-style: italic;
+    }
+    
+    .error {
+      color: #e53e3e;
+    }
   `;
   
   document.head.appendChild(styles);
@@ -1602,11 +1763,54 @@ function renderFilterPanel() {
         </div>
       </div>
       
-      <!-- Các bộ lọc khác có thể thêm vào đây -->
+      <!-- Bộ lọc phần mềm -->
       <div class="filter-section">
-        <h4>🎯 Bộ Lọc Khác</h4>
-        <div class="filter-note">
-          <em>Các bộ lọc khác sẽ được thêm vào sau...</em>
+        <h4>💻 Lọc theo Phần mềm</h4>
+        <div class="software-filter">
+          <div class="filter-toggle">
+            <label class="toggle-switch">
+              <input type="checkbox" id="showAllSoftware" 
+                     ${window.globalFilters.showAllSoftware ? 'checked' : ''}
+                     onchange="toggleSoftwareFilter(this.checked)">
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label">Hiển thị tất cả phần mềm</span>
+          </div>
+          
+          <div class="software-list ${window.globalFilters.showAllSoftware ? 'disabled' : ''}" id="softwareFilterList">
+            <div class="loading-spinner">\u0110ang tải danh sách phần mềm...</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Bộ lọc so sánh -->
+      <div class="filter-section">
+        <h4>📊 So sánh Kỳ</h4>
+        <div class="compare-options">
+          <label class="radio-option ${window.globalFilters.compareMode === 'none' ? 'selected' : ''}">
+            <input type="radio" name="compareMode" value="none" 
+                   ${window.globalFilters.compareMode === 'none' ? 'checked' : ''}
+                   onchange="setCompareMode('none')">
+            <span class="radio-label">🚫 Không so sánh</span>
+          </label>
+          
+          <label class="radio-option ${window.globalFilters.compareMode === 'previous_period' ? 'selected' : ''}">
+            <input type="radio" name="compareMode" value="previous_period"
+                   ${window.globalFilters.compareMode === 'previous_period' ? 'checked' : ''}
+                   onchange="setCompareMode('previous_period')">
+            <span class="radio-label">🔄 So với kỳ trước</span>
+          </label>
+          
+          <label class="radio-option ${window.globalFilters.compareMode === 'same_period_last_year' ? 'selected' : ''}">
+            <input type="radio" name="compareMode" value="same_period_last_year"
+                   ${window.globalFilters.compareMode === 'same_period_last_year' ? 'checked' : ''}
+                   onchange="setCompareMode('same_period_last_year')">
+            <span class="radio-label">📅 So với cùng kỳ năm trước</span>
+          </label>
+        </div>
+        
+        <div class="compare-note" id="compareNote">
+          ${getCompareNote()}
         </div>
       </div>
       
@@ -1623,19 +1827,19 @@ function renderFilterPanel() {
 }
 
 /**
- * Lọc dữ liệu theo khoảng thời gian
+ * Lọc dữ liệu theo khoảng thời gian và các filter khác
  */
-export function filterDataByDateRange(data, dateRange) {
-  if (!dateRange || !dateRange.start || !dateRange.end) {
-    return data;
-  }
-
-  const startDate = new Date(dateRange.start);
-  const endDate = new Date(dateRange.end);
-  // Đặt startDate về đầu ngày (00:00:00) để bao gồm cả ngày đầu tiên
-  startDate.setHours(0, 0, 0, 0);
-  // Đặt endDate về cuối ngày (23:59:59) để bao gồm cả ngày cuối cùng
-  endDate.setHours(23, 59, 59, 999);
+export function filterDataByDateRange(data, dateRange, additionalFilters = {}) {
+  let filteredData = data;
+  
+  // Date range filter
+  if (dateRange && dateRange.start && dateRange.end) {
+    const startDate = new Date(dateRange.start);
+    const endDate = new Date(dateRange.end);
+    // Đặt startDate về đầu ngày (00:00:00) để bao gồm cả ngày đầu tiên
+    startDate.setHours(0, 0, 0, 0);
+    // Đặt endDate về cuối ngày (23:59:59) để bao gồm cả ngày cuối cùng
+    endDate.setHours(23, 59, 59, 999);
   
   console.log("🔍 Filter date range:", {
     original: dateRange,
@@ -1691,7 +1895,17 @@ export function filterDataByDateRange(data, dateRange) {
     
     return inRange;
   });
+  }
   
+  // Software filter
+  if (additionalFilters.selectedSoftware && 
+      additionalFilters.selectedSoftware.length > 0 && 
+      !additionalFilters.showAllSoftware) {
+    filteredData = filteredData.filter(item => {
+      const softwareName = item.softwareName || '';
+      return additionalFilters.selectedSoftware.includes(softwareName);
+    });
+  }
   
   return filteredData;
 }
@@ -1838,6 +2052,11 @@ window.applyFilters = function() {
     }
   }
   
+  // Refresh report components that support filters
+  if (window.refreshCurrentReport) {
+    window.refreshCurrentReport();
+  }
+  
   // Đóng filter panel sau khi áp dụng
   toggleFilterPanel();
 }
@@ -1936,4 +2155,147 @@ window.setQuickRange = function(range) {
     start: startDateStr,
     end: endDateStr
   });
+}
+
+/**
+ * Load software list for filter
+ */
+async function loadSoftwareList() {
+  const container = document.getElementById('softwareFilterList');
+  if (!container) return;
+  
+  try {
+    // Get unique software names from transactions
+    const transactionData = window.transactionList || [];
+    const softwareSet = new Set();
+    
+    transactionData.forEach(transaction => {
+      if (transaction.softwareName) {
+        softwareSet.add(transaction.softwareName);
+      }
+    });
+    
+    const softwareList = Array.from(softwareSet).sort();
+    
+    if (softwareList.length === 0) {
+      container.innerHTML = '<div class="no-data">Không có dữ liệu phần mềm</div>';
+      return;
+    }
+    
+    // Render checkboxes
+    container.innerHTML = softwareList.map(software => `
+      <label class="checkbox-option">
+        <input type="checkbox" 
+               value="${software}" 
+               ${window.globalFilters.selectedSoftware.includes(software) ? 'checked' : ''}
+               onchange="updateSoftwareFilter()">
+        <span class="checkbox-label">${software}</span>
+      </label>
+    `).join('');
+    
+  } catch (error) {
+    console.error('Error loading software list:', error);
+    container.innerHTML = '<div class="error">Lỗi khi tải danh sách phần mềm</div>';
+  }
+}
+
+/**
+ * Toggle software filter
+ */
+window.toggleSoftwareFilter = function(showAll) {
+  window.globalFilters.showAllSoftware = showAll;
+  
+  const softwareList = document.getElementById('softwareFilterList');
+  if (softwareList) {
+    softwareList.classList.toggle('disabled', showAll);
+  }
+  
+  saveFiltersToStorage();
+}
+
+/**
+ * Update software filter
+ */
+window.updateSoftwareFilter = function() {
+  const checkboxes = document.querySelectorAll('#softwareFilterList input[type="checkbox"]:checked');
+  window.globalFilters.selectedSoftware = Array.from(checkboxes).map(cb => cb.value);
+  
+  saveFiltersToStorage();
+}
+
+/**
+ * Set compare mode
+ */
+window.setCompareMode = function(mode) {
+  window.globalFilters.compareMode = mode;
+  
+  // Update radio button styles
+  document.querySelectorAll('.compare-options .radio-option').forEach(option => {
+    const radio = option.querySelector('input[type="radio"]');
+    option.classList.toggle('selected', radio.value === mode);
+  });
+  
+  // Update compare note
+  const compareNote = document.getElementById('compareNote');
+  if (compareNote) {
+    compareNote.innerHTML = getCompareNote();
+  }
+  
+  saveFiltersToStorage();
+}
+
+/**
+ * Get compare note based on current filters
+ */
+function getCompareNote() {
+  if (window.globalFilters.compareMode === 'none') {
+    return '';
+  }
+  
+  if (!window.globalFilters.dateRange) {
+    return '<em>Chọn khoảng thời gian để xem so sánh</em>';
+  }
+  
+  const { start, end } = window.globalFilters.dateRange;
+  
+  if (window.globalFilters.compareMode === 'previous_period') {
+    const compareRange = getCompareDateRange('previous_period', start, end);
+    return `<em>So sánh với: ${compareRange.start} - ${compareRange.end}</em>`;
+  } else {
+    const compareRange = getCompareDateRange('same_period_last_year', start, end);
+    return `<em>So sánh với: ${compareRange.start} - ${compareRange.end}</em>`;
+  }
+}
+
+/**
+ * Get compare date range
+ */
+function getCompareDateRange(mode, startStr, endStr) {
+  const start = new Date(startStr);
+  const end = new Date(endStr);
+  const daysDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+  
+  if (mode === 'previous_period') {
+    // Previous period with same duration
+    const compareEnd = new Date(start);
+    compareEnd.setDate(compareEnd.getDate() - 1);
+    const compareStart = new Date(compareEnd);
+    compareStart.setDate(compareStart.getDate() - daysDiff + 1);
+    
+    return {
+      start: formatDateForInput(compareStart),
+      end: formatDateForInput(compareEnd)
+    };
+  } else {
+    // Same period last year
+    const compareStart = new Date(start);
+    compareStart.setFullYear(compareStart.getFullYear() - 1);
+    const compareEnd = new Date(end);
+    compareEnd.setFullYear(compareEnd.getFullYear() - 1);
+    
+    return {
+      start: formatDateForInput(compareStart),
+      end: formatDateForInput(compareEnd)
+    };
+  }
 }

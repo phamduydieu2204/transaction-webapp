@@ -314,16 +314,36 @@ export function renderRevenueExpenseChart(transactionData, expenseData, containe
     return;
   }
   
-  // Get date range from global filters
+  // Get date range and compare mode from global filters
   const dateRange = window.globalFilters && window.globalFilters.dateRange ? window.globalFilters.dateRange : null;
+  const compareMode = window.globalFilters && window.globalFilters.compareMode || 'none';
   
   console.log('📆 Calculating chart data...');
   const chartData = calculateChartData(transactionData, expenseData, dateRange);
   console.log('📊 Chart data calculated:', chartData);
   
-  // Find max value for scaling
+  // Calculate compare data if needed
+  let compareData = null;
+  if (compareMode !== 'none' && dateRange) {
+    console.log('🔄 Calculating compare data...');
+    const compareRange = getCompareDateRange(compareMode, dateRange);
+    
+    // Get all data and filter for compare period
+    const allTransactions = window.transactionList || [];
+    const allExpenses = window.expenseList || [];
+    
+    const { filterDataByDateRange } = await import('./financialDashboard.js');
+    const compareTransactions = filterDataByDateRange(allTransactions, compareRange, window.globalFilters);
+    const compareExpenses = filterDataByDateRange(allExpenses, compareRange, window.globalFilters);
+    
+    compareData = calculateChartData(compareTransactions, compareExpenses, compareRange);
+    console.log('🔄 Compare data calculated:', compareData);
+  }
+  
+  // Find max value for scaling (include compare data if exists)
+  const allData = compareData ? [...chartData, ...compareData] : chartData;
   const maxValue = Math.max(
-    ...chartData.map(d => Math.max(d.revenue, d.expense))
+    ...allData.map(d => Math.max(d.revenue, d.expense))
   );
   console.log('📏 Max value for scaling:', maxValue);
   
@@ -336,6 +356,43 @@ export function renderRevenueExpenseChart(transactionData, expenseData, containe
     granularity = determineGranularity(dateRange);
   }
   
+  // Helper function to get compare date range
+  function getCompareDateRange(mode, currentRange) {
+    const start = new Date(currentRange.start);
+    const end = new Date(currentRange.end);
+    const daysDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+    
+    if (mode === 'previous_period') {
+      const compareEnd = new Date(start);
+      compareEnd.setDate(compareEnd.getDate() - 1);
+      const compareStart = new Date(compareEnd);
+      compareStart.setDate(compareStart.getDate() - daysDiff + 1);
+      
+      return {
+        start: formatDate(compareStart),
+        end: formatDate(compareEnd)
+      };
+    } else {
+      const compareStart = new Date(start);
+      compareStart.setFullYear(compareStart.getFullYear() - 1);
+      const compareEnd = new Date(end);
+      compareEnd.setFullYear(compareEnd.getFullYear() - 1);
+      
+      return {
+        start: formatDate(compareStart),
+        end: formatDate(compareEnd)
+      };
+    }
+  }
+  
+  // Format date helper
+  function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+  
   // Create chart HTML
   const chartHTML = `
     <div class="revenue-expense-chart">
@@ -345,16 +402,23 @@ export function renderRevenueExpenseChart(transactionData, expenseData, containe
         <div class="chart-legend">
           <div class="legend-item">
             <span class="legend-color revenue"></span>
-            <span>Doanh thu</span>
+            <span>Doanh thu${compareMode !== 'none' ? ' (hiện tại)' : ''}</span>
           </div>
           <div class="legend-item">
             <span class="legend-color expense"></span>
-            <span>Chi phí</span>
+            <span>Chi phí${compareMode !== 'none' ? ' (hiện tại)' : ''}</span>
           </div>
-          <div class="legend-item">
-            <span class="legend-color profit"></span>
-            <span>Lợi nhuận</span>
-          </div>
+          ${compareMode !== 'none' ? `
+            <div class="legend-item">
+              <span class="legend-color compare"></span>
+              <span>${compareMode === 'previous_period' ? 'Kỳ trước' : 'Cùng kỳ năm trước'}</span>
+            </div>
+          ` : `
+            <div class="legend-item">
+              <span class="legend-color profit"></span>
+              <span>Lợi nhuận</span>
+            </div>
+          `}
         </div>
       </div>
       
@@ -393,6 +457,31 @@ export function renderRevenueExpenseChart(transactionData, expenseData, containe
               fill="url(#profitGradient)"
               opacity="0.3"
             />
+            
+            <!-- Compare lines if compare mode is active -->
+            ${compareData && compareMode !== 'none' ? `
+              <!-- Compare Revenue line -->
+              <polyline
+                class="chart-line compare-revenue-line"
+                points="${generateLinePoints(compareData, 'revenue', maxValue)}"
+                fill="none"
+                stroke="#28a745"
+                stroke-width="2"
+                stroke-dasharray="5,5"
+                opacity="0.6"
+              />
+              
+              <!-- Compare Expense line -->
+              <polyline
+                class="chart-line compare-expense-line"
+                points="${generateLinePoints(compareData, 'expense', maxValue)}"
+                fill="none"
+                stroke="#dc3545"
+                stroke-width="2"
+                stroke-dasharray="5,5"
+                opacity="0.6"
+              />
+            ` : ''}
             
             <!-- Data points -->
             ${generateDataPoints(chartData, maxValue)}
@@ -759,6 +848,12 @@ export function addRevenueExpenseChartStyles() {
     .legend-color.revenue { background: #28a745; }
     .legend-color.expense { background: #dc3545; }
     .legend-color.profit { background: #17a2b8; }
+    .legend-color.compare { 
+      background: #6c757d;
+      border: 2px dashed #6c757d;
+      background-clip: content-box;
+      padding: 1px;
+    }
     
     .chart-container {
       position: relative;
