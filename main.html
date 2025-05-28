@@ -643,6 +643,123 @@
     }
   }
 
+    /* Period Selector Styles */
+    .period-selector-wrapper {
+      padding: 15px;
+      border-bottom: 1px solid #e2e8f0;
+      margin-bottom: 10px;
+    }
+    
+    .period-selector-wrapper .period-label {
+      display: block;
+      font-size: 12px;
+      color: #718096;
+      margin-bottom: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .period-dropdown {
+      position: relative;
+    }
+    
+    .period-selected {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .period-selected:hover {
+      border-color: #4299e1;
+      background: #f7faff;
+    }
+    
+    .period-selected span {
+      font-weight: 500;
+      color: #2d3748;
+    }
+    
+    .period-selected i {
+      color: #718096;
+      transition: transform 0.2s;
+    }
+    
+    .period-dropdown.active .period-selected i {
+      transform: rotate(180deg);
+    }
+    
+    .period-options {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin-top: 4px;
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+    }
+    
+    .period-dropdown.active .period-options {
+      display: block;
+    }
+    
+    .period-option {
+      padding: 10px 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .period-option i {
+      width: 16px;
+      color: #718096;
+    }
+    
+    .period-option:hover {
+      background: #f7faff;
+      color: #4299e1;
+    }
+    
+    .period-option:hover i {
+      color: #4299e1;
+    }
+    
+    .period-option.active {
+      background: #ebf8ff;
+      color: #3182ce;
+      font-weight: 600;
+    }
+    
+    .period-option.active i {
+      color: #3182ce;
+    }
+    
+    .period-option.custom {
+      border-top: 1px solid #e2e8f0;
+      margin-top: 4px;
+      padding-top: 14px;
+    }
+    
+    .period-option:first-child {
+      border-radius: 4px 4px 0 0;
+    }
+    
+    .period-option:last-child {
+      border-radius: 0 0 4px 4px;
+    }
   </style>
 </head>
 <body>
@@ -925,6 +1042,62 @@
     <!-- Menu báo cáo bên trái -->
     <div class="report-menu">
       <h3 class="menu-title">📊 Báo cáo thống kê</h3>
+      
+      <!-- Period Selector -->
+      <div class="period-selector-wrapper">
+        <label class="period-label">Kỳ báo cáo:</label>
+        <div class="period-dropdown">
+          <div class="period-selected" onclick="togglePeriodDropdown()">
+            <span id="selectedPeriodText">Tháng này</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <div class="period-options" id="periodOptions">
+            <div class="period-option" onclick="selectReportPeriod('today')">
+              <i class="fas fa-calendar-day"></i> Hôm nay
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('yesterday')">
+              <i class="fas fa-history"></i> Hôm qua
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('this_week')">
+              <i class="fas fa-calendar-week"></i> Tuần này
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('last_week')">
+              <i class="fas fa-calendar-alt"></i> Tuần trước
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('last_7_days')">
+              <i class="fas fa-calendar-minus"></i> 7 ngày qua
+            </div>
+            <div class="period-option active" onclick="selectReportPeriod('this_month')">
+              <i class="fas fa-calendar"></i> Tháng này
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('last_month')">
+              <i class="fas fa-calendar-check"></i> Tháng trước
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('last_30_days')">
+              <i class="fas fa-calendar-plus"></i> 30 ngày qua
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('this_quarter')">
+              <i class="fas fa-business-time"></i> Quý này
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('last_quarter')">
+              <i class="fas fa-chart-bar"></i> Quý trước
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('this_year')">
+              <i class="fas fa-calendar-times"></i> Năm nay
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('last_year')">
+              <i class="fas fa-chart-line"></i> Năm trước
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('all_time')">
+              <i class="fas fa-infinity"></i> Tất cả thời gian
+            </div>
+            <div class="period-option custom" onclick="selectReportPeriod('custom')">
+              <i class="fas fa-calendar-range"></i> Tùy chỉnh...
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <ul class="report-menu-list">
         <li class="menu-item active" data-report="overview">
           <i class="fas fa-chart-line"></i>
@@ -1149,6 +1322,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script type="module" src="scripts/main.js"></script>
+  <script type="module" src="scripts/periodSelector.js"></script>
 
   <!-- Modal xác nhận thêm hoặc cập nhật giao dịch -->
 <div id="addOrUpdateModal" class="modal">
