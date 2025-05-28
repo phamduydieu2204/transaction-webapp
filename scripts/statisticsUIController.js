@@ -486,9 +486,11 @@ async function refreshStatistics() {
     const expenseData = window.expenseList || [];
     const transactionData = window.transactionList || [];
     
-    // Calculate date range
+    // Calculate date range - sử dụng globalFilters nếu có
     let dateRangeFilter = null;
-    if (typeof uiState.dateRange === 'string') {
+    if (window.globalFilters && window.globalFilters.dateRange) {
+      dateRangeFilter = window.globalFilters.dateRange;
+    } else if (typeof uiState.dateRange === 'string') {
       dateRangeFilter = getDateRange(uiState.dateRange);
     } else if (uiState.dateRange && uiState.dateRange.start && uiState.dateRange.end) {
       dateRangeFilter = uiState.dateRange;
@@ -630,7 +632,8 @@ async function renderEnhancedStatistics(expenseData, transactionData, financialA
       filteredTransactionData = filterDataByDateRange(transactionData, globalFilters.dateRange);
     }
     
-    // 1. Render NEW Financial Dashboard với global filters
+    // 1. Render NEW Financial Dashboard với data đã lọc
+    // Truyền data gốc vì renderFinancialDashboard sẽ tự lọc dựa trên globalFilters
     renderFinancialDashboard(transactionData, expenseData, {
       containerId: "financialDashboard",
       globalFilters: globalFilters

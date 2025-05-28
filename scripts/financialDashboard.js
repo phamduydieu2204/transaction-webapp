@@ -257,8 +257,8 @@ function calculateFinancialMetrics(transactionData, expenseData, globalFilters =
 
   // Revenue calculations - sử dụng primaryPeriod làm chính
   const revenueToday = calculateRevenue(transactionData, todayStr, todayStr);
-  // Nếu data đã được filter, skip date filter cho primaryPeriod
-  const isDataFiltered = globalFilters && globalFilters.dateRange;
+  // Data đã được filter trong renderFinancialDashboard khi có globalFilters
+  const isDataFiltered = globalFilters && globalFilters.dateRange ? true : false;
   const revenueMonth = calculateRevenue(transactionData, primaryPeriod.start, primaryPeriod.end, isDataFiltered);
   const revenueQuarter = calculateRevenue(transactionData, thisQuarter.start, thisQuarter.end);
   const revenueYear = calculateRevenue(transactionData, thisYear.start, thisYear.end);
