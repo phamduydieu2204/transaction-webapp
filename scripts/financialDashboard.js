@@ -238,15 +238,9 @@ function formatDateForInput(date) {
  * Calculates comprehensive financial metrics
  */
 function calculateFinancialMetrics(transactionData, expenseData, globalFilters = null) {
-  const today = new Date();
-  const todayStr = normalizeDate(today);
-  const thisMonth = getDateRange("month");
-  const thisQuarter = getDateRange("quarter");
-  const thisYear = getDateRange("year");
-
   console.log("🧮 Calculating financial metrics...");
   
-  // Sử dụng filtered date range nếu có
+  // Sử dụng filtered date range làm period chính cho tất cả metrics
   let primaryPeriod;
   if (globalFilters && globalFilters.dateRange) {
     primaryPeriod = {
@@ -254,59 +248,53 @@ function calculateFinancialMetrics(transactionData, expenseData, globalFilters =
       end: globalFilters.dateRange.end
     };
   } else {
+    // Fallback về tháng hiện tại nếu không có filter
+    const thisMonth = getDateRange("month");
     primaryPeriod = thisMonth;
   }
 
-  // Revenue calculations - sử dụng primaryPeriod làm chính
-  const revenueToday = calculateRevenue(transactionData, todayStr, todayStr);
-  // Data đã được filter trong renderFinancialDashboard khi có globalFilters
-  const isDataFiltered = globalFilters && globalFilters.dateRange ? true : false;
-  const revenueMonth = calculateRevenue(transactionData, primaryPeriod.start, primaryPeriod.end, isDataFiltered);
-  const revenueQuarter = calculateRevenue(transactionData, thisQuarter.start, thisQuarter.end);
-  const revenueYear = calculateRevenue(transactionData, thisYear.start, thisYear.end);
+  console.log("📊 Using primary period for all metrics:", primaryPeriod);
 
-  // Expense calculations by category - sử dụng primaryPeriod làm chính
-  const expensesToday = calculateExpensesByCategory(expenseData, todayStr, todayStr);
-  const expensesMonth = calculateExpensesByCategory(expenseData, primaryPeriod.start, primaryPeriod.end, isDataFiltered);
-  const expensesQuarter = calculateExpensesByCategory(expenseData, thisQuarter.start, thisQuarter.end);
-  const expensesYear = calculateExpensesByCategory(expenseData, thisYear.start, thisYear.end);
+  // Tất cả calculations đều sử dụng data đã được filter và primaryPeriod
+  const isDataFiltered = globalFilters && globalFilters.dateRange ? true : false;
+  
+  // Revenue calculations - tất cả đều theo primaryPeriod
+  const revenueMain = calculateRevenue(transactionData, primaryPeriod.start, primaryPeriod.end, isDataFiltered);
+  
+  // Expense calculations - tất cả đều theo primaryPeriod  
+  const expensesMain = calculateExpensesByCategory(expenseData, primaryPeriod.start, primaryPeriod.end, isDataFiltered);
 
   // Profit calculations
-  const profitToday = revenueToday.total - expensesToday.total;
-  const profitMonth = revenueMonth.total - expensesMonth.total;
-  const profitQuarter = revenueQuarter.total - expensesQuarter.total;
-  const profitYear = revenueYear.total - expensesYear.total;
+  const profitMain = revenueMain.total - expensesMain.total;
 
   // Margin calculations
-  const marginToday = revenueToday.total > 0 ? (profitToday / revenueToday.total) * 100 : 0;
-  const marginMonth = revenueMonth.total > 0 ? (profitMonth / revenueMonth.total) * 100 : 0;
-  const marginQuarter = revenueQuarter.total > 0 ? (profitQuarter / revenueQuarter.total) * 100 : 0;
-  const marginYear = revenueYear.total > 0 ? (profitYear / revenueYear.total) * 100 : 0;
+  const marginMain = revenueMain.total > 0 ? (profitMain / revenueMain.total) * 100 : 0;
 
+  // Return same structure but all periods use filtered data
   return {
     today: {
-      revenue: revenueToday,
-      expenses: expensesToday,
-      profit: profitToday,
-      margin: marginToday
+      revenue: revenueMain,
+      expenses: expensesMain,
+      profit: profitMain,
+      margin: marginMain
     },
     month: {
-      revenue: revenueMonth,
-      expenses: expensesMonth,
-      profit: profitMonth,
-      margin: marginMonth
+      revenue: revenueMain,
+      expenses: expensesMain,
+      profit: profitMain,
+      margin: marginMain
     },
     quarter: {
-      revenue: revenueQuarter,
-      expenses: expensesQuarter,
-      profit: profitQuarter,
-      margin: marginQuarter
+      revenue: revenueMain,
+      expenses: expensesMain,
+      profit: profitMain,
+      margin: marginMain
     },
     year: {
-      revenue: revenueYear,
-      expenses: expensesYear,
-      profit: profitYear,
-      margin: marginYear
+      revenue: revenueMain,
+      expenses: expensesMain,
+      profit: profitMain,
+      margin: marginMain
     }
   };
 }
@@ -547,28 +535,32 @@ function getTopSoftware(bySoftware) {
  * Renders cash flow tracking section
  */
 function renderCashFlowTracker(metrics) {
+  const periodLabel = getPeriodLabel();
+  
   return `
     <div class="cash-flow-section">
-      <h3>💳 Dòng Tiền & Thanh Khoản</h3>
+      <h3>💳 Dòng Tiền & Thanh Khoản 
+        <span class="period-label-inline">${periodLabel}</span>
+      </h3>
       <div class="cash-flow-grid">
         <div class="cash-flow-item">
-          <div class="cf-label">Tiền vào hôm nay</div>
-          <div class="cf-amount positive">+${formatCurrency(metrics.today.revenue.total, "VND")}</div>
+          <div class="cf-label">Tổng tiền vào</div>
+          <div class="cf-amount positive">+${formatCurrency(metrics.month.revenue.total, "VND")}</div>
         </div>
         <div class="cash-flow-item">
-          <div class="cf-label">Tiền ra hôm nay</div>
-          <div class="cf-amount negative">-${formatCurrency(metrics.today.expenses.total, "VND")}</div>
+          <div class="cf-label">Tổng tiền ra</div>
+          <div class="cf-amount negative">-${formatCurrency(metrics.month.expenses.total, "VND")}</div>
         </div>
         <div class="cash-flow-item">
           <div class="cf-label">Net Cash Flow</div>
-          <div class="cf-amount ${metrics.today.profit >= 0 ? 'positive' : 'negative'}">
-            ${metrics.today.profit >= 0 ? '+' : ''}${formatCurrency(metrics.today.profit, "VND")}
+          <div class="cf-amount ${metrics.month.profit >= 0 ? 'positive' : 'negative'}">
+            ${metrics.month.profit >= 0 ? '+' : ''}${formatCurrency(metrics.month.profit, "VND")}
           </div>
         </div>
         <div class="cash-flow-item">
-          <div class="cf-label">Dự kiến tháng này</div>
-          <div class="cf-amount ${metrics.month.profit >= 0 ? 'positive' : 'negative'}">
-            ${formatCurrency(metrics.month.profit, "VND")}
+          <div class="cf-label">Tỷ suất lợi nhuận</div>
+          <div class="cf-amount ${metrics.month.margin >= 0 ? 'positive' : 'negative'}">
+            ${metrics.month.margin.toFixed(1)}%
           </div>
         </div>
       </div>
