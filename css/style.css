@@ -739,20 +739,45 @@ body.login-page {
   flex-direction: column;
 }
 
-/* Layout for transaction tab - form and table side by side */
+/* Expense tab styling to match transaction tab */
+#tab-chi-phi.active {
+  padding: 20px;
+  background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+}
+
+#tab-chi-phi #expenseForm {
+  width: 100%;
+  max-width: 95%;
+  margin: 0 auto 20px auto;
+}
+
+/* Ensure button-row spans full width in all forms */
+.form-grid .button-row {
+  grid-column: span 12;
+}
+
+/* Layout for transaction tab - form on top, table below */
 #tab-giao-dich.active {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 0;
 }
 
 .form-container {
-  width: 400px;
+  width: 100%;
   flex-shrink: 0;
-  padding: 16px;
-  overflow-y: auto;
-  border-right: 2px solid #e3f2fd;
+  padding: 20px;
+  overflow-y: visible;
+  border-bottom: 2px solid #e3f2fd;
   background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+  display: flex;
+  justify-content: center;
+}
+
+/* Container for transaction form with specific width */
+.form-container #transactionForm {
+  width: 100%;
+  max-width: calc(95% * 1.1); /* 10% wider than expense form */
 }
 
 .table-container {

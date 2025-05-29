@@ -389,18 +389,8 @@
   }
   
   /* Mobile layout for transaction tab */
-  #tab-giao-dich.active {
-    flex-direction: column !important;
-  }
-  
-  .form-container {
-    width: 100% !important;
-    border-right: none !important;
-    border-bottom: 2px solid #e3f2fd;
-  }
-  
-  .table-container {
-    flex: 1 !important;
+  .form-container #transactionForm {
+    max-width: 100% !important;
   }
   
   .tab-button[style*="display: none"] {
@@ -1216,10 +1206,10 @@
     </div>
 
     <!-- Buttons -->
-    <div class="button-row" style="grid-column: span 2;">
-      <button type="button" onclick="handleAddExpense()">Thêm chi phí</button>
-      <button type="button" onclick="handleUpdateExpense()">Cập nhật chi phí</button>
-      <button type="button" onclick="handleSearchExpense()">Tìm kiếm chi phí</button>
+    <div class="button-row">
+      <button type="button" onclick="handleAddExpense()">Thêm</button>
+      <button type="button" onclick="handleUpdateExpense()">Cập nhật</button>
+      <button type="button" onclick="handleSearchExpense()">Tìm kiếm</button>
       <button type="reset">Làm mới</button>
     </div>
   </form>
