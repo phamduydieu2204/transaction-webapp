@@ -80,8 +80,13 @@ async function searchExpenseDescriptions(query) {
     
     if (result.status === 'success') {
       currentSearchResults = result.data || [];
+      console.log('Search results received:', currentSearchResults);
+      currentSearchResults.forEach((item, index) => {
+        console.log(`Result ${index}: "${item.description}"`);
+      });
       displaySearchResults(currentSearchResults);
     } else {
+      console.error('Search error:', result);
       resultsDiv.innerHTML = '<div class="search-error">Lỗi khi tìm kiếm</div>';
     }
   } catch (error) {
@@ -129,13 +134,26 @@ function highlightMatch(text, query) {
     .replace(/\s+/g, ' ')
     .trim();
   
+  console.log(`Original text: "${text}"`);
+  console.log(`Clean text: "${cleanText}"`);
+  console.log(`Query: "${query}"`);
+  
   // Escape special regex characters in query
-  const escapedQuery = query.split(/\s+/)
+  const queryTerms = query.split(/\s+/).filter(term => term.length > 0);
+  const escapedQuery = queryTerms
     .map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
     .join('|');
   
+  console.log(`Escaped query: "${escapedQuery}"`);
+  
+  if (!escapedQuery) return cleanText;
+  
   const regex = new RegExp(`(${escapedQuery})`, 'gi');
-  return cleanText.replace(regex, '<mark>$1</mark>');
+  const result = cleanText.replace(regex, '<mark>$1</mark>');
+  
+  console.log(`Highlighted result: "${result}"`);
+  
+  return result;
 }
 
 /**
