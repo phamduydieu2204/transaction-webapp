@@ -790,6 +790,53 @@
     <p id="welcome">
       <span id="userWelcome"></span>
     </p>
+
+    <!-- Ô tìm kiếm nhanh khoản chi -->
+    <div id="expenseQuickSearchWrapper" style="margin: 15px 0; position: relative; z-index: 100;">
+      <label style="color: #17a2b8; font-weight: 600; display: block; margin-bottom: 8px;">
+        <i class="fas fa-search"></i> Tìm kiếm nhanh khoản chi:
+      </label>
+      <div style="position: relative; max-width: 600px;">
+        <input type="text" 
+               id="expenseQuickSearch" 
+               placeholder="Nhập mô tả khoản chi để tìm kiếm (ví dụ: thuê văn phòng, mua phần mềm...)"
+               style="width: 100%; padding-right: 30px;"
+               autocomplete="off">
+        <i class="fas fa-times-circle" 
+           id="clearExpenseSearch" 
+           style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #6c757d; display: none;"
+           onclick="clearExpenseSearch()"></i>
+        
+        <!-- Dropdown gợi ý với overlay -->
+        <div id="expenseSearchResults" style="
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: white;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          max-height: 400px;
+          overflow-y: auto;
+          z-index: 1000;
+          display: none;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          margin-top: 5px;
+        "></div>
+      </div>
+    </div>
+    
+    <!-- Overlay background -->
+    <div id="searchOverlay" style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 99;
+      display: none;
+    " onclick="clearExpenseSearch()"></div>
     
     <hr>
 
@@ -947,23 +994,6 @@
     <input type="hidden" id="expenseId">
     <input type="hidden" id="expenseRecorder">
 
-    <!-- Quick Search Section -->
-    <div style="grid-column: span 2;">
-      <label>
-        <i class="fas fa-search"></i> Tìm kiếm nhanh khoản chi
-      </label>
-      <div style="position: relative;">
-        <input type="text" 
-               id="expenseQuickSearch" 
-               placeholder="Nhập mô tả khoản chi để tìm kiếm (ví dụ: thuê văn phòng, mua phần mềm...)"
-               autocomplete="off">
-        <i class="fas fa-times-circle" 
-           id="clearExpenseSearch" 
-           style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; display: none;"
-           onclick="clearExpenseSearch()"></i>
-        <div id="expenseSearchResults"></div>
-      </div>
-    </div>
 
     <div>
       <label>Ngày chi</label>

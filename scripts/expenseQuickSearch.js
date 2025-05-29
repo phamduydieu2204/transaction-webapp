@@ -33,6 +33,7 @@ export function initExpenseQuickSearch() {
     if (!query) {
       resultsDiv.style.display = 'none';
       resultsDiv.innerHTML = '';
+      document.getElementById('searchOverlay').style.display = 'none'; // Hide overlay
       return;
     }
     
@@ -44,8 +45,10 @@ export function initExpenseQuickSearch() {
   
   // Handle click outside to close dropdown
   document.addEventListener('click', (e) => {
+    const overlay = document.getElementById('searchOverlay');
     if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
       resultsDiv.style.display = 'none';
+      overlay.style.display = 'none';
     }
   });
   
@@ -100,11 +103,16 @@ async function searchExpenseDescriptions(query) {
  */
 function displaySearchResults(results) {
   const resultsDiv = document.getElementById('expenseSearchResults');
+  const overlay = document.getElementById('searchOverlay');
   
   if (results.length === 0) {
     resultsDiv.innerHTML = '<div class="no-results">Không tìm thấy kết quả phù hợp</div>';
+    overlay.style.display = 'block'; // Show overlay
     return;
   }
+  
+  // Show overlay when results are displayed
+  overlay.style.display = 'block';
   
   resultsDiv.innerHTML = results.map((item, index) => `
     <div class="search-result-item" data-index="${index}" onclick="selectExpenseItem(${index})">
@@ -197,11 +205,13 @@ window.clearExpenseSearch = function() {
   const searchInput = document.getElementById('expenseQuickSearch');
   const clearBtn = document.getElementById('clearExpenseSearch');
   const resultsDiv = document.getElementById('expenseSearchResults');
+  const overlay = document.getElementById('searchOverlay');
   
   searchInput.value = '';
   clearBtn.style.display = 'none';
   resultsDiv.style.display = 'none';
   resultsDiv.innerHTML = '';
+  overlay.style.display = 'none'; // Hide overlay
   currentSearchResults = [];
 }
 
