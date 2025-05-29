@@ -103,17 +103,12 @@ function displaySearchResults(results) {
   
   resultsDiv.innerHTML = results.map((item, index) => `
     <div class="search-result-item" data-index="${index}" onclick="selectExpenseItem(${index})">
-      <div class="result-description">${highlightMatch(item.description, document.getElementById('expenseQuickSearch').value)}</div>
-      <div class="result-details">
-        <span class="detail-item">${item.category}</span>
-        <span class="detail-separator">•</span>
-        <span class="detail-item">${item.subCategory}</span>
-        ${item.product ? `<span class="detail-separator">•</span><span class="detail-item">${item.product}</span>` : ''}
-        ${item.package ? `<span class="detail-separator">•</span><span class="detail-item">${item.package}</span>` : ''}
-      </div>
-      <div class="result-accounting">
-        <span class="accounting-type ${item.accountingType}">${item.accountingType || 'N/A'}</span>
-        ${item.periodicAllocation === 'Có' ? '<span class="allocation-badge">Phân bổ</span>' : ''}
+      <div class="result-single-line">
+        <span class="result-text">${highlightMatch(item.description, document.getElementById('expenseQuickSearch').value)}</span>
+        <span class="result-badges">
+          <span class="accounting-type ${item.accountingType}">${item.accountingType || 'N/A'}</span>
+          ${item.periodicAllocation === 'Có' ? '<span class="allocation-badge">Phân bổ</span>' : ''}
+        </span>
       </div>
     </div>
   `).join('');
@@ -159,6 +154,12 @@ window.selectExpenseItem = function(index) {
       
       setTimeout(() => {
         document.getElementById('expensePackage').value = item.package || '';
+        
+        // Fill account used if available
+        const accountField = document.getElementById('expenseAccount');
+        if (accountField && item.accountUsed) {
+          accountField.value = item.accountUsed;
+        }
       }, 100);
     }, 100);
   }, 100);
@@ -286,33 +287,34 @@ style.textContent = `
     background: #f8f9fa;
   }
   
-  .result-description {
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 6px;
+  .result-single-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
   }
   
-  .result-description mark {
+  .result-text {
+    flex: 1;
+    font-weight: 500;
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: 12px;
+  }
+  
+  .result-text mark {
     background: #fff3cd;
     padding: 0 2px;
     border-radius: 2px;
   }
   
-  .result-details {
-    font-size: 13px;
-    color: #6c757d;
-    margin-bottom: 4px;
-  }
-  
-  .detail-separator {
-    margin: 0 6px;
-    color: #dee2e6;
-  }
-  
-  .result-accounting {
+  .result-badges {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     align-items: center;
+    flex-shrink: 0;
   }
   
   .accounting-type {
