@@ -38,9 +38,16 @@ export function renderBusinessOverviewDashboard(transactionData, expenseData, op
   if (dateRange && dateRange.start && dateRange.end) {
     filteredTransactions = filterDataByDateRange(transactionData, dateRange);
     filteredExpenses = filterDataByDateRange(expenseData, dateRange);
+    
+    console.log("📊 Filtered data:", {
+      originalTransactions: transactionData.length,
+      filteredTransactions: filteredTransactions.length,
+      originalExpenses: expenseData.length,
+      filteredExpenses: filteredExpenses.length
+    });
   }
 
-  // Calculate all business metrics
+  // Calculate all business metrics using filtered data
   const metrics = calculateBusinessMetrics(filteredTransactions, filteredExpenses, dateRange);
   
   // Generate dashboard HTML
@@ -333,15 +340,24 @@ function determineAccountingTypeFromData(expense) {
  * Calculate growth metrics
  */
 function calculateGrowthMetrics(transactionData, expenseData, dateRange) {
-  // Simplified growth calculation - compare with previous period
+  // Calculate current period metrics
   const currentRevenue = calculateTotalRevenue(transactionData);
   const currentExpenses = calculateTotalExpenses(expenseData);
+  const currentProfit = currentRevenue - currentExpenses;
+  const currentTransactionCount = transactionData.length;
   
+  // For now, return placeholder values
+  // In a real implementation, we would need to fetch previous period data
   return {
-    revenueGrowth: 0, // TODO: Calculate vs previous period
-    expenseGrowth: 0, // TODO: Calculate vs previous period
-    profitGrowth: 0,  // TODO: Calculate vs previous period
-    transactionGrowth: 0 // TODO: Calculate vs previous period
+    revenueGrowth: 0,
+    expenseGrowth: 0,
+    profitGrowth: 0,
+    transactionGrowth: 0,
+    // Add current values for reference
+    currentRevenue,
+    currentExpenses,
+    currentProfit,
+    currentTransactionCount
   };
 }
 
@@ -381,7 +397,21 @@ function calculateRevenuePerDay(transactionData, dateRange) {
   const totalRevenue = calculateTotalRevenue(transactionData);
   
   if (!dateRange || !dateRange.start || !dateRange.end) {
-    return totalRevenue; // Return total if no date range
+    // If no date range, calculate based on actual data span
+    if (transactionData.length === 0) return 0;
+    
+    const dates = transactionData
+      .map(t => new Date(t.transactionDate || t.date))
+      .filter(d => !isNaN(d.getTime()))
+      .sort((a, b) => a - b);
+    
+    if (dates.length === 0) return totalRevenue;
+    
+    const firstDate = dates[0];
+    const lastDate = dates[dates.length - 1];
+    const daysDiff = Math.ceil((lastDate - firstDate) / (1000 * 60 * 60 * 24)) + 1;
+    
+    return daysDiff > 0 ? totalRevenue / daysDiff : totalRevenue;
   }
   
   const startDate = new Date(dateRange.start);
@@ -398,7 +428,21 @@ function calculateBurnRate(expenseData, dateRange) {
   const operatingExpenses = calculateOperatingExpenses(expenseData);
   
   if (!dateRange || !dateRange.start || !dateRange.end) {
-    return operatingExpenses;
+    // If no date range, calculate based on actual data span
+    if (expenseData.length === 0) return 0;
+    
+    const dates = expenseData
+      .map(e => new Date(e.date || e.transactionDate))
+      .filter(d => !isNaN(d.getTime()))
+      .sort((a, b) => a - b);
+    
+    if (dates.length === 0) return operatingExpenses;
+    
+    const firstDate = dates[0];
+    const lastDate = dates[dates.length - 1];
+    const daysDiff = Math.ceil((lastDate - firstDate) / (1000 * 60 * 60 * 24)) + 1;
+    
+    return daysDiff > 0 ? operatingExpenses / daysDiff : operatingExpenses;
   }
   
   const startDate = new Date(dateRange.start);
@@ -416,8 +460,20 @@ function calculateRunway(netProfit, totalExpenses, dateRange) {
     return Infinity; // Profitable
   }
   
-  const monthlyBurn = totalExpenses; // Simplified - assume current period is monthly
-  const currentCash = Math.abs(netProfit); // Simplified assumption
+  // Calculate monthly burn rate based on date range
+  let monthlyBurn = totalExpenses;
+  
+  if (dateRange && dateRange.start && dateRange.end) {
+    const startDate = new Date(dateRange.start);
+    const endDate = new Date(dateRange.end);
+    const daysDiff = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+    
+    // Convert to monthly rate (30 days average)
+    monthlyBurn = (totalExpenses / daysDiff) * 30;
+  }
+  
+  // Simplified assumption for current cash
+  const currentCash = Math.abs(netProfit);
   
   return monthlyBurn > 0 ? currentCash / monthlyBurn : 0;
 }
@@ -426,14 +482,27 @@ function calculateRunway(netProfit, totalExpenses, dateRange) {
  * Render dashboard header
  */
 function renderDashboardHeader(dateRange) {
-  const periodLabel = dateRange ? 
-    `${dateRange.start} đến ${dateRange.end}` : 
-    'Tất cả thời gian';
+  let periodLabel = 'Tất cả thời gian';
+  
+  if (dateRange && dateRange.start && dateRange.end) {
+    // Format dates for display
+    const startDate = new Date(dateRange.start);
+    const endDate = new Date(dateRange.end);
+    
+    const formatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    const startStr = startDate.toLocaleDateString('vi-VN', formatOptions);
+    const endStr = endDate.toLocaleDateString('vi-VN', formatOptions);
+    
+    periodLabel = `${startStr} - ${endStr}`;
+  }
     
   return `
     <div class="dashboard-header">
       <div class="header-content">
         <h1>Tổng Quan Kinh Doanh</h1>
+        <div class="period-info">
+          <span class="period-label">Kỳ báo cáo: ${periodLabel}</span>
+        </div>
         <div class="last-updated">Cập nhật: ${new Date().toLocaleString('vi-VN')}</div>
       </div>
     </div>
@@ -918,7 +987,10 @@ function filterDataByDateRange(data, dateRange) {
   endDate.setHours(23, 59, 59, 999);
   
   return data.filter(item => {
-    const itemDate = new Date(item.transactionDate || item.date);
+    const dateField = item.transactionDate || item.date || item.timestamp;
+    if (!dateField) return false;
+    
+    const itemDate = new Date(dateField);
     return itemDate >= startDate && itemDate <= endDate;
   });
 }

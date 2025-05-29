@@ -1,26 +1,13 @@
 import { getConstants } from './constants.js';
 import { renderExpenseStats } from './renderExpenseStats.js';
-import { determineAccountingType } from './accountingTypeManager.js';
 
 export async function handleAddExpense() {
   const getValue = (id) => document.getElementById(id)?.value?.trim() || "";
 
-  // Prepare expense data
-  const expenseData = {
-    expenseCategory: getValue("expenseCategory"),
-    expenseSubCategory: getValue("expenseSubCategory"),
-    expenseProduct: getValue("expenseProduct"),
-    expensePackage: getValue("expensePackage")
-  };
-  
-  // Determine accounting type
-  const accountingType = await determineAccountingType(expenseData);
-  console.log("📊 Determined accounting type:", accountingType);
-
   const data = {
     action: "addExpense",
     expenseDate: getValue("expenseDate"),
-    accountingType: accountingType, // New field
+    // Loại kế toán sẽ được tự động xác định ở backend dựa vào danh mục
     expenseCategory: getValue("expenseCategory"),
     expenseSubCategory: getValue("expenseSubCategory"),
     expenseProduct: getValue("expenseProduct"),
