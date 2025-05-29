@@ -206,12 +206,12 @@ function renderExpenseTable(data, formatDate) {
     const row = table1.insertRow();
 
     // ✅ Thêm style cho dòng đã hết hạn tái tục
-    if (e.renew) {
+    if (e.renewDate) {
       const parseDate = (str) => {
         const [y, m, d] = (str || "").split("/").map(Number);
         return new Date(y, m - 1, d);
       };
-      const renewDate = parseDate(e.renew);
+      const renewDate = parseDate(e.renewDate);
       if (renewDate < today) {
         row.classList.add("expired-row");
       }
@@ -225,6 +225,15 @@ function renderExpenseTable(data, formatDate) {
     // ✅ HIỂN THỊ CÁC CELL
     row.insertCell().textContent = e.expenseId || "";
     row.insertCell().textContent = formatDate(e.date);
+    row.insertCell().textContent = e.accountingType || "";
+    
+    // ✅ Hiển thị cột phân bổ định kỳ với icon
+    const allocationCell = row.insertCell();
+    if (e.periodicAllocation === "Có") {
+      allocationCell.innerHTML = '<span style="color: #28a745;">✓ Có</span>';
+    } else {
+      allocationCell.innerHTML = '<span style="color: #6c757d;">✗ Không</span>';
+    }
     
     // ✅ Gộp 4 cột thành 1 cột "Thông tin khoản chi"
     const expenseInfoParts = [
@@ -238,7 +247,7 @@ function renderExpenseTable(data, formatDate) {
     expenseInfoCell.textContent = expenseInfoParts.join(" - ");
     
     row.insertCell().textContent = `${(e.amount || 0).toLocaleString()} ${e.currency || ""}`;
-    row.insertCell().textContent = formatDate(e.renew);
+    row.insertCell().textContent = formatDate(e.renewDate);
     row.insertCell().textContent = e.note || ""; // Hiển thị ghi chú thay vì trạng thái
 
     // ✅ Action dropdown
