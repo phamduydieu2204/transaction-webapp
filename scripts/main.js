@@ -125,6 +125,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       }
 
+      // ✅ Ẩn/hiện phần tìm kiếm nhanh chi phí dựa trên tab
+      const expenseQuickSearchWrapper = document.getElementById("expenseQuickSearchWrapper");
+      if (expenseQuickSearchWrapper) {
+        if (selectedTab === "tab-chi-phi") {
+          expenseQuickSearchWrapper.style.display = "flex";
+        } else {
+          expenseQuickSearchWrapper.style.display = "none";
+        }
+      }
+
       // ✅ Xử lý logic riêng cho từng tab
       if (selectedTab === "tab-giao-dich") {
         // Chỉ refresh nếu dữ liệu đã được load
@@ -240,8 +250,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Initialize expense quick search
   initExpenseQuickSearch();
   
-  // Load giao dịch (chỉ khi đang ở tab giao dịch)
+  // ✅ Ẩn phần tìm kiếm nhanh chi phí nếu không phải tab chi phí
+  const expenseQuickSearchWrapper = document.getElementById("expenseQuickSearchWrapper");
   const currentActiveTab = document.querySelector(".tab-button.active");
+  if (expenseQuickSearchWrapper && currentActiveTab) {
+    if (currentActiveTab.dataset.tab === "tab-chi-phi") {
+      expenseQuickSearchWrapper.style.display = "flex";
+    } else {
+      expenseQuickSearchWrapper.style.display = "none";
+    }
+  }
+  
+  // Load giao dịch (chỉ khi đang ở tab giao dịch)
   if (currentActiveTab && currentActiveTab.dataset.tab === "tab-giao-dich") {
     window.loadTransactions()
       .catch(err => console.error("Lỗi khi load giao dịch:", err));
