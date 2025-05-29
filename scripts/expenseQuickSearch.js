@@ -103,13 +103,7 @@ function displaySearchResults(results) {
   
   resultsDiv.innerHTML = results.map((item, index) => `
     <div class="search-result-item" data-index="${index}" onclick="selectExpenseItem(${index})">
-      <div class="result-single-line">
-        <span class="result-text">${highlightMatch(item.description, document.getElementById('expenseQuickSearch').value)}</span>
-        <span class="result-badges">
-          <span class="accounting-type ${item.accountingType}">${item.accountingType || 'N/A'}</span>
-          ${item.periodicAllocation === 'Có' ? '<span class="allocation-badge">Phân bổ</span>' : ''}
-        </span>
-      </div>
+      <div class="result-text">${highlightMatch(item.description, document.getElementById('expenseQuickSearch').value)}</div>
     </div>
   `).join('');
   
@@ -293,22 +287,13 @@ style.textContent = `
     background: #f8f9fa;
   }
   
-  .result-single-line {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-  }
-  
   .result-text {
-    flex: 1;
     font-weight: 500;
     color: #333;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    margin-right: 12px;
-    max-width: calc(100% - 120px);
+    width: 100%;
   }
   
   .result-text mark {
@@ -317,40 +302,6 @@ style.textContent = `
     border-radius: 2px;
   }
   
-  .result-badges {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-    flex-shrink: 0;
-  }
-  
-  .accounting-type {
-    font-size: 11px;
-    padding: 2px 8px;
-    border-radius: 3px;
-    background: #e9ecef;
-    color: #495057;
-    font-weight: 500;
-  }
-  
-  .accounting-type.COGS {
-    background: #d4edda;
-    color: #155724;
-  }
-  
-  .accounting-type.OPEX {
-    background: #d1ecf1;
-    color: #0c5460;
-  }
-  
-  .allocation-badge {
-    font-size: 11px;
-    padding: 2px 8px;
-    border-radius: 3px;
-    background: #f8d7da;
-    color: #721c24;
-    font-weight: 500;
-  }
   
   @keyframes slideIn {
     from {
