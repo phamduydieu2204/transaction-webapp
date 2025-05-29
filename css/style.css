@@ -119,9 +119,9 @@ body.login-page {
   
   .form-grid {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 12px 16px;
-    margin-bottom: 16px;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 8px 12px;
+    margin-bottom: 12px;
   }
   
   .form-grid div {
@@ -144,14 +144,14 @@ body.login-page {
   .form-grid select,
   .form-grid textarea {
     width: 100%;
-    padding: 8px;
-    margin-top: 4px;
+    padding: 6px 8px;
+    margin-top: 2px;
     margin-bottom: 0;
-    border-radius: 6px;
+    border-radius: 4px;
     border: 1px solid #ddd;
     box-sizing: border-box;
-    font-size: 14px;
-    height: 36px;
+    font-size: 13px;
+    height: 30px;
     transition: all 0.3s ease;
   }
   
@@ -166,22 +166,24 @@ body.login-page {
   .form-grid label {
     font-weight: 500;
     color: #37474f;
-    font-size: 13px;
-    margin-bottom: 4px;
+    font-size: 12px;
+    margin-bottom: 2px;
+    line-height: 1.2;
   }
   
   /* Điều chỉnh chiều cao của textarea */
   .form-grid textarea {
     resize: none;
-    height: 36px;
+    height: 30px;
+    line-height: 1.3;
   }
 
   /* Form sections styling */
   .form-section {
     background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 12px;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
     border: 1px solid #e0e0e0;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   }
@@ -189,53 +191,53 @@ body.login-page {
   .section-title {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     font-weight: 600;
-    font-size: 16px;
+    font-size: 14px;
     color: #1565c0;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
     border-bottom: 2px solid #e3f2fd;
   }
 
   .section-title i {
     color: #2196f3;
-    font-size: 18px;
+    font-size: 16px;
   }
   
   .full-row {
-    grid-column: span 6;
+    grid-column: span 12;
     display: flex;
     gap: 12px;
     justify-content: flex-start;
     align-items: center;
-    margin-top: 10px;
+    margin-top: 8px;
   }
   
   /* CSS cho các nút trong button-row */
   .button-row {
-    grid-column: span 6;
+    grid-column: span 12;
     display: flex;
     flex-direction: row;
     justify-content: center;
-    gap: 12px;
-    margin-top: 16px;
+    gap: 10px;
+    margin-top: 12px;
     flex-wrap: nowrap;
   }
   
   .button-row button {
-    padding: 10px 20px;
-    font-size: 14px;
+    padding: 8px 16px;
+    font-size: 13px;
     font-weight: 500;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     background: linear-gradient(135deg, #2196f3 0%, #21cbf3 100%);
     color: white;
     cursor: pointer;
     transition: all 0.3s ease;
     box-sizing: border-box;
     box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
-    min-width: 100px;
+    min-width: 80px;
   }
   
   .button-row button:hover {
@@ -728,13 +730,36 @@ body.login-page {
 .tab-content {
   display: none;
   flex: 1;
-  overflow-y: auto;
-  padding: 20px;
+  overflow: hidden;
+  padding: 0;
 }
 
 .tab-content.active {
   display: flex;
   flex-direction: column;
+}
+
+/* Layout for transaction tab - form and table side by side */
+#tab-giao-dich.active {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+}
+
+.form-container {
+  width: 400px;
+  flex-shrink: 0;
+  padding: 16px;
+  overflow-y: auto;
+  border-right: 2px solid #e3f2fd;
+  background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+}
+
+.table-container {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  background: white;
 }
 #expenseListTable {
   width: 100%;

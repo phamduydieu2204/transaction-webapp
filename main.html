@@ -388,6 +388,21 @@
     min-width: auto;
   }
   
+  /* Mobile layout for transaction tab */
+  #tab-giao-dich.active {
+    flex-direction: column !important;
+  }
+  
+  .form-container {
+    width: 100% !important;
+    border-right: none !important;
+    border-bottom: 2px solid #e3f2fd;
+  }
+  
+  .table-container {
+    flex: 1 !important;
+  }
+  
   .tab-button[style*="display: none"] {
   display: none !important;
   }
@@ -913,7 +928,9 @@
     <hr>
 
     <div id="tab-giao-dich" class="tab-content active">
-        <form id="transactionForm" class="fixed-header" onreset="handleReset()">
+      <!-- Form Container -->
+      <div class="form-container">
+        <form id="transactionForm" onreset="handleReset()">
           <!-- Section 1: Thông tin khách hàng -->
           <div class="form-section">
             <div class="section-title">
@@ -921,12 +938,12 @@
               Thông tin khách hàng
             </div>
             <div class="form-grid">
-              <div style="grid-column: span 2;">
-                <label>Email:</label>
+              <div style="grid-column: span 4;">
+                <label>Email khách hàng:</label>
                 <input type="email" id="customerEmail">
               </div>
 
-              <div style="grid-column: span 2;">
+              <div style="grid-column: span 4;">
                 <label>Tên khách hàng:</label>
                 <div class="search-icon-container">
                   <input type="text" id="customerName">
@@ -934,13 +951,13 @@
                 </div>
               </div>
 
-              <div>
-                <label>Liên hệ:</label>
+              <div style="grid-column: span 2;">
+                <label>SĐT liên hệ:</label>
                 <input type="text" id="customerPhone">
               </div>
 
-              <div>
-                <label>Người nhận / Nhà cung cấp:</label>
+              <div style="grid-column: span 2;">
+                <label>Nhà cung cấp:</label>
                 <input type="text" id="transactionSupplier">
               </div>
             </div>
@@ -953,7 +970,7 @@
               Chi tiết giao dịch
             </div>
             <div class="form-grid">
-              <div>
+              <div style="grid-column: span 2;">
                 <label>Ngày giao dịch:</label>
                 <div class="date-input-container">
                   <input type="text" id="transactionDate" placeholder="yyyy/mm/dd">
@@ -961,7 +978,7 @@
                 </div>
               </div>
 
-              <div>
+              <div style="grid-column: span 2;">
                 <label>Loại giao dịch:</label>
                 <select id="transactionType" required>
                   <option value="">-- Chọn loại --</option>
@@ -972,12 +989,12 @@
                 </select>
               </div>
 
-              <div>
+              <div style="grid-column: span 1;">
                 <label>Số tháng:</label>
                 <input type="number" id="duration">
               </div>
 
-              <div>
+              <div style="grid-column: span 2;">
                 <label>Ngày bắt đầu:</label>
                 <div class="date-input-container">
                   <input type="text" id="startDate" placeholder="yyyy/mm/dd">
@@ -985,7 +1002,7 @@
                 </div>
               </div>
 
-              <div>
+              <div style="grid-column: span 2;">
                 <label>Ngày kết thúc:</label>
                 <div class="date-input-container">
                   <input type="text" id="endDate" placeholder="yyyy/mm/dd">
@@ -993,8 +1010,8 @@
                 </div>
               </div>
 
-              <div>
-                <label>Số thiết bị:</label>
+              <div style="grid-column: span 1;">
+                <label>Số TB:</label>
                 <input type="number" id="deviceCount">
               </div>
 
@@ -1012,28 +1029,28 @@
               Thông tin phần mềm & bổ sung
             </div>
             <div class="form-grid">
-              <div>
+              <div style="grid-column: span 3;">
                 <label>Tên phần mềm:</label>
                 <select id="softwareName">
                   <option value="">-- Chọn phần mềm --</option>
                 </select>
               </div>
 
-              <div>
+              <div style="grid-column: span 3;">
                 <label>Gói phần mềm:</label>
                 <select id="softwarePackage">
                   <option value="">-- Chọn gói --</option>
                 </select>
               </div>
 
-              <div>
+              <div style="grid-column: span 2;">
                 <label>Tên tài khoản:</label>
                 <select id="accountName">
                   <option value="">-- Chọn tài khoản --</option>
                 </select>
               </div>
 
-              <div>
+              <div style="grid-column: span 2;">
                 <label>Trạng thái:</label>
                 <select id="transactionStatus">
                   <option value="Đang hoạt động">Đang hoạt động</option>
@@ -1044,7 +1061,7 @@
 
               <div style="grid-column: span 2;">
                 <label>Ghi chú:</label>
-                <textarea id="note" rows="2"></textarea>
+                <textarea id="note" rows="1"></textarea>
               </div>
             </div>
           </div>
@@ -1057,6 +1074,36 @@
             <button type="reset">Làm mới</button>
           </div>
         </form>
+      </div>
+      
+      <!-- Table Container -->
+      <div class="table-container">
+        <div id="transactionSection">
+          <h3 style="margin-top: 0; color: #1565c0; font-size: 18px;">Danh sách giao dịch</h3>
+          <div class="pagination" id="pagination"></div>
+          <table id="transactionTable">
+            <thead>
+              <tr>
+                <th>Mã giao dịch</th>
+                <th>Ngày giao dịch</th>
+                <th>Loại giao dịch</th>
+                <th>Tên khách hàng</th>
+                <th>Email</th>
+                <th>Số tháng</th>
+                <th>Ngày bắt đầu</th>
+                <th>Ngày kết thúc</th>
+                <th>Số thiết bị</th>
+                <th>Thông tin phần mềm</th>
+                <th>Doanh thu</th>
+                <th>Thông tin khác</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
 <div id="tab-chi-phi" class="tab-content">
@@ -1426,33 +1473,6 @@
     <!-- Khu vực thông báo -->
     <div id="notification"></div>
 
-<div id="transactionSection">
-    <h2 class="fixed-header">Danh sách giao dịch</h2>
-    <div class="pagination fixed-header" id="pagination">
-    </div>
-
-    <table id="transactionTable">
-      <thead>
-        <tr>
-          <th>Mã giao dịch</th>
-          <th>Ngày giao dịch</th>
-          <th>Loại giao dịch</th>
-          <th>Tên khách hàng</th>
-          <th>Email</th>
-          <th>Số tháng</th>
-          <th>Ngày bắt đầu</th>
-          <th>Ngày kết thúc</th>
-          <th>Số thiết bị</th>
-          <th>Thông tin phần mềm</th>
-          <th>Doanh thu</th>
-          <th>Thông tin khác</th>
-          <th>Hành động</th>
-        </tr>
-      </thead>
-      <tbody>
-      </tbody>
-    </table>
-</div>
 
     <!-- Modal để hiển thị chi tiết giao dịch -->
     <div id="transactionDetailModal" class="modal">
