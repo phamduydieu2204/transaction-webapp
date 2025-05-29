@@ -1,32 +1,6 @@
 import { getConstants } from './constants.js';
 
 export async function initExpenseDropdowns() {
-  // Initialize bank dropdown first
-  const bankSelect = document.getElementById('expenseBank');
-  if (bankSelect) {
-    const banks = [
-      'Vietcombank',
-      'Techcombank', 
-      'BIDV',
-      'Agribank',
-      'MB Bank',
-      'VPBank',
-      'ACB',
-      'SHB',
-      'TPBank',
-      'MoMo',
-      'ZaloPay',
-      'VNPay'
-    ];
-    
-    banks.forEach(bank => {
-      const option = document.createElement('option');
-      option.value = bank;
-      option.textContent = bank;
-      bankSelect.appendChild(option);
-    });
-  }
-
   const { BACKEND_URL } = getConstants();
   try {
     const res = await fetch(BACKEND_URL, {

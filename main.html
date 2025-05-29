@@ -761,368 +761,6 @@
       border-radius: 0 0 4px 4px;
     }
 
-    /* ===== EXPENSE FORM REDESIGN - COMPACT VERSION ===== */
-    #tab-chi-phi {
-      background: #f8f9fa;
-      padding: 0;
-      border-radius: 8px;
-    }
-
-    #expenseForm {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      margin-bottom: 20px;
-    }
-
-    /* Form sections - Compact */
-    .form-section {
-      margin-bottom: 15px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #e9ecef;
-    }
-
-    .form-section:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
-    }
-
-    .section-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #2d3748;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .section-title i {
-      color: #4299e1;
-      font-size: 14px;
-    }
-
-    /* Compact form grid */
-    #expenseForm .form-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 12px;
-    }
-
-    /* Compact label styling */
-    #expenseForm label {
-      display: block;
-      font-size: 11px;
-      font-weight: 600;
-      color: #4a5568;
-      margin-bottom: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-    }
-
-    /* Compact input styling */
-    #expenseForm input[type="text"],
-    #expenseForm input[type="number"],
-    #expenseForm select,
-    #expenseForm textarea {
-      width: 100%;
-      padding: 8px 12px;
-      border: 1px solid #e2e8f0;
-      border-radius: 6px;
-      font-size: 14px;
-      transition: all 0.2s;
-      background: #f7fafc;
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-    
-    #expenseForm textarea {
-      resize: vertical;
-      min-height: 50px;
-    }
-
-    #expenseForm input:focus,
-    #expenseForm select:focus,
-    #expenseForm textarea:focus {
-      outline: none;
-      border-color: #4299e1;
-      background: white;
-      box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.1);
-    }
-
-    /* Compact quick search */
-    .expense-quick-search-container {
-      grid-column: span 2;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      padding: 12px 16px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-    }
-
-    .expense-quick-search-container label {
-      color: white !important;
-      font-size: 12px !important;
-      margin-bottom: 8px !important;
-    }
-
-    #expenseQuickSearch {
-      background: white !important;
-      border: none !important;
-      padding: 10px 35px 10px 12px !important;
-      font-size: 14px !important;
-    }
-
-    #clearExpenseSearch {
-      color: #a0aec0 !important;
-    }
-
-    #clearExpenseSearch:hover {
-      color: #e53e3e !important;
-    }
-
-    #expenseSearchResults {
-      border-radius: 6px !important;
-      margin-top: 6px !important;
-      border: 1px solid #e2e8f0 !important;
-      max-height: 200px !important;
-    }
-
-    /* Compact date input */
-    #expenseForm .date-input-container {
-      position: relative;
-    }
-
-    #expenseForm .calendar-icon {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #4299e1;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    #expenseForm .calendar-icon:hover {
-      color: #3182ce;
-    }
-
-    /* Compact button styling */
-    #expenseForm .button-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid #e9ecef;
-      flex-wrap: wrap;
-    }
-
-    #expenseForm button {
-      flex: 1;
-      min-width: 120px;
-      padding: 8px 16px;
-      border: none;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    #expenseForm button[onclick="handleAddExpense()"] {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-    }
-
-    #expenseForm button[onclick="handleAddExpense()"]:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-    }
-
-    #expenseForm button[onclick="handleUpdateExpense()"] {
-      background: #48bb78;
-      color: white;
-    }
-
-    #expenseForm button[onclick="handleUpdateExpense()"]:hover {
-      background: #38a169;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
-    }
-
-    #expenseForm button[onclick="handleSearchExpense()"] {
-      background: #4299e1;
-      color: white;
-    }
-
-    #expenseForm button[onclick="handleSearchExpense()"]:hover {
-      background: #3182ce;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
-    }
-
-    #expenseForm button[type="reset"] {
-      background: #e2e8f0;
-      color: #4a5568;
-    }
-
-    #expenseForm button[type="reset"]:hover {
-      background: #cbd5e0;
-    }
-
-    /* Compact amount input */
-    #expenseAmount {
-      font-size: 16px !important;
-      font-weight: 600;
-      color: #2d3748;
-      background: #f0fff4 !important;
-      border-color: #9ae6b4 !important;
-    }
-
-    /* Status select coloring */
-    #expenseStatus {
-      font-weight: 600;
-    }
-
-    #expenseStatus option[value="Đã thanh toán"] {
-      color: #48bb78;
-    }
-
-    #expenseStatus option[value="Chưa thanh toán"] {
-      color: #f56565;
-    }
-
-    #expenseStatus option[value="Đã hủy"] {
-      color: #a0aec0;
-    }
-
-    /* Compact expense list table */
-    #expenseListTable {
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      margin-top: 8px;
-      font-size: 13px;
-    }
-
-    #expenseListTable thead {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-
-    #expenseListTable thead th {
-      color: white;
-      font-weight: 600;
-      text-transform: uppercase;
-      font-size: 11px;
-      letter-spacing: 0.3px;
-      padding: 10px 8px;
-      border: none;
-    }
-
-    #expenseListTable tbody tr {
-      transition: all 0.1s;
-    }
-
-    #expenseListTable tbody tr:hover {
-      background: #f7fafc;
-    }
-
-    #expenseListTable tbody td {
-      padding: 8px;
-      border-bottom: 1px solid #e2e8f0;
-    }
-    
-    /* Compact table headings */
-    #tab-chi-phi h3 {
-      font-size: 16px;
-      margin-top: 15px;
-      margin-bottom: 10px;
-      color: #2d3748;
-    }
-
-    /* Responsive improvements */
-    @media (max-width: 768px) {
-      #expenseForm {
-        padding: 20px;
-      }
-
-      #expenseForm .form-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .expense-quick-search-container {
-        grid-column: span 1;
-      }
-
-      #expenseForm .button-row {
-        flex-direction: column;
-      }
-
-      #expenseForm button {
-        width: 100%;
-      }
-    }
-
-    /* Add icons to buttons - smaller size */
-    #expenseForm button[onclick="handleAddExpense()"]::before {
-      content: "\f067";
-      font-family: "Font Awesome 5 Free";
-      font-weight: 900;
-      font-size: 11px;
-    }
-
-    #expenseForm button[onclick="handleUpdateExpense()"]::before {
-      content: "\f021";
-      font-family: "Font Awesome 5 Free";
-      font-weight: 900;
-      font-size: 11px;
-    }
-
-    #expenseForm button[onclick="handleSearchExpense()"]::before {
-      content: "\f002";
-      font-family: "Font Awesome 5 Free";
-      font-weight: 900;
-      font-size: 11px;
-    }
-
-    #expenseForm button[type="reset"]::before {
-      content: "\f2f1";
-      font-family: "Font Awesome 5 Free";
-      font-weight: 900;
-      font-size: 11px;
-    }
-    
-    /* Optimize grid for 3-4 columns on desktop */
-    @media (min-width: 1200px) {
-      #expenseForm .form-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-      
-      .expense-quick-search-container {
-        grid-column: span 4;
-      }
-      
-      #expenseForm textarea {
-        grid-column: span 2;
-      }
-    }
-    
-    /* Medium screens - 3 columns */
-    @media (min-width: 992px) and (max-width: 1199px) {
-      #expenseForm .form-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-      
-      .expense-quick-search-container {
-        grid-column: span 3;
-      }
-    }
   </style>
 </head>
 <body>
@@ -1303,14 +941,14 @@
     </div>
 
 <div id="tab-chi-phi" class="tab-content">
-  <form id="expenseForm">
+  <form id="expenseForm" class="form-grid">
     
     <!-- Hidden fields -->
     <input type="hidden" id="expenseId">
     <input type="hidden" id="expenseRecorder">
 
     <!-- Quick Search Section -->
-    <div class="expense-quick-search-container">
+    <div style="grid-column: span 2;">
       <label>
         <i class="fas fa-search"></i> Tìm kiếm nhanh khoản chi
       </label>
@@ -1327,136 +965,109 @@
       </div>
     </div>
 
-    <!-- Section 1: Thông tin khoản chi -->
-    <div class="form-section">
-      <div class="section-title">
-        <i class="fas fa-file-invoice-dollar"></i>
-        Thông tin khoản chi
-      </div>
-      <div class="form-grid">
-        <div>
-          <label>Ngày chi</label>
-          <div class="date-input-container">
-            <input type="text" id="expenseDate" placeholder="yyyy/mm/dd">
-            <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseDate')"></i>
-          </div>
-        </div>
-
-        <div>
-          <label>Loại khoản chi</label>
-          <select id="expenseCategory" onchange="handleCategoryChange()">
-            <option value="">-- Chọn loại --</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Danh mục chung</label>
-          <select id="expenseSubCategory" onchange="handleSubCategoryChange()">
-            <option value="">-- Chọn danh mục --</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Tên sản phẩm/Dịch vụ</label>
-          <select id="expenseProduct" onchange="handleProductChange()">
-            <option value="">-- Chọn sản phẩm --</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Phiên bản/Gói dịch vụ</label>
-          <select id="expensePackage">
-            <option value="">-- Chọn gói --</option>
-          </select>
-        </div>
+    <div>
+      <label>Ngày chi</label>
+      <div class="date-input-container">
+        <input type="text" id="expenseDate" placeholder="yyyy/mm/dd">
+        <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseDate')"></i>
       </div>
     </div>
 
-    <!-- Section 2: Chi tiết thanh toán -->
-    <div class="form-section">
-      <div class="section-title">
-        <i class="fas fa-money-check-alt"></i>
-        Chi tiết thanh toán
-      </div>
-      <div class="form-grid">
-        <div>
-          <label>Số tiền</label>
-          <input type="number" id="expenseAmount">
-        </div>
+    <div>
+      <label>Loại khoản chi</label>
+      <select id="expenseCategory" onchange="handleCategoryChange()">
+        <option value="">-- Chọn loại --</option>
+      </select>
+    </div>
 
-        <div>
-          <label>Đơn vị tiền tệ</label>
-          <select id="expenseCurrency">
-            <option value="VND">VND</option>
-            <option value="USD">USD</option>
-            <option value="NGN">NGN</option>
-          </select>
-        </div>
+    <div>
+      <label>Danh mục chung</label>
+      <select id="expenseSubCategory" onchange="handleSubCategoryChange()">
+        <option value="">-- Chọn danh mục --</option>
+      </select>
+    </div>
 
-        <div>
-          <label>Ngân hàng/Ví</label>
-          <select id="expenseBank" onchange="handleBankChange()">
-            <option value="">-- Chọn ngân hàng/ví --</option>
-          </select>
-        </div>
+    <div>
+      <label>Tên sản phẩm/Dịch vụ</label>
+      <select id="expenseProduct" onchange="handleProductChange()">
+        <option value="">-- Chọn sản phẩm --</option>
+      </select>
+    </div>
 
-        <div>
-          <label>Thông tin thẻ/Tài khoản</label>
-          <select id="expenseCard">
-            <option value="">-- Chọn tài khoản --</option>
-          </select>
-        </div>
+    <div>
+      <label>Phiên bản/Gói dịch vụ</label>
+      <select id="expensePackage">
+        <option value="">-- Chọn gói --</option>
+      </select>
+    </div>
 
-        <div>
-          <label>Phương thức chi</label>
-          <select id="expenseRecurring" onchange="handleRecurringChange()">
-            <option value="Chi một lần">Chi một lần</option>
-            <option value="Hàng tháng">Định kỳ hàng tháng</option>
-            <option value="Hàng quý">Định kỳ hàng quý</option>
-            <option value="Hàng năm">Định kỳ hàng năm</option>
-          </select>
-        </div>
+    <div>
+      <label>Số tiền</label>
+      <input type="number" id="expenseAmount">
+    </div>
 
-        <div>
-          <label>Ngày tái tục</label>
-          <div class="date-input-container">
-            <input type="text" id="expenseRenewDate" placeholder="yyyy/mm/dd">
-            <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseRenewDate')"></i>
-          </div>
-        </div>
+    <div>
+      <label>Đơn vị tiền tệ</label>
+      <select id="expenseCurrency">
+        <option value="VND">VND</option>
+        <option value="USD">USD</option>
+        <option value="NGN">NGN</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Ngân hàng/Ví</label>
+      <select id="expenseBank" onchange="handleBankChange()">
+        <option value="">-- Chọn ngân hàng/ví --</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Thông tin thẻ/Tài khoản</label>
+      <select id="expenseCard">
+        <option value="">-- Chọn tài khoản --</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Phương thức chi</label>
+      <select id="expenseRecurring" onchange="handleRecurringChange()">
+        <option value="Chi một lần">Chi một lần</option>
+        <option value="Hàng tháng">Định kỳ hàng tháng</option>
+        <option value="Hàng quý">Định kỳ hàng quý</option>
+        <option value="Hàng năm">Định kỳ hàng năm</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Ngày tái tục</label>
+      <div class="date-input-container">
+        <input type="text" id="expenseRenewDate" placeholder="yyyy/mm/dd">
+        <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseRenewDate')"></i>
       </div>
     </div>
 
-    <!-- Section 3: Thông tin bổ sung -->
-    <div class="form-section">
-      <div class="section-title">
-        <i class="fas fa-info-circle"></i>
-        Thông tin bổ sung
-      </div>
-      <div class="form-grid">
-        <div>
-          <label>Người nhận / Nhà cung cấp</label>
-          <input type="text" id="expenseSupplier">
-        </div>
+    <div>
+      <label>Người nhận / Nhà cung cấp</label>
+      <input type="text" id="expenseSupplier">
+    </div>
 
-        <div>
-          <label>Trạng thái</label>
-          <select id="expenseStatus">
-            <option>Đã thanh toán</option>
-            <option>Chưa thanh toán</option>
-            <option>Đã hủy</option>
-          </select>
-        </div>
+    <div>
+      <label>Trạng thái</label>
+      <select id="expenseStatus">
+        <option>Đã thanh toán</option>
+        <option>Chưa thanh toán</option>
+        <option>Đã hủy</option>
+      </select>
+    </div>
 
-        <div>
-          <label>Ghi chú</label>
-          <textarea id="expenseNote" rows="2"></textarea>
-        </div>
-      </div>
+    <div>
+      <label>Ghi chú</label>
+      <textarea id="expenseNote" rows="2"></textarea>
     </div>
 
     <!-- Buttons -->
-    <div class="button-row">
+    <div class="button-row" style="grid-column: span 2;">
       <button type="button" onclick="handleAddExpense()">Thêm chi phí</button>
       <button type="button" onclick="handleUpdateExpense()">Cập nhật chi phí</button>
       <button type="button" onclick="handleSearchExpense()">Tìm kiếm chi phí</button>
