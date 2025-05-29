@@ -134,26 +134,20 @@ function highlightMatch(text, query) {
     .replace(/\s+/g, ' ')
     .trim();
   
-  console.log(`Original text: "${text}"`);
-  console.log(`Clean text: "${cleanText}"`);
-  console.log(`Query: "${query}"`);
+  // Option 1: No highlighting at all
+  // return cleanText;
   
+  // Option 2: Simple highlighting (current)
   // Escape special regex characters in query
   const queryTerms = query.split(/\s+/).filter(term => term.length > 0);
   const escapedQuery = queryTerms
     .map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
     .join('|');
   
-  console.log(`Escaped query: "${escapedQuery}"`);
-  
   if (!escapedQuery) return cleanText;
   
   const regex = new RegExp(`(${escapedQuery})`, 'gi');
-  const result = cleanText.replace(regex, '<mark>$1</mark>');
-  
-  console.log(`Highlighted result: "${result}"`);
-  
-  return result;
+  return cleanText.replace(regex, '<mark>$1</mark>');
 }
 
 /**
