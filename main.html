@@ -246,9 +246,13 @@
   position: relative;
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  margin: 0;
   width: 100%;
-  min-height: 60px;
+  min-height: 80px;
+  background: white;
+  padding: 0 20px;
+  border-bottom: 1px solid #dee2e6;
+  flex-shrink: 0;
 }
 
 .header-container h1 {
@@ -259,12 +263,14 @@
   font-size: 28px;
   z-index: 1;
   white-space: nowrap;
+  color: #2c3e50;
 }
 
 .totals-container {
   position: absolute;
-  right: 0;
-  top: 0;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -296,6 +302,17 @@
     flex-direction: column;
     text-align: center;
     min-height: auto;
+    padding: 15px;
+  }
+  
+  #welcome {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 12px;
   }
   
   .header-container h1 {
@@ -309,6 +326,8 @@
   .totals-container {
     position: relative;
     right: auto;
+    top: auto;
+    transform: none;
     align-items: center;
     min-width: auto;
   }
@@ -316,6 +335,27 @@
   .total-item {
     font-size: 13px;
   }
+  
+  .tab-menu {
+    padding: 0 10px;
+  }
+  
+  .tab-button {
+    padding: 12px 15px;
+    font-size: 14px;
+  }
+  
+  .tab-content {
+    padding: 15px;
+  }
+  
+  .logout-btn {
+    top: 10px;
+    right: 10px;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
   .tab-button[style*="display: none"] {
   display: none !important;
   }
@@ -777,6 +817,11 @@
 
     <!-- ✅ Header với layout mới -->
     <div class="header-container">
+      <!-- Welcome message ở góc trái -->
+      <p id="welcome">
+        <span id="userWelcome"></span>
+      </p>
+      
       <h1>Hệ thống quản lý</h1>
       
       <!-- ✅ Tổng doanh thu và chi phí ở góc phải, cùng hàng với h1 -->
@@ -785,11 +830,6 @@
         <div id="todayExpenseTotal" class="total-item expense"></div>
       </div>
     </div>
-
-    <!-- ✅ Dòng chào mừng ở dưới -->
-    <p id="welcome">
-      <span id="userWelcome"></span>
-    </p>
 
     <!-- Ô tìm kiếm nhanh khoản chi -->
     <div id="expenseQuickSearchWrapper" style="margin: 15px 0; position: relative; z-index: 100; display: flex; flex-direction: column; align-items: center;">
