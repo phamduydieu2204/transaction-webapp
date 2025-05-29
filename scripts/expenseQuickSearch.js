@@ -135,9 +135,10 @@ function highlightMatch(text, query) {
     .trim();
   
   // Option 1: No highlighting at all
-  // return cleanText;
+  return cleanText;
   
-  // Option 2: Simple highlighting (current)
+  // Option 2: Simple highlighting (disabled for now)
+  /*
   // Escape special regex characters in query
   const queryTerms = query.split(/\s+/).filter(term => term.length > 0);
   const escapedQuery = queryTerms
@@ -148,6 +149,7 @@ function highlightMatch(text, query) {
   
   const regex = new RegExp(`(${escapedQuery})`, 'gi');
   return cleanText.replace(regex, '<mark>$1</mark>');
+  */
 }
 
 /**
