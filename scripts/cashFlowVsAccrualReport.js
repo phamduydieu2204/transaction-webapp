@@ -5,7 +5,6 @@
  */
 
 import { formatCurrency, normalizeDate } from './statisticsCore.js';
-import { getAllocatedAmount, isExpenseInRange } from './handleAllocationPeriod.js';
 
 /**
  * Render Cash Flow vs Accrual comparison report
@@ -91,7 +90,7 @@ function calculateCashFlowView(expenseData, dateRange) {
         date: day,
         amount: amount,
         description: expense.note || expense.category || 'Chi phí lớn',
-        allocation: expense.allocationPeriod
+        allocation: expense.periodicAllocation || 'Không'
       });
     }
   });
@@ -125,34 +124,36 @@ function calculateAccrualView(expenseData, dateRange) {
 
   // Process each expense
   expenseData.forEach(expense => {
-    // Check if expense affects this period
-    if (!isExpenseInRange(expense, rangeStart, rangeEnd)) {
-      return;
-    }
-
-    // Calculate allocated amount for this period
-    const allocatedAmount = getAllocatedAmount(expense, rangeStart, rangeEnd);
-    if (allocatedAmount === 0) return;
-
+    const expenseDate = new Date(expense.date);
+    const amount = parseFloat(expense.amount || 0);
     const category = expense.type || expense.category || 'Khác';
-
-    // For allocated expenses, distribute daily
-    if (expense.allocationPeriod && expense.allocationPeriod !== 'none') {
-      const allocStart = new Date(Math.max(
-        new Date(expense.allocationStart || expense.date),
-        rangeStart
-      ));
-      const allocEnd = new Date(Math.min(
-        new Date(expense.allocationEnd || expense.date),
-        rangeEnd
-      ));
-
-      // Calculate daily amount
-      const totalDays = Math.ceil((allocEnd - allocStart) / (1000 * 60 * 60 * 24)) + 1;
-      const dailyAmount = allocatedAmount / totalDays;
-
+    
+    // Check if expense has periodic allocation (new logic)
+    const hasPeriodicAllocation = expense.periodicAllocation === 'Có' || expense.periodicAllocation === 'Yes';
+    const renewDate = expense.renewDate ? new Date(expense.renewDate) : null;
+    
+    if (hasPeriodicAllocation && renewDate && renewDate > expenseDate) {
+      // Calculate allocation period
+      const allocStart = new Date(Math.max(expenseDate, rangeStart));
+      const allocEnd = new Date(Math.min(renewDate, rangeEnd));
+      
+      // Check if allocation period overlaps with report range
+      if (allocStart > allocEnd || allocEnd < rangeStart || allocStart > rangeEnd) {
+        return; // No overlap
+      }
+      
+      // Calculate total days in full allocation period
+      const fullPeriodDays = Math.ceil((renewDate - expenseDate) / (1000 * 60 * 60 * 24));
+      
+      // Calculate days in report period
+      const reportPeriodDays = Math.ceil((allocEnd - allocStart) / (1000 * 60 * 60 * 24));
+      
+      // Calculate allocated amount for report period
+      const dailyAmount = amount / fullPeriodDays;
+      const allocatedAmount = dailyAmount * reportPeriodDays;
+      
       // Distribute to each day
-      for (let d = new Date(allocStart); d <= allocEnd; d.setDate(d.getDate() + 1)) {
+      for (let d = new Date(allocStart); d < allocEnd; d.setDate(d.getDate() + 1)) {
         const day = normalizeDate(d);
         const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
         
@@ -160,26 +161,31 @@ function calculateAccrualView(expenseData, dateRange) {
         result.byMonth[month] = (result.byMonth[month] || 0) + dailyAmount;
         result.byCategory[category] = (result.byCategory[category] || 0) + dailyAmount;
       }
-
-      result.allocatedExpenses.push({
-        originalDate: expense.date,
-        amount: expense.amount,
-        allocatedAmount: allocatedAmount,
-        period: expense.allocationPeriod,
-        description: expense.note || expense.category
-      });
-    } else {
-      // Non-allocated expense
-      const expenseDate = new Date(expense.date);
-      const day = normalizeDate(expense.date);
-      const month = `${expenseDate.getFullYear()}-${String(expenseDate.getMonth() + 1).padStart(2, '0')}`;
       
-      result.byDay[day] = (result.byDay[day] || 0) + allocatedAmount;
-      result.byMonth[month] = (result.byMonth[month] || 0) + allocatedAmount;
-      result.byCategory[category] = (result.byCategory[category] || 0) + allocatedAmount;
+      result.allocatedExpenses.push({
+        originalDate: normalizeDate(expense.date),
+        renewDate: normalizeDate(renewDate),
+        amount: amount,
+        allocatedAmount: allocatedAmount,
+        period: `${Math.ceil(fullPeriodDays / 30)} tháng`,
+        description: expense.note || expense.category || 'Chi phí phân bổ'
+      });
+      
+      result.total += allocatedAmount;
+      
+    } else {
+      // Non-allocated expense or no valid renewal date
+      if (expenseDate >= rangeStart && expenseDate <= rangeEnd) {
+        const day = normalizeDate(expense.date);
+        const month = `${expenseDate.getFullYear()}-${String(expenseDate.getMonth() + 1).padStart(2, '0')}`;
+        
+        result.byDay[day] = (result.byDay[day] || 0) + amount;
+        result.byMonth[month] = (result.byMonth[month] || 0) + amount;
+        result.byCategory[category] = (result.byCategory[category] || 0) + amount;
+        
+        result.total += amount;
+      }
     }
-
-    result.total += allocatedAmount;
   });
 
   return result;
@@ -380,8 +386,8 @@ function renderLargePayments(largePayments) {
             <div class="payment-date">${payment.date}</div>
             <div class="payment-amount">${formatCurrency(payment.amount, 'VND')}</div>
             <div class="payment-description">${payment.description}</div>
-            <div class="payment-allocation ${payment.allocation && payment.allocation !== 'none' ? 'allocated' : 'not-allocated'}">
-              ${payment.allocation && payment.allocation !== 'none' ? 
+            <div class="payment-allocation ${payment.allocation === 'Có' ? 'allocated' : 'not-allocated'}">
+              ${payment.allocation === 'Có' ? 
                 '✅ Đã phân bổ' : 
                 '⚠️ Chưa phân bổ - Cân nhắc phân bổ để báo cáo chính xác hơn'}
             </div>

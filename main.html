@@ -990,37 +990,6 @@
         <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseRenewDate')"></i>
       </div>
     </div>
-    
-    <!-- PHẦN PHÂN BỔ CHI PHÍ -->
-    <div style="grid-column: span 2; margin-top: 10px; border-top: 1px solid #ddd; padding-top: 10px;">
-      <h4 style="margin-bottom: 10px; color: #007bff;">⏱️ Phân bổ chi phí (cho báo cáo)</h4>
-    </div>
-    
-    <div>
-      <label data-tooltip="Chi phí này được sử dụng trong bao lâu? Ví dụ: Tiền thuê nhà tháng 1 thì chọn 'Sử dụng cho 1 tháng'">Kỳ sử dụng:</label>
-      <select id="expenseAllocationPeriod" onchange="handleAllocationPeriodChange()">
-        <option value="none">Không phân bổ (chi phí 1 lần)</option>
-        <option value="1_month">Sử dụng cho 1 tháng</option>
-        <option value="3_months">Sử dụng cho 3 tháng</option>
-        <option value="6_months">Sử dụng cho 6 tháng</option>
-        <option value="12_months">Sử dụng cho 1 năm</option>
-        <option value="custom">Tùy chỉnh...</option>
-      </select>
-    </div>
-    
-    <div id="customAllocationDiv" style="display: none;">
-      <label>Từ ngày - Đến ngày:</label>
-      <div style="display: flex; gap: 10px;">
-        <div class="date-input-container" style="flex: 1;">
-          <input type="text" id="expenseAllocationStart" placeholder="Từ ngày">
-          <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseAllocationStart')"></i>
-        </div>
-        <div class="date-input-container" style="flex: 1;">
-          <input type="text" id="expenseAllocationEnd" placeholder="Đến ngày">
-          <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseAllocationEnd')"></i>
-        </div>
-      </div>
-    </div>
 
     <!-- PHẦN 3: Khác -->
     <div>
@@ -1435,8 +1404,5 @@
   z-index: 9999;
   cursor: not-allowed;
 "></div>
-
-<!-- Import handleAllocationPeriod.js -->
-<script type="module" src="scripts/handleAllocationPeriod.js"></script>
 </body>
 </html>
