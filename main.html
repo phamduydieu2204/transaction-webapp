@@ -760,6 +760,325 @@
     .period-option:last-child {
       border-radius: 0 0 4px 4px;
     }
+
+    /* ===== EXPENSE FORM REDESIGN ===== */
+    #tab-chi-phi {
+      background: #f8f9fa;
+      padding: 0;
+      border-radius: 12px;
+    }
+
+    #expenseForm {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      margin-bottom: 30px;
+    }
+
+    /* Form sections */
+    .form-section {
+      margin-bottom: 25px;
+      padding-bottom: 25px;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .form-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title i {
+      color: #4299e1;
+      font-size: 18px;
+    }
+
+    /* Improved form grid */
+    #expenseForm .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    /* Label styling */
+    #expenseForm label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Input styling */
+    #expenseForm input[type="text"],
+    #expenseForm input[type="number"],
+    #expenseForm select,
+    #expenseForm textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.3s;
+      background: #f7fafc;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    #expenseForm input:focus,
+    #expenseForm select:focus,
+    #expenseForm textarea:focus {
+      outline: none;
+      border-color: #4299e1;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+    }
+
+    /* Quick search styling */
+    .expense-quick-search-container {
+      grid-column: span 2;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 25px;
+    }
+
+    .expense-quick-search-container label {
+      color: white !important;
+      font-size: 14px !important;
+      margin-bottom: 12px !important;
+    }
+
+    #expenseQuickSearch {
+      background: white !important;
+      border: none !important;
+      padding: 14px 40px 14px 16px !important;
+      font-size: 15px !important;
+    }
+
+    #clearExpenseSearch {
+      color: #a0aec0 !important;
+    }
+
+    #clearExpenseSearch:hover {
+      color: #e53e3e !important;
+    }
+
+    #expenseSearchResults {
+      border-radius: 8px !important;
+      margin-top: 8px !important;
+      border: 2px solid #e2e8f0 !important;
+    }
+
+    /* Date input container */
+    #expenseForm .date-input-container {
+      position: relative;
+    }
+
+    #expenseForm .calendar-icon {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #4299e1;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    #expenseForm .calendar-icon:hover {
+      color: #3182ce;
+    }
+
+    /* Button styling */
+    #expenseForm .button-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 30px;
+      padding-top: 30px;
+      border-top: 2px solid #e9ecef;
+      flex-wrap: wrap;
+    }
+
+    #expenseForm button {
+      flex: 1;
+      min-width: 140px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    #expenseForm button[onclick="handleAddExpense()"] {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    #expenseForm button[onclick="handleAddExpense()"]:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    #expenseForm button[onclick="handleUpdateExpense()"] {
+      background: #48bb78;
+      color: white;
+    }
+
+    #expenseForm button[onclick="handleUpdateExpense()"]:hover {
+      background: #38a169;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(72, 187, 120, 0.3);
+    }
+
+    #expenseForm button[onclick="handleSearchExpense()"] {
+      background: #4299e1;
+      color: white;
+    }
+
+    #expenseForm button[onclick="handleSearchExpense()"]:hover {
+      background: #3182ce;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(66, 153, 225, 0.3);
+    }
+
+    #expenseForm button[type="reset"] {
+      background: #e2e8f0;
+      color: #4a5568;
+    }
+
+    #expenseForm button[type="reset"]:hover {
+      background: #cbd5e0;
+    }
+
+    /* Amount input special styling */
+    #expenseAmount {
+      font-size: 18px !important;
+      font-weight: 600;
+      color: #2d3748;
+      background: #f0fff4 !important;
+      border-color: #9ae6b4 !important;
+    }
+
+    /* Status select coloring */
+    #expenseStatus {
+      font-weight: 600;
+    }
+
+    #expenseStatus option[value="Đã thanh toán"] {
+      color: #48bb78;
+    }
+
+    #expenseStatus option[value="Chưa thanh toán"] {
+      color: #f56565;
+    }
+
+    #expenseStatus option[value="Đã hủy"] {
+      color: #a0aec0;
+    }
+
+    /* Expense list table improvements */
+    #expenseListTable {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      margin-top: 10px;
+    }
+
+    #expenseListTable thead {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    #expenseListTable thead th {
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      padding: 16px 12px;
+      border: none;
+    }
+
+    #expenseListTable tbody tr {
+      transition: all 0.2s;
+    }
+
+    #expenseListTable tbody tr:hover {
+      background: #f7fafc;
+      transform: scale(1.01);
+    }
+
+    #expenseListTable tbody td {
+      padding: 14px 12px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    /* Responsive improvements */
+    @media (max-width: 768px) {
+      #expenseForm {
+        padding: 20px;
+      }
+
+      #expenseForm .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .expense-quick-search-container {
+        grid-column: span 1;
+      }
+
+      #expenseForm .button-row {
+        flex-direction: column;
+      }
+
+      #expenseForm button {
+        width: 100%;
+      }
+    }
+
+    /* Add icons to buttons */
+    #expenseForm button[onclick="handleAddExpense()"]::before {
+      content: "\f067";
+      font-family: "Font Awesome 5 Free";
+      font-weight: 900;
+    }
+
+    #expenseForm button[onclick="handleUpdateExpense()"]::before {
+      content: "\f021";
+      font-family: "Font Awesome 5 Free";
+      font-weight: 900;
+    }
+
+    #expenseForm button[onclick="handleSearchExpense()"]::before {
+      content: "\f002";
+      font-family: "Font Awesome 5 Free";
+      font-weight: 900;
+    }
+
+    #expenseForm button[type="reset"]::before {
+      content: "\f2f1";
+      font-family: "Font Awesome 5 Free";
+      font-weight: 900;
+    }
   </style>
 </head>
 <body>
@@ -793,105 +1112,143 @@
     <hr>
 
     <div id="tab-giao-dich" class="tab-content active">
-        <form id="transactionForm" class="form-grid fixed-header" onreset="handleReset()">
-          <!-- Dòng 1 -->
-          <div>
-            <label>Ngày giao dịch:</label>
-            <div class="date-input-container">
-              <input type="text" id="transactionDate" placeholder="yyyy/mm/dd">
-              <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('transactionDate')"></i>
+        <form id="transactionForm" class="fixed-header" onreset="handleReset()">
+          <!-- Section 1: Thông tin khách hàng -->
+          <div class="form-section">
+            <div class="section-title">
+              <i class="fas fa-user"></i>
+              Thông tin khách hàng
+            </div>
+            <div class="form-grid">
+              <div>
+                <label>Email:</label>
+                <input type="email" id="customerEmail">
+              </div>
+
+              <div>
+                <label>Tên khách hàng:</label>
+                <div class="search-icon-container">
+                  <input type="text" id="customerName">
+                  <i class="fas fa-search search-icon" onclick="updateCustomerInfo()"></i>
+                </div>
+              </div>
+
+              <div>
+                <label>Liên hệ:</label>
+                <input type="text" id="customerPhone">
+              </div>
+
+              <div>
+                <label>Người nhận / Nhà cung cấp:</label>
+                <input type="text" id="transactionSupplier">
+              </div>
             </div>
           </div>
 
-          <div>
-            <label>Loại giao dịch:</label>
-            <select id="transactionType" required>
-              <option value="">-- Chọn loại --</option>
-              <option value="Bán hàng">Bán hàng</option>
-              <option value="Hoàn Tiền">Hoàn Tiền</option>
-              <option value="Dùng thử">Dùng thử</option>
-              <option value="Nhập hàng">Nhập hàng</option>
-            </select>
-          </div>
+          <!-- Section 2: Chi tiết giao dịch -->
+          <div class="form-section">
+            <div class="section-title">
+              <i class="fas fa-file-invoice"></i>
+              Chi tiết giao dịch
+            </div>
+            <div class="form-grid">
+              <div>
+                <label>Ngày giao dịch:</label>
+                <div class="date-input-container">
+                  <input type="text" id="transactionDate" placeholder="yyyy/mm/dd">
+                  <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('transactionDate')"></i>
+                </div>
+              </div>
 
-          <div>
-            <label>Email:</label>
-            <input type="email" id="customerEmail">
-          </div>
+              <div>
+                <label>Loại giao dịch:</label>
+                <select id="transactionType" required>
+                  <option value="">-- Chọn loại --</option>
+                  <option value="Bán hàng">Bán hàng</option>
+                  <option value="Hoàn Tiền">Hoàn Tiền</option>
+                  <option value="Dùng thử">Dùng thử</option>
+                  <option value="Nhập hàng">Nhập hàng</option>
+                </select>
+              </div>
 
-          <div>
-            <label>Tên khách hàng:</label>
-            <div class="search-icon-container">
-              <input type="text" id="customerName">
-              <i class="fas fa-search search-icon" onclick="updateCustomerInfo()"></i>
+              <div>
+                <label>Số tháng đăng ký:</label>
+                <input type="number" id="duration">
+              </div>
+
+              <div>
+                <label>Ngày bắt đầu:</label>
+                <div class="date-input-container">
+                  <input type="text" id="startDate" placeholder="yyyy/mm/dd">
+                  <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('startDate')"></i>
+                </div>
+              </div>
+
+              <div>
+                <label>Ngày kết thúc:</label>
+                <div class="date-input-container">
+                  <input type="text" id="endDate" placeholder="yyyy/mm/dd">
+                  <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('endDate')"></i>
+                </div>
+              </div>
+
+              <div>
+                <label>Số thiết bị:</label>
+                <input type="number" id="deviceCount">
+              </div>
+
+              <div>
+                <label>Doanh thu:</label>
+                <input type="number" id="revenue">
+              </div>
             </div>
           </div>
 
-          <div>
-            <label>Liên hệ:</label>
-            <input type="text" id="customerPhone">
-          </div>
+          <!-- Section 3: Thông tin phần mềm & bổ sung -->
+          <div class="form-section">
+            <div class="section-title">
+              <i class="fas fa-laptop-code"></i>
+              Thông tin phần mềm & bổ sung
+            </div>
+            <div class="form-grid">
+              <div>
+                <label>Tên phần mềm:</label>
+                <select id="softwareName">
+                  <option value="">-- Chọn phần mềm --</option>
+                </select>
+              </div>
 
-          <!-- Dòng 2 -->
-          <div>
-            <label>Số tháng đăng ký:</label>
-            <input type="number" id="duration">
-          </div>
+              <div>
+                <label>Gói phần mềm:</label>
+                <select id="softwarePackage">
+                  <option value="">-- Chọn gói --</option>
+                </select>
+              </div>
 
-          <div>
-            <label>Ngày bắt đầu:</label>
-            <div class="date-input-container">
-              <input type="text" id="startDate" placeholder="yyyy/mm/dd">
-              <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('startDate')"></i>
+              <div>
+                <label>Tên tài khoản:</label>
+                <select id="accountName">
+                  <option value="">-- Chọn tài khoản --</option>
+                </select>
+              </div>
+
+              <div>
+                <label>Trạng thái:</label>
+                <select id="transactionStatus">
+                  <option value="Đang hoạt động">Đang hoạt động</option>
+                  <option value="Hết hạn">Hết hạn</option>
+                  <option value="Đã hủy">Đã hủy</option>
+                </select>
+              </div>
+
+              <div>
+                <label>Ghi chú:</label>
+                <textarea id="note" rows="2"></textarea>
+              </div>
             </div>
           </div>
 
-          <div>
-            <label>Ngày kết thúc:</label>
-            <div class="date-input-container">
-              <input type="text" id="endDate" placeholder="yyyy/mm/dd">
-              <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('endDate')"></i>
-            </div>
-          </div>
-
-          <div>
-            <label>Số thiết bị:</label>
-            <input type="number" id="deviceCount">
-          </div>
-
-          <div>
-            <label>Ghi chú:</label>
-            <textarea id="note" rows="2"></textarea>
-          </div>
-
-          <!-- Dòng 3 -->
-          <div>
-            <label>Tên phần mềm:</label>
-            <select id="softwareName">
-              <option value="">-- Chọn phần mềm --</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Gói phần mềm:</label>
-            <select id="softwarePackage">
-              <option value="">-- Chọn gói --</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Tên tài khoản:</label>
-            <select id="accountName">
-              <option value="">-- Chọn tài khoản --</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Doanh thu:</label>
-            <input type="number" id="revenue">
-          </div>
-
-          <!-- Dòng 4: Các nút -->
+          <!-- Buttons -->
           <div class="button-row">
             <button type="button" onclick="handleAdd()">Thêm</button>
             <button type="button" onclick="handleUpdate()">Cập nhật</button>
@@ -902,150 +1259,159 @@
     </div>
 
 <div id="tab-chi-phi" class="tab-content">
-  <form id="expenseForm" class="form-grid">
+  <form id="expenseForm">
     
-    <!-- PHẦN 1: Thông tin khoản chi -->
+    <!-- Hidden fields -->
     <input type="hidden" id="expenseId">
-    <div>
-      <label>Ngày chi:</label>
-      <div class="date-input-container">
-        <input type="text" id="expenseDate" placeholder="yyyy/mm/dd">
-        <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseDate')"></i>
-      </div>
-    </div>
-
     <input type="hidden" id="expenseRecorder">
 
-    <!-- Ô tìm kiếm nhanh khoản chi -->
-    <div style="grid-column: span 2;">
-      <label style="color: #17a2b8; font-weight: 600;">
-        <i class="fas fa-search"></i> Tìm kiếm nhanh khoản chi:
+    <!-- Quick Search Section -->
+    <div class="expense-quick-search-container">
+      <label>
+        <i class="fas fa-search"></i> Tìm kiếm nhanh khoản chi
       </label>
       <div style="position: relative;">
         <input type="text" 
                id="expenseQuickSearch" 
                placeholder="Nhập mô tả khoản chi để tìm kiếm (ví dụ: thuê văn phòng, mua phần mềm...)"
-               style="width: 100%; padding-right: 30px;"
                autocomplete="off">
         <i class="fas fa-times-circle" 
            id="clearExpenseSearch" 
-           style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #6c757d; display: none;"
+           style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; display: none;"
            onclick="clearExpenseSearch()"></i>
-        
-        <!-- Dropdown gợi ý -->
-        <div id="expenseSearchResults" style="
-          position: absolute;
-          top: 100%;
-          left: 0;
-          right: 0;
-          background: white;
-          border: 1px solid #ddd;
-          border-top: none;
-          border-radius: 0 0 4px 4px;
-          max-height: 300px;
-          overflow-y: auto;
-          z-index: 1000;
-          display: none;
-          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        "></div>
+        <div id="expenseSearchResults"></div>
       </div>
     </div>
 
-    <div>
-      <label>Loại khoản chi:</label>
-      <select id="expenseCategory" onchange="handleCategoryChange()">
-        <option value="">-- Chọn loại --</option>
-      </select>
-    </div>
+    <!-- Section 1: Thông tin khoản chi -->
+    <div class="form-section">
+      <div class="section-title">
+        <i class="fas fa-file-invoice-dollar"></i>
+        Thông tin khoản chi
+      </div>
+      <div class="form-grid">
+        <div>
+          <label>Ngày chi</label>
+          <div class="date-input-container">
+            <input type="text" id="expenseDate" placeholder="yyyy/mm/dd">
+            <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseDate')"></i>
+          </div>
+        </div>
 
-    <div>
-      <label>Danh mục chung:</label>
-      <select id="expenseSubCategory" onchange="handleSubCategoryChange()">
-        <option value="">-- Chọn danh mục --</option>
-      </select>
-    </div>
+        <div>
+          <label>Loại khoản chi</label>
+          <select id="expenseCategory" onchange="handleCategoryChange()">
+            <option value="">-- Chọn loại --</option>
+          </select>
+        </div>
 
-    <div>
-      <label>Tên sản phẩm/Dịch vụ:</label>
-      <select id="expenseProduct" onchange="handleProductChange()">
-        <option value="">-- Chọn sản phẩm --</option>
-      </select>
-    </div>
+        <div>
+          <label>Danh mục chung</label>
+          <select id="expenseSubCategory" onchange="handleSubCategoryChange()">
+            <option value="">-- Chọn danh mục --</option>
+          </select>
+        </div>
 
-    <div>
-      <label>Phiên bản/Gói dịch vụ:</label>
-      <select id="expensePackage">
-        <option value="">-- Chọn gói --</option>
-      </select>
-    </div>
+        <div>
+          <label>Tên sản phẩm/Dịch vụ</label>
+          <select id="expenseProduct" onchange="handleProductChange()">
+            <option value="">-- Chọn sản phẩm --</option>
+          </select>
+        </div>
 
-    <!-- PHẦN 2: Chi tiết thanh toán -->
-    <div>
-      <label>Số tiền:</label>
-      <input type="number" id="expenseAmount">
-    </div>
-
-    <div>
-      <label>Đơn vị tiền tệ:</label>
-      <select id="expenseCurrency">
-        <option value="VND">VND</option>
-        <option value="USD">USD</option>
-        <option value="NGN">NGN</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Ngân hàng/Ví:</label>
-      <select id="expenseBank" onchange="handleBankChange()">
-        <option value="">-- Chọn ngân hàng/ví --</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Thông tin thẻ/Tài khoản:</label>
-      <select id="expenseCard">
-        <option value="">-- Chọn tài khoản --</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Phương thức chi:</label>
-      <select id="expenseRecurring" onchange="handleRecurringChange()">
-        <option value="Chi một lần">Chi một lần</option>
-        <option value="Hàng tháng">Định kỳ hàng tháng</option>
-        <option value="Hàng quý">Định kỳ hàng quý</option>
-        <option value="Hàng năm">Định kỳ hàng năm</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Ngày tái tục:</label>
-      <div class="date-input-container">
-        <input type="text" id="expenseRenewDate" placeholder="yyyy/mm/dd">
-        <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseRenewDate')"></i>
+        <div>
+          <label>Phiên bản/Gói dịch vụ</label>
+          <select id="expensePackage">
+            <option value="">-- Chọn gói --</option>
+          </select>
+        </div>
       </div>
     </div>
 
-    <!-- PHẦN 3: Khác -->
-    <div>
-      <label>Người nhận / Nhà cung cấp:</label>
-      <input type="text" id="expenseSupplier">
+    <!-- Section 2: Chi tiết thanh toán -->
+    <div class="form-section">
+      <div class="section-title">
+        <i class="fas fa-money-check-alt"></i>
+        Chi tiết thanh toán
+      </div>
+      <div class="form-grid">
+        <div>
+          <label>Số tiền</label>
+          <input type="number" id="expenseAmount">
+        </div>
+
+        <div>
+          <label>Đơn vị tiền tệ</label>
+          <select id="expenseCurrency">
+            <option value="VND">VND</option>
+            <option value="USD">USD</option>
+            <option value="NGN">NGN</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Ngân hàng/Ví</label>
+          <select id="expenseBank" onchange="handleBankChange()">
+            <option value="">-- Chọn ngân hàng/ví --</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Thông tin thẻ/Tài khoản</label>
+          <select id="expenseCard">
+            <option value="">-- Chọn tài khoản --</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Phương thức chi</label>
+          <select id="expenseRecurring" onchange="handleRecurringChange()">
+            <option value="Chi một lần">Chi một lần</option>
+            <option value="Hàng tháng">Định kỳ hàng tháng</option>
+            <option value="Hàng quý">Định kỳ hàng quý</option>
+            <option value="Hàng năm">Định kỳ hàng năm</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Ngày tái tục</label>
+          <div class="date-input-container">
+            <input type="text" id="expenseRenewDate" placeholder="yyyy/mm/dd">
+            <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseRenewDate')"></i>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div>
-      <label>Trạng thái:</label>
-      <select id="expenseStatus">
-        <option>Đã thanh toán</option>
-        <option>Chưa thanh toán</option>
-        <option>Đã hủy</option>
-      </select>
+    <!-- Section 3: Thông tin bổ sung -->
+    <div class="form-section">
+      <div class="section-title">
+        <i class="fas fa-info-circle"></i>
+        Thông tin bổ sung
+      </div>
+      <div class="form-grid">
+        <div>
+          <label>Người nhận / Nhà cung cấp</label>
+          <input type="text" id="expenseSupplier">
+        </div>
+
+        <div>
+          <label>Trạng thái</label>
+          <select id="expenseStatus">
+            <option>Đã thanh toán</option>
+            <option>Chưa thanh toán</option>
+            <option>Đã hủy</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Ghi chú</label>
+          <textarea id="expenseNote" rows="2"></textarea>
+        </div>
+      </div>
     </div>
 
-    <div>
-      <label>Ghi chú:</label>
-      <textarea id="expenseNote" rows="2"></textarea>
-    </div>
-
+    <!-- Buttons -->
     <div class="button-row">
       <button type="button" onclick="handleAddExpense()">Thêm chi phí</button>
       <button type="button" onclick="handleUpdateExpense()">Cập nhật chi phí</button>

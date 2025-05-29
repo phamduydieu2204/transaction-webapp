@@ -255,6 +255,49 @@ document.addEventListener("DOMContentLoaded", async () => {
 window.logout = logout;
 window.openCalendar = (inputId) =>
   openCalendar(inputId, calculateEndDate, document.getElementById("startDate"), document.getElementById("duration"), document.getElementById("endDate"));
+
+// Handle recurring payment method change
+window.handleRecurringChange = function() {
+  const recurring = document.getElementById('expenseRecurring').value;
+  const renewDateInput = document.getElementById('expenseRenewDate');
+  const renewDateContainer = renewDateInput.parentElement.parentElement;
+  
+  if (recurring === 'Chi một lần') {
+    renewDateInput.disabled = true;
+    renewDateInput.value = '';
+    renewDateContainer.style.opacity = '0.5';
+  } else {
+    renewDateInput.disabled = false;
+    renewDateContainer.style.opacity = '1';
+  }
+};
+
+// Handle bank change for expense form
+window.handleBankChange = function() {
+  const bankSelect = document.getElementById('expenseBank');
+  const cardSelect = document.getElementById('expenseCard');
+  
+  // Clear current options
+  cardSelect.innerHTML = '<option value="">-- Chọn tài khoản --</option>';
+  
+  // Add dummy data for demo
+  if (bankSelect.value) {
+    const accounts = {
+      'Vietcombank': ['**** 1234', '**** 5678'],
+      'Techcombank': ['**** 9012', '**** 3456'],
+      'MoMo': ['0912345678', '0987654321'],
+      'ZaloPay': ['0901234567']
+    };
+    
+    const bankAccounts = accounts[bankSelect.value] || [];
+    bankAccounts.forEach(account => {
+      const option = document.createElement('option');
+      option.value = account;
+      option.textContent = account;
+      cardSelect.appendChild(option);
+    });
+  }
+};
 window.updateCustomerInfo = () => updateCustomerInfo(window.transactionList);
 window.handleReset = () =>
   handleReset(fetchSoftwareList, showProcessingModal, showResultModal, window.todayFormatted, updatePackageList, updateAccountList);
