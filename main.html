@@ -916,6 +916,41 @@
 
     <input type="hidden" id="expenseRecorder">
 
+    <!-- Ô tìm kiếm nhanh khoản chi -->
+    <div style="grid-column: span 2;">
+      <label style="color: #17a2b8; font-weight: 600;">
+        <i class="fas fa-search"></i> Tìm kiếm nhanh khoản chi:
+      </label>
+      <div style="position: relative;">
+        <input type="text" 
+               id="expenseQuickSearch" 
+               placeholder="Nhập mô tả khoản chi để tìm kiếm (ví dụ: thuê văn phòng, mua phần mềm...)"
+               style="width: 100%; padding-right: 30px;"
+               autocomplete="off">
+        <i class="fas fa-times-circle" 
+           id="clearExpenseSearch" 
+           style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #6c757d; display: none;"
+           onclick="clearExpenseSearch()"></i>
+        
+        <!-- Dropdown gợi ý -->
+        <div id="expenseSearchResults" style="
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: white;
+          border: 1px solid #ddd;
+          border-top: none;
+          border-radius: 0 0 4px 4px;
+          max-height: 300px;
+          overflow-y: auto;
+          z-index: 1000;
+          display: none;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        "></div>
+      </div>
+    </div>
+
     <div>
       <label>Loại khoản chi:</label>
       <select id="expenseCategory" onchange="handleCategoryChange()">

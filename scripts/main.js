@@ -48,6 +48,7 @@ import { handleUpdateExpense } from './handleUpdateExpense.js';
 import { viewExpenseRow } from './viewExpenseRow.js';
 import { handleSearchExpense } from './handleSearchExpense.js';
 import { initTotalDisplay } from './updateTotalDisplay.js';
+import { initExpenseQuickSearch } from './expenseQuickSearch.js';
 import { handleChangePassword, closeChangePasswordModal, confirmChangePassword } from './handleChangePassword.js';
 import { formatDateTime } from './formatDateTime.js';
 import { openConfirmModal, closeConfirmModal, confirmDelete } from './confirmModal.js';
@@ -235,6 +236,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Load dropdown chi phí
   initExpenseDropdowns()
     .catch(err => console.error("Lỗi khi load dropdown chi phí:", err));
+  
+  // Initialize expense quick search
+  initExpenseQuickSearch();
   
   // Load giao dịch (chỉ khi đang ở tab giao dịch)
   const currentActiveTab = document.querySelector(".tab-button.active");
