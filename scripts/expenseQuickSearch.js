@@ -127,10 +127,13 @@ function displaySearchResults(results) {
  * Highlight matching text
  */
 function highlightMatch(text, query) {
-  if (!query) return text;
+  if (!query || !text) return text || '';
+  
+  // Clean the text first - remove extra spaces and line breaks
+  const cleanText = text.toString().replace(/\s+/g, ' ').trim();
   
   const regex = new RegExp(`(${query.split(/\s+/).join('|')})`, 'gi');
-  return text.replace(regex, '<mark>$1</mark>');
+  return cleanText.replace(regex, '<mark>$1</mark>');
 }
 
 /**
@@ -272,10 +275,13 @@ style.textContent = `
   }
   
   .search-result-item {
-    padding: 12px;
+    padding: 8px 12px;
     border-bottom: 1px solid #f0f0f0;
     cursor: pointer;
     transition: background 0.2s;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
   }
   
   .search-result-item:last-child {
@@ -302,6 +308,7 @@ style.textContent = `
     text-overflow: ellipsis;
     white-space: nowrap;
     margin-right: 12px;
+    max-width: calc(100% - 120px);
   }
   
   .result-text mark {
