@@ -123,10 +123,18 @@ function displaySearchResults(results) {
 function highlightMatch(text, query) {
   if (!query || !text) return text || '';
   
-  // Clean the text first - remove extra spaces and line breaks
-  const cleanText = text.toString().replace(/\s+/g, ' ').trim();
+  // Clean the text thoroughly - remove line breaks, tabs, and extra spaces
+  const cleanText = text.toString()
+    .replace(/[\r\n\t]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
   
-  const regex = new RegExp(`(${query.split(/\s+/).join('|')})`, 'gi');
+  // Escape special regex characters in query
+  const escapedQuery = query.split(/\s+/)
+    .map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .join('|');
+  
+  const regex = new RegExp(`(${escapedQuery})`, 'gi');
   return cleanText.replace(regex, '<mark>$1</mark>');
 }
 
