@@ -521,28 +521,28 @@ function renderExecutiveSummary(metrics) {
       <div class="summary-cards">
         
         <!-- Revenue Card -->
-        <div class="summary-card revenue-card">
+        <div class="summary-card revenue-card" data-tooltip="Tổng doanh thu trong kỳ báo cáo, bao gồm tất cả các giao dịch bán hàng. AOV (Average Order Value) là giá trị trung bình mỗi đơn hàng.">
           <div class="card-icon">💰</div>
           <div class="card-content">
             <h3>Doanh Thu</h3>
             <div class="primary-value">${formatCurrency(financial.totalRevenue, 'VND')}</div>
             <div class="secondary-info">
-              <span>${revenue.totalTransactions} giao dịch</span>
-              <span>AOV: ${formatCurrency(revenue.averageOrderValue, 'VND')}</span>
+              <span data-tooltip="Tổng số giao dịch đã thực hiện trong kỳ">${revenue.totalTransactions} giao dịch</span>
+              <span data-tooltip="Giá trị trung bình mỗi giao dịch (Average Order Value)">AOV: ${formatCurrency(revenue.averageOrderValue, 'VND')}</span>
             </div>
           </div>
           <div class="card-trend positive">↗️ +12%</div>
         </div>
         
         <!-- Profit Card -->
-        <div class="summary-card profit-card ${financial.netProfit >= 0 ? 'positive' : 'negative'}">
+        <div class="summary-card profit-card ${financial.netProfit >= 0 ? 'positive' : 'negative'}" data-tooltip="Lợi nhuận ròng = Doanh thu - Tổng chi phí. Đây là số tiền thực tế doanh nghiệp kiếm được sau khi trừ mọi chi phí.">
           <div class="card-icon">${financial.netProfit >= 0 ? '📈' : '📉'}</div>
           <div class="card-content">
             <h3>Lợi Nhuận Ròng</h3>
             <div class="primary-value">${formatCurrency(financial.netProfit, 'VND')}</div>
             <div class="secondary-info">
-              <span>Margin: ${financial.profitMargin.toFixed(1)}%</span>
-              <span>Gross: ${financial.grossMargin.toFixed(1)}%</span>
+              <span data-tooltip="Tỷ suất lợi nhuận ròng = (Lợi nhuận ròng / Doanh thu) x 100%">Margin: ${financial.profitMargin.toFixed(1)}%</span>
+              <span data-tooltip="Tỷ suất lợi nhuận gộp = ((Doanh thu - Giá vốn) / Doanh thu) x 100%">Gross: ${financial.grossMargin.toFixed(1)}%</span>
             </div>
           </div>
           <div class="card-trend ${financial.netProfit >= 0 ? 'positive' : 'negative'}">
@@ -551,28 +551,28 @@ function renderExecutiveSummary(metrics) {
         </div>
         
         <!-- Daily Performance -->
-        <div class="summary-card performance-card">
+        <div class="summary-card performance-card" data-tooltip="Hiệu suất kinh doanh trung bình mỗi ngày trong kỳ báo cáo">
           <div class="card-icon">📅</div>
           <div class="card-content">
             <h3>Hiệu Suất Hàng Ngày</h3>
-            <div class="primary-value">${formatCurrency(kpis.revenuePerDay, 'VND')}/ngày</div>
+            <div class="primary-value" data-tooltip="Doanh thu trung bình mỗi ngày">${formatCurrency(kpis.revenuePerDay, 'VND')}/ngày</div>
             <div class="secondary-info">
-              <span>Burn Rate: ${formatCurrency(kpis.burnRate, 'VND')}/ngày</span>
-              <span>Net: ${formatCurrency(kpis.revenuePerDay - kpis.burnRate, 'VND')}/ngày</span>
+              <span data-tooltip="Chi phí vận hành trung bình mỗi ngày (không bao gồm chi phí cá nhân)">Burn Rate: ${formatCurrency(kpis.burnRate, 'VND')}/ngày</span>
+              <span data-tooltip="Lợi nhuận ròng trung bình mỗi ngày">Net: ${formatCurrency(kpis.revenuePerDay - kpis.burnRate, 'VND')}/ngày</span>
             </div>
           </div>
           <div class="card-trend neutral">📊</div>
         </div>
         
         <!-- Cash Flow -->
-        <div class="summary-card cashflow-card">
+        <div class="summary-card cashflow-card" data-tooltip="Dòng tiền thể hiện lượng tiền thực tế ra vào doanh nghiệp trong kỳ">
           <div class="card-icon">💸</div>
           <div class="card-content">
             <h3>Dòng Tiền</h3>
-            <div class="primary-value">${formatCurrency(metrics.cashFlow.netCashFlow, 'VND')}</div>
+            <div class="primary-value" data-tooltip="Dòng tiền ròng = Tổng tiền vào - Tổng tiền ra">${formatCurrency(metrics.cashFlow.netCashFlow, 'VND')}</div>
             <div class="secondary-info">
-              <span>Operating: ${formatCurrency(metrics.cashFlow.operatingCashFlow, 'VND')}</span>
-              <span>Free: ${formatCurrency(metrics.cashFlow.freeCashFlow, 'VND')}</span>
+              <span data-tooltip="Dòng tiền từ hoạt động kinh doanh chính">Operating: ${formatCurrency(metrics.cashFlow.operatingCashFlow, 'VND')}</span>
+              <span data-tooltip="Dòng tiền tự do sau khi trừ chi phí đầu tư">Free: ${formatCurrency(metrics.cashFlow.freeCashFlow, 'VND')}</span>
             </div>
           </div>
           <div class="card-trend ${metrics.cashFlow.netCashFlow >= 0 ? 'positive' : 'negative'}">
@@ -598,25 +598,25 @@ function renderFinancialPerformance(metrics) {
         <div class="performance-card pnl-card">
           <h3>📋 Báo Cáo Lãi Lỗ</h3>
           <div class="pnl-items">
-            <div class="pnl-item revenue">
+            <div class="pnl-item revenue" data-tooltip="Tổng tiền thu được từ bán hàng và dịch vụ trong kỳ">
               <span class="label">Doanh thu</span>
               <span class="value positive">${formatCurrency(metrics.financial.totalRevenue, 'VND')}</span>
             </div>
-            <div class="pnl-item cogs">
+            <div class="pnl-item cogs" data-tooltip="Chi phí trực tiếp để tạo ra sản phẩm/dịch vụ đã bán (Cost of Goods Sold)">
               <span class="label">Giá vốn hàng bán (COGS)</span>
               <span class="value negative">-${formatCurrency(metrics.costs.costOfRevenue, 'VND')}</span>
             </div>
-            <div class="pnl-item gross-profit">
+            <div class="pnl-item gross-profit" data-tooltip="Lợi nhuận gộp = Doanh thu - Giá vốn. Số tiền còn lại để chi trả chi phí vận hành">
               <span class="label">Lợi nhuận gộp</span>
               <span class="value ${metrics.financial.grossProfit >= 0 ? 'positive' : 'negative'}">
                 ${formatCurrency(metrics.financial.grossProfit, 'VND')}
               </span>
             </div>
-            <div class="pnl-item operating">
+            <div class="pnl-item operating" data-tooltip="Chi phí vận hành hàng ngày như lương, thuê mặt bằng, marketing, hành chính (Operating Expenses)">
               <span class="label">Chi phí vận hành (OPEX)</span>
               <span class="value negative">-${formatCurrency(metrics.costs.operating, 'VND')}</span>
             </div>
-            <div class="pnl-item net-profit">
+            <div class="pnl-item net-profit" data-tooltip="Lợi nhuận cuối cùng sau khi trừ tất cả chi phí. Đây là số tiền thực sự kiếm được">
               <span class="label">Lợi nhuận ròng</span>
               <span class="value ${metrics.financial.netProfit >= 0 ? 'positive' : 'negative'}">
                 ${formatCurrency(metrics.financial.netProfit, 'VND')}
@@ -629,21 +629,21 @@ function renderFinancialPerformance(metrics) {
         <div class="performance-card ratios-card">
           <h3>📊 Chỉ Số Quan Trọng</h3>
           <div class="ratio-items">
-            <div class="ratio-item">
+            <div class="ratio-item" data-tooltip="Tỷ suất lợi nhuận gộp cho biết bạn giữ lại được bao nhiêu % doanh thu sau khi trừ giá vốn hàng bán. Càng cao càng tốt.">
               <div class="ratio-label">Tỷ suất lợi nhuận gộp</div>
               <div class="ratio-value">${metrics.financial.grossMargin.toFixed(1)}%</div>
               <div class="ratio-bar">
                 <div class="ratio-fill" style="width: ${Math.min(metrics.financial.grossMargin, 100)}%"></div>
               </div>
             </div>
-            <div class="ratio-item">
+            <div class="ratio-item" data-tooltip="Tỷ suất lợi nhuận ròng cho biết bạn giữ lại được bao nhiêu % doanh thu sau khi trừ TẤT CẢ chi phí. Đây là chỉ số quan trọng nhất.">
               <div class="ratio-label">Tỷ suất lợi nhuận ròng</div>
               <div class="ratio-value">${metrics.financial.profitMargin.toFixed(1)}%</div>
               <div class="ratio-bar">
                 <div class="ratio-fill" style="width: ${Math.min(Math.abs(metrics.financial.profitMargin), 100)}%"></div>
               </div>
             </div>
-            <div class="ratio-item">
+            <div class="ratio-item" data-tooltip="Tỷ lệ chi phí vận hành so với doanh thu. Càng thấp càng tốt, dưới 70% là tốt, dưới 50% là xuất sắc.">
               <div class="ratio-label">Hiệu quả chi phí</div>
               <div class="ratio-value">${metrics.efficiency.costEfficiencyRatio.toFixed(1)}%</div>
               <div class="ratio-bar">
@@ -696,28 +696,28 @@ function renderRevenueAnalysis(metrics) {
         <div class="analysis-card metrics-card">
           <h3>📊 Chỉ Số Doanh Thu</h3>
           <div class="metrics-grid">
-            <div class="metric-item">
+            <div class="metric-item" data-tooltip="Giá trị trung bình của mỗi giao dịch. Tăng chỉ số này bằng cách bán thêm sản phẩm hoặc nâng cấp gói">
               <div class="metric-icon">🎯</div>
               <div class="metric-content">
                 <div class="metric-label">Giá trị đơn hàng TB</div>
                 <div class="metric-value">${formatCurrency(metrics.revenue.averageOrderValue, 'VND')}</div>
               </div>
             </div>
-            <div class="metric-item">
+            <div class="metric-item" data-tooltip="Tổng số giao dịch thành công trong kỳ báo cáo">
               <div class="metric-icon">📦</div>
               <div class="metric-content">
                 <div class="metric-label">Tổng số giao dịch</div>
                 <div class="metric-value">${metrics.revenue.totalTransactions}</div>
               </div>
             </div>
-            <div class="metric-item">
+            <div class="metric-item" data-tooltip="Chi phí trung bình cho mỗi giao dịch. Giảm chỉ số này để tăng lợi nhuận">
               <div class="metric-icon">💎</div>
               <div class="metric-content">
                 <div class="metric-label">Chi phí mỗi giao dịch</div>
                 <div class="metric-value">${formatCurrency(metrics.costs.costPerTransaction, 'VND')}</div>
               </div>
             </div>
-            <div class="metric-item">
+            <div class="metric-item" data-tooltip="Doanh thu trung bình trên mỗi giao dịch, thể hiện hiệu quả bán hàng">
               <div class="metric-icon">🚀</div>
               <div class="metric-content">
                 <div class="metric-label">Chỉ số năng suất</div>
@@ -768,14 +768,14 @@ function renderCostManagement(metrics) {
         <div class="cost-card efficiency-card">
           <h3>⚡ Hiệu Quả Chi Phí</h3>
           <div class="efficiency-metrics">
-            <div class="efficiency-item">
+            <div class="efficiency-item" data-tooltip="Tỷ lệ chi phí vận hành so với doanh thu. Thấp hơn 70% là tốt, thấp hơn 50% là xuất sắc">
               <div class="efficiency-label">Chi phí vận hành / Doanh thu</div>
               <div class="efficiency-value">${metrics.efficiency.costEfficiencyRatio.toFixed(1)}%</div>
               <div class="efficiency-status ${metrics.efficiency.costEfficiencyRatio < 70 ? 'good' : 'warning'}">
                 ${metrics.efficiency.costEfficiencyRatio < 70 ? '✅ Tốt' : '⚠️ Cần cải thiện'}
               </div>
             </div>
-            <div class="efficiency-item">
+            <div class="efficiency-item" data-tooltip="Số tiền chi tiêu trung bình mỗi ngày cho hoạt động kinh doanh (không bao gồm chi phí cá nhân)">
               <div class="efficiency-label">Burn Rate (hàng ngày)</div>
               <div class="efficiency-value">${formatCurrency(metrics.kpis.burnRate, 'VND')}</div>
               <div class="efficiency-status neutral">📊 Theo dõi</div>
@@ -786,19 +786,19 @@ function renderCostManagement(metrics) {
           <div class="accounting-breakdown">
             <h4>📊 Phân loại kế toán</h4>
             <div class="breakdown-items">
-              <div class="breakdown-item">
+              <div class="breakdown-item" data-tooltip="Cost of Goods Sold - Chi phí trực tiếp để tạo ra sản phẩm/dịch vụ">
                 <span class="breakdown-label">COGS</span>
                 <span class="breakdown-value">${formatCurrency(metrics.costs.accountingBreakdown.COGS, 'VND')}</span>
                 <span class="breakdown-percent">${metrics.financial.totalExpenses > 0 ? 
                   ((metrics.costs.accountingBreakdown.COGS / metrics.financial.totalExpenses) * 100).toFixed(1) : 0}%</span>
               </div>
-              <div class="breakdown-item">
+              <div class="breakdown-item" data-tooltip="Operating Expenses - Chi phí vận hành kinh doanh như lương, thuê văn phòng, marketing">
                 <span class="breakdown-label">OPEX</span>
                 <span class="breakdown-value">${formatCurrency(metrics.costs.accountingBreakdown.OPEX, 'VND')}</span>
                 <span class="breakdown-percent">${metrics.financial.totalExpenses > 0 ? 
                   ((metrics.costs.accountingBreakdown.OPEX / metrics.financial.totalExpenses) * 100).toFixed(1) : 0}%</span>
               </div>
-              <div class="breakdown-item">
+              <div class="breakdown-item" data-tooltip="Chi phí cá nhân không liên quan đến kinh doanh">
                 <span class="breakdown-label">Không liên quan</span>
                 <span class="breakdown-value">${formatCurrency(metrics.costs.accountingBreakdown['Không liên quan'], 'VND')}</span>
                 <span class="breakdown-percent">${metrics.financial.totalExpenses > 0 ? 
@@ -872,7 +872,7 @@ function renderOperationalEfficiency(metrics) {
         <div class="efficiency-card kpi-card">
           <h3>🎯 KPIs Quan Trọng</h3>
           <div class="kpi-list">
-            <div class="kpi-item">
+            <div class="kpi-item" data-tooltip="Giá trị trọng đời của khách hàng - Tổng doanh thu ước tính từ một khách hàng trong suốt thời gian họ là khách hàng">
               <div class="kpi-icon">💎</div>
               <div class="kpi-content">
                 <div class="kpi-label">Customer Lifetime Value</div>
@@ -880,7 +880,7 @@ function renderOperationalEfficiency(metrics) {
                 <div class="kpi-trend">📈 Ước tính</div>
               </div>
             </div>
-            <div class="kpi-item">
+            <div class="kpi-item" data-tooltip="Doanh thu trung bình trên mỗi giao dịch">
               <div class="kpi-icon">🎪</div>
               <div class="kpi-content">
                 <div class="kpi-label">Revenue per Transaction</div>
@@ -888,7 +888,7 @@ function renderOperationalEfficiency(metrics) {
                 <div class="kpi-trend">📊 Hiện tại</div>
               </div>
             </div>
-            <div class="kpi-item">
+            <div class="kpi-item" data-tooltip="Hiệu quả vận hành - Phần trăm doanh thu giữ lại sau khi trừ chi phí vận hành">
               <div class="kpi-icon">⚡</div>
               <div class="kpi-content">
                 <div class="kpi-label">Operational Efficiency</div>
@@ -1009,7 +1009,47 @@ function addBusinessDashboardInteractivity(metrics) {
     });
   });
   
+  // Initialize tooltip functionality
+  initializeTooltips();
+  
   console.log("✅ Business dashboard interactivity added");
+}
+
+/**
+ * Initialize tooltip functionality
+ */
+function initializeTooltips() {
+  // Add tooltip functionality for touch devices
+  const tooltipElements = document.querySelectorAll('[data-tooltip]');
+  
+  tooltipElements.forEach(element => {
+    // For touch devices, show tooltip on tap
+    element.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      showTooltip(element);
+      
+      // Hide after 3 seconds
+      setTimeout(() => {
+        hideTooltip(element);
+      }, 3000);
+    });
+  });
+  
+  console.log("✅ Tooltips initialized for", tooltipElements.length, "elements");
+}
+
+/**
+ * Show tooltip programmatically
+ */
+function showTooltip(element) {
+  element.classList.add('tooltip-active');
+}
+
+/**
+ * Hide tooltip programmatically
+ */
+function hideTooltip(element) {
+  element.classList.remove('tooltip-active');
 }
 
 /**
@@ -1027,6 +1067,110 @@ export function addBusinessDashboardStyles() {
       background: #f5f7fa;
       min-height: 100vh;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    /* Tooltip Styles */
+    [data-tooltip] {
+      position: relative;
+      cursor: help;
+    }
+    
+    [data-tooltip]:hover::before,
+    [data-tooltip]:hover::after {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    
+    [data-tooltip]::before {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(5px);
+      padding: 10px 15px;
+      background-color: rgba(33, 37, 41, 0.95);
+      color: white;
+      font-size: 13px;
+      line-height: 1.5;
+      border-radius: 6px;
+      white-space: normal;
+      max-width: 300px;
+      min-width: 200px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      font-weight: normal;
+    }
+    
+    [data-tooltip]::after {
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      border: 6px solid transparent;
+      border-top-color: rgba(33, 37, 41, 0.95);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+    
+    /* Adjust tooltip position for elements near the top */
+    .summary-card[data-tooltip]::before,
+    .pnl-item[data-tooltip]::before {
+      bottom: auto;
+      top: 100%;
+      transform: translateX(-50%) translateY(-5px);
+    }
+    
+    .summary-card[data-tooltip]:hover::before,
+    .pnl-item[data-tooltip]:hover::before {
+      transform: translateX(-50%) translateY(5px);
+    }
+    
+    .summary-card[data-tooltip]::after,
+    .pnl-item[data-tooltip]::after {
+      bottom: auto;
+      top: 100%;
+      transform: translateX(-50%) translateY(-10px);
+      border-top-color: transparent;
+      border-bottom-color: rgba(33, 37, 41, 0.95);
+    }
+    
+    .summary-card[data-tooltip]:hover::after,
+    .pnl-item[data-tooltip]:hover::after {
+      transform: translateX(-50%) translateY(-2px);
+    }
+    
+    /* Special handling for small elements */
+    .secondary-info span[data-tooltip]::before,
+    .breakdown-item[data-tooltip]::before {
+      left: 0;
+      transform: translateX(0) translateY(5px);
+    }
+    
+    .secondary-info span[data-tooltip]:hover::before,
+    .breakdown-item[data-tooltip]:hover::before {
+      transform: translateX(0) translateY(0);
+    }
+    
+    .secondary-info span[data-tooltip]::after,
+    .breakdown-item[data-tooltip]::after {
+      left: 20px;
+      transform: translateX(0) translateY(10px);
+    }
+    
+    /* Active tooltip state for touch devices */
+    [data-tooltip].tooltip-active::before,
+    [data-tooltip].tooltip-active::after {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) !important;
     }
     
     /* Dashboard Header */
