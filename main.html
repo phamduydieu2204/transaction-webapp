@@ -936,6 +936,7 @@
       <div class="form-container">
         <form id="transactionForm" onreset="handleReset()">
           <div class="form-grid">
+              <!-- Hàng 1: Thông tin khách hàng -->
               <div style="grid-column: span 4;">
                 <label>Email khách hàng:</label>
                 <input type="email" id="customerEmail">
@@ -949,15 +950,12 @@
                 </div>
               </div>
 
-              <div style="grid-column: span 2;">
-                <label>SĐT liên hệ:</label>
+              <div style="grid-column: span 4;">
+                <label>Liên hệ:</label>
                 <input type="text" id="customerPhone">
               </div>
 
-              <div style="grid-column: span 2;">
-                <label>Nhà cung cấp:</label>
-                <input type="text" id="transactionSupplier">
-              </div>
+              <!-- Hàng 2: Thông tin giao dịch -->
               <div style="grid-column: span 2;">
                 <label>Ngày giao dịch:</label>
                 <div class="date-input-container">
@@ -977,8 +975,8 @@
                 </select>
               </div>
 
-              <div style="grid-column: span 1;">
-                <label>Số tháng:</label>
+              <div style="grid-column: span 2;">
+                <label>Số tháng đăng ký:</label>
                 <input type="number" id="duration">
               </div>
 
@@ -998,15 +996,12 @@
                 </div>
               </div>
 
-              <div style="grid-column: span 1;">
-                <label>Số TB:</label>
+              <div style="grid-column: span 2;">
+                <label>Số thiết bị:</label>
                 <input type="number" id="deviceCount">
               </div>
 
-              <div style="grid-column: span 2;">
-                <label>Doanh thu (VNĐ):</label>
-                <input type="number" id="revenue">
-              </div>
+              <!-- Hàng 3: Thông tin phần mềm và doanh thu -->
               <div style="grid-column: span 3;">
                 <label>Tên phần mềm:</label>
                 <select id="softwareName">
@@ -1021,25 +1016,22 @@
                 </select>
               </div>
 
-              <div style="grid-column: span 2;">
+              <div style="grid-column: span 3;">
                 <label>Tên tài khoản:</label>
                 <select id="accountName">
                   <option value="">-- Chọn tài khoản --</option>
                 </select>
               </div>
 
-              <div style="grid-column: span 2;">
-                <label>Trạng thái:</label>
-                <select id="transactionStatus">
-                  <option value="Đang hoạt động">Đang hoạt động</option>
-                  <option value="Hết hạn">Hết hạn</option>
-                  <option value="Đã hủy">Đã hủy</option>
-                </select>
+              <div style="grid-column: span 3;">
+                <label>Doanh thu (VNĐ):</label>
+                <input type="number" id="revenue">
               </div>
 
-              <div style="grid-column: span 2;">
+              <!-- Hàng 4: Ghi chú -->
+              <div style="grid-column: span 12;">
                 <label>Ghi chú:</label>
-                <textarea id="note" rows="1"></textarea>
+                <textarea id="note" rows="2"></textarea>
               </div>
           </div>
 
