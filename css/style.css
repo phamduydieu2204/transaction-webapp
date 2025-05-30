@@ -113,6 +113,25 @@ body.login-page {
     margin-bottom: 8px;
   }
   
+  /* Layout riêng cho expense form - tối đa 7 trường mỗi dòng */
+  #expenseForm.form-grid {
+    grid-template-columns: repeat(14, 1fr); /* 14 cột để chia đều cho 7 trường */
+  }
+  
+  #expenseForm.form-grid > div {
+    grid-column: span 2; /* Mỗi trường chiếm 2 cột = 7 trường/dòng */
+  }
+  
+  /* Ghi chú chiếm 4 cột (2 trường) */
+  #expenseForm.form-grid > .note-field {
+    grid-column: span 4;
+  }
+  
+  /* Button row chiếm toàn bộ chiều rộng */
+  #expenseForm.form-grid > .button-row {
+    grid-column: 1 / -1;
+  }
+  
   .form-grid div {
     display: flex;
     flex-direction: column;
