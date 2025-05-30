@@ -5,51 +5,8 @@
  * Hiển thị ở header: doanh thu ở trên (xanh), chi phí ở dưới (đỏ)
  */
 export function updateTotalDisplay() {
-  const revenueEl = document.getElementById("todayRevenue");
-  const expenseEl = document.getElementById("todayExpenseTotal");
-  
-  // Kiểm tra admin
-  const isAdmin = window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin";
-  
-  // Kiểm tra có đang ở tab thống kê không
-  const isStatsTab = document.body.classList.contains("show-totals");
-  
-  console.log("🔄 updateTotalDisplay - isAdmin:", isAdmin, "isStatsTab:", isStatsTab);
-  console.log("🔄 totalRevenue:", window.totalRevenue);
-  console.log("🔄 totalExpense:", window.totalExpense);
-  
-  if (!isAdmin || !isStatsTab) {
-    if (revenueEl) revenueEl.textContent = "";
-    if (expenseEl) expenseEl.textContent = "";
-    return;
-  }
-  
-  // Hiển thị doanh thu
-  if (revenueEl && window.totalRevenue !== undefined) {
-    const revenueText = window.isSearching 
-      ? `Tổng doanh thu (tìm kiếm): ${window.totalRevenue.toLocaleString()} VNĐ`
-      : `Tổng doanh thu hôm nay: ${window.totalRevenue.toLocaleString()} VNĐ`;
-    revenueEl.textContent = revenueText;
-    console.log("💰 Hiển thị doanh thu:", revenueText);
-  }
-  
-  // Hiển thị chi phí  
-  if (expenseEl && window.totalExpense !== undefined) {
-    const expenseText = window.isExpenseSearching 
-      ? `Tổng chi phí (tìm kiếm): ${window.totalExpense.toLocaleString()} VNĐ`
-      : `Tổng chi phí hôm nay: ${window.totalExpense.toLocaleString()} VNĐ`;
-    expenseEl.textContent = expenseText;
-    console.log("💸 Hiển thị chi phí:", expenseText);
-  }
-  
-  // Cập nhật chi phí ở bottom (trong expense pagination)
-  const expenseBottomEl = document.getElementById("todayExpenseTotalBottom");
-  if (expenseBottomEl && window.totalExpense !== undefined) {
-    const expenseText = window.isExpenseSearching 
-      ? `Tổng chi phí (tìm kiếm): ${window.totalExpense.toLocaleString()} VNĐ`
-      : `Tổng chi phí hôm nay: ${window.totalExpense.toLocaleString()} VNĐ`;
-    expenseBottomEl.textContent = expenseText;
-  }
+  // Không làm gì cả - đã xóa totals display
+  console.log("🔄 updateTotalDisplay - totals display đã bị xóa");
 }
 
 /**

@@ -844,10 +844,6 @@ body.login-page {
     margin-top: 10px;
   }
   
-  .totals-container {
-    font-size: 12px !important;
-    flex-wrap: wrap;
-  }
 }
 /* Header container - flexbox layout */
 .header-container {
@@ -866,35 +862,4 @@ body.login-page {
   font-size: 28px;
 }
 
-/* Container cho tổng doanh thu và chi phí trong header - chỉ hiển thị ở tab thống kê */
-.header-container .totals-container {
-  display: none;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-  min-width: 250px;
-}
-
-/* Hiển thị totals chỉ khi ở tab thống kê */
-.show-totals .header-container .totals-container {
-  display: flex !important;
-}
-
-/* Styling cho từng dòng tổng số trong header */
-.header-container .total-item {
-  font-weight: bold;
-  font-size: 14px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  background: transparent;
-  white-space: nowrap;
-}
-
-.header-container .total-item.revenue {
-  color: #2d7d2d !important;
-}
-
-.header-container .total-item.expense {
-  color: #c53030 !important;
-}
 

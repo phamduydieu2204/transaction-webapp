@@ -124,12 +124,8 @@ function renderExpenseData(data) {
   // ✅ Lưu tổng chi phí vào biến global và cập nhật hiển thị
   window.totalExpense = totalExpense;
 
-  // Gọi hàm cập nhật hiển thị tổng số
-  if (typeof updateTotalDisplay === 'function') {
-    updateTotalDisplay();
-  } else if (typeof window.updateTotalDisplay === 'function') {
-    window.updateTotalDisplay();
-  }
+  // Không cần cập nhật hiển thị totals nữa - đã xóa
+  console.log("✅ Đã lưu totalExpense:", totalExpense, "- Không hiển thị totals");
 
   // ✅ CHỈ RENDER BẢNG NẾU ĐANG Ở TAB TƯƠNG ỨNG
   if (isChiPhiTab) {

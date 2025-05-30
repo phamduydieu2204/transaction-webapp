@@ -162,22 +162,6 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
   window.totalRevenue = totalRevenue;
   console.log("✅ Đã lưu totalRevenue:", totalRevenue);
 
-  // Gọi hàm cập nhật hiển thị tổng số
-  if (typeof updateTotalDisplay === 'function') {
-    updateTotalDisplay();
-  } else if (typeof window.updateTotalDisplay === 'function') {
-    window.updateTotalDisplay();
-  } else {
-    // Fallback nếu hàm chưa load - chỉ hiển thị nếu đang ở tab thống kê
-    console.warn("⚠️ updateTotalDisplay chưa sẵn sàng, sử dụng fallback");
-    const todayRevenueElement = document.getElementById("todayRevenue");
-    const isStatsTab = document.body.classList.contains("show-totals");
-    if (todayRevenueElement && window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin" && isStatsTab) {
-      const displayText = window.isSearching 
-        ? `Tổng doanh thu (kết quả tìm kiếm): ${totalRevenue.toLocaleString()} VNĐ`
-        : `Tổng doanh thu hôm nay: ${totalRevenue.toLocaleString()} VNĐ`;
-      todayRevenueElement.textContent = displayText;
-      console.log("💰 Fallback - Hiển thị doanh thu:", displayText);
-    }
-  }
+  // Không cần cập nhật hiển thị totals nữa - đã xóa
+  console.log("✅ Đã lưu totalRevenue:", totalRevenue, "- Không hiển thị totals");
 }

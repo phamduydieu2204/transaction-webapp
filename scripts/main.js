@@ -135,12 +135,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       }
 
-      // ✅ Ẩn/hiện phần tổng doanh thu và chi phí - chỉ hiển thị ở tab thống kê
-      if (selectedTab === "tab-thong-ke") {
-        document.body.classList.add("show-totals");
-      } else {
-        document.body.classList.remove("show-totals");
-      }
 
       // ✅ Xử lý logic riêng cho từng tab
       if (selectedTab === "tab-giao-dich") {
