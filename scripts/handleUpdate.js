@@ -91,7 +91,6 @@ export async function handleUpdate(
     const result = await response.json();
 
     if (result.status === "success") {
-      document.getElementById("successMessage").textContent = "Giao dịch đã được cập nhật!";
       handleReset(fetchSoftwareList, showProcessingModal, showResultModal, window.todayFormatted, updatePackageList, updateAccountList);
       await loadTransactions(userInfo, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction);
       window.loadTransactions();

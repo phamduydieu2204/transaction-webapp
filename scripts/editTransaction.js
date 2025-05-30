@@ -74,6 +74,17 @@ console.log("🔎 typeof fetchSoftwareList =", typeof fetchSoftwareList);
     const matchedOption = Array.from(transactionTypeSelect.options)
                                .find(opt => opt.value.toLowerCase() === normalizedType);
     transactionTypeSelect.value = matchedOption ? matchedOption.value : "";
+    
+    // Thêm cảnh báo nếu đang sửa từ Bán hàng sang Hoàn tiền
+    transactionTypeSelect.addEventListener("change", function() {
+      if (transaction.transactionType !== "Hoàn Tiền" && this.value === "Hoàn Tiền") {
+        alert("⚠️ Lưu ý: Khi chuyển từ 'Bán hàng' sang 'Hoàn Tiền':\n\n" +
+              "1. Hệ thống sẽ tự động tạo giao dịch hoàn tiền MỚI\n" +
+              "2. Giao dịch gốc vẫn giữ là 'Bán hàng' nhưng ngày kết thúc = hôm nay\n" +
+              "3. Doanh thu hoàn tiền sẽ tự động là số âm của giao dịch gốc\n\n" +
+              "Bạn không cần nhập lại doanh thu!");
+      }
+    });
   }
 
   // Gắn sự kiện 'change' cho dropdown tài khoản để cập nhật biến toàn cục tương ứng
