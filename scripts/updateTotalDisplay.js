@@ -11,11 +11,14 @@ export function updateTotalDisplay() {
   // Kiểm tra admin
   const isAdmin = window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin";
   
-  console.log("🔄 updateTotalDisplay - isAdmin:", isAdmin);
+  // Kiểm tra có đang ở tab thống kê không
+  const isStatsTab = document.body.classList.contains("show-totals");
+  
+  console.log("🔄 updateTotalDisplay - isAdmin:", isAdmin, "isStatsTab:", isStatsTab);
   console.log("🔄 totalRevenue:", window.totalRevenue);
   console.log("🔄 totalExpense:", window.totalExpense);
   
-  if (!isAdmin) {
+  if (!isAdmin || !isStatsTab) {
     if (revenueEl) revenueEl.textContent = "";
     if (expenseEl) expenseEl.textContent = "";
     return;

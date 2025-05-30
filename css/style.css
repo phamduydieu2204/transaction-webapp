@@ -866,13 +866,18 @@ body.login-page {
   font-size: 28px;
 }
 
-/* Container cho tổng doanh thu và chi phí trong header */
+/* Container cho tổng doanh thu và chi phí trong header - chỉ hiển thị ở tab thống kê */
 .header-container .totals-container {
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: flex-end;
   gap: 4px;
   min-width: 250px;
+}
+
+/* Hiển thị totals chỉ khi ở tab thống kê */
+.show-totals .header-container .totals-container {
+  display: flex !important;
 }
 
 /* Styling cho từng dòng tổng số trong header */
