@@ -125,6 +125,9 @@ async function loadOverviewReport() {
     expenseList: window.expenseList ? window.expenseList.length : 0
   });
   
+  // Ensure data is loaded before proceeding
+  await ensureDataIsLoaded();
+  
   // Financial dashboard đã được render từ statisticsUIController
   // Chỉ cần trigger refresh nếu cần
   if (window.refreshStatisticsWithFilters) {
@@ -140,6 +143,54 @@ async function loadOverviewReport() {
     loadRevenueChart()
   ]);
   console.log('✅ Overview components loaded');
+}
+
+/**
+ * Ensure data is loaded before rendering reports
+ */
+async function ensureDataIsLoaded() {
+  let attempts = 0;
+  const maxAttempts = 50; // Wait up to 5 seconds
+  
+  while (attempts < maxAttempts && (!window.transactionList || !window.expenseList)) {
+    console.log(`⏳ Waiting for data to load... (attempt ${attempts + 1}/${maxAttempts})`);
+    await new Promise(resolve => setTimeout(resolve, 100));
+    attempts++;
+  }
+  
+  // If still no data after waiting, try to trigger load
+  if (!window.transactionList || window.transactionList.length === 0) {
+    console.log('🔄 No transaction data found, triggering load...');
+    if (window.loadTransactions) {
+      try {
+        await window.loadTransactions();
+      } catch (error) {
+        console.warn('⚠️ Failed to load transactions:', error);
+      }
+    }
+  }
+  
+  // Also ensure expense data is loaded
+  if (!window.expenseList || window.expenseList.length === 0) {
+    console.log('🔄 No expense data found, trying to load from statistics...');
+    // Try to get expense data from statistics module
+    if (window.loadStatisticsData && typeof window.loadStatisticsData === 'function') {
+      try {
+        await window.loadStatisticsData();
+      } catch (error) {
+        console.warn('⚠️ Failed to load expense data:', error);
+      }
+    }
+  }
+  
+  // Use fallback data if still no data
+  if (!window.transactionList) window.transactionList = [];
+  if (!window.expenseList) window.expenseList = [];
+  
+  console.log('✅ Data ensured:', {
+    transactions: window.transactionList.length,
+    expenses: window.expenseList.length
+  });
 }
 
 /**
@@ -257,10 +308,17 @@ async function loadTopProducts() {
   
   let transactionData = window.transactionList || [];
   
+  console.log('🏆 loadTopProducts:', {
+    totalTransactions: transactionData.length,
+    hasGlobalFilters: !!(window.globalFilters),
+    hasDateRange: !!(window.globalFilters && window.globalFilters.dateRange)
+  });
+  
   // Apply date filter if exists
   if (window.globalFilters && window.globalFilters.dateRange) {
     const { filterDataByDateRange } = await import('./financialDashboard.js');
     transactionData = filterDataByDateRange(transactionData, window.globalFilters.dateRange);
+    console.log('🔍 After filtering:', transactionData.length, 'transactions');
   }
   
   const productRevenue = {};
@@ -276,6 +334,12 @@ async function loadTopProducts() {
   const topProducts = Object.entries(productRevenue)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5);
+  
+  console.log('🔢 Product revenue calculated:', {
+    totalProducts: Object.keys(productRevenue).length,
+    topProducts: topProducts.length,
+    sampleProduct: topProducts[0]
+  });
   
   // Get period label
   const periodLabel = getPeriodLabel();
@@ -374,11 +438,22 @@ async function loadSummaryStats() {
   let transactionData = window.transactionList || [];
   let expenseData = window.expenseList || [];
   
+  console.log('📊 loadSummaryStats:', {
+    initialTransactions: transactionData.length,
+    initialExpenses: expenseData.length,
+    hasGlobalFilters: !!(window.globalFilters),
+    hasDateRange: !!(window.globalFilters && window.globalFilters.dateRange)
+  });
+  
   // Apply date filter if exists
   if (window.globalFilters && window.globalFilters.dateRange) {
     const { filterDataByDateRange } = await import('./financialDashboard.js');
     transactionData = filterDataByDateRange(transactionData, window.globalFilters.dateRange);
     expenseData = filterDataByDateRange(expenseData, window.globalFilters.dateRange);
+    console.log('🔍 After filtering:', {
+      transactions: transactionData.length,
+      expenses: expenseData.length
+    });
   }
   
   // Calculate statistics
@@ -386,6 +461,13 @@ async function loadSummaryStats() {
   const totalCustomers = new Set(transactionData.map(t => t.customerName)).size;
   const totalSoftware = new Set(transactionData.map(t => t.softwareName)).size;
   const totalExpenseItems = expenseData.length;
+  
+  console.log('📈 Summary stats calculated:', {
+    totalTransactions,
+    totalCustomers,
+    totalSoftware,
+    totalExpenseItems
+  });
   
   // Render summary stats
   container.innerHTML = `
@@ -1047,6 +1129,9 @@ function refreshCurrentReport() {
   console.log('🔄 Refreshing current report:', reportState.currentReport);
   loadReport(reportState.currentReport);
 }
+
+// Export refresh function globally
+window.refreshCurrentReport = refreshCurrentReport;
 
 /**
  * Export current report

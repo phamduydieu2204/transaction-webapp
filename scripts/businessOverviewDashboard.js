@@ -346,13 +346,87 @@ function calculateGrowthMetrics(transactionData, expenseData, dateRange) {
   const currentProfit = currentRevenue - currentExpenses;
   const currentTransactionCount = transactionData.length;
   
-  // For now, return placeholder values
-  // In a real implementation, we would need to fetch previous period data
+  // Calculate growth by comparing current month vs previous month
+  let revenueGrowth = 0;
+  let expenseGrowth = 0;
+  let profitGrowth = 0;
+  let transactionGrowth = 0;
+  
+  try {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    
+    // Get previous month
+    const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+    
+    // Filter current month data
+    const currentMonthTransactions = transactionData.filter(t => {
+      const date = new Date(t.transactionDate || t.date);
+      return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+    });
+    
+    const currentMonthExpenses = expenseData.filter(e => {
+      const date = new Date(e.date || e.transactionDate);
+      return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+    });
+    
+    // Filter previous month data
+    const prevMonthTransactions = transactionData.filter(t => {
+      const date = new Date(t.transactionDate || t.date);
+      return date.getMonth() === prevMonth && date.getFullYear() === prevYear;
+    });
+    
+    const prevMonthExpenses = expenseData.filter(e => {
+      const date = new Date(e.date || e.transactionDate);
+      return date.getMonth() === prevMonth && date.getFullYear() === prevYear;
+    });
+    
+    // Calculate metrics for both periods
+    const currentMonthRevenue = calculateTotalRevenue(currentMonthTransactions);
+    const currentMonthExpenseTotal = calculateTotalExpenses(currentMonthExpenses);
+    const currentMonthProfit = currentMonthRevenue - currentMonthExpenseTotal;
+    
+    const prevMonthRevenue = calculateTotalRevenue(prevMonthTransactions);
+    const prevMonthExpenseTotal = calculateTotalExpenses(prevMonthExpenses);
+    const prevMonthProfit = prevMonthRevenue - prevMonthExpenseTotal;
+    
+    // Calculate growth percentages
+    if (prevMonthRevenue > 0) {
+      revenueGrowth = ((currentMonthRevenue - prevMonthRevenue) / prevMonthRevenue) * 100;
+    }
+    
+    if (prevMonthExpenseTotal > 0) {
+      expenseGrowth = ((currentMonthExpenseTotal - prevMonthExpenseTotal) / prevMonthExpenseTotal) * 100;
+    }
+    
+    if (prevMonthProfit !== 0) {
+      profitGrowth = ((currentMonthProfit - prevMonthProfit) / Math.abs(prevMonthProfit)) * 100;
+    }
+    
+    if (prevMonthTransactions.length > 0) {
+      transactionGrowth = ((currentMonthTransactions.length - prevMonthTransactions.length) / prevMonthTransactions.length) * 100;
+    }
+    
+    console.log('📊 Growth calculation:', {
+      currentMonthRevenue,
+      prevMonthRevenue,
+      revenueGrowth,
+      currentMonthTransactions: currentMonthTransactions.length,
+      prevMonthTransactions: prevMonthTransactions.length,
+      transactionGrowth
+    });
+    
+  } catch (error) {
+    console.warn('⚠️ Error calculating growth metrics:', error);
+  }
+  
   return {
-    revenueGrowth: 0,
-    expenseGrowth: 0,
-    profitGrowth: 0,
-    transactionGrowth: 0,
+    revenueGrowth: isFinite(revenueGrowth) ? revenueGrowth : 0,
+    expenseGrowth: isFinite(expenseGrowth) ? expenseGrowth : 0,
+    profitGrowth: isFinite(profitGrowth) ? profitGrowth : 0,
+    transactionGrowth: isFinite(transactionGrowth) ? transactionGrowth : 0,
     // Add current values for reference
     currentRevenue,
     currentExpenses,
@@ -843,14 +917,11 @@ function renderGrowthTrends(metrics) {
           </div>
         </div>
         
-        <!-- Trend Chart Placeholder -->
+        <!-- Trend Chart -->
         <div class="trend-card chart-card">
           <h3>📈 Biểu Đồ Xu Hướng</h3>
-          <div class="chart-placeholder">
-            <div class="chart-info">
-              <p>📊 Biểu đồ xu hướng doanh thu và chi phí</p>
-              <p>🔄 Tích hợp với module chart hiện tại</p>
-            </div>
+          <div id="trendChart" class="trend-chart-container">
+            <!-- Chart will be rendered here -->
           </div>
         </div>
         
@@ -998,7 +1069,7 @@ function filterDataByDateRange(data, dateRange) {
 /**
  * Add interactivity to dashboard
  */
-function addBusinessDashboardInteractivity(metrics) {
+async function addBusinessDashboardInteractivity(metrics) {
   // Add hover effects and click handlers
   document.querySelectorAll('.summary-card').forEach(card => {
     card.addEventListener('mouseenter', () => {
@@ -1009,10 +1080,48 @@ function addBusinessDashboardInteractivity(metrics) {
     });
   });
   
+  // Render trend chart
+  await renderTrendChart();
+  
   // Initialize tooltip functionality
   initializeTooltips();
   
   console.log("✅ Business dashboard interactivity added");
+}
+
+/**
+ * Render trend chart using existing chart module
+ */
+async function renderTrendChart() {
+  try {
+    // Check if trend chart container exists
+    const container = document.getElementById('trendChart');
+    if (!container) {
+      console.log('⚠️ Trend chart container not found');
+      return;
+    }
+    
+    // Import chart module
+    const { renderRevenueExpenseChart, addRevenueExpenseChartStyles } = await import('./revenueExpenseChart.js');
+    
+    // Add styles
+    addRevenueExpenseChartStyles();
+    
+    // Get data
+    const transactionData = window.transactionList || [];
+    const expenseData = window.expenseList || [];
+    
+    // Render chart in the trend container
+    await renderRevenueExpenseChart(transactionData, expenseData, 'trendChart');
+    
+    console.log('✅ Trend chart rendered successfully');
+  } catch (error) {
+    console.error('❌ Error rendering trend chart:', error);
+    const container = document.getElementById('trendChart');
+    if (container) {
+      container.innerHTML = '<p style="color: #c53030; text-align: center; padding: 20px;">Không thể tải biểu đồ xu hướng</p>';
+    }
+  }
 }
 
 /**
