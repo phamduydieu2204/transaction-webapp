@@ -1263,18 +1263,3 @@ body.login-page {
   color: #4a5568;
 }
 
-/* Trend Chart Container */
-.trend-chart-container {
-  min-height: 400px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.trend-chart-container .revenue-expense-chart {
-  width: 100%;
-  margin: 0;
-}

@@ -917,14 +917,6 @@ function renderGrowthTrends(metrics) {
           </div>
         </div>
         
-        <!-- Trend Chart -->
-        <div class="trend-card chart-card">
-          <h3>📈 Biểu Đồ Xu Hướng</h3>
-          <div id="trendChart" class="trend-chart-container">
-            <!-- Chart will be rendered here -->
-          </div>
-        </div>
-        
       </div>
     </div>
   `;
@@ -970,79 +962,11 @@ function renderOperationalEfficiency(metrics) {
           </div>
         </div>
         
-        <!-- Action Items -->
-        <div class="efficiency-card actions-card">
-          <h3>🎯 Khuyến Nghị Hành Động</h3>
-          <div class="action-list">
-            ${generateActionItems(metrics).map(action => `
-              <div class="action-item ${action.priority}">
-                <div class="action-icon">${action.icon}</div>
-                <div class="action-content">
-                  <div class="action-title">${action.title}</div>
-                  <div class="action-description">${action.description}</div>
-                </div>
-                <div class="action-priority">${action.priority}</div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-        
       </div>
     </div>
   `;
 }
 
-/**
- * Generate action items based on metrics
- */
-function generateActionItems(metrics) {
-  const actions = [];
-  
-  if (metrics.financial.profitMargin < 20) {
-    actions.push({
-      icon: '📈',
-      title: 'Tối ưu tỷ suất lợi nhuận',
-      description: 'Tỷ suất lợi nhuận hiện tại thấp, cần tăng giá hoặc giảm chi phí',
-      priority: 'high'
-    });
-  }
-  
-  if (metrics.efficiency.costEfficiencyRatio > 70) {
-    actions.push({
-      icon: '💸',
-      title: 'Kiểm soát chi phí vận hành',
-      description: 'Chi phí vận hành quá cao so với doanh thu',
-      priority: 'high'
-    });
-  }
-  
-  if (metrics.revenue.totalTransactions < 50) {
-    actions.push({
-      icon: '🎯',
-      title: 'Tăng số lượng giao dịch',
-      description: 'Cần tập trung vào marketing và bán hàng',
-      priority: 'medium'
-    });
-  }
-  
-  if (metrics.revenue.averageOrderValue < 100000) {
-    actions.push({
-      icon: '💎',
-      title: 'Nâng cao giá trị đơn hàng',
-      description: 'Phát triển sản phẩm cao cấp hoặc cross-sell',
-      priority: 'medium'
-    });
-  }
-  
-  actions.push({
-    icon: '📊',
-    title: 'Theo dõi KPIs định kỳ',
-    description: 'Thiết lập báo cáo tự động và review hàng tuần',
-    priority: 'low'
-  });
-  
-  return actions;
-}
 
 /**
  * Filter data by date range
@@ -1080,8 +1004,6 @@ async function addBusinessDashboardInteractivity(metrics) {
     });
   });
   
-  // Render trend chart
-  await renderTrendChart();
   
   // Initialize tooltip functionality
   initializeTooltips();
@@ -1089,40 +1011,6 @@ async function addBusinessDashboardInteractivity(metrics) {
   console.log("✅ Business dashboard interactivity added");
 }
 
-/**
- * Render trend chart using existing chart module
- */
-async function renderTrendChart() {
-  try {
-    // Check if trend chart container exists
-    const container = document.getElementById('trendChart');
-    if (!container) {
-      console.log('⚠️ Trend chart container not found');
-      return;
-    }
-    
-    // Import chart module
-    const { renderRevenueExpenseChart, addRevenueExpenseChartStyles } = await import('./revenueExpenseChart.js');
-    
-    // Add styles
-    addRevenueExpenseChartStyles();
-    
-    // Get data
-    const transactionData = window.transactionList || [];
-    const expenseData = window.expenseList || [];
-    
-    // Render chart in the trend container
-    await renderRevenueExpenseChart(transactionData, expenseData, 'trendChart');
-    
-    console.log('✅ Trend chart rendered successfully');
-  } catch (error) {
-    console.error('❌ Error rendering trend chart:', error);
-    const container = document.getElementById('trendChart');
-    if (container) {
-      container.innerHTML = '<p style="color: #c53030; text-align: center; padding: 20px;">Không thể tải biểu đồ xu hướng</p>';
-    }
-  }
-}
 
 /**
  * Initialize tooltip functionality
