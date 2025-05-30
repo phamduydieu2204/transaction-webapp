@@ -80,9 +80,13 @@ console.log("🔎 typeof fetchSoftwareList =", typeof fetchSoftwareList);
       if (transaction.transactionType !== "Hoàn Tiền" && this.value === "Hoàn Tiền") {
         alert("⚠️ Lưu ý: Khi chuyển từ 'Bán hàng' sang 'Hoàn Tiền':\n\n" +
               "1. Hệ thống sẽ tự động tạo giao dịch hoàn tiền MỚI\n" +
-              "2. Giao dịch gốc vẫn giữ là 'Bán hàng' nhưng ngày kết thúc = hôm nay\n" +
-              "3. Doanh thu hoàn tiền sẽ tự động là số âm của giao dịch gốc\n\n" +
-              "Bạn không cần nhập lại doanh thu!");
+              "2. Giao dịch gốc vẫn giữ là 'Bán hàng' với doanh thu ban đầu\n" +
+              "3. Nhập số tiền hoàn lại vào ô Doanh thu (VD: hoàn 11 VNĐ thì nhập 11)\n" +
+              "4. Hệ thống sẽ tự động chuyển thành số âm (-11)\n\n" +
+              "💡 Ví dụ: Giao dịch gốc 1122 VNĐ, hoàn lại 11 VNĐ:\n" +
+              "- Giao dịch gốc: +1122 VNĐ\n" +
+              "- Giao dịch hoàn tiền: -11 VNĐ\n" +
+              "- Tổng thực thu: 1111 VNĐ");
       }
     });
   }
