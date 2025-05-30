@@ -697,7 +697,7 @@ body.login-page {
 .tab-content {
   display: none;
   flex: 1;
-  overflow: hidden;
+  overflow-y: auto;
   padding: 0;
 }
 
@@ -728,7 +728,7 @@ body.login-page {
   display: flex;
   flex-direction: column;
   gap: 0;
-  overflow-y: auto;
+  overflow-y: visible;
 }
 
 .form-container {
