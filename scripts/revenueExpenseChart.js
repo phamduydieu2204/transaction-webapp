@@ -615,7 +615,7 @@ function generateLinePoints(data, type, maxValue) {
   
   return data.map((item, index) => {
     const x = data.length === 1 ? 500 : (1000 / (data.length - 1)) * index;
-    const y = 400 - (item[type] / maxValue) * 400;
+    const y = maxValue === 0 ? 400 : 400 - (item[type] / maxValue) * 400;
     return `${x},${y}`;
   }).join(' ');
 }
@@ -630,7 +630,7 @@ function generateProfitArea(data, maxValue) {
   
   data.forEach((item, index) => {
     const x = data.length === 1 ? 500 : (1000 / (data.length - 1)) * index;
-    const revenueY = 400 - (item.revenue / maxValue) * 400;
+    const revenueY = maxValue === 0 ? 400 : 400 - (item.revenue / maxValue) * 400;
     
     if (index === 0) {
       path += ` L ${x},${revenueY}`;
@@ -642,7 +642,7 @@ function generateProfitArea(data, maxValue) {
   // Close the path
   for (let i = data.length - 1; i >= 0; i--) {
     const x = data.length === 1 ? 500 : (1000 / (data.length - 1)) * i;
-    const expenseY = 400 - (data[i].expense / maxValue) * 400;
+    const expenseY = maxValue === 0 ? 400 : 400 - (data[i].expense / maxValue) * 400;
     path += ` L ${x},${expenseY}`;
   }
   
@@ -660,8 +660,8 @@ function generateDataPoints(data, maxValue) {
   
   data.forEach((item, index) => {
     const x = data.length === 1 ? 500 : (1000 / (data.length - 1)) * index;
-    const revenueY = 400 - (item.revenue / maxValue) * 400;
-    const expenseY = 400 - (item.expense / maxValue) * 400;
+    const revenueY = maxValue === 0 ? 400 : 400 - (item.revenue / maxValue) * 400;
+    const expenseY = maxValue === 0 ? 400 : 400 - (item.expense / maxValue) * 400;
     
     // Revenue point
     points += `

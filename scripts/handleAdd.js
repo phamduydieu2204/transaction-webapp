@@ -76,7 +76,6 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
 
     const result = await response.json();
     if (result.status === "success") {
-      document.getElementById("successMessage").textContent = "Giao dịch đã được lưu!";
       await handleReset(fetchSoftwareList, showProcessingModal, showResultModal, todayFormatted, updatePackageList, updateAccountList);
       await loadTransactions(userInfo, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction);
       window.loadTransactions();
