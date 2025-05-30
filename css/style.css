@@ -122,9 +122,9 @@ body.login-page {
     grid-column: span 2; /* Mỗi trường chiếm 2 cột = 7 trường/dòng */
   }
   
-  /* Ghi chú chiếm 4 cột (2 trường) */
+  /* Ghi chú chiếm 2 cột (1 trường) - giống các trường khác */
   #expenseForm.form-grid > .note-field {
-    grid-column: span 4;
+    grid-column: span 2;
   }
   
   /* Button row chiếm toàn bộ chiều rộng */
