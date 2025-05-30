@@ -393,6 +393,18 @@
     max-width: 100% !important;
   }
   
+  /* Toast notifications on mobile */
+  #toastContainer {
+    top: 10px !important;
+    right: 10px !important;
+    left: 10px !important;
+  }
+  
+  .toast {
+    min-width: auto !important;
+    font-size: 13px;
+  }
+  
   .tab-button[style*="display: none"] {
   display: none !important;
   }
@@ -1545,5 +1557,141 @@
   z-index: 9999;
   cursor: not-allowed;
 "></div>
+
+<!-- Toast Notifications Container -->
+<div id="toastContainer" style="
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+"></div>
+
+<style>
+.toast {
+  min-width: 300px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: slideIn 0.3s ease-out;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.toast:hover {
+  transform: translateX(-5px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
+
+.toast.success {
+  border-left: 4px solid #4caf50;
+}
+
+.toast.error {
+  border-left: 4px solid #f44336;
+}
+
+.toast-icon {
+  font-size: 24px;
+}
+
+.toast.success .toast-icon {
+  color: #4caf50;
+}
+
+.toast.error .toast-icon {
+  color: #f44336;
+}
+
+.toast-message {
+  flex: 1;
+  font-size: 14px;
+  color: #333;
+  line-height: 1.4;
+}
+
+.toast-close {
+  font-size: 20px;
+  color: #999;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.toast-close:hover {
+  color: #333;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.toast.removing {
+  animation: slideOut 0.3s ease-in;
+}
+</style>
+
+<script>
+// Toast notification functions
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  
+  const icon = type === 'success' ? '✓' : '✗';
+  
+  toast.innerHTML = `
+    <span class="toast-icon">${icon}</span>
+    <span class="toast-message">${message}</span>
+    <span class="toast-close">&times;</span>
+  `;
+  
+  container.appendChild(toast);
+  
+  // Auto remove after 3 seconds
+  const timeout = setTimeout(() => removeToast(toast), 3000);
+  
+  // Remove on click
+  toast.addEventListener('click', () => {
+    clearTimeout(timeout);
+    removeToast(toast);
+  });
+}
+
+function removeToast(toast) {
+  toast.classList.add('removing');
+  setTimeout(() => toast.remove(), 300);
+}
+
+// Replace old success/error message functions
+window.showSuccessMessage = (message) => showToast(message, 'success');
+window.showErrorMessage = (message) => showToast(message, 'error');
+</script>
+
 </body>
 </html>
