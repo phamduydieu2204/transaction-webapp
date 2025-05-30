@@ -249,9 +249,10 @@ body.login-page {
   
   /* Container cho các nút phân trang */
   .pagination-buttons {
-    display: flex;
+    display: inline-flex;
     gap: 5px;
     align-items: center;
+    margin-left: auto;
   }
   
   table {
@@ -895,11 +896,12 @@ body.login-page {
 
 /* Container cho tổng doanh thu và chi phí trong pagination */
 .totals-container {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 10px;
   font-size: 14px;
   font-weight: bold;
+  margin: 0;
 }
 
 /* Styling cho từng phần tổng số */
