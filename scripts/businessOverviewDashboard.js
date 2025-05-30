@@ -71,8 +71,6 @@ export function renderBusinessOverviewDashboard(transactionData, expenseData, op
       <!-- Growth & Trends -->
       ${renderGrowthTrends(metrics)}
       
-      <!-- Operational Efficiency -->
-      ${renderOperationalEfficiency(metrics)}
       
     </div>
   `;
@@ -917,23 +915,9 @@ function renderGrowthTrends(metrics) {
           </div>
         </div>
         
-      </div>
-    </div>
-  `;
-}
-
-/**
- * Render operational efficiency section
- */
-function renderOperationalEfficiency(metrics) {
-  return `
-    <div class="operational-efficiency">
-      <h2>⚡ Hiệu Quả Vận Hành</h2>
-      <div class="efficiency-grid">
-        
-        <!-- Key Performance Indicators -->
-        <div class="efficiency-card kpi-card">
-          <h3>🎯 KPIs Quan Trọng</h3>
+        <!-- Operational Efficiency -->
+        <div class="trend-card efficiency-card">
+          <h3>⚡ Hiệu Quả Vận Hành</h3>
           <div class="kpi-list">
             <div class="kpi-item" data-tooltip="Giá trị trọng đời của khách hàng - Tổng doanh thu ước tính từ một khách hàng trong suốt thời gian họ là khách hàng">
               <div class="kpi-icon">💎</div>
@@ -966,6 +950,7 @@ function renderOperationalEfficiency(metrics) {
     </div>
   `;
 }
+
 
 
 /**
