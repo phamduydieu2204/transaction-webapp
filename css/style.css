@@ -219,7 +219,8 @@ body.login-page {
   /* CSS cho pagination */
   .pagination {
     display: flex;
-    justify-content: flex-end; /* Căn phải */
+    justify-content: space-between; /* Totals bên trái, buttons bên phải */
+    align-items: center;
     gap: 5px;
     margin-top: 12px; /* Khoảng cách sau table */
     margin-bottom: 8px;
@@ -885,22 +886,17 @@ body.login-page {
   font-size: 28px;
 }
 
-/* Container cho tổng doanh thu và chi phí */
+/* Container cho tổng doanh thu và chi phí trong pagination */
 .totals-container {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-  min-width: 250px;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: bold;
 }
 
-/* Styling cho từng dòng tổng số */
+/* Styling cho từng phần tổng số */
 .total-item {
-  font-weight: bold;
-  font-size: 14px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  background: transparent;
   white-space: nowrap;
 }
 
@@ -910,4 +906,10 @@ body.login-page {
 
 .total-item.expense {
   color: #c53030 !important;
+}
+
+/* Separator giữa doanh thu và chi phí */
+.separator {
+  color: #6c757d;
+  font-weight: normal;
 }

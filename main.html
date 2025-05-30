@@ -875,11 +875,6 @@
       
       <h1>Hệ thống quản lý</h1>
       
-      <!-- ✅ Tổng doanh thu và chi phí ở góc phải, cùng hàng với h1 -->
-      <div class="totals-container">
-        <div id="todayRevenue" class="total-item revenue"></div>
-        <div id="todayExpenseTotal" class="total-item expense"></div>
-      </div>
     </div>
 
     <!-- Ô tìm kiếm nhanh khoản chi -->
@@ -1069,7 +1064,13 @@
             <tbody>
             </tbody>
           </table>
-          <div class="pagination" id="pagination"></div>
+          <div class="pagination" id="pagination">
+            <div class="totals-container">
+              <span id="todayRevenue" class="total-item revenue"></span>
+              <span class="separator"> | </span>
+              <span id="todayExpenseTotal" class="total-item expense"></span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
