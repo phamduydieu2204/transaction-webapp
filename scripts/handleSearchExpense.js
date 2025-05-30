@@ -7,12 +7,19 @@ export async function handleSearchExpense() {
   showProcessingModal("Đang tìm kiếm chi phí...");
   const { BACKEND_URL } = getConstants();
   const getValue = (id) => document.getElementById(id)?.value?.trim() || "";
+  
+  // Kiểm tra có phải admin không
+  const isAdmin = window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin";
+  
+  if (!isAdmin) {
+    console.log("⚠️ Không phải admin - một số điều kiện tìm kiếm chi phí sẽ bị bỏ qua: ngày chi phí, sản phẩm, gói");
+  }
 
   // Lấy các điều kiện tìm kiếm từ form
   const conditions = {};
   
-  // Chỉ thêm điều kiện nếu người dùng đã nhập giá trị
-  const expenseDate = getValue("expenseDate");
+  // Chỉ thêm điều kiện nếu người dùng đã nhập giá trị (và đối với một số field chỉ admin mới được tìm)
+  const expenseDate = isAdmin ? getValue("expenseDate") : "";
   if (expenseDate && expenseDate !== "yyyy/mm/dd") conditions.expenseDate = expenseDate;
   
   const expenseCategory = getValue("expenseCategory");
@@ -21,10 +28,10 @@ export async function handleSearchExpense() {
   const expenseSubCategory = getValue("expenseSubCategory");
   if (expenseSubCategory) conditions.expenseSubCategory = expenseSubCategory;
   
-  const expenseProduct = getValue("expenseProduct");
+  const expenseProduct = isAdmin ? getValue("expenseProduct") : "";
   if (expenseProduct) conditions.expenseProduct = expenseProduct;
   
-  const expensePackage = getValue("expensePackage");
+  const expensePackage = isAdmin ? getValue("expensePackage") : "";
   if (expensePackage) conditions.expensePackage = expensePackage;
   
   const expenseAmount = getValue("expenseAmount");

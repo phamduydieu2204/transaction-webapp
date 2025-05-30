@@ -21,19 +21,26 @@ export async function handleSearch(
   const conditions = {};
 
   const getValue = (id) => document.getElementById(id)?.value?.trim() || "";
+  
+  // Kiểm tra có phải admin không
+  const isAdmin = userInfo.vaiTro && userInfo.vaiTro.toLowerCase() === "admin";
+  
+  if (!isAdmin) {
+    console.log("⚠️ Không phải admin - một số điều kiện tìm kiếm sẽ bị bỏ qua: tên phần mềm, gói phần mềm, tên tài khoản, ngày giao dịch, ngày bắt đầu");
+  }
 
   const transactionType = getValue("transactionType");
-  const transactionDate = getValue("transactionDate");
+  const transactionDate = isAdmin ? getValue("transactionDate") : "";
   const customerName = getValue("customerName");
   const customerEmail = getValue("customerEmail").toLowerCase();
   const customerPhone = getValue("customerPhone");
   const duration = getValue("duration");
-  const startDate = getValue("startDate");
+  const startDate = isAdmin ? getValue("startDate") : "";
   const endDate = getValue("endDate");
   const deviceCount = getValue("deviceCount");
-  const softwareName = getValue("softwareName");
-  const softwarePackage = getValue("softwarePackage");
-  const accountName = getValue("accountName");
+  const softwareName = isAdmin ? getValue("softwareName") : "";
+  const softwarePackage = isAdmin ? getValue("softwarePackage") : "";
+  const accountName = isAdmin ? getValue("accountName") : "";
   const revenue = getValue("revenue");
   const note = getValue("note");
 
