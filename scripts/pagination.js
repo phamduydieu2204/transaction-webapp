@@ -1,18 +1,26 @@
 export function updatePagination(totalPages, currentPage, firstPage, prevPage, nextPage, lastPage, goToPage) {
     const pagination = document.getElementById("pagination");
-    pagination.innerHTML = "";
+    const paginationButtons = pagination.querySelector(".pagination-buttons");
+    if (paginationButtons) {
+        paginationButtons.innerHTML = "";
+    } else {
+        // Fallback for compatibility
+        pagination.innerHTML = "";
+    }
+    
+    const targetContainer = paginationButtons || pagination;
   
     const firstButton = document.createElement("button");
     firstButton.textContent = "«";
     firstButton.onclick = firstPage;
     firstButton.disabled = currentPage === 1;
-    pagination.appendChild(firstButton);
+    targetContainer.appendChild(firstButton);
   
     const prevButton = document.createElement("button");
     prevButton.textContent = "‹";
     prevButton.onclick = prevPage;
     prevButton.disabled = currentPage === 1;
-    pagination.appendChild(prevButton);
+    targetContainer.appendChild(prevButton);
   
     const maxVisiblePages = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
@@ -26,7 +34,7 @@ export function updatePagination(totalPages, currentPage, firstPage, prevPage, n
       const dots = document.createElement("span");
       dots.textContent = "...";
       dots.style.padding = "4px 8px";
-      pagination.appendChild(dots);
+      targetContainer.appendChild(dots);
     }
   
     for (let i = startPage; i <= endPage; i++) {
@@ -36,27 +44,27 @@ export function updatePagination(totalPages, currentPage, firstPage, prevPage, n
       if (i === currentPage) {
         pageButton.classList.add("active");
       }
-      pagination.appendChild(pageButton);
+      targetContainer.appendChild(pageButton);
     }
   
     if (endPage < totalPages) {
       const dots = document.createElement("span");
       dots.textContent = "...";
       dots.style.padding = "4px 8px";
-      pagination.appendChild(dots);
+      targetContainer.appendChild(dots);
     }
   
     const nextButton = document.createElement("button");
     nextButton.textContent = "›";
     nextButton.onclick = nextPage;
     nextButton.disabled = currentPage === totalPages;
-    pagination.appendChild(nextButton);
+    targetContainer.appendChild(nextButton);
   
     const lastButton = document.createElement("button");
     lastButton.textContent = "»";
     lastButton.onclick = lastPage;
     lastButton.disabled = currentPage === totalPages;
-    pagination.appendChild(lastButton);
+    targetContainer.appendChild(lastButton);
   }
   
   export function firstPage(updateTable) {

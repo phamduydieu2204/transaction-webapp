@@ -38,6 +38,15 @@ export function updateTotalDisplay() {
     expenseEl.textContent = expenseText;
     console.log("💸 Hiển thị chi phí:", expenseText);
   }
+  
+  // Cập nhật chi phí ở bottom (trong expense pagination)
+  const expenseBottomEl = document.getElementById("todayExpenseTotalBottom");
+  if (expenseBottomEl && window.totalExpense !== undefined) {
+    const expenseText = window.isExpenseSearching 
+      ? `Tổng chi phí (tìm kiếm): ${window.totalExpense.toLocaleString()} VNĐ`
+      : `Tổng chi phí hôm nay: ${window.totalExpense.toLocaleString()} VNĐ`;
+    expenseBottomEl.textContent = expenseText;
+  }
 }
 
 /**

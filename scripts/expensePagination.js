@@ -2,7 +2,15 @@ export function updateExpensePagination(totalPages, currentPage, firstPage, prev
     const pagination = document.getElementById("expensePagination");
     if (!pagination) return;
 
-    pagination.innerHTML = "";
+    const paginationButtons = pagination.querySelector(".pagination-buttons");
+    if (paginationButtons) {
+        paginationButtons.innerHTML = "";
+    } else {
+        // Fallback for compatibility
+        pagination.innerHTML = "";
+    }
+    
+    const targetContainer = paginationButtons || pagination;
 
     // Thêm nút "Tất cả" nếu đang trong trạng thái tìm kiếm
     if (window.isExpenseSearching) {
@@ -17,7 +25,7 @@ export function updateExpensePagination(totalPages, currentPage, firstPage, prev
           window.renderExpenseStats();
         }
       });
-      pagination.appendChild(allBtn);
+      targetContainer.appendChild(allBtn);
     }
 
     if (totalPages <= 1) return;
@@ -26,13 +34,13 @@ export function updateExpensePagination(totalPages, currentPage, firstPage, prev
     firstButton.textContent = "«";
     firstButton.onclick = firstPage;
     firstButton.disabled = currentPage === 1;
-    pagination.appendChild(firstButton);
+    targetContainer.appendChild(firstButton);
 
     const prevButton = document.createElement("button");
     prevButton.textContent = "‹";
     prevButton.onclick = prevPage;
     prevButton.disabled = currentPage === 1;
-    pagination.appendChild(prevButton);
+    targetContainer.appendChild(prevButton);
 
     const maxVisiblePages = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
@@ -46,7 +54,7 @@ export function updateExpensePagination(totalPages, currentPage, firstPage, prev
       const dots = document.createElement("span");
       dots.textContent = "...";
       dots.style.padding = "4px 8px";
-      pagination.appendChild(dots);
+      targetContainer.appendChild(dots);
     }
 
     for (let i = startPage; i <= endPage; i++) {
@@ -56,25 +64,25 @@ export function updateExpensePagination(totalPages, currentPage, firstPage, prev
       if (i === currentPage) {
         pageButton.classList.add("active");
       }
-      pagination.appendChild(pageButton);
+      targetContainer.appendChild(pageButton);
     }
 
     if (endPage < totalPages) {
       const dots = document.createElement("span");
       dots.textContent = "...";
       dots.style.padding = "4px 8px";
-      pagination.appendChild(dots);
+      targetContainer.appendChild(dots);
     }
 
     const nextButton = document.createElement("button");
     nextButton.textContent = "›";
     nextButton.onclick = nextPage;
     nextButton.disabled = currentPage === totalPages;
-    pagination.appendChild(nextButton);
+    targetContainer.appendChild(nextButton);
 
     const lastButton = document.createElement("button");
     lastButton.textContent = "»";
     lastButton.onclick = lastPage;
     lastButton.disabled = currentPage === totalPages;
-    pagination.appendChild(lastButton);
+    targetContainer.appendChild(lastButton);
 }
