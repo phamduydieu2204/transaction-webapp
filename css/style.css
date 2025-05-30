@@ -104,18 +104,7 @@ body.login-page {
     grid-column: span 3;
   }
   
-  #errorMessage, #successMessage {
-    text-align: center;
-    font-weight: bold;
-  }
-  
-  #errorMessage {
-    color: red;
-  }
-  
-  #successMessage {
-    color: green;
-  }
+  /* Success and error messages removed - using toast notifications instead */
   
   .form-grid {
     display: grid;
