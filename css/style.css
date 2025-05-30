@@ -232,7 +232,8 @@ body.login-page {
     display: flex;
     justify-content: flex-end; /* Căn phải */
     gap: 5px;
-    margin-top: 5px; /* Khoảng cách nhỏ giữa "Danh sách giao dịch" và pagination */
+    margin-top: 12px; /* Khoảng cách sau table */
+    margin-bottom: 8px;
   }
   
   .pagination button {
