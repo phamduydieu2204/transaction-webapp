@@ -1491,12 +1491,12 @@ async function renderSoftwareCostRevenue(transactionData, expenseData) {
 }
 
 /**
- * Calculate customer metrics for employee reports
+ * Calculate customer metrics with proper retention rate by software
  * @param {Array} allTransactions - All transactions (not filtered by date)
  * @param {Array} currentPeriodTransactions - Transactions in current period
  * @param {string} employeeName - Employee name to filter
  * @param {Object} dateRange - Current period date range
- * @returns {Object} - Customer metrics {renewalRate, newCustomers, renewals}
+ * @returns {Object} - Customer metrics
  */
 function calculateCustomerMetrics(allTransactions, currentPeriodTransactions, employeeName, dateRange) {
   // Get current period transactions for this employee
@@ -1505,10 +1505,10 @@ function calculateCustomerMetrics(allTransactions, currentPeriodTransactions, em
   );
   
   if (employeeCurrentTransactions.length === 0) {
-    return { renewalRate: 0, newCustomers: 0, renewals: 0 };
+    return { newCustomers: 0, retentionRate: 0, retentionDetails: [] };
   }
   
-  // Get period start date for comparison
+  // Import normalizeDate if available
   const { normalizeDate } = window.statisticsCore || {};
   const periodStart = dateRange ? new Date(dateRange.start) : new Date('1900-01-01');
   
@@ -1518,49 +1518,72 @@ function calculateCustomerMetrics(allTransactions, currentPeriodTransactions, em
     return transactionDate < periodStart;
   });
   
-  // Get unique emails that existed before current period
+  // Get emails that existed in previous period
   const previousEmails = new Set(previousTransactions.map(t => t.customerEmail));
   
-  // Get unique email+software combinations before current period
-  const previousEmailSoftware = new Set(
-    previousTransactions.map(t => `${t.customerEmail}|${t.softwareName}`)
-  );
+  // Count new customers in current period (emails not in previous period)
+  const currentEmails = new Set(employeeCurrentTransactions.map(t => t.customerEmail));
+  const newCustomers = Array.from(currentEmails).filter(email => !previousEmails.has(email)).length;
   
-  // Analyze current period transactions
-  const currentEmails = new Set();
-  const currentEmailSoftware = new Set();
-  let newCustomerCount = 0;
-  let renewalCount = 0;
+  // Calculate retention rate by software
+  const softwareRetention = {};
   
+  // Group previous transactions by software
+  const previousBySoftware = {};
+  previousTransactions.forEach(t => {
+    const software = t.softwareName || 'Không xác định';
+    if (!previousBySoftware[software]) {
+      previousBySoftware[software] = new Set();
+    }
+    previousBySoftware[software].add(t.customerEmail);
+  });
+  
+  // Group current transactions by software
+  const currentBySoftware = {};
   employeeCurrentTransactions.forEach(t => {
-    const email = t.customerEmail;
-    const emailSoftwareKey = `${email}|${t.softwareName}`;
+    const software = t.softwareName || 'Không xác định';
+    if (!currentBySoftware[software]) {
+      currentBySoftware[software] = new Set();
+    }
+    currentBySoftware[software].add(t.customerEmail);
+  });
+  
+  // Calculate retention for each software
+  const retentionDetails = [];
+  let totalOldCustomers = 0;
+  let totalRetainedCustomers = 0;
+  
+  Object.keys(previousBySoftware).forEach(software => {
+    const oldCustomers = previousBySoftware[software];
+    const currentCustomers = currentBySoftware[software] || new Set();
     
-    currentEmails.add(email);
-    currentEmailSoftware.add(emailSoftwareKey);
+    // Count how many old customers continue using this software
+    const retainedCustomers = Array.from(oldCustomers).filter(email => 
+      currentCustomers.has(email)
+    ).length;
+    
+    const retentionRate = oldCustomers.size > 0 ? (retainedCustomers / oldCustomers.size) * 100 : 0;
+    
+    retentionDetails.push({
+      software,
+      oldCustomers: oldCustomers.size,
+      retainedCustomers,
+      retentionRate
+    });
+    
+    totalOldCustomers += oldCustomers.size;
+    totalRetainedCustomers += retainedCustomers;
   });
   
-  // Count new customers (emails that never appeared before)
-  currentEmails.forEach(email => {
-    if (!previousEmails.has(email)) {
-      newCustomerCount++;
-    }
-  });
-  
-  // Count renewals (email+software combinations that existed before)
-  currentEmailSoftware.forEach(emailSoftwareKey => {
-    if (previousEmailSoftware.has(emailSoftwareKey)) {
-      renewalCount++;
-    }
-  });
-  
-  const renewalRate = currentEmailSoftware.size > 0 ? (renewalCount / currentEmailSoftware.size) * 100 : 0;
+  // Overall retention rate
+  const overallRetentionRate = totalOldCustomers > 0 ? (totalRetainedCustomers / totalOldCustomers) * 100 : 0;
   
   return {
-    renewalRate,
-    newCustomers: newCustomerCount,
-    renewals: renewalCount,
-    totalEmailSoftwareCombos: currentEmailSoftware.size
+    newCustomers,
+    retentionRate: overallRetentionRate,
+    retentionDetails,
+    totalOldCustomers,
+    totalRetainedCustomers
   };
 }
 
@@ -1614,9 +1637,11 @@ async function renderEmployeePerformance(data) {
         customerCount: emp.customers.size,
         productCount: emp.products.size,
         avgTransactionValue: emp.transactionCount > 0 ? emp.totalRevenue / emp.transactionCount : 0,
-        renewalRate: customerMetrics.renewalRate,
+        retentionRate: customerMetrics.retentionRate,
         newCustomers: customerMetrics.newCustomers,
-        renewals: customerMetrics.renewals
+        totalRetainedCustomers: customerMetrics.totalRetainedCustomers,
+        totalOldCustomers: customerMetrics.totalOldCustomers,
+        retentionDetails: customerMetrics.retentionDetails
       };
     });
     
@@ -1637,11 +1662,11 @@ async function renderEmployeePerformance(data) {
                 <th title="Mã nhân viên trong hệ thống">Mã NV</th>
                 <th title="Tổng doanh thu từ các giao dịch của nhân viên">Doanh thu</th>
                 <th title="Số lượng giao dịch đã thực hiện">Số GD</th>
-                <th title="Số lượng khách hàng độc lập (theo email)">Số KH</th>
-                <th title="Khách hàng mới: Email chưa từng xuất hiện trong chu kỳ trước">KH mới</th>
-                <th title="Gia hạn: Email + tên phần mềm đã có trong chu kỳ trước">Gia hạn</th>
+                <th title="Số lượng khách hàng độc lập trong kỳ hiện tại">Số KH</th>
+                <th title="Khách hàng mới: Email chưa từng xuất hiện trong kỳ trước">KH mới</th>
+                <th title="Khách cũ tiếp tục: Số khách từ kỳ trước vẫn tiếp tục sử dụng">KH giữ chân</th>
                 <th title="Giá trị trung bình mỗi giao dịch = Tổng doanh thu / Số giao dịch">TB/GD</th>
-                <th title="Tỷ lệ gia hạn: % email+phần mềm đã từng đăng ký trước đó">Tỷ lệ gia hạn</th>
+                <th title="Tỷ lệ giữ chân: Khách cũ tiếp tục / Tổng khách cũ * 100%">Tỷ lệ giữ chân</th>
                 <th title="Tổng hoa hồng nhận được từ các giao dịch">Hoa hồng</th>
               </tr>
             </thead>
@@ -1653,10 +1678,10 @@ async function renderEmployeePerformance(data) {
                   <td class="revenue">${formatCurrency(emp.totalRevenue)}</td>
                   <td class="count">${emp.transactionCount}</td>
                   <td class="count">${emp.customerCount}</td>
-                  <td class="new-customers" title="${emp.newCustomers} email chưa từng xuất hiện trước">${emp.newCustomers}</td>
-                  <td class="renewals" title="${emp.renewals} combo email+phần mềm đã có trước">${emp.renewals}</td>
+                  <td class="new-customers" title="${emp.newCustomers} email chưa từng xuất hiện trong kỳ trước">${emp.newCustomers}</td>
+                  <td class="retained-customers" title="${emp.totalRetainedCustomers}/${emp.totalOldCustomers} khách cũ tiếp tục sử dụng">${emp.totalRetainedCustomers}</td>
                   <td class="avg-value" title="${formatCurrency(emp.totalRevenue)} ÷ ${emp.transactionCount} giao dịch">${formatCurrency(emp.avgTransactionValue)}</td>
-                  <td class="renewal-rate" title="${emp.renewals}/${emp.renewals + emp.newCustomers} = ${emp.renewalRate.toFixed(1)}%">${emp.renewalRate.toFixed(1)}%</td>
+                  <td class="retention-rate" title="${emp.totalRetainedCustomers}/${emp.totalOldCustomers} = ${emp.retentionRate.toFixed(1)}%">${emp.retentionRate.toFixed(1)}%</td>
                   <td class="commission">${formatCurrency(emp.totalCommission)}</td>
                 </tr>
               `).join('')}
@@ -1668,13 +1693,37 @@ async function renderEmployeePerformance(data) {
                 <td class="count"><strong>${employeeArray.reduce((sum, emp) => sum + emp.transactionCount, 0)}</strong></td>
                 <td class="count"><strong>${new Set(data.map(t => t.customerEmail)).size}</strong></td>
                 <td class="count"><strong>${employeeArray.reduce((sum, emp) => sum + emp.newCustomers, 0)}</strong></td>
-                <td class="count"><strong>${employeeArray.reduce((sum, emp) => sum + emp.renewals, 0)}</strong></td>
+                <td class="count"><strong>${employeeArray.reduce((sum, emp) => sum + emp.totalRetainedCustomers, 0)}</strong></td>
                 <td>-</td>
                 <td>-</td>
                 <td class="commission"><strong>${formatCurrency(employeeArray.reduce((sum, emp) => sum + emp.totalCommission, 0))}</strong></td>
               </tr>
             </tfoot>
           </table>
+        </div>
+        
+        <!-- Retention Rate by Software Details -->
+        <div class="retention-by-software">
+          <h4>📈 Tỷ lệ giữ chân theo phần mềm</h4>
+          <div class="software-retention-grid">
+            ${employeeArray.slice(0, 5).map(emp => `
+              <div class="employee-retention-card">
+                <h5>${emp.name}</h5>
+                <div class="retention-details">
+                  ${emp.retentionDetails.length > 0 ? emp.retentionDetails.map(detail => `
+                    <div class="software-retention-item">
+                      <div class="software-name">${detail.software}</div>
+                      <div class="retention-stats">
+                        <span class="retained">${detail.retainedCustomers}</span>/
+                        <span class="total">${detail.oldCustomers}</span>
+                        <span class="rate">(${detail.retentionRate.toFixed(1)}%)</span>
+                      </div>
+                    </div>
+                  `).join('') : '<p class="no-data">Chưa có dữ liệu</p>'}
+                </div>
+              </div>
+            `).join('')}
+          </div>
         </div>
       </div>
     `;
@@ -1783,28 +1832,28 @@ async function renderEmployeePerformance(data) {
           transition: all 0.2s;
         }
         
-        .renewals {
+        .retained-customers {
           text-align: center;
-          color: #f59e0b;
+          color: #10b981;
           font-weight: 600;
           cursor: help;
         }
         
-        .renewals:hover {
-          color: #d97706;
+        .retained-customers:hover {
+          color: #059669;
           transform: scale(1.05);
           transition: all 0.2s;
         }
         
-        .renewal-rate {
+        .retention-rate {
           text-align: center;
-          color: #059669;
+          color: #7c3aed;
           font-weight: 600;
           cursor: help;
         }
         
-        .renewal-rate:hover {
-          color: #10b981;
+        .retention-rate:hover {
+          color: #5b21b6;
           transform: scale(1.05);
           transition: all 0.2s;
         }
@@ -1816,6 +1865,78 @@ async function renderEmployeePerformance(data) {
         
         .total-row td {
           border-top: 2px solid #d1d5db;
+        }
+        
+        .retention-by-software {
+          margin-top: 30px;
+        }
+        
+        .retention-by-software h4 {
+          margin: 0 0 20px 0;
+          color: #374151;
+          font-size: 1.1em;
+        }
+        
+        .software-retention-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 20px;
+        }
+        
+        .employee-retention-card {
+          background: #f9fafb;
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+          padding: 16px;
+        }
+        
+        .employee-retention-card h5 {
+          margin: 0 0 12px 0;
+          color: #1f2937;
+          font-weight: 600;
+        }
+        
+        .software-retention-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 8px 0;
+          border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .software-retention-item:last-child {
+          border-bottom: none;
+        }
+        
+        .software-name {
+          font-weight: 500;
+          color: #374151;
+          flex: 1;
+        }
+        
+        .retention-stats {
+          font-size: 0.9em;
+          font-weight: 500;
+        }
+        
+        .retention-stats .retained {
+          color: #059669;
+        }
+        
+        .retention-stats .total {
+          color: #6b7280;
+        }
+        
+        .retention-stats .rate {
+          color: #7c3aed;
+          margin-left: 8px;
+        }
+        
+        .no-data {
+          color: #9ca3af;
+          font-style: italic;
+          text-align: center;
+          margin: 0;
         }
       `;
       document.head.appendChild(style);
