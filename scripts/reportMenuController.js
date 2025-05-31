@@ -1499,8 +1499,8 @@ async function renderEmployeePerformance(data) {
     const employeeStats = {};
     
     data.forEach(transaction => {
-      const employee = transaction.employeeName || 'Không xác định';
-      const employeeCode = transaction.employeeCode || 'N/A';
+      const employee = transaction.tenNhanVien || 'Không xác định';
+      const employeeCode = transaction.maNhanVien || 'N/A';
       const revenue = parseFloat(transaction.revenue) || 0;
       const commission = parseFloat(transaction.commission) || 0;
       
@@ -1689,7 +1689,7 @@ async function renderTransactionCount(data) {
     const dateLabels = new Set();
     
     data.forEach(transaction => {
-      const employee = transaction.employeeName || 'Không xác định';
+      const employee = transaction.tenNhanVien || 'Không xác định';
       const date = normalizeDate(transaction.transactionDate).slice(0, 7); // yyyy/mm
       
       dateLabels.add(date);
@@ -1951,7 +1951,7 @@ async function renderEmployeeRanking(data) {
     const employeeMetrics = {};
     
     data.forEach(transaction => {
-      const employee = transaction.employeeName || 'Không xác định';
+      const employee = transaction.tenNhanVien || 'Không xác định';
       const revenue = parseFloat(transaction.revenue) || 0;
       
       if (!employeeMetrics[employee]) {
