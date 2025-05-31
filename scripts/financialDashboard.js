@@ -1902,7 +1902,7 @@ export function filterDataByDateRange(data, dateRange, additionalFilters = {}) {
   });
   
   
-  const filteredData = data.filter((item, index) => {
+  filteredData = data.filter((item, index) => {
     // Sử dụng đúng field names: transactionDate cho transactions, date cho expenses
     const dateValue = item.transactionDate || item.date;
     
