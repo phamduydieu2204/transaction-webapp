@@ -572,15 +572,21 @@ export function groupExpensesByTenChuan(expenses) {
  * @returns {number} - Allocated amount for the period
  */
 export function calculateAllocatedExpense(expense, dateRange) {
-  // Debug: Log full expense object for Helium10
-  if ((expense.product && expense.product.includes('Helium10')) || 
-      (expense.description && expense.description.includes('Helium10'))) {
-    console.log(`🔍 HELIUM10 DEBUG - Full expense object:`, {
+  // Debug: Log full expense object for Helium10 or salary payments
+  if ((expense.product && (expense.product.includes('Helium10') || expense.product.includes('Trả lương'))) || 
+      (expense.description && (expense.description.includes('Helium10') || expense.description.includes('Trả lương'))) ||
+      (expense['Tên sản phẩm/Dịch vụ'] && expense['Tên sản phẩm/Dịch vụ'].includes('Trả lương'))) {
+    console.log(`🔍 DEBUG - Salary/Helium10 expense object:`, {
       fullExpense: expense,
       keys: Object.keys(expense),
       periodicAllocation: expense.periodicAllocation,
+      'Phân bổ': expense['Phân bổ'],
       renewDate: expense.renewDate,
-      date: expense.date
+      'Ngày tái tục': expense['Ngày tái tục'],
+      date: expense.date,
+      'Ngày chi': expense['Ngày chi'],
+      amount: expense.amount,
+      'Số tiền': expense['Số tiền']
     });
   }
   
@@ -632,8 +638,8 @@ export function calculateAllocatedExpense(expense, dateRange) {
     return 0;
   }
   
-  // Calculate total validity period in days
-  const totalValidityDays = Math.ceil((renewalDate - transactionDate) / (1000 * 60 * 60 * 24));
+  // Calculate total validity period in days (inclusive of both start and end dates)
+  const totalValidityDays = Math.ceil((renewalDate - transactionDate) / (1000 * 60 * 60 * 24)) + 1;
   
   // Calculate daily amount - check multiple field names
   const amountValue = expense.amount || expense['Số tiền'] || 0;
@@ -669,12 +675,30 @@ export function calculateAllocatedExpense(expense, dateRange) {
   const overlapStart = new Date(Math.max(periodStart, transactionDate));
   const overlapEnd = new Date(Math.min(periodEnd, renewalDate));
   
+  // Special handling for monthly salary payments
+  if (expense.product && expense.product.includes('Trả lương') || 
+      expense['Tên sản phẩm/Dịch vụ'] && expense['Tên sản phẩm/Dịch vụ'].includes('Trả lương')) {
+    console.log(`💵 Salary payment debug:`, {
+      transactionDate: normalizeDate(transactionDate),
+      renewalDate: normalizeDate(renewalDate),
+      periodStart: normalizeDate(periodStart),
+      periodEnd: normalizeDate(periodEnd),
+      overlapStart: normalizeDate(overlapStart),
+      overlapEnd: normalizeDate(overlapEnd),
+      'transactionDate.getTime()': transactionDate.getTime(),
+      'renewalDate.getTime()': renewalDate.getTime(),
+      'diff in ms': renewalDate.getTime() - transactionDate.getTime(),
+      'diff in days (raw)': (renewalDate.getTime() - transactionDate.getTime()) / (1000 * 60 * 60 * 24)
+    });
+  }
+  
   // If no overlap, return 0
   if (overlapStart > overlapEnd) {
     return 0;
   }
   
   // Calculate days that software is valid within the target period
+  // Note: We add 1 because both start and end dates are inclusive
   const validDaysInPeriod = Math.ceil((overlapEnd - overlapStart) / (1000 * 60 * 60 * 24)) + 1;
   
   // Return allocated amount for the overlapping period
@@ -686,10 +710,13 @@ export function calculateAllocatedExpense(expense, dateRange) {
     transactionDate: normalizeDate(transactionDate),
     renewalDate: normalizeDate(renewalDate),
     totalValidityDays,
-    dailyAmount,
+    dailyAmount: dailyAmount.toFixed(2),
     periodRange: `${dateRange.start} to ${dateRange.end}`,
+    overlapStart: normalizeDate(overlapStart),
+    overlapEnd: normalizeDate(overlapEnd),
     validDaysInPeriod,
-    allocatedAmount
+    calculation: `${dailyAmount.toFixed(2)} × ${validDaysInPeriod} days`,
+    allocatedAmount: allocatedAmount.toFixed(2)
   });
   
   return allocatedAmount;
