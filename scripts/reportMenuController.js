@@ -1492,22 +1492,777 @@ async function renderSoftwareCostRevenue(transactionData, expenseData) {
 
 async function renderEmployeePerformance(data) {
   const container = document.getElementById('employeePerformance');
-  if (container) {
-    container.innerHTML = '<p>📊 Hiệu suất nhân viên đang được phát triển...</p>';
+  if (!container) return;
+  
+  try {
+    // Group transactions by employee
+    const employeeStats = {};
+    
+    data.forEach(transaction => {
+      const employee = transaction.employeeName || 'Không xác định';
+      const employeeCode = transaction.employeeCode || 'N/A';
+      const revenue = parseFloat(transaction.revenue) || 0;
+      const commission = parseFloat(transaction.commission) || 0;
+      
+      if (!employeeStats[employee]) {
+        employeeStats[employee] = {
+          name: employee,
+          code: employeeCode,
+          totalRevenue: 0,
+          totalCommission: 0,
+          transactionCount: 0,
+          customers: new Set(),
+          products: new Set()
+        };
+      }
+      
+      employeeStats[employee].totalRevenue += revenue;
+      employeeStats[employee].totalCommission += commission;
+      employeeStats[employee].transactionCount++;
+      employeeStats[employee].customers.add(transaction.customerEmail);
+      employeeStats[employee].products.add(transaction.softwareName);
+    });
+    
+    // Convert to array and calculate additional metrics
+    const employeeArray = Object.values(employeeStats).map(emp => ({
+      ...emp,
+      customerCount: emp.customers.size,
+      productCount: emp.products.size,
+      avgTransactionValue: emp.transactionCount > 0 ? emp.totalRevenue / emp.transactionCount : 0,
+      conversionRate: emp.customers.size > 0 ? (emp.transactionCount / emp.customers.size * 100) : 0
+    }));
+    
+    // Sort by revenue
+    employeeArray.sort((a, b) => b.totalRevenue - a.totalRevenue);
+    
+    // Get period label
+    const periodLabel = getPeriodLabel();
+    
+    container.innerHTML = `
+      <div class="employee-performance">
+        <h3>📊 Hiệu suất nhân viên <span class="period-indicator">${periodLabel}</span></h3>
+        <div class="performance-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Nhân viên</th>
+                <th>Mã NV</th>
+                <th>Doanh thu</th>
+                <th>Số GD</th>
+                <th>Số KH</th>
+                <th>TB/GD</th>
+                <th>Tỷ lệ chuyển đổi</th>
+                <th>Hoa hồng</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${employeeArray.map(emp => `
+                <tr>
+                  <td class="employee-name">${emp.name}</td>
+                  <td class="employee-code">${emp.code}</td>
+                  <td class="revenue">${formatCurrency(emp.totalRevenue)}</td>
+                  <td class="count">${emp.transactionCount}</td>
+                  <td class="count">${emp.customerCount}</td>
+                  <td class="avg-value">${formatCurrency(emp.avgTransactionValue)}</td>
+                  <td class="conversion-rate">${emp.conversionRate.toFixed(1)}%</td>
+                  <td class="commission">${formatCurrency(emp.totalCommission)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td colspan="2"><strong>Tổng cộng</strong></td>
+                <td class="revenue"><strong>${formatCurrency(employeeArray.reduce((sum, emp) => sum + emp.totalRevenue, 0))}</strong></td>
+                <td class="count"><strong>${employeeArray.reduce((sum, emp) => sum + emp.transactionCount, 0)}</strong></td>
+                <td class="count"><strong>${new Set(data.map(t => t.customerEmail)).size}</strong></td>
+                <td>-</td>
+                <td>-</td>
+                <td class="commission"><strong>${formatCurrency(employeeArray.reduce((sum, emp) => sum + emp.totalCommission, 0))}</strong></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    `;
+    
+    // Add CSS if not already added
+    if (!document.getElementById('employeePerformanceStyles')) {
+      const style = document.createElement('style');
+      style.id = 'employeePerformanceStyles';
+      style.textContent = `
+        .employee-performance {
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .employee-performance h3 {
+          margin: 0 0 20px 0;
+          color: #333;
+        }
+        
+        .performance-table {
+          overflow-x: auto;
+        }
+        
+        .performance-table table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        
+        .performance-table th,
+        .performance-table td {
+          padding: 12px;
+          text-align: left;
+          border-bottom: 1px solid #eee;
+        }
+        
+        .performance-table th {
+          background: #f8f9fa;
+          font-weight: bold;
+          color: #333;
+          position: sticky;
+          top: 0;
+        }
+        
+        .performance-table tbody tr:hover {
+          background: #f8f9fa;
+        }
+        
+        .employee-name {
+          font-weight: 500;
+          color: #2563eb;
+        }
+        
+        .employee-code {
+          color: #6b7280;
+          font-size: 0.9em;
+        }
+        
+        .revenue, .commission {
+          font-weight: 500;
+          color: #059669;
+        }
+        
+        .count {
+          text-align: center;
+          color: #6b7280;
+        }
+        
+        .avg-value {
+          color: #8b5cf6;
+        }
+        
+        .conversion-rate {
+          text-align: center;
+          color: #f59e0b;
+          font-weight: 500;
+        }
+        
+        .total-row {
+          background: #f3f4f6;
+          font-weight: bold;
+        }
+        
+        .total-row td {
+          border-top: 2px solid #d1d5db;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  } catch (error) {
+    console.error('Error rendering employee performance:', error);
+    container.innerHTML = '<p style="color: #c53030;">Lỗi khi tải hiệu suất nhân viên</p>';
   }
 }
 
 async function renderTransactionCount(data) {
   const container = document.getElementById('transactionCount');
-  if (container) {
-    container.innerHTML = '<p>📈 Số lượng giao dịch đang được phát triển...</p>';
+  if (!container) return;
+  
+  try {
+    // Import normalizeDate function
+    const { normalizeDate } = await import('./statisticsCore.js');
+    // Group transactions by employee and date
+    const employeeTransactions = {};
+    const dateLabels = new Set();
+    
+    data.forEach(transaction => {
+      const employee = transaction.employeeName || 'Không xác định';
+      const date = normalizeDate(transaction.transactionDate).slice(0, 7); // yyyy/mm
+      
+      dateLabels.add(date);
+      
+      if (!employeeTransactions[employee]) {
+        employeeTransactions[employee] = {};
+      }
+      
+      if (!employeeTransactions[employee][date]) {
+        employeeTransactions[employee][date] = {
+          count: 0,
+          revenue: 0,
+          newCustomers: new Set(),
+          renewals: 0
+        };
+      }
+      
+      employeeTransactions[employee][date].count++;
+      employeeTransactions[employee][date].revenue += parseFloat(transaction.revenue) || 0;
+      
+      if (transaction.transactionType === 'Gia hạn') {
+        employeeTransactions[employee][date].renewals++;
+      } else {
+        employeeTransactions[employee][date].newCustomers.add(transaction.customerEmail);
+      }
+    });
+    
+    // Sort dates
+    const sortedDates = Array.from(dateLabels).sort();
+    const recentDates = sortedDates.slice(-6); // Last 6 months
+    
+    // Prepare data for display
+    const employeeArray = Object.entries(employeeTransactions).map(([employee, dates]) => {
+      const monthlyData = recentDates.map(date => ({
+        date,
+        count: dates[date]?.count || 0,
+        revenue: dates[date]?.revenue || 0,
+        newCustomers: dates[date]?.newCustomers.size || 0,
+        renewals: dates[date]?.renewals || 0
+      }));
+      
+      const totalCount = monthlyData.reduce((sum, d) => sum + d.count, 0);
+      const totalRevenue = monthlyData.reduce((sum, d) => sum + d.revenue, 0);
+      
+      return {
+        employee,
+        monthlyData,
+        totalCount,
+        totalRevenue,
+        avgCount: totalCount / recentDates.length
+      };
+    });
+    
+    // Sort by total count
+    employeeArray.sort((a, b) => b.totalCount - a.totalCount);
+    
+    // Get period label
+    const periodLabel = getPeriodLabel();
+    
+    container.innerHTML = `
+      <div class="transaction-count-analysis">
+        <h3>📈 Số lượng giao dịch theo nhân viên <span class="period-indicator">${periodLabel}</span></h3>
+        
+        <div class="summary-cards">
+          <div class="summary-card">
+            <div class="card-icon">📦</div>
+            <div class="card-content">
+              <div class="card-label">Tổng giao dịch</div>
+              <div class="card-value">${data.length}</div>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="card-icon">👥</div>
+            <div class="card-content">
+              <div class="card-label">Số nhân viên</div>
+              <div class="card-value">${employeeArray.length}</div>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="card-icon">📊</div>
+            <div class="card-content">
+              <div class="card-label">TB/nhân viên</div>
+              <div class="card-value">${(data.length / employeeArray.length).toFixed(1)}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="monthly-breakdown">
+          <h4>Phân bổ theo tháng (6 tháng gần nhất)</h4>
+          <div class="transaction-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nhân viên</th>
+                  ${recentDates.map(date => `<th>${date}</th>`).join('')}
+                  <th>Tổng cộng</th>
+                  <th>Trung bình</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${employeeArray.slice(0, 10).map(emp => `
+                  <tr>
+                    <td class="employee-name">${emp.employee}</td>
+                    ${emp.monthlyData.map(d => `
+                      <td class="count-cell">
+                        <div class="count-value">${d.count}</div>
+                        ${d.count > 0 ? `
+                          <div class="count-details">
+                            <span class="new-customers" title="Khách mới">🆕 ${d.newCustomers}</span>
+                            <span class="renewals" title="Gia hạn">🔄 ${d.renewals}</span>
+                          </div>
+                        ` : ''}
+                      </td>
+                    `).join('')}
+                    <td class="total-count">${emp.totalCount}</td>
+                    <td class="avg-count">${emp.avgCount.toFixed(1)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Add CSS if not already added
+    if (!document.getElementById('transactionCountStyles')) {
+      const style = document.createElement('style');
+      style.id = 'transactionCountStyles';
+      style.textContent = `
+        .transaction-count-analysis {
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .transaction-count-analysis h3 {
+          margin: 0 0 20px 0;
+          color: #333;
+        }
+        
+        .transaction-count-analysis h4 {
+          margin: 20px 0 15px 0;
+          color: #555;
+          font-size: 1.1em;
+        }
+        
+        .summary-cards {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 15px;
+          margin-bottom: 30px;
+        }
+        
+        .summary-card {
+          background: #f8f9fa;
+          padding: 15px;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          gap: 15px;
+        }
+        
+        .card-icon {
+          font-size: 2em;
+        }
+        
+        .card-label {
+          font-size: 0.9em;
+          color: #6b7280;
+        }
+        
+        .card-value {
+          font-size: 1.8em;
+          font-weight: bold;
+          color: #1f2937;
+        }
+        
+        .transaction-table {
+          overflow-x: auto;
+        }
+        
+        .transaction-table table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        
+        .transaction-table th,
+        .transaction-table td {
+          padding: 10px;
+          text-align: center;
+          border: 1px solid #e5e7eb;
+        }
+        
+        .transaction-table th {
+          background: #f3f4f6;
+          font-weight: bold;
+          font-size: 0.9em;
+        }
+        
+        .transaction-table .employee-name {
+          text-align: left;
+          font-weight: 500;
+          color: #2563eb;
+        }
+        
+        .count-cell {
+          position: relative;
+        }
+        
+        .count-value {
+          font-size: 1.2em;
+          font-weight: bold;
+          color: #059669;
+        }
+        
+        .count-details {
+          display: flex;
+          justify-content: center;
+          gap: 8px;
+          margin-top: 4px;
+          font-size: 0.8em;
+        }
+        
+        .new-customers {
+          color: #3b82f6;
+        }
+        
+        .renewals {
+          color: #f59e0b;
+        }
+        
+        .total-count {
+          font-weight: bold;
+          background: #ecfdf5;
+          color: #059669;
+        }
+        
+        .avg-count {
+          font-weight: 500;
+          color: #6b7280;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  } catch (error) {
+    console.error('Error rendering transaction count:', error);
+    container.innerHTML = '<p style="color: #c53030;">Lỗi khi tải số lượng giao dịch</p>';
   }
 }
 
 async function renderEmployeeRanking(data) {
   const container = document.getElementById('employeeRanking');
-  if (container) {
-    container.innerHTML = '<p>🏆 Ranking nhân viên đang được phát triển...</p>';
+  if (!container) return;
+  
+  try {
+    // Calculate employee rankings based on multiple criteria
+    const employeeMetrics = {};
+    
+    data.forEach(transaction => {
+      const employee = transaction.employeeName || 'Không xác định';
+      const revenue = parseFloat(transaction.revenue) || 0;
+      
+      if (!employeeMetrics[employee]) {
+        employeeMetrics[employee] = {
+          name: employee,
+          totalRevenue: 0,
+          transactionCount: 0,
+          customerSet: new Set(),
+          newCustomers: 0,
+          renewals: 0,
+          totalDuration: 0,
+          points: 0
+        };
+      }
+      
+      employeeMetrics[employee].totalRevenue += revenue;
+      employeeMetrics[employee].transactionCount++;
+      employeeMetrics[employee].customerSet.add(transaction.customerEmail);
+      employeeMetrics[employee].totalDuration += parseInt(transaction.duration) || 0;
+      
+      if (transaction.transactionType === 'Gia hạn') {
+        employeeMetrics[employee].renewals++;
+      } else {
+        employeeMetrics[employee].newCustomers++;
+      }
+    });
+    
+    // Calculate rankings and points
+    const employees = Object.values(employeeMetrics).map(emp => {
+      const avgTransactionValue = emp.transactionCount > 0 ? emp.totalRevenue / emp.transactionCount : 0;
+      const avgDuration = emp.transactionCount > 0 ? emp.totalDuration / emp.transactionCount : 0;
+      const renewalRate = emp.transactionCount > 0 ? (emp.renewals / emp.transactionCount * 100) : 0;
+      
+      // Point calculation (weighted scoring)
+      const revenuePoints = (emp.totalRevenue / 1000000) * 10; // 10 points per million
+      const transactionPoints = emp.transactionCount * 5; // 5 points per transaction
+      const customerPoints = emp.customerSet.size * 20; // 20 points per unique customer
+      const renewalPoints = emp.renewals * 15; // 15 points per renewal
+      const durationPoints = (avgDuration / 30) * 10; // 10 points per month avg duration
+      
+      const totalPoints = revenuePoints + transactionPoints + customerPoints + renewalPoints + durationPoints;
+      
+      return {
+        ...emp,
+        customerCount: emp.customerSet.size,
+        avgTransactionValue,
+        avgDuration,
+        renewalRate,
+        revenuePoints,
+        transactionPoints,
+        customerPoints,
+        renewalPoints,
+        durationPoints,
+        totalPoints
+      };
+    });
+    
+    // Sort by total points
+    employees.sort((a, b) => b.totalPoints - a.totalPoints);
+    
+    // Assign rankings
+    employees.forEach((emp, index) => {
+      emp.rank = index + 1;
+      emp.medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+    });
+    
+    // Get period label
+    const periodLabel = getPeriodLabel();
+    
+    container.innerHTML = `
+      <div class="employee-ranking">
+        <h3>🏆 Xếp hạng nhân viên <span class="period-indicator">${periodLabel}</span></h3>
+        
+        <div class="ranking-podium">
+          ${employees.slice(0, 3).map((emp, index) => `
+            <div class="podium-position position-${index + 1}">
+              <div class="medal">${emp.medal}</div>
+              <div class="employee-info">
+                <div class="name">${emp.name}</div>
+                <div class="points">${emp.totalPoints.toFixed(0)} điểm</div>
+                <div class="revenue">${formatCurrency(emp.totalRevenue)}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        
+        <div class="ranking-details">
+          <h4>Bảng xếp hạng chi tiết</h4>
+          <div class="ranking-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Nhân viên</th>
+                  <th>Tổng điểm</th>
+                  <th>Doanh thu</th>
+                  <th>Số GD</th>
+                  <th>Số KH</th>
+                  <th>Gia hạn</th>
+                  <th>TB thời hạn</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${employees.map(emp => `
+                  <tr class="${emp.rank <= 3 ? 'top-3' : ''}">
+                    <td class="rank">
+                      <span class="rank-number">${emp.rank}</span>
+                      ${emp.medal || ''}
+                    </td>
+                    <td class="employee-name">${emp.name}</td>
+                    <td class="total-points">
+                      <div class="points-value">${emp.totalPoints.toFixed(0)}</div>
+                      <div class="points-breakdown">
+                        <span title="Điểm doanh thu">💰 ${emp.revenuePoints.toFixed(0)}</span>
+                        <span title="Điểm giao dịch">📦 ${emp.transactionPoints.toFixed(0)}</span>
+                        <span title="Điểm khách hàng">👥 ${emp.customerPoints.toFixed(0)}</span>
+                        <span title="Điểm gia hạn">🔄 ${emp.renewalPoints.toFixed(0)}</span>
+                      </div>
+                    </td>
+                    <td class="revenue">${formatCurrency(emp.totalRevenue)}</td>
+                    <td class="count">${emp.transactionCount}</td>
+                    <td class="count">${emp.customerCount}</td>
+                    <td class="renewal-rate">${emp.renewalRate.toFixed(1)}%</td>
+                    <td class="avg-duration">${emp.avgDuration.toFixed(0)} ngày</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <div class="ranking-legend">
+          <h4>Hướng dẫn tính điểm</h4>
+          <ul>
+            <li>💰 Doanh thu: 10 điểm/triệu VND</li>
+            <li>📦 Số giao dịch: 5 điểm/giao dịch</li>
+            <li>👥 Khách hàng độc lập: 20 điểm/khách</li>
+            <li>🔄 Gia hạn: 15 điểm/lần</li>
+            <li>⏰ Thời hạn TB: 10 điểm/tháng</li>
+          </ul>
+        </div>
+      </div>
+    `;
+    
+    // Add CSS if not already added
+    if (!document.getElementById('employeeRankingStyles')) {
+      const style = document.createElement('style');
+      style.id = 'employeeRankingStyles';
+      style.textContent = `
+        .employee-ranking {
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .employee-ranking h3 {
+          margin: 0 0 20px 0;
+          color: #333;
+        }
+        
+        .employee-ranking h4 {
+          margin: 20px 0 15px 0;
+          color: #555;
+          font-size: 1.1em;
+        }
+        
+        .ranking-podium {
+          display: flex;
+          justify-content: center;
+          align-items: flex-end;
+          gap: 20px;
+          margin-bottom: 40px;
+          height: 200px;
+        }
+        
+        .podium-position {
+          text-align: center;
+          padding: 20px;
+          border-radius: 8px;
+          width: 150px;
+        }
+        
+        .position-1 {
+          background: linear-gradient(135deg, #ffd700, #ffed4e);
+          height: 180px;
+        }
+        
+        .position-2 {
+          background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+          height: 150px;
+        }
+        
+        .position-3 {
+          background: linear-gradient(135deg, #cd7f32, #e5a572);
+          height: 120px;
+        }
+        
+        .medal {
+          font-size: 2.5em;
+          margin-bottom: 10px;
+        }
+        
+        .employee-info .name {
+          font-weight: bold;
+          margin-bottom: 5px;
+        }
+        
+        .employee-info .points {
+          font-size: 1.2em;
+          color: #333;
+          margin-bottom: 5px;
+        }
+        
+        .employee-info .revenue {
+          font-size: 0.9em;
+          color: #666;
+        }
+        
+        .ranking-table {
+          overflow-x: auto;
+        }
+        
+        .ranking-table table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        
+        .ranking-table th,
+        .ranking-table td {
+          padding: 12px;
+          text-align: left;
+          border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .ranking-table th {
+          background: #f3f4f6;
+          font-weight: bold;
+        }
+        
+        .ranking-table tr.top-3 {
+          background: #fef3c7;
+        }
+        
+        .rank {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        
+        .rank-number {
+          font-weight: bold;
+          font-size: 1.2em;
+        }
+        
+        .total-points {
+          text-align: center;
+        }
+        
+        .points-value {
+          font-size: 1.3em;
+          font-weight: bold;
+          color: #059669;
+        }
+        
+        .points-breakdown {
+          display: flex;
+          gap: 8px;
+          margin-top: 4px;
+          font-size: 0.8em;
+          justify-content: center;
+        }
+        
+        .points-breakdown span {
+          color: #6b7280;
+        }
+        
+        .renewal-rate {
+          text-align: center;
+          color: #f59e0b;
+          font-weight: 500;
+        }
+        
+        .avg-duration {
+          text-align: center;
+          color: #8b5cf6;
+        }
+        
+        .ranking-legend {
+          margin-top: 30px;
+          padding: 15px;
+          background: #f9fafb;
+          border-radius: 8px;
+        }
+        
+        .ranking-legend ul {
+          margin: 0;
+          padding-left: 20px;
+          list-style: none;
+        }
+        
+        .ranking-legend li {
+          margin: 8px 0;
+          color: #4b5563;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  } catch (error) {
+    console.error('Error rendering employee ranking:', error);
+    container.innerHTML = '<p style="color: #c53030;">Lỗi khi tải xếp hạng nhân viên</p>';
   }
 }
 
