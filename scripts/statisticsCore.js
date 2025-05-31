@@ -567,24 +567,57 @@ export function groupExpensesByTenChuan(expenses) {
  * @returns {number} - Allocated amount for the period
  */
 export function calculateAllocatedExpense(expense, dateRange) {
-  // If no allocation needed, return 0
-  if (!expense.periodicAllocation || expense.periodicAllocation !== 'Có') {
-    console.log(`❌ ${expense.product || expense.description} - No allocation:`, {
+  // Debug: Log full expense object for Helium10
+  if ((expense.product && expense.product.includes('Helium10')) || 
+      (expense.description && expense.description.includes('Helium10'))) {
+    console.log(`🔍 HELIUM10 DEBUG - Full expense object:`, {
+      fullExpense: expense,
+      keys: Object.keys(expense),
       periodicAllocation: expense.periodicAllocation,
-      reason: 'periodicAllocation !== "Có"'
+      renewDate: expense.renewDate,
+      date: expense.date
+    });
+  }
+  
+  // Check multiple possible field names for allocation
+  const allocationValue = expense.periodicAllocation || expense['Phân bổ'] || expense.allocation;
+  
+  // If no allocation needed, return 0
+  if (!allocationValue || (allocationValue !== 'Có' && allocationValue !== 'Có')) {
+    console.log(`❌ ${expense.product || expense.description || 'Unknown'} - No allocation:`, {
+      periodicAllocation: expense.periodicAllocation,
+      'Phân bổ': expense['Phân bổ'],
+      allocation: expense.allocation,
+      allocationValue: allocationValue,
+      reason: 'allocation field not "Có"'
     });
     return 0;
   }
   
   // Parse dates - both transaction date and renewal date are required
-  const transactionDate = expense.date ? new Date(normalizeDate(expense.date)) : null;
-  const renewalDate = expense.renewDate ? new Date(normalizeDate(expense.renewDate)) : null;
+  // Check multiple possible field names for dates
+  const dateValue = expense.date || expense['Ngày chi'] || expense.transactionDate;
+  const renewDateValue = expense.renewDate || expense['Ngày tái tục'] || expense.renewalDate;
+  
+  const transactionDate = dateValue ? new Date(normalizeDate(dateValue)) : null;
+  const renewalDate = renewDateValue ? new Date(normalizeDate(renewDateValue)) : null;
+  
+  console.log(`📅 Date parsing for ${expense.product || expense.description}:`, {
+    originalDate: expense.date,
+    'Ngày chi': expense['Ngày chi'],
+    dateValue,
+    originalRenewDate: expense.renewDate,
+    'Ngày tái tục': expense['Ngày tái tục'],
+    renewDateValue,
+    parsedTransactionDate: transactionDate,
+    parsedRenewalDate: renewalDate
+  });
   
   // Must have both dates for allocation
   if (!transactionDate || !renewalDate || renewalDate <= transactionDate) {
-    console.log(`❌ ${expense.product || expense.description} - Invalid dates:`, {
-      transactionDate: expense.date,
-      renewalDate: expense.renewDate,
+    console.log(`❌ ${expense.product || expense['Tên sản phẩm/Dịch vụ'] || expense.description} - Invalid dates:`, {
+      transactionDate: dateValue,
+      renewalDate: renewDateValue,
       parsedTransactionDate: transactionDate,
       parsedRenewalDate: renewalDate,
       reason: !transactionDate ? 'No transaction date' : 
@@ -597,8 +630,17 @@ export function calculateAllocatedExpense(expense, dateRange) {
   // Calculate total validity period in days
   const totalValidityDays = Math.ceil((renewalDate - transactionDate) / (1000 * 60 * 60 * 24));
   
-  // Calculate daily amount
-  const totalAmount = parseFloat(expense.amount) || 0;
+  // Calculate daily amount - check multiple field names
+  const amountValue = expense.amount || expense['Số tiền'] || 0;
+  const totalAmount = parseFloat(amountValue) || 0;
+  
+  console.log(`💰 Amount parsing for ${expense.product || expense['Tên sản phẩm/Dịch vụ']}:`, {
+    originalAmount: expense.amount,
+    'Số tiền': expense['Số tiền'],
+    amountValue,
+    totalAmount,
+    totalValidityDays
+  });
   const dailyAmount = totalAmount / totalValidityDays;
   
   // If no date range specified, return amount for current month
