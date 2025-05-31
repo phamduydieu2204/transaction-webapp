@@ -1491,42 +1491,77 @@ async function renderSoftwareCostRevenue(transactionData, expenseData) {
 }
 
 /**
- * Calculate actual renewal rate based on email + software name across periods
+ * Calculate customer metrics for employee reports
  * @param {Array} allTransactions - All transactions (not filtered by date)
  * @param {Array} currentPeriodTransactions - Transactions in current period
  * @param {string} employeeName - Employee name to filter
- * @returns {number} - Renewal rate percentage
+ * @param {Object} dateRange - Current period date range
+ * @returns {Object} - Customer metrics {renewalRate, newCustomers, renewals}
  */
-function calculateRenewalRate(allTransactions, currentPeriodTransactions, employeeName) {
+function calculateCustomerMetrics(allTransactions, currentPeriodTransactions, employeeName, dateRange) {
   // Get current period transactions for this employee
   const employeeCurrentTransactions = currentPeriodTransactions.filter(t => 
     (t.tenNhanVien || 'Không xác định') === employeeName
   );
   
-  if (employeeCurrentTransactions.length === 0) return 0;
+  if (employeeCurrentTransactions.length === 0) {
+    return { renewalRate: 0, newCustomers: 0, renewals: 0 };
+  }
   
-  // Group current transactions by email + software name
-  const currentCustomerSoftware = new Set();
-  employeeCurrentTransactions.forEach(t => {
-    const key = `${t.customerEmail}|${t.softwareName}`;
-    currentCustomerSoftware.add(key);
+  // Get period start date for comparison
+  const { normalizeDate } = window.statisticsCore || {};
+  const periodStart = dateRange ? new Date(dateRange.start) : new Date('1900-01-01');
+  
+  // Get all transactions before current period
+  const previousTransactions = allTransactions.filter(t => {
+    const transactionDate = new Date(normalizeDate ? normalizeDate(t.transactionDate) : t.transactionDate);
+    return transactionDate < periodStart;
   });
   
-  // Check how many of these combinations existed before
-  const renewalCount = Array.from(currentCustomerSoftware).filter(key => {
-    const [email, softwareName] = key.split('|');
-    
-    // Check if this email + software existed in previous transactions
-    const hadBefore = allTransactions.some(t => 
-      t.customerEmail === email && 
-      t.softwareName === softwareName &&
-      new Date(t.transactionDate) < new Date(employeeCurrentTransactions[0].transactionDate)
-    );
-    
-    return hadBefore;
-  }).length;
+  // Get unique emails that existed before current period
+  const previousEmails = new Set(previousTransactions.map(t => t.customerEmail));
   
-  return (renewalCount / currentCustomerSoftware.size) * 100;
+  // Get unique email+software combinations before current period
+  const previousEmailSoftware = new Set(
+    previousTransactions.map(t => `${t.customerEmail}|${t.softwareName}`)
+  );
+  
+  // Analyze current period transactions
+  const currentEmails = new Set();
+  const currentEmailSoftware = new Set();
+  let newCustomerCount = 0;
+  let renewalCount = 0;
+  
+  employeeCurrentTransactions.forEach(t => {
+    const email = t.customerEmail;
+    const emailSoftwareKey = `${email}|${t.softwareName}`;
+    
+    currentEmails.add(email);
+    currentEmailSoftware.add(emailSoftwareKey);
+  });
+  
+  // Count new customers (emails that never appeared before)
+  currentEmails.forEach(email => {
+    if (!previousEmails.has(email)) {
+      newCustomerCount++;
+    }
+  });
+  
+  // Count renewals (email+software combinations that existed before)
+  currentEmailSoftware.forEach(emailSoftwareKey => {
+    if (previousEmailSoftware.has(emailSoftwareKey)) {
+      renewalCount++;
+    }
+  });
+  
+  const renewalRate = currentEmailSoftware.size > 0 ? (renewalCount / currentEmailSoftware.size) * 100 : 0;
+  
+  return {
+    renewalRate,
+    newCustomers: newCustomerCount,
+    renewals: renewalCount,
+    totalEmailSoftwareCombos: currentEmailSoftware.size
+  };
 }
 
 async function renderEmployeePerformance(data) {
@@ -1567,14 +1602,21 @@ async function renderEmployeePerformance(data) {
     
     // Convert to array and calculate additional metrics
     const employeeArray = Object.values(employeeStats).map(emp => {
-      const renewalRate = calculateRenewalRate(allTransactions, data, emp.name);
+      const customerMetrics = calculateCustomerMetrics(
+        allTransactions, 
+        data, 
+        emp.name, 
+        window.globalFilters?.dateRange
+      );
       
       return {
         ...emp,
         customerCount: emp.customers.size,
         productCount: emp.products.size,
         avgTransactionValue: emp.transactionCount > 0 ? emp.totalRevenue / emp.transactionCount : 0,
-        renewalRate: renewalRate
+        renewalRate: customerMetrics.renewalRate,
+        newCustomers: customerMetrics.newCustomers,
+        renewals: customerMetrics.renewals
       };
     });
     
@@ -1596,8 +1638,10 @@ async function renderEmployeePerformance(data) {
                 <th title="Tổng doanh thu từ các giao dịch của nhân viên">Doanh thu</th>
                 <th title="Số lượng giao dịch đã thực hiện">Số GD</th>
                 <th title="Số lượng khách hàng độc lập (theo email)">Số KH</th>
+                <th title="Khách hàng mới: Email chưa từng xuất hiện trong chu kỳ trước">KH mới</th>
+                <th title="Gia hạn: Email + tên phần mềm đã có trong chu kỳ trước">Gia hạn</th>
                 <th title="Giá trị trung bình mỗi giao dịch = Tổng doanh thu / Số giao dịch">TB/GD</th>
-                <th title="Tỷ lệ gia hạn: Khách hàng có đăng ký phần mềm trước đó và tiếp tục đăng ký">Tỷ lệ gia hạn</th>
+                <th title="Tỷ lệ gia hạn: % email+phần mềm đã từng đăng ký trước đó">Tỷ lệ gia hạn</th>
                 <th title="Tổng hoa hồng nhận được từ các giao dịch">Hoa hồng</th>
               </tr>
             </thead>
@@ -1609,8 +1653,10 @@ async function renderEmployeePerformance(data) {
                   <td class="revenue">${formatCurrency(emp.totalRevenue)}</td>
                   <td class="count">${emp.transactionCount}</td>
                   <td class="count">${emp.customerCount}</td>
+                  <td class="new-customers" title="${emp.newCustomers} email chưa từng xuất hiện trước">${emp.newCustomers}</td>
+                  <td class="renewals" title="${emp.renewals} combo email+phần mềm đã có trước">${emp.renewals}</td>
                   <td class="avg-value" title="${formatCurrency(emp.totalRevenue)} ÷ ${emp.transactionCount} giao dịch">${formatCurrency(emp.avgTransactionValue)}</td>
-                  <td class="renewal-rate" title="${emp.renewalRate.toFixed(1)}% khách hàng gia hạn (email + phần mềm)">${emp.renewalRate.toFixed(1)}%</td>
+                  <td class="renewal-rate" title="${emp.renewals}/${emp.renewals + emp.newCustomers} = ${emp.renewalRate.toFixed(1)}%">${emp.renewalRate.toFixed(1)}%</td>
                   <td class="commission">${formatCurrency(emp.totalCommission)}</td>
                 </tr>
               `).join('')}
@@ -1621,6 +1667,8 @@ async function renderEmployeePerformance(data) {
                 <td class="revenue"><strong>${formatCurrency(employeeArray.reduce((sum, emp) => sum + emp.totalRevenue, 0))}</strong></td>
                 <td class="count"><strong>${employeeArray.reduce((sum, emp) => sum + emp.transactionCount, 0)}</strong></td>
                 <td class="count"><strong>${new Set(data.map(t => t.customerEmail)).size}</strong></td>
+                <td class="count"><strong>${employeeArray.reduce((sum, emp) => sum + emp.newCustomers, 0)}</strong></td>
+                <td class="count"><strong>${employeeArray.reduce((sum, emp) => sum + emp.renewals, 0)}</strong></td>
                 <td>-</td>
                 <td>-</td>
                 <td class="commission"><strong>${formatCurrency(employeeArray.reduce((sum, emp) => sum + emp.totalCommission, 0))}</strong></td>
@@ -1720,6 +1768,32 @@ async function renderEmployeePerformance(data) {
         
         .avg-value {
           color: #8b5cf6;
+        }
+        
+        .new-customers {
+          text-align: center;
+          color: #3b82f6;
+          font-weight: 600;
+          cursor: help;
+        }
+        
+        .new-customers:hover {
+          color: #1d4ed8;
+          transform: scale(1.05);
+          transition: all 0.2s;
+        }
+        
+        .renewals {
+          text-align: center;
+          color: #f59e0b;
+          font-weight: 600;
+          cursor: help;
+        }
+        
+        .renewals:hover {
+          color: #d97706;
+          transform: scale(1.05);
+          transition: all 0.2s;
         }
         
         .renewal-rate {
