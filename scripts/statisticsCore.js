@@ -522,6 +522,11 @@ export function groupExpensesByTenChuan(expenses) {
   if (!Array.isArray(expenses)) return grouped;
   
   expenses.forEach(expense => {
+    // Skip expenses with accountingType = "Không liên quan"
+    const accountingType = expense.accountingType || expense['Loại kế toán'] || '';
+    if (accountingType === 'Không liên quan') {
+      return; // Skip this expense
+    }
     const tenChuan = expense.standardName || expense.product || "Không xác định";
     
     if (!grouped[tenChuan]) {
@@ -934,8 +939,30 @@ export function calculateActualExpense(expense, dateRange) {
  * @returns {Array} - ROI analysis results
  */
 export function calculateROIByTenChuan(transactions, expenses, dateRange = null) {
+  // Filter out expenses with accountingType = "Không liên quan"
+  const filteredExpenses = expenses.filter(expense => {
+    // Check multiple possible field names for accountingType
+    const accountingType = expense.accountingType || expense['Loại kế toán'] || '';
+    
+    if (accountingType === 'Không liên quan') {
+      console.log(`🚫 Excluding expense from ROI:`, {
+        product: expense.product || expense['Tên sản phẩm/Dịch vụ'],
+        accountingType: accountingType,
+        amount: expense.amount || expense['Số tiền']
+      });
+      return false;
+    }
+    return true;
+  });
+  
+  console.log(`🛡️ Filtered expenses for ROI:`, {
+    original: expenses.length,
+    filtered: filteredExpenses.length,
+    excluded: expenses.length - filteredExpenses.length
+  });
+  
   const transactionGroups = groupTransactionsByTenChuan(transactions);
-  const expenseGroups = groupExpensesByTenChuan(expenses);
+  const expenseGroups = groupExpensesByTenChuan(filteredExpenses);
   
   const roiAnalysis = [];
   
