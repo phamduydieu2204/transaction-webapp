@@ -1490,11 +1490,53 @@ async function renderSoftwareCostRevenue(transactionData, expenseData) {
   }
 }
 
+/**
+ * Calculate actual renewal rate based on email + software name across periods
+ * @param {Array} allTransactions - All transactions (not filtered by date)
+ * @param {Array} currentPeriodTransactions - Transactions in current period
+ * @param {string} employeeName - Employee name to filter
+ * @returns {number} - Renewal rate percentage
+ */
+function calculateRenewalRate(allTransactions, currentPeriodTransactions, employeeName) {
+  // Get current period transactions for this employee
+  const employeeCurrentTransactions = currentPeriodTransactions.filter(t => 
+    (t.tenNhanVien || 'Không xác định') === employeeName
+  );
+  
+  if (employeeCurrentTransactions.length === 0) return 0;
+  
+  // Group current transactions by email + software name
+  const currentCustomerSoftware = new Set();
+  employeeCurrentTransactions.forEach(t => {
+    const key = `${t.customerEmail}|${t.softwareName}`;
+    currentCustomerSoftware.add(key);
+  });
+  
+  // Check how many of these combinations existed before
+  const renewalCount = Array.from(currentCustomerSoftware).filter(key => {
+    const [email, softwareName] = key.split('|');
+    
+    // Check if this email + software existed in previous transactions
+    const hadBefore = allTransactions.some(t => 
+      t.customerEmail === email && 
+      t.softwareName === softwareName &&
+      new Date(t.transactionDate) < new Date(employeeCurrentTransactions[0].transactionDate)
+    );
+    
+    return hadBefore;
+  }).length;
+  
+  return (renewalCount / currentCustomerSoftware.size) * 100;
+}
+
 async function renderEmployeePerformance(data) {
   const container = document.getElementById('employeePerformance');
   if (!container) return;
   
   try {
+    // Get all transactions for renewal calculation
+    const allTransactions = window.transactionList || [];
+    
     // Group transactions by employee
     const employeeStats = {};
     
@@ -1524,13 +1566,17 @@ async function renderEmployeePerformance(data) {
     });
     
     // Convert to array and calculate additional metrics
-    const employeeArray = Object.values(employeeStats).map(emp => ({
-      ...emp,
-      customerCount: emp.customers.size,
-      productCount: emp.products.size,
-      avgTransactionValue: emp.transactionCount > 0 ? emp.totalRevenue / emp.transactionCount : 0,
-      conversionRate: emp.customers.size > 0 ? (emp.transactionCount / emp.customers.size * 100) : 0
-    }));
+    const employeeArray = Object.values(employeeStats).map(emp => {
+      const renewalRate = calculateRenewalRate(allTransactions, data, emp.name);
+      
+      return {
+        ...emp,
+        customerCount: emp.customers.size,
+        productCount: emp.products.size,
+        avgTransactionValue: emp.transactionCount > 0 ? emp.totalRevenue / emp.transactionCount : 0,
+        renewalRate: renewalRate
+      };
+    });
     
     // Sort by revenue
     employeeArray.sort((a, b) => b.totalRevenue - a.totalRevenue);
@@ -1545,14 +1591,14 @@ async function renderEmployeePerformance(data) {
           <table>
             <thead>
               <tr>
-                <th>Nhân viên</th>
-                <th>Mã NV</th>
-                <th>Doanh thu</th>
-                <th>Số GD</th>
-                <th>Số KH</th>
-                <th>TB/GD</th>
-                <th>Tỷ lệ chuyển đổi</th>
-                <th>Hoa hồng</th>
+                <th title="Tên nhân viên thực hiện giao dịch">Nhân viên</th>
+                <th title="Mã nhân viên trong hệ thống">Mã NV</th>
+                <th title="Tổng doanh thu từ các giao dịch của nhân viên">Doanh thu</th>
+                <th title="Số lượng giao dịch đã thực hiện">Số GD</th>
+                <th title="Số lượng khách hàng độc lập (theo email)">Số KH</th>
+                <th title="Giá trị trung bình mỗi giao dịch = Tổng doanh thu / Số giao dịch">TB/GD</th>
+                <th title="Tỷ lệ gia hạn: Khách hàng có đăng ký phần mềm trước đó và tiếp tục đăng ký">Tỷ lệ gia hạn</th>
+                <th title="Tổng hoa hồng nhận được từ các giao dịch">Hoa hồng</th>
               </tr>
             </thead>
             <tbody>
@@ -1563,8 +1609,8 @@ async function renderEmployeePerformance(data) {
                   <td class="revenue">${formatCurrency(emp.totalRevenue)}</td>
                   <td class="count">${emp.transactionCount}</td>
                   <td class="count">${emp.customerCount}</td>
-                  <td class="avg-value">${formatCurrency(emp.avgTransactionValue)}</td>
-                  <td class="conversion-rate">${emp.conversionRate.toFixed(1)}%</td>
+                  <td class="avg-value" title="${formatCurrency(emp.totalRevenue)} ÷ ${emp.transactionCount} giao dịch">${formatCurrency(emp.avgTransactionValue)}</td>
+                  <td class="renewal-rate" title="${emp.renewalRate.toFixed(1)}% khách hàng gia hạn (email + phần mềm)">${emp.renewalRate.toFixed(1)}%</td>
                   <td class="commission">${formatCurrency(emp.totalCommission)}</td>
                 </tr>
               `).join('')}
@@ -1591,15 +1637,22 @@ async function renderEmployeePerformance(data) {
       style.id = 'employeePerformanceStyles';
       style.textContent = `
         .employee-performance {
-          background: white;
-          padding: 20px;
-          border-radius: 8px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          background: #ffffff;
+          padding: 24px;
+          border-radius: 12px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          border: 1px solid #e5e7eb;
         }
         
         .employee-performance h3 {
-          margin: 0 0 20px 0;
-          color: #333;
+          margin: 0 0 24px 0;
+          color: #1f2937;
+          font-size: 1.5em;
+          font-weight: 600;
+          background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
         
         .performance-table {
@@ -1619,20 +1672,35 @@ async function renderEmployeePerformance(data) {
         }
         
         .performance-table th {
-          background: #f8f9fa;
-          font-weight: bold;
-          color: #333;
+          background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+          font-weight: 600;
+          color: #1e293b;
           position: sticky;
           top: 0;
+          cursor: help;
+          transition: background-color 0.2s;
+        }
+        
+        .performance-table th:hover {
+          background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
         }
         
         .performance-table tbody tr:hover {
-          background: #f8f9fa;
+          background: #f1f5f9;
+          transform: translateY(-1px);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+          transition: all 0.2s;
         }
         
         .employee-name {
-          font-weight: 500;
-          color: #2563eb;
+          font-weight: 600;
+          color: #1e40af;
+          cursor: pointer;
+        }
+        
+        .employee-name:hover {
+          color: #3b82f6;
+          text-decoration: underline;
         }
         
         .employee-code {
@@ -1654,10 +1722,17 @@ async function renderEmployeePerformance(data) {
           color: #8b5cf6;
         }
         
-        .conversion-rate {
+        .renewal-rate {
           text-align: center;
-          color: #f59e0b;
-          font-weight: 500;
+          color: #059669;
+          font-weight: 600;
+          cursor: help;
+        }
+        
+        .renewal-rate:hover {
+          color: #10b981;
+          transform: scale(1.05);
+          transition: all 0.2s;
         }
         
         .total-row {
@@ -1783,10 +1858,10 @@ async function renderTransactionCount(data) {
             <table>
               <thead>
                 <tr>
-                  <th>Nhân viên</th>
-                  ${recentDates.map(date => `<th>${date}</th>`).join('')}
-                  <th>Tổng cộng</th>
-                  <th>Trung bình</th>
+                  <th title="Tên nhân viên thực hiện giao dịch">Nhân viên</th>
+                  ${recentDates.map(date => `<th title="Số giao dịch trong tháng ${date}">${date}</th>`).join('')}
+                  <th title="Tổng số giao dịch trong 6 tháng">Tổng cộng</th>
+                  <th title="Số giao dịch trung bình mỗi tháng">Trung bình</th>
                 </tr>
               </thead>
               <tbody>
@@ -1821,15 +1896,22 @@ async function renderTransactionCount(data) {
       style.id = 'transactionCountStyles';
       style.textContent = `
         .transaction-count-analysis {
-          background: white;
-          padding: 20px;
-          border-radius: 8px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          background: #ffffff;
+          padding: 24px;
+          border-radius: 12px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          border: 1px solid #e5e7eb;
         }
         
         .transaction-count-analysis h3 {
-          margin: 0 0 20px 0;
-          color: #333;
+          margin: 0 0 24px 0;
+          color: #1f2937;
+          font-size: 1.5em;
+          font-weight: 600;
+          background: linear-gradient(135deg, #10b981, #059669);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
         
         .transaction-count-analysis h4 {
@@ -1886,9 +1968,16 @@ async function renderTransactionCount(data) {
         }
         
         .transaction-table th {
-          background: #f3f4f6;
-          font-weight: bold;
+          background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+          font-weight: 600;
           font-size: 0.9em;
+          color: #065f46;
+          cursor: help;
+          transition: background-color 0.2s;
+        }
+        
+        .transaction-table th:hover {
+          background: linear-gradient(135deg, #d1fae5, #a7f3d0);
         }
         
         .transaction-table .employee-name {
@@ -2044,14 +2133,14 @@ async function renderEmployeeRanking(data) {
             <table>
               <thead>
                 <tr>
-                  <th>Rank</th>
-                  <th>Nhân viên</th>
-                  <th>Tổng điểm</th>
-                  <th>Doanh thu</th>
-                  <th>Số GD</th>
-                  <th>Số KH</th>
-                  <th>Gia hạn</th>
-                  <th>TB thời hạn</th>
+                  <th title="Thứ hạng dựa trên tổng điểm tính toán">Rank</th>
+                  <th title="Tên nhân viên tham gia xếp hạng">Nhân viên</th>
+                  <th title="Điểm tổng hợp từ 5 tiêu chí: doanh thu, giao dịch, khách hàng, gia hạn, thời hạn">Tổng điểm</th>
+                  <th title="Tổng doanh thu từ các giao dịch (10 điểm/triệu VND)">Doanh thu</th>
+                  <th title="Số lượng giao dịch đã thực hiện (5 điểm/GD)">Số GD</th>
+                  <th title="Số khách hàng độc lập theo email (20 điểm/KH)">Số KH</th>
+                  <th title="Tỷ lệ khách hàng gia hạn dựa trên email + phần mềm">Gia hạn</th>
+                  <th title="Thời hạn trung bình của các gói phần mềm (10 điểm/tháng)">TB thời hạn</th>
                 </tr>
               </thead>
               <tbody>
@@ -2102,15 +2191,22 @@ async function renderEmployeeRanking(data) {
       style.id = 'employeeRankingStyles';
       style.textContent = `
         .employee-ranking {
-          background: white;
-          padding: 20px;
-          border-radius: 8px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          background: #ffffff;
+          padding: 24px;
+          border-radius: 12px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          border: 1px solid #e5e7eb;
         }
         
         .employee-ranking h3 {
-          margin: 0 0 20px 0;
-          color: #333;
+          margin: 0 0 24px 0;
+          color: #1f2937;
+          font-size: 1.5em;
+          font-weight: 600;
+          background: linear-gradient(135deg, #f59e0b, #d97706);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
         
         .employee-ranking h4 {
@@ -2188,8 +2284,15 @@ async function renderEmployeeRanking(data) {
         }
         
         .ranking-table th {
-          background: #f3f4f6;
-          font-weight: bold;
+          background: linear-gradient(135deg, #fef3c7, #fde68a);
+          font-weight: 600;
+          color: #92400e;
+          cursor: help;
+          transition: background-color 0.2s;
+        }
+        
+        .ranking-table th:hover {
+          background: linear-gradient(135deg, #fde68a, #fcd34d);
         }
         
         .ranking-table tr.top-3 {
@@ -2256,6 +2359,51 @@ async function renderEmployeeRanking(data) {
         .ranking-legend li {
           margin: 8px 0;
           color: #4b5563;
+        }
+        
+        /* Global tooltip styles for all employee reports */
+        [title] {
+          position: relative;
+          cursor: help;
+        }
+        
+        [title]:hover::after {
+          content: attr(title);
+          position: absolute;
+          bottom: 100%;
+          left: 50%;
+          transform: translateX(-50%);
+          background: #1f2937;
+          color: white;
+          padding: 8px 12px;
+          border-radius: 6px;
+          font-size: 0.875rem;
+          white-space: nowrap;
+          z-index: 1000;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          opacity: 0;
+          animation: tooltipFadeIn 0.2s forwards;
+        }
+        
+        [title]:hover::before {
+          content: '';
+          position: absolute;
+          bottom: 92%;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 0;
+          height: 0;
+          border-left: 5px solid transparent;
+          border-right: 5px solid transparent;
+          border-top: 5px solid #1f2937;
+          z-index: 1001;
+          opacity: 0;
+          animation: tooltipFadeIn 0.2s forwards;
+        }
+        
+        @keyframes tooltipFadeIn {
+          from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+          to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
       `;
       document.head.appendChild(style);
