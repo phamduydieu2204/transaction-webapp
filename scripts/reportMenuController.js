@@ -1018,6 +1018,117 @@ async function renderExpiringSoftware(data) {
   }
 }
 
+// State management for ROI table sorting
+let roiSortState = {
+  column: 'accountingROI', // Default sort by accounting ROI
+  direction: 'desc' // desc = high to low, asc = low to high
+};
+
+/**
+ * Sort ROI data by specified column and direction
+ * @param {Array} data - ROI data array
+ * @param {string} column - Column to sort by
+ * @param {string} direction - Sort direction ('asc' or 'desc')
+ * @returns {Array} - Sorted data
+ */
+function sortROIData(data, column, direction) {
+  return data.sort((a, b) => {
+    let valueA, valueB;
+    
+    switch (column) {
+      case 'tenChuan':
+        valueA = a.tenChuan || '';
+        valueB = b.tenChuan || '';
+        return direction === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
+        
+      case 'revenue':
+        valueA = a.revenue || 0;
+        valueB = b.revenue || 0;
+        break;
+        
+      case 'allocatedExpense':
+        valueA = a.allocatedExpense || 0;
+        valueB = b.allocatedExpense || 0;
+        break;
+        
+      case 'accountingProfit':
+        valueA = a.accountingProfit || 0;
+        valueB = b.accountingProfit || 0;
+        break;
+        
+      case 'accountingROI':
+        valueA = a.accountingROI || 0;
+        valueB = b.accountingROI || 0;
+        break;
+        
+      case 'accountingProfitMargin':
+        valueA = a.accountingProfitMargin || 0;
+        valueB = b.accountingProfitMargin || 0;
+        break;
+        
+      case 'actualExpense':
+        valueA = a.actualExpense || 0;
+        valueB = b.actualExpense || 0;
+        break;
+        
+      case 'actualProfit':
+        valueA = a.actualProfit || 0;
+        valueB = b.actualProfit || 0;
+        break;
+        
+      case 'actualROI':
+        valueA = a.actualROI || 0;
+        valueB = b.actualROI || 0;
+        break;
+        
+      case 'actualProfitMargin':
+        valueA = a.actualProfitMargin || 0;
+        valueB = b.actualProfitMargin || 0;
+        break;
+        
+      default:
+        valueA = a.accountingROI || 0;
+        valueB = b.accountingROI || 0;
+    }
+    
+    return direction === 'asc' ? valueA - valueB : valueB - valueA;
+  });
+}
+
+/**
+ * Handle column header click for sorting
+ * @param {string} column - Column name
+ */
+function handleROISort(column) {
+  // Toggle direction if same column, otherwise use desc as default
+  if (roiSortState.column === column) {
+    roiSortState.direction = roiSortState.direction === 'asc' ? 'desc' : 'asc';
+  } else {
+    roiSortState.column = column;
+    roiSortState.direction = 'desc';
+  }
+  
+  console.log('🔄 ROI Sort changed:', roiSortState);
+  
+  // Re-render the ROI table with new sorting
+  const transactionData = window.transactionList || [];
+  let expenseData = window.expenseList || [];
+  
+  // Apply transaction filter if exists (but keep all expenses for allocation)
+  let filteredTransactions = transactionData;
+  if (window.globalFilters && window.globalFilters.dateRange) {
+    const { filterDataByDateRange } = window.financialDashboardModule || {};
+    if (filterDataByDateRange) {
+      filteredTransactions = filterDataByDateRange(transactionData, window.globalFilters.dateRange, window.globalFilters);
+    }
+  }
+  
+  renderSoftwareROI(filteredTransactions, expenseData);
+}
+
+// Make handleROISort globally available
+window.handleROISort = handleROISort;
+
 async function renderSoftwareROI(transactionData, expenseData) {
   const container = document.getElementById('softwareROI');
   if (!container) return;
@@ -1035,15 +1146,33 @@ async function renderSoftwareROI(transactionData, expenseData) {
     const { calculateROIByTenChuan } = await import('./statisticsCore.js');
     
     // Calculate ROI using Tên chuẩn matching with date range for allocation
-    const roiData = calculateROIByTenChuan(transactionData, expenseData, window.globalFilters?.dateRange);
+    let roiData = calculateROIByTenChuan(transactionData, expenseData, window.globalFilters?.dateRange);
     
     console.log('💰 ROI calculated:', {
       roiItems: roiData.length,
       sampleROI: roiData[0]
     });
     
+    // Apply sorting
+    roiData = sortROIData(roiData, roiSortState.column, roiSortState.direction);
+    
     // Get period label
     const periodLabel = getPeriodLabel();
+    
+    // Helper function to create sortable header
+    const createSortableHeader = (column, label, style = '') => {
+      const isActive = roiSortState.column === column;
+      const direction = isActive ? roiSortState.direction : 'desc';
+      const arrow = isActive ? (direction === 'asc' ? ' ↑' : ' ↓') : ' ↕️';
+      
+      return `
+        <th onclick="handleROISort('${column}')" 
+            style="cursor: pointer; user-select: none; ${style} ${isActive ? 'background-color: #e8f4fd;' : ''}" 
+            title="Click to sort ${direction === 'asc' ? 'high to low' : 'low to high'}">
+          ${label}${arrow}
+        </th>
+      `;
+    };
     
     container.innerHTML = `
       <div class="software-roi-analysis">
@@ -1052,24 +1181,24 @@ async function renderSoftwareROI(transactionData, expenseData) {
           <table>
             <thead>
               <tr>
-                <th rowspan="2">Phần mềm</th>
-                <th rowspan="2">Doanh thu</th>
+                ${createSortableHeader('tenChuan', 'Phần mềm', 'rowspan="2"')}
+                ${createSortableHeader('revenue', 'Doanh thu', 'rowspan="2"')}
                 <th colspan="4" style="text-align: center; background: #e3f2fd;">Góc kế toán (Phân bổ)</th>
                 <th colspan="4" style="text-align: center; background: #fff3e0;">Góc dòng tiền (Thực tế)</th>
               </tr>
               <tr>
-                <th style="background: #e3f2fd;">Chi phí phân bổ</th>
-                <th style="background: #e3f2fd;">Lợi nhuận KT</th>
-                <th style="background: #e3f2fd;">ROI KT</th>
-                <th style="background: #e3f2fd;">Biên LN KT</th>
-                <th style="background: #fff3e0;">Chi phí thực tế</th>
-                <th style="background: #fff3e0;">Lợi nhuận TT</th>
-                <th style="background: #fff3e0;">ROI TT</th>
-                <th style="background: #fff3e0;">Biên LN TT</th>
+                ${createSortableHeader('allocatedExpense', 'Chi phí phân bổ', 'background: #e3f2fd;')}
+                ${createSortableHeader('accountingProfit', 'Lợi nhuận KT', 'background: #e3f2fd;')}
+                ${createSortableHeader('accountingROI', 'ROI KT', 'background: #e3f2fd;')}
+                ${createSortableHeader('accountingProfitMargin', 'Biên LN KT', 'background: #e3f2fd;')}
+                ${createSortableHeader('actualExpense', 'Chi phí thực tế', 'background: #fff3e0;')}
+                ${createSortableHeader('actualProfit', 'Lợi nhuận TT', 'background: #fff3e0;')}
+                ${createSortableHeader('actualROI', 'ROI TT', 'background: #fff3e0;')}
+                ${createSortableHeader('actualProfitMargin', 'Biên LN TT', 'background: #fff3e0;')}
               </tr>
             </thead>
             <tbody>
-              ${roiData.slice(0, 10).map(software => `
+              ${roiData.map(software => `
                 <tr>
                   <td>
                     <div class="software-name">${software.tenChuan}</div>
@@ -1163,10 +1292,10 @@ async function renderSoftwareROI(transactionData, expenseData) {
       </div>
     `;
     
-    // Add styles for period indicator if not already added
-    if (!document.getElementById('periodIndicatorStyles')) {
+    // Add styles for period indicator and sortable table if not already added
+    if (!document.getElementById('roiTableStyles')) {
       const style = document.createElement('style');
-      style.id = 'periodIndicatorStyles';
+      style.id = 'roiTableStyles';
       style.textContent = `
         .period-indicator {
           font-size: 14px;
@@ -1176,6 +1305,96 @@ async function renderSoftwareROI(transactionData, expenseData) {
           padding: 4px 12px;
           border-radius: 16px;
           margin-left: 12px;
+        }
+        
+        .roi-table table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 10px;
+        }
+        
+        .roi-table th {
+          padding: 8px 12px;
+          border: 1px solid #ddd;
+          font-weight: bold;
+          text-align: center;
+          transition: background-color 0.2s;
+        }
+        
+        .roi-table th:hover {
+          background-color: #f0f8ff !important;
+        }
+        
+        .roi-table th[onclick] {
+          position: relative;
+        }
+        
+        .roi-table th[onclick]:hover::after {
+          content: 'Click to sort';
+          position: absolute;
+          bottom: -25px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: #333;
+          color: white;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 11px;
+          white-space: nowrap;
+          z-index: 1000;
+        }
+        
+        .roi-table td {
+          padding: 8px 12px;
+          border: 1px solid #ddd;
+          text-align: right;
+        }
+        
+        .roi-table td:first-child {
+          text-align: left;
+        }
+        
+        .software-name {
+          font-weight: bold;
+          margin-bottom: 4px;
+        }
+        
+        .transaction-count {
+          font-size: 12px;
+          color: #666;
+        }
+        
+        .profit {
+          color: #2e7d32;
+          font-weight: bold;
+        }
+        
+        .loss {
+          color: #c62828;
+          font-weight: bold;
+        }
+        
+        .roi.positive {
+          color: #2e7d32;
+          font-weight: bold;
+        }
+        
+        .roi.negative {
+          color: #c62828;
+          font-weight: bold;
+        }
+        
+        .revenue {
+          color: #1976d2;
+          font-weight: bold;
+        }
+        
+        .cost {
+          color: #ef6c00;
+        }
+        
+        .margin {
+          font-size: 13px;
         }
       `;
       document.head.appendChild(style);
