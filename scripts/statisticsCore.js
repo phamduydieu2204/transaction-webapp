@@ -569,6 +569,10 @@ export function groupExpensesByTenChuan(expenses) {
 export function calculateAllocatedExpense(expense, dateRange) {
   // If no allocation needed, return 0
   if (!expense.periodicAllocation || expense.periodicAllocation !== 'Có') {
+    console.log(`❌ ${expense.product || expense.description} - No allocation:`, {
+      periodicAllocation: expense.periodicAllocation,
+      reason: 'periodicAllocation !== "Có"'
+    });
     return 0;
   }
   
@@ -578,6 +582,15 @@ export function calculateAllocatedExpense(expense, dateRange) {
   
   // Must have both dates for allocation
   if (!transactionDate || !renewalDate || renewalDate <= transactionDate) {
+    console.log(`❌ ${expense.product || expense.description} - Invalid dates:`, {
+      transactionDate: expense.date,
+      renewalDate: expense.renewDate,
+      parsedTransactionDate: transactionDate,
+      parsedRenewalDate: renewalDate,
+      reason: !transactionDate ? 'No transaction date' : 
+             !renewalDate ? 'No renewal date' : 
+             'Renewal date <= transaction date'
+    });
     return 0;
   }
   
@@ -922,11 +935,23 @@ export function calculateROIByTenChuan(transactions, expenses, dateRange = null)
       if (allocatedAmount > 0) {
         // Has periodic allocation
         allocatedExpenseVND += convertToVND(allocatedAmount, currency);
+        console.log(`📊 ${tenChuan} - Allocated expense:`, {
+          product: expense.product,
+          allocatedAmount,
+          currency,
+          convertedVND: convertToVND(allocatedAmount, currency)
+        });
       } else {
         // No allocation - use actual amount if in period
         const actualAmount = calculateActualExpense(expense, dateRange);
         if (actualAmount > 0) {
           allocatedExpenseVND += convertToVND(actualAmount, currency);
+          console.log(`💰 ${tenChuan} - Non-allocated actual expense:`, {
+            product: expense.product,
+            actualAmount,
+            currency,
+            convertedVND: convertToVND(actualAmount, currency)
+          });
         }
       }
       

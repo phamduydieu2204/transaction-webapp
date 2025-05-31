@@ -294,17 +294,18 @@ async function loadSoftwareReport() {
   let transactionData = window.transactionList || [];
   let expenseData = window.expenseList || [];
   
-  // Apply date filter if exists
+  // Apply date filter to transactions only
+  // Keep ALL expenses for allocation calculation, but filter transactions by date
   if (window.globalFilters && window.globalFilters.dateRange) {
     const { filterDataByDateRange } = await import('./financialDashboard.js');
     transactionData = filterDataByDateRange(transactionData, window.globalFilters.dateRange, window.globalFilters);
-    expenseData = filterDataByDateRange(expenseData, window.globalFilters.dateRange, window.globalFilters);
-    console.log('🔍 Applied date filter:', {
+    // DO NOT filter expenseData - we need all expenses for allocation calculation
+    console.log('🔍 Applied date filter to transactions only:', {
       originalTransactions: window.transactionList.length,
       filteredTransactions: transactionData.length,
-      originalExpenses: window.expenseList.length,
-      filteredExpenses: expenseData.length,
-      dateRange: window.globalFilters.dateRange
+      totalExpenses: expenseData.length,
+      dateRange: window.globalFilters.dateRange,
+      note: 'Expenses not filtered - needed for allocation calculation'
     });
   }
   
