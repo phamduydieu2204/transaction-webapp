@@ -1021,6 +1021,14 @@ async function renderSoftwareROI(transactionData, expenseData) {
   const container = document.getElementById('softwareROI');
   if (!container) return;
   
+  console.log('📊 renderSoftwareROI called with:', {
+    transactions: transactionData.length,
+    expenses: expenseData.length,
+    sampleTransaction: transactionData[0],
+    sampleExpense: expenseData[0],
+    globalFilters: window.globalFilters
+  });
+  
   try {
     // Import the new ROI calculation function
     const { calculateROIByTenChuan } = await import('./statisticsCore.js');
@@ -1028,9 +1036,17 @@ async function renderSoftwareROI(transactionData, expenseData) {
     // Calculate ROI using Tên chuẩn matching
     const roiData = calculateROIByTenChuan(transactionData, expenseData);
     
+    console.log('💰 ROI calculated:', {
+      roiItems: roiData.length,
+      sampleROI: roiData[0]
+    });
+    
+    // Get period label
+    const periodLabel = getPeriodLabel();
+    
     container.innerHTML = `
       <div class="software-roi-analysis">
-        <h3>📈 Phân tích ROI Phần mềm</h3>
+        <h3>📈 Phân tích ROI Phần mềm <span class="period-indicator">${periodLabel}</span></h3>
         <div class="roi-table">
           <table>
             <thead>
@@ -1083,6 +1099,24 @@ async function renderSoftwareROI(transactionData, expenseData) {
         </div>
       </div>
     `;
+    
+    // Add styles for period indicator if not already added
+    if (!document.getElementById('periodIndicatorStyles')) {
+      const style = document.createElement('style');
+      style.id = 'periodIndicatorStyles';
+      style.textContent = `
+        .period-indicator {
+          font-size: 14px;
+          font-weight: normal;
+          background: #e3f2fd;
+          color: #1976d2;
+          padding: 4px 12px;
+          border-radius: 16px;
+          margin-left: 12px;
+        }
+      `;
+      document.head.appendChild(style);
+    }
   } catch (error) {
     console.error('Error rendering software ROI:', error);
     container.innerHTML = '<p style="color: #c53030;">Lỗi khi tải phân tích ROI</p>';
