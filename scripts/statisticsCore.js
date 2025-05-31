@@ -468,3 +468,153 @@ export function calculateGrowthRate(currentValue, previousValue) {
     isNew: false
   };
 }
+
+/**
+ * Groups transactions by Tên chuẩn (Standard Name)
+ * @param {Array} transactions - Array of transaction records
+ * @returns {Object} - Grouped transactions by tenChuan
+ */
+export function groupTransactionsByTenChuan(transactions) {
+  const grouped = {};
+  
+  if (!Array.isArray(transactions)) return grouped;
+  
+  transactions.forEach(transaction => {
+    const tenChuan = transaction.tenChuan || transaction.softwareName || "Không xác định";
+    
+    if (!grouped[tenChuan]) {
+      grouped[tenChuan] = {
+        tenChuan: tenChuan,
+        transactions: [],
+        totalRevenue: 0,
+        totalDuration: 0,
+        customerCount: new Set(),
+        softwarePackages: new Set()
+      };
+    }
+    
+    grouped[tenChuan].transactions.push(transaction);
+    grouped[tenChuan].totalRevenue += parseFloat(transaction.revenue) || 0;
+    grouped[tenChuan].totalDuration += parseInt(transaction.duration) || 0;
+    grouped[tenChuan].customerCount.add(transaction.customerEmail);
+    grouped[tenChuan].softwarePackages.add(transaction.softwarePackage);
+  });
+  
+  // Convert Sets to counts
+  Object.keys(grouped).forEach(key => {
+    grouped[key].uniqueCustomers = grouped[key].customerCount.size;
+    grouped[key].packageCount = grouped[key].softwarePackages.size;
+    delete grouped[key].customerCount;
+    delete grouped[key].softwarePackages;
+  });
+  
+  return grouped;
+}
+
+/**
+ * Groups expenses by Tên chuẩn (Standard Name)
+ * @param {Array} expenses - Array of expense records
+ * @returns {Object} - Grouped expenses by standardName
+ */
+export function groupExpensesByTenChuan(expenses) {
+  const grouped = {};
+  
+  if (!Array.isArray(expenses)) return grouped;
+  
+  expenses.forEach(expense => {
+    const tenChuan = expense.standardName || expense.product || "Không xác định";
+    
+    if (!grouped[tenChuan]) {
+      grouped[tenChuan] = {
+        tenChuan: tenChuan,
+        expenses: [],
+        totalAmount: {
+          VND: 0,
+          USD: 0,
+          NGN: 0
+        },
+        categories: new Set(),
+        suppliers: new Set()
+      };
+    }
+    
+    grouped[tenChuan].expenses.push(expense);
+    const currency = expense.currency || "VND";
+    const amount = parseFloat(expense.amount) || 0;
+    grouped[tenChuan].totalAmount[currency] = (grouped[tenChuan].totalAmount[currency] || 0) + amount;
+    grouped[tenChuan].categories.add(expense.category);
+    grouped[tenChuan].suppliers.add(expense.supplier);
+  });
+  
+  // Convert Sets to counts
+  Object.keys(grouped).forEach(key => {
+    grouped[key].categoryCount = grouped[key].categories.size;
+    grouped[key].supplierCount = grouped[key].suppliers.size;
+    delete grouped[key].categories;
+    delete grouped[key].suppliers;
+  });
+  
+  return grouped;
+}
+
+/**
+ * Calculates ROI by matching transactions and expenses using Tên chuẩn
+ * @param {Array} transactions - Transaction records
+ * @param {Array} expenses - Expense records
+ * @returns {Array} - ROI analysis results
+ */
+export function calculateROIByTenChuan(transactions, expenses) {
+  const transactionGroups = groupTransactionsByTenChuan(transactions);
+  const expenseGroups = groupExpensesByTenChuan(expenses);
+  
+  const roiAnalysis = [];
+  
+  // Get all unique Tên chuẩn from both transactions and expenses
+  const allTenChuan = new Set([
+    ...Object.keys(transactionGroups),
+    ...Object.keys(expenseGroups)
+  ]);
+  
+  allTenChuan.forEach(tenChuan => {
+    const transactionData = transactionGroups[tenChuan] || {
+      totalRevenue: 0,
+      uniqueCustomers: 0,
+      transactions: []
+    };
+    
+    const expenseData = expenseGroups[tenChuan] || {
+      totalAmount: { VND: 0, USD: 0, NGN: 0 },
+      expenses: []
+    };
+    
+    // Calculate total expense in VND (simplified - in real app you'd use exchange rates)
+    const totalExpenseVND = expenseData.totalAmount.VND + 
+                           (expenseData.totalAmount.USD * 25000) + 
+                           (expenseData.totalAmount.NGN * 50);
+    
+    const roi = totalExpenseVND > 0 
+      ? ((transactionData.totalRevenue - totalExpenseVND) / totalExpenseVND) * 100
+      : transactionData.totalRevenue > 0 ? 100 : 0;
+    
+    const profit = transactionData.totalRevenue - totalExpenseVND;
+    
+    roiAnalysis.push({
+      tenChuan: tenChuan,
+      revenue: transactionData.totalRevenue,
+      expense: totalExpenseVND,
+      profit: profit,
+      roi: roi,
+      customerCount: transactionData.uniqueCustomers,
+      transactionCount: transactionData.transactions.length,
+      expenseCount: expenseData.expenses.length,
+      profitMargin: transactionData.totalRevenue > 0 
+        ? (profit / transactionData.totalRevenue) * 100 
+        : 0
+    });
+  });
+  
+  // Sort by ROI descending
+  roiAnalysis.sort((a, b) => b.roi - a.roi);
+  
+  return roiAnalysis;
+}

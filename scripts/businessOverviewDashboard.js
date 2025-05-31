@@ -171,13 +171,14 @@ function calculateTotalExpenses(expenseData) {
 }
 
 /**
- * Calculate revenue by source (software)
+ * Calculate revenue by source (software) using Tên chuẩn
  */
 function calculateRevenueBySource(transactionData) {
   const bySource = {};
   
   transactionData.forEach(transaction => {
-    const source = transaction.softwareName || 'Khác';
+    // Use Tên chuẩn if available, otherwise fall back to software name
+    const source = transaction.tenChuan || transaction.softwareName || 'Khác';
     const amount = parseFloat(transaction.revenue || transaction.amount || 0);
     bySource[source] = (bySource[source] || 0) + amount;
   });
@@ -207,41 +208,43 @@ function calculateRevenueByPeriod(transactionData, dateRange) {
 }
 
 /**
- * Calculate expenses by category
+ * Calculate expenses by category using Tên chuẩn for better grouping
  */
 function calculateExpensesByCategory(expenseData) {
-  const categories = {
-    'Kinh doanh phần mềm': 0,
-    'Sinh hoạt cá nhân': 0,
-    'Kinh doanh Amazon': 0,
-    'Marketing & Quảng cáo': 0,
-    'Vận hành': 0,
-    'Khác': 0
-  };
+  const categories = {};
   
   expenseData.forEach(expense => {
     // Skip non-related expenses if accounting type is available
     if (expense.accountingType && expense.accountingType === 'Không liên quan') {
-      categories['Sinh hoạt cá nhân'] += parseFloat(expense.amount || 0);
+      categories['Sinh hoạt cá nhân'] = (categories['Sinh hoạt cá nhân'] || 0) + parseFloat(expense.amount || 0);
       return;
     }
     
     const amount = parseFloat(expense.amount || 0);
-    const type = expense.type || 'Khác';
-    const category = expense.category || 'Khác';
     
-    if (type.includes('phần mềm') || category.includes('phần mềm')) {
-      categories['Kinh doanh phần mềm'] += amount;
-    } else if (type.includes('cá nhân') || type.includes('Sinh hoạt')) {
-      categories['Sinh hoạt cá nhân'] += amount;
-    } else if (type.includes('Amazon') || category.includes('Amazon')) {
-      categories['Kinh doanh Amazon'] += amount;
-    } else if (category.includes('Marketing') || category.includes('Quảng cáo')) {
-      categories['Marketing & Quảng cáo'] += amount;
-    } else if (category.includes('Vận hành') || category.includes('Operational')) {
-      categories['Vận hành'] += amount;
+    // Use Tên chuẩn for categorization if available
+    if (expense.standardName || expense.tenChuan) {
+      const categoryName = expense.standardName || expense.tenChuan;
+      categories[categoryName] = (categories[categoryName] || 0) + amount;
     } else {
-      categories['Khác'] += amount;
+      // Fallback to original logic
+      const type = expense.type || 'Khác';
+      const category = expense.category || 'Khác';
+      
+      let assignedCategory = 'Khác';
+      if (type.includes('phần mềm') || category.includes('phần mềm')) {
+        assignedCategory = 'Kinh doanh phần mềm';
+      } else if (type.includes('cá nhân') || type.includes('Sinh hoạt')) {
+        assignedCategory = 'Sinh hoạt cá nhân';
+      } else if (type.includes('Amazon') || category.includes('Amazon')) {
+        assignedCategory = 'Kinh doanh Amazon';
+      } else if (category.includes('Marketing') || category.includes('Quảng cáo')) {
+        assignedCategory = 'Marketing & Quảng cáo';
+      } else if (category.includes('Vận hành') || category.includes('Operational')) {
+        assignedCategory = 'Vận hành';
+      }
+      
+      categories[assignedCategory] = (categories[assignedCategory] || 0) + amount;
     }
   });
   

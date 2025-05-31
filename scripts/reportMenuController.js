@@ -964,58 +964,11 @@ async function renderSoftwareROI(transactionData, expenseData) {
   if (!container) return;
   
   try {
-    // Calculate ROI by software
-    const softwareROI = new Map();
+    // Import the new ROI calculation function
+    const { calculateROIByTenChuan } = await import('./statisticsCore.js');
     
-    // Calculate revenue by software
-    transactionData.forEach(transaction => {
-      const software = transaction.softwareName || 'Khác';
-      if (!softwareROI.has(software)) {
-        softwareROI.set(software, {
-          name: software,
-          revenue: 0,
-          cost: 0,
-          transactionCount: 0
-        });
-      }
-      
-      const data = softwareROI.get(software);
-      data.revenue += parseFloat(transaction.revenue) || 0;
-      data.transactionCount++;
-    });
-    
-    // Calculate costs by software
-    expenseData.forEach(expense => {
-      // Match expense to software based on category/description
-      const desc = (expense.description || '').toLowerCase();
-      const category = (expense.category || '').toLowerCase();
-      
-      // Simple matching logic - can be improved
-      let matchedSoftware = null;
-      softwareROI.forEach((data, software) => {
-        if (desc.includes(software.toLowerCase()) || category.includes(software.toLowerCase())) {
-          matchedSoftware = software;
-        }
-      });
-      
-      if (matchedSoftware) {
-        softwareROI.get(matchedSoftware).cost += parseFloat(expense.amount) || 0;
-      }
-    });
-    
-    // Calculate ROI metrics
-    const roiData = Array.from(softwareROI.values()).map(software => {
-      const roi = software.cost > 0 ? ((software.revenue - software.cost) / software.cost) * 100 : 0;
-      const profit = software.revenue - software.cost;
-      const margin = software.revenue > 0 ? (profit / software.revenue) * 100 : 0;
-      
-      return {
-        ...software,
-        roi,
-        profit,
-        margin
-      };
-    }).sort((a, b) => b.roi - a.roi);
+    // Calculate ROI using Tên chuẩn matching
+    const roiData = calculateROIByTenChuan(transactionData, expenseData);
     
     container.innerHTML = `
       <div class="software-roi-analysis">
@@ -1036,16 +989,16 @@ async function renderSoftwareROI(transactionData, expenseData) {
               ${roiData.slice(0, 10).map(software => `
                 <tr>
                   <td>
-                    <div class="software-name">${software.name}</div>
-                    <div class="transaction-count">${software.transactionCount} giao dịch</div>
+                    <div class="software-name">${software.tenChuan}</div>
+                    <div class="transaction-count">${software.transactionCount} GD / ${software.expenseCount} CP</div>
                   </td>
                   <td class="revenue">${formatCurrency(software.revenue)}</td>
-                  <td class="cost">${formatCurrency(software.cost)}</td>
+                  <td class="cost">${formatCurrency(software.expense)}</td>
                   <td class="${software.profit >= 0 ? 'profit' : 'loss'}">${formatCurrency(software.profit)}</td>
                   <td class="roi ${software.roi >= 0 ? 'positive' : 'negative'}">
                     ${software.roi > 0 ? '+' : ''}${software.roi.toFixed(1)}%
                   </td>
-                  <td class="margin">${software.margin.toFixed(1)}%</td>
+                  <td class="margin">${software.profitMargin.toFixed(1)}%</td>
                 </tr>
               `).join('')}
             </tbody>
