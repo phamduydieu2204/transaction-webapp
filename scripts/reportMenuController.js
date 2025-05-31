@@ -199,7 +199,18 @@ async function ensureDataIsLoaded() {
 async function loadRevenueReport() {
   console.log('💰 Loading revenue report');
   
-  const transactionData = window.transactionList || [];
+  let transactionData = window.transactionList || [];
+  
+  // Apply date filter if exists
+  if (window.globalFilters && window.globalFilters.dateRange) {
+    const { filterDataByDateRange } = await import('./financialDashboard.js');
+    transactionData = filterDataByDateRange(transactionData, window.globalFilters.dateRange, window.globalFilters);
+    console.log('🔍 Applied date filter:', {
+      original: window.transactionList.length,
+      filtered: transactionData.length,
+      dateRange: window.globalFilters.dateRange
+    });
+  }
   
   // Render các component doanh thu
   await Promise.all([
@@ -217,7 +228,18 @@ async function loadRevenueReport() {
 async function loadExpenseReport() {
   console.log('💸 Loading expense report');
   
-  const expenseData = window.expenseList || [];
+  let expenseData = window.expenseList || [];
+  
+  // Apply date filter if exists
+  if (window.globalFilters && window.globalFilters.dateRange) {
+    const { filterDataByDateRange } = await import('./financialDashboard.js');
+    expenseData = filterDataByDateRange(expenseData, window.globalFilters.dateRange, window.globalFilters);
+    console.log('🔍 Applied date filter:', {
+      original: window.expenseList.length,
+      filtered: expenseData.length,
+      dateRange: window.globalFilters.dateRange
+    });
+  }
   
   // Render existing monthly summary table
   if (window.renderExpenseStats) {
@@ -239,7 +261,18 @@ async function loadExpenseReport() {
 async function loadCustomerReport() {
   console.log('👥 Loading customer report');
   
-  const transactionData = window.transactionList || [];
+  let transactionData = window.transactionList || [];
+  
+  // Apply date filter if exists
+  if (window.globalFilters && window.globalFilters.dateRange) {
+    const { filterDataByDateRange } = await import('./financialDashboard.js');
+    transactionData = filterDataByDateRange(transactionData, window.globalFilters.dateRange, window.globalFilters);
+    console.log('🔍 Applied date filter:', {
+      original: window.transactionList.length,
+      filtered: transactionData.length,
+      dateRange: window.globalFilters.dateRange
+    });
+  }
   
   await Promise.all([
     renderCustomerOverview(transactionData),
@@ -258,8 +291,22 @@ async function loadSoftwareReport() {
   
   // Need to fetch software data from PhanMem sheet
   // For now, analyze from transaction data
-  const transactionData = window.transactionList || [];
-  const expenseData = window.expenseList || [];
+  let transactionData = window.transactionList || [];
+  let expenseData = window.expenseList || [];
+  
+  // Apply date filter if exists
+  if (window.globalFilters && window.globalFilters.dateRange) {
+    const { filterDataByDateRange } = await import('./financialDashboard.js');
+    transactionData = filterDataByDateRange(transactionData, window.globalFilters.dateRange, window.globalFilters);
+    expenseData = filterDataByDateRange(expenseData, window.globalFilters.dateRange, window.globalFilters);
+    console.log('🔍 Applied date filter:', {
+      originalTransactions: window.transactionList.length,
+      filteredTransactions: transactionData.length,
+      originalExpenses: window.expenseList.length,
+      filteredExpenses: expenseData.length,
+      dateRange: window.globalFilters.dateRange
+    });
+  }
   
   await Promise.all([
     renderSoftwareOverview(transactionData),
@@ -275,7 +322,18 @@ async function loadSoftwareReport() {
 async function loadEmployeeReport() {
   console.log('👔 Loading employee report');
   
-  const transactionData = window.transactionList || [];
+  let transactionData = window.transactionList || [];
+  
+  // Apply date filter if exists
+  if (window.globalFilters && window.globalFilters.dateRange) {
+    const { filterDataByDateRange } = await import('./financialDashboard.js');
+    transactionData = filterDataByDateRange(transactionData, window.globalFilters.dateRange, window.globalFilters);
+    console.log('🔍 Applied date filter:', {
+      original: window.transactionList.length,
+      filtered: transactionData.length,
+      dateRange: window.globalFilters.dateRange
+    });
+  }
   
   await Promise.all([
     renderEmployeePerformance(transactionData),
@@ -1139,4 +1197,28 @@ function formatCurrency(amount) {
     currency: 'VND'
   }).format(amount);
 }
+
+// Add global refresh function
+window.refreshCurrentReport = async function() {
+  console.log('🔄 Refreshing current report with new filters');
+  
+  // Get current active report type
+  const activeTab = document.querySelector('.report-menu-item.active');
+  if (!activeTab) {
+    console.log('ℹ️ No active report to refresh');
+    return;
+  }
+  
+  const reportType = activeTab.dataset.report;
+  console.log(`🔄 Refreshing ${reportType} report`);
+  
+  // Clear any existing content first
+  const contentArea = document.getElementById('reportContent');
+  if (contentArea) {
+    contentArea.innerHTML = '<div class="loading-spinner">Đang tải lại báo cáo...</div>';
+  }
+  
+  // Reload the report with new filters
+  await loadReport(reportType);
+};
 
