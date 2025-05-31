@@ -1160,19 +1160,47 @@ async function renderSoftwareROI(transactionData, expenseData) {
     const periodLabel = getPeriodLabel();
     
     // Helper function to create sortable header
-    const createSortableHeader = (column, label, style = '') => {
+    const createSortableHeader = (column, label, extraStyle = '', extraAttrs = '') => {
       const isActive = roiSortState.column === column;
       const direction = isActive ? roiSortState.direction : 'desc';
       const arrow = isActive ? (direction === 'asc' ? ' ↑' : ' ↓') : ' ↕️';
       
       return `
         <th onclick="handleROISort('${column}')" 
-            style="cursor: pointer; user-select: none; ${style} ${isActive ? 'background-color: #e8f4fd;' : ''}" 
-            title="Click to sort ${direction === 'asc' ? 'high to low' : 'low to high'}">
+            style="cursor: pointer; user-select: none; ${extraStyle} ${isActive ? 'background-color: #e8f4fd;' : ''}" 
+            title="Click to sort ${direction === 'asc' ? 'high to low' : 'low to high'}"
+            ${extraAttrs}>
           ${label}${arrow}
         </th>
       `;
     };
+    
+    // Calculate totals for summary row
+    const totals = {
+      revenue: 0,
+      allocatedExpense: 0,
+      accountingProfit: 0,
+      actualExpense: 0,
+      actualProfit: 0
+    };
+    
+    roiData.forEach(item => {
+      totals.revenue += item.revenue || 0;
+      totals.allocatedExpense += item.allocatedExpense || 0;
+      totals.accountingProfit += item.accountingProfit || 0;
+      totals.actualExpense += item.actualExpense || 0;
+      totals.actualProfit += item.actualProfit || 0;
+    });
+    
+    // Calculate average ROI and margins
+    const avgAccountingROI = totals.allocatedExpense > 0 
+      ? ((totals.revenue - totals.allocatedExpense) / totals.allocatedExpense) * 100 : 0;
+    const avgActualROI = totals.actualExpense > 0 
+      ? ((totals.revenue - totals.actualExpense) / totals.actualExpense) * 100 : 0;
+    const avgAccountingMargin = totals.revenue > 0 
+      ? (totals.accountingProfit / totals.revenue) * 100 : 0;
+    const avgActualMargin = totals.revenue > 0 
+      ? (totals.actualProfit / totals.revenue) * 100 : 0;
     
     container.innerHTML = `
       <div class="software-roi-analysis">
@@ -1181,8 +1209,8 @@ async function renderSoftwareROI(transactionData, expenseData) {
           <table>
             <thead>
               <tr>
-                ${createSortableHeader('tenChuan', 'Phần mềm', 'rowspan="2"')}
-                ${createSortableHeader('revenue', 'Doanh thu', 'rowspan="2"')}
+                ${createSortableHeader('tenChuan', 'Phần mềm', '', 'rowspan="2"')}
+                ${createSortableHeader('revenue', 'Doanh thu', '', 'rowspan="2"')}
                 <th colspan="4" style="text-align: center; background: #e3f2fd;">Góc kế toán (Phân bổ)</th>
                 <th colspan="4" style="text-align: center; background: #fff3e0;">Góc dòng tiền (Thực tế)</th>
               </tr>
@@ -1198,6 +1226,28 @@ async function renderSoftwareROI(transactionData, expenseData) {
               </tr>
             </thead>
             <tbody>
+              <!-- Tổng giá trị -->
+              <tr style="background-color: #f0f7ff; font-weight: bold; border-top: 2px solid #1976d2;">
+                <td>
+                  <div class="software-name">TổNG CỘNG</div>
+                  <div class="transaction-count">${roiData.length} phần mềm</div>
+                </td>
+                <td class="revenue">${formatCurrency(totals.revenue)}</td>
+                <!-- Góc kế toán -->
+                <td class="cost" style="background: #e8f4fd;">${formatCurrency(totals.allocatedExpense)}</td>
+                <td class="${totals.accountingProfit >= 0 ? 'profit' : 'loss'}" style="background: #e8f4fd;">${formatCurrency(totals.accountingProfit)}</td>
+                <td class="roi ${avgAccountingROI >= 0 ? 'positive' : 'negative'}" style="background: #e8f4fd;">
+                  ${avgAccountingROI > 0 ? '+' : ''}${avgAccountingROI.toFixed(1)}%
+                </td>
+                <td class="margin" style="background: #e8f4fd;">${avgAccountingMargin.toFixed(1)}%</td>
+                <!-- Góc dòng tiền -->
+                <td class="cost" style="background: #fff8f0;">${formatCurrency(totals.actualExpense)}</td>
+                <td class="${totals.actualProfit >= 0 ? 'profit' : 'loss'}" style="background: #fff8f0;">${formatCurrency(totals.actualProfit)}</td>
+                <td class="roi ${avgActualROI >= 0 ? 'positive' : 'negative'}" style="background: #fff8f0;">
+                  ${avgActualROI > 0 ? '+' : ''}${avgActualROI.toFixed(1)}%
+                </td>
+                <td class="margin" style="background: #fff8f0;">${avgActualMargin.toFixed(1)}%</td>
+              </tr>
               ${roiData.map(software => `
                 <tr>
                   <td>
@@ -1395,6 +1445,19 @@ async function renderSoftwareROI(transactionData, expenseData) {
         
         .margin {
           font-size: 13px;
+        }
+        
+        /* Summary row styles */
+        .roi-table tbody tr:first-child {
+          position: sticky;
+          top: 0;
+          z-index: 10;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .roi-table tbody tr:first-child td {
+          font-weight: bold;
+          border-bottom: 2px solid #1976d2;
         }
       `;
       document.head.appendChild(style);
