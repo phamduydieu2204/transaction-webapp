@@ -558,12 +558,65 @@ export function groupExpensesByTenChuan(expenses) {
 }
 
 /**
+ * Calculate allocated expense for a period
+ * @param {Object} expense - Expense record
+ * @param {Object} dateRange - Date range for allocation calculation
+ * @returns {number} - Allocated amount for the period
+ */
+function calculateAllocatedExpense(expense, dateRange) {
+  // If no allocation needed, return 0
+  if (!expense.periodicAllocation || expense.periodicAllocation !== 'Có') {
+    return 0;
+  }
+  
+  // Parse dates
+  const expenseDate = new Date(normalizeDate(expense.date));
+  const renewDate = expense.renewDate ? new Date(normalizeDate(expense.renewDate)) : null;
+  
+  // If no renew date, cannot allocate
+  if (!renewDate || renewDate <= expenseDate) {
+    return 0;
+  }
+  
+  // Calculate total allocation period in days
+  const totalDays = Math.ceil((renewDate - expenseDate) / (1000 * 60 * 60 * 24));
+  
+  // Calculate daily amount
+  const dailyAmount = (parseFloat(expense.amount) || 0) / totalDays;
+  
+  // If no date range specified, return full amount
+  if (!dateRange || !dateRange.start || !dateRange.end) {
+    return parseFloat(expense.amount) || 0;
+  }
+  
+  // Parse date range
+  const rangeStart = new Date(normalizeDate(dateRange.start));
+  const rangeEnd = new Date(normalizeDate(dateRange.end));
+  
+  // Calculate overlap period
+  const overlapStart = new Date(Math.max(rangeStart, expenseDate));
+  const overlapEnd = new Date(Math.min(rangeEnd, renewDate));
+  
+  // If no overlap, return 0
+  if (overlapStart > overlapEnd) {
+    return 0;
+  }
+  
+  // Calculate allocated days
+  const allocatedDays = Math.ceil((overlapEnd - overlapStart) / (1000 * 60 * 60 * 24)) + 1;
+  
+  // Return allocated amount
+  return dailyAmount * allocatedDays;
+}
+
+/**
  * Calculates ROI by matching transactions and expenses using Tên chuẩn
  * @param {Array} transactions - Transaction records
  * @param {Array} expenses - Expense records
+ * @param {Object} dateRange - Optional date range for allocation calculation
  * @returns {Array} - ROI analysis results
  */
-export function calculateROIByTenChuan(transactions, expenses) {
+export function calculateROIByTenChuan(transactions, expenses, dateRange = null) {
   const transactionGroups = groupTransactionsByTenChuan(transactions);
   const expenseGroups = groupExpensesByTenChuan(expenses);
   
@@ -587,34 +640,100 @@ export function calculateROIByTenChuan(transactions, expenses) {
       expenses: []
     };
     
-    // Calculate total expense in VND (simplified - in real app you'd use exchange rates)
-    const totalExpenseVND = expenseData.totalAmount.VND + 
+    // Calculate actual expense (cash flow)
+    const actualExpenseVND = expenseData.totalAmount.VND + 
                            (expenseData.totalAmount.USD * 25000) + 
                            (expenseData.totalAmount.NGN * 50);
     
-    const roi = totalExpenseVND > 0 
-      ? ((transactionData.totalRevenue - totalExpenseVND) / totalExpenseVND) * 100
-      : transactionData.totalRevenue > 0 ? 100 : 0;
+    // Calculate allocated expense (accounting view)
+    let allocatedExpenseVND = 0;
+    let actualExpenseInPeriod = 0;
     
-    const profit = transactionData.totalRevenue - totalExpenseVND;
+    expenseData.expenses.forEach(expense => {
+      const amount = parseFloat(expense.amount) || 0;
+      const currency = expense.currency || 'VND';
+      
+      // Convert to VND
+      let amountVND = amount;
+      if (currency === 'USD') amountVND = amount * 25000;
+      else if (currency === 'NGN') amountVND = amount * 50;
+      
+      // Check if expense date is within the period
+      if (dateRange && dateRange.start && dateRange.end) {
+        const expenseDate = new Date(normalizeDate(expense.date));
+        const rangeStart = new Date(normalizeDate(dateRange.start));
+        const rangeEnd = new Date(normalizeDate(dateRange.end));
+        
+        // Only count actual expense if it's within the period
+        if (expenseDate >= rangeStart && expenseDate <= rangeEnd) {
+          actualExpenseInPeriod += amountVND;
+        }
+      } else {
+        // No date range, count all
+        actualExpenseInPeriod += amountVND;
+      }
+      
+      // Calculate allocated amount
+      const allocatedAmount = calculateAllocatedExpense(expense, dateRange);
+      if (allocatedAmount > 0) {
+        // Convert allocated amount to VND if needed
+        if (currency === 'USD') allocatedExpenseVND += allocatedAmount * 25000;
+        else if (currency === 'NGN') allocatedExpenseVND += allocatedAmount * 50;
+        else allocatedExpenseVND += allocatedAmount;
+      } else if (!expense.periodicAllocation || expense.periodicAllocation !== 'Có') {
+        // If not allocated, use actual amount in period
+        if (dateRange && dateRange.start && dateRange.end) {
+          const expenseDate = new Date(normalizeDate(expense.date));
+          const rangeStart = new Date(normalizeDate(dateRange.start));
+          const rangeEnd = new Date(normalizeDate(dateRange.end));
+          
+          if (expenseDate >= rangeStart && expenseDate <= rangeEnd) {
+            allocatedExpenseVND += amountVND;
+          }
+        } else {
+          allocatedExpenseVND += amountVND;
+        }
+      }
+    });
+    
+    // Calculate profits and ROI
+    const accountingProfit = transactionData.totalRevenue - allocatedExpenseVND;
+    const actualProfit = transactionData.totalRevenue - actualExpenseInPeriod;
+    
+    const accountingROI = allocatedExpenseVND > 0 
+      ? ((transactionData.totalRevenue - allocatedExpenseVND) / allocatedExpenseVND) * 100
+      : transactionData.totalRevenue > 0 ? 100 : 0;
+      
+    const actualROI = actualExpenseInPeriod > 0 
+      ? ((transactionData.totalRevenue - actualExpenseInPeriod) / actualExpenseInPeriod) * 100
+      : transactionData.totalRevenue > 0 ? 100 : 0;
     
     roiAnalysis.push({
       tenChuan: tenChuan,
       revenue: transactionData.totalRevenue,
-      expense: totalExpenseVND,
-      profit: profit,
-      roi: roi,
+      // Accounting view
+      allocatedExpense: allocatedExpenseVND,
+      accountingProfit: accountingProfit,
+      accountingROI: accountingROI,
+      accountingProfitMargin: transactionData.totalRevenue > 0 
+        ? (accountingProfit / transactionData.totalRevenue) * 100 
+        : 0,
+      // Cash flow view
+      actualExpense: actualExpenseInPeriod,
+      actualProfit: actualProfit,
+      actualROI: actualROI,
+      actualProfitMargin: transactionData.totalRevenue > 0 
+        ? (actualProfit / transactionData.totalRevenue) * 100 
+        : 0,
+      // General info
       customerCount: transactionData.uniqueCustomers,
       transactionCount: transactionData.transactions.length,
-      expenseCount: expenseData.expenses.length,
-      profitMargin: transactionData.totalRevenue > 0 
-        ? (profit / transactionData.totalRevenue) * 100 
-        : 0
+      expenseCount: expenseData.expenses.length
     });
   });
   
-  // Sort by ROI descending
-  roiAnalysis.sort((a, b) => b.roi - a.roi);
+  // Sort by accounting ROI descending
+  roiAnalysis.sort((a, b) => b.accountingROI - a.accountingROI);
   
   return roiAnalysis;
 }

@@ -1033,8 +1033,8 @@ async function renderSoftwareROI(transactionData, expenseData) {
     // Import the new ROI calculation function
     const { calculateROIByTenChuan } = await import('./statisticsCore.js');
     
-    // Calculate ROI using Tên chuẩn matching
-    const roiData = calculateROIByTenChuan(transactionData, expenseData);
+    // Calculate ROI using Tên chuẩn matching with date range for allocation
+    const roiData = calculateROIByTenChuan(transactionData, expenseData, window.globalFilters?.dateRange);
     
     console.log('💰 ROI calculated:', {
       roiItems: roiData.length,
@@ -1051,12 +1051,20 @@ async function renderSoftwareROI(transactionData, expenseData) {
           <table>
             <thead>
               <tr>
-                <th>Phần mềm</th>
-                <th>Doanh thu</th>
-                <th>Chi phí</th>
-                <th>Lợi nhuận</th>
-                <th>ROI</th>
-                <th>Biên lợi nhuận</th>
+                <th rowspan="2">Phần mềm</th>
+                <th rowspan="2">Doanh thu</th>
+                <th colspan="4" style="text-align: center; background: #e3f2fd;">Góc kế toán (Phân bổ)</th>
+                <th colspan="4" style="text-align: center; background: #fff3e0;">Góc dòng tiền (Thực tế)</th>
+              </tr>
+              <tr>
+                <th style="background: #e3f2fd;">Chi phí phân bổ</th>
+                <th style="background: #e3f2fd;">Lợi nhuận KT</th>
+                <th style="background: #e3f2fd;">ROI KT</th>
+                <th style="background: #e3f2fd;">Biên LN KT</th>
+                <th style="background: #fff3e0;">Chi phí thực tế</th>
+                <th style="background: #fff3e0;">Lợi nhuận TT</th>
+                <th style="background: #fff3e0;">ROI TT</th>
+                <th style="background: #fff3e0;">Biên LN TT</th>
               </tr>
             </thead>
             <tbody>
@@ -1067,12 +1075,20 @@ async function renderSoftwareROI(transactionData, expenseData) {
                     <div class="transaction-count">${software.transactionCount} GD / ${software.expenseCount} CP</div>
                   </td>
                   <td class="revenue">${formatCurrency(software.revenue)}</td>
-                  <td class="cost">${formatCurrency(software.expense)}</td>
-                  <td class="${software.profit >= 0 ? 'profit' : 'loss'}">${formatCurrency(software.profit)}</td>
-                  <td class="roi ${software.roi >= 0 ? 'positive' : 'negative'}">
-                    ${software.roi > 0 ? '+' : ''}${software.roi.toFixed(1)}%
+                  <!-- Góc kế toán -->
+                  <td class="cost" style="background: #f5f5f5;">${formatCurrency(software.allocatedExpense)}</td>
+                  <td class="${software.accountingProfit >= 0 ? 'profit' : 'loss'}" style="background: #f5f5f5;">${formatCurrency(software.accountingProfit)}</td>
+                  <td class="roi ${software.accountingROI >= 0 ? 'positive' : 'negative'}" style="background: #f5f5f5;">
+                    ${software.accountingROI > 0 ? '+' : ''}${software.accountingROI.toFixed(1)}%
                   </td>
-                  <td class="margin">${software.profitMargin.toFixed(1)}%</td>
+                  <td class="margin" style="background: #f5f5f5;">${software.accountingProfitMargin.toFixed(1)}%</td>
+                  <!-- Góc dòng tiền -->
+                  <td class="cost" style="background: #fafafa;">${formatCurrency(software.actualExpense)}</td>
+                  <td class="${software.actualProfit >= 0 ? 'profit' : 'loss'}" style="background: #fafafa;">${formatCurrency(software.actualProfit)}</td>
+                  <td class="roi ${software.actualROI >= 0 ? 'positive' : 'negative'}" style="background: #fafafa;">
+                    ${software.actualROI > 0 ? '+' : ''}${software.actualROI.toFixed(1)}%
+                  </td>
+                  <td class="margin" style="background: #fafafa;">${software.actualProfitMargin.toFixed(1)}%</td>
                 </tr>
               `).join('')}
             </tbody>
@@ -1080,20 +1096,66 @@ async function renderSoftwareROI(transactionData, expenseData) {
         </div>
         
         <div class="roi-summary">
-          <div class="summary-card">
-            <div class="summary-icon">🏆</div>
-            <div class="summary-content">
-              <div class="summary-label">ROI cao nhất</div>
-              <div class="summary-value">${roiData[0]?.name || 'N/A'}</div>
-              <div class="summary-detail">${roiData[0]?.roi > 0 ? '+' : ''}${roiData[0]?.roi?.toFixed(1) || 0}%</div>
+          <h4 style="margin: 20px 0 15px 0;">📊 So sánh hai góc nhìn</h4>
+          <div class="comparison-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <!-- Góc kế toán -->
+            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;">
+              <h5 style="margin: 0 0 10px 0; color: #1565c0;">💼 Góc kế toán (Phân bổ)</h5>
+              <div style="font-size: 14px;">
+                <div style="margin-bottom: 8px;">
+                  <strong>Tổng chi phí phân bổ:</strong> 
+                  ${formatCurrency(roiData.reduce((sum, s) => sum + s.allocatedExpense, 0))}
+                </div>
+                <div style="margin-bottom: 8px;">
+                  <strong>Tổng lợi nhuận KT:</strong> 
+                  <span style="color: ${roiData.reduce((sum, s) => sum + s.accountingProfit, 0) >= 0 ? '#2e7d32' : '#c62828'}">
+                    ${formatCurrency(roiData.reduce((sum, s) => sum + s.accountingProfit, 0))}
+                  </span>
+                </div>
+                <div>
+                  <strong>ROI trung bình KT:</strong> 
+                  ${roiData.length > 0 ? (roiData.reduce((sum, s) => sum + s.accountingROI, 0) / roiData.length).toFixed(1) : 0}%
+                </div>
+              </div>
+            </div>
+            <!-- Góc dòng tiền -->
+            <div style="background: #fff3e0; padding: 15px; border-radius: 8px;">
+              <h5 style="margin: 0 0 10px 0; color: #e65100;">💰 Góc dòng tiền (Thực tế)</h5>
+              <div style="font-size: 14px;">
+                <div style="margin-bottom: 8px;">
+                  <strong>Tổng chi phí thực tế:</strong> 
+                  ${formatCurrency(roiData.reduce((sum, s) => sum + s.actualExpense, 0))}
+                </div>
+                <div style="margin-bottom: 8px;">
+                  <strong>Tổng lợi nhuận TT:</strong> 
+                  <span style="color: ${roiData.reduce((sum, s) => sum + s.actualProfit, 0) >= 0 ? '#2e7d32' : '#c62828'}">
+                    ${formatCurrency(roiData.reduce((sum, s) => sum + s.actualProfit, 0))}
+                  </span>
+                </div>
+                <div>
+                  <strong>ROI trung bình TT:</strong> 
+                  ${roiData.length > 0 ? (roiData.reduce((sum, s) => sum + s.actualROI, 0) / roiData.length).toFixed(1) : 0}%
+                </div>
+              </div>
             </div>
           </div>
-          <div class="summary-card">
-            <div class="summary-icon">💰</div>
-            <div class="summary-content">
-              <div class="summary-label">Lợi nhuận cao nhất</div>
-              <div class="summary-value">${roiData.sort((a, b) => b.profit - a.profit)[0]?.name || 'N/A'}</div>
-              <div class="summary-detail">${formatCurrency(roiData[0]?.profit || 0)}</div>
+          <!-- Top performers -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="summary-card">
+              <div class="summary-icon">🏆</div>
+              <div class="summary-content">
+                <div class="summary-label">ROI kế toán cao nhất</div>
+                <div class="summary-value">${roiData[0]?.tenChuan || 'N/A'}</div>
+                <div class="summary-detail">${roiData[0]?.accountingROI > 0 ? '+' : ''}${roiData[0]?.accountingROI?.toFixed(1) || 0}%</div>
+              </div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-icon">💎</div>
+              <div class="summary-content">
+                <div class="summary-label">ROI thực tế cao nhất</div>
+                <div class="summary-value">${roiData.sort((a, b) => b.actualROI - a.actualROI)[0]?.tenChuan || 'N/A'}</div>
+                <div class="summary-detail">${roiData.sort((a, b) => b.actualROI - a.actualROI)[0]?.actualROI > 0 ? '+' : ''}${roiData.sort((a, b) => b.actualROI - a.actualROI)[0]?.actualROI?.toFixed(1) || 0}%</div>
+              </div>
             </div>
           </div>
         </div>
