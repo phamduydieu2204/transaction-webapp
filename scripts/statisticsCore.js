@@ -558,55 +558,317 @@ export function groupExpensesByTenChuan(expenses) {
 }
 
 /**
- * Calculate allocated expense for a period
+ * Calculate allocated expense for a period based on software validity period
+ * Logic: If expense has Phân bổ = Có and valid Ngày giao dịch + Ngày tái tục,
+ * divide the cost evenly across the validity period.
+ * Only count the portion that falls within the target period.
  * @param {Object} expense - Expense record
  * @param {Object} dateRange - Date range for allocation calculation
  * @returns {number} - Allocated amount for the period
  */
-function calculateAllocatedExpense(expense, dateRange) {
+export function calculateAllocatedExpense(expense, dateRange) {
   // If no allocation needed, return 0
   if (!expense.periodicAllocation || expense.periodicAllocation !== 'Có') {
     return 0;
   }
   
-  // Parse dates
-  const expenseDate = new Date(normalizeDate(expense.date));
-  const renewDate = expense.renewDate ? new Date(normalizeDate(expense.renewDate)) : null;
+  // Parse dates - both transaction date and renewal date are required
+  const transactionDate = expense.date ? new Date(normalizeDate(expense.date)) : null;
+  const renewalDate = expense.renewDate ? new Date(normalizeDate(expense.renewDate)) : null;
   
-  // If no renew date, cannot allocate
-  if (!renewDate || renewDate <= expenseDate) {
+  // Must have both dates for allocation
+  if (!transactionDate || !renewalDate || renewalDate <= transactionDate) {
     return 0;
   }
   
-  // Calculate total allocation period in days
-  const totalDays = Math.ceil((renewDate - expenseDate) / (1000 * 60 * 60 * 24));
+  // Calculate total validity period in days
+  const totalValidityDays = Math.ceil((renewalDate - transactionDate) / (1000 * 60 * 60 * 24));
   
   // Calculate daily amount
-  const dailyAmount = (parseFloat(expense.amount) || 0) / totalDays;
+  const totalAmount = parseFloat(expense.amount) || 0;
+  const dailyAmount = totalAmount / totalValidityDays;
   
-  // If no date range specified, return full amount
+  // If no date range specified, return amount for current month
   if (!dateRange || !dateRange.start || !dateRange.end) {
-    return parseFloat(expense.amount) || 0;
+    // Default to current month
+    const today = new Date();
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+    const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    
+    dateRange = {
+      start: normalizeDate(monthStart),
+      end: normalizeDate(monthEnd)
+    };
   }
   
-  // Parse date range
-  const rangeStart = new Date(normalizeDate(dateRange.start));
-  const rangeEnd = new Date(normalizeDate(dateRange.end));
+  // Parse target period
+  const periodStart = new Date(normalizeDate(dateRange.start));
+  const periodEnd = new Date(normalizeDate(dateRange.end));
   
-  // Calculate overlap period
-  const overlapStart = new Date(Math.max(rangeStart, expenseDate));
-  const overlapEnd = new Date(Math.min(rangeEnd, renewDate));
+  // Calculate overlap between validity period and target period
+  const overlapStart = new Date(Math.max(periodStart, transactionDate));
+  const overlapEnd = new Date(Math.min(periodEnd, renewalDate));
   
   // If no overlap, return 0
   if (overlapStart > overlapEnd) {
     return 0;
   }
   
-  // Calculate allocated days
-  const allocatedDays = Math.ceil((overlapEnd - overlapStart) / (1000 * 60 * 60 * 24)) + 1;
+  // Calculate days that software is valid within the target period
+  const validDaysInPeriod = Math.ceil((overlapEnd - overlapStart) / (1000 * 60 * 60 * 24)) + 1;
   
-  // Return allocated amount
-  return dailyAmount * allocatedDays;
+  // Return allocated amount for the overlapping period
+  const allocatedAmount = dailyAmount * validDaysInPeriod;
+  
+  console.log(`📊 Allocated expense calculation:`, {
+    expense: expense.product || expense.description,
+    totalAmount,
+    transactionDate: normalizeDate(transactionDate),
+    renewalDate: normalizeDate(renewalDate),
+    totalValidityDays,
+    dailyAmount,
+    periodRange: `${dateRange.start} to ${dateRange.end}`,
+    validDaysInPeriod,
+    allocatedAmount
+  });
+  
+  return allocatedAmount;
+}
+
+/**
+ * Calculate monthly allocated expenses for current month
+ * This function calculates the portion of each expense that should be allocated to the current month
+ * based on the software's validity period
+ * @param {Array} expenses - Array of expense records
+ * @param {Object} targetMonth - Target month {year, month} or null for current month
+ * @returns {Object} - Summary of allocated vs actual expenses
+ */
+export function calculateMonthlyExpenseBreakdown(expenses, targetMonth = null) {
+  if (!targetMonth) {
+    const now = new Date();
+    targetMonth = {
+      year: now.getFullYear(),
+      month: now.getMonth() + 1 // 1-indexed
+    };
+  }
+  
+  // Create date range for target month
+  const monthStart = new Date(targetMonth.year, targetMonth.month - 1, 1);
+  const monthEnd = new Date(targetMonth.year, targetMonth.month, 0);
+  
+  const dateRange = {
+    start: normalizeDate(monthStart),
+    end: normalizeDate(monthEnd)
+  };
+  
+  const breakdown = {
+    targetMonth: `${targetMonth.year}/${String(targetMonth.month).padStart(2, '0')}`,
+    totalAllocatedExpense: 0,    // Chi phí phân bổ tháng
+    totalActualExpense: 0,       // Chi phí thực tế
+    allocatedDetails: [],        // Chi tiết phân bổ
+    actualDetails: [],           // Chi tiết thực tế
+    currencyBreakdown: {
+      VND: { allocated: 0, actual: 0 },
+      USD: { allocated: 0, actual: 0 },
+      NGN: { allocated: 0, actual: 0 }
+    }
+  };
+  
+  expenses.forEach(expense => {
+    const currency = expense.currency || 'VND';
+    
+    // Calculate allocated amount for the month
+    const allocatedAmount = calculateAllocatedExpense(expense, dateRange);
+    if (allocatedAmount > 0) {
+      breakdown.currencyBreakdown[currency].allocated += allocatedAmount;
+      breakdown.allocatedDetails.push({
+        product: expense.product || expense.description,
+        amount: allocatedAmount,
+        currency: currency,
+        isAllocated: true,
+        originalAmount: parseFloat(expense.amount) || 0,
+        transactionDate: expense.date,
+        renewDate: expense.renewDate
+      });
+    }
+    
+    // Calculate actual amount paid in the month
+    const actualAmount = calculateActualExpense(expense, dateRange);
+    if (actualAmount > 0) {
+      breakdown.currencyBreakdown[currency].actual += actualAmount;
+      breakdown.actualDetails.push({
+        product: expense.product || expense.description,
+        amount: actualAmount,
+        currency: currency,
+        isPaid: true,
+        transactionDate: expense.date
+      });
+    }
+  });
+  
+  // Convert everything to VND for totals
+  const convertToVND = (amount, currency) => {
+    if (currency === 'USD') return amount * 25000;
+    if (currency === 'NGN') return amount * 50;
+    return amount;
+  };
+  
+  Object.keys(breakdown.currencyBreakdown).forEach(currency => {
+    const currData = breakdown.currencyBreakdown[currency];
+    breakdown.totalAllocatedExpense += convertToVND(currData.allocated, currency);
+    breakdown.totalActualExpense += convertToVND(currData.actual, currency);
+  });
+  
+  console.log(`📅 Monthly expense breakdown for ${breakdown.targetMonth}:`, {
+    totalAllocated: breakdown.totalAllocatedExpense,
+    totalActual: breakdown.totalActualExpense,
+    allocatedCount: breakdown.allocatedDetails.length,
+    actualCount: breakdown.actualDetails.length
+  });
+  
+  return breakdown;
+}
+
+/**
+ * Test function for allocation logic verification
+ * @param {Array} testCases - Array of test scenarios
+ * @returns {Array} - Test results
+ */
+export function testAllocationLogic(testCases = null) {
+  const defaultTestCases = [
+    {
+      name: 'Phần mềm mua từ năm trước, vẫn còn hiệu lực',
+      expense: {
+        product: 'Adobe Photoshop',
+        amount: 1200000,
+        currency: 'VND',
+        date: '2024/01/15',
+        renewDate: '2025/01/14',
+        periodicAllocation: 'Có'
+      },
+      targetPeriod: {
+        start: '2024/12/01',
+        end: '2024/12/31'
+      },
+      expectedAllocated: Math.round((1200000 / 365) * 31), // 31 ngày tháng 12
+      expectedActual: 0 // Không thanh toán trong tháng 12
+    },
+    {
+      name: 'Phần mềm mua trong tháng, không có phân bổ',
+      expense: {
+        product: 'Microsoft Office',
+        amount: 5000000,
+        currency: 'VND',
+        date: '2024/12/10',
+        renewDate: '2025/12/09',
+        periodicAllocation: 'Không'
+      },
+      targetPeriod: {
+        start: '2024/12/01',
+        end: '2024/12/31'
+      },
+      expectedAllocated: 5000000, // Toàn bộ trong tháng mua
+      expectedActual: 5000000    // Toàn bộ trong tháng mua
+    },
+    {
+      name: 'Phần mềm hết hạn giữa tháng',
+      expense: {
+        product: 'Canva Pro',
+        amount: 600000,
+        currency: 'VND',
+        date: '2024/11/15',
+        renewDate: '2024/12/15',
+        periodicAllocation: 'Có'
+      },
+      targetPeriod: {
+        start: '2024/12/01',
+        end: '2024/12/31'
+      },
+      expectedAllocated: Math.round((600000 / 30) * 15), // 15 ngày đầu tháng
+      expectedActual: 0 // Không thanh toán trong tháng 12
+    }
+  ];
+  
+  const tests = testCases || defaultTestCases;
+  const results = [];
+  
+  tests.forEach(test => {
+    const allocatedAmount = calculateAllocatedExpense(test.expense, test.targetPeriod);
+    const actualAmount = calculateActualExpense(test.expense, test.targetPeriod);
+    
+    const result = {
+      testName: test.name,
+      allocated: {
+        calculated: Math.round(allocatedAmount),
+        expected: test.expectedAllocated,
+        passed: Math.abs(allocatedAmount - test.expectedAllocated) < 1000 // Tolerance 1000 VND
+      },
+      actual: {
+        calculated: Math.round(actualAmount),
+        expected: test.expectedActual,
+        passed: actualAmount === test.expectedActual
+      }
+    };
+    
+    result.overallPassed = result.allocated.passed && result.actual.passed;
+    results.push(result);
+    
+    console.log(`🗺️ Test: ${test.name}`, {
+      allocated: result.allocated,
+      actual: result.actual,
+      passed: result.overallPassed
+    });
+  });
+  
+  const totalPassed = results.filter(r => r.overallPassed).length;
+  console.log(`🏆 Test Results: ${totalPassed}/${results.length} tests passed`);
+  
+  return results;
+}
+
+/**
+ * Calculate actual expense for cash flow analysis
+ * Logic: Only count expenses that were actually paid in the target period
+ * @param {Object} expense - Expense record  
+ * @param {Object} dateRange - Date range for cash flow calculation
+ * @returns {number} - Actual expense amount if paid in period, 0 otherwise
+ */
+export function calculateActualExpense(expense, dateRange) {
+  const expenseDate = expense.date ? new Date(normalizeDate(expense.date)) : null;
+  
+  if (!expenseDate) return 0;
+  
+  // If no date range specified, use current month
+  if (!dateRange || !dateRange.start || !dateRange.end) {
+    const today = new Date();
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+    const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    
+    dateRange = {
+      start: normalizeDate(monthStart),
+      end: normalizeDate(monthEnd)
+    };
+  }
+  
+  const periodStart = new Date(normalizeDate(dateRange.start));
+  const periodEnd = new Date(normalizeDate(dateRange.end));
+  
+  // Only count if expense was paid within the period
+  if (expenseDate >= periodStart && expenseDate <= periodEnd) {
+    const amount = parseFloat(expense.amount) || 0;
+    
+    console.log(`💰 Actual expense calculation:`, {
+      expense: expense.product || expense.description,
+      expenseDate: normalizeDate(expenseDate),
+      periodRange: `${dateRange.start} to ${dateRange.end}`,
+      amount,
+      included: true
+    });
+    
+    return amount;
+  }
+  
+  return 0;
 }
 
 /**
@@ -640,72 +902,53 @@ export function calculateROIByTenChuan(transactions, expenses, dateRange = null)
       expenses: []
     };
     
-    // Calculate actual expense (cash flow)
-    const actualExpenseVND = expenseData.totalAmount.VND + 
-                           (expenseData.totalAmount.USD * 25000) + 
-                           (expenseData.totalAmount.NGN * 50);
-    
-    // Calculate allocated expense (accounting view)
-    let allocatedExpenseVND = 0;
-    let actualExpenseInPeriod = 0;
+    // Calculate allocated expense (accounting view) and actual expense (cash flow view)
+    let allocatedExpenseVND = 0;  // Chi phí phân bổ tháng
+    let actualExpenseVND = 0;     // Chi phí thực tế
     
     expenseData.expenses.forEach(expense => {
       const amount = parseFloat(expense.amount) || 0;
       const currency = expense.currency || 'VND';
       
-      // Convert to VND
-      let amountVND = amount;
-      if (currency === 'USD') amountVND = amount * 25000;
-      else if (currency === 'NGN') amountVND = amount * 50;
+      // Convert to VND helper function
+      const convertToVND = (amt, curr) => {
+        if (curr === 'USD') return amt * 25000;
+        if (curr === 'NGN') return amt * 50;
+        return amt;
+      };
       
-      // Check if expense date is within the period
-      if (dateRange && dateRange.start && dateRange.end) {
-        const expenseDate = new Date(normalizeDate(expense.date));
-        const rangeStart = new Date(normalizeDate(dateRange.start));
-        const rangeEnd = new Date(normalizeDate(dateRange.end));
-        
-        // Only count actual expense if it's within the period
-        if (expenseDate >= rangeStart && expenseDate <= rangeEnd) {
-          actualExpenseInPeriod += amountVND;
-        }
-      } else {
-        // No date range, count all
-        actualExpenseInPeriod += amountVND;
-      }
-      
-      // Calculate allocated amount
+      // Calculate allocated expense for accounting view
       const allocatedAmount = calculateAllocatedExpense(expense, dateRange);
       if (allocatedAmount > 0) {
-        // Convert allocated amount to VND if needed
-        if (currency === 'USD') allocatedExpenseVND += allocatedAmount * 25000;
-        else if (currency === 'NGN') allocatedExpenseVND += allocatedAmount * 50;
-        else allocatedExpenseVND += allocatedAmount;
-      } else if (!expense.periodicAllocation || expense.periodicAllocation !== 'Có') {
-        // If not allocated, use actual amount in period
-        if (dateRange && dateRange.start && dateRange.end) {
-          const expenseDate = new Date(normalizeDate(expense.date));
-          const rangeStart = new Date(normalizeDate(dateRange.start));
-          const rangeEnd = new Date(normalizeDate(dateRange.end));
-          
-          if (expenseDate >= rangeStart && expenseDate <= rangeEnd) {
-            allocatedExpenseVND += amountVND;
-          }
-        } else {
-          allocatedExpenseVND += amountVND;
+        // Has periodic allocation
+        allocatedExpenseVND += convertToVND(allocatedAmount, currency);
+      } else {
+        // No allocation - use actual amount if in period
+        const actualAmount = calculateActualExpense(expense, dateRange);
+        if (actualAmount > 0) {
+          allocatedExpenseVND += convertToVND(actualAmount, currency);
         }
+      }
+      
+      // Calculate actual expense for cash flow view
+      const actualAmount = calculateActualExpense(expense, dateRange);
+      if (actualAmount > 0) {
+        actualExpenseVND += convertToVND(actualAmount, currency);
       }
     });
     
-    // Calculate profits and ROI
-    const accountingProfit = transactionData.totalRevenue - allocatedExpenseVND;
-    const actualProfit = transactionData.totalRevenue - actualExpenseInPeriod;
+    // Calculate profits and ROI for both perspectives
+    const accountingProfit = transactionData.totalRevenue - allocatedExpenseVND;  // Lợi nhuận kế toán
+    const actualProfit = transactionData.totalRevenue - actualExpenseVND;        // Lợi nhuận thực tế
     
+    // ROI theo góc nhìn kế toán (phân bổ)
     const accountingROI = allocatedExpenseVND > 0 
       ? ((transactionData.totalRevenue - allocatedExpenseVND) / allocatedExpenseVND) * 100
       : transactionData.totalRevenue > 0 ? 100 : 0;
       
-    const actualROI = actualExpenseInPeriod > 0 
-      ? ((transactionData.totalRevenue - actualExpenseInPeriod) / actualExpenseInPeriod) * 100
+    // ROI theo góc nhìn dòng tiền (thực tế)
+    const actualROI = actualExpenseVND > 0 
+      ? ((transactionData.totalRevenue - actualExpenseVND) / actualExpenseVND) * 100
       : transactionData.totalRevenue > 0 ? 100 : 0;
     
     roiAnalysis.push({
@@ -719,7 +962,7 @@ export function calculateROIByTenChuan(transactions, expenses, dateRange = null)
         ? (accountingProfit / transactionData.totalRevenue) * 100 
         : 0,
       // Cash flow view
-      actualExpense: actualExpenseInPeriod,
+      actualExpense: actualExpenseVND,
       actualProfit: actualProfit,
       actualROI: actualROI,
       actualProfitMargin: transactionData.totalRevenue > 0 
