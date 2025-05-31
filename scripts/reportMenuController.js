@@ -294,6 +294,17 @@ async function loadSoftwareReport() {
   let transactionData = window.transactionList || [];
   let expenseData = window.expenseList || [];
   
+  // First, filter out transactions with accountingType = "Không liên quan"
+  transactionData = transactionData.filter(transaction => 
+    transaction.accountingType !== 'Không liên quan'
+  );
+  
+  console.log('🛡️ Filtered out "Không liên quan" transactions:', {
+    originalCount: window.transactionList.length,
+    afterAccountingFilter: transactionData.length,
+    removedCount: window.transactionList.length - transactionData.length
+  });
+  
   // Apply date filter to transactions only
   // Keep ALL expenses for allocation calculation, but filter transactions by date
   if (window.globalFilters && window.globalFilters.dateRange) {
@@ -301,7 +312,7 @@ async function loadSoftwareReport() {
     transactionData = filterDataByDateRange(transactionData, window.globalFilters.dateRange, window.globalFilters);
     // DO NOT filter expenseData - we need all expenses for allocation calculation
     console.log('🔍 Applied date filter to transactions only:', {
-      originalTransactions: window.transactionList.length,
+      afterAccountingFilter: window.transactionList.filter(t => t.accountingType !== 'Không liên quan').length,
       filteredTransactions: transactionData.length,
       totalExpenses: expenseData.length,
       dateRange: window.globalFilters.dateRange,
@@ -1099,7 +1110,7 @@ function sortROIData(data, column, direction) {
  * Handle column header click for sorting
  * @param {string} column - Column name
  */
-function handleROISort(column) {
+async function handleROISort(column) {
   // Toggle direction if same column, otherwise use desc as default
   if (roiSortState.column === column) {
     roiSortState.direction = roiSortState.direction === 'asc' ? 'desc' : 'asc';
@@ -1111,18 +1122,22 @@ function handleROISort(column) {
   console.log('🔄 ROI Sort changed:', roiSortState);
   
   // Re-render the ROI table with new sorting
+  // IMPORTANT: Must apply the same filters as original render
   const transactionData = window.transactionList || [];
-  let expenseData = window.expenseList || [];
+  const expenseData = window.expenseList || [];
   
-  // Apply transaction filter if exists (but keep all expenses for allocation)
-  let filteredTransactions = transactionData;
+  // Filter transactions by date AND exclude "Không liên quan"
+  let filteredTransactions = transactionData.filter(t => 
+    t.accountingType !== 'Không liên quan'
+  );
+  
+  // Apply date filter if exists
   if (window.globalFilters && window.globalFilters.dateRange) {
-    const { filterDataByDateRange } = window.financialDashboardModule || {};
-    if (filterDataByDateRange) {
-      filteredTransactions = filterDataByDateRange(transactionData, window.globalFilters.dateRange, window.globalFilters);
-    }
+    const { filterDataByDateRange } = await import('./financialDashboard.js');
+    filteredTransactions = filterDataByDateRange(filteredTransactions, window.globalFilters.dateRange, window.globalFilters);
   }
   
+  // Re-render with filtered data (keep all expenses for allocation)
   renderSoftwareROI(filteredTransactions, expenseData);
 }
 
