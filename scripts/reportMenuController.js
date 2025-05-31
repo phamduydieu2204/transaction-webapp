@@ -1047,13 +1047,6 @@ async function renderSoftwareROI(transactionData, expenseData) {
     container.innerHTML = `
       <div class="software-roi-analysis">
         <h3>📈 Phân tích ROI Phần mềm <span class="period-indicator">${periodLabel}</span></h3>
-        <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 13px; line-height: 1.4;">
-          <strong>📋 Logic phân tích:</strong><br>
-          • <strong>Góc kế toán:</strong> Phân bổ chi phí theo thời gian hiệu lực (nếu có Phân bổ = Có + Ngày tái tục)<br>
-          • <strong>Góc dòng tiền:</strong> Chỉ tính chi phí thực sự thanh toán trong kỳ<br>
-          • <strong>Lợi nhuận kế toán:</strong> Doanh thu - Chi phí phân bổ tháng<br>
-          • <strong>Lợi nhuận thực tế:</strong> Doanh thu - Chi phí thực tế
-        </div>
         <div class="roi-table">
           <table>
             <thead>
@@ -1102,7 +1095,7 @@ async function renderSoftwareROI(transactionData, expenseData) {
           </table>
         </div>
         
-        <div class="roi-summary">
+        <div>
           <h4 style="margin: 20px 0 15px 0;">📊 So sánh hai góc nhìn</h4>
           <div class="comparison-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
             <!-- Góc kế toán -->
