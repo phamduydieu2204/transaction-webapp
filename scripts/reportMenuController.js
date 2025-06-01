@@ -194,6 +194,37 @@ async function ensureDataIsLoaded() {
 }
 
 /**
+ * Ensure software data is loaded for commission calculation
+ */
+async function ensureSoftwareDataLoaded() {
+  try {
+    console.log('🔄 Loading software data for commission calculation...');
+    const { getConstants } = await import('./constants.js');
+    const { BACKEND_URL } = getConstants();
+    
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "getSoftwareList" })
+    });
+    
+    const result = await response.json();
+    
+    if (result.status === "success") {
+      window.softwareData = result.data;
+      console.log('✅ Software data loaded for commission calculation:', {
+        count: window.softwareData.length,
+        sample: window.softwareData[0]
+      });
+    } else {
+      console.error('❌ Failed to load software data:', result.message);
+    }
+  } catch (error) {
+    console.error('❌ Error loading software data:', error);
+  }
+}
+
+/**
  * Load revenue report (Phân tích doanh thu)
  */
 async function loadRevenueReport() {
@@ -336,6 +367,12 @@ async function loadEmployeeReport() {
   
   let transactionData = window.transactionList || [];
   
+  // Ensure software data is loaded for commission calculation
+  if (!window.softwareData || window.softwareData.length === 0) {
+    console.log('🔄 Software data not loaded, fetching...');
+    await ensureSoftwareDataLoaded();
+  }
+  
   // Apply date filter if exists
   if (window.globalFilters && window.globalFilters.dateRange) {
     const { filterDataByDateRange } = await import('./financialDashboard.js');
@@ -346,6 +383,12 @@ async function loadEmployeeReport() {
       dateRange: window.globalFilters.dateRange
     });
   }
+  
+  console.log('🔍 Software data status:', {
+    loaded: !!(window.softwareData),
+    count: window.softwareData ? window.softwareData.length : 0,
+    sample: window.softwareData ? window.softwareData[0] : null
+  });
   
   await Promise.all([
     renderEmployeePerformance(transactionData),
@@ -1598,11 +1641,31 @@ async function renderEmployeePerformance(data) {
     // Group transactions by employee
     const employeeStats = {};
     
-    data.forEach(transaction => {
+    console.log('🔍 DEBUG renderEmployeePerformance processing transactions:', {
+      count: data.length,
+      sample: data[0],
+      hasSoftwareData: !!(window.softwareData),
+      softwareDataCount: window.softwareData ? window.softwareData.length : 0
+    });
+
+    data.forEach((transaction, index) => {
       const employee = transaction.tenNhanVien || 'Không xác định';
       const employeeCode = transaction.maNhanVien || 'N/A';
       const revenue = parseFloat(transaction.revenue) || 0;
-      const commission = parseFloat(transaction.commission) || 0;
+      
+      // Calculate commission using new logic (handles sales and refunds)
+      const calculatedCommission = calculateTransactionCommission(transaction);
+      
+      // Debug first few transactions
+      if (index < 5) {
+        console.log(`🔍 DEBUG transaction ${index}:`, {
+          employee,
+          revenue,
+          tenChuan: transaction.tenChuan,
+          calculatedCommission,
+          transactionType: transaction.transactionType || transaction.loaiGiaoDich
+        });
+      }
       
       if (!employeeStats[employee]) {
         employeeStats[employee] = {
@@ -1617,12 +1680,20 @@ async function renderEmployeePerformance(data) {
       }
       
       employeeStats[employee].totalRevenue += revenue;
-      employeeStats[employee].totalCommission += commission;
+      employeeStats[employee].totalCommission += calculatedCommission;
       employeeStats[employee].transactionCount++;
       employeeStats[employee].customers.add(transaction.customerEmail);
       employeeStats[employee].products.add(transaction.softwareName);
     });
     
+    // Log commission summary
+    const totalCommission = Object.values(employeeStats).reduce((sum, emp) => sum + emp.totalCommission, 0);
+    console.log('🔍 Commission calculation summary:', {
+      totalEmployees: Object.keys(employeeStats).length,
+      totalCommission,
+      sampleEmployee: Object.values(employeeStats)[0]
+    });
+
     // Convert to array and calculate additional metrics
     const employeeArray = Object.values(employeeStats).map(emp => {
       const customerMetrics = calculateCustomerMetrics(
@@ -1667,7 +1738,7 @@ async function renderEmployeePerformance(data) {
                 <th title="Khách cũ tiếp tục: Số khách từ kỳ trước vẫn tiếp tục sử dụng">KH giữ chân</th>
                 <th title="Giá trị trung bình mỗi giao dịch = Tổng doanh thu / Số giao dịch">TB/GD</th>
                 <th title="Tỷ lệ giữ chân: Khách cũ tiếp tục / Tổng khách cũ * 100%">Tỷ lệ giữ chân</th>
-                <th title="Tổng hoa hồng nhận được từ các giao dịch">Hoa hồng</th>
+                <th title="Hoa hồng: +% hoa hồng cho giao dịch bán hàng, -% hoa hồng cho giao dịch hoàn tiền (theo Tên chuẩn từ sheet PhanMem)">Hoa hồng</th>
               </tr>
             </thead>
             <tbody>
@@ -1682,7 +1753,7 @@ async function renderEmployeePerformance(data) {
                   <td class="retained-customers" title="${emp.totalRetainedCustomers}/${emp.totalOldCustomers} khách cũ tiếp tục sử dụng">${emp.totalRetainedCustomers}</td>
                   <td class="avg-value" title="${formatCurrency(emp.totalRevenue)} ÷ ${emp.transactionCount} giao dịch">${formatCurrency(emp.avgTransactionValue)}</td>
                   <td class="retention-rate" title="${emp.totalRetainedCustomers}/${emp.totalOldCustomers} = ${emp.retentionRate.toFixed(1)}%">${emp.retentionRate.toFixed(1)}%</td>
-                  <td class="commission">${formatCurrency(emp.totalCommission)}</td>
+                  <td class="commission" title="Bán hàng: +% hoa hồng × doanh thu | Hoàn tiền: -% hoa hồng × số tiền hoàn">${formatCurrency(emp.totalCommission)}</td>
                 </tr>
               `).join('')}
             </tbody>
@@ -2643,6 +2714,109 @@ function exportCurrentReport() {
   console.log('📤 Exporting current report:', reportState.currentReport);
   // TODO: Implement export logic
   alert('Chức năng xuất báo cáo đang được phát triển');
+}
+
+/**
+ * Get commission rate from PhanMem sheet data using Tên chuẩn
+ * @param {string} tenChuan - Standardized software name (Tên chuẩn)
+ * @returns {number} - Commission rate percentage
+ */
+function getCommissionRateByTenChuan(tenChuan) {
+  try {
+    if (!window.softwareData || !Array.isArray(window.softwareData)) {
+      console.warn('🔍 Software data not available for commission calculation');
+      return 0;
+    }
+    
+    console.log('🔍 DEBUG getCommissionRateByTenChuan:', {
+      tenChuan,
+      softwareDataCount: window.softwareData.length,
+      availableTenChuan: window.softwareData.map(item => item.tenChuan || item.standardName || 'missing').slice(0, 5)
+    });
+    
+    // Find matching software entry by Tên chuẩn
+    const softwareEntry = window.softwareData.find(item => 
+      item.tenChuan === tenChuan || item.standardName === tenChuan
+    );
+    
+    if (softwareEntry) {
+      // Try different possible field names for commission rate
+      const commissionRate = parseFloat(
+        softwareEntry.commissionRate || 
+        softwareEntry.commissionPercent || 
+        softwareEntry['% Hoa hồng'] ||
+        softwareEntry.hoaHong ||
+        0
+      );
+      
+      console.log('🔍 DEBUG found software entry:', {
+        tenChuan,
+        commissionRate: softwareEntry.commissionRate,
+        allFields: Object.keys(softwareEntry),
+        finalRate: commissionRate
+      });
+      
+      if (commissionRate > 0) {
+        console.log(`💰 Commission rate for ${tenChuan}: ${commissionRate}%`);
+      }
+      
+      return isNaN(commissionRate) ? 0 : commissionRate;
+    } else {
+      console.warn(`⚠️ No commission rate found for Tên chuẩn: ${tenChuan}`);
+      return 0;
+    }
+  } catch (error) {
+    console.error('❌ Error getting commission rate:', error);
+    return 0;
+  }
+}
+
+/**
+ * Calculate commission for a transaction
+ * @param {object} transaction - Transaction data
+ * @returns {number} - Commission amount (positive for sales, negative for refunds)
+ */
+function calculateTransactionCommission(transaction) {
+  try {
+    const tenChuan = transaction.tenChuan || transaction.standardName || '';
+    const revenue = parseFloat(transaction.revenue) || 0;
+    const transactionType = transaction.transactionType || transaction.loaiGiaoDich || '';
+    
+    console.log('🔍 DEBUG calculateTransactionCommission:', {
+      tenChuan,
+      revenue,
+      transactionType,
+      hasWindow: !!(window),
+      hasSoftwareData: !!(window.softwareData),
+      softwareDataCount: window.softwareData ? window.softwareData.length : 0
+    });
+    
+    // Get commission rate for this software
+    const commissionRate = getCommissionRateByTenChuan(tenChuan);
+    
+    if (commissionRate === 0) {
+      console.log('⚠️ Commission rate is 0 for:', tenChuan);
+      return 0;
+    }
+    
+    // Calculate base commission amount
+    const baseCommission = Math.abs(revenue) * (commissionRate / 100);
+    
+    // Handle different transaction types
+    if (transactionType === 'Hoàn tiền' || transactionType === 'Refund') {
+      // For refunds: subtract commission (make it negative)
+      // Revenue is already negative for refunds, so we need to return negative commission
+      console.log(`🔄 Refund transaction - Commission deducted: -${baseCommission.toFixed(0)} VND for ${tenChuan}`);
+      return -baseCommission;
+    } else {
+      // For sales: add commission (positive)
+      console.log(`💰 Sales transaction - Commission added: +${baseCommission.toFixed(0)} VND for ${tenChuan}`);
+      return baseCommission;
+    }
+  } catch (error) {
+    console.error('❌ Error calculating transaction commission:', error);
+    return 0;
+  }
 }
 
 /**
