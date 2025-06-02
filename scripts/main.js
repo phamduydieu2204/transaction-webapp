@@ -1,44 +1,43 @@
-// Khai báo các biến và thiết lập ban đầu
-window.userInfo = null;
-window.currentEditIndex = -1;
-window.currentEditTransactionId = null;
-window.transactionList = [];
-window.today = new Date();
-window.todayFormatted = `${window.today.getFullYear()}/${String(window.today.getMonth() + 1).padStart(2, '0')}/${String(window.today.getDate()).padStart(2, '0')}`;
-window.currentPage = 1;
-window.itemsPerPage = 50;
-window.softwareData = [];
-window.confirmCallback = null;
-window.currentSoftwareName = "";
-window.currentSoftwarePackage = "";
-window.currentAccountName = "";
+/**
+ * main.js - Entry Point
+ * 
+ * Main entry point that orchestrates all application modules
+ * Imports and initializes core application functionality
+ */
 
-// Import các module cần thiết
-import { getConstants } from './constants.js';
-import { calculateEndDate } from './calculateEndDate.js';
-import { logout } from './logout.js';
-import { updateAccountList } from './updateAccountList.js';
-import { openCalendar } from './openCalendar.js';
-import { updateCustomerInfo } from './updateCustomerInfo.js';
+// Import core modules
+import { initializeApp } from './core/appInitializer.js';
+import { initializeEventHandlers } from './core/eventManager.js';
+import { initializeState, getState, updateState } from './core/stateManager.js';
+import { switchToTab, initializeTabSystem } from './core/navigationManager.js';
+import { authManager } from './core/authManager.js';
+
+// Import essential utilities
 import { showProcessingModal } from './showProcessingModal.js';
 import { showResultModal } from './showResultModal.js';
 import { closeProcessingModal } from './closeProcessingModal.js';
+
+// Import legacy functions for backward compatibility
+import { logout } from './logout.js';
+import { openCalendar } from './openCalendar.js';
+import { calculateEndDate } from './calculateEndDate.js';
+import { updateCustomerInfo } from './updateCustomerInfo.js';
 import { handleReset } from './handleReset.js';
-import { formatDate } from './formatDate.js';
+import { loadTransactions } from './loadTransactions.js';
 import { handleAdd } from './handleAdd.js';
 import { handleUpdate } from './handleUpdate.js';
 import { handleSearch } from './handleSearch.js';
-import { loadTransactions } from './loadTransactions.js';
-import { updateTable } from './updateTable.js';
 import { viewTransaction } from './viewTransaction.js';
-import { copyToClipboard } from './copyToClipboard.js';
-import { closeModal } from './closeModal.js';
-import { updatePagination, firstPage, prevPage, nextPage, lastPage, goToPage } from './pagination.js';
 import { editTransaction } from './editTransaction.js';
 import { deleteTransaction } from './deleteTransaction.js';
 import { fetchSoftwareList } from './fetchSoftwareList.js';
 import { updatePackageList } from './updatePackageList.js';
-import { editRow, deleteRow } from './legacy.js';
+import { updateAccountList } from './updateAccountList.js';
+import { updateTable } from './updateTable.js';
+import { formatDate } from './formatDate.js';
+import { copyToClipboard } from './copyToClipboard.js';
+import { closeModal } from './closeModal.js';
+import { firstPage, prevPage, nextPage, lastPage, goToPage } from './pagination.js';
 import { handleAddExpense } from './handleAddExpense.js';
 import { initExpenseDropdowns } from './initExpenseDropdowns.js';
 import { renderExpenseStats } from './renderExpenseStats.js';
@@ -53,12 +52,12 @@ import { initExpenseQuickSearch } from './expenseQuickSearch.js';
 import { handleChangePassword, closeChangePasswordModal, confirmChangePassword } from './handleChangePassword.js';
 import { formatDateTime } from './formatDateTime.js';
 import { openConfirmModal, closeConfirmModal, confirmDelete } from './confirmModal.js';
-import {
-  openAddOrUpdateModal,
-  closeAddOrUpdateModal,
-  handleAddNewTransaction,
-  handleUpdateTransactionFromModal,
-  handleCancelModal
+import { 
+  openAddOrUpdateModal, 
+  closeAddOrUpdateModal, 
+  handleAddNewTransaction, 
+  handleUpdateTransactionFromModal, 
+  handleCancelModal 
 } from './handleAddOrUpdateModal.js';
 import {
   handleUpdateCookie,
@@ -67,237 +66,103 @@ import {
   copyCurrentCookie,
   closeUpdateCookieModal
 } from './handleUpdateCookie.js';
+import { editRow, deleteRow } from './legacy.js';
+import { getConstants } from './constants.js';
 
-
-// Thực hiện khi DOMContentLoaded
-// CÁCH 1: Sửa trong file main.js - Di chuyển phần khởi tạo tab lên trước
-
+/**
+ * Application startup sequence
+ */
 document.addEventListener("DOMContentLoaded", async () => {
-  window.isExpenseSearching = false;
-  window.expenseList = [];
-
-  const userData = localStorage.getItem("employeeInfo");
+  console.log('🚀 Starting Transaction WebApp...');
+  
   try {
-    window.userInfo = userData ? JSON.parse(userData) : null;
-  } catch (e) {
-    window.userInfo = null;
-  }
-
-  if (!window.userInfo) {
-    window.location.href = "index.html";
-    return;
-  }
-
-  // ✅ KHỞI TẠO HỆ THỐNG HIỂN THỊ TỔNG SỐ NGAY LẬP TỨC
-  initTotalDisplay();
-
-  // ✅ HIỂN THỊ THÔNG TIN NGƯỜI DÙNG NGAY LẬP TỨC
-  document.getElementById("userWelcome").textContent =
-    `Xin chào ${window.userInfo.tenNhanVien} (${window.userInfo.maNhanVien}) - ${window.userInfo.vaiTro}`;
-
-  // ✅ THIẾT LẬP CÁC SỰ KIỆN TAB NGAY LẬP TỨC (TRƯỚC KHI LOAD DỮ LIỆU)
-  document.querySelectorAll(".tab-button").forEach(button => {
-    button.addEventListener("click", () => {
-      const selectedTab = button.dataset.tab;
-
-      // 1. Kích hoạt nút
-      document.querySelectorAll(".tab-button").forEach(btn =>
-        btn.classList.remove("active")
-      );
-      button.classList.add("active");
-
-      // 2. Ẩn tất cả tab content
-      document.querySelectorAll(".tab-content").forEach(content =>
-        content.classList.remove("active")
-      );
-
-      // 3. Hiện tab tương ứng
-      const target = document.getElementById(selectedTab);
-      if (target) {
-        target.classList.add("active");
-      }
-
-      const transactionSection = document.getElementById("transactionSection");
-      if (transactionSection) {
-        if (selectedTab === "tab-giao-dich") {
-          transactionSection.style.display = "block";
-        } else {
-          transactionSection.style.display = "none";
-        }
-      }
-
-      // ✅ Ẩn/hiện phần tìm kiếm nhanh chi phí dựa trên tab
-      const expenseQuickSearchWrapper = document.getElementById("expenseQuickSearchWrapper");
-      if (expenseQuickSearchWrapper) {
-        if (selectedTab === "tab-chi-phi") {
-          expenseQuickSearchWrapper.style.display = "flex";
-        } else {
-          expenseQuickSearchWrapper.style.display = "none";
-        }
-      }
-
-
-      // ✅ Xử lý logic riêng cho từng tab
-      if (selectedTab === "tab-giao-dich") {
-        // Chỉ refresh nếu dữ liệu đã được load
-        if (window.transactionList && window.transactionList.length >= 0) {
-          console.log("🔄 Chuyển sang tab giao dịch - refresh bảng");
-          window.loadTransactions();
-        }
-      } else if (selectedTab === "tab-chi-phi" || selectedTab === "tab-thong-ke") {
-        // ✅ DEBUG: Check tab switching details
-        const activeButton = document.querySelector(".tab-button.active");
-        const tabContent = document.getElementById(selectedTab);
-        const tabStyle = tabContent ? window.getComputedStyle(tabContent) : null;
-        
-        console.log("🔍 DEBUG main.js tab switching:", {
-          selectedTab: selectedTab,
-          activeButtonDataset: activeButton ? activeButton.dataset.tab : "null",
-          tabContent: tabContent ? "found" : "null",
-          tabDisplay: tabStyle ? tabStyle.display : "unknown"
-        });
-        
-        // ✅ Khởi tạo statistics UI controller nếu là tab thống kê
-        if (selectedTab === "tab-thong-ke") {
-          console.log("🎮 Initializing statistics UI for tab-thong-ke...");
-          // Lazy load and initialize statistics UI controller
-          import('./statisticsUIController.js').then(module => {
-            if (module.initializeStatisticsUI) {
-              console.log("✅ Statistics UI Controller loaded, initializing...");
-              module.initializeStatisticsUI();
-            }
-          }).catch(error => {
-            console.warn("⚠️ Could not load statistics UI controller:", error);
-            // Fallback to legacy renderExpenseStats
-            renderExpenseStats();
-          });
-        } else {
-          // Refresh bảng chi phí cho tab chi phí
-          console.log("🔄 Chuyển sang tab chi phí - refresh bảng");
-          renderExpenseStats();
-        }
-      }
-    });
-  });
-
-  // ✅ XỬ LÝ LOGIC ẨN/HIỆN TAB DỰA TRÊN QUYỀN (NGAY LẬP TỨC)
-  const tabNhinThay = window.userInfo.tabNhinThay || "tất cả";
-  const allowedTabs = tabNhinThay.toLowerCase().split(",").map(t => t.trim());
-  
-  if (tabNhinThay !== "tất cả") {
-    document.querySelectorAll(".tab-button").forEach(button => {
-      const tabName = button.dataset.tab;
-      let tabKey = "";
-      
-      if (tabName === "tab-giao-dich") tabKey = "giao dịch";
-      else if (tabName === "tab-chi-phi") tabKey = "chi phí";
-      else if (tabName === "tab-thong-ke") tabKey = "thống kê";
-      
-      if (tabKey && !allowedTabs.includes(tabKey)) {
-        button.style.display = "none";
-      }
-    });
+    // Phase 1: Initialize state and authentication
+    console.log('📊 Phase 1: Initializing state and auth...');
+    initializeState();
     
-    // Chuyển đến tab đầu tiên được phép nếu tab hiện tại bị ẩn
-    const activeTab = document.querySelector(".tab-button.active");
-    if (activeTab && activeTab.style.display === "none") {
-      const firstVisibleTab = document.querySelector(".tab-button:not([style*='display: none'])");
-      if (firstVisibleTab) {
-        activeTab.classList.remove("active");
-        firstVisibleTab.classList.add("active");
-        firstVisibleTab.click();
+    // Check authentication
+    if (!authManager.loadSession()) {
+      // Try legacy session format
+      const userData = localStorage.getItem("employeeInfo");
+      if (userData) {
+        try {
+          const userInfo = JSON.parse(userData);
+          updateState({ user: userInfo });
+        } catch (e) {
+          console.warn('Invalid legacy session data');
+          window.location.href = "index.html";
+          return;
+        }
+      } else {
+        window.location.href = "index.html";
+        return;
       }
     }
+    
+    // Phase 2: Initialize core application
+    console.log('🏗️ Phase 2: Initializing core application...');
+    await initializeApp();
+    
+    // Phase 3: Setup event handlers
+    console.log('🎮 Phase 3: Setting up event handlers...');
+    initializeEventHandlers();
+    
+    // Phase 4: Initialize navigation system
+    console.log('🧭 Phase 4: Initializing navigation...');
+    initializeTabSystem();
+    
+    console.log('✅ Application startup complete!');
+    
+  } catch (error) {
+    console.error('❌ Application startup failed:', error);
+    showResultModal(
+      'Lỗi khởi tạo ứng dụng',
+      'Có lỗi xảy ra khi khởi tạo ứng dụng. Vui lòng tải lại trang.',
+      'error'
+    );
   }
-
-  // ✅ THIẾT LẬP CÁC INPUT NGÀY THÁNG
-  const startDateInput = document.getElementById("startDate");
-  const durationInput = document.getElementById("duration");
-  const endDateInput = document.getElementById("endDate");
-  const transactionDateInput = document.getElementById("transactionDate");
-
-  startDateInput.value = window.todayFormatted;
-  transactionDateInput.value = window.todayFormatted;
-
-  startDateInput.addEventListener("change", () =>
-    calculateEndDate(startDateInput, durationInput, endDateInput)
-  );
-  durationInput.addEventListener("input", () =>
-    calculateEndDate(startDateInput, durationInput, endDateInput)
-  );
-
-  // ✅ THIẾT LẬP CÁC SỰ KIỆN DROPDOWN
-  document.getElementById("softwareName").addEventListener("change", () =>
-    updatePackageList(window.softwareData, null, updateAccountList)
-  );
-  document.getElementById("softwarePackage").addEventListener("change", () =>
-    updateAccountList(window.softwareData, null)
-  );
-
-  // ✅ THIẾT LẬP CHI PHÍ
-  document.getElementById("expenseDate").value = window.todayFormatted;
-  document.getElementById("expenseRecorder").value = window.userInfo?.tenNhanVien || "";
-
-  // ✅ BẮT ĐẦU LOAD DỮ LIỆU (KHÔNG ĐỒNG BỘ - KHÔNG BLOCK UI)
-  console.log("🚀 Bắt đầu load dữ liệu không đồng bộ...");
-  
-  // Load dữ liệu phần mềm
-  fetchSoftwareList(null, window.softwareData, updatePackageList, updateAccountList)
-    .catch(err => console.error("Lỗi khi load danh sách phần mềm:", err));
-  
-  // Load dropdown chi phí
-  initExpenseDropdowns()
-    .catch(err => console.error("Lỗi khi load dropdown chi phí:", err));
-  
-  // Initialize expense quick search
-  initExpenseQuickSearch();
-  
-  // ✅ Ẩn phần tìm kiếm nhanh chi phí nếu không phải tab chi phí
-  const expenseQuickSearchWrapper = document.getElementById("expenseQuickSearchWrapper");
-  const currentActiveTab = document.querySelector(".tab-button.active");
-  if (expenseQuickSearchWrapper && currentActiveTab) {
-    if (currentActiveTab.dataset.tab === "tab-chi-phi") {
-      expenseQuickSearchWrapper.style.display = "flex";
-    } else {
-      expenseQuickSearchWrapper.style.display = "none";
-    }
-  }
-  
-  // Load giao dịch (chỉ khi đang ở tab giao dịch)
-  if (currentActiveTab && currentActiveTab.dataset.tab === "tab-giao-dich") {
-    window.loadTransactions()
-      .catch(err => console.error("Lỗi khi load giao dịch:", err));
-  }
-
-  console.log("✅ Khởi tạo hoàn tất - UI có thể tương tác ngay lập tức");
 });
 
-
-
+// Legacy global function exports for backward compatibility
 window.logout = logout;
 window.openCalendar = (inputId) =>
   openCalendar(inputId, calculateEndDate, document.getElementById("startDate"), document.getElementById("duration"), document.getElementById("endDate"));
-window.updateCustomerInfo = () => updateCustomerInfo(window.transactionList);
-window.handleReset = () =>
-  handleReset(fetchSoftwareList, showProcessingModal, showResultModal, window.todayFormatted, updatePackageList, updateAccountList);
-window.loadTransactions = () =>
-  loadTransactions(window.userInfo, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction);
-window.handleAdd = () =>
-  handleAdd(window.userInfo, window.currentEditTransactionId, window.loadTransactions, window.handleReset, updatePackageList, showProcessingModal, showResultModal);
-window.handleUpdate = () =>
-  handleUpdate(window.userInfo, window.currentEditTransactionId, window.transactionList, window.loadTransactions, window.handleReset, showProcessingModal, showResultModal, getConstants, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction, fetchSoftwareList, updatePackageList, updateAccountList);
-window.handleSearch = () =>
-  handleSearch(window.userInfo, window.transactionList, showProcessingModal, showResultModal, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction);
-window.viewTransaction = (index) =>
-  viewTransaction(index, window.transactionList, formatDate, copyToClipboard);
-window.editTransaction = (index) => {
-  editTransaction(index, window.transactionList, fetchSoftwareList, updatePackageList, updateAccountList);
+window.updateCustomerInfo = () => {
+  const state = getState();
+  return updateCustomerInfo(state.transactions);
 };
-window.deleteTransaction = (index) =>
-  deleteTransaction(
+window.handleReset = () =>
+  handleReset(fetchSoftwareList, showProcessingModal, showResultModal, getState().todayFormatted, updatePackageList, updateAccountList);
+window.loadTransactions = () => {
+  const state = getState();
+  return loadTransactions(state.user, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction);
+};
+window.handleAdd = () => {
+  const state = getState();
+  return handleAdd(state.user, state.currentEditTransactionId, window.loadTransactions, window.handleReset, updatePackageList, showProcessingModal, showResultModal);
+};
+window.handleUpdate = () => {
+  const state = getState();
+  return handleUpdate(state.user, state.currentEditTransactionId, state.transactions, window.loadTransactions, window.handleReset, showProcessingModal, showResultModal, getConstants, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction, fetchSoftwareList, updatePackageList, updateAccountList);
+};
+window.handleSearch = () => {
+  const state = getState();
+  return handleSearch(state.user, state.transactions, showProcessingModal, showResultModal, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction);
+};
+window.viewTransaction = (index) => {
+  const state = getState();
+  return viewTransaction(index, state.transactions, formatDate, copyToClipboard);
+};
+window.editTransaction = (index) => {
+  const state = getState();
+  return editTransaction(index, state.transactions, fetchSoftwareList, updatePackageList, updateAccountList);
+};
+window.deleteTransaction = (index) => {
+  const state = getState();
+  return deleteTransaction(
     index,
-    window.transactionList,
-    window.userInfo,
+    state.transactions,
+    state.user,
     window.loadTransactions,
     window.handleReset,
     showProcessingModal,
@@ -305,11 +170,11 @@ window.deleteTransaction = (index) =>
     openConfirmModal,
     getConstants
   );
-  
-window.handleUpdateCookie = (index) =>
-  handleUpdateCookie(index, window.transactionList);
-window.handleChangePassword = (index) =>
-  alert("🔐 Chức năng đổi mật khẩu đang được phát triển cho index: " + index);
+};
+window.handleUpdateCookie = (index) => {
+  const state = getState();
+  return handleUpdateCookie(index, state.transactions);
+};
 window.handleChangePassword = handleChangePassword;
 window.handleAddExpense = handleAddExpense;
 window.closeChangePasswordModal = closeChangePasswordModal;
@@ -320,13 +185,14 @@ window.copyCurrentCookie = copyCurrentCookie;
 window.closeUpdateCookieModal = closeUpdateCookieModal;
 window.editExpenseRow = editExpenseRow;
 window.handleDeleteExpense = handleDeleteExpense;
-window.handleAddExpense = handleAddExpense;
 window.handleUpdateExpense = handleUpdateExpense;
 window.viewExpenseRow = viewExpenseRow;
 window.handleSearchExpense = () => handleSearchExpense();
 window.handleResetExpense = handleResetExpense;
-window.currentExpensePage = 1;
-window.editRow = (index) => editRow(index, window.transactionList);
+window.editRow = (index) => {
+  const state = getState();
+  return editRow(index, state.transactions);
+};
 window.deleteRow = (index) => deleteRow(index, window.deleteTransaction);
 window.closeModal = closeModal;
 window.confirmDelete = confirmDelete;
@@ -336,3 +202,25 @@ window.prevPage = prevPage;
 window.nextPage = nextPage;
 window.lastPage = lastPage;
 window.goToPage = goToPage;
+
+// Export state management for modules that need it
+window.getState = getState;
+window.updateState = updateState;
+window.switchToTab = switchToTab;
+
+// Legacy global variables (maintained for compatibility)
+window.currentEditIndex = -1;
+window.currentEditTransactionId = null;
+window.transactionList = [];
+window.today = new Date();
+window.todayFormatted = `${window.today.getFullYear()}/${String(window.today.getMonth() + 1).padStart(2, '0')}/${String(window.today.getDate()).padStart(2, '0')}`;
+window.currentPage = 1;
+window.itemsPerPage = 50;
+window.softwareData = [];
+window.confirmCallback = null;
+window.currentSoftwareName = "";
+window.currentSoftwarePackage = "";
+window.currentAccountName = "";
+window.isExpenseSearching = false;
+window.expenseList = [];
+window.currentExpensePage = 1;
