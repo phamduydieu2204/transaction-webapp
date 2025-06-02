@@ -1,0 +1,113 @@
+<!-- Report Pages - Load vào report-pages-container -->
+
+<!-- Trang 1: Tổng quan kinh doanh -->
+<div id="report-overview" class="report-page active">
+  <div class="page-header">
+    <div class="header-actions">
+      <button class="btn-refresh" onclick="refreshCurrentReport()">
+        <i class="fas fa-sync-alt"></i> Làm mới
+      </button>
+      <button class="btn-export" onclick="exportCurrentReport()">
+        <i class="fas fa-download"></i> Xuất báo cáo
+      </button>
+    </div>
+  </div>
+  
+  <!-- Financial Dashboard với bộ lọc -->
+  <div id="financialDashboard"></div>
+  
+  <!-- Grid layout cho các thành phần -->
+  <div class="overview-grid">
+    <!-- Charts section -->
+    <div class="charts-section">
+      <div id="overviewChart"></div>
+      <div id="revenueChart"></div>
+    </div>
+    
+    <!-- Top performers section -->
+    <div class="top-performers">
+      <div id="topProducts"></div>
+      <div id="topCustomers"></div>
+    </div>
+  </div>
+  
+  <!-- Summary stats -->
+  <div id="summaryStats"></div>
+</div>
+
+<!-- Trang 2: Phân tích doanh thu -->
+<div id="report-revenue" class="report-page">
+  <div class="page-header">
+    <h2>💰 Phân tích doanh thu</h2>
+  </div>
+  <div id="revenueByProduct"></div>
+  <div id="revenueByPackage"></div>
+  <div id="revenueByEmployee"></div>
+  <div id="revenueComparison"></div>
+  <div id="revenueTrend"></div>
+</div>
+
+<!-- Trang 3: Phân tích chi phí -->
+<div id="report-expense" class="report-page">
+  <div class="page-header">
+    <h2>💸 Phân tích chi phí</h2>
+  </div>
+  <div id="expenseCategoryChart"></div>
+  <div id="expenseTrendChart"></div>
+  <div id="expenseByAccount"></div>
+  <div id="recurringExpenses"></div>
+  <div id="expenseComparison"></div>
+</div>
+
+<!-- Trang 4: Quản lý khách hàng -->
+<div id="report-customer" class="report-page">
+  <div class="page-header">
+    <h2>👥 Quản lý khách hàng</h2>
+  </div>
+  <div id="activeCustomers"></div>
+  <div id="newCustomers"></div>
+  <div id="customerRetention"></div>
+  <div id="customerLifetimeValue"></div>
+  <div id="expiringCustomers"></div>
+</div>
+
+<!-- Trang 5: Quản lý phần mềm -->
+<div id="report-software" class="report-page">
+  <div class="page-header">
+    <h2>💻 Quản lý tài khoản phần mềm</h2>
+  </div>
+  <div id="softwareUsage"></div>
+  <div id="accountUtilization"></div>
+  <div id="softwareRevenue"></div>
+  <div id="accountExpiring"></div>
+  <div id="unusedAccounts"></div>
+</div>
+
+<!-- Trang 6: Báo cáo nhân viên -->
+<div id="report-employee" class="report-page">
+  <div class="page-header">
+    <h2>👔 Báo cáo nhân viên</h2>
+  </div>
+  <div id="employeePerformance"></div>
+  <div id="transactionCount"></div>
+  <div id="employeeRanking"></div>
+  <div id="performanceChart"></div>
+  <div id="employeeKPI"></div>
+</div>
+
+<!-- Trang 7: Quản lý tài chính -->
+<div id="report-finance" class="report-page">
+  <div class="page-header">
+    <h2>🏦 Quản lý tài chính</h2>
+  </div>
+  <div id="bankBalances"></div>
+  <div id="balanceHistory"></div>
+  <div id="cashFlowForecast"></div>
+  <div id="taxReport"></div>
+  <div id="profitLossStatement"></div>
+</div>
+
+<!-- Trang 8: Cash Flow vs Chi phí phân bổ -->
+<div id="report-cashflow-accrual" class="report-page">
+  <div id="cashFlowVsAccrualReport"></div>
+</div>

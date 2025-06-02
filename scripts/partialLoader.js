@@ -73,4 +73,12 @@ export async function initializePartials() {
   ];
 
   await loadPartials(partialConfigs);
+  
+  // Load report pages after statistics tab is loaded
+  setTimeout(async () => {
+    const reportPagesContainer = document.getElementById('report-pages-container');
+    if (reportPagesContainer) {
+      await loadPartial('report-pages-container', './partials/tabs/report-pages.html');
+    }
+  }, 200);
 }

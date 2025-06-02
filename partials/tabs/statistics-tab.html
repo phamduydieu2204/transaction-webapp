@@ -1,0 +1,108 @@
+<!-- Tab Thống kê -->
+<div id="tab-thong-ke" class="tab-content">
+  <div class="statistics-container">
+    <!-- Menu báo cáo bên trái -->
+    <div class="report-menu">
+      <h3 class="menu-title">📊 Báo cáo thống kê</h3>
+      
+      <!-- Period Selector -->
+      <div class="period-selector-wrapper">
+        <label class="period-label">Kỳ báo cáo:</label>
+        <div class="period-dropdown">
+          <div class="period-selected" onclick="togglePeriodDropdown()">
+            <span id="selectedPeriodText">Tháng này</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <div class="period-options" id="periodOptions">
+            <div class="period-option" onclick="selectReportPeriod('today')">
+              <i class="fas fa-calendar-day"></i> Hôm nay
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('yesterday')">
+              <i class="fas fa-history"></i> Hôm qua
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('this_week')">
+              <i class="fas fa-calendar-week"></i> Tuần này
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('last_week')">
+              <i class="fas fa-calendar-alt"></i> Tuần trước
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('last_7_days')">
+              <i class="fas fa-calendar-minus"></i> 7 ngày qua
+            </div>
+            <div class="period-option active" onclick="selectReportPeriod('this_month')">
+              <i class="fas fa-calendar"></i> Tháng này
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('last_month')">
+              <i class="fas fa-calendar-check"></i> Tháng trước
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('last_30_days')">
+              <i class="fas fa-calendar-plus"></i> 30 ngày qua
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('this_quarter')">
+              <i class="fas fa-business-time"></i> Quý này
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('last_quarter')">
+              <i class="fas fa-chart-bar"></i> Quý trước
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('this_year')">
+              <i class="fas fa-calendar-times"></i> Năm nay
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('last_year')">
+              <i class="fas fa-chart-line"></i> Năm trước
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('all_time')">
+              <i class="fas fa-infinity"></i> Tất cả thời gian
+            </div>
+            <div class="period-option custom" onclick="selectReportPeriod('custom')">
+              <i class="fas fa-calendar-range"></i> Tùy chỉnh...
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <ul class="report-menu-list">
+        <li class="menu-item active" data-report="overview">
+          <i class="fas fa-chart-line"></i>
+          <span>Tổng quan kinh doanh</span>
+        </li>
+        <li class="menu-item" data-report="revenue">
+          <i class="fas fa-dollar-sign"></i>
+          <span>Phân tích doanh thu</span>
+        </li>
+        <li class="menu-item" data-report="expense">
+          <i class="fas fa-wallet"></i>
+          <span>Phân tích chi phí</span>
+        </li>
+        <li class="menu-item" data-report="customer">
+          <i class="fas fa-users"></i>
+          <span>Quản lý khách hàng</span>
+        </li>
+        <li class="menu-item" data-report="software">
+          <i class="fas fa-laptop-code"></i>
+          <span>Tài khoản phần mềm</span>
+        </li>
+        <li class="menu-item" data-report="employee">
+          <i class="fas fa-user-tie"></i>
+          <span>Báo cáo nhân viên</span>
+        </li>
+        <li class="menu-item" data-report="finance">
+          <i class="fas fa-university"></i>
+          <span>Quản lý tài chính</span>
+        </li>
+        <li class="menu-item" data-report="cashflow-accrual">
+          <i class="fas fa-balance-scale"></i>
+          <span>Cash Flow vs Phân bổ</span>
+        </li>
+      </ul>
+    </div>
+    
+    <!-- Nội dung báo cáo bên phải -->
+    <div class="report-content">
+      <!-- Dynamic report pages will be loaded here -->
+      <div id="report-pages-container"></div>
+    </div>
+  </div>
+  
+  <!-- Controls xuất dữ liệu chung -->
+  <div id="statisticsExportControls"></div>
+</div>

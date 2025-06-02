@@ -1,0 +1,143 @@
+<!-- Tab Nhập giao dịch -->
+<div id="tab-giao-dich" class="tab-content active">
+  <!-- Form Container -->
+  <div class="form-container">
+    <form id="transactionForm" onreset="handleReset()">
+      <div class="form-grid">
+          <!-- Hàng 1: Thông tin khách hàng -->
+          <div style="grid-column: span 4;">
+            <label>Email khách hàng:</label>
+            <input type="email" id="customerEmail">
+          </div>
+
+          <div style="grid-column: span 4;">
+            <label>Tên khách hàng:</label>
+            <div class="search-icon-container">
+              <input type="text" id="customerName">
+              <i class="fas fa-search search-icon" onclick="updateCustomerInfo()"></i>
+            </div>
+          </div>
+
+          <div style="grid-column: span 4;">
+            <label>Liên hệ:</label>
+            <input type="text" id="customerPhone">
+          </div>
+
+          <!-- Hàng 2: Thông tin giao dịch -->
+          <div style="grid-column: span 2;">
+            <label>Ngày giao dịch:</label>
+            <div class="date-input-container">
+              <input type="text" id="transactionDate" placeholder="yyyy/mm/dd">
+              <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('transactionDate')"></i>
+            </div>
+          </div>
+
+          <div style="grid-column: span 2;">
+            <label>Loại giao dịch:</label>
+            <select id="transactionType" required>
+              <option value="">-- Chọn loại --</option>
+              <option value="Bán hàng">Bán hàng</option>
+              <option value="Hoàn Tiền">Hoàn Tiền</option>
+              <option value="Dùng thử">Dùng thử</option>
+              <option value="Nhập hàng">Nhập hàng</option>
+            </select>
+          </div>
+
+          <div style="grid-column: span 2;">
+            <label>Số tháng đăng ký:</label>
+            <input type="number" id="duration">
+          </div>
+
+          <div style="grid-column: span 2;">
+            <label>Ngày bắt đầu:</label>
+            <div class="date-input-container">
+              <input type="text" id="startDate" placeholder="yyyy/mm/dd">
+              <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('startDate')"></i>
+            </div>
+          </div>
+
+          <div style="grid-column: span 2;">
+            <label>Ngày kết thúc:</label>
+            <div class="date-input-container">
+              <input type="text" id="endDate" placeholder="yyyy/mm/dd">
+              <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('endDate')"></i>
+            </div>
+          </div>
+
+          <div style="grid-column: span 2;">
+            <label>Số thiết bị:</label>
+            <input type="number" id="deviceCount">
+          </div>
+
+          <!-- Hàng 3: Thông tin phần mềm và doanh thu -->
+          <div style="grid-column: span 3;">
+            <label>Tên phần mềm:</label>
+            <select id="softwareName">
+              <option value="">-- Chọn phần mềm --</option>
+            </select>
+          </div>
+
+          <div style="grid-column: span 3;">
+            <label>Gói phần mềm:</label>
+            <select id="softwarePackage">
+              <option value="">-- Chọn gói --</option>
+            </select>
+          </div>
+
+          <div style="grid-column: span 3;">
+            <label>Tên tài khoản:</label>
+            <select id="accountName">
+              <option value="">-- Chọn tài khoản --</option>
+            </select>
+          </div>
+
+          <div style="grid-column: span 3;">
+            <label>Doanh thu (VNĐ):</label>
+            <input type="number" id="revenue">
+          </div>
+
+          <!-- Hàng 4: Ghi chú -->
+          <div style="grid-column: span 12;">
+            <label>Ghi chú:</label>
+            <textarea id="note" rows="2"></textarea>
+          </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="button-row">
+        <button type="button" onclick="handleAdd()">Thêm</button>
+        <button type="button" onclick="handleUpdate()">Cập nhật</button>
+        <button type="button" onclick="handleSearch()">Tìm kiếm</button>
+        <button type="reset">Làm mới</button>
+      </div>
+    </form>
+  </div>
+  
+  <!-- Table Container -->
+  <div class="table-container">
+    <div id="transactionSection">
+      <table id="transactionTable">
+        <thead>
+          <tr>
+            <th>Mã giao dịch</th>
+            <th>Ngày giao dịch</th>
+            <th>Loại giao dịch</th>
+            <th>Tên khách hàng</th>
+            <th>Email</th>
+            <th>Số tháng</th>
+            <th>Ngày bắt đầu</th>
+            <th>Ngày kết thúc</th>
+            <th>Số thiết bị</th>
+            <th>Thông tin phần mềm</th>
+            <th>Doanh thu</th>
+            <th>Thông tin khác</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </div>
+</div>

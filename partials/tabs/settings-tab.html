@@ -1,0 +1,80 @@
+<!-- Tab Cài đặt -->
+<div id="tab-cai-dat" class="tab-content">
+  <div class="settings-container">
+    <h2>⚙️ Cài đặt hệ thống</h2>
+    
+    <!-- Account Settings -->
+    <div class="settings-section">
+      <h3>👤 Thông tin tài khoản</h3>
+      <div class="settings-group">
+        <label>Tên nhân viên:</label>
+        <input type="text" id="settingsEmployeeName" readonly>
+      </div>
+      <div class="settings-group">
+        <label>Mã nhân viên:</label>
+        <input type="text" id="settingsEmployeeCode" readonly>
+      </div>
+      <div class="settings-group">
+        <label>Vai trò:</label>
+        <input type="text" id="settingsRole" readonly>
+      </div>
+      <button onclick="openChangePasswordModal()">
+        <i class="fas fa-key"></i> Đổi mật khẩu
+      </button>
+    </div>
+    
+    <!-- System Settings -->
+    <div class="settings-section">
+      <h3>🔧 Cấu hình hệ thống</h3>
+      <div class="settings-group">
+        <label>
+          <input type="checkbox" id="autoRefresh"> 
+          Tự động làm mới dữ liệu
+        </label>
+      </div>
+      <div class="settings-group">
+        <label>
+          <input type="checkbox" id="showNotifications"> 
+          Hiển thị thông báo
+        </label>
+      </div>
+      <div class="settings-group">
+        <label>Ngôn ngữ:</label>
+        <select id="language">
+          <option value="vi">Tiếng Việt</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- Cookie Management -->
+    <div class="settings-section">
+      <h3>🍪 Quản lý Cookie</h3>
+      <div class="cookie-info">
+        <p>Cookie hiện tại: <span id="currentCookieStatus">Đang hoạt động</span></p>
+        <button onclick="openUpdateCookieModal()">
+          <i class="fas fa-sync"></i> Cập nhật Cookie
+        </button>
+      </div>
+    </div>
+    
+    <!-- Data Management -->
+    <div class="settings-section">
+      <h3>💾 Quản lý dữ liệu</h3>
+      <button onclick="exportAllData()">
+        <i class="fas fa-download"></i> Xuất toàn bộ dữ liệu
+      </button>
+      <button onclick="clearCache()">
+        <i class="fas fa-broom"></i> Xóa cache
+      </button>
+    </div>
+    
+    <!-- About -->
+    <div class="settings-section">
+      <h3>ℹ️ Thông tin</h3>
+      <p>Phiên bản: 2.0.0</p>
+      <p>Cập nhật lần cuối: 06/01/2025</p>
+      <p>Developed by: Team Dev</p>
+    </div>
+  </div>
+</div>

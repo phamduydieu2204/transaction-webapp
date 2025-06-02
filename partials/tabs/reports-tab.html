@@ -1,0 +1,54 @@
+<!-- Tab Báo cáo -->
+<div id="tab-reports" class="tab-content">
+  <div class="reports-container">
+    <h2>📊 Báo cáo chi tiết</h2>
+    
+    <!-- Quick Stats -->
+    <div class="quick-stats">
+      <div class="stat-card">
+        <i class="fas fa-chart-line"></i>
+        <h3>Doanh thu tháng này</h3>
+        <p id="monthlyRevenueStat">0 VNĐ</p>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-wallet"></i>
+        <h3>Chi phí tháng này</h3>
+        <p id="monthlyExpenseStat">0 VNĐ</p>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-users"></i>
+        <h3>Khách hàng mới</h3>
+        <p id="newCustomersStat">0</p>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-percentage"></i>
+        <h3>Tỷ lệ gia hạn</h3>
+        <p id="renewalRateStat">0%</p>
+      </div>
+    </div>
+    
+    <!-- Report Actions -->
+    <div class="report-actions">
+      <button onclick="generateMonthlyReport()">
+        <i class="fas fa-file-pdf"></i> Báo cáo tháng
+      </button>
+      <button onclick="generateQuarterlyReport()">
+        <i class="fas fa-file-excel"></i> Báo cáo quý
+      </button>
+      <button onclick="generateYearlyReport()">
+        <i class="fas fa-file-alt"></i> Báo cáo năm
+      </button>
+      <button onclick="generateCustomReport()">
+        <i class="fas fa-cogs"></i> Báo cáo tùy chỉnh
+      </button>
+    </div>
+    
+    <!-- Report List -->
+    <div class="report-list">
+      <h3>Báo cáo gần đây</h3>
+      <div id="recentReports">
+        <!-- Dynamic report list -->
+      </div>
+    </div>
+  </div>
+</div>
