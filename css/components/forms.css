@@ -1,0 +1,159 @@
+/* Form styles */
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  box-sizing: border-box;
+  font-size: var(--font-base);
+  transition: all 0.3s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+  outline: none;
+}
+
+/* Form grid system */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 6px 10px;
+  margin-bottom: var(--spacing-sm);
+}
+
+.form-grid div {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Form grid inputs */
+.form-grid input,
+.form-grid select,
+.form-grid textarea {
+  width: 100%;
+  padding: 6px 8px;
+  margin-top: 2px;
+  margin-bottom: 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  font-size: 13px;
+  height: 30px;
+}
+
+.form-grid textarea {
+  resize: none;
+  height: auto;
+  min-height: 60px;
+}
+
+.form-grid label {
+  font-weight: 500;
+  color: #37474f;
+  font-size: 12px;
+  margin-bottom: 2px;
+  line-height: 1.2;
+}
+
+/* Expense form specific layout */
+#expenseForm.form-grid {
+  grid-template-columns: repeat(14, 1fr);
+}
+
+#expenseForm.form-grid > div {
+  grid-column: span 2;
+}
+
+#expenseForm.form-grid > .note-field {
+  grid-column: span 2;
+}
+
+#expenseForm.form-grid > .button-row {
+  grid-column: 1 / -1;
+}
+
+/* Date input container */
+.date-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.date-input-container input {
+  width: 100%;
+  padding-right: 30px;
+}
+
+.date-input-container .calendar-icon {
+  position: absolute;
+  right: 5px;
+  cursor: pointer;
+  color: var(--primary-color);
+}
+
+/* Search icon container */
+.search-icon-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon-container input {
+  width: 100%;
+  padding-right: 30px;
+}
+
+.search-icon-container .search-icon {
+  position: absolute;
+  right: 8px;
+  cursor: pointer;
+  color: var(--primary-color);
+  z-index: var(--z-base);
+}
+
+/* Password container */
+.password-container {
+  position: relative;
+  width: 100%;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+/* Textarea */
+textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+/* Select dropdown */
+select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+  padding-right: 32px;
+}
+
+/* Unavailable option style */
+option.unavailable {
+  font-style: italic;
+  color: #888;
+}
+
+/* Form container */
+.form-container {
+  padding: var(--spacing-lg);
+  background: var(--bg-white);
+}

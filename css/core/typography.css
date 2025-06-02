@@ -1,0 +1,87 @@
+/* Typography - Font styles and text utilities */
+body {
+  font-family: var(--font-primary);
+  font-size: var(--font-base);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: var(--spacing-md);
+}
+
+h1 {
+  font-size: var(--font-3xl);
+  text-align: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+h2 {
+  font-size: var(--font-2xl);
+  color: var(--text-primary);
+}
+
+h3 {
+  font-size: var(--font-xl);
+  color: var(--text-primary);
+}
+
+h4 {
+  font-size: var(--font-lg);
+}
+
+h5 {
+  font-size: var(--font-md);
+}
+
+h6 {
+  font-size: var(--font-sm);
+}
+
+/* Paragraphs */
+p {
+  margin-bottom: var(--spacing-md);
+}
+
+/* Labels */
+label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* Text utilities */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-danger { color: var(--danger-color); }
+.text-success { color: var(--success-color); }
+
+.font-bold { font-weight: 700; }
+.font-semibold { font-weight: 600; }
+.font-normal { font-weight: 400; }
+.font-light { font-weight: 300; }
+
+.italic { font-style: italic; }
+
+/* Welcome message style */
+#welcome {
+  font-style: italic;
+  color: var(--text-secondary);
+  font-size: var(--font-sm);
+}
+
+/* Error text */
+.error {
+  color: var(--danger-color);
+  font-size: var(--font-sm);
+  margin-top: var(--spacing-xs);
+}

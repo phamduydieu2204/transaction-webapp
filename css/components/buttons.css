@@ -1,0 +1,124 @@
+/* Button styles */
+button {
+  background: var(--primary-color);
+  color: var(--text-white);
+  border: none;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-weight: bold;
+  font-size: var(--font-md);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: auto;
+  display: inline-block;
+  text-align: center;
+}
+
+button:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Button variants */
+.btn-primary {
+  background: var(--primary-color);
+  color: var(--text-white);
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
+
+.btn-success {
+  background: var(--success-color);
+  color: var(--text-white);
+}
+
+.btn-success:hover {
+  background: var(--success-hover);
+}
+
+.btn-danger {
+  background: var(--danger-color);
+  color: var(--text-white);
+}
+
+.btn-danger:hover {
+  background: var(--danger-hover);
+}
+
+/* Button sizes */
+.btn-sm {
+  padding: 8px 12px;
+  font-size: var(--font-sm);
+}
+
+.btn-lg {
+  padding: 16px 24px;
+  font-size: var(--font-lg);
+}
+
+/* Button with icon */
+button i {
+  margin-right: var(--spacing-xs);
+}
+
+/* Button row styles */
+.button-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+/* Logout button */
+.logout-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: var(--danger-color);
+  color: var(--text-white);
+  border: none;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  z-index: var(--z-header);
+}
+
+.logout-btn:hover {
+  background-color: var(--danger-hover);
+}
+
+.logout-btn i {
+  margin-right: 5px;
+}
+
+/* Action buttons */
+.btn-refresh,
+.btn-export {
+  padding: 8px 16px;
+  font-size: var(--font-sm);
+  background: var(--bg-white);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+}
+
+.btn-refresh:hover,
+.btn-export:hover {
+  background: var(--bg-light);
+  color: var(--primary-color);
+}

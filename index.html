@@ -2,20 +2,61 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Đăng nhập</title>
-  <link rel="stylesheet" href="css/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý giao dịch và chi phí</title>
+  
+  <!-- CSS Files -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="css/main.css">
 </head>
-<body class="login-page">
-  <div class="login-container">
-    <h2>Đăng nhập hệ thống</h2>
-    <input type="text" id="employeeCode" placeholder="Mã nhân viên">
-    <div class="password-container">
-      <input type="password" id="password" placeholder="Mật khẩu">
-      <span class="toggle-password" onclick="togglePassword()">👁️</span>
+<body>
+  <div class="container">
+    <!-- Header & Navigation -->
+    <header>
+      <div id="header-container"></div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <div id="tab-navigation-container"></div>
+
+    <!-- Tab Contents -->
+    <div class="tab-contents">
+      <!-- Transaction Tab -->
+      <div id="transaction-tab-container"></div>
+      
+      <!-- Expense Tab -->
+      <div id="expense-tab-container"></div>
+      
+      <!-- Statistics Tab -->
+      <div id="statistics-tab-container"></div>
+      
+      <!-- Reports Tab -->
+      <div id="reports-tab-container"></div>
+      
+      <!-- Settings Tab -->
+      <div id="settings-tab-container"></div>
     </div>
-    <button onclick="handleLogin()">Đăng nhập</button>
-    <p id="errorMessage" class="error"></p>
+
+    <!-- Notification Area -->
+    <div id="notification"></div>
+
+    <!-- All Modals -->
+    <div id="modals-container"></div>
   </div>
-  <script type="module" src="scripts/login.js"></script>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script type="module">
+    import { initializePartials } from './scripts/partialLoader.js';
+    
+    // Load all partials when DOM is ready
+    document.addEventListener('DOMContentLoaded', async () => {
+      await initializePartials();
+      
+      // After partials are loaded, initialize main.js
+      const mainModule = await import('./scripts/main.js');
+    });
+  </script>
 </body>
 </html>

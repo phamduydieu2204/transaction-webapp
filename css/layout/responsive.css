@@ -1,0 +1,251 @@
+/* ========================================
+   RESPONSIVE DESIGN & MEDIA QUERIES
+   ======================================== */
+
+/* Large screens */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1140px;
+  }
+}
+
+/* Medium screens - Tablets */
+@media (max-width: 991px) {
+  .container {
+    max-width: 720px;
+  }
+  
+  #main {
+    margin: 10px;
+  }
+}
+
+/* Small screens - Mobile */
+@media (max-width: 768px) {
+  /* Typography adjustments */
+  body {
+    font-size: 14px;
+    padding-bottom: 80px;
+  }
+  
+  h1 {
+    font-size: 24px;
+  }
+  
+  h2 {
+    font-size: 20px;
+  }
+  
+  h3 {
+    font-size: 18px;
+  }
+  
+  /* Form adjustments */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  select,
+  textarea {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  /* Button adjustments */
+  button {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+  
+  /* Modal adjustments */
+  .modal-content {
+    margin: 20px;
+    max-width: calc(100% - 40px);
+  }
+  
+  /* Table adjustments */
+  table {
+    font-size: 12px;
+  }
+  
+  th, td {
+    padding: 6px;
+  }
+  
+  /* Tab content adjustments */
+  .tab-content h2 {
+    margin-bottom: 10px;
+  }
+  
+  /* Total summary adjustments */
+  #totalSummary {
+    float: none !important;
+    display: block;
+    text-align: center !important;
+    margin-top: 10px;
+  }
+  
+  #todayExpenseTotal {
+    font-size: 14px !important;
+    padding: 6px 12px;
+  }
+  
+  /* Pagination adjustments */
+  .pagination {
+    margin-bottom: 40px;
+  }
+  
+  .pagination button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  
+  .pagination .page-info {
+    font-size: 12px;
+  }
+  
+  /* Container adjustments */
+  .container {
+    padding: 0 15px;
+  }
+  
+  #main {
+    margin: 5px;
+  }
+  
+  /* Header adjustments */
+  .header-container {
+    margin-bottom: 15px;
+  }
+  
+  .header-container h1 {
+    font-size: 20px;
+  }
+  
+  /* Search container adjustments */
+  #searchContainer {
+    margin-bottom: 15px;
+  }
+  
+  /* Info other adjustments */
+  .info-other {
+    font-size: 12px;
+  }
+  
+  .order-info {
+    max-width: 120px;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  /* Further typography adjustments */
+  body {
+    font-size: 13px;
+  }
+  
+  /* Modal adjustments */
+  .modal-content {
+    margin: 10px;
+    max-width: calc(100% - 20px);
+    padding: 15px;
+  }
+  
+  /* Form adjustments */
+  .form-grid {
+    gap: 5px;
+  }
+  
+  /* Button adjustments */
+  button {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+  
+  .button-row {
+    gap: 5px;
+  }
+  
+  /* Tab menu adjustments */
+  .tab-menu {
+    padding: 0 5px;
+  }
+  
+  .tab-button {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  
+  /* Table container adjustments */
+  .table-container {
+    padding: 10px;
+  }
+  
+  /* Metric card adjustments */
+  .metric-card {
+    padding: 15px;
+  }
+  
+  .metric-icon {
+    font-size: 24px;
+  }
+  
+  .metric-value {
+    font-size: 20px;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  body {
+    padding-bottom: 60px;
+  }
+  
+  .modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .tab-menu {
+    padding: 0 10px;
+  }
+  
+  .tab-button {
+    padding: 10px 16px;
+  }
+}
+
+/* Print styles */
+@media print {
+  /* Hide navigation and interactive elements */
+  .tab-menu,
+  .button-row,
+  .pagination,
+  button,
+  .modal {
+    display: none !important;
+  }
+  
+  /* Adjust layout for print */
+  body {
+    font-size: 12pt;
+    line-height: 1.5;
+    color: black;
+    background: white;
+  }
+  
+  .container {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Ensure tables fit on page */
+  table {
+    page-break-inside: avoid;
+  }
+  
+  tr {
+    page-break-inside: avoid;
+  }
+}

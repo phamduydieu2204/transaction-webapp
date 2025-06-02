@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quản lý giao dịch</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Thêm Flatpickr CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <!-- Thêm Font Awesome cho icon lịch, icon copy, icon đăng xuất và icon kính lúp -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    .date-input-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .date-input-container input {
+      width: 100%;
+      padding-right: 30px;
+    }
+    .date-input-container .calendar-icon {
+      position: absolute;
+      right: 5px;
+      cursor: pointer;
+      color: #007bff;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 10px;
+      position: relative;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+    }
+
+    .detail-content {
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    .detail-content .detail-row {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .detail-content .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-content .detail-label {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    .detail-content .detail-value {
+      flex: 1;
+    }
+
+    .detail-content .copy-icon {
+      margin-left: 10px;
+      cursor: pointer;
+      color: #007bff;
+      position: relative;
+    }
+
+    .detail-content .copy-icon:hover {
+      color: #0056b3;
+    }
+
+    .copy-message {
+      position: absolute;
+      left: 100%;
+      margin-left: 10px;
+      color: #28a745;
+      font-size: 12px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .copy-message.show {
+      opacity: 1;
+    }
+
+    .container {
+      padding-bottom: 20px;
+      position: relative;
+    }
+
+    .fixed-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background-color: #fff;
+    }
+
+    #transactionTable {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    #transactionTable thead {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background-color: #007bff;
+      color: white;
+    }
+
+    #transactionTable th,
+    #transactionTable td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    #transactionTable tbody {
+      display: block;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    #transactionTable thead,
+    #transactionTable tbody tr {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }
+
+    #transactionTable tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    .logout-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      z-index: 20;
+    }
+
+    .logout-btn:hover {
+      background-color: #c82333;
+    }
+
+    .logout-btn i {
+      margin-right: 5px;
+    }
+
+    /* CSS để in nghiêng các tùy chọn không khả dụng */
+    option.unavailable {
+      font-style: italic;
+      color: #888;
+    }
+
+    /* CSS cho icon kính lúp */
+    .search-icon-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .search-icon-container input {
+      width: 100%;
+      padding-right: 30px;
+    }
+    .search-icon-container .search-icon {
+      position: absolute;
+      right: 5px;
+      cursor: pointer;
+      color: #007bff;
+    }
+
+    /* CSS cho placeholder "Đang tìm kiếm..." */
+    input[placeholder="Đang tìm kiếm..."] {
+      font-style: italic;
+      color: #888;
+      opacity: 0.7;
+    }
+
+    /* Định dạng mặc định cho các trường input */
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    textarea {
+      font-style: normal;
+      color: #000;
+      opacity: 1;
+    }
+
+    /* CSS cho thông báo */
+    #notification {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 5px;
+      display: none;
+    }
+    #notification.success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    #notification.error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+/* ✅ CSS mới cho header layout căn giữa hoàn hảo */
+.header-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  width: 100%;
+  min-height: 80px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  padding: 0 20px;
+  border-bottom: 3px solid #e3f2fd;
+  flex-shrink: 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.header-container h1 {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-size: 32px;
+  z-index: 1;
+  white-space: nowrap;
+  color: #1565c0;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.totals-container {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 250px;
+  z-index: 2;
+}
+
+.total-item {
+  font-weight: bold;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: transparent;
+  white-space: nowrap;
+}
+
+.total-item.revenue {
+  color: #2d7d2d !important;
+}
+
+.total-item.expense {
+  color: #c53030 !important;
+}
+
+/* Responsive cho mobile */
+@media (max-width: 768px) {
+  .header-container {
+    flex-direction: column;
+    text-align: center;
+    min-height: auto;
+    padding: 15px;
+  }
+  
+  #welcome {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 12px;
+  }
+  
+  .header-container h1 {
+    position: relative;
+    left: auto;
+    transform: none;
+    margin-bottom: 10px;
+    font-size: 24px;
+  }
+  
+  .totals-container {
+    position: relative;
+    right: auto;
+    top: auto;
+    transform: none;
+    align-items: center;
+    min-width: auto;
+  }
+  
+  .total-item {
+    font-size: 13px;
+  }
+  
+  .tab-menu {
+    padding: 0 10px;
+  }
+  
+  .tab-button {
+    padding: 12px 15px;
+    font-size: 14px;
+  }
+  
+  .tab-content {
+    padding: 15px;
+  }
+  
+  .logout-btn {
+    top: 10px;
+    right: 10px;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .form-grid div[style*="grid-column: span"] {
+    grid-column: span 1 !important;
+  }
+  
+  .form-section {
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+  
+  .section-title {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  
+  .button-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .button-row button {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  /* Mobile layout for transaction tab */
+  .form-container #transactionForm {
+    max-width: 100% !important;
+  }
+  
+  /* Toast notifications on mobile */
+  #toastContainer {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+  
+  .toast {
+    min-width: 280px !important;
+    max-width: 90vw !important;
+    font-size: 14px;
+    padding: 16px 20px;
+  }
+  
+  .tab-button[style*="display: none"] {
+  display: none !important;
+  }
+}
+
+  /* CSS cho menu báo cáo thống kê */
+  .statistics-container {
+    display: flex;
+    gap: 20px;
+    height: calc(100vh - 200px);
+    min-height: 600px;
+  }
+
+  .report-menu {
+    width: 260px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .menu-title {
+    margin: 0 0 20px 0;
+    color: #2d3748;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .report-menu-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #4a5568;
+    font-size: 14px;
+  }
+
+  .menu-item:hover {
+    background: #e2e8f0;
+    color: #2d3748;
+  }
+
+  .menu-item.active {
+    background: #3182ce;
+    color: white;
+    font-weight: 500;
+  }
+
+  .menu-item i {
+    width: 20px;
+    text-align: center;
+  }
+
+  .report-content {
+    flex: 1;
+    background: white;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow-y: auto;
+  }
+
+  .report-page {
+    display: none;
+  }
+
+  .report-page.active {
+    display: block;
+  }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  .page-header h2 {
+    margin: 0;
+    color: #2d3748;
+    font-size: 24px;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn-refresh, .btn-export {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+
+  .btn-refresh {
+    background: #48bb78;
+    color: white;
+  }
+
+  .btn-refresh:hover {
+    background: #38a169;
+  }
+
+  .btn-export {
+    background: #3182ce;
+    color: white;
+  }
+
+  .btn-export:hover {
+    background: #2c5aa0;
+  }
+
+  /* Responsive cho mobile */
+  @media (max-width: 768px) {
+    .statistics-container {
+      flex-direction: column;
+      height: auto;
+    }
+    
+    .report-menu {
+      width: 100%;
+      padding: 15px;
+    }
+    
+    .report-menu-list {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      padding-bottom: 10px;
+    }
+    
+    .menu-item {
+      white-space: nowrap;
+      margin-bottom: 0;
+    }
+    
+    .report-content {
+      padding: 20px;
+    }
+  }
+
+  /* Overview page grid layout */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  .charts-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .top-performers {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* Top products & customers cards */
+  .top-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    padding: 24px;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  .top-section.products {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+
+  .top-section.customers {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  }
+
+  .top-section h3 {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .period-selector {
+    margin-left: auto;
+    font-size: 12px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 4px;
+    padding: 4px 8px;
+    color: white;
+    cursor: pointer;
+  }
+
+  .top-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .top-item {
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.1);
+    padding: 12px;
+    border-radius: 8px;
+    transition: all 0.3s;
+  }
+
+  .top-item:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateX(5px);
+  }
+
+  .rank-badge {
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 12px;
+  }
+
+  .rank-badge.gold {
+    background: #ffd700;
+    color: #333;
+  }
+
+  .rank-badge.silver {
+    background: #c0c0c0;
+    color: #333;
+  }
+
+  .rank-badge.bronze {
+    background: #cd7f32;
+    color: white;
+  }
+
+  .item-info {
+    flex: 1;
+  }
+
+  .item-name {
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .item-detail {
+    font-size: 12px;
+    opacity: 0.8;
+  }
+
+  .item-value {
+    font-weight: bold;
+    font-size: 16px;
+  }
+
+  /* Summary stats */
+  #summaryStats {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .stat-card {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .stat-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2d3748;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 14px;
+    color: #718096;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .overview-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+    /* Period Selector Styles */
+    .period-selector-wrapper {
+      padding: 15px;
+      border-bottom: 1px solid #e2e8f0;
+      margin-bottom: 10px;
+    }
+    
+    .period-selector-wrapper .period-label {
+      display: block;
+      font-size: 12px;
+      color: #718096;
+      margin-bottom: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .period-dropdown {
+      position: relative;
+    }
+    
+    .period-selected {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .period-selected:hover {
+      border-color: #4299e1;
+      background: #f7faff;
+    }
+    
+    .period-selected span {
+      font-weight: 500;
+      color: #2d3748;
+    }
+    
+    .period-selected i {
+      color: #718096;
+      transition: transform 0.2s;
+    }
+    
+    .period-dropdown.active .period-selected i {
+      transform: rotate(180deg);
+    }
+    
+    .period-options {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin-top: 4px;
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+    }
+    
+    .period-dropdown.active .period-options {
+      display: block;
+    }
+    
+    .period-option {
+      padding: 10px 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .period-option i {
+      width: 16px;
+      color: #718096;
+    }
+    
+    .period-option:hover {
+      background: #f7faff;
+      color: #4299e1;
+    }
+    
+    .period-option:hover i {
+      color: #4299e1;
+    }
+    
+    .period-option.active {
+      background: #ebf8ff;
+      color: #3182ce;
+      font-weight: 600;
+    }
+    
+    .period-option.active i {
+      color: #3182ce;
+    }
+    
+    .period-option.custom {
+      border-top: 1px solid #e2e8f0;
+      margin-top: 4px;
+      padding-top: 14px;
+    }
+    
+    .period-option:first-child {
+      border-radius: 4px 4px 0 0;
+    }
+    
+    .period-option:last-child {
+      border-radius: 0 0 4px 4px;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="tab-menu">
+      <button class="tab-button active" data-tab="tab-giao-dich">Nhập giao dịch</button>
+      <button class="tab-button" data-tab="tab-chi-phi">Nhập chi phí</button>
+      <button class="tab-button" data-tab="tab-thong-ke">Thống kê</button>
+    </div>
+
+    <button class="logout-btn" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i> Đăng xuất
+    </button>
+
+    <!-- ✅ Header với layout mới -->
+    <div class="header-container">
+      <!-- Welcome message ở góc trái -->
+      <p id="welcome">
+        <span id="userWelcome"></span>
+      </p>
+      
+      <h1>Hệ thống quản lý</h1>
+    </div>
+
+    <!-- Ô tìm kiếm nhanh khoản chi -->
+    <div id="expenseQuickSearchWrapper" style="margin: 15px 0; position: relative; z-index: 100; display: flex; flex-direction: column; align-items: center;">
+      <div style="position: relative; max-width: 600px; width: 100%;">
+        <input type="text" 
+               id="expenseQuickSearch" 
+               placeholder="Nhập mô tả khoản chi để tìm kiếm (ví dụ: thuê văn phòng, mua phần mềm...)"
+               style="width: 100%; padding-right: 30px;"
+               autocomplete="off">
+        <i class="fas fa-times-circle" 
+           id="clearExpenseSearch" 
+           style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #6c757d; display: none;"
+           onclick="clearExpenseSearch()"></i>
+        
+        <!-- Dropdown gợi ý với overlay -->
+        <div id="expenseSearchResults" style="
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: white;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          max-height: 400px;
+          overflow-y: auto;
+          z-index: 1000;
+          display: none;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          margin-top: 5px;
+        "></div>
+      </div>
+    </div>
+    
+    <!-- Overlay background -->
+    <div id="searchOverlay" style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 99;
+      display: none;
+    " onclick="clearExpenseSearch()"></div>
+    
+    <hr>
+
+    <div id="tab-giao-dich" class="tab-content active">
+      <!-- Form Container -->
+      <div class="form-container">
+        <form id="transactionForm" onreset="handleReset()">
+          <div class="form-grid">
+              <!-- Hàng 1: Thông tin khách hàng -->
+              <div style="grid-column: span 4;">
+                <label>Email khách hàng:</label>
+                <input type="email" id="customerEmail">
+              </div>
+
+              <div style="grid-column: span 4;">
+                <label>Tên khách hàng:</label>
+                <div class="search-icon-container">
+                  <input type="text" id="customerName">
+                  <i class="fas fa-search search-icon" onclick="updateCustomerInfo()"></i>
+                </div>
+              </div>
+
+              <div style="grid-column: span 4;">
+                <label>Liên hệ:</label>
+                <input type="text" id="customerPhone">
+              </div>
+
+              <!-- Hàng 2: Thông tin giao dịch -->
+              <div style="grid-column: span 2;">
+                <label>Ngày giao dịch:</label>
+                <div class="date-input-container">
+                  <input type="text" id="transactionDate" placeholder="yyyy/mm/dd">
+                  <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('transactionDate')"></i>
+                </div>
+              </div>
+
+              <div style="grid-column: span 2;">
+                <label>Loại giao dịch:</label>
+                <select id="transactionType" required>
+                  <option value="">-- Chọn loại --</option>
+                  <option value="Bán hàng">Bán hàng</option>
+                  <option value="Hoàn Tiền">Hoàn Tiền</option>
+                  <option value="Dùng thử">Dùng thử</option>
+                  <option value="Nhập hàng">Nhập hàng</option>
+                </select>
+              </div>
+
+              <div style="grid-column: span 2;">
+                <label>Số tháng đăng ký:</label>
+                <input type="number" id="duration">
+              </div>
+
+              <div style="grid-column: span 2;">
+                <label>Ngày bắt đầu:</label>
+                <div class="date-input-container">
+                  <input type="text" id="startDate" placeholder="yyyy/mm/dd">
+                  <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('startDate')"></i>
+                </div>
+              </div>
+
+              <div style="grid-column: span 2;">
+                <label>Ngày kết thúc:</label>
+                <div class="date-input-container">
+                  <input type="text" id="endDate" placeholder="yyyy/mm/dd">
+                  <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('endDate')"></i>
+                </div>
+              </div>
+
+              <div style="grid-column: span 2;">
+                <label>Số thiết bị:</label>
+                <input type="number" id="deviceCount">
+              </div>
+
+              <!-- Hàng 3: Thông tin phần mềm và doanh thu -->
+              <div style="grid-column: span 3;">
+                <label>Tên phần mềm:</label>
+                <select id="softwareName">
+                  <option value="">-- Chọn phần mềm --</option>
+                </select>
+              </div>
+
+              <div style="grid-column: span 3;">
+                <label>Gói phần mềm:</label>
+                <select id="softwarePackage">
+                  <option value="">-- Chọn gói --</option>
+                </select>
+              </div>
+
+              <div style="grid-column: span 3;">
+                <label>Tên tài khoản:</label>
+                <select id="accountName">
+                  <option value="">-- Chọn tài khoản --</option>
+                </select>
+              </div>
+
+              <div style="grid-column: span 3;">
+                <label>Doanh thu (VNĐ):</label>
+                <input type="number" id="revenue">
+              </div>
+
+              <!-- Hàng 4: Ghi chú -->
+              <div style="grid-column: span 12;">
+                <label>Ghi chú:</label>
+                <textarea id="note" rows="2"></textarea>
+              </div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="button-row">
+            <button type="button" onclick="handleAdd()">Thêm</button>
+            <button type="button" onclick="handleUpdate()">Cập nhật</button>
+            <button type="button" onclick="handleSearch()">Tìm kiếm</button>
+            <button type="reset">Làm mới</button>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Table Container -->
+      <div class="table-container">
+        <div id="transactionSection">
+          <table id="transactionTable">
+            <thead>
+              <tr>
+                <th>Mã giao dịch</th>
+                <th>Ngày giao dịch</th>
+                <th>Loại giao dịch</th>
+                <th>Tên khách hàng</th>
+                <th>Email</th>
+                <th>Số tháng</th>
+                <th>Ngày bắt đầu</th>
+                <th>Ngày kết thúc</th>
+                <th>Số thiết bị</th>
+                <th>Thông tin phần mềm</th>
+                <th>Doanh thu</th>
+                <th>Thông tin khác</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+          <div class="pagination" id="pagination"></div>
+        </div>
+      </div>
+    </div>
+
+<div id="tab-chi-phi" class="tab-content">
+  <form id="expenseForm" class="form-grid">
+    
+    <!-- Hidden fields -->
+    <input type="hidden" id="expenseId">
+    <input type="hidden" id="expenseRecorder">
+
+
+    <div>
+      <label>Ngày chi</label>
+      <div class="date-input-container">
+        <input type="text" id="expenseDate" placeholder="yyyy/mm/dd">
+        <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseDate')"></i>
+      </div>
+    </div>
+
+    <div>
+      <label>Loại khoản chi</label>
+      <select id="expenseCategory" onchange="handleCategoryChange()">
+        <option value="">-- Chọn loại --</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Danh mục chung</label>
+      <select id="expenseSubCategory" onchange="handleSubCategoryChange()">
+        <option value="">-- Chọn danh mục --</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Tên sản phẩm/Dịch vụ</label>
+      <select id="expenseProduct" onchange="handleProductChange()">
+        <option value="">-- Chọn sản phẩm --</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Phiên bản/Gói dịch vụ</label>
+      <select id="expensePackage">
+        <option value="">-- Chọn gói --</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Số tiền</label>
+      <input type="number" id="expenseAmount">
+    </div>
+
+    <div>
+      <label>Đơn vị tiền tệ</label>
+      <select id="expenseCurrency">
+        <option value="VND">VND</option>
+        <option value="USD">USD</option>
+        <option value="NGN">NGN</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Ngân hàng/Ví</label>
+      <select id="expenseBank" onchange="handleBankChange()">
+        <option value="">-- Chọn ngân hàng/ví --</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Thông tin thẻ/Tài khoản</label>
+      <select id="expenseCard">
+        <option value="">-- Chọn tài khoản --</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Phương thức chi</label>
+      <select id="expenseRecurring" onchange="handleRecurringChange()">
+        <option value="Chi một lần">Chi một lần</option>
+        <option value="Hàng tháng">Định kỳ hàng tháng</option>
+        <option value="Hàng quý">Định kỳ hàng quý</option>
+        <option value="Hàng năm">Định kỳ hàng năm</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Ngày tái tục</label>
+      <div class="date-input-container">
+        <input type="text" id="expenseRenewDate" placeholder="yyyy/mm/dd">
+        <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseRenewDate')"></i>
+      </div>
+    </div>
+
+    <div>
+      <label>Người nhận / Nhà cung cấp</label>
+      <input type="text" id="expenseSupplier">
+    </div>
+
+    <div>
+      <label>Trạng thái</label>
+      <select id="expenseStatus">
+        <option>Đã thanh toán</option>
+        <option>Chưa thanh toán</option>
+        <option>Đã hủy</option>
+      </select>
+    </div>
+
+    <div class="note-field">
+      <label>Ghi chú</label>
+      <textarea id="expenseNote" rows="2"></textarea>
+    </div>
+
+    <!-- Buttons -->
+    <div class="button-row">
+      <button type="button" onclick="handleAddExpense()">Thêm</button>
+      <button type="button" onclick="handleUpdateExpense()">Cập nhật</button>
+      <button type="button" onclick="handleSearchExpense()">Tìm kiếm</button>
+      <button type="button" onclick="handleResetExpense()">Làm mới</button>
+    </div>
+  </form>
+  <table id="expenseListTable">
+    <thead>
+      <tr>
+        <th>Mã chi phí</th>
+        <th>Ngày chi</th>
+        <th>Loại kế toán</th>
+        <th>Phân bổ</th>
+        <th>Thông tin khoản chi</th>
+        <th>Số tiền</th>
+        <th>Ngày tái tục</th>
+        <th>Ghi chú</th>
+        <th>Hành động</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="pagination" id="expensePagination"></div>
+</div>
+
+<div id="tab-thong-ke" class="tab-content">
+  <div class="statistics-container">
+    <!-- Menu báo cáo bên trái -->
+    <div class="report-menu">
+      <h3 class="menu-title">📊 Báo cáo thống kê</h3>
+      
+      <!-- Period Selector -->
+      <div class="period-selector-wrapper">
+        <label class="period-label">Kỳ báo cáo:</label>
+        <div class="period-dropdown">
+          <div class="period-selected" onclick="togglePeriodDropdown()">
+            <span id="selectedPeriodText">Tháng này</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <div class="period-options" id="periodOptions">
+            <div class="period-option" onclick="selectReportPeriod('today')">
+              <i class="fas fa-calendar-day"></i> Hôm nay
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('yesterday')">
+              <i class="fas fa-history"></i> Hôm qua
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('this_week')">
+              <i class="fas fa-calendar-week"></i> Tuần này
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('last_week')">
+              <i class="fas fa-calendar-alt"></i> Tuần trước
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('last_7_days')">
+              <i class="fas fa-calendar-minus"></i> 7 ngày qua
+            </div>
+            <div class="period-option active" onclick="selectReportPeriod('this_month')">
+              <i class="fas fa-calendar"></i> Tháng này
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('last_month')">
+              <i class="fas fa-calendar-check"></i> Tháng trước
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('last_30_days')">
+              <i class="fas fa-calendar-plus"></i> 30 ngày qua
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('this_quarter')">
+              <i class="fas fa-business-time"></i> Quý này
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('last_quarter')">
+              <i class="fas fa-chart-bar"></i> Quý trước
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('this_year')">
+              <i class="fas fa-calendar-times"></i> Năm nay
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('last_year')">
+              <i class="fas fa-chart-line"></i> Năm trước
+            </div>
+            <div class="period-option" onclick="selectReportPeriod('all_time')">
+              <i class="fas fa-infinity"></i> Tất cả thời gian
+            </div>
+            <div class="period-option custom" onclick="selectReportPeriod('custom')">
+              <i class="fas fa-calendar-range"></i> Tùy chỉnh...
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <ul class="report-menu-list">
+        <li class="menu-item active" data-report="overview">
+          <i class="fas fa-chart-line"></i>
+          <span>Tổng quan kinh doanh</span>
+        </li>
+        <li class="menu-item" data-report="revenue">
+          <i class="fas fa-dollar-sign"></i>
+          <span>Phân tích doanh thu</span>
+        </li>
+        <li class="menu-item" data-report="expense">
+          <i class="fas fa-wallet"></i>
+          <span>Phân tích chi phí</span>
+        </li>
+        <li class="menu-item" data-report="customer">
+          <i class="fas fa-users"></i>
+          <span>Quản lý khách hàng</span>
+        </li>
+        <li class="menu-item" data-report="software">
+          <i class="fas fa-laptop-code"></i>
+          <span>Tài khoản phần mềm</span>
+        </li>
+        <li class="menu-item" data-report="employee">
+          <i class="fas fa-user-tie"></i>
+          <span>Báo cáo nhân viên</span>
+        </li>
+        <li class="menu-item" data-report="finance">
+          <i class="fas fa-university"></i>
+          <span>Quản lý tài chính</span>
+        </li>
+        <li class="menu-item" data-report="cashflow-accrual">
+          <i class="fas fa-balance-scale"></i>
+          <span>Cash Flow vs Phân bổ</span>
+        </li>
+      </ul>
+    </div>
+    
+    <!-- Nội dung báo cáo bên phải -->
+    <div class="report-content">
+      <!-- Trang 1: Tổng quan kinh doanh -->
+      <div id="report-overview" class="report-page active">
+        <div class="page-header">
+          <div class="header-actions">
+            <button class="btn-refresh" onclick="refreshCurrentReport()">
+              <i class="fas fa-sync-alt"></i> Làm mới
+            </button>
+            <button class="btn-export" onclick="exportCurrentReport()">
+              <i class="fas fa-download"></i> Xuất báo cáo
+            </button>
+          </div>
+        </div>
+        
+        <!-- Financial Dashboard với bộ lọc -->
+        <div id="financialDashboard"></div>
+        
+        <!-- Grid layout cho các thành phần -->
+        <div class="overview-grid">
+          <!-- Charts section -->
+          <div class="charts-section">
+            <div id="overviewChart"></div>
+            <div id="revenueChart"></div>
+          </div>
+          
+          <!-- Top performers section -->
+          <div class="top-performers">
+            <div id="topProducts"></div>
+            <div id="topCustomers"></div>
+          </div>
+        </div>
+        
+        <!-- Summary stats -->
+        <div id="summaryStats"></div>
+      </div>
+      
+      <!-- Trang 2: Phân tích doanh thu -->
+      <div id="report-revenue" class="report-page">
+        <div class="page-header">
+          <h2>💰 Phân tích doanh thu</h2>
+        </div>
+        <div id="revenueByProduct"></div>
+        <div id="revenueByPackage"></div>
+        <div id="revenueByEmployee"></div>
+        <div id="revenueComparison"></div>
+        <div id="revenueTrend"></div>
+      </div>
+      
+      <!-- Trang 3: Phân tích chi phí -->
+      <div id="report-expense" class="report-page">
+        <div class="page-header">
+          <h2>💸 Phân tích chi phí</h2>
+        </div>
+        <div id="expenseByCategory"></div>
+        <div id="recurringExpenses"></div>
+        <div id="paymentMethods"></div>
+        <div id="topExpenses"></div>
+        <table id="monthlySummaryTable">
+          <thead>
+            <tr>
+              <th>Tháng</th>
+              <th>Loại khoản chi</th>
+              <th>Tổng tiền (VND)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      
+      <!-- Trang 4: Quản lý khách hàng -->
+      <div id="report-customer" class="report-page">
+        <div class="page-header">
+          <h2>👥 Quản lý khách hàng</h2>
+        </div>
+        <div id="customerOverview"></div>
+        <div id="expiringCustomers"></div>
+        <div id="renewalRate"></div>
+        <div id="transactionTypes"></div>
+        <div id="customerLifetimeValue"></div>
+      </div>
+      
+      <!-- Trang 5: Tài khoản phần mềm -->
+      <div id="report-software" class="report-page">
+        <div class="page-header">
+          <h2>💻 Quản lý tài khoản phần mềm</h2>
+        </div>
+        <div id="softwareOverview"></div>
+        <div id="expiringSoftware"></div>
+        <div id="softwareROI"></div>
+        <div id="softwareCostRevenue"></div>
+        <div id="softwareDetailsList"></div>
+      </div>
+      
+      <!-- Trang 6: Báo cáo nhân viên -->
+      <div id="report-employee" class="report-page">
+        <div class="page-header">
+          <h2>👔 Báo cáo nhân viên</h2>
+        </div>
+        <div id="employeePerformance"></div>
+        <div id="transactionCount"></div>
+        <div id="employeeRanking"></div>
+        <div id="performanceChart"></div>
+        <div id="employeeKPI"></div>
+      </div>
+      
+      <!-- Trang 7: Quản lý tài chính -->
+      <div id="report-finance" class="report-page">
+        <div class="page-header">
+          <h2>🏦 Quản lý tài chính</h2>
+        </div>
+        <div id="bankBalances"></div>
+        <div id="balanceHistory"></div>
+        <div id="cashFlowForecast"></div>
+        <div id="taxReport"></div>
+        <div id="profitLossStatement"></div>
+      </div>
+      
+      <!-- Trang 8: Cash Flow vs Chi phí phân bổ -->
+      <div id="report-cashflow-accrual" class="report-page">
+        <div id="cashFlowVsAccrualReport"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Controls xuất dữ liệu chung -->
+  <div id="statisticsExportControls"></div>
+</div>
+
+    <!-- Khu vực thông báo -->
+    <div id="notification"></div>
+
+
+    <!-- Modal để hiển thị chi tiết giao dịch -->
+    <div id="transactionDetailModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">×</span>
+        <h2>Chi tiết giao dịch</h2>
+        <div class="detail-content" id="transactionDetailContent"></div>
+      </div>
+    </div>
+
+    <!-- Modal để hiển thị thông báo xử lý -->
+    <div id="processingModal" class="modal">
+      <div class="modal-content">
+        <h2 id="modalTitle">Thông báo</h2>
+        <p id="modalMessage">Hệ thống đang thực thi...</p>
+        <span id="modalClose" class="close" style="display: none;" onclick="closeProcessingModal()">×</span>
+      </div>
+    </div>
+
+    <!-- Modal xác nhận xóa -->
+    <div id="confirmDeleteModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeConfirmModal()">×</span>
+        <h2>Xác nhận xóa</h2>
+        <p id="confirmMessage"></p>
+        <div style="text-align: center;">
+          <button onclick="confirmDelete(true)">OK</button>
+          <button onclick="confirmDelete(false)">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script type="module" src="scripts/main.js"></script>
+  <script type="module" src="scripts/periodSelector.js"></script>
+
+  <!-- Modal xác nhận thêm hoặc cập nhật giao dịch -->
+<div id="addOrUpdateModal" class="modal">
+  <div class="modal-content">
+    <h2>Bạn đang trong tiến trình sửa giao dịch</h2>
+    <p>Bạn muốn thêm giao dịch mới hay cập nhật giao dịch hiện có?</p>
+    <div style="text-align: center; margin-top: 20px;">
+      <button id="confirmAddNew" style="margin: 5px;">Thêm giao dịch mới</button>
+      <button id="confirmUpdate" style="margin: 5px;">Cập nhật giao dịch</button>
+      <button id="confirmCancel" style="margin: 5px;">Hủy bỏ</button>
+    </div>
+  </div>
+</div>
+<!-- Modal cập nhật cookie -->
+<div id="updateCookieModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeUpdateCookieModal()">&times;</span>
+    <h2>Cập nhật Cookie</h2>
+
+    <label for="currentCookie">Cookie hiện tại:</label>
+    <textarea id="currentCookie" readonly rows="6"></textarea>
+    <button onclick="copyCurrentCookie()">📋 Copy Cookie</button>
+
+    <label for="newCookie">Cookie cập nhật:</label>
+    <textarea id="newCookie" rows="6" placeholder="Nhập cookie mới..."></textarea>
+
+    <div class="button-row">
+      <button onclick="confirmUpdateCookie()">Cập nhật</button>
+      <button onclick="cancelUpdateCookie()">Hủy bỏ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal đổi mật khẩu -->
+<div id="changePasswordModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeChangePasswordModal()">&times;</span>
+    <h2>Đổi thông tin tài khoản</h2>
+
+    <h4>Thông tin cũ</h4>
+    <p>Email đăng nhập: <span id="oldLoginEmail"></span></p>
+    <p>Mật khẩu: <span id="oldPassword"></span></p>
+    <p>Secret: <span id="oldSecret"></span></p>
+
+    <hr>
+
+    <h4>Thông tin mới</h4>
+    <label for="newLoginEmail">Email đăng nhập mới:</label>
+    <input type="text" id="newLoginEmail" placeholder="Nhập email mới (nếu cần)">
+
+    <label for="newPassword">Mật khẩu mới:</label>
+    <input type="text" id="newPassword" placeholder="Nhập mật khẩu mới (nếu cần)">
+
+    <label for="newSecret">Secret mới:</label>
+    <input type="text" id="newSecret" placeholder="Nhập secret mới (nếu cần)">
+
+    <div class="button-row" style="margin-top: 10px;">
+      <button onclick="confirmChangePassword()">Cập nhật</button>
+      <button onclick="closeChangePasswordModal()">Hủy</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lớp phủ ngăn tương tác -->
+<div id="formOverlay" style="
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+  cursor: not-allowed;
+"></div>
+
+<!-- Toast Notifications Container -->
+<div id="toastContainer" style="
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+"></div>
+
+<style>
+.toast {
+  min-width: 350px;
+  max-width: 500px;
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  animation: fadeIn 0.3s ease-out;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.toast:hover {
+  transform: scale(1.02);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+}
+
+.toast.success {
+  background: rgba(76, 175, 80, 0.9);
+}
+
+.toast.error {
+  background: rgba(244, 67, 54, 0.9);
+}
+
+.toast-icon {
+  font-size: 28px;
+  color: white;
+}
+
+.toast-message {
+  flex: 1;
+  font-size: 16px;
+  color: white;
+  line-height: 1.4;
+  font-weight: 500;
+  text-align: center;
+}
+
+.toast-close {
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.toast-close:hover {
+  color: white;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+.toast.removing {
+  animation: fadeOut 0.3s ease-in;
+}
+</style>
+
+<script>
+// Toast notification functions
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  
+  const icon = type === 'success' ? '✓' : '✗';
+  
+  toast.innerHTML = `
+    <span class="toast-icon">${icon}</span>
+    <span class="toast-message">${message}</span>
+    <span class="toast-close">&times;</span>
+  `;
+  
+  container.appendChild(toast);
+  
+  // Auto remove after 3 seconds
+  const timeout = setTimeout(() => removeToast(toast), 3000);
+  
+  // Remove on click
+  toast.addEventListener('click', () => {
+    clearTimeout(timeout);
+    removeToast(toast);
+  });
+}
+
+function removeToast(toast) {
+  toast.classList.add('removing');
+  setTimeout(() => toast.remove(), 300);
+}
+
+// Replace old success/error message functions
+window.showSuccessMessage = (message) => showToast(message, 'success');
+window.showErrorMessage = (message) => showToast(message, 'error');
+</script>
+
+</body>
+</html>

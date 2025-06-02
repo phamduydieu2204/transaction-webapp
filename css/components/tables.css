@@ -1,0 +1,203 @@
+/* ========================================
+   TABLE STYLES
+   ======================================== */
+
+/* Base table styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+/* Transaction table */
+#transactionTable {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+#transactionTable thead {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--primary-color);
+  color: white;
+}
+
+#transactionTable th,
+#transactionTable td {
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  resize: horizontal;
+  min-width: 100px;
+  max-width: 600px;
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+#transactionTable th {
+  position: relative;
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+#transactionTable th .resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 5px;
+  cursor: col-resize;
+  user-select: none;
+  height: 100%;
+}
+
+#transactionTable tbody tr {
+  transition: background-color 0.2s;
+}
+
+#transactionTable tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+#transactionTable tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Expired row styling */
+#transactionTable tr.expired-row {
+  font-style: italic;
+  color: #ff0202a2;
+}
+
+/* Expense table */
+#expenseListTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+#expenseListTable thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--primary-color);
+  color: white;
+}
+
+#expenseListTable tbody {
+  display: block;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+#expenseListTable thead,
+#expenseListTable tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+#expenseListTable th,
+#expenseListTable td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+  font-size: 14px;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+/* ROI Analysis table */
+.roi-table {
+  overflow-x: auto;
+  margin-bottom: 24px;
+}
+
+.roi-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.roi-table th {
+  background: #f7fafc;
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #4a5568;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.roi-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.roi-table .revenue {
+  color: #48bb78;
+  font-weight: 500;
+}
+
+.roi-table .cost {
+  color: #e53e3e;
+  font-weight: 500;
+}
+
+.roi-table .profit {
+  color: #38a169;
+  font-weight: bold;
+}
+
+.roi-table .loss {
+  color: #e53e3e;
+  font-weight: bold;
+}
+
+.roi-table .roi.positive {
+  color: #38a169;
+  font-weight: bold;
+}
+
+.roi-table .roi.negative {
+  color: #e53e3e;
+  font-weight: bold;
+}
+
+.roi-table .margin {
+  color: #2d3748;
+  font-weight: 500;
+}
+
+/* Table utilities */
+.software-name {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.transaction-count {
+  font-size: 12px;
+  color: #718096;
+  margin-top: 2px;
+}
+
+.detail-value {
+  white-space: pre-line;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Responsive tables */
+@media (max-width: 768px) {
+  table {
+    font-size: 12px;
+  }
+  
+  th, td {
+    padding: 6px;
+  }
+}

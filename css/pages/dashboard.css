@@ -1,0 +1,217 @@
+/* ========================================
+   DASHBOARD PAGE STYLES
+   ======================================== */
+
+/* Main dashboard container */
+#main {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  margin: 15px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+  overflow: hidden;
+}
+
+/* Welcome message */
+#welcome {
+  text-align: center;
+  font-style: italic;
+  color: #666;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+/* Total summary display */
+#totalSummary {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Today expense total */
+#todayExpenseTotal {
+  background-color: #fff5f5;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #fed7d7;
+  color: #c53030 !important;
+  font-weight: bold !important;
+  font-size: 16px !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Search container */
+#searchContainer {
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+}
+
+#searchContainer h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+/* Info other section */
+.info-other {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.order-info {
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Copy button in info section */
+.copy-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #007bff;
+  padding: 2px;
+}
+
+.copy-btn:hover {
+  color: #0056b3;
+}
+
+/* Detail view copy icon */
+.detail-row i.copy-icon {
+  color: #007bff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+  margin-left: 10px;
+}
+
+.detail-row i.copy-icon:hover {
+  color: #0056b3;
+  transform: scale(1.2);
+}
+
+.detail-row i.copy-icon:active {
+  transform: scale(0.95);
+}
+
+.detail-row i.copy-icon::before {
+  vertical-align: middle;
+}
+
+/* Chart containers */
+.renewal-trend {
+  margin-top: 24px;
+}
+
+.renewal-trend h4 {
+  font-size: 16px;
+  color: #4a5568;
+  margin-bottom: 16px;
+}
+
+.trend-bar .bar {
+  width: 40px;
+  background: #667eea;
+  border-radius: 4px 4px 0 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 4px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  min-height: 20px;
+  transition: all 0.3s ease;
+}
+
+.trend-bar:hover .bar {
+  background: #5a67d8;
+}
+
+.month-label {
+  font-size: 12px;
+  color: #718096;
+  margin-top: 8px;
+}
+
+/* Pagination container */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 10px;
+  position: relative;
+  z-index: 10;
+}
+
+.pagination button {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #f0f0f0;
+  border-color: #007bff;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination .page-info {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Responsive dashboard */
+@media (max-width: 768px) {
+  #main {
+    margin: 5px;
+    padding: 10px;
+  }
+  
+  #welcome {
+    font-size: 14px;
+    margin-bottom: 15px;
+  }
+  
+  #todayExpenseTotal {
+    font-size: 14px !important;
+    padding: 6px 12px;
+  }
+  
+  #totalSummary {
+    float: none !important;
+    display: block;
+    text-align: center !important;
+    margin-top: 10px;
+  }
+  
+  .pagination {
+    margin-bottom: 40px;
+  }
+}
+
+/* Dashboard specific body adjustments */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f5f5;
+  padding-bottom: 50px;
+}

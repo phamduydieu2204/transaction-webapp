@@ -1,0 +1,67 @@
+/* CSS Variables - Color scheme, spacing, fonts */
+:root {
+  /* Colors */
+  --primary-color: #007bff;
+  --primary-hover: #0056b3;
+  --success-color: #28a745;
+  --success-hover: #218838;
+  --danger-color: #dc3545;
+  --danger-hover: #c82333;
+  --warning-color: #ffc107;
+  --info-color: #17a2b8;
+  
+  /* Background colors */
+  --bg-gradient-start: #667eea;
+  --bg-gradient-end: #764ba2;
+  --bg-light: #f2f2f2;
+  --bg-white: #ffffff;
+  
+  /* Text colors */
+  --text-primary: #333;
+  --text-secondary: #666;
+  --text-muted: #999;
+  --text-white: #fff;
+  
+  /* Border colors */
+  --border-color: #ccc;
+  --border-light: #ddd;
+  --border-dark: #888;
+  
+  /* Shadows */
+  --shadow-sm: 0px 0px 6px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0px 0px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0px 0px 20px rgba(0, 0, 0, 0.2);
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 12px;
+  
+  /* Font sizes */
+  --font-xs: 12px;
+  --font-sm: 14px;
+  --font-base: 15px;
+  --font-md: 16px;
+  --font-lg: 18px;
+  --font-xl: 20px;
+  --font-2xl: 24px;
+  --font-3xl: 28px;
+  
+  /* Font families */
+  --font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-secondary: Arial, sans-serif;
+  
+  /* Z-index layers */
+  --z-base: 1;
+  --z-dropdown: 10;
+  --z-header: 20;
+  --z-modal: 100;
+  --z-overlay: 999;
+}

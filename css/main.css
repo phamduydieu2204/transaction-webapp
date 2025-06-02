@@ -1,0 +1,28 @@
+/* ========================================
+   MAIN CSS - IMPORTS ALL MODULES
+   ======================================== */
+
+/* Core styles */
+@import url('core/variables.css');
+@import url('core/reset.css');
+@import url('core/typography.css');
+
+/* Layout styles */
+@import url('layout/grid.css');
+@import url('layout/responsive.css');
+
+/* Component styles */
+@import url('components/buttons.css');
+@import url('components/forms.css');
+@import url('components/modals.css');
+@import url('components/tables.css');
+@import url('components/tabs.css');
+@import url('components/cards.css');
+@import url('components/charts.css');
+
+/* Page specific styles */
+@import url('pages/login.css');
+@import url('pages/dashboard.css');
+
+/* Utility classes */
+@import url('utilities/helpers.css');

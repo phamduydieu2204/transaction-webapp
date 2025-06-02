@@ -1,0 +1,151 @@
+/* ========================================
+   LOGIN PAGE STYLES
+   ======================================== */
+
+/* Login container */
+#loginContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+/* Login form */
+#loginForm {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 400px;
+  animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#loginForm h2 {
+  margin: 0 0 30px 0;
+  text-align: center;
+  color: #333;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+/* Login form inputs */
+#loginForm .form-group {
+  margin-bottom: 20px;
+}
+
+#loginForm label {
+  display: block;
+  margin-bottom: 8px;
+  color: #555;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+#loginForm input[type="text"],
+#loginForm input[type="password"] {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e1e4e8;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  background: #f6f8fa;
+}
+
+#loginForm input[type="text"]:focus,
+#loginForm input[type="password"]:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Login button */
+#loginForm button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#loginForm button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+}
+
+#loginForm button[type="submit"]:active {
+  transform: translateY(0);
+}
+
+/* Error messages */
+#loginForm .error-message {
+  background: #fee;
+  border: 1px solid #fcc;
+  color: #c33;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Remember me checkbox */
+#loginForm .remember-me {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+}
+
+#loginForm .remember-me input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+#loginForm .remember-me label {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+/* Responsive login */
+@media (max-width: 480px) {
+  #loginForm {
+    padding: 30px 20px;
+  }
+  
+  #loginForm h2 {
+    font-size: 24px;
+    margin-bottom: 25px;
+  }
+  
+  #loginForm input[type="text"],
+  #loginForm input[type="password"] {
+    padding: 10px 14px;
+    font-size: 15px;
+  }
+  
+  #loginForm button[type="submit"] {
+    padding: 10px;
+    font-size: 15px;
+  }
+}

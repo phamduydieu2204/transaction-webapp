@@ -1,0 +1,214 @@
+/* ========================================
+   CHART & VISUALIZATION STYLES
+   ======================================== */
+
+/* Chart containers */
+.chart-container {
+  position: relative;
+  height: 300px;
+  margin: 20px 0;
+}
+
+/* Trend chart styles */
+.trend-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  height: 120px;
+  padding: 0 20px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.trend-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  max-width: 60px;
+}
+
+.trend-bar .bar {
+  width: 40px;
+  background: #667eea;
+  border-radius: 4px 4px 0 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 4px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  min-height: 20px;
+  transition: all 0.3s ease;
+}
+
+.trend-bar:hover .bar {
+  background: #5a67d8;
+}
+
+.month-label {
+  font-size: 12px;
+  color: #718096;
+  margin-top: 8px;
+}
+
+/* Canvas styles for Chart.js */
+canvas {
+  max-width: 100%;
+  height: auto !important;
+}
+
+/* Chart legend customization */
+.chart-legend {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.chart-legend ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.chart-legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #4a5568;
+}
+
+.chart-legend .color-box {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+/* Chart tooltip styles */
+.chart-tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 1000;
+  white-space: nowrap;
+}
+
+.chart-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid rgba(0, 0, 0, 0.8);
+}
+
+/* Bar chart specific styles */
+.bar-chart-container {
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.bar-chart-container h4 {
+  margin: 0 0 20px 0;
+  color: #2d3748;
+  font-size: 18px;
+  text-align: center;
+}
+
+/* Pie chart specific styles */
+.pie-chart-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+}
+
+/* Line chart specific styles */
+.line-chart-container {
+  padding: 20px;
+  background: #f7fafc;
+  border-radius: 8px;
+}
+
+/* Chart loading state */
+.chart-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  color: #718096;
+  font-size: 16px;
+}
+
+.chart-loading::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Chart error state */
+.chart-error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  color: #e53e3e;
+  font-size: 16px;
+  background: #fff5f5;
+  border: 1px solid #feb2b2;
+  border-radius: 8px;
+}
+
+/* Responsive charts */
+@media (max-width: 768px) {
+  .chart-container {
+    height: 250px;
+  }
+  
+  .trend-chart {
+    height: 100px;
+    padding: 0 10px;
+  }
+  
+  .trend-bar .bar {
+    width: 30px;
+    font-size: 10px;
+  }
+  
+  .chart-legend {
+    font-size: 12px;
+  }
+  
+  .chart-legend .color-box {
+    width: 12px;
+    height: 12px;
+  }
+}
