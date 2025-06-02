@@ -5,224 +5,238 @@
  * Handles login/logout, session persistence, and user management
  */
 
-export const authManager = {
-    currentUser: null,
-    sessionTimeout: null,
+import { updateState, getState } from './stateManager.js';
+import { showTab } from './navigationManager.js';
+
+// Auth configuration
+const SESSION_TIMEOUT = 24 * 60 * 60 * 1000; // 24 hours
+const AUTH_STORAGE_KEY = 'authData';
+
+/**
+ * Initialize authentication
+ */
+export function initializeAuth() {
+    // Check for existing session
+    const savedAuth = loadAuthFromStorage();
+    if (savedAuth && isSessionValid(savedAuth)) {
+        restoreSession(savedAuth);
+    }
     
-    async login(email, password) {
-        try {
-            showProcessingModal('Đang đăng nhập...');
-            
-            const response = await fetch(`${PROXY_URL}/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password })
-            });
+    // Set up periodic session check
+    setInterval(checkSessionValidity, 60000); // Check every minute
+}
 
-            const result = await response.json();
-            closeProcessingModal();
-
-            if (result.success) {
-                this.currentUser = {
-                    email: email,
-                    sessionId: result.sessionId,
-                    loginTime: new Date().toISOString(),
-                    accountInfo: result.accountInfo
-                };
-                
-                this.saveSession();
-                this.startSessionTimeout();
-                
-                showResultModal(
-                    'Đăng nhập thành công!',
-                    `Chào mừng ${email}`,
-                    'success'
-                );
-                
-                return { success: true, user: this.currentUser };
-            } else {
-                showResultModal('Lỗi đăng nhập', result.message, 'error');
-                return { success: false, message: result.message };
-            }
-        } catch (error) {
-            closeProcessingModal();
-            console.error('Login error:', error);
-            showResultModal(
-                'Lỗi kết nối',
-                'Không thể kết nối đến server',
-                'error'
-            );
-            return { success: false, message: 'Lỗi kết nối' };
-        }
-    },
-
-    logout() {
-        try {
-            this.clearSession();
-            this.clearSessionTimeout();
-            this.currentUser = null;
-            
-            localStorage.removeItem('currentTransactions');
-            localStorage.removeItem('currentPage');
-            localStorage.removeItem('searchKeyword');
-            
-            window.location.href = 'index.html';
-        } catch (error) {
-            console.error('Logout error:', error);
-            window.location.href = 'index.html';
-        }
-    },
-
-    saveSession() {
-        if (this.currentUser) {
-            localStorage.setItem('userSession', JSON.stringify({
-                email: this.currentUser.email,
-                sessionId: this.currentUser.sessionId,
-                loginTime: this.currentUser.loginTime,
-                accountInfo: this.currentUser.accountInfo
-            }));
-        }
-    },
-
-    loadSession() {
-        try {
-            const savedSession = localStorage.getItem('userSession');
-            if (savedSession) {
-                const sessionData = JSON.parse(savedSession);
-                
-                if (this.isSessionValid(sessionData)) {
-                    this.currentUser = sessionData;
-                    this.startSessionTimeout();
-                    return true;
-                }
-            }
-        } catch (error) {
-            console.error('Error loading session:', error);
-        }
-        
-        this.clearSession();
+/**
+ * Handle user login
+ */
+export function login(userData) {
+    if (!userData || !userData.username) {
+        console.error('Invalid user data for login');
         return false;
-    },
+    }
+    
+    const authData = {
+        user: userData,
+        loginTime: Date.now(),
+        expiryTime: Date.now() + SESSION_TIMEOUT
+    };
+    
+    // Update state
+    updateState({ 
+        user: userData,
+        isAuthenticated: true 
+    });
+    
+    // Save to storage
+    saveAuthToStorage(authData);
+    
+    // Show main content
+    showTab('list');
+    
+    console.log('User logged in:', userData.username);
+    return true;
+}
 
-    clearSession() {
-        localStorage.removeItem('userSession');
-        this.currentUser = null;
-    },
+/**
+ * Handle user logout
+ */
+export function logout() {
+    // Clear state
+    updateState({ 
+        user: null,
+        isAuthenticated: false,
+        transactions: [],
+        expenses: [],
+        currentPage: 1
+    });
+    
+    // Clear storage
+    clearAuthFromStorage();
+    
+    // Show login tab
+    showTab('messages');
+    
+    // Clear any cached data
+    clearCache();
+    
+    console.log('User logged out');
+}
 
-    isSessionValid(sessionData) {
-        if (!sessionData || !sessionData.loginTime) {
-            return false;
-        }
+/**
+ * Check if user is authenticated
+ */
+export function isAuthenticated() {
+    const state = getState();
+    return state.isAuthenticated && state.user !== null;
+}
 
-        const loginTime = new Date(sessionData.loginTime);
-        const now = new Date();
-        const timeDiff = now - loginTime;
-        const maxSessionTime = 24 * 60 * 60 * 1000; // 24 hours
+/**
+ * Get current user
+ */
+export function getCurrentUser() {
+    const state = getState();
+    return state.user;
+}
 
-        return timeDiff < maxSessionTime;
-    },
-
-    startSessionTimeout() {
-        this.clearSessionTimeout();
-        
-        this.sessionTimeout = setTimeout(() => {
-            showResultModal(
-                'Phiên đăng nhập hết hạn',
-                'Vui lòng đăng nhập lại',
-                'warning'
-            );
-            
-            setTimeout(() => {
-                this.logout();
-            }, 3000);
-        }, 24 * 60 * 60 * 1000); // 24 hours
-    },
-
-    clearSessionTimeout() {
-        if (this.sessionTimeout) {
-            clearTimeout(this.sessionTimeout);
-            this.sessionTimeout = null;
-        }
-    },
-
-    async refreshSession() {
-        if (!this.currentUser) {
-            return false;
-        }
-
-        try {
-            const response = await fetch(`${PROXY_URL}/refresh`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email: this.currentUser.email,
-                    sessionId: this.currentUser.sessionId
-                })
-            });
-
-            const result = await response.json();
-            
-            if (result.success) {
-                this.currentUser.sessionId = result.sessionId;
-                this.currentUser.loginTime = new Date().toISOString();
-                this.saveSession();
-                this.startSessionTimeout();
-                return true;
-            }
-        } catch (error) {
-            console.error('Session refresh error:', error);
-        }
-        
-        return false;
-    },
-
-    requireAuth() {
-        if (!this.currentUser) {
-            showResultModal(
-                'Chưa đăng nhập',
-                'Vui lòng đăng nhập để tiếp tục',
-                'warning'
-            );
-            
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 2000);
-            
-            return false;
-        }
-        
-        return true;
-    },
-
-    getUserInfo() {
-        return this.currentUser;
-    },
-
-    updateAccountInfo(accountInfo) {
-        if (this.currentUser) {
-            this.currentUser.accountInfo = accountInfo;
-            this.saveSession();
+/**
+ * Check session validity
+ */
+function checkSessionValidity() {
+    const authData = loadAuthFromStorage();
+    
+    if (!authData || !isSessionValid(authData)) {
+        if (isAuthenticated()) {
+            console.warn('Session expired, logging out');
+            logout();
         }
     }
-};
+}
 
-// Make authManager globally available for backward compatibility
-window.authManager = authManager;
+/**
+ * Validate session data
+ */
+function isSessionValid(authData) {
+    if (!authData || !authData.expiryTime) {
+        return false;
+    }
+    
+    return Date.now() < authData.expiryTime;
+}
 
-// Export individual functions for convenience
-export const {
-    login,
-    logout,
-    saveSession,
-    loadSession,
-    clearSession,
-    isSessionValid,
-    requireAuth,
-    getUserInfo,
-    updateAccountInfo,
-    refreshSession
-} = authManager;
+/**
+ * Restore session from storage
+ */
+function restoreSession(authData) {
+    if (authData && authData.user) {
+        updateState({ 
+            user: authData.user,
+            isAuthenticated: true 
+        });
+        
+        console.log('Session restored for:', authData.user.username);
+    }
+}
+
+/**
+ * Save auth data to storage
+ */
+function saveAuthToStorage(authData) {
+    try {
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authData));
+    } catch (error) {
+        console.error('Failed to save auth data:', error);
+    }
+}
+
+/**
+ * Load auth data from storage
+ */
+function loadAuthFromStorage() {
+    try {
+        const data = localStorage.getItem(AUTH_STORAGE_KEY);
+        return data ? JSON.parse(data) : null;
+    } catch (error) {
+        console.error('Failed to load auth data:', error);
+        return null;
+    }
+}
+
+/**
+ * Clear auth data from storage
+ */
+function clearAuthFromStorage() {
+    try {
+        localStorage.removeItem(AUTH_STORAGE_KEY);
+    } catch (error) {
+        console.error('Failed to clear auth data:', error);
+    }
+}
+
+/**
+ * Clear cached data
+ */
+function clearCache() {
+    // Clear any other cached data
+    const keysToRemove = [
+        'cachedTransactions',
+        'cachedExpenses',
+        'lastSearch',
+        'filters'
+    ];
+    
+    keysToRemove.forEach(key => {
+        try {
+            localStorage.removeItem(key);
+        } catch (error) {
+            console.error(`Failed to remove ${key}:`, error);
+        }
+    });
+}
+
+/**
+ * Update session expiry
+ */
+export function extendSession() {
+    const authData = loadAuthFromStorage();
+    
+    if (authData && isSessionValid(authData)) {
+        authData.expiryTime = Date.now() + SESSION_TIMEOUT;
+        saveAuthToStorage(authData);
+    }
+}
+
+/**
+ * Handle session expiry warning
+ */
+export function checkSessionExpiry() {
+    const authData = loadAuthFromStorage();
+    
+    if (!authData || !authData.expiryTime) {
+        return;
+    }
+    
+    const timeRemaining = authData.expiryTime - Date.now();
+    const WARNING_TIME = 5 * 60 * 1000; // 5 minutes
+    
+    if (timeRemaining > 0 && timeRemaining < WARNING_TIME) {
+        showSessionExpiryWarning(timeRemaining);
+    }
+}
+
+/**
+ * Show session expiry warning
+ */
+function showSessionExpiryWarning(timeRemaining) {
+    const minutes = Math.floor(timeRemaining / 60000);
+    
+    if (window.confirm(`Phiên làm việc sẽ hết hạn trong ${minutes} phút. Bạn có muốn gia hạn không?`)) {
+        extendSession();
+    }
+}
+
+// Make functions available globally for backward compatibility
+window.login = login;
+window.logout = logout;
+window.isAuthenticated = isAuthenticated;
+window.getCurrentUser = getCurrentUser;
+window.extendSession = extendSession;
