@@ -1,8 +1,8 @@
 /**
  * dataUtilities.js
  * 
- * Data normalization, filtering, and sorting utilities
- * Core data processing functions for statistics
+ * Data utilities for statistics
+ * Handles date normalization, data filtering, and sorting operations
  */
 
 /**
@@ -268,3 +268,10 @@ export function groupRevenueByMonth(data, options = {}) {
   console.log("✅ Revenue grouping completed:", summaryArray.length, "entries");
   return summaryArray;
 }
+
+// Make functions available globally for backward compatibility
+window.normalizeDate = normalizeDate;
+window.groupTransactionsByTenChuan = groupTransactionsByTenChuan;
+window.groupExpensesByTenChuan = groupExpensesByTenChuan;
+window.groupExpensesByMonth = groupExpensesByMonth;
+window.groupRevenueByMonth = groupRevenueByMonth;
