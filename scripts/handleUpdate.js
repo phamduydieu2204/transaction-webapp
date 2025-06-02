@@ -44,6 +44,48 @@ export async function handleUpdate(
     return;
   }
 
+  // Kiểm tra các trường bắt buộc
+  const requiredFields = {
+    customerEmail: "Email khách hàng",
+    customerName: "Tên khách hàng", 
+    customerPhone: "Liên hệ",
+    transactionDate: "Ngày giao dịch",
+    transactionType: "Loại giao dịch",
+    duration: "Số tháng đăng ký",
+    startDate: "Ngày bắt đầu",
+    softwareName: "Tên phần mềm",
+    softwarePackage: "Gói phần mềm",
+    accountName: "Tên tài khoản",
+    revenue: "Doanh thu"
+  };
+
+  for (const [fieldId, fieldName] of Object.entries(requiredFields)) {
+    const element = document.getElementById(fieldId);
+    if (!element) {
+      console.error(`Không tìm thấy element với id: ${fieldId}`);
+      continue;
+    }
+    
+    const value = element.value;
+    
+    // Kiểm tra đặc biệt cho các trường số
+    if (fieldId === 'revenue' || fieldId === 'duration') {
+      const numValue = parseFloat(value);
+      if (isNaN(numValue) || numValue <= 0) {
+        showResultModal("Thiếu dữ liệu bắt buộc, vui lòng kiểm tra lại", false);
+        element.focus();
+        return;
+      }
+    } else {
+      // Kiểm tra các trường text/select
+      if (!value || value.trim() === "" || value === "0") {
+        showResultModal("Thiếu dữ liệu bắt buộc, vui lòng kiểm tra lại", false);
+        element.focus();
+        return;
+      }
+    }
+  }
+
   const softwareNameElement = document.getElementById("softwareName");
   const softwarePackageElement = document.getElementById("softwarePackage");
   const accountNameElement = document.getElementById("accountName");

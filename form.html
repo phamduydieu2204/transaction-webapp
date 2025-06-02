@@ -3,7 +3,7 @@
       <div>
         <label>Ngày giao dịch:</label>
         <div class="date-input-container">
-          <input type="text" id="transactionDate" placeholder="yyyy/mm/dd">
+          <input type="text" id="transactionDate" placeholder="yyyy/mm/dd" required>
           <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('transactionDate')"></i>
         </div>
       </div>
@@ -21,32 +21,32 @@
 
       <div>
         <label>Email:</label>
-        <input type="email" id="customerEmail">
+        <input type="email" id="customerEmail" required>
       </div>
 
       <div>
         <label>Tên khách hàng:</label>
         <div class="search-icon-container">
-          <input type="text" id="customerName">
+          <input type="text" id="customerName" required>
           <i class="fas fa-search search-icon" onclick="updateCustomerInfo()"></i>
         </div>
       </div>
 
       <div>
         <label>Liên hệ:</label>
-        <input type="text" id="customerPhone">
+        <input type="text" id="customerPhone" required>
       </div>
 
       <!-- Dòng 2 -->
       <div>
         <label>Số tháng đăng ký:</label>
-        <input type="number" id="duration">
+        <input type="number" id="duration" required>
       </div>
 
       <div>
         <label>Ngày bắt đầu:</label>
         <div class="date-input-container">
-          <input type="text" id="startDate" placeholder="yyyy/mm/dd">
+          <input type="text" id="startDate" placeholder="yyyy/mm/dd" required>
           <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('startDate')"></i>
         </div>
       </div>
@@ -72,28 +72,28 @@
       <!-- Dòng 3 -->
       <div>
         <label>Tên phần mềm:</label>
-        <select id="softwareName">
+        <select id="softwareName" required>
           <option value="">-- Chọn phần mềm --</option>
         </select>
       </div>
 
       <div>
         <label>Gói phần mềm:</label>
-        <select id="softwarePackage">
+        <select id="softwarePackage" required>
           <option value="">-- Chọn gói --</option>
         </select>
       </div>
 
       <div>
         <label>Tên tài khoản:</label>
-        <select id="accountName">
+        <select id="accountName" required>
           <option value="">-- Chọn tài khoản --</option>
         </select>
       </div>
 
       <div>
         <label>Doanh thu:</label>
-        <input type="number" id="revenue">
+        <input type="number" id="revenue" required>
       </div>
 
       <!-- Dòng 4: Các nút -->

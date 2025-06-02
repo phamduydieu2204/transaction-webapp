@@ -45,6 +45,10 @@ export async function handleReset(fetchSoftwareList, showProcessingModal, showRe
 
   try {
     await fetchSoftwareList(null, window.softwareData, updatePackageList, updateAccountList);
+    // Cập nhật lại danh sách giao dịch
+    if (window.loadTransactions) {
+      await window.loadTransactions();
+    }
     showResultModal("Dữ liệu đã được làm mới!", true);
   } catch (err) {
     showResultModal(`Lỗi khi làm mới dữ liệu: ${err.message}`, false);

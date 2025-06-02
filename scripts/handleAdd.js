@@ -20,6 +20,8 @@ const today = new Date();
 const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
 
 export async function handleAdd(userInfo, currentEditTransactionId, loadTransactions, handleReset, updatePackageList, showProcessingModal, showResultModal) {
+  console.log("🔍 handleAdd được gọi");
+  
   // Nếu đang trong tiến trình sửa thì mở modal xác nhận
   if (window.currentEditTransactionId !== null) {
     console.log("Đang trong tiến trình sửa, mở modal lựa chọn thêm/cập nhật...");
@@ -27,13 +29,56 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
     return;
   }
   
-  showProcessingModal("Đang thêm giao dịch...");
   const { BACKEND_URL } = getConstants();
 
   if (!userInfo) {
     showResultModal("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.", false);
     return;
   }
+
+  // Kiểm tra các trường bắt buộc
+  const requiredFields = {
+    customerEmail: "Email khách hàng",
+    customerName: "Tên khách hàng", 
+    customerPhone: "Liên hệ",
+    transactionDate: "Ngày giao dịch",
+    transactionType: "Loại giao dịch",
+    duration: "Số tháng đăng ký",
+    startDate: "Ngày bắt đầu",
+    softwareName: "Tên phần mềm",
+    softwarePackage: "Gói phần mềm",
+    accountName: "Tên tài khoản",
+    revenue: "Doanh thu"
+  };
+
+  for (const [fieldId, fieldName] of Object.entries(requiredFields)) {
+    const element = document.getElementById(fieldId);
+    if (!element) {
+      console.error(`Không tìm thấy element với id: ${fieldId}`);
+      continue;
+    }
+    
+    const value = element.value;
+    
+    // Kiểm tra đặc biệt cho các trường số
+    if (fieldId === 'revenue' || fieldId === 'duration') {
+      const numValue = parseFloat(value);
+      if (isNaN(numValue) || numValue <= 0) {
+        showResultModal("Thiếu dữ liệu bắt buộc, vui lòng kiểm tra lại", false);
+        element.focus();
+        return;
+      }
+    } else {
+      // Kiểm tra các trường text/select
+      if (!value || value.trim() === "" || value === "0") {
+        showResultModal("Thiếu dữ liệu bắt buộc, vui lòng kiểm tra lại", false);
+        element.focus();
+        return;
+      }
+    }
+  }
+
+  showProcessingModal("Đang thêm giao dịch...");
 
   const transactionType = document.getElementById("transactionType").value;
   let note = document.getElementById("note").value;
@@ -45,7 +90,7 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
   const data = {
     action: "addTransaction",
     transactionType: transactionType,
-    transactionDate: todayFormatted,
+    transactionDate: document.getElementById("transactionDate").value || todayFormatted,
     customerName: document.getElementById("customerName").value,
     customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
     customerPhone: document.getElementById("customerPhone").value,
@@ -76,7 +121,13 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
 
     const result = await response.json();
     if (result.status === "success") {
-      await handleReset(fetchSoftwareList, showProcessingModal, showResultModal, todayFormatted, updatePackageList, updateAccountList);
+      // Reset form về giá trị mặc định
+      document.getElementById("transactionForm").reset();
+      // Reset các dropdown
+      document.getElementById("softwareName").value = "";
+      document.getElementById("softwarePackage").innerHTML = '<option value="">-- Chọn gói --</option>';
+      document.getElementById("accountName").innerHTML = '<option value="">-- Chọn tài khoản --</option>';
+      // Cập nhật lại danh sách giao dịch
       await loadTransactions(userInfo, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction);
       window.loadTransactions();
       showResultModal("Giao dịch đã được lưu!", true);
