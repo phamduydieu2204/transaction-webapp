@@ -1,30 +1,53 @@
 /**
  * statisticsUIController.js
  * 
- * Controls UI interactions and state management for statistics tab
- * Handles tab switching, filters, date ranges, and user interactions
+ * Orchestrator module for statistics UI controller
+ * Coordinates between specialized UI modules
  */
 
-import { getCombinedStatistics, exportData, fetchExpenseData } from './statisticsDataManager.js';
-import { 
-  groupExpensesByMonth, 
-  groupRevenueByMonth, 
-  calculateFinancialAnalysis,
-  calculateTotalExpenses,
-  calculateTotalRevenue,
-  getDateRange,
-  normalizeDate 
-} from './statisticsCore.js';
-import { 
-  renderMonthlySummaryTable, 
-  renderFinancialOverview, 
-  renderSimpleChart,
-  renderExportControls,
-  renderLoadingState,
-  renderErrorState 
-} from './statisticsRenderer.js';
-import { renderFinancialDashboard, addFinancialDashboardStyles } from './financialDashboard.js';
-import { renderBusinessOverviewDashboard, addBusinessDashboardStyles } from './businessOverviewDashboard.js';
+console.log('📦 statisticsUIController.js orchestrator loading...');
+
+// Import specialized UI modules
+import {
+  setupTabListeners,
+  setupFilterControls,
+  setupDateRangeControls,
+  setupExportControls,
+  handleStatisticsTabActivation
+} from './ui-statistics/uiHandlers.js';
+
+import {
+  loadStatisticsData,
+  processDataForUI,
+  prepareCombinedExportData,
+  forceRefreshData,
+  filterDataByGlobalFilters
+} from './ui-statistics/dataProcessors.js';
+
+import {
+  renderEnhancedStatistics,
+  renderOverviewTab,
+  renderExpensesTab,
+  renderRevenueTab,
+  renderDefaultTab
+} from './ui-statistics/chartRenderers.js';
+
+import {
+  showSuccessMessage,
+  showErrorMessage,
+  loadingManager
+} from './ui-statistics/displayManagers.js';
+
+import {
+  viewController,
+  layoutManager,
+  initializeViewControllers
+} from './ui-statistics/viewControllers.js';
+
+// Legacy imports for backward compatibility
+import { exportData } from './statisticsDataManager.js';
+import { addFinancialDashboardStyles } from './financialDashboard.js';
+import { addBusinessDashboardStyles } from './businessOverviewDashboard.js';
 
 /**
  * UI state management
@@ -40,11 +63,14 @@ const uiState = {
   lastError: null
 };
 
+// Make uiState available globally for modules
+window.uiState = uiState;
+
 /**
- * Initializes the statistics UI controller
+ * Initializes the statistics UI controller using modular components
  */
 export function initializeStatisticsUI() {
-  console.log("🎮 Initializing statistics UI controller");
+  console.log("🎮 Initializing statistics UI controller orchestrator");
   
   // Set flag to indicate UI controller is active
   window.statisticsUIControllerActive = true;
@@ -53,10 +79,14 @@ export function initializeStatisticsUI() {
   addFinancialDashboardStyles();
   addBusinessDashboardStyles();
   
+  // Initialize view controllers
+  initializeViewControllers();
+  
+  // Setup UI handlers with callbacks
   setupTabListeners();
-  setupFilterControls();
-  setupDateRangeControls();
-  setupExportControls();
+  setupFilterControls(uiState, refreshStatistics);
+  setupDateRangeControls(uiState, refreshStatistics);
+  setupExportControls(handleDataExport);
   
   // Initialize report menu controller
   import('./reportMenuController.js').then(module => {
@@ -68,230 +98,30 @@ export function initializeStatisticsUI() {
     console.warn("⚠️ Could not load report menu controller:", error);
   });
   
-  // Load initial data
-  loadStatisticsData();
+  // Load initial data using modular data processor
+  loadStatisticsData(uiState).then(() => {
+    refreshStatistics();
+  }).catch(error => {
+    console.error("❌ Failed to load initial data:", error);
+    showErrorMessage("Không thể tải dữ liệu thống kê");
+  });
   
   // Expose refresh function for global filters
   window.refreshStatisticsWithFilters = refreshStatisticsWithFilters;
   
-  console.log("✅ Statistics UI controller initialized");
+  console.log("✅ Statistics UI controller orchestrator initialized");
 }
 
 /**
- * Sets up tab switching listeners
- */
-function setupTabListeners() {
-  // Main tab switching (between nhập giao dịch, chi phí, thống kê)
-  const mainTabButtons = document.querySelectorAll('.tab-button');
-  mainTabButtons.forEach(button => {
-    button.addEventListener('click', (e) => {
-      const tabId = e.target.dataset.tab;
-      if (tabId === 'tab-thong-ke') {
-        handleStatisticsTabActivation();
-      }
-    });
-  });
-
-  // Sub-tabs within statistics (if any)
-  const statsSubTabs = document.querySelectorAll('.stats-sub-tab');
-  statsSubTabs.forEach(button => {
-    button.addEventListener('click', (e) => {
-      const subTab = e.target.dataset.subtab;
-      handleSubTabSwitch(subTab);
-    });
-  });
-}
-
-/**
- * Sets up filter control listeners
- */
-function setupFilterControls() {
-  // Currency filter
-  const currencySelect = document.getElementById('statsCurrencyFilter');
-  if (currencySelect) {
-    currencySelect.addEventListener('change', (e) => {
-      uiState.currency = e.target.value;
-      refreshStatistics();
-    });
-  }
-
-  // Sort controls
-  const sortBySelect = document.getElementById('statsSortBy');
-  if (sortBySelect) {
-    sortBySelect.addEventListener('change', (e) => {
-      uiState.sortBy = e.target.value;
-      refreshStatistics();
-    });
-  }
-
-  const sortOrderSelect = document.getElementById('statsSortOrder');
-  if (sortOrderSelect) {
-    sortOrderSelect.addEventListener('change', (e) => {
-      uiState.sortOrder = e.target.value;
-      refreshStatistics();
-    });
-  }
-
-  // Growth rate toggle
-  const growthToggle = document.getElementById('statsGrowthToggle');
-  if (growthToggle) {
-    growthToggle.addEventListener('change', (e) => {
-      uiState.showGrowthRate = e.target.checked;
-      refreshStatistics();
-    });
-  }
-}
-
-/**
- * Sets up date range control listeners
- */
-function setupDateRangeControls() {
-  // Quick date range buttons
-  const dateRangeButtons = document.querySelectorAll('.date-range-btn');
-  dateRangeButtons.forEach(button => {
-    button.addEventListener('click', (e) => {
-      const range = e.target.dataset.range;
-      handleDateRangeChange(range);
-      
-      // Update active button
-      dateRangeButtons.forEach(btn => btn.classList.remove('active'));
-      e.target.classList.add('active');
-    });
-  });
-
-  // Custom date range inputs
-  const startDateInput = document.getElementById('statsStartDate');
-  const endDateInput = document.getElementById('statsEndDate');
-  
-  if (startDateInput && endDateInput) {
-    const handleCustomDateChange = () => {
-      const startDate = startDateInput.value;
-      const endDate = endDateInput.value;
-      
-      if (startDate && endDate) {
-        uiState.dateRange = { start: startDate, end: endDate };
-        refreshStatistics();
-      }
-    };
-
-    startDateInput.addEventListener('change', handleCustomDateChange);
-    endDateInput.addEventListener('change', handleCustomDateChange);
-  }
-}
-
-/**
- * Sets up export control listeners
- */
-function setupExportControls() {
-  renderExportControls({
-    containerId: "statisticsExportControls",
-    formats: ["csv", "json"],
-    onExport: handleDataExport
-  });
-}
-
-/**
- * Handles main statistics tab activation
- */
-function handleStatisticsTabActivation() {
-  console.log("📊 Statistics tab activated");
-  
-  // ✅ DEBUG: Check initial state
-  const currentTab = document.querySelector(".tab-button.active");
-  const tabContent = document.getElementById("tab-thong-ke");
-  const tabContentStyle = tabContent ? window.getComputedStyle(tabContent) : null;
-  
-  console.log("🔍 DEBUG handleStatisticsTabActivation initial state:", {
-    currentTab: currentTab ? currentTab.dataset.tab : "null",
-    tabContent: tabContent ? "found" : "null",
-    tabDisplay: tabContentStyle ? tabContentStyle.display : "unknown",
-    windowExpenseList: window.expenseList ? window.expenseList.length : "null"
-  });
-  
-  // Wait for tab to be fully displayed before rendering
-  setTimeout(() => {
-    // ✅ DEBUG: Check state after timeout
-    const currentTabAfter = document.querySelector(".tab-button.active");
-    const tabContentAfter = document.getElementById("tab-thong-ke");
-    const tabContentStyleAfter = tabContentAfter ? window.getComputedStyle(tabContentAfter) : null;
-    
-    console.log("🔍 DEBUG handleStatisticsTabActivation after timeout:", {
-      currentTab: currentTabAfter ? currentTabAfter.dataset.tab : "null",
-      tabContent: tabContentAfter ? "found" : "null",
-      tabDisplay: tabContentStyleAfter ? tabContentStyleAfter.display : "unknown",
-      tableExists: document.querySelector("#monthlySummaryTable") ? "found" : "null",
-      tbodyExists: document.querySelector("#monthlySummaryTable tbody") ? "found" : "null"
-    });
-    
-    // Check if we need to refresh data
-    if (!window.expenseList || window.expenseList.length === 0) {
-      console.log("🔄 Loading statistics data (no existing data)");
-      loadStatisticsData();
-    } else {
-      console.log("🔄 Refreshing statistics (using existing data)");
-      refreshStatistics();
-    }
-    
-    // Render any pending data that was stored
-    if (window.pendingStatsData && window.pendingStatsOptions) {
-      console.log("📊 Rendering pending statistics data...");
-      renderMonthlySummaryTable(window.pendingStatsData, window.pendingStatsOptions);
-      window.pendingStatsData = null;
-      window.pendingStatsOptions = null;
-    }
-  }, 200); // Increased delay to ensure tab is visible
-}
-
-/**
- * Handles sub-tab switching within statistics
- * @param {string} subTab - Sub-tab identifier
- */
-function handleSubTabSwitch(subTab) {
-  console.log("🔄 Switching to sub-tab:", subTab);
-  
-  uiState.currentTab = subTab;
-  
-  // Hide all sub-tab content
-  const subTabContents = document.querySelectorAll('.stats-sub-content');
-  subTabContents.forEach(content => content.style.display = 'none');
-  
-  // Show selected sub-tab content
-  const selectedContent = document.getElementById(`stats-${subTab}`);
-  if (selectedContent) {
-    selectedContent.style.display = 'block';
-  }
-  
-  // Update active sub-tab button
-  const subTabButtons = document.querySelectorAll('.stats-sub-tab');
-  subTabButtons.forEach(btn => btn.classList.remove('active'));
-  
-  const activeButton = document.querySelector(`[data-subtab="${subTab}"]`);
-  if (activeButton) {
-    activeButton.classList.add('active');
-  }
-  
-  refreshStatistics();
-}
-
-/**
- * Handles date range changes
- * @param {string} range - Date range type
- */
-function handleDateRangeChange(range) {
-  console.log("📅 Date range changed to:", range);
-  
-  uiState.dateRange = range;
-  refreshStatistics();
-}
-
-/**
- * Handles data export
+ * Handles data export using modular data processor
  * @param {string} format - Export format
  */
 async function handleDataExport(format) {
   console.log("📤 Exporting data in format:", format);
   
   try {
+    // Use modular data processor for export preparation
+    const { getCombinedStatistics } = await import('./statisticsDataManager.js');
     const data = await getCombinedStatistics();
     
     let exportData = [];
@@ -307,8 +137,8 @@ async function handleDataExport(format) {
         filename = "revenue_statistics";
         break;
       default:
-        // Export combined summary
-        exportData = prepareCombinedExportData(data);
+        // Export combined summary using modular function
+        exportData = prepareCombinedExportData(data, uiState);
         filename = "combined_statistics";
     }
     
@@ -321,156 +151,19 @@ async function handleDataExport(format) {
   }
 }
 
-/**
- * Prepares combined data for export
- * @param {Object} data - Combined statistics data
- * @returns {Array} - Formatted export data
- */
-function prepareCombinedExportData(data) {
-  const combined = [];
-  
-  // Add expense summary
-  const expenseSummary = groupExpensesByMonth(data.expenses, {
-    currency: uiState.currency,
-    sortBy: uiState.sortBy,
-    sortOrder: uiState.sortOrder
-  });
-  
-  expenseSummary.forEach(item => {
-    combined.push({
-      type: "Expense",
-      month: item.month,
-      category: item.type,
-      amount: item.amount,
-      currency: uiState.currency
-    });
-  });
-  
-  // Add revenue summary
-  const revenueSummary = groupRevenueByMonth(data.transactions, {
-    currency: uiState.currency,
-    sortBy: uiState.sortBy,
-    sortOrder: uiState.sortOrder
-  });
-  
-  revenueSummary.forEach(item => {
-    combined.push({
-      type: "Revenue",
-      month: item.month,
-      category: item.software,
-      amount: item.amount,
-      currency: uiState.currency
-    });
-  });
-  
-  return combined;
-}
+// Make handleDataExport available globally for modules
+window.handleDataExport = handleDataExport;
 
 /**
- * Loads initial statistics data
- */
-async function loadStatisticsData() {
-  if (uiState.isLoading) return;
-  
-  uiState.isLoading = true;
-  uiState.lastError = null;
-  
-  // Show loading state
-  renderLoadingState("monthlySummaryTable");
-  
-  try {
-    console.log("🔄 Loading statistics data...");
-    
-    // Get expense data and create combined data structure
-    const expenseData = await fetchExpenseData({ forceRefresh: false });
-    
-    // For now, use existing transaction data from window.transactionList
-    // TODO: Implement proper transaction API when ready
-    const transactionData = window.transactionList || [];
-    
-    const data = {
-      expenses: expenseData,
-      transactions: transactionData,
-      timestamp: Date.now()
-    };
-    
-    console.log("📊 Combined data prepared:", {
-      expenses: data.expenses.length,
-      transactions: data.transactions.length
-    });
-    
-    // Store in global variables for compatibility
-    window.expenseList = data.expenses;
-    window.transactionList = data.transactions;
-    
-    console.log("🎯 About to call refreshStatistics from loadStatisticsData");
-    await refreshStatistics();
-    
-    // ✅ DEBUG: Check data loading completion
-    const dataLoadState = {
-      expenseCount: data.expenses ? data.expenses.length : 0,
-      transactionCount: data.transactions ? data.transactions.length : 0,
-      windowExpenseList: window.expenseList ? window.expenseList.length : 0,
-      windowTransactionList: window.transactionList ? window.transactionList.length : 0,
-      isLoadingFlag: uiState.isLoading
-    };
-    
-    console.log("🔍 DEBUG data loading state:", dataLoadState);
-    
-    console.log("✅ Statistics data loaded successfully");
-    
-  } catch (error) {
-    console.error("❌ Failed to load statistics data:", error);
-    uiState.lastError = error.message;
-    renderErrorState("monthlySummaryTable", error.message);
-    showErrorMessage("Không thể tải dữ liệu thống kê");
-  } finally {
-    uiState.isLoading = false;
-    
-    // ✅ DEBUG: Ensure any processing modals are closed
-    if (typeof window.closeProcessingModal === 'function') {
-      console.log("🚫 Force closing any processing modals");
-      window.closeProcessingModal();
-    }
-    
-    // Check for any modal elements that might be stuck
-    const modalElements = [
-      document.querySelector('#processingModal'),
-      document.querySelector('.modal'),
-      document.querySelector('[class*="modal"]'),
-      document.querySelector('#loading-modal')
-    ].filter(el => el !== null);
-    
-    console.log("🔍 DEBUG modal elements:", {
-      foundModals: modalElements.length,
-      modals: modalElements.map(el => ({
-        id: el.id,
-        className: el.className,
-        display: window.getComputedStyle(el).display,
-        visibility: window.getComputedStyle(el).visibility
-      }))
-    });
-    
-    // Force hide any visible modals
-    modalElements.forEach(el => {
-      if (window.getComputedStyle(el).display !== 'none') {
-        console.log(`🚫 Force hiding modal:`, el.id || el.className);
-        el.style.display = 'none';
-      }
-    });
-  }
-}
-
-/**
- * Refreshes statistics display
+ * Refreshes statistics display using modular components
  */
 async function refreshStatistics() {
   if (uiState.isLoading) return;
   
   try {
-    console.log("🔄 Refreshing statistics display...");
+    console.log("🔄 Refreshing statistics display using orchestrator...");
     
-    // ✅ DEBUG: Check if we're in statistics tab
+    // Check if we're in statistics tab
     const currentTab = document.querySelector(".tab-button.active");
     const isThongKeTab = currentTab && currentTab.dataset.tab === "tab-thong-ke";
     
@@ -488,274 +181,33 @@ async function refreshStatistics() {
     const expenseData = window.expenseList || [];
     const transactionData = window.transactionList || [];
     
-    // Calculate date range - sử dụng globalFilters nếu có
-    let dateRangeFilter = null;
-    if (window.globalFilters && window.globalFilters.dateRange) {
-      dateRangeFilter = window.globalFilters.dateRange;
-    } else if (typeof uiState.dateRange === 'string') {
-      dateRangeFilter = getDateRange(uiState.dateRange);
-    } else if (uiState.dateRange && uiState.dateRange.start && uiState.dateRange.end) {
-      dateRangeFilter = uiState.dateRange;
-    }
+    // Process data using modular processor
+    const processedData = processDataForUI(expenseData, transactionData, uiState);
     
-    // Calculate totals
-    const expenseTotals = calculateTotalExpenses(expenseData, {
-      currency: uiState.currency,
-      dateRange: dateRangeFilter
-    });
-    
-    const revenueTotals = calculateTotalRevenue(transactionData, {
-      currency: uiState.currency,
-      dateRange: dateRangeFilter
-    });
-    
-    // Calculate financial analysis
-    const financialAnalysis = calculateFinancialAnalysis(revenueTotals, expenseTotals);
-    
-    // Render based on current tab with enhanced features
-    console.log("🎯 About to call renderEnhancedStatistics with data:", {
+    console.log("🎯 About to call renderEnhancedStatistics with processed data:", {
       expenseCount: expenseData.length,
       transactionCount: transactionData.length,
-      hasFinancialAnalysis: !!financialAnalysis
+      hasFinancialAnalysis: !!processedData.financialAnalysis
     });
     
-    await renderEnhancedStatistics(expenseData, transactionData, financialAnalysis);
+    // Render using modular chart renderer
+    await renderEnhancedStatistics(
+      processedData.expenseData, 
+      processedData.transactionData, 
+      processedData.financialAnalysis,
+      window.globalFilters
+    );
     
-    // ✅ DEBUG: Check final UI state and loading indicators
-    const finalUIState = {
-      isLoading: uiState.isLoading,
-      lastError: uiState.lastError,
-      tabVisible: document.getElementById("tab-thong-ke") ? 
-        window.getComputedStyle(document.getElementById("tab-thong-ke")).display : "unknown",
-      tableVisible: document.querySelector("#monthlySummaryTable tbody") ? "found" : "null",
-      loadingElements: document.querySelectorAll('[class*="loading"], [class*="spinner"]').length
-    };
-    
-    console.log("🔍 DEBUG final UI state:", finalUIState);
-    
-    // Ensure loading state is cleared
+    // Clear loading state
     uiState.isLoading = false;
     uiState.lastError = null;
     
-    console.log("✅ Statistics refreshed successfully");
+    console.log("✅ Statistics refreshed successfully using orchestrator");
     
   } catch (error) {
     console.error("❌ Failed to refresh statistics:", error);
     showErrorMessage("Có lỗi xảy ra khi cập nhật thống kê");
   }
-}
-
-/**
- * Renders overview tab content
- */
-async function renderOverviewTab(expenseData, transactionData, financialAnalysis) {
-  // Render financial overview
-  renderFinancialOverview(financialAnalysis, {
-    containerId: "financialOverview",
-    showDetails: true
-  });
-  
-  // Render summary chart
-  const chartData = groupExpensesByMonth(expenseData, {
-    currency: uiState.currency,
-    sortBy: "month",
-    sortOrder: "desc"
-  }).slice(0, 12); // Last 12 months
-  
-  renderSimpleChart(chartData, {
-    containerId: "overviewChart",
-    chartType: "bar",
-    title: "Chi Phí Theo Tháng",
-    xLabel: "Tháng",
-    yLabel: "Số Tiền (VND)"
-  });
-}
-
-/**
- * Renders expenses tab content
- */
-async function renderExpensesTab(expenseData) {
-  const summaryData = groupExpensesByMonth(expenseData, {
-    currency: uiState.currency,
-    sortBy: uiState.sortBy,
-    sortOrder: uiState.sortOrder
-  });
-  
-  renderMonthlySummaryTable(summaryData, {
-    tableId: "monthlySummaryTable",
-    showGrowthRate: uiState.showGrowthRate
-  });
-}
-
-/**
- * Renders revenue tab content
- */
-async function renderRevenueTab(transactionData) {
-  const summaryData = groupRevenueByMonth(transactionData, {
-    currency: uiState.currency,
-    sortBy: uiState.sortBy,
-    sortOrder: uiState.sortOrder
-  });
-  
-  // Convert to expense table format for compatibility
-  const expenseFormatData = summaryData.map(item => ({
-    month: item.month,
-    type: item.software,
-    amount: item.amount
-  }));
-  
-  renderMonthlySummaryTable(expenseFormatData, {
-    tableId: "monthlySummaryTable",
-    showGrowthRate: uiState.showGrowthRate
-  });
-}
-
-/**
- * Renders enhanced statistics with all features
- */
-async function renderEnhancedStatistics(expenseData, transactionData, financialAnalysis, globalFilters = null) {
-  try {
-    console.log("🎨 Rendering Business Overview Dashboard...");
-    
-    // Use saved filters if no filters provided
-    if (!globalFilters && window.globalFilters) {
-      globalFilters = window.globalFilters;
-    }
-    
-    // Prepare date range for business dashboard
-    let dateRange = null;
-    if (globalFilters && globalFilters.dateRange) {
-      dateRange = {
-        start: globalFilters.dateRange.start,
-        end: globalFilters.dateRange.end
-      };
-    }
-    
-    // 1. Render NEW Business Overview Dashboard
-    renderBusinessOverviewDashboard(transactionData, expenseData, {
-      containerId: "financialDashboard",
-      dateRange: dateRange
-    });
-    
-    // Refresh report menu components if active
-    if (window.refreshCurrentReport && document.querySelector('.report-page.active')) {
-      window.refreshCurrentReport();
-    }
-    console.log("✅ Business Overview Dashboard rendered");
-    
-    // 2. Render Export Controls
-    renderExportControls({
-      containerId: "statisticsExportControls",
-      formats: ["csv", "json"],
-      onExport: handleDataExport
-    });
-    console.log("✅ Export controls rendered");
-    
-    // 3. Render Monthly Summary Table với filtered data
-    let filteredExpenseData = expenseData;
-    if (globalFilters && globalFilters.dateRange) {
-      // Import filter function from financialDashboard.js
-      const { filterDataByDateRange } = await import('./financialDashboard.js');
-      filteredExpenseData = filterDataByDateRange(expenseData, globalFilters.dateRange);
-    }
-    
-    const summaryData = groupExpensesByMonth(filteredExpenseData, {
-      currency: uiState.currency,
-      sortBy: uiState.sortBy,
-      sortOrder: uiState.sortOrder
-    });
-    
-    renderMonthlySummaryTable(summaryData, {
-      tableId: "monthlySummaryTable",
-      showGrowthRate: false
-    });
-    console.log("✅ Monthly summary table rendered");
-    
-    console.log("🎉 Business Overview Dashboard complete!");
-    
-  } catch (error) {
-    console.error("❌ Error rendering business overview:", error);
-    // Fallback to old financial dashboard
-    try {
-      renderFinancialDashboard(transactionData, expenseData, {
-        containerId: "financialDashboard",
-        globalFilters: globalFilters
-      });
-      console.log("✅ Fallback to old financial dashboard");
-    } catch (fallbackError) {
-      console.error("❌ Fallback failed:", fallbackError);
-      await renderDefaultTab(expenseData, financialAnalysis);
-    }
-  }
-}
-
-/**
- * Renders default tab content (backward compatibility)
- */
-async function renderDefaultTab(expenseData, financialAnalysis) {
-  try {
-    const summaryData = groupExpensesByMonth(expenseData, {
-      currency: uiState.currency,
-      sortBy: uiState.sortBy,
-      sortOrder: uiState.sortOrder
-    });
-    
-    renderMonthlySummaryTable(summaryData, {
-      tableId: "monthlySummaryTable",
-      showGrowthRate: false
-    });
-  } catch (error) {
-    console.error("❌ Error rendering default tab:", error);
-    // Fallback - just show basic message
-    const table = document.querySelector("#monthlySummaryTable tbody");
-    if (table) {
-      table.innerHTML = `
-        <tr>
-          <td colspan="3" style="text-align: center; color: #666;">
-            Đang cập nhật dữ liệu thống kê...
-          </td>
-        </tr>
-      `;
-    }
-  }
-}
-
-/**
- * Shows success message to user
- * @param {string} message - Success message
- */
-function showSuccessMessage(message) {
-  const notification = document.getElementById('notification');
-  if (notification) {
-    notification.textContent = message;
-    notification.className = 'success';
-    notification.style.display = 'block';
-    
-    setTimeout(() => {
-      notification.style.display = 'none';
-    }, 3000);
-  }
-  
-  console.log("✅ Success:", message);
-}
-
-/**
- * Shows error message to user
- * @param {string} message - Error message
- */
-function showErrorMessage(message) {
-  const notification = document.getElementById('notification');
-  if (notification) {
-    notification.textContent = message;
-    notification.className = 'error';
-    notification.style.display = 'block';
-    
-    setTimeout(() => {
-      notification.style.display = 'none';
-    }, 5000);
-  }
-  
-  console.error("❌ Error:", message);
 }
 
 /**
@@ -776,15 +228,13 @@ export function updateUIState(newState) {
 }
 
 /**
- * Forces refresh of statistics
+ * Forces refresh of statistics using modular data processor
  */
 export async function forceRefresh() {
-  console.log("🔄 Forcing statistics refresh...");
+  console.log("🔄 Forcing statistics refresh using orchestrator...");
   
   try {
-    const data = await getCombinedStatistics({ forceRefresh: true });
-    window.expenseList = data.expenses;
-    window.transactionList = data.transactions;
+    const data = await forceRefreshData(uiState);
     
     await refreshStatistics();
     showSuccessMessage("Dữ liệu đã được cập nhật");
@@ -796,10 +246,10 @@ export async function forceRefresh() {
 }
 
 /**
- * Resets UI to default state
+ * Resets UI to default state using modular UI handlers
  */
 export function resetUI() {
-  console.log("🔄 Resetting statistics UI...");
+  console.log("🔄 Resetting statistics UI using orchestrator...");
   
   uiState.currentTab = "overview";
   uiState.dateRange = "month";
@@ -808,37 +258,50 @@ export function resetUI() {
   uiState.sortOrder = "desc";
   uiState.showGrowthRate = false;
   
-  // Reset form controls
-  const currencySelect = document.getElementById('statsCurrencyFilter');
-  if (currencySelect) currencySelect.value = "VND";
-  
-  const sortBySelect = document.getElementById('statsSortBy');
-  if (sortBySelect) sortBySelect.value = "month";
-  
-  const sortOrderSelect = document.getElementById('statsSortOrder');
-  if (sortOrderSelect) sortOrderSelect.value = "desc";
-  
-  const growthToggle = document.getElementById('statsGrowthToggle');
-  if (growthToggle) growthToggle.checked = false;
+  // Reset UI controls using modular function
+  import('./ui-statistics/uiHandlers.js').then(module => {
+    if (module.resetUIControls) {
+      module.resetUIControls();
+    }
+  });
   
   refreshStatistics();
 }
 
 /**
- * Refresh statistics với global filters
+ * Refresh statistics với global filters using modular components
  */
 async function refreshStatisticsWithFilters(globalFilters) {
-  console.log("🔄 Refreshing statistics with global filters:", globalFilters);
+  console.log("🔄 Refreshing statistics with global filters using orchestrator:", globalFilters);
   
   try {
     const expenseData = window.expenseList || [];
     const transactionData = window.transactionList || [];
     
-    // Render dashboard với global filters
-    await renderEnhancedStatistics(expenseData, transactionData, null, globalFilters);
+    // Filter data using modular processor
+    const filteredData = await filterDataByGlobalFilters(expenseData, transactionData, globalFilters);
     
-    console.log("✅ Statistics refreshed with filters");
+    // Render dashboard using modular chart renderer
+    await renderEnhancedStatistics(
+      filteredData.expenses, 
+      filteredData.transactions, 
+      null, 
+      globalFilters
+    );
+    
+    console.log("✅ Statistics refreshed with filters using orchestrator");
   } catch (error) {
     console.error("❌ Error refreshing statistics with filters:", error);
   }
 }
+
+// Make core functions available globally for legacy compatibility
+window.initializeStatisticsUI = initializeStatisticsUI;
+window.refreshStatistics = refreshStatistics;
+window.refreshStatisticsWithFilters = refreshStatisticsWithFilters;
+window.getUIState = getUIState;
+window.updateUIState = updateUIState;
+window.forceRefresh = forceRefresh;
+window.resetUI = resetUI;
+
+console.log('✅ statisticsUIController.js orchestrator loaded successfully');
