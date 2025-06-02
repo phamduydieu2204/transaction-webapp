@@ -1,0 +1,19 @@
+<!-- Modal cập nhật cookie -->
+<div id="updateCookieModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeUpdateCookieModal()">&times;</span>
+    <h2>Cập nhật Cookie</h2>
+
+    <label for="currentCookie">Cookie hiện tại:</label>
+    <textarea id="currentCookie" readonly rows="6"></textarea>
+    <button onclick="copyCurrentCookie()">📋 Copy Cookie</button>
+
+    <label for="newCookie">Cookie cập nhật:</label>
+    <textarea id="newCookie" rows="6" placeholder="Nhập cookie mới..."></textarea>
+
+    <div class="button-row">
+      <button onclick="confirmUpdateCookie()">Cập nhật</button>
+      <button onclick="cancelUpdateCookie()">Hủy bỏ</button>
+    </div>
+  </div>
+</div>
