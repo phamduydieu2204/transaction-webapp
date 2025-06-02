@@ -1,5 +1,8 @@
 import { getConstants } from './constants.js';
 import { determineAccountingType } from './accountingTypeManager.js';
+import { showProcessingModal } from './showProcessingModal.js';
+import { closeProcessingModal } from './closeProcessingModal.js';
+import { showResultModal } from './showResultModal.js';
 
 export async function handleUpdateExpense() {
   const getValue = (id) => document.getElementById(id)?.value?.trim() || "";
@@ -39,6 +42,8 @@ export async function handleUpdateExpense() {
 
   const { BACKEND_URL } = getConstants();
 
+  showProcessingModal("Đang cập nhật chi phí...");
+
   try {
     const response = await fetch(BACKEND_URL, {
       method: "POST",
@@ -47,14 +52,17 @@ export async function handleUpdateExpense() {
     });
 
     const result = await response.json();
+    closeProcessingModal();
+    
     if (result.status === "success") {
-      alert("✅ Đã cập nhật chi phí thành công!");
+      showResultModal("Đã cập nhật chi phí thành công!", true);
       document.getElementById("expenseForm").reset();
       document.getElementById("expenseDate").value = window.todayFormatted;
     } else {
-      alert("❌ Không thể cập nhật chi phí: " + result.message);
+      showResultModal(`Không thể cập nhật chi phí: ${result.message}`, false);
     }
   } catch (err) {
-    alert("❌ Lỗi kết nối: " + err.message);
+    closeProcessingModal();
+    showResultModal(`Lỗi kết nối: ${err.message}`, false);
   }
 }

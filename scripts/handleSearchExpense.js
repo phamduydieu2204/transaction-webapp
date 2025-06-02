@@ -69,6 +69,8 @@ export async function handleSearchExpense() {
 
   console.log("📤 Tìm kiếm chi phí với điều kiện:", JSON.stringify(data, null, 2));
 
+  showProcessingModal("Đang tìm kiếm chi phí...");
+
   try {
     const res = await fetch(BACKEND_URL, {
       method: "POST",
@@ -77,6 +79,7 @@ export async function handleSearchExpense() {
     });
 
     const result = await res.json();
+    closeProcessingModal();
     
     if (result.status === "success") {
       window.expenseList = result.data || [];
