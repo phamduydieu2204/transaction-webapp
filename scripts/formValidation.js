@@ -11,7 +11,8 @@ const validationConfig = {
       { id: 'customerEmail', required: true, type: 'email', message: 'Vui lòng nhập email hợp lệ' },
       { id: 'customerName', required: true, message: 'Vui lòng nhập tên khách hàng' },
       { id: 'transactionType', required: true, message: 'Vui lòng chọn loại giao dịch' },
-      { id: 'revenue', required: true, type: 'number', message: 'Vui lòng nhập doanh thu' }
+      { id: 'startDate', required: true, message: 'Vui lòng nhập ngày bắt đầu' },
+      { id: 'softwareName', required: true, message: 'Vui lòng chọn tên phần mềm' }
     ]
   },
   expenseForm: {
@@ -28,7 +29,7 @@ const validationConfig = {
  */
 function validateField(fieldConfig) {
   const element = document.getElementById(fieldConfig.id);
-  const formField = element.closest('.form-field');
+  const formField = element?.closest('.form-field');
   
   if (!element || !formField) return true;
   
@@ -58,11 +59,24 @@ function validateField(fieldConfig) {
   // Update UI based on validation result
   if (isValid) {
     formField.classList.remove('error');
+    // Hide specific error message by ID
+    const errorMessageById = document.getElementById(`${fieldConfig.id}-error`);
+    if (errorMessageById) {
+      errorMessageById.style.display = 'none';
+      errorMessageById.textContent = '';
+    }
   } else {
     formField.classList.add('error');
-    const errorMessage = formField.querySelector('.error-message');
+    
+    // Try to find error message by ID first, then by class
+    let errorMessage = document.getElementById(`${fieldConfig.id}-error`);
+    if (!errorMessage) {
+      errorMessage = formField.querySelector('.error-message');
+    }
+    
     if (errorMessage) {
       errorMessage.textContent = fieldConfig.message;
+      errorMessage.style.display = 'block';
     }
   }
   
@@ -96,9 +110,17 @@ function clearValidationErrors(formId) {
   const form = document.getElementById(formId);
   if (!form) return;
   
+  // Remove error class from fields
   const errorFields = form.querySelectorAll('.form-field.error');
   errorFields.forEach(field => {
     field.classList.remove('error');
+  });
+  
+  // Hide all error messages
+  const errorMessages = form.querySelectorAll('.error-message');
+  errorMessages.forEach(msg => {
+    msg.style.display = 'none';
+    msg.textContent = '';
   });
 }
 
@@ -121,6 +143,12 @@ function setupRealTimeValidation() {
           const formField = element.closest('.form-field');
           if (formField && formField.classList.contains('error')) {
             formField.classList.remove('error');
+            // Also hide the specific error message
+            const errorMessage = document.getElementById(`${fieldConfig.id}-error`);
+            if (errorMessage) {
+              errorMessage.style.display = 'none';
+              errorMessage.textContent = '';
+            }
           }
         });
       }
@@ -142,6 +170,12 @@ function setupRealTimeValidation() {
           const formField = element.closest('.form-field');
           if (formField && formField.classList.contains('error')) {
             formField.classList.remove('error');
+            // Also hide the specific error message
+            const errorMessage = document.getElementById(`${fieldConfig.id}-error`);
+            if (errorMessage) {
+              errorMessage.style.display = 'none';
+              errorMessage.textContent = '';
+            }
           }
         });
       }
