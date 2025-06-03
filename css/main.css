@@ -113,7 +113,7 @@ table {
 }
 
 /* ========================================
-   FORM LAYOUT - FULL WIDTH & OPTIMIZED
+   FORM LAYOUT - CSS GRID SYSTEM
    ======================================== */
 
 /* Form container takes full width */
@@ -123,33 +123,15 @@ table {
   padding: 16px 10px !important;
 }
 
-/* Form grid - flexible layout */
+/* Form grid - Bootstrap-like 5-column system */
 .form-grid {
+  display: grid !important;
+  grid-template-columns: repeat(5, 1fr) !important;
+  gap: 15px !important;
   width: 100% !important;
-  max-width: none !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 16px !important;
   margin: 0 !important;
   padding: 0 !important;
-}
-
-/* Form rows for logical grouping */
-.form-row {
-  display: grid !important;
-  gap: 12px !important;
-  width: 100% !important;
   align-items: end !important;
-}
-
-/* Form groups */
-.form-group {
-  width: 100% !important;
-  margin-bottom: 12px !important;
-}
-
-.form-group:last-child {
-  margin-bottom: 0 !important;
 }
 
 /* Individual form field */
@@ -170,6 +152,13 @@ table {
   text-overflow: ellipsis !important;
 }
 
+/* Required field indicator */
+.form-field label.required::after {
+  content: " *" !important;
+  color: #dc3545 !important;
+  font-weight: bold !important;
+}
+
 .form-field input,
 .form-field select,
 .form-field textarea {
@@ -179,7 +168,7 @@ table {
   font-size: 14px !important;
   min-height: 38px !important;
   box-sizing: border-box !important;
-  transition: border-color 0.15s ease-in-out !important;
+  transition: all 0.15s ease-in-out !important;
   width: 100% !important;
 }
 
@@ -191,91 +180,89 @@ table {
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15) !important;
 }
 
+/* Error states for validation */
+.form-field.error input,
+.form-field.error select,
+.form-field.error textarea {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.15) !important;
+}
+
+.form-field .error-message {
+  color: #dc3545 !important;
+  font-size: 12px !important;
+  margin-top: 2px !important;
+  display: none !important;
+}
+
+.form-field.error .error-message {
+  display: block !important;
+}
+
 .form-field textarea {
   min-height: 80px !important;
   resize: vertical !important;
 }
 
-/* Row layouts for different form sections */
+/* Column spans for specific layout */
+.col-span-1 { grid-column: span 1; }
+.col-span-2 { grid-column: span 2; }
+.col-span-3 { grid-column: span 3; }
+.col-span-4 { grid-column: span 4; }
+.col-span-5 { grid-column: span 5; }
 
-/* Customer info row - 3 fields */
-.customer-row {
-  grid-template-columns: 2fr 3fr 2fr !important;
-}
+/* Transaction form specific layout */
+/* Row 1: Date, Email, Name, Contact, Revenue */
+#transactionForm .form-field:nth-child(1) { grid-column: span 1; } /* Date */
+#transactionForm .form-field:nth-child(2) { grid-column: span 1; } /* Email */
+#transactionForm .form-field:nth-child(3) { grid-column: span 1; } /* Name */
+#transactionForm .form-field:nth-child(4) { grid-column: span 1; } /* Contact */
+#transactionForm .form-field:nth-child(5) { grid-column: span 1; } /* Revenue */
 
-/* Transaction details row - 3 fields per row */
-.transaction-dates-row {
-  grid-template-columns: 1.5fr 2fr 1fr !important;
-}
+/* Row 2: Type, Duration, Start, End, Device */
+#transactionForm .form-field:nth-child(6) { grid-column: span 1; } /* Type */
+#transactionForm .form-field:nth-child(7) { grid-column: span 1; } /* Duration */
+#transactionForm .form-field:nth-child(8) { grid-column: span 1; } /* Start */
+#transactionForm .form-field:nth-child(9) { grid-column: span 1; } /* End */
+#transactionForm .form-field:nth-child(10) { grid-column: span 1; } /* Device */
 
-.transaction-period-row {
-  grid-template-columns: 1.5fr 1.5fr 1fr !important;
-}
+/* Row 3: Software, Package, Account, Note (2 cols) */
+#transactionForm .form-field:nth-child(11) { grid-column: span 1; } /* Software */
+#transactionForm .form-field:nth-child(12) { grid-column: span 1; } /* Package */
+#transactionForm .form-field:nth-child(13) { grid-column: span 1; } /* Account */
+#transactionForm .form-field:nth-child(14) { grid-column: span 2; } /* Note */
 
-/* Software info row - 2 fields */
-.software-row {
-  grid-template-columns: 2fr 2fr 2fr 1.5fr !important;
-}
+/* Expense form layout */
+#expenseForm .form-field:nth-child(1) { grid-column: span 1; } /* Date */
+#expenseForm .form-field:nth-child(2) { grid-column: span 1; } /* Category */
+#expenseForm .form-field:nth-child(3) { grid-column: span 1; } /* Sub */
+#expenseForm .form-field:nth-child(4) { grid-column: span 1; } /* Product */
+#expenseForm .form-field:nth-child(5) { grid-column: span 1; } /* Package */
 
-/* Full width rows */
-.note-row {
-  grid-template-columns: 1fr !important;
-}
+#expenseForm .form-field:nth-child(6) { grid-column: span 1; } /* Amount */
+#expenseForm .form-field:nth-child(7) { grid-column: span 1; } /* Currency */
+#expenseForm .form-field:nth-child(8) { grid-column: span 1; } /* Bank */
+#expenseForm .form-field:nth-child(9) { grid-column: span 1; } /* Card */
+#expenseForm .form-field:nth-child(10) { grid-column: span 1; } /* Method */
 
-/* Expense form rows */
-.expense-basic-row {
-  grid-template-columns: 1fr 1.5fr 1.5fr 1.5fr 1fr 1fr !important;
-}
-
-.expense-payment-row {
-  grid-template-columns: 1fr 2fr 2fr 1.5fr 1.5fr 1fr !important;
-}
-
-.expense-final-row {
-  grid-template-columns: 1fr 4fr !important;
-}
+#expenseForm .form-field:nth-child(11) { grid-column: span 1; } /* Renew */
+#expenseForm .form-field:nth-child(12) { grid-column: span 1; } /* Supplier */
+#expenseForm .form-field:nth-child(13) { grid-column: span 1; } /* Status */
+#expenseForm .form-field:nth-child(14) { grid-column: span 2; } /* Note */
 
 /* Responsive design */
-@media (max-width: 1400px) {
-  .customer-row {
-    grid-template-columns: 1fr 1fr 1fr !important;
+@media (max-width: 1200px) {
+  .form-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
   }
   
-  .software-row {
-    grid-template-columns: 1fr 1fr 1fr 1fr !important;
-  }
+  #transactionForm .form-field:nth-child(5) { grid-column: span 1; } /* Revenue moves to next line */
+  #transactionForm .form-field:nth-child(10) { grid-column: span 1; } 
+  #transactionForm .form-field:nth-child(14) { grid-column: span 2; }
   
-  .expense-basic-row {
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr !important;
-  }
-  
-  .expense-payment-row {
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr !important;
-  }
-}
-
-@media (max-width: 1024px) {
-  .customer-row,
-  .transaction-dates-row,
-  .transaction-period-row {
-    grid-template-columns: 1fr 1fr 1fr !important;
-  }
-  
-  .software-row {
-    grid-template-columns: 1fr 1fr !important;
-  }
-  
-  .expense-basic-row {
-    grid-template-columns: 1fr 1fr 1fr !important;
-  }
-  
-  .expense-payment-row {
-    grid-template-columns: 1fr 1fr 1fr !important;
-  }
-  
-  .expense-final-row {
-    grid-template-columns: 1fr 2fr !important;
-  }
+  #expenseForm .form-field:nth-child(5) { grid-column: span 1; }
+  #expenseForm .form-field:nth-child(10) { grid-column: span 1; }
+  #expenseForm .form-field:nth-child(14) { grid-column: span 2; }
 }
 
 @media (max-width: 768px) {
@@ -283,13 +270,19 @@ table {
     padding: 12px 8px !important;
   }
   
-  .form-row {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 8px !important;
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
   }
   
-  .note-row {
-    grid-template-columns: 1fr !important;
+  #transactionForm .form-field,
+  #expenseForm .form-field {
+    grid-column: span 1 !important;
+  }
+  
+  #transactionForm .form-field:nth-child(14),
+  #expenseForm .form-field:nth-child(14) {
+    grid-column: span 2 !important;
   }
   
   .form-field input,
@@ -301,8 +294,13 @@ table {
 }
 
 @media (max-width: 480px) {
-  .form-row {
+  .form-grid {
     grid-template-columns: 1fr !important;
+  }
+  
+  #transactionForm .form-field,
+  #expenseForm .form-field {
+    grid-column: span 1 !important;
   }
   
   .form-field label {
