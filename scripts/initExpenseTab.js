@@ -15,22 +15,25 @@ import { updateExpenseTable } from './updateExpenseTable.js';
 export async function initExpenseTab() {
   console.log('📊 Initializing expense tab...');
   
-  try {
-    // Show loading modal
-    showProcessingModal('Đang tải dữ liệu chi phí...');
-    
-    // Load expense data
-    await loadExpenses();
-    
-    // Render expense statistics
-    renderExpenseStats();
-    
-    console.log('✅ Expense tab initialized');
-  } catch (error) {
-    console.error('❌ Error initializing expense tab:', error);
-  } finally {
-    closeProcessingModal();
-  }
+  // Wait a bit for DOM to be ready
+  setTimeout(async () => {
+    try {
+      // Show loading modal
+      showProcessingModal('Đang tải dữ liệu chi phí...');
+      
+      // Load expense data
+      await loadExpenses();
+      
+      // Render expense statistics
+      renderExpenseStats();
+      
+      console.log('✅ Expense tab initialized');
+    } catch (error) {
+      console.error('❌ Error initializing expense tab:', error);
+    } finally {
+      closeProcessingModal();
+    }
+  }, 100); // Small delay to ensure DOM is ready
 }
 
 /**
@@ -48,10 +51,7 @@ async function loadExpenses() {
   const data = {
     action: 'searchExpenses',
     maNhanVien: window.userInfo.maNhanVien,
-    vaiTro: window.userInfo.vaiTro,
-    searchType: 'all', // Load all expenses
-    startDate: '',
-    endDate: ''
+    conditions: {} // Empty conditions to get all expenses
   };
   
   try {
@@ -72,9 +72,10 @@ async function loadExpenses() {
     const result = await response.json();
     
     if (result.status === 'success') {
-      // Store expenses globally
-      window.expenseList = result.expenses || [];
+      // Store expenses globally - API returns data not expenses
+      window.expenseList = result.data || [];
       window.currentExpensePage = 1;
+      window.isExpenseSearching = false;
       
       console.log(`✅ Loaded ${window.expenseList.length} expenses`);
       
