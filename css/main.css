@@ -447,11 +447,11 @@ table {
   box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1) !important;
 }
 
-/* Button row styling */
+/* Button row styling - aligned to the right */
 .transaction-form-grid + .button-row {
   display: flex !important;
   gap: 15px !important;
-  justify-content: flex-start !important;
+  justify-content: flex-end !important;
   margin-top: 20px !important;
   padding: 20px !important;
   background: #f8f9fa !important;
@@ -524,13 +524,16 @@ table {
   }
   
   .transaction-form-grid + .button-row {
-    flex-direction: column !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
     gap: 10px !important;
+    justify-content: flex-end !important;
   }
   
   .transaction-form-grid + .button-row button {
-    width: 100% !important;
-    min-width: auto !important;
+    width: auto !important;
+    min-width: 100px !important;
+    flex: 0 0 calc(50% - 5px) !important;
   }
 }
 
@@ -551,5 +554,16 @@ table {
   .transaction-form-grid .form-field textarea {
     padding: 10px 12px !important;
     font-size: 16px !important; /* Prevent zoom on iOS */
+  }
+  
+  .transaction-form-grid + .button-row {
+    flex-direction: column !important;
+    align-items: flex-end !important;
+  }
+  
+  .transaction-form-grid + .button-row button {
+    width: auto !important;
+    min-width: 120px !important;
+    flex: none !important;
   }
 }
