@@ -113,93 +113,133 @@ table {
 }
 
 /* ========================================
-   FORM LAYOUT - 7 COLUMNS PER ROW MAX
+   FORM LAYOUT - BEAUTIFUL & RESPONSIVE
    ======================================== */
 
-/* Transaction form layout */
+/* Form grid container */
 .form-grid {
-  display: grid !important;
-  grid-template-columns: repeat(7, 1fr) !important;
-  gap: 15px !important;
-  margin-bottom: 15px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 20px !important;
+  margin-bottom: 20px !important;
 }
 
-/* Transaction form - Row 1: Customer info (3 columns) */
-.col-email { grid-column: span 2; }
-.col-name { grid-column: span 3; }
-.col-phone { grid-column: span 2; }
+/* Form group (each section) */
+.form-group {
+  background: #f8f9fa !important;
+  border: 1px solid #e9ecef !important;
+  border-radius: 8px !important;
+  padding: 16px !important;
+  margin-bottom: 10px !important;
+}
 
-/* Transaction form - Row 2: Transaction details (7 columns) */
-.col-date { grid-column: span 1; }
-.col-type { grid-column: span 1; }
-.col-duration { grid-column: span 1; }
-.col-start { grid-column: span 1; }
-.col-end { grid-column: span 1; }
-.col-device { grid-column: span 1; }
-.col-revenue { grid-column: span 1; }
+.form-group:last-child {
+  margin-bottom: 0 !important;
+}
 
-/* Transaction form - Row 3: Software info (3 columns) */
-.col-software { grid-column: span 2; }
-.col-package { grid-column: span 2; }
-.col-account { grid-column: span 3; }
+/* Form row (container for fields in each group) */
+.form-row {
+  display: grid !important;
+  gap: 12px !important;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+}
 
-/* Transaction form - Row 4: Note (full width) */
-.col-note { grid-column: span 7; }
+/* Individual form field */
+.form-field {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+}
 
-/* Expense form - Row 1: Basic info (7 columns) */
-.col-expense-date { grid-column: span 1; }
-.col-expense-category { grid-column: span 1; }
-.col-expense-sub { grid-column: span 1; }
-.col-expense-product { grid-column: span 1; }
-.col-expense-package { grid-column: span 1; }
-.col-expense-amount { grid-column: span 1; }
-.col-expense-currency { grid-column: span 1; }
+.form-field label {
+  font-weight: 500 !important;
+  color: #495057 !important;
+  font-size: 14px !important;
+  margin-bottom: 4px !important;
+}
 
-/* Expense form - Row 2: Payment info (6 columns) */
-.col-expense-bank { grid-column: span 1; }
-.col-expense-card { grid-column: span 1; }
-.col-expense-method { grid-column: span 1; }
-.col-expense-renew { grid-column: span 1; }
-.col-expense-supplier { grid-column: span 2; }
-.col-expense-status { grid-column: span 1; }
+.form-field input,
+.form-field select {
+  padding: 8px 12px !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 4px !important;
+  font-size: 14px !important;
+  transition: border-color 0.15s ease-in-out !important;
+}
 
-/* Expense form - Row 3: Note (full width) */
-.col-expense-note { grid-column: span 7; }
+.form-field input:focus,
+.form-field select:focus {
+  outline: none !important;
+  border-color: #007bff !important;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25) !important;
+}
 
-/* Responsive adjustments for smaller screens */
-@media (max-width: 1200px) {
-  .form-grid {
+/* Full width field (for notes) */
+.form-field-full {
+  grid-column: 1 / -1 !important;
+}
+
+/* Specific adjustments for different screen sizes */
+
+/* Large screens (Desktop) - max 7 fields per row */
+@media (min-width: 1200px) {
+  .form-row {
+    grid-template-columns: repeat(7, 1fr) !important;
+  }
+  
+  /* Customer info group - 3 fields */
+  .customer-info .form-row {
+    grid-template-columns: 2fr 3fr 2fr !important;
+  }
+  
+  /* Software info group - 3 fields */
+  .software-info .form-row {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  
+  /* Expense basic group - 7 fields */
+  .expense-basic .form-row {
+    grid-template-columns: repeat(7, 1fr) !important;
+  }
+  
+  /* Expense payment group - 6 fields */
+  .expense-payment .form-row {
+    grid-template-columns: repeat(6, 1fr) !important;
+  }
+}
+
+/* Medium screens (Tablets) - max 4 fields per row */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .form-row {
     grid-template-columns: repeat(4, 1fr) !important;
   }
   
-  .col-email, .col-name, .col-phone,
-  .col-software, .col-package, .col-account,
-  .col-expense-supplier { grid-column: span 2; }
-  
-  .col-date, .col-type, .col-duration, .col-start, .col-end, .col-device, .col-revenue,
-  .col-expense-date, .col-expense-category, .col-expense-sub, .col-expense-product,
-  .col-expense-package, .col-expense-amount, .col-expense-currency,
-  .col-expense-bank, .col-expense-card, .col-expense-method, .col-expense-renew, .col-expense-status { 
-    grid-column: span 1; 
+  .customer-info .form-row,
+  .software-info .form-row {
+    grid-template-columns: repeat(3, 1fr) !important;
   }
-  
-  .col-note, .col-expense-note { grid-column: span 4; }
 }
 
-@media (max-width: 768px) {
-  .form-grid {
+/* Small screens (Mobile) - max 2 fields per row */
+@media (max-width: 767px) {
+  .form-row {
     grid-template-columns: repeat(2, 1fr) !important;
   }
   
-  .col-email, .col-name, .col-phone,
-  .col-date, .col-type, .col-duration, .col-start, .col-end, .col-device, .col-revenue,
-  .col-software, .col-package, .col-account,
-  .col-expense-date, .col-expense-category, .col-expense-sub, .col-expense-product,
-  .col-expense-package, .col-expense-amount, .col-expense-currency,
-  .col-expense-bank, .col-expense-card, .col-expense-method, .col-expense-renew,
-  .col-expense-supplier, .col-expense-status { 
-    grid-column: span 1; 
+  .form-group {
+    padding: 12px !important;
   }
   
-  .col-note, .col-expense-note { grid-column: span 2; }
+  .form-field input,
+  .form-field select {
+    padding: 10px !important;
+    font-size: 16px !important; /* Prevent zoom on iOS */
+  }
+}
+
+/* Extra small screens - single column */
+@media (max-width: 480px) {
+  .form-row {
+    grid-template-columns: 1fr !important;
+  }
 }
