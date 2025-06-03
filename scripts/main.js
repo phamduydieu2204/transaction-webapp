@@ -148,24 +148,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     initializeStateManager();
     
     // Check authentication
-    if (!authManager.loadSession()) {
+    console.log('🔐 Checking authentication...');
+    const hasSession = authManager.loadSession();
+    console.log('📌 Session loaded:', hasSession);
+    
+    if (!hasSession) {
+      console.log('❌ No valid session found, checking legacy format...');
       // Try legacy session format
       const userData = localStorage.getItem("employeeInfo");
+      console.log('📌 Legacy user data:', userData ? 'Found' : 'Not found');
+      
       if (userData) {
         try {
           const userInfo = JSON.parse(userData);
+          console.log('✅ Legacy session parsed:', userInfo.maNhanVien);
           updateState({ user: userInfo });
         } catch (e) {
-          console.warn('Invalid legacy session data');
+          console.warn('❌ Invalid legacy session data:', e);
           // Show login form instead of redirect
+          console.log('🔐 Showing login form (invalid legacy data)...');
           showLoginForm();
           return;
         }
       } else {
         // Show login form instead of redirect
+        console.log('🔐 Showing login form (no auth data)...');
         showLoginForm();
         return;
       }
+    } else {
+      console.log('✅ Valid session found, continuing...');
     }
     
     // Phase 2: Initialize core application

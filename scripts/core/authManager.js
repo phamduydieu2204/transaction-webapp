@@ -117,11 +117,19 @@ function checkSessionValidity() {
  * Validate session data
  */
 function isSessionValid(authData) {
+    console.log('🔐 Checking session validity...');
     if (!authData || !authData.expiryTime) {
+        console.log('❌ Session invalid: No auth data or expiry time');
         return false;
     }
     
-    return Date.now() < authData.expiryTime;
+    const now = Date.now();
+    const isValid = now < authData.expiryTime;
+    console.log(`🔐 Session expiry: ${new Date(authData.expiryTime).toLocaleString()}`);
+    console.log(`🔐 Current time: ${new Date(now).toLocaleString()}`);
+    console.log(`🔐 Session valid: ${isValid}`);
+    
+    return isValid;
 }
 
 /**
@@ -154,7 +162,9 @@ function saveAuthToStorage(authData) {
  */
 function loadAuthFromStorage() {
     try {
+        console.log('🔍 Looking for auth data with key:', AUTH_STORAGE_KEY);
         const data = localStorage.getItem(AUTH_STORAGE_KEY);
+        console.log('🔍 Raw auth data:', data ? `Found (${data.length} chars)` : 'Not found');
         return data ? JSON.parse(data) : null;
     } catch (error) {
         console.error('Failed to load auth data:', error);
@@ -245,14 +255,19 @@ export const authManager = {
     extendSession,
     checkSessionExpiry,
     loadSession: () => {
+        console.log('📱 AuthManager: Loading session...');
         const auth = loadAuthFromStorage();
+        console.log('📱 AuthManager: Auth data from storage:', auth ? 'Found' : 'Not found');
+        
         if (auth && isSessionValid(auth)) {
+            console.log('✅ AuthManager: Session is valid');
             updateState({ 
                 user: auth.user,
                 sessionStart: auth.sessionStart 
             });
             return true;
         }
+        console.log('❌ AuthManager: No valid session');
         return false;
     }
 };
