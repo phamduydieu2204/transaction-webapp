@@ -197,6 +197,38 @@ async function startApp() {
     console.log('🧭 Phase 4: Initializing navigation...');
     initializeTabSystem();
     
+    // Phase 5: Apply ultra full-width layout override
+    console.log('🔧 Phase 5: Applying ultra full-width layout...');
+    setTimeout(async () => {
+      try {
+        // Import and run the force full-width script
+        const { forceFullWidth } = await import('./forceFullWidth.js');
+        forceFullWidth();
+      } catch (error) {
+        console.error('❌ Error loading forceFullWidth:', error);
+        
+        // Fallback: Apply basic full-width override directly
+        console.log('🔧 Applying fallback full-width override...');
+        const container = document.querySelector('.container');
+        if (container) {
+          container.style.cssText = `
+            width: 100vw !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-sizing: border-box !important;
+            position: relative !important;
+            left: 0 !important;
+            right: 0 !important;
+          `;
+          
+          setTimeout(() => {
+            console.log('✅ Fallback applied - Container width:', container.getBoundingClientRect().width, '/', window.innerWidth);
+          }, 100);
+        }
+      }
+    }, 500);
+    
     console.log('✅ Application startup complete!');
     
   } catch (error) {

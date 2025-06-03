@@ -26,3 +26,88 @@
 
 /* Utility classes */
 @import url('utilities/helpers.css');
+
+/* ========================================
+   FULL WIDTH OVERRIDE - HIGHEST PRIORITY
+   ======================================== */
+
+/* Force full width layout */
+.container {
+  width: 100vw !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.tab-contents {
+  padding: 0 5px !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.form-container {
+  padding: 16px 5px !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.table-container {
+  padding: 16px 5px !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+header {
+  padding: 0 5px !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.form-container #transactionForm {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+table {
+  width: 100% !important;
+  margin: 0 !important;
+  max-width: none !important;
+}
+
+/* Responsive adjustments for large screens */
+@media (min-width: 1400px) {
+  .form-grid {
+    grid-template-columns: repeat(20, 1fr) !important;
+  }
+  
+  .form-grid .col-6 {
+    grid-column: span 5 !important;
+  }
+  
+  .form-grid .col-4 {
+    grid-column: span 4 !important;
+  }
+  
+  .form-grid .col-3 {
+    grid-column: span 3 !important;
+  }
+}
+
+@media (min-width: 1600px) {
+  .form-grid {
+    grid-template-columns: repeat(24, 1fr) !important;
+  }
+  
+  .form-grid .col-6 {
+    grid-column: span 6 !important;
+  }
+  
+  .form-grid .col-4 {
+    grid-column: span 4 !important;
+  }
+  
+  .form-grid .col-3 {
+    grid-column: span 3 !important;
+  }
+}

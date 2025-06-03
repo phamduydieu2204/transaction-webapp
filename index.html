@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/full-width-override.css">
 </head>
 <body>
   <div class="container">
@@ -52,6 +53,15 @@
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script type="module">
     console.log('🚀 Index.html: Starting application...');
+    
+    // Load debug layout script first
+    import('./scripts/debugLayout.js')
+      .then(() => {
+        console.log('🔍 Debug layout script loaded');
+      })
+      .catch(error => {
+        console.error('❌ Error loading debug layout:', error);
+      });
     
     // Skip partialLoader for now and load main.js directly
     console.log('🎯 Index.html: Loading main.js directly...');

@@ -4,10 +4,10 @@
 
 /* Base container */
 .container {
-  width: 100%;
+  width: 100vw; /* Use viewport width */
   max-width: none; /* Allow full width on desktop */
-  margin: 0 auto; /* Keep centered */
-  padding: 0 20px;
+  margin: 0;
+  padding: 0; /* Remove padding for full width */
   box-sizing: border-box; /* Include padding in width calculation */
 }
 
@@ -60,10 +60,14 @@
 }
 
 /* Layout containers */
+.tab-contents {
+  padding: 0 10px; /* Add minimal padding to tab contents */
+}
+
 .form-container {
   width: 100%;
   flex-shrink: 0;
-  padding: 16px 20px;
+  padding: 16px 10px; /* Reduce horizontal padding */
   overflow-y: visible;
   border-bottom: 2px solid #e3f2fd;
   background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
@@ -78,7 +82,7 @@
 
 .table-container {
   flex: 1;
-  padding: 16px;
+  padding: 16px 10px; /* Reduce horizontal padding */
   overflow-y: visible;
   overflow-x: auto; /* Allow horizontal scroll for wide tables */
   background: white;
