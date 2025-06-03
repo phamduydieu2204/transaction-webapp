@@ -5,17 +5,45 @@
 /* Base container */
 .container {
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: none; /* Allow full width on desktop */
+  margin: 0;
   padding: 0 20px;
+}
+
+/* Responsive container - only limit width on mobile */
+@media (max-width: 768px) {
+  .container {
+    max-width: 100%;
+    margin: 0 auto;
+  }
 }
 
 /* Form grid system */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  gap: 10px;
+  gap: 15px; /* Increase gap on desktop */
   margin-bottom: 15px;
+}
+
+/* Desktop optimization - use more columns effectively */
+@media (min-width: 1200px) {
+  .form-grid {
+    grid-template-columns: repeat(16, 1fr); /* More columns for larger screens */
+    gap: 20px;
+  }
+  
+  .form-grid .col-6 {
+    grid-column: span 4; /* Smaller relative size on large screens */
+  }
+  
+  .form-grid .col-4 {
+    grid-column: span 3;
+  }
+  
+  .form-grid .col-3 {
+    grid-column: span 2;
+  }
 }
 
 .form-grid .col-6 {
