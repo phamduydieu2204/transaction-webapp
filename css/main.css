@@ -113,35 +113,29 @@ table {
 }
 
 /* ========================================
-   FORM LAYOUT - BEAUTIFUL & RESPONSIVE
+   FORM LAYOUT - CLEAN & SIMPLE
    ======================================== */
 
 /* Form grid container */
 .form-grid {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 20px !important;
-  margin-bottom: 20px !important;
-}
-
-/* Form group (each section) */
-.form-group {
-  background: #f8f9fa !important;
-  border: 1px solid #e9ecef !important;
-  border-radius: 8px !important;
-  padding: 16px !important;
-  margin-bottom: 10px !important;
-}
-
-.form-group:last-child {
-  margin-bottom: 0 !important;
-}
-
-/* Form row (container for fields in each group) */
-.form-row {
   display: grid !important;
-  gap: 12px !important;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+  grid-template-columns: repeat(6, 1fr) !important;
+  gap: 15px !important;
+  margin-bottom: 20px !important;
+  padding: 0 !important;
+}
+
+/* Remove old form group styles */
+.form-group {
+  display: contents !important;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.form-row {
+  display: contents !important;
 }
 
 /* Individual form field */
@@ -154,16 +148,19 @@ table {
 .form-field label {
   font-weight: 500 !important;
   color: #495057 !important;
-  font-size: 14px !important;
+  font-size: 13px !important;
   margin-bottom: 4px !important;
+  white-space: nowrap !important;
 }
 
 .form-field input,
 .form-field select {
-  padding: 8px 12px !important;
+  padding: 8px 10px !important;
   border: 1px solid #ced4da !important;
   border-radius: 4px !important;
-  font-size: 14px !important;
+  font-size: 13px !important;
+  height: 36px !important;
+  box-sizing: border-box !important;
   transition: border-color 0.15s ease-in-out !important;
 }
 
@@ -171,75 +168,78 @@ table {
 .form-field select:focus {
   outline: none !important;
   border-color: #007bff !important;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25) !important;
+  box-shadow: 0 0 0 1px rgba(0, 123, 255, 0.25) !important;
 }
+
+/* Transaction form layout - clean rows */
+#transactionForm .form-field:nth-child(1) { grid-column: span 2; } /* Email */
+#transactionForm .form-field:nth-child(2) { grid-column: span 2; } /* Name */
+#transactionForm .form-field:nth-child(3) { grid-column: span 2; } /* Phone */
+
+#transactionForm .form-field:nth-child(4) { grid-column: span 1; } /* Date */
+#transactionForm .form-field:nth-child(5) { grid-column: span 1; } /* Type */
+#transactionForm .form-field:nth-child(6) { grid-column: span 1; } /* Duration */
+#transactionForm .form-field:nth-child(7) { grid-column: span 1; } /* Start */
+#transactionForm .form-field:nth-child(8) { grid-column: span 1; } /* End */
+#transactionForm .form-field:nth-child(9) { grid-column: span 1; } /* Device */
+
+#transactionForm .form-field:nth-child(10) { grid-column: span 2; } /* Software */
+#transactionForm .form-field:nth-child(11) { grid-column: span 2; } /* Package */
+#transactionForm .form-field:nth-child(12) { grid-column: span 1; } /* Account */
+#transactionForm .form-field:nth-child(13) { grid-column: span 1; } /* Revenue */
+
+/* Expense form layout - clean rows */
+#expenseForm .form-field:nth-child(1) { grid-column: span 1; } /* Date */
+#expenseForm .form-field:nth-child(2) { grid-column: span 1; } /* Category */
+#expenseForm .form-field:nth-child(3) { grid-column: span 1; } /* Sub */
+#expenseForm .form-field:nth-child(4) { grid-column: span 1; } /* Product */
+#expenseForm .form-field:nth-child(5) { grid-column: span 1; } /* Package */
+#expenseForm .form-field:nth-child(6) { grid-column: span 1; } /* Amount */
+
+#expenseForm .form-field:nth-child(7) { grid-column: span 1; } /* Currency */
+#expenseForm .form-field:nth-child(8) { grid-column: span 1; } /* Bank */
+#expenseForm .form-field:nth-child(9) { grid-column: span 1; } /* Card */
+#expenseForm .form-field:nth-child(10) { grid-column: span 1; } /* Method */
+#expenseForm .form-field:nth-child(11) { grid-column: span 1; } /* Renew */
+#expenseForm .form-field:nth-child(12) { grid-column: span 1; } /* Supplier */
+
+#expenseForm .form-field:nth-child(13) { grid-column: span 1; } /* Status */
 
 /* Full width field (for notes) */
 .form-field-full {
   grid-column: 1 / -1 !important;
 }
 
-/* Specific adjustments for different screen sizes */
-
-/* Large screens (Desktop) - max 7 fields per row */
-@media (min-width: 1200px) {
-  .form-row {
-    grid-template-columns: repeat(7, 1fr) !important;
-  }
-  
-  /* Customer info group - 3 fields */
-  .customer-info .form-row {
-    grid-template-columns: 2fr 3fr 2fr !important;
-  }
-  
-  /* Software info group - 3 fields */
-  .software-info .form-row {
-    grid-template-columns: repeat(3, 1fr) !important;
-  }
-  
-  /* Expense basic group - 7 fields */
-  .expense-basic .form-row {
-    grid-template-columns: repeat(7, 1fr) !important;
-  }
-  
-  /* Expense payment group - 6 fields */
-  .expense-payment .form-row {
-    grid-template-columns: repeat(6, 1fr) !important;
-  }
-}
-
-/* Medium screens (Tablets) - max 4 fields per row */
-@media (min-width: 768px) and (max-width: 1199px) {
-  .form-row {
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .form-grid {
     grid-template-columns: repeat(4, 1fr) !important;
   }
   
-  .customer-info .form-row,
-  .software-info .form-row {
-    grid-template-columns: repeat(3, 1fr) !important;
-  }
+  .form-field:nth-child(1),
+  .form-field:nth-child(2),
+  .form-field:nth-child(3) { grid-column: span 2; }
+  
+  .transaction-info .form-field,
+  .expense-basic .form-field,
+  .expense-payment .form-field { grid-column: span 1; }
+  
+  .software-info .form-field { grid-column: span 2; }
 }
 
-/* Small screens (Mobile) - max 2 fields per row */
-@media (max-width: 767px) {
-  .form-row {
+@media (max-width: 768px) {
+  .form-grid {
     grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
   }
   
-  .form-group {
-    padding: 12px !important;
-  }
+  .form-field { grid-column: span 1 !important; }
+  .form-field-full { grid-column: 1 / -1 !important; }
   
   .form-field input,
   .form-field select {
+    font-size: 14px !important;
     padding: 10px !important;
-    font-size: 16px !important; /* Prevent zoom on iOS */
-  }
-}
-
-/* Extra small screens - single column */
-@media (max-width: 480px) {
-  .form-row {
-    grid-template-columns: 1fr !important;
+    height: 40px !important;
   }
 }
