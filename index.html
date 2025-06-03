@@ -53,29 +53,28 @@
   <script type="module">
     console.log('🚀 Index.html: Starting application...');
     
-    try {
-      console.log('📦 Index.html: Importing partialLoader...');
-      const { initializePartials } = await import('./scripts/partialLoader.js');
-      
-      // Load all partials when DOM is ready
-      document.addEventListener('DOMContentLoaded', async () => {
-        console.log('📄 Index.html: DOM loaded, initializing partials...');
-        
-        try {
-          await initializePartials();
-          console.log('✅ Index.html: Partials loaded successfully');
-          
-          // After partials are loaded, initialize main.js
-          console.log('🎯 Index.html: Loading main.js...');
-          const mainModule = await import('./scripts/main.js');
-          console.log('✅ Index.html: Main.js loaded successfully');
-        } catch (partialError) {
-          console.error('❌ Index.html: Error loading partials:', partialError);
-        }
+    // Skip partialLoader for now and load main.js directly
+    console.log('🎯 Index.html: Loading main.js directly...');
+    import('./scripts/main.js')
+      .then(() => {
+        console.log('✅ Index.html: Main.js loaded successfully');
+      })
+      .catch(error => {
+        console.error('❌ Index.html: Error loading main.js:', error);
       });
-    } catch (error) {
-      console.error('❌ Index.html: Error in initial setup:', error);
-    }
+      
+    // Load partials in background (non-blocking)
+    import('./scripts/partialLoader.js')
+      .then(({ initializePartials }) => {
+        console.log('📦 Index.html: Loading partials in background...');
+        return initializePartials();
+      })
+      .then(() => {
+        console.log('✅ Index.html: Partials loaded');
+      })
+      .catch(error => {
+        console.error('⚠️ Index.html: Error loading partials (non-critical):', error);
+      });
   </script>
 </body>
 </html>

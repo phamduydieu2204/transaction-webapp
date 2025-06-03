@@ -4,24 +4,28 @@
  */
 
 export async function loadPartial(elementId, partialPath) {
+  console.log(`📄 Loading partial: ${partialPath} into #${elementId}`);
   try {
     const response = await fetch(partialPath);
     if (!response.ok) {
       throw new Error(`Failed to load ${partialPath}: ${response.status}`);
     }
     const html = await response.text();
+    console.log(`✅ Loaded ${partialPath} (${html.length} chars)`);
+    
     const element = document.getElementById(elementId);
     if (element) {
       element.innerHTML = html;
+      console.log(`✅ Inserted into #${elementId}`);
     } else {
-      console.error(`Element with id '${elementId}' not found`);
+      console.error(`❌ Element with id '${elementId}' not found`);
     }
   } catch (error) {
-    console.error(`Error loading partial ${partialPath}:`, error);
+    console.error(`❌ Error loading partial ${partialPath}:`, error);
     // Hiển thị thông báo lỗi cho user
     const element = document.getElementById(elementId);
     if (element) {
-      element.innerHTML = `<div class="error">Không thể tải nội dung. Vui lòng thử lại.</div>`;
+      element.innerHTML = `<div class="error">Không thể tải nội dung: ${error.message}</div>`;
     }
   }
 }
@@ -41,7 +45,10 @@ export async function loadPartials(partials) {
  * Initialize all partials khi DOM loaded
  */
 export async function initializePartials() {
+  console.log('🚀 PartialLoader: Starting to load partials...');
+  
   // Load modals first
+  console.log('📦 PartialLoader: Loading modals container...');
   await loadPartial('modals-container', './partials/modals/all-modals.html');
   
   // Then load individual modals into their placeholders
