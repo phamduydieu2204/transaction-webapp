@@ -13,10 +13,34 @@ import { handleDeleteExpense } from './handleDeleteExpense.js';
  * Update expense table with current data
  */
 export function updateExpenseTable() {
-  const tableBody = document.querySelector('#expenseTable tbody');
+  const table = document.querySelector('#expenseListTable');
+  if (!table) {
+    console.warn('⚠️ Expense table not found');
+    return;
+  }
+  
+  const tableHead = table.querySelector('thead tr');
+  const tableBody = table.querySelector('tbody');
+  
   if (!tableBody) {
     console.warn('⚠️ Expense table body not found');
     return;
+  }
+  
+  // Setup table headers if empty
+  if (tableHead && tableHead.children.length === 0) {
+    tableHead.innerHTML = `
+      <th>STT</th>
+      <th>Loại chi phí</th>
+      <th>Mô tả</th>
+      <th>Số tiền</th>
+      <th>Loại kế toán</th>
+      <th>Ngày</th>
+      <th>Kỳ phân bổ</th>
+      <th>Nhân viên</th>
+      <th>Thời gian</th>
+      <th>Thao tác</th>
+    `;
   }
   
   // Clear current table
@@ -24,7 +48,7 @@ export function updateExpenseTable() {
   
   // Check if we have data
   if (!window.expenseList || window.expenseList.length === 0) {
-    tableBody.innerHTML = '<tr><td colspan="11" class="text-center">Không có dữ liệu chi phí</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="10" class="text-center">Không có dữ liệu chi phí</td></tr>';
     updateExpensePagination(0, 0, 0);
     return;
   }
