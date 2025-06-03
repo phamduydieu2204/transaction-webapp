@@ -211,27 +211,6 @@ table {
 .col-span-4 { grid-column: span 4; }
 .col-span-5 { grid-column: span 5; }
 
-/* Transaction form specific layout */
-/* Row 1: Date, Email, Name, Contact, Revenue */
-#transactionForm .form-field:nth-child(1) { grid-column: span 1; } /* Date */
-#transactionForm .form-field:nth-child(2) { grid-column: span 1; } /* Email */
-#transactionForm .form-field:nth-child(3) { grid-column: span 1; } /* Name */
-#transactionForm .form-field:nth-child(4) { grid-column: span 1; } /* Contact */
-#transactionForm .form-field:nth-child(5) { grid-column: span 1; } /* Revenue */
-
-/* Row 2: Type, Duration, Start, End, Device */
-#transactionForm .form-field:nth-child(6) { grid-column: span 1; } /* Type */
-#transactionForm .form-field:nth-child(7) { grid-column: span 1; } /* Duration */
-#transactionForm .form-field:nth-child(8) { grid-column: span 1; } /* Start */
-#transactionForm .form-field:nth-child(9) { grid-column: span 1; } /* End */
-#transactionForm .form-field:nth-child(10) { grid-column: span 1; } /* Device */
-
-/* Row 3: Software, Package, Account, Note (2 cols) */
-#transactionForm .form-field:nth-child(11) { grid-column: span 1; } /* Software */
-#transactionForm .form-field:nth-child(12) { grid-column: span 1; } /* Package */
-#transactionForm .form-field:nth-child(13) { grid-column: span 1; } /* Account */
-#transactionForm .form-field:nth-child(14) { grid-column: span 2; } /* Note */
-
 /* Expense form layout */
 #expenseForm .form-field:nth-child(1) { grid-column: span 1; } /* Date */
 #expenseForm .form-field:nth-child(2) { grid-column: span 1; } /* Category */
@@ -425,6 +404,11 @@ table {
   height: calc(100% - 40px) !important;
   min-height: 120px !important;
   resize: vertical !important;
+}
+
+/* Ensure all form fields default to 1 column */
+.transaction-form-grid .form-field {
+  grid-column: span 1 !important;
 }
 
 /* Empty field for layout alignment */
