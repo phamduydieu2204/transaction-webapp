@@ -46,17 +46,36 @@
   </div>
 
   <!-- Scripts -->
+  <script>
+    console.log('🔥 Index.html: Basic script loaded');
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script type="module">
-    import { initializePartials } from './scripts/partialLoader.js';
+    console.log('🚀 Index.html: Starting application...');
     
-    // Load all partials when DOM is ready
-    document.addEventListener('DOMContentLoaded', async () => {
-      await initializePartials();
+    try {
+      console.log('📦 Index.html: Importing partialLoader...');
+      const { initializePartials } = await import('./scripts/partialLoader.js');
       
-      // After partials are loaded, initialize main.js
-      const mainModule = await import('./scripts/main.js');
-    });
+      // Load all partials when DOM is ready
+      document.addEventListener('DOMContentLoaded', async () => {
+        console.log('📄 Index.html: DOM loaded, initializing partials...');
+        
+        try {
+          await initializePartials();
+          console.log('✅ Index.html: Partials loaded successfully');
+          
+          // After partials are loaded, initialize main.js
+          console.log('🎯 Index.html: Loading main.js...');
+          const mainModule = await import('./scripts/main.js');
+          console.log('✅ Index.html: Main.js loaded successfully');
+        } catch (partialError) {
+          console.error('❌ Index.html: Error loading partials:', partialError);
+        }
+      });
+    } catch (error) {
+      console.error('❌ Index.html: Error in initial setup:', error);
+    }
   </script>
 </body>
 </html>

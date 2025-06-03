@@ -5,6 +5,8 @@
  * Imports and initializes core application functionality
  */
 
+console.log('🎯 Main.js: File loaded, starting imports...');
+
 // Import core modules
 import { initializeApp } from './core/appInitializer.js';
 import { initializeEventHandlers } from './core/eventManager.js';
