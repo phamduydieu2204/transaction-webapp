@@ -151,7 +151,15 @@ async function loadTransactionData() {
     
     // Only update table if we have data
     if (window.transactionList && window.transactionList.length > 0) {
-      updateTable();
+      updateTable(
+        window.transactionList,
+        window.currentPage || 1,
+        window.itemsPerPage || 50,
+        formatDate,
+        editTransaction,
+        deleteTransaction,
+        viewTransaction
+      );
       console.log('✅ Transaction data loaded');
     } else {
       console.log('ℹ️ No transaction data to display');
