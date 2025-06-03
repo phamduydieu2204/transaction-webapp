@@ -10,9 +10,15 @@ const validationConfig = {
       { id: 'transactionDate', required: true, message: 'Vui lòng nhập ngày giao dịch' },
       { id: 'customerEmail', required: true, type: 'email', message: 'Vui lòng nhập email hợp lệ' },
       { id: 'customerName', required: true, message: 'Vui lòng nhập tên khách hàng' },
+      { id: 'customerPhone', required: true, message: 'Vui lòng nhập số liên hệ' },
+      { id: 'revenue', required: true, type: 'number', message: 'Vui lòng nhập doanh thu' },
       { id: 'transactionType', required: true, message: 'Vui lòng chọn loại giao dịch' },
+      { id: 'softwareName', required: true, message: 'Vui lòng chọn tên phần mềm' },
+      { id: 'softwarePackage', required: true, message: 'Vui lòng chọn gói phần mềm' },
+      { id: 'accountName', required: true, message: 'Vui lòng chọn tên tài khoản' },
+      { id: 'duration', required: true, type: 'number', message: 'Vui lòng nhập số tháng đăng ký' },
       { id: 'startDate', required: true, message: 'Vui lòng nhập ngày bắt đầu' },
-      { id: 'softwareName', required: true, message: 'Vui lòng chọn tên phần mềm' }
+      { id: 'endDate', required: true, message: 'Vui lòng nhập ngày kết thúc' }
     ]
   },
   expenseForm: {

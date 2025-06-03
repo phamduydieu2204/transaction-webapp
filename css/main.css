@@ -415,9 +415,16 @@ table {
   color: #27ae60 !important;
 }
 
-/* Note field spans 2 columns */
-.transaction-form-grid .note-field {
-  grid-column: span 2 !important;
+/* Note field - tall version that spans 2 rows */
+.transaction-form-grid .note-field-tall {
+  grid-row: span 2 !important;
+  grid-column: span 1 !important;
+}
+
+.transaction-form-grid .note-field-tall textarea {
+  height: calc(100% - 40px) !important;
+  min-height: 120px !important;
+  resize: vertical !important;
 }
 
 /* Error message styling */
@@ -506,8 +513,9 @@ table {
     padding: 15px !important;
   }
   
-  .transaction-form-grid .note-field {
-    grid-column: span 2 !important;
+  .transaction-form-grid .note-field-tall {
+    grid-row: span 2 !important;
+    grid-column: span 1 !important;
   }
 }
 
@@ -519,8 +527,13 @@ table {
     padding: 12px !important;
   }
   
-  .transaction-form-grid .note-field {
-    grid-column: span 2 !important;
+  .transaction-form-grid .note-field-tall {
+    grid-row: span 1 !important;
+    grid-column: span 1 !important;
+  }
+  
+  .transaction-form-grid .note-field-tall textarea {
+    min-height: 80px !important;
   }
   
   .transaction-form-grid + .button-row {
@@ -545,8 +558,13 @@ table {
     padding: 10px !important;
   }
   
-  .transaction-form-grid .note-field {
+  .transaction-form-grid .note-field-tall {
+    grid-row: span 1 !important;
     grid-column: span 1 !important;
+  }
+  
+  .transaction-form-grid .note-field-tall textarea {
+    min-height: 60px !important;
   }
   
   .transaction-form-grid .form-field input,
