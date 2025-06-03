@@ -8,6 +8,7 @@
 // Import core dependencies
 import { getConstants } from '../constants.js';
 import { updateAccountList } from '../updateAccountList.js';
+import { updatePackageList } from '../updatePackageList.js';
 import { fetchSoftwareList } from '../fetchSoftwareList.js';
 import { loadTransactions } from '../loadTransactions.js';
 import { updateTable } from '../updateTable.js';
@@ -113,8 +114,15 @@ export async function loadInitialData() {
  */
 async function loadSoftwareData() {
   try {
-    await fetchSoftwareList();
-    await updateAccountList();
+    // Pass required parameters to fetchSoftwareList
+    await fetchSoftwareList(
+      null, // softwareNameToKeep
+      window.softwareData || [], // softwareData
+      updatePackageList, // updatePackageList function
+      updateAccountList, // updateAccountList function
+      null, // softwarePackageToKeep
+      null  // accountNameToKeep
+    );
     console.log('✅ Software data loaded');
   } catch (error) {
     console.error('❌ Error loading software data:', error);
@@ -128,8 +136,18 @@ async function loadSoftwareData() {
 async function loadTransactionData() {
   try {
     await loadTransactions();
-    updateTable();
-    console.log('✅ Transaction data loaded');
+    // Only update table if we have data
+    if (window.transactionList && window.transactionList.length > 0) {
+      updateTable();
+      console.log('✅ Transaction data loaded');
+    } else {
+      console.log('ℹ️ No transaction data to display');
+      // Show empty state
+      const tableBody = document.querySelector('#transactionTable tbody');
+      if (tableBody) {
+        tableBody.innerHTML = '<tr><td colspan="10" class="text-center">Không có dữ liệu</td></tr>';
+      }
+    }
   } catch (error) {
     console.error('❌ Error loading transaction data:', error);
     // Continue execution even if transaction data fails
