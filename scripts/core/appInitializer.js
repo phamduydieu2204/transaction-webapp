@@ -12,6 +12,10 @@ import { updatePackageList } from '../updatePackageList.js';
 import { fetchSoftwareList } from '../fetchSoftwareList.js';
 import { loadTransactions } from '../loadTransactions.js';
 import { updateTable } from '../updateTable.js';
+import { formatDate } from '../formatDate.js';
+import { editTransaction } from '../editTransaction.js';
+import { deleteTransaction } from '../deleteTransaction.js';
+import { viewTransaction } from '../viewTransaction.js';
 import { initExpenseDropdowns } from '../initExpenseDropdowns.js';
 import { renderExpenseStats } from '../renderExpenseStats.js';
 import { initTotalDisplay } from '../updateTotalDisplay.js';
@@ -135,7 +139,16 @@ async function loadSoftwareData() {
  */
 async function loadTransactionData() {
   try {
-    await loadTransactions();
+    // Pass required parameters to loadTransactions
+    await loadTransactions(
+      window.userInfo,
+      updateTable,
+      formatDate,
+      editTransaction,
+      deleteTransaction,
+      viewTransaction
+    );
+    
     // Only update table if we have data
     if (window.transactionList && window.transactionList.length > 0) {
       updateTable();
