@@ -111,3 +111,95 @@ table {
     grid-column: span 3 !important;
   }
 }
+
+/* ========================================
+   FORM LAYOUT - 7 COLUMNS PER ROW MAX
+   ======================================== */
+
+/* Transaction form layout */
+.form-grid {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr) !important;
+  gap: 15px !important;
+  margin-bottom: 15px !important;
+}
+
+/* Transaction form - Row 1: Customer info (3 columns) */
+.col-email { grid-column: span 2; }
+.col-name { grid-column: span 3; }
+.col-phone { grid-column: span 2; }
+
+/* Transaction form - Row 2: Transaction details (7 columns) */
+.col-date { grid-column: span 1; }
+.col-type { grid-column: span 1; }
+.col-duration { grid-column: span 1; }
+.col-start { grid-column: span 1; }
+.col-end { grid-column: span 1; }
+.col-device { grid-column: span 1; }
+.col-revenue { grid-column: span 1; }
+
+/* Transaction form - Row 3: Software info (3 columns) */
+.col-software { grid-column: span 2; }
+.col-package { grid-column: span 2; }
+.col-account { grid-column: span 3; }
+
+/* Transaction form - Row 4: Note (full width) */
+.col-note { grid-column: span 7; }
+
+/* Expense form - Row 1: Basic info (7 columns) */
+.col-expense-date { grid-column: span 1; }
+.col-expense-category { grid-column: span 1; }
+.col-expense-sub { grid-column: span 1; }
+.col-expense-product { grid-column: span 1; }
+.col-expense-package { grid-column: span 1; }
+.col-expense-amount { grid-column: span 1; }
+.col-expense-currency { grid-column: span 1; }
+
+/* Expense form - Row 2: Payment info (6 columns) */
+.col-expense-bank { grid-column: span 1; }
+.col-expense-card { grid-column: span 1; }
+.col-expense-method { grid-column: span 1; }
+.col-expense-renew { grid-column: span 1; }
+.col-expense-supplier { grid-column: span 2; }
+.col-expense-status { grid-column: span 1; }
+
+/* Expense form - Row 3: Note (full width) */
+.col-expense-note { grid-column: span 7; }
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 1200px) {
+  .form-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+  
+  .col-email, .col-name, .col-phone,
+  .col-software, .col-package, .col-account,
+  .col-expense-supplier { grid-column: span 2; }
+  
+  .col-date, .col-type, .col-duration, .col-start, .col-end, .col-device, .col-revenue,
+  .col-expense-date, .col-expense-category, .col-expense-sub, .col-expense-product,
+  .col-expense-package, .col-expense-amount, .col-expense-currency,
+  .col-expense-bank, .col-expense-card, .col-expense-method, .col-expense-renew, .col-expense-status { 
+    grid-column: span 1; 
+  }
+  
+  .col-note, .col-expense-note { grid-column: span 4; }
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .col-email, .col-name, .col-phone,
+  .col-date, .col-type, .col-duration, .col-start, .col-end, .col-device, .col-revenue,
+  .col-software, .col-package, .col-account,
+  .col-expense-date, .col-expense-category, .col-expense-sub, .col-expense-product,
+  .col-expense-package, .col-expense-amount, .col-expense-currency,
+  .col-expense-bank, .col-expense-card, .col-expense-method, .col-expense-renew,
+  .col-expense-supplier, .col-expense-status { 
+    grid-column: span 1; 
+  }
+  
+  .col-note, .col-expense-note { grid-column: span 2; }
+}
