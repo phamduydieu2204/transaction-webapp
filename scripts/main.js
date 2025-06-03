@@ -8,7 +8,7 @@
 // Import core modules
 import { initializeApp } from './core/appInitializer.js';
 import { initializeEventHandlers } from './core/eventManager.js';
-import { initializeState, getState, updateState } from './core/stateManager.js';
+import { initializeStateManager, getState, updateState } from './core/stateManager.js';
 import { switchToTab, initializeTabSystem } from './core/navigationManager.js';
 import { authManager } from './core/authManager.js';
 
@@ -145,7 +145,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     // Phase 1: Initialize state and authentication
     console.log('📊 Phase 1: Initializing state and auth...');
-    initializeState();
+    initializeStateManager();
     
     // Check authentication
     if (!authManager.loadSession()) {
