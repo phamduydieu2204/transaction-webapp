@@ -420,11 +420,6 @@ table {
   grid-column: span 2 !important;
 }
 
-.transaction-form-grid .note-field textarea {
-  min-height: 100px !important;
-  resize: vertical !important;
-}
-
 /* Error message styling */
 .transaction-form-grid .error-message {
   color: #e74c3c !important;
