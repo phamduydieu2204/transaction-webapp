@@ -70,6 +70,73 @@ import { editRow, deleteRow } from './legacy.js';
 import { getConstants } from './constants.js';
 
 /**
+ * Show login form when user is not authenticated
+ */
+function showLoginForm() {
+  console.log('🔐 Showing login form...');
+  
+  // Hide main content
+  document.querySelector('.container').style.display = 'none';
+  
+  // Create and show login form
+  const loginContainer = document.createElement('div');
+  loginContainer.className = 'login-container';
+  loginContainer.innerHTML = `
+    <div class="login-box">
+      <h2 class="login-title">Đăng nhập hệ thống</h2>
+      <form id="loginForm" class="login-form">
+        <div class="form-group">
+          <label for="username">Tên đăng nhập</label>
+          <input type="text" id="username" name="username" required class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="password">Mật khẩu</label>
+          <input type="password" id="password" name="password" required class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
+      </form>
+      <div id="loginError" class="error-message" style="display: none;"></div>
+    </div>
+  `;
+  
+  document.body.appendChild(loginContainer);
+  
+  // Handle login form submission
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    
+    try {
+      // Import login function
+      const { login } = await import('./login.js');
+      
+      // Show processing
+      const loginBtn = e.target.querySelector('button[type="submit"]');
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Đang xử lý...';
+      
+      // Attempt login
+      await login(username, password);
+      
+      // If login successful, reload page
+      window.location.reload();
+      
+    } catch (error) {
+      console.error('Login error:', error);
+      document.getElementById('loginError').style.display = 'block';
+      document.getElementById('loginError').textContent = 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.';
+      
+      // Reset button
+      const loginBtn = e.target.querySelector('button[type="submit"]');
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Đăng nhập';
+    }
+  });
+}
+
+/**
  * Application startup sequence
  */
 document.addEventListener("DOMContentLoaded", async () => {
@@ -90,11 +157,13 @@ document.addEventListener("DOMContentLoaded", async () => {
           updateState({ user: userInfo });
         } catch (e) {
           console.warn('Invalid legacy session data');
-          window.location.href = "index.html";
+          // Show login form instead of redirect
+          showLoginForm();
           return;
         }
       } else {
-        window.location.href = "index.html";
+        // Show login form instead of redirect
+        showLoginForm();
         return;
       }
     }

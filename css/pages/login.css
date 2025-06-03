@@ -3,17 +3,25 @@
    ======================================== */
 
 /* Login container */
-#loginContainer {
+#loginContainer,
+.login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
 }
 
 /* Login form */
-#loginForm {
+#loginForm,
+.login-box {
   background: white;
   padding: 40px;
   border-radius: 12px;
@@ -34,7 +42,8 @@
   }
 }
 
-#loginForm h2 {
+#loginForm h2,
+.login-title {
   margin: 0 0 30px 0;
   text-align: center;
   color: #333;

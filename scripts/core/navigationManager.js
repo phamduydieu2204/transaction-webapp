@@ -477,6 +477,9 @@ export function getAllTabs() {
   }));
 }
 
+// Export alias for backward compatibility
+export const initializeTabSystem = initializeNavigation;
+
 // Make functions globally available for backward compatibility
 if (typeof window !== 'undefined') {
   window.switchToTab = switchToTab;

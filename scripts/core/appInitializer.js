@@ -55,8 +55,7 @@ export function loadUserInfo() {
   }
 
   if (!window.userInfo) {
-    console.warn('⚠️ No user information found, redirecting to login');
-    window.location.href = "index.html";
+    console.warn('⚠️ No user information found');
     return false;
   }
 

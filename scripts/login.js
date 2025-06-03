@@ -52,13 +52,49 @@ export async function handleLogin() {
       duocTimKiemGiaoDichCuaAi: result.duocTimKiemGiaoDichCuaAi || "chỉ bản thân"
     };
       localStorage.setItem('employeeInfo', JSON.stringify(employeeInfo));
-      window.location.href = 'main.html';
+      // Don't redirect if called from login wrapper
+      if (!window._isLoginWrapper) {
+        window.location.href = 'main.html';
+      }
     } else {
       errorEl.textContent = result.message || 'Đăng nhập thất bại!';
     }
   } catch (error) {
     errorEl.textContent = 'Lỗi kết nối máy chủ: ' + error.message;
     console.error(error);
+  }
+}
+
+// Export login wrapper for main.js
+export async function login(username, password) {
+  // Create mock DOM elements for handleLogin
+  const mockElements = {
+    employeeCode: { value: username },
+    password: { value: password },
+    errorMessage: { textContent: '' }
+  };
+  
+  // Override getElementById temporarily
+  const originalGetElementById = document.getElementById;
+  document.getElementById = (id) => mockElements[id] || originalGetElementById.call(document, id);
+  
+  try {
+    // Set flag to prevent redirect
+    window._isLoginWrapper = true;
+    
+    await handleLogin();
+    
+    // Check if login was successful by checking localStorage
+    const employeeInfo = localStorage.getItem('employeeInfo');
+    if (!employeeInfo) {
+      throw new Error(mockElements.errorMessage.textContent || 'Login failed');
+    }
+    
+    return true;
+  } finally {
+    // Restore original getElementById and remove flag
+    document.getElementById = originalGetElementById;
+    delete window._isLoginWrapper;
   }
 }
 

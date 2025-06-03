@@ -6,7 +6,7 @@
  */
 
 import { updateState, getState } from './stateManager.js';
-import { showTab } from './navigationManager.js';
+import { switchToTab } from './navigationManager.js';
 
 // Auth configuration
 const SESSION_TIMEOUT = 24 * 60 * 60 * 1000; // 24 hours
@@ -51,7 +51,7 @@ export function login(userData) {
     saveAuthToStorage(authData);
     
     // Show main content
-    showTab('list');
+    switchToTab('giao-dich');
     
     console.log('User logged in:', userData.username);
     return true;
@@ -74,7 +74,8 @@ export function logout() {
     clearAuthFromStorage();
     
     // Show login tab
-    showTab('messages');
+    // Show login tab or redirect to login
+    window.location.hash = '#login';
     
     // Clear any cached data
     clearCache();
@@ -233,6 +234,28 @@ function showSessionExpiryWarning(timeRemaining) {
         extendSession();
     }
 }
+
+// Export authManager object for module imports
+export const authManager = {
+    initializeAuth,
+    login,
+    logout,
+    isAuthenticated,
+    getCurrentUser,
+    extendSession,
+    checkSessionExpiry,
+    loadSession: () => {
+        const auth = loadAuthFromStorage();
+        if (auth && isSessionValid(auth)) {
+            updateState({ 
+                user: auth.user,
+                sessionStart: auth.sessionStart 
+            });
+            return true;
+        }
+        return false;
+    }
+};
 
 // Make functions available globally for backward compatibility
 window.login = login;
