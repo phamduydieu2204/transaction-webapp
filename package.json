@@ -1,0 +1,22 @@
+{
+  "name": "transaction-webapp",
+  "version": "1.0.0",
+  "description": "Transaction management web application",
+  "type": "module",
+  "scripts": {
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "test:performance": "vitest tests/performance/ --reporter=verbose",
+    "performance:report": "node tests/performance/performance-summary.js",
+    "test:unit": "vitest tests/ --exclude=\"tests/{performance,integration}/**\"",
+    "test:integration": "vitest tests/integration/",
+    "test:all": "vitest tests/"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^1.6.1",
+    "@vitest/ui": "^1.0.0",
+    "jsdom": "^23.0.0",
+    "vitest": "^1.0.0"
+  }
+}

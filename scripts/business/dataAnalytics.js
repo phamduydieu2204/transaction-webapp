@@ -80,6 +80,10 @@ export function calculateBusinessMetrics(transactionData, expenseData, dateRange
 export function calculateTotalRevenue(transactionData) {
   return transactionData.reduce((total, transaction) => {
     const amount = parseFloat(transaction.revenue || transaction.amount || 0);
+    // Skip invalid amounts
+    if (isNaN(amount) || amount === null || amount === undefined) {
+      return total;
+    }
     return total + amount;
   }, 0);
 }
@@ -90,6 +94,10 @@ export function calculateTotalRevenue(transactionData) {
 export function calculateTotalExpenses(expenseData) {
   return expenseData.reduce((total, expense) => {
     const amount = parseFloat(expense.amount || 0);
+    // Skip invalid amounts
+    if (isNaN(amount) || amount === null || amount === undefined) {
+      return total;
+    }
     return total + amount;
   }, 0);
 }
@@ -192,9 +200,18 @@ export function calculateOperatingExpenses(expenseData) {
       // Fallback to old logic if no accounting type
       const type = expense.type || '';
       const category = expense.category || '';
-      return !type.includes('cá nhân') && !type.includes('Sinh hoạt');
+      // Exclude personal expenses from both type and category fields
+      return !type.includes('cá nhân') && !type.includes('Sinh hoạt') && 
+             !category.includes('cá nhân') && !category.includes('Sinh hoạt');
     })
-    .reduce((total, expense) => total + parseFloat(expense.amount || 0), 0);
+    .reduce((total, expense) => {
+      const amount = parseFloat(expense.amount || 0);
+      // Skip invalid amounts
+      if (isNaN(amount) || amount === null || amount === undefined) {
+        return total;
+      }
+      return total + amount;
+    }, 0);
 }
 
 /**
