@@ -113,29 +113,43 @@ table {
 }
 
 /* ========================================
-   FORM LAYOUT - CLEAN & SIMPLE
+   FORM LAYOUT - FULL WIDTH & OPTIMIZED
    ======================================== */
 
-/* Form grid container */
+/* Form container takes full width */
+.form-container {
+  width: 100% !important;
+  max-width: none !important;
+  padding: 16px 10px !important;
+}
+
+/* Form grid - flexible layout */
 .form-grid {
-  display: grid !important;
-  grid-template-columns: repeat(6, 1fr) !important;
-  gap: 15px !important;
-  margin-bottom: 20px !important;
-  padding: 0 !important;
-}
-
-/* Remove old form group styles */
-.form-group {
-  display: contents !important;
-  background: none !important;
-  border: none !important;
-  padding: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
   margin: 0 !important;
+  padding: 0 !important;
 }
 
+/* Form rows for logical grouping */
 .form-row {
-  display: contents !important;
+  display: grid !important;
+  gap: 12px !important;
+  width: 100% !important;
+  align-items: end !important;
+}
+
+/* Form groups */
+.form-group {
+  width: 100% !important;
+  margin-bottom: 12px !important;
+}
+
+.form-group:last-child {
+  margin-bottom: 0 !important;
 }
 
 /* Individual form field */
@@ -143,103 +157,155 @@ table {
   display: flex !important;
   flex-direction: column !important;
   gap: 4px !important;
+  min-width: 0 !important;
 }
 
 .form-field label {
   font-weight: 500 !important;
   color: #495057 !important;
-  font-size: 13px !important;
+  font-size: 14px !important;
   margin-bottom: 4px !important;
   white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 .form-field input,
-.form-field select {
-  padding: 8px 10px !important;
+.form-field select,
+.form-field textarea {
+  padding: 8px 12px !important;
   border: 1px solid #ced4da !important;
   border-radius: 4px !important;
-  font-size: 13px !important;
-  height: 36px !important;
+  font-size: 14px !important;
+  min-height: 38px !important;
   box-sizing: border-box !important;
   transition: border-color 0.15s ease-in-out !important;
+  width: 100% !important;
 }
 
 .form-field input:focus,
-.form-field select:focus {
+.form-field select:focus,
+.form-field textarea:focus {
   outline: none !important;
   border-color: #007bff !important;
-  box-shadow: 0 0 0 1px rgba(0, 123, 255, 0.25) !important;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15) !important;
 }
 
-/* Transaction form layout - clean rows */
-#transactionForm .form-field:nth-child(1) { grid-column: span 2; } /* Email */
-#transactionForm .form-field:nth-child(2) { grid-column: span 2; } /* Name */
-#transactionForm .form-field:nth-child(3) { grid-column: span 2; } /* Phone */
-
-#transactionForm .form-field:nth-child(4) { grid-column: span 1; } /* Date */
-#transactionForm .form-field:nth-child(5) { grid-column: span 1; } /* Type */
-#transactionForm .form-field:nth-child(6) { grid-column: span 1; } /* Duration */
-#transactionForm .form-field:nth-child(7) { grid-column: span 1; } /* Start */
-#transactionForm .form-field:nth-child(8) { grid-column: span 1; } /* End */
-#transactionForm .form-field:nth-child(9) { grid-column: span 1; } /* Device */
-
-#transactionForm .form-field:nth-child(10) { grid-column: span 2; } /* Software */
-#transactionForm .form-field:nth-child(11) { grid-column: span 2; } /* Package */
-#transactionForm .form-field:nth-child(12) { grid-column: span 1; } /* Account */
-#transactionForm .form-field:nth-child(13) { grid-column: span 1; } /* Revenue */
-
-/* Expense form layout - clean rows */
-#expenseForm .form-field:nth-child(1) { grid-column: span 1; } /* Date */
-#expenseForm .form-field:nth-child(2) { grid-column: span 1; } /* Category */
-#expenseForm .form-field:nth-child(3) { grid-column: span 1; } /* Sub */
-#expenseForm .form-field:nth-child(4) { grid-column: span 1; } /* Product */
-#expenseForm .form-field:nth-child(5) { grid-column: span 1; } /* Package */
-#expenseForm .form-field:nth-child(6) { grid-column: span 1; } /* Amount */
-
-#expenseForm .form-field:nth-child(7) { grid-column: span 1; } /* Currency */
-#expenseForm .form-field:nth-child(8) { grid-column: span 1; } /* Bank */
-#expenseForm .form-field:nth-child(9) { grid-column: span 1; } /* Card */
-#expenseForm .form-field:nth-child(10) { grid-column: span 1; } /* Method */
-#expenseForm .form-field:nth-child(11) { grid-column: span 1; } /* Renew */
-#expenseForm .form-field:nth-child(12) { grid-column: span 1; } /* Supplier */
-
-#expenseForm .form-field:nth-child(13) { grid-column: span 1; } /* Status */
-
-/* Full width field (for notes) */
-.form-field-full {
-  grid-column: 1 / -1 !important;
+.form-field textarea {
+  min-height: 80px !important;
+  resize: vertical !important;
 }
 
-/* Responsive adjustments */
-@media (max-width: 1200px) {
-  .form-grid {
-    grid-template-columns: repeat(4, 1fr) !important;
+/* Row layouts for different form sections */
+
+/* Customer info row - 3 fields */
+.customer-row {
+  grid-template-columns: 2fr 3fr 2fr !important;
+}
+
+/* Transaction details row - 3 fields per row */
+.transaction-dates-row {
+  grid-template-columns: 1.5fr 2fr 1fr !important;
+}
+
+.transaction-period-row {
+  grid-template-columns: 1.5fr 1.5fr 1fr !important;
+}
+
+/* Software info row - 2 fields */
+.software-row {
+  grid-template-columns: 2fr 2fr 2fr 1.5fr !important;
+}
+
+/* Full width rows */
+.note-row {
+  grid-template-columns: 1fr !important;
+}
+
+/* Expense form rows */
+.expense-basic-row {
+  grid-template-columns: 1fr 1.5fr 1.5fr 1.5fr 1fr 1fr !important;
+}
+
+.expense-payment-row {
+  grid-template-columns: 1fr 2fr 2fr 1.5fr 1.5fr 1fr !important;
+}
+
+.expense-final-row {
+  grid-template-columns: 1fr 4fr !important;
+}
+
+/* Responsive design */
+@media (max-width: 1400px) {
+  .customer-row {
+    grid-template-columns: 1fr 1fr 1fr !important;
   }
   
-  .form-field:nth-child(1),
-  .form-field:nth-child(2),
-  .form-field:nth-child(3) { grid-column: span 2; }
+  .software-row {
+    grid-template-columns: 1fr 1fr 1fr 1fr !important;
+  }
   
-  .transaction-info .form-field,
-  .expense-basic .form-field,
-  .expense-payment .form-field { grid-column: span 1; }
+  .expense-basic-row {
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr !important;
+  }
   
-  .software-info .form-field { grid-column: span 2; }
+  .expense-payment-row {
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .customer-row,
+  .transaction-dates-row,
+  .transaction-period-row {
+    grid-template-columns: 1fr 1fr 1fr !important;
+  }
+  
+  .software-row {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  
+  .expense-basic-row {
+    grid-template-columns: 1fr 1fr 1fr !important;
+  }
+  
+  .expense-payment-row {
+    grid-template-columns: 1fr 1fr 1fr !important;
+  }
+  
+  .expense-final-row {
+    grid-template-columns: 1fr 2fr !important;
+  }
 }
 
 @media (max-width: 768px) {
-  .form-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
+  .form-container {
+    padding: 12px 8px !important;
   }
   
-  .form-field { grid-column: span 1 !important; }
-  .form-field-full { grid-column: 1 / -1 !important; }
+  .form-row {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  
+  .note-row {
+    grid-template-columns: 1fr !important;
+  }
   
   .form-field input,
   .form-field select {
-    font-size: 14px !important;
-    padding: 10px !important;
-    height: 40px !important;
+    font-size: 16px !important; /* Prevent zoom on iOS */
+    padding: 12px !important;
+    min-height: 44px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-row {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .form-field label {
+    font-size: 15px !important;
   }
 }

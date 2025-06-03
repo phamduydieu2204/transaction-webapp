@@ -8,97 +8,109 @@
       <input type="hidden" id="expenseRecorder">
 
       <div class="form-grid">
-        <!-- Dòng 1: Thông tin cơ bản (6 trường) -->
-        <div class="form-field">
-          <label>Ngày chi</label>
-          <div class="date-input-container">
-            <input type="text" id="expenseDate" placeholder="yyyy/mm/dd">
-            <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseDate')"></i>
+        <!-- Nhóm 1: Thông tin cơ bản -->
+        <div class="form-group">
+          <div class="form-row expense-basic-row">
+            <div class="form-field">
+              <label>Ngày chi</label>
+              <div class="date-input-container">
+                <input type="text" id="expenseDate" placeholder="yyyy/mm/dd">
+                <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseDate')"></i>
+              </div>
+            </div>
+            <div class="form-field">
+              <label>Loại khoản chi</label>
+              <select id="expenseCategory" onchange="handleCategoryChange()">
+                <option value="">-- Chọn loại --</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Danh mục chung</label>
+              <select id="expenseSubCategory" onchange="handleSubCategoryChange()">
+                <option value="">-- Chọn danh mục --</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Sản phẩm/Dịch vụ</label>
+              <select id="expenseProduct" onchange="handleProductChange()">
+                <option value="">-- Chọn sản phẩm --</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Gói dịch vụ</label>
+              <select id="expensePackage">
+                <option value="">-- Chọn gói --</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Số tiền</label>
+              <input type="number" id="expenseAmount">
+            </div>
           </div>
         </div>
-        <div class="form-field">
-          <label>Loại khoản chi</label>
-          <select id="expenseCategory" onchange="handleCategoryChange()">
-            <option value="">-- Chọn loại --</option>
-          </select>
-        </div>
-        <div class="form-field">
-          <label>Danh mục chung</label>
-          <select id="expenseSubCategory" onchange="handleSubCategoryChange()">
-            <option value="">-- Chọn danh mục --</option>
-          </select>
-        </div>
-        <div class="form-field">
-          <label>Sản phẩm/Dịch vụ</label>
-          <select id="expenseProduct" onchange="handleProductChange()">
-            <option value="">-- Chọn sản phẩm --</option>
-          </select>
-        </div>
-        <div class="form-field">
-          <label>Gói dịch vụ</label>
-          <select id="expensePackage">
-            <option value="">-- Chọn gói --</option>
-          </select>
-        </div>
-        <div class="form-field">
-          <label>Số tiền</label>
-          <input type="number" id="expenseAmount">
-        </div>
 
-        <!-- Dòng 2: Thông tin thanh toán (6 trường) -->
-        <div class="form-field">
-          <label>Tiền tệ</label>
-          <select id="expenseCurrency">
-            <option value="VND">VND</option>
-            <option value="USD">USD</option>
-            <option value="NGN">NGN</option>
-          </select>
-        </div>
-        <div class="form-field">
-          <label>Ngân hàng/Ví</label>
-          <select id="expenseBank" onchange="handleBankChange()">
-            <option value="">-- Chọn ngân hàng/ví --</option>
-          </select>
-        </div>
-        <div class="form-field">
-          <label>Tài khoản</label>
-          <select id="expenseCard">
-            <option value="">-- Chọn tài khoản --</option>
-          </select>
-        </div>
-        <div class="form-field">
-          <label>Phương thức chi</label>
-          <select id="expenseRecurring" onchange="handleRecurringChange()">
-            <option value="Chi một lần">Chi một lần</option>
-            <option value="Hàng tháng">Định kỳ hàng tháng</option>
-            <option value="Hàng quý">Định kỳ hàng quý</option>
-            <option value="Hàng năm">Định kỳ hàng năm</option>
-          </select>
-        </div>
-        <div class="form-field">
-          <label>Ngày tái tục</label>
-          <div class="date-input-container">
-            <input type="text" id="expenseRenewDate" placeholder="yyyy/mm/dd">
-            <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseRenewDate')"></i>
+        <!-- Nhóm 2: Thông tin thanh toán -->
+        <div class="form-group">
+          <div class="form-row expense-payment-row">
+            <div class="form-field">
+              <label>Tiền tệ</label>
+              <select id="expenseCurrency">
+                <option value="VND">VND</option>
+                <option value="USD">USD</option>
+                <option value="NGN">NGN</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Ngân hàng/Ví</label>
+              <select id="expenseBank" onchange="handleBankChange()">
+                <option value="">-- Chọn ngân hàng/ví --</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Thông tin thẻ/Tài khoản</label>
+              <select id="expenseCard">
+                <option value="">-- Chọn tài khoản --</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Phương thức chi</label>
+              <select id="expenseRecurring" onchange="handleRecurringChange()">
+                <option value="Chi một lần">Chi một lần</option>
+                <option value="Hàng tháng">Định kỳ hàng tháng</option>
+                <option value="Hàng quý">Định kỳ hàng quý</option>
+                <option value="Hàng năm">Định kỳ hàng năm</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Ngày tái tục</label>
+              <div class="date-input-container">
+                <input type="text" id="expenseRenewDate" placeholder="yyyy/mm/dd">
+                <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseRenewDate')"></i>
+              </div>
+            </div>
+            <div class="form-field">
+              <label>Trạng thái</label>
+              <select id="expenseStatus">
+                <option>Đã thanh toán</option>
+                <option>Chưa thanh toán</option>
+                <option>Đã hủy</option>
+              </select>
+            </div>
           </div>
         </div>
-        <div class="form-field">
-          <label>Nhà cung cấp</label>
-          <input type="text" id="expenseSupplier">
-        </div>
 
-        <!-- Dòng 3: Trạng thái và ghi chú (2 trường) -->
-        <div class="form-field">
-          <label>Trạng thái</label>
-          <select id="expenseStatus">
-            <option>Đã thanh toán</option>
-            <option>Chưa thanh toán</option>
-            <option>Đã hủy</option>
-          </select>
-        </div>
-        <div class="form-field form-field-full">
-          <label>Ghi chú</label>
-          <input type="text" id="expenseNote" placeholder="Nhập ghi chú...">
+        <!-- Nhóm 3: Nhà cung cấp và ghi chú -->
+        <div class="form-group">
+          <div class="form-row expense-final-row">
+            <div class="form-field">
+              <label>Người nhận/Nhà cung cấp</label>
+              <input type="text" id="expenseSupplier">
+            </div>
+            <div class="form-field">
+              <label>Ghi chú</label>
+              <textarea id="expenseNote" rows="3" placeholder="Nhập ghi chú chi tiết..."></textarea>
+            </div>
+          </div>
         </div>
       </div>
 

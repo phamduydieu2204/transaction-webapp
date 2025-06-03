@@ -4,92 +4,111 @@
   <div class="form-container">
     <form id="transactionForm" onreset="handleReset()">
       <div class="form-grid">
-          <!-- Dòng 1: Thông tin khách hàng (3 trường) -->
-          <div class="form-field">
-            <label>Email khách hàng:</label>
-            <input type="email" id="customerEmail">
-          </div>
-          <div class="form-field">
-            <label>Tên khách hàng:</label>
-            <div class="search-icon-container">
-              <input type="text" id="customerName">
-              <i class="fas fa-search search-icon" onclick="updateCustomerInfo()"></i>
+          <!-- Nhóm 1: Thông tin khách hàng -->
+          <div class="form-group">
+            <div class="form-row customer-row">
+              <div class="form-field">
+                <label>Email khách hàng:</label>
+                <input type="email" id="customerEmail">
+              </div>
+              <div class="form-field">
+                <label>Tên khách hàng:</label>
+                <div class="search-icon-container">
+                  <input type="text" id="customerName">
+                  <i class="fas fa-search search-icon" onclick="updateCustomerInfo()"></i>
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Liên hệ:</label>
+                <input type="text" id="customerPhone">
+              </div>
             </div>
-          </div>
-          <div class="form-field">
-            <label>Liên hệ:</label>
-            <input type="text" id="customerPhone">
           </div>
 
-          <!-- Dòng 2: Thông tin giao dịch (6 trường) -->
-          <div class="form-field">
-            <label>Ngày giao dịch:</label>
-            <div class="date-input-container">
-              <input type="text" id="transactionDate" placeholder="yyyy/mm/dd">
-              <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('transactionDate')"></i>
+          <!-- Nhóm 2: Thời gian và loại giao dịch -->
+          <div class="form-group">
+            <div class="form-row transaction-dates-row">
+              <div class="form-field">
+                <label>Ngày giao dịch:</label>
+                <div class="date-input-container">
+                  <input type="text" id="transactionDate" placeholder="yyyy/mm/dd">
+                  <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('transactionDate')"></i>
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Loại giao dịch:</label>
+                <select id="transactionType" required>
+                  <option value="">-- Chọn loại --</option>
+                  <option value="Bán hàng">Bán hàng</option>
+                  <option value="Hoàn Tiền">Hoàn Tiền</option>
+                  <option value="Dùng thử">Dùng thử</option>
+                  <option value="Nhập hàng">Nhập hàng</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label>Số tháng đăng ký:</label>
+                <input type="number" id="duration">
+              </div>
             </div>
-          </div>
-          <div class="form-field">
-            <label>Loại giao dịch:</label>
-            <select id="transactionType" required>
-              <option value="">-- Chọn loại --</option>
-              <option value="Bán hàng">Bán hàng</option>
-              <option value="Hoàn Tiền">Hoàn Tiền</option>
-              <option value="Dùng thử">Dùng thử</option>
-              <option value="Nhập hàng">Nhập hàng</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label>Số tháng:</label>
-            <input type="number" id="duration">
-          </div>
-          <div class="form-field">
-            <label>Ngày bắt đầu:</label>
-            <div class="date-input-container">
-              <input type="text" id="startDate" placeholder="yyyy/mm/dd">
-              <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('startDate')"></i>
+            
+            <div class="form-row transaction-period-row">
+              <div class="form-field">
+                <label>Ngày bắt đầu:</label>
+                <div class="date-input-container">
+                  <input type="text" id="startDate" placeholder="yyyy/mm/dd">
+                  <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('startDate')"></i>
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Ngày kết thúc:</label>
+                <div class="date-input-container">
+                  <input type="text" id="endDate" placeholder="yyyy/mm/dd">
+                  <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('endDate')"></i>
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Số thiết bị:</label>
+                <input type="number" id="deviceCount">
+              </div>
             </div>
-          </div>
-          <div class="form-field">
-            <label>Ngày kết thúc:</label>
-            <div class="date-input-container">
-              <input type="text" id="endDate" placeholder="yyyy/mm/dd">
-              <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('endDate')"></i>
-            </div>
-          </div>
-          <div class="form-field">
-            <label>Số thiết bị:</label>
-            <input type="number" id="deviceCount">
           </div>
 
-          <!-- Dòng 3: Thông tin phần mềm và doanh thu (4 trường) -->
-          <div class="form-field">
-            <label>Tên phần mềm:</label>
-            <select id="softwareName">
-              <option value="">-- Chọn phần mềm --</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label>Gói phần mềm:</label>
-            <select id="softwarePackage">
-              <option value="">-- Chọn gói --</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label>Tên tài khoản:</label>
-            <select id="accountName">
-              <option value="">-- Chọn tài khoản --</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label>Doanh thu (VNĐ):</label>
-            <input type="number" id="revenue">
+          <!-- Nhóm 3: Phần mềm và doanh thu -->
+          <div class="form-group">
+            <div class="form-row software-row">
+              <div class="form-field">
+                <label>Tên phần mềm:</label>
+                <select id="softwareName">
+                  <option value="">-- Chọn phần mềm --</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label>Gói phần mềm:</label>
+                <select id="softwarePackage">
+                  <option value="">-- Chọn gói --</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label>Tên tài khoản:</label>
+                <select id="accountName">
+                  <option value="">-- Chọn tài khoản --</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label>Doanh thu (VNĐ):</label>
+                <input type="number" id="revenue">
+              </div>
+            </div>
           </div>
 
-          <!-- Dòng 4: Ghi chú (full width) -->
-          <div class="form-field form-field-full">
-            <label>Ghi chú:</label>
-            <input type="text" id="note" placeholder="Nhập ghi chú...">
+          <!-- Nhóm 4: Ghi chú -->
+          <div class="form-group">
+            <div class="form-row note-row">
+              <div class="form-field">
+                <label>Ghi chú:</label>
+                <textarea id="note" rows="3" placeholder="Nhập ghi chú chi tiết..."></textarea>
+              </div>
+            </div>
           </div>
       </div>
 
