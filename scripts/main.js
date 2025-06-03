@@ -141,7 +141,7 @@ function showLoginForm() {
 /**
  * Application startup sequence
  */
-document.addEventListener("DOMContentLoaded", async () => {
+async function startApp() {
   console.log('🚀 Starting Transaction WebApp...');
   
   try {
@@ -204,7 +204,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       'error'
     );
   }
-});
+}
 
 // Legacy global function exports for backward compatibility
 window.logout = logout;
@@ -307,3 +307,9 @@ window.currentAccountName = "";
 window.isExpenseSearching = false;
 window.expenseList = [];
 window.currentExpensePage = 1;
+
+// Start the app immediately when module loads
+console.log('🚀 Main.js: Starting app...');
+startApp().catch(error => {
+  console.error('❌ Main.js: Failed to start app:', error);
+});
