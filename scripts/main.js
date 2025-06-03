@@ -19,6 +19,9 @@ import { showProcessingModal } from './showProcessingModal.js';
 import { showResultModal } from './showResultModal.js';
 import { closeProcessingModal } from './closeProcessingModal.js';
 
+// Import tab initialization functions
+import { initExpenseTab } from './initExpenseTab.js';
+
 // Import legacy functions for backward compatibility
 import { logout } from './logout.js';
 import { openCalendar } from './openCalendar.js';
