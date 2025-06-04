@@ -98,11 +98,14 @@ export async function loadTransactionsOptimized(userInfo, updateTable, formatDat
       }
 
       if (page === 1) {
+        // For ultra-fast performance, only keep the requested page
         window.transactionList = transactions;
         window.currentPage = 1;
+        window.totalTransactionCount = result.total || transactions.length;
       } else {
-        // Append to existing list for pagination
-        window.transactionList = window.transactionList.concat(transactions);
+        // For subsequent pages, replace data instead of appending
+        window.transactionList = transactions;
+        window.currentPage = page;
       }
       
       // ✅ Sort transactions by timestamp (newest first)

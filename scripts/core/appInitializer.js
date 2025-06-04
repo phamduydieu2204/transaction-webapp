@@ -11,7 +11,8 @@ import { updateAccountList } from '../updateAccountList.js';
 import { updatePackageList } from '../updatePackageList.js';
 import { fetchSoftwareList } from '../fetchSoftwareList.js';
 import { loadTransactions, loadTransactionsOptimized } from '../loadTransactions.js';
-import { updateTable } from '../updateTableOptimized.js';
+import { ultraFastInit, shouldUseUltraFast } from './ultraFastInit.js';
+import { updateTable } from '../updateTableUltraFast.js';
 import { formatDate } from '../formatDate.js';
 import { editTransaction } from '../editTransaction.js';
 import { deleteTransaction } from '../deleteTransaction.js';
@@ -94,9 +95,20 @@ export function initializeUI() {
  * Load initial data for the application
  */
 export async function loadInitialData() {
-  console.log('🚀 Loading initial data (optimized)...');
+  console.log('🚀 Loading initial data...');
 
   try {
+    // Check if we should use ultra-fast mode
+    if (shouldUseUltraFast()) {
+      console.log('⚡ Using ULTRA-FAST mode for performance');
+      const success = await ultraFastInit(window.userInfo);
+      if (success) {
+        console.log('✅ Ultra-fast initialization complete');
+        return;
+      }
+      console.warn('⚠️ Ultra-fast init failed, falling back to optimized mode');
+    }
+
     // Phase 1: Critical data only (parallel loading)
     console.log('🚀 Phase 1: Loading critical data...');
     const softwareDataPromise = loadSoftwareData();
@@ -153,8 +165,8 @@ async function loadTransactionDataOptimized() {
   console.log('📊 Loading transaction data (optimized)...');
   
   try {
-    // Load only first page initially with smaller batch size
-    const initialPageSize = 25; // Reduced from 50
+    // Ultra-fast initial load with minimal data
+    const initialPageSize = 15; // Ultra-small for fastest possible load
     window.currentPage = 1;
     window.itemsPerPage = initialPageSize;
     

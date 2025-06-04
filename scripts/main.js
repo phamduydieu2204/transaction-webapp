@@ -45,7 +45,7 @@ import { deleteTransaction } from './deleteTransaction.js';
 import { fetchSoftwareList } from './fetchSoftwareList.js';
 import { updatePackageList } from './updatePackageList.js';
 import { updateAccountList } from './updateAccountList.js';
-import { updateTable } from './updateTableOptimized.js';
+import { updateTable } from './updateTableUltraFast.js';
 import { formatDate } from './formatDate.js';
 import { copyToClipboard } from './copyToClipboard.js';
 import { closeModal } from './closeModal.js';
