@@ -15,6 +15,7 @@ import { openAddOrUpdateModal } from './handleAddOrUpdateModal.js';
 import { fetchSoftwareList } from './fetchSoftwareList.js'; // <<== thêm
 import { updateAccountList } from './updateAccountList.js'; // <<== thêm
 import { updateState } from './core/stateManager.js';
+import { validateBeforeOperation } from './core/sessionValidator.js';
 
 // Hàm lấy todayFormatted vì không lấy được trực tiếp từ main.js
 const today = new Date();
@@ -22,6 +23,12 @@ const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).pa
 
 export async function handleAdd(userInfo, currentEditTransactionId, loadTransactions, handleReset, updatePackageList, showProcessingModal, showResultModal) {
   console.log("🔍 handleAdd được gọi");
+  
+  // Validate session before adding transaction
+  const sessionValid = await validateBeforeOperation();
+  if (!sessionValid) {
+    return;
+  }
   
   // Nếu đang trong tiến trình sửa thì mở modal xác nhận
   if (window.currentEditTransactionId !== null) {

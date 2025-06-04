@@ -1,3 +1,5 @@
+import { validateBeforeOperation } from './core/sessionValidator.js';
+
 export async function deleteTransaction(
   index,
   transactionList,
@@ -15,6 +17,12 @@ export async function deleteTransaction(
     transactionListLength: transactionList ? transactionList.length : 0,
     hasUserInfo: !!userInfo
   });
+  
+  // Validate session before deleting transaction
+  const sessionValid = await validateBeforeOperation();
+  if (!sessionValid) {
+    return;
+  }
 
   // Additional validation
   if (!transactionList || !Array.isArray(transactionList)) {

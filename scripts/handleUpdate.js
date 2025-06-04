@@ -1,8 +1,15 @@
 import { getConstants } from './constants.js';
 import { updateState } from './core/stateManager.js';
+import { validateBeforeOperation } from './core/sessionValidator.js';
 
 export async function handleUpdate() {
   console.log("🔄 handleUpdate được gọi");
+  
+  // Validate session before updating transaction
+  const sessionValid = await validateBeforeOperation();
+  if (!sessionValid) {
+    return;
+  }
   
   // Kiểm tra currentEditTransactionId từ window và state
   const windowId = window.currentEditTransactionId;

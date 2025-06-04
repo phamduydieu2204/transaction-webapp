@@ -1,0 +1,284 @@
+/**
+ * sessionValidator.js
+ * 
+ * Session validation system
+ * Validates user sessions against server data
+ */
+
+import { getConstants } from '../constants.js';
+import { getState, updateState } from './stateManager.js';
+
+/**
+ * Session validation configuration
+ */
+const VALIDATION_CONFIG = {
+  checkInterval: 5 * 60 * 1000, // Check every 5 minutes
+  onPageLoadCheck: true, // Check immediately on page load
+  retryAttempts: 3,
+  retryDelay: 2000
+};
+
+/**
+ * Last validation timestamp
+ */
+let lastValidation = 0;
+
+/**
+ * Validation in progress flag
+ */
+let validationInProgress = false;
+
+/**
+ * Initialize session validation system
+ */
+export function initializeSessionValidation() {
+  console.log('🔐 Initializing session validation system...');
+  
+  // Check on page load if user is logged in
+  if (VALIDATION_CONFIG.onPageLoadCheck) {
+    setTimeout(() => {
+      validateCurrentSession();
+    }, 2000); // Delay to allow app initialization
+  }
+  
+  // Set up periodic validation
+  setInterval(() => {
+    validateCurrentSession();
+  }, VALIDATION_CONFIG.checkInterval);
+  
+  console.log('✅ Session validation system initialized');
+}
+
+/**
+ * Validate current session against server
+ */
+export async function validateCurrentSession() {
+  const user = getState().user;
+  
+  if (!user || !user.maNhanVien) {
+    console.log('👤 No user session to validate');
+    return true; // No session to validate
+  }
+  
+  // Prevent multiple simultaneous validations
+  if (validationInProgress) {
+    console.log('⏳ Session validation already in progress');
+    return;
+  }
+  
+  // Check if we validated recently
+  const now = Date.now();
+  if (now - lastValidation < 60000) { // Don't validate more than once per minute
+    console.log('⚡ Session validated recently, skipping');
+    return;
+  }
+  
+  console.log('🔍 Validating session for user:', user.tenNhanVien);
+  validationInProgress = true;
+  
+  try {
+    const isValid = await validateWithServer(user);
+    lastValidation = now;
+    
+    if (!isValid) {
+      console.error('❌ Session validation failed - forcing logout');
+      await handleInvalidSession();
+    } else {
+      console.log('✅ Session validation successful');
+    }
+    
+  } catch (error) {
+    console.error('❌ Session validation error:', error);
+    // Don't logout on network errors, just log them
+  } finally {
+    validationInProgress = false;
+  }
+}
+
+/**
+ * Validate session with server
+ * @param {Object} user - User object to validate
+ * @returns {Promise<boolean>} True if session is valid
+ */
+async function validateWithServer(user) {
+  const { BACKEND_URL } = getConstants();
+  
+  const data = {
+    action: 'validateSession',
+    maNhanVien: user.maNhanVien,
+    tenNhanVien: user.tenNhanVien,
+    currentSessionData: {
+      vaiTro: user.vaiTro,
+      tabNhinThay: user.tabNhinThay,
+      giaoDichNhinThay: user.giaoDichNhinThay,
+      nhinThayGiaoDichCuaAi: user.nhinThayGiaoDichCuaAi,
+      duocSuaGiaoDichCuaAi: user.duocSuaGiaoDichCuaAi,
+      duocXoaGiaoDichCuaAi: user.duocXoaGiaoDichCuaAi
+    }
+  };
+  
+  console.log('📡 Sending session validation request...');
+  
+  for (let attempt = 1; attempt <= VALIDATION_CONFIG.retryAttempts; attempt++) {
+    try {
+      const response = await fetch(BACKEND_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.status === 'success') {
+        if (result.sessionValid === false) {
+          console.log('📋 Server says session is invalid:', result.reason || 'Unknown reason');
+          return false;
+        }
+        
+        // Check if user data has changed significantly
+        if (result.updatedUserData) {
+          console.log('🔄 User data updated from server');
+          updateUserDataFromServer(result.updatedUserData);
+        }
+        
+        return true;
+      } else {
+        console.error('❌ Server validation error:', result.message);
+        return false;
+      }
+      
+    } catch (error) {
+      console.error(`❌ Session validation attempt ${attempt} failed:`, error);
+      
+      if (attempt < VALIDATION_CONFIG.retryAttempts) {
+        console.log(`⏳ Retrying in ${VALIDATION_CONFIG.retryDelay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, VALIDATION_CONFIG.retryDelay));
+      } else {
+        throw error; // Re-throw on final attempt
+      }
+    }
+  }
+}
+
+/**
+ * Update user data from server response
+ * @param {Object} updatedData - Updated user data from server
+ */
+function updateUserDataFromServer(updatedData) {
+  const currentUser = getState().user;
+  
+  const updatedUser = {
+    ...currentUser,
+    ...updatedData
+  };
+  
+  updateState({ user: updatedUser });
+  console.log('✅ User data updated from server');
+}
+
+/**
+ * Handle invalid session
+ */
+async function handleInvalidSession() {
+  console.log('🚪 Handling invalid session...');
+  
+  // Show user-friendly message
+  const message = 'Phiên đăng nhập của bạn đã hết hạn hoặc tài khoản đã bị thay đổi. Vui lòng đăng nhập lại.';
+  
+  if (window.showResultModal) {
+    window.showResultModal(message, false);
+  } else {
+    alert(message);
+  }
+  
+  // Wait a moment for user to see the message
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  
+  // Force logout
+  if (window.logout) {
+    window.logout();
+  } else {
+    // Fallback logout
+    localStorage.clear();
+    window.location.reload();
+  }
+}
+
+/**
+ * Force session validation (can be called manually)
+ */
+export async function forceSessionValidation() {
+  console.log('🔄 Forcing session validation...');
+  lastValidation = 0; // Reset last validation time
+  await validateCurrentSession();
+}
+
+/**
+ * Get last validation time
+ */
+export function getLastValidationTime() {
+  return lastValidation;
+}
+
+/**
+ * Check if validation is in progress
+ */
+export function isValidationInProgress() {
+  return validationInProgress;
+}
+
+/**
+ * Validate session before critical operations
+ * @returns {Promise<boolean>} True if session is valid
+ */
+export async function validateBeforeOperation() {
+  console.log('🔍 Validating session before operation...');
+  
+  const user = getState().user;
+  if (!user) {
+    console.log('❌ No user session for operation');
+    return false;
+  }
+  
+  try {
+    const isValid = await validateWithServer(user);
+    if (!isValid) {
+      console.error('❌ Session invalid for operation');
+      await handleInvalidSession();
+      return false;
+    }
+    
+    console.log('✅ Session valid for operation');
+    return true;
+  } catch (error) {
+    console.error('❌ Session validation failed for operation:', error);
+    // Don't block operation on network errors
+    return true;
+  }
+}
+
+/**
+ * Add session validation to existing functions
+ */
+export function wrapWithSessionValidation(originalFunction, functionName) {
+  return async function(...args) {
+    console.log(`🔐 Session check for ${functionName}`);
+    
+    const isValid = await validateBeforeOperation();
+    if (!isValid) {
+      console.error(`❌ Operation ${functionName} blocked due to invalid session`);
+      return {
+        status: 'error',
+        message: 'Phên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.'
+      };
+    }
+    
+    return originalFunction.apply(this, args);
+  };
+}
