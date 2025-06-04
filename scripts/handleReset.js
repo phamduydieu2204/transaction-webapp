@@ -42,22 +42,14 @@ export async function handleReset(fetchSoftwareList, showProcessingModal, showRe
   // Set default dates after reset
   setDefaultDates();
 
-  // Re-initialize transaction tab to ensure event handlers are working
-  if (window.initTransactionTab) {
-    setTimeout(() => {
-      window.initTransactionTab();
-    }, 100);
-  }
+  // Event handlers are already attached, no need to re-initialize
 
   window.currentEditIndex = -1;
   window.currentEditTransactionId = null;
 
   try {
     await fetchSoftwareList(null, window.softwareData, updatePackageList, updateAccountList);
-    // Cập nhật lại danh sách giao dịch
-    if (window.loadTransactions) {
-      await window.loadTransactions();
-    }
+    // Don't reload transactions here, it's handled by the caller
     showResultModal("Dữ liệu đã được làm mới!", true);
   } catch (err) {
     showResultModal(`Lỗi khi làm mới dữ liệu: ${err.message}`, false);

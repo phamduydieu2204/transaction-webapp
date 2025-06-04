@@ -280,7 +280,9 @@ window.viewTransaction = (index) => {
 };
 window.editTransaction = (index) => {
   const state = getState();
-  return editTransaction(index, state.transactions, fetchSoftwareList, updatePackageList, updateAccountList);
+  // Use window.transactionList for consistency
+  const transactionList = window.transactionList || state.transactions || [];
+  return editTransaction(index, transactionList, fetchSoftwareList, updatePackageList, updateAccountList);
 };
 window.deleteTransaction = (index) => {
   const state = getState();
