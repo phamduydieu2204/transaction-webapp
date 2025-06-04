@@ -29,6 +29,34 @@ let lastValidation = 0;
 let validationInProgress = false;
 
 /**
+ * Handle legacy user logout
+ */
+async function handleLegacyUserLogout() {
+  console.log('🚪 Handling legacy user logout...');
+  
+  // Show user-friendly message for legacy users
+  const message = 'Hệ thống bảo mật đã được cập nhật. Vui lòng đăng nhập lại để tiếp tục sử dụng.';
+  
+  if (window.showResultModal) {
+    window.showResultModal(message, false);
+  } else {
+    alert(message);
+  }
+  
+  // Wait a moment for user to see the message
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  
+  // Force logout
+  if (window.logout) {
+    window.logout();
+  } else {
+    // Fallback logout
+    localStorage.clear();
+    window.location.reload();
+  }
+}
+
+/**
  * Initialize session validation system
  */
 export function initializeSessionValidation() {
@@ -62,6 +90,13 @@ export async function validateCurrentSession() {
     return true; // No session to validate
   }
   
+  // Check if user has passwordHash (new login) or is legacy user
+  if (!user.passwordHash) {
+    console.log('⚠️ Legacy user without passwordHash detected - forcing re-login');
+    await handleLegacyUserLogout();
+    return false;
+  }
+  
   // Prevent multiple simultaneous validations
   if (validationInProgress) {
     console.log('⏳ Session validation already in progress');
@@ -76,6 +111,10 @@ export async function validateCurrentSession() {
   }
   
   console.log('🔍 Validating session for user:', user.tenNhanVien);
+  console.log('🔑 User has passwordHash:', !!user.passwordHash);
+  if (user.passwordHash) {
+    console.log('🔑 PasswordHash preview:', user.passwordHash.substring(0, 8) + '...');
+  }
   validationInProgress = true;
   
   try {
@@ -121,6 +160,7 @@ async function validateWithServer(user) {
   };
   
   console.log('📡 Sending session validation request...');
+  console.log('📋 Request data:', JSON.stringify(data, null, 2));
   
   for (let attempt = 1; attempt <= VALIDATION_CONFIG.retryAttempts; attempt++) {
     try {
