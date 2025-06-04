@@ -1,64 +1,44 @@
 import { getConstants } from './constants.js';
 import { updateState } from './core/stateManager.js';
 
-export async function handleUpdate(
-  userInfo,
-  currentEditTransactionId,
-  transactionList,
-  loadTransactions,
-  handleReset,
-  showProcessingModal,
-  showResultModal,
-  getConstants,
-  updateTable,
-  formatDate,
-  editTransaction,
-  deleteTransaction,
-  viewTransaction,
-  fetchSoftwareList,
-  updatePackageList,
-  updateAccountList
-) {
-  console.log("🔍 handleUpdate được gọi với:", {
-    currentEditTransactionId,
-    hasUserInfo: !!userInfo,
-    transactionListLength: transactionList?.length
-  });
+export async function handleUpdate() {
+  console.log("🔄 handleUpdate được gọi");
   
-  showProcessingModal("Đang cập nhật giao dịch...");
-  const { BACKEND_URL } = getConstants();
-
+  // Kiểm tra currentEditTransactionId từ window và state
+  const windowId = window.currentEditTransactionId;
+  const stateId = window.getState ? window.getState().currentEditTransactionId : null;
+  const currentEditTransactionId = windowId || stateId;
+  
+  console.log("🔍 Current edit IDs:", { windowId, stateId, currentEditTransactionId });
+  
+  if (!currentEditTransactionId) {
+    console.error("❌ Không có giao dịch nào đang được chỉnh sửa");
+    window.showResultModal("Vui lòng chọn một giao dịch để chỉnh sửa!", false);
+    return;
+  }
+  
+  // Lấy thông tin user
+  const userInfo = window.getState ? window.getState().user : null;
   if (!userInfo) {
-    showResultModal("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.", false);
+    console.error("❌ Không có thông tin user");
+    window.showResultModal("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.", false);
     return;
   }
-
-  if (currentEditTransactionId === null) {
-    console.error("❌ currentEditTransactionId is null");
-    showResultModal("Vui lòng chọn một giao dịch để chỉnh sửa!", false);
-    return;
-  }
-
-  const loadResult = await loadTransactions(userInfo, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction);
-  if (loadResult.status === "error") {
-    showResultModal(loadResult.message, false);
-    return;
-  }
-
-  // Use window.transactionList instead of parameter for consistency
-  const actualTransactionList = window.transactionList || transactionList;
-  console.log("🔍 Looking for transaction:", currentEditTransactionId, "in list of", actualTransactionList.length);
   
-  const transaction = actualTransactionList.find(t => t.transactionId === currentEditTransactionId);
+  console.log("✅ User info:", userInfo.tenNhanVien);
+  
+  // Tìm giao dịch đang chỉnh sửa
+  const transactionList = window.transactionList || [];
+  const transaction = transactionList.find(t => t.transactionId === currentEditTransactionId);
+  
   if (!transaction) {
-    console.error("❌ Transaction not found:", currentEditTransactionId);
-    showResultModal("Giao dịch không tồn tại hoặc đã bị xóa. Vui lòng thử lại!", false);
-    handleReset(fetchSoftwareList, showProcessingModal, showResultModal, window.todayFormatted, updatePackageList, updateAccountList);
+    console.error("❌ Không tìm thấy giao dịch:", currentEditTransactionId);
+    window.showResultModal("Giao dịch không tồn tại hoặc đã bị xóa. Vui lòng thử lại!", false);
     return;
   }
   
-  console.log("✅ Found transaction:", transaction);
-
+  console.log("✅ Found transaction to update:", transaction.transactionId);
+  
   // Kiểm tra các trường bắt buộc
   const requiredFields = {
     customerEmail: "Email khách hàng",
@@ -77,7 +57,7 @@ export async function handleUpdate(
   for (const [fieldId, fieldName] of Object.entries(requiredFields)) {
     const element = document.getElementById(fieldId);
     if (!element) {
-      console.error(`Không tìm thấy element với id: ${fieldId}`);
+      console.error(`❌ Không tìm thấy element với id: ${fieldId}`);
       continue;
     }
     
@@ -87,29 +67,27 @@ export async function handleUpdate(
     if (fieldId === 'revenue' || fieldId === 'duration') {
       const numValue = parseFloat(value);
       if (isNaN(numValue) || numValue <= 0) {
-        showResultModal("Thiếu dữ liệu bắt buộc, vui lòng kiểm tra lại", false);
+        window.showResultModal(`${fieldName} không hợp lệ. Vui lòng kiểm tra lại`, false);
         element.focus();
         return;
       }
     } else {
       // Kiểm tra các trường text/select
       if (!value || value.trim() === "" || value === "0") {
-        showResultModal("Thiếu dữ liệu bắt buộc, vui lòng kiểm tra lại", false);
+        window.showResultModal(`${fieldName} không được để trống. Vui lòng kiểm tra lại`, false);
         element.focus();
         return;
       }
     }
   }
-
-  const softwareNameElement = document.getElementById("softwareName");
-  const softwarePackageElement = document.getElementById("softwarePackage");
-  const accountNameElement = document.getElementById("accountName");
-
-  if (!softwareNameElement || !softwarePackageElement || !accountNameElement) {
-    showResultModal("Không tìm thấy các trường dữ liệu trên form. Vui lòng thử lại!", false);
-    return;
-  }
-
+  
+  console.log("✅ Validation passed");
+  
+  // Hiển thị processing modal
+  window.showProcessingModal("Đang cập nhật giao dịch...");
+  
+  // Chuẩn bị dữ liệu gửi lên server
+  const { BACKEND_URL } = getConstants();
   const data = {
     action: "updateTransaction",
     transactionId: currentEditTransactionId,
@@ -122,17 +100,15 @@ export async function handleUpdate(
     startDate: document.getElementById("startDate").value,
     endDate: document.getElementById("endDate").value,
     deviceCount: parseInt(document.getElementById("deviceCount").value) || 0,
-    softwareName: softwareNameElement.value,
-    softwarePackage: softwarePackageElement.value,
-    accountName: accountNameElement.value,
+    softwareName: document.getElementById("softwareName").value,
+    softwarePackage: document.getElementById("softwarePackage").value,
+    accountName: document.getElementById("accountName").value,
     revenue: parseFloat(document.getElementById("revenue").value) || 0,
-    note: document.getElementById("note").value,
+    note: document.getElementById("note").value || "",
     tenNhanVien: transaction.tenNhanVien,
     maNhanVien: transaction.maNhanVien,
     editorTenNhanVien: userInfo.tenNhanVien,
     editorMaNhanVien: userInfo.maNhanVien,
-
-    // ✅ Truyền quyền mới
     duocSuaGiaoDichCuaAi: userInfo.duocSuaGiaoDichCuaAi || "chỉ bản thân"
   };
 
@@ -146,19 +122,31 @@ export async function handleUpdate(
     });
 
     const result = await response.json();
+    console.log("📥 Kết quả từ server:", result);
 
     if (result.status === "success") {
-      handleReset(fetchSoftwareList, showProcessingModal, showResultModal, window.todayFormatted, updatePackageList, updateAccountList);
-      // Reset currentEditTransactionId sau khi cập nhật thành công
+      // Reset currentEditTransactionId
       window.currentEditTransactionId = null;
       updateState({ currentEditTransactionId: null });
-      await window.loadTransactions();
-      showResultModal("Giao dịch đã được cập nhật!", true);
+      
+      // Reset form
+      if (window.handleReset) {
+        window.handleReset();
+      }
+      
+      // Reload transactions
+      if (window.loadTransactions) {
+        await window.loadTransactions();
+      }
+      
+      console.log("✅ Cập nhật thành công");
+      window.showResultModal("Giao dịch đã được cập nhật thành công!", true);
     } else {
-      showResultModal(result.message || "Không thể cập nhật giao dịch!", false);
+      console.error("❌ Lỗi từ server:", result.message);
+      window.showResultModal(result.message || "Không thể cập nhật giao dịch!", false);
     }
   } catch (err) {
-    console.error("Lỗi khi cập nhật:", err);
-    showResultModal(`Lỗi kết nối server: ${err.message}`, false);
+    console.error("❌ Lỗi khi cập nhật:", err);
+    window.showResultModal(`Lỗi kết nối server: ${err.message}`, false);
   }
 }

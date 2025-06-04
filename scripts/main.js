@@ -268,13 +268,7 @@ window.handleAdd = () => {
 };
 window.handleUpdate = () => {
   console.log("🎯 window.handleUpdate called");
-  const state = getState();
-  console.log("📊 State:", {
-    hasUser: !!state.user,
-    currentEditTransactionId: state.currentEditTransactionId,
-    transactionsCount: state.transactions?.length
-  });
-  return handleUpdate(state.user, state.currentEditTransactionId, state.transactions, window.loadTransactions, window.handleReset, showProcessingModal, showResultModal, getConstants, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction, fetchSoftwareList, updatePackageList, updateAccountList);
+  return handleUpdate();
 };
 window.handleSearch = () => {
   const state = getState();
