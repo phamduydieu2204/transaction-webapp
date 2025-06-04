@@ -1,6 +1,7 @@
 import { updatePackageList } from './updatePackageList.js';
 import { updateAccountList } from './updateAccountList.js';
 import { getTodayFormatted, setDefaultDates } from './calculateEndDate.js';
+import { updateState } from './core/stateManager.js';
 
 export async function handleReset(fetchSoftwareList, showProcessingModal, showResultModal, todayFormatted, updatePackageList, updateAccountList) {
   showProcessingModal("Đang làm mới dữ liệu...");
@@ -46,6 +47,8 @@ export async function handleReset(fetchSoftwareList, showProcessingModal, showRe
 
   window.currentEditIndex = -1;
   window.currentEditTransactionId = null;
+  // Cập nhật state để đồng bộ
+  updateState({ currentEditTransactionId: null });
 
   try {
     await fetchSoftwareList(null, window.softwareData, updatePackageList, updateAccountList);

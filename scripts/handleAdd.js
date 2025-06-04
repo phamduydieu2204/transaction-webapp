@@ -14,6 +14,7 @@ import { viewTransaction } from './viewTransaction.js';
 import { openAddOrUpdateModal } from './handleAddOrUpdateModal.js';
 import { fetchSoftwareList } from './fetchSoftwareList.js'; // <<== thêm
 import { updateAccountList } from './updateAccountList.js'; // <<== thêm
+import { updateState } from './core/stateManager.js';
 
 // Hàm lấy todayFormatted vì không lấy được trực tiếp từ main.js
 const today = new Date();
@@ -127,6 +128,9 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
       document.getElementById("softwareName").value = "";
       document.getElementById("softwarePackage").innerHTML = '<option value="">-- Chọn gói --</option>';
       document.getElementById("accountName").innerHTML = '<option value="">-- Chọn tài khoản --</option>';
+      // Reset currentEditTransactionId sau khi thêm thành công
+      window.currentEditTransactionId = null;
+      updateState({ currentEditTransactionId: null });
       // Cập nhật lại danh sách giao dịch
       await window.loadTransactions();
       showResultModal("Giao dịch đã được lưu!", true);

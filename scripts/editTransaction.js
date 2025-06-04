@@ -1,5 +1,6 @@
 import { showProcessingModal } from './showProcessingModal.js';
 import { closeProcessingModal } from './closeProcessingModal.js';
+import { updateState } from './core/stateManager.js';
 
 
 export async function editTransaction(index, transactionList, fetchSoftwareList, updatePackageList, updateAccountList) {
@@ -16,6 +17,8 @@ export async function editTransaction(index, transactionList, fetchSoftwareList,
 
   // Lưu ID giao dịch hiện tại đang sửa
   window.currentEditTransactionId = transaction.transactionId;
+  // Cập nhật state để đồng bộ
+  updateState({ currentEditTransactionId: transaction.transactionId });
 
   // Lấy các phần tử dropdown và input từ DOM
   const softwareNameSelect = document.getElementById("softwareName");

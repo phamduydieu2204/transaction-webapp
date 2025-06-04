@@ -1,4 +1,5 @@
 import { getConstants } from './constants.js';
+import { updateState } from './core/stateManager.js';
 
 export async function handleUpdate(
   userInfo,
@@ -134,6 +135,9 @@ export async function handleUpdate(
 
     if (result.status === "success") {
       handleReset(fetchSoftwareList, showProcessingModal, showResultModal, window.todayFormatted, updatePackageList, updateAccountList);
+      // Reset currentEditTransactionId sau khi cập nhật thành công
+      window.currentEditTransactionId = null;
+      updateState({ currentEditTransactionId: null });
       await window.loadTransactions();
       showResultModal("Giao dịch đã được cập nhật!", true);
     } else {
