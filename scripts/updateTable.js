@@ -1,9 +1,15 @@
 import { updatePagination } from './pagination.js';
 import { updateTotalDisplay } from './updateTotalDisplay.js';
+import { batchWrite, debounce } from './core/domOptimizer.js';
 
 export function updateTable(transactionList, currentPage, itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction) {
   const tableBody = document.querySelector("#transactionTable tbody");
-  tableBody.innerHTML = "";
+  if (!tableBody) return;
+  
+  // Batch DOM operations
+  batchWrite(() => {
+    tableBody.innerHTML = "";
+  });
 
   const totalPages = Math.ceil(transactionList.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -45,8 +51,8 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     console.log("📅 Không tìm kiếm - Tổng doanh thu hôm nay:", totalRevenue);
   }
 
-  // ✅ Hiển thị dữ liệu bảng
-  paginatedItems.forEach((transaction, index) => {
+  // ✅ Build all rows HTML first (no DOM manipulation yet)
+  const rowsHtml = paginatedItems.map((transaction, index) => {
     const globalIndex = startIndex + index;
     const row = document.createElement("tr");
 

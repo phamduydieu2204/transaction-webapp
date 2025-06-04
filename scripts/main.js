@@ -25,6 +25,10 @@ import { closeProcessingModal } from './closeProcessingModal.js';
 import { initExpenseTab } from './initExpenseTab.js';
 import { initTransactionTab } from './initTransactionTab.js';
 
+// Import performance optimizers
+import './core/requestOptimizer.js';
+import './core/domOptimizer.js';
+
 // Import legacy functions for backward compatibility
 import { logout } from './logout.js';
 import { openCalendar } from './openCalendar.js';
@@ -41,7 +45,7 @@ import { deleteTransaction } from './deleteTransaction.js';
 import { fetchSoftwareList } from './fetchSoftwareList.js';
 import { updatePackageList } from './updatePackageList.js';
 import { updateAccountList } from './updateAccountList.js';
-import { updateTable } from './updateTable.js';
+import { updateTable } from './updateTableOptimized.js';
 import { formatDate } from './formatDate.js';
 import { copyToClipboard } from './copyToClipboard.js';
 import { closeModal } from './closeModal.js';

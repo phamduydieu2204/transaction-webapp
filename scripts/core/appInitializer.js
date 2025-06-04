@@ -11,7 +11,7 @@ import { updateAccountList } from '../updateAccountList.js';
 import { updatePackageList } from '../updatePackageList.js';
 import { fetchSoftwareList } from '../fetchSoftwareList.js';
 import { loadTransactions, loadTransactionsOptimized } from '../loadTransactions.js';
-import { updateTable } from '../updateTable.js';
+import { updateTable } from '../updateTableOptimized.js';
 import { formatDate } from '../formatDate.js';
 import { editTransaction } from '../editTransaction.js';
 import { deleteTransaction } from '../deleteTransaction.js';

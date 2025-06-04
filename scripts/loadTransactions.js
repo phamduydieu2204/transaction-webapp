@@ -1,6 +1,7 @@
 // CÁCH 2: Cải thiện hàm loadTransactions trong file loadTransactions.js
 
 import { getConstants } from './constants.js';
+import { deduplicateRequest } from './core/requestOptimizer.js';
 
 /**
  * Optimized transaction loading with pagination support
@@ -42,10 +43,6 @@ export async function loadTransactionsOptimized(userInfo, updateTable, formatDat
   };
 
   try {
-    // ✅ Shorter timeout for better UX
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 giây timeout
-
     if (showProgress) {
       // Show minimal loading indicator
       const tableBody = document.querySelector('#transactionTable tbody');
@@ -54,22 +51,38 @@ export async function loadTransactionsOptimized(userInfo, updateTable, formatDat
       }
     }
 
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
+    // Use request deduplication for transactions
+    const requestKey = `transactions-${userInfo.maNhanVien}-page${page}-limit${limit}`;
+    const result = await deduplicateRequest(
+      requestKey,
+      async () => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
+
+        try {
+          const response = await fetch(BACKEND_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data),
+            signal: controller.signal
+          });
+
+          clearTimeout(timeoutId);
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          return await response.json();
+        } catch (error) {
+          clearTimeout(timeoutId);
+          throw error;
+        }
       },
-      body: JSON.stringify(data),
-      signal: controller.signal
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const result = await response.json();
+      { cacheDuration: 2 * 60 * 1000, forceRefresh: !useCache } // 2 minutes cache
+    );
     
     if (result.status === "success") {
       const transactions = result.data || [];

@@ -1,4 +1,5 @@
 import { getConstants } from './constants.js';
+import { deduplicateRequest } from './core/requestOptimizer.js';
 
 export async function fetchSoftwareList(
   softwareNameToKeep,
@@ -12,13 +13,19 @@ export async function fetchSoftwareList(
   const data = { action: "getSoftwareList" };
 
   try {
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-
-    const result = await response.json();
+    // Use request deduplication to prevent duplicate API calls
+    const result = await deduplicateRequest(
+      'software-list',
+      async () => {
+        const response = await fetch(BACKEND_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        return await response.json();
+      },
+      { cacheDuration: 10 * 60 * 1000 } // Cache for 10 minutes
+    );
 
     if (result.status === "success") {
       // Cập nhật biến toàn cục
