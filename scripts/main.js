@@ -13,7 +13,7 @@ import { initializeEventHandlers } from './core/eventManager.js';
 import { initializeStateManager, getState, updateState } from './core/stateManager.js';
 import { switchToTab, initializeTabSystem, switchToIntendedTab } from './core/navigationManager.js';
 import { initializeTabPermissions } from './core/tabPermissions.js';
-import { initializeSessionValidation } from './core/sessionValidator.js';
+import { initializeSessionValidation, validateSessionImmediate } from './core/sessionValidator.js';
 import { authManager } from './core/authManager.js';
 
 // Import essential utilities
@@ -160,6 +160,18 @@ async function startApp() {
     const hasSession = authManager.loadSession();
     console.log('📌 Session loaded:', hasSession);
     
+    if (hasSession) {
+      // Phase 1.5: Immediate session validation for authenticated users
+      console.log('🔐 Phase 1.5: Immediate session validation...');
+      const sessionValid = await validateSessionImmediate();
+      if (!sessionValid) {
+        console.log('❌ Session invalid - stopping app initialization');
+        return; // Stop app initialization
+      }
+      // Setup periodic validation after immediate check passes
+      initializeSessionValidation();
+    }
+    
     if (!hasSession) {
       console.log('❌ No valid session found, checking legacy format...');
       // Try legacy session format
@@ -178,6 +190,16 @@ async function startApp() {
           }
           
           updateState({ user: userInfo });
+          
+          // Phase 1.5: Immediate session validation for legacy users
+          console.log('🔐 Phase 1.5: Immediate session validation...');
+          const sessionValid = await validateSessionImmediate();
+          if (!sessionValid) {
+            console.log('❌ Legacy session invalid - stopping app initialization');
+            return; // Stop app initialization
+          }
+          // Setup periodic validation after immediate check passes
+          initializeSessionValidation();
         } catch (e) {
           console.warn('❌ Invalid legacy session data:', e);
           // Show login form instead of redirect
@@ -211,9 +233,6 @@ async function startApp() {
     console.log('🎯 Phase 4.1: Switching to intended tab...');
     switchToIntendedTab();
     
-    // Phase 4.2: Initialize session validation
-    console.log('🔐 Phase 4.2: Initializing session validation...');
-    initializeSessionValidation();
     
     // Phase 4.5: Initialize date defaults and calculations
     console.log('📅 Phase 4.5: Initializing date defaults...');

@@ -15,7 +15,8 @@ const VALIDATION_CONFIG = {
   checkInterval: 5 * 60 * 1000, // Check every 5 minutes
   onPageLoadCheck: true, // Check immediately on page load
   retryAttempts: 3,
-  retryDelay: 2000
+  retryDelay: 2000,
+  immediateTimeout: 5000 // Faster timeout for immediate validation
 };
 
 /**
@@ -66,7 +67,7 @@ export function initializeSessionValidation() {
   if (VALIDATION_CONFIG.onPageLoadCheck) {
     setTimeout(() => {
       validateCurrentSession();
-    }, 3000); // Delay to allow app initialization
+    }, 500); // Quick check after basic initialization
   }
   
   console.log('✅ Session validation enabled');
@@ -77,6 +78,47 @@ export function initializeSessionValidation() {
   }, VALIDATION_CONFIG.checkInterval);
   
   console.log('✅ Session validation system initialized');
+}
+
+/**
+ * Validate session immediately (blocking)
+ * Used during app initialization to prevent loading invalid sessions
+ */
+export async function validateSessionImmediate() {
+  console.log('⚡ Immediate session validation...');
+  
+  const user = getState().user;
+  
+  if (!user || !user.maNhanVien) {
+    console.log('👤 No user session to validate immediately');
+    return true;
+  }
+  
+  // Check if user has passwordHash (new login) or is legacy user
+  if (!user.passwordHash) {
+    console.log('⚠️ Legacy user without passwordHash detected - forcing re-login immediately');
+    await handleLegacyUserLogout();
+    return false;
+  }
+  
+  try {
+    // Use faster validation for immediate check
+    const isValid = await validateWithServerFast(user);
+    if (!isValid) {
+      console.error('❌ Immediate session validation failed - forcing logout');
+      await handleInvalidSession();
+      return false;
+    }
+    
+    console.log('✅ Immediate session validation successful');
+    return true;
+    
+  } catch (error) {
+    console.error('❌ Immediate session validation error:', error);
+    // On network errors during startup, allow login but show warning
+    console.log('⚠️ Network error during immediate validation - allowing login with warning');
+    return true;
+  }
 }
 
 /**
@@ -133,6 +175,77 @@ export async function validateCurrentSession() {
     // Don't logout on network errors, just log them
   } finally {
     validationInProgress = false;
+  }
+}
+
+/**
+ * Fast session validation with server (for immediate checks)
+ * @param {Object} user - User object to validate
+ * @returns {Promise<boolean>} True if session is valid
+ */
+async function validateWithServerFast(user) {
+  const { BACKEND_URL } = getConstants();
+  
+  const data = {
+    action: 'validateSession',
+    maNhanVien: user.maNhanVien,
+    tenNhanVien: user.tenNhanVien,
+    passwordHash: user.passwordHash,
+    currentSessionData: {
+      vaiTro: user.vaiTro,
+      tabNhinThay: user.tabNhinThay,
+      giaoDichNhinThay: user.giaoDichNhinThay,
+      nhinThayGiaoDichCuaAi: user.nhinThayGiaoDichCuaAi,
+      duocSuaGiaoDichCuaAi: user.duocSuaGiaoDichCuaAi,
+      duocXoaGiaoDichCuaAi: user.duocXoaGiaoDichCuaAi
+    }
+  };
+  
+  console.log('⚡ Fast session validation request...');
+  
+  try {
+    // Single attempt with faster timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), VALIDATION_CONFIG.immediateTimeout);
+
+    const response = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    
+    if (result.status === 'success') {
+      if (result.sessionValid === false) {
+        console.log('📋 Server says session is invalid:', result.reason || 'Unknown reason');
+        return false;
+      }
+      
+      // Check if user data has changed significantly
+      if (result.updatedUserData) {
+        console.log('🔄 User data updated from server (fast)');
+        updateUserDataFromServer(result.updatedUserData);
+      }
+      
+      return true;
+    } else {
+      console.error('❌ Server validation error (fast):', result.message);
+      return false;
+    }
+    
+  } catch (error) {
+    console.error('❌ Fast session validation failed:', error);
+    throw error; // Re-throw for caller to handle
   }
 }
 
