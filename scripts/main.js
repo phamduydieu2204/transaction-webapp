@@ -31,7 +31,7 @@ import { openCalendar } from './openCalendar.js';
 import { calculateEndDate, initializeDateCalculations } from './calculateEndDate.js';
 import { updateCustomerInfo } from './updateCustomerInfo.js';
 import { handleReset } from './handleReset.js';
-import { loadTransactions } from './loadTransactions.js';
+import { loadTransactions, loadTransactionsOptimized } from './loadTransactions.js';
 import { handleAdd } from './handleAdd.js';
 import { handleUpdate } from './handleUpdate.js';
 import { handleSearch } from './handleSearch.js';
@@ -297,6 +297,10 @@ window.handleReset = () =>
 window.loadTransactions = () => {
   const state = getState();
   return loadTransactions(state.user, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction);
+};
+window.loadTransactionsOptimized = (options = {}) => {
+  const state = getState();
+  return loadTransactionsOptimized(state.user, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction, options);
 };
 window.handleAdd = () => {
   const state = getState();

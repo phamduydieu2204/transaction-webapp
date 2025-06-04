@@ -45,47 +45,62 @@ export async function loadPartials(partials) {
  * Initialize all partials khi DOM loaded
  */
 export async function initializePartials() {
-  console.log('🚀 PartialLoader: Starting to load partials...');
+  console.log('🚀 PartialLoader: Starting optimized partial loading...');
   
-  // Load modals first
-  console.log('📦 PartialLoader: Loading modals container...');
-  await loadPartial('modals-container', './partials/modals/all-modals.html');
-  
-  // Then load individual modals into their placeholders
-  const modalConfigs = [
-    { elementId: 'processing-modal-placeholder', partialPath: './partials/modals/processing-modal.html' },
-    { elementId: 'delete-modal-placeholder', partialPath: './partials/modals/delete-modal.html' },
-    { elementId: 'transaction-detail-modal-placeholder', partialPath: './partials/modals/transaction-detail-modal.html' },
-    { elementId: 'add-update-modal-placeholder', partialPath: './partials/modals/add-update-modal.html' },
-    { elementId: 'cookie-modal-placeholder', partialPath: './partials/modals/cookie-modal.html' },
-    { elementId: 'password-modal-placeholder', partialPath: './partials/modals/password-modal.html' }
-  ];
-  
-  // Wait a bit for modals container to be loaded
-  setTimeout(async () => {
-    await loadPartials(modalConfigs);
-  }, 100);
-  
-  const partialConfigs = [
-    // Header
-    { elementId: 'header-container', partialPath: './partials/header/header.html' },
-    { elementId: 'tab-navigation-container', partialPath: './partials/header/tab-navigation.html' },
+  try {
+    // Phase 1: Critical UI components (parallel loading)
+    console.log('🚀 Phase 1: Loading critical UI components...');
+    const criticalPartials = [
+      { elementId: 'modals-container', partialPath: './partials/modals/all-modals.html' },
+      { elementId: 'header-container', partialPath: './partials/header/header.html' },
+      { elementId: 'tab-navigation-container', partialPath: './partials/header/tab-navigation.html' },
+      { elementId: 'transaction-tab-container', partialPath: './partials/tabs/transaction-tab.html' }
+    ];
     
-    // Tabs
-    { elementId: 'transaction-tab-container', partialPath: './partials/tabs/transaction-tab.html' },
-    { elementId: 'expense-tab-container', partialPath: './partials/tabs/expense-tab.html' },
-    { elementId: 'statistics-tab-container', partialPath: './partials/tabs/statistics-tab.html' },
-    { elementId: 'reports-tab-container', partialPath: './partials/tabs/reports-tab.html' },
-    { elementId: 'settings-tab-container', partialPath: './partials/tabs/settings-tab.html' }
-  ];
-
-  await loadPartials(partialConfigs);
-  
-  // Load report pages after statistics tab is loaded
-  setTimeout(async () => {
-    const reportPagesContainer = document.getElementById('report-pages-container');
-    if (reportPagesContainer) {
-      await loadPartial('report-pages-container', './partials/tabs/report-pages.html');
-    }
-  }, 200);
+    await loadPartials(criticalPartials);
+    console.log('✅ Critical components loaded');
+    
+    // Phase 2: Secondary tabs (parallel loading)
+    console.log('🚀 Phase 2: Loading secondary tabs...');
+    const secondaryPartials = [
+      { elementId: 'expense-tab-container', partialPath: './partials/tabs/expense-tab.html' },
+      { elementId: 'statistics-tab-container', partialPath: './partials/tabs/statistics-tab.html' },
+      { elementId: 'reports-tab-container', partialPath: './partials/tabs/reports-tab.html' },
+      { elementId: 'settings-tab-container', partialPath: './partials/tabs/settings-tab.html' }
+    ];
+    
+    const secondaryLoad = loadPartials(secondaryPartials);
+    
+    // Phase 3: Modal components (parallel loading)
+    console.log('🚀 Phase 3: Loading modal components...');
+    const modalConfigs = [
+      { elementId: 'processing-modal-placeholder', partialPath: './partials/modals/processing-modal.html' },
+      { elementId: 'delete-modal-placeholder', partialPath: './partials/modals/delete-modal.html' },
+      { elementId: 'transaction-detail-modal-placeholder', partialPath: './partials/modals/transaction-detail-modal.html' },
+      { elementId: 'add-update-modal-placeholder', partialPath: './partials/modals/add-update-modal.html' },
+      { elementId: 'cookie-modal-placeholder', partialPath: './partials/modals/cookie-modal.html' },
+      { elementId: 'password-modal-placeholder', partialPath: './partials/modals/password-modal.html' }
+    ];
+    
+    const modalLoad = loadPartials(modalConfigs);
+    
+    // Wait for secondary and modal loading to complete
+    await Promise.all([secondaryLoad, modalLoad]);
+    console.log('✅ Secondary tabs and modals loaded');
+    
+    // Phase 4: Optional components (lazy load)
+    console.log('🚀 Phase 4: Loading optional components...');
+    setTimeout(async () => {
+      const reportPagesContainer = document.getElementById('report-pages-container');
+      if (reportPagesContainer) {
+        await loadPartial('report-pages-container', './partials/tabs/report-pages.html');
+        console.log('✅ Report pages loaded');
+      }
+    }, 50); // Reduced delay
+    
+    console.log('✅ All partials loading initiated');
+    
+  } catch (error) {
+    console.error('❌ Error in partial loading:', error);
+  }
 }

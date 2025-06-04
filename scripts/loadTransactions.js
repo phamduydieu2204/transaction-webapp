@@ -2,6 +2,133 @@
 
 import { getConstants } from './constants.js';
 
+/**
+ * Optimized transaction loading with pagination support
+ */
+export async function loadTransactionsOptimized(userInfo, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction, options = {}) {
+  const {
+    page = 1,
+    limit = 25,
+    useCache = true,
+    showProgress = true
+  } = options;
+
+  // ✅ Kiểm tra cache trước
+  if (useCache && window.transactionCache && window.transactionCache.page === page && window.transactionCache.limit === limit) {
+    console.log('📦 Using cached transaction data for page', page);
+    updateTable(window.transactionCache.data, page, limit, formatDate, editTransaction, deleteTransaction, viewTransaction);
+    return { status: "success", data: window.transactionCache.data, cached: true };
+  }
+
+  // ✅ Kiểm tra nhanh userInfo trước khi gọi API
+  if (!userInfo) {
+    console.warn("⚠️ Không có thông tin user, bỏ qua load transactions");
+    return { status: "error", message: "Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại." };
+  }
+
+  console.log(`🔄 Loading transactions (page ${page}, limit ${limit})...`);
+  
+  const { BACKEND_URL } = getConstants();
+  const data = {
+    action: "getTransactions",
+    maNhanVien: userInfo.maNhanVien,
+    vaiTro: userInfo.vaiTro ? userInfo.vaiTro.toLowerCase() : "",
+    giaoDichNhinThay: userInfo.giaoDichNhinThay || "",
+    nhinThayGiaoDichCuaAi: userInfo.nhinThayGiaoDichCuaAi || "",
+    // Add pagination parameters (backend needs to support these)
+    page: page,
+    limit: limit,
+    optimized: true
+  };
+
+  try {
+    // ✅ Shorter timeout for better UX
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 giây timeout
+
+    if (showProgress) {
+      // Show minimal loading indicator
+      const tableBody = document.querySelector('#transactionTable tbody');
+      if (tableBody && page === 1) {
+        tableBody.innerHTML = '<tr><td colspan="10" class="text-center">🔄 Đang tải...</td></tr>';
+      }
+    }
+
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    
+    if (result.status === "success") {
+      const transactions = result.data || [];
+      
+      // ✅ Cache the result for faster subsequent access
+      if (useCache) {
+        window.transactionCache = {
+          data: transactions,
+          page: page,
+          limit: limit,
+          timestamp: Date.now()
+        };
+      }
+
+      if (page === 1) {
+        window.transactionList = transactions;
+        window.currentPage = 1;
+      } else {
+        // Append to existing list for pagination
+        window.transactionList = window.transactionList.concat(transactions);
+      }
+      
+      // ✅ Sort transactions by timestamp (newest first)
+      window.transactionList.sort((a, b) => {
+        const timestampA = (a.transactionId || "").replace(/[^0-9]/g, "");
+        const timestampB = (b.transactionId || "").replace(/[^0-9]/g, "");
+        return timestampB.localeCompare(timestampA);
+      });
+
+      // ✅ Update table only if on transaction tab
+      const activeTab = document.querySelector(".tab-content.active");
+      const isTransactionTabActive = activeTab && activeTab.id === "tab-giao-dich";
+      
+      if (isTransactionTabActive || page === 1) {
+        console.log(`🔄 Updating table with ${transactions.length} transactions (page ${page})`);
+        updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
+      }
+
+      console.log(`✅ Load transactions successful: ${transactions.length} transactions (page ${page})`);
+      return { status: "success", data: transactions, page: page, total: result.total || transactions.length };
+      
+    } else {
+      const errorMsg = result.message || "Không thể tải danh sách giao dịch!";
+      console.error("❌ Lỗi từ server:", errorMsg);
+      return { status: "error", message: errorMsg };
+    }
+    
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      console.warn("⚠️ Load transactions bị timeout sau 15 giây");
+      return { status: "error", message: "Tải dữ liệu quá lâu, vui lòng thử lại" };
+    }
+    
+    const errorMsg = `Lỗi khi tải danh sách giao dịch: ${err.message}`;
+    console.error("❌", errorMsg);
+    return { status: "error", message: errorMsg };
+  }
+}
+
 export async function loadTransactions(userInfo, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction) {
   // ✅ Kiểm tra nhanh userInfo trước khi gọi API
   if (!userInfo) {

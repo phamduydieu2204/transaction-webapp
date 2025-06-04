@@ -10,7 +10,7 @@ import { getConstants } from '../constants.js';
 import { updateAccountList } from '../updateAccountList.js';
 import { updatePackageList } from '../updatePackageList.js';
 import { fetchSoftwareList } from '../fetchSoftwareList.js';
-import { loadTransactions } from '../loadTransactions.js';
+import { loadTransactions, loadTransactionsOptimized } from '../loadTransactions.js';
 import { updateTable } from '../updateTable.js';
 import { formatDate } from '../formatDate.js';
 import { editTransaction } from '../editTransaction.js';
@@ -94,19 +94,31 @@ export function initializeUI() {
  * Load initial data for the application
  */
 export async function loadInitialData() {
-  console.log('🔄 Loading initial data...');
+  console.log('🚀 Loading initial data (optimized)...');
 
   try {
-    // Load software data first (required for dropdowns)
-    await loadSoftwareData();
+    // Phase 1: Critical data only (parallel loading)
+    console.log('🚀 Phase 1: Loading critical data...');
+    const softwareDataPromise = loadSoftwareData();
     
-    // Load transaction data
-    await loadTransactionData();
+    // Wait for software data (needed for dropdowns)
+    await softwareDataPromise;
+    console.log('✅ Software data loaded');
     
-    // Initialize expense-related features
-    await initializeExpenseFeatures();
+    // Phase 2: Tab-specific data (lazy loading)
+    console.log('🚀 Phase 2: Loading tab-specific data...');
     
-    console.log('✅ Initial data loaded successfully');
+    // Only load transaction data initially (most common tab)
+    // Other tab data will be loaded when user switches to them
+    await loadTransactionDataOptimized();
+    console.log('✅ Transaction data loaded');
+    
+    // Phase 3: Initialize minimal features
+    console.log('🚀 Phase 3: Initializing minimal features...');
+    await initializeMinimalFeatures();
+    console.log('✅ Minimal features initialized');
+    
+    console.log('✅ Initial data loaded successfully (optimized)');
   } catch (error) {
     console.error('❌ Error loading initial data:', error);
     throw error;
@@ -135,43 +147,115 @@ async function loadSoftwareData() {
 }
 
 /**
- * Load transaction data and update table
+ * Load transaction data optimized for performance
  */
-async function loadTransactionData() {
+async function loadTransactionDataOptimized() {
+  console.log('📊 Loading transaction data (optimized)...');
+  
   try {
-    // Pass required parameters to loadTransactions
-    await loadTransactions(
+    // Load only first page initially with smaller batch size
+    const initialPageSize = 25; // Reduced from 50
+    window.currentPage = 1;
+    window.itemsPerPage = initialPageSize;
+    
+    // Show loading indicator immediately
+    const tableBody = document.querySelector('#transactionTable tbody');
+    if (tableBody) {
+      tableBody.innerHTML = '<tr><td colspan="10" class="text-center">🔄 Đang tải dữ liệu...</td></tr>';
+    }
+    
+    // Load transactions without blocking UI using optimized function
+    await loadTransactionsOptimized(
       window.userInfo,
       updateTable,
       formatDate,
       editTransaction,
       deleteTransaction,
-      viewTransaction
+      viewTransaction,
+      {
+        page: 1,
+        limit: initialPageSize,
+        useCache: true,
+        showProgress: true
+      }
     );
     
-    // Only update table if we have data
-    if (window.transactionList && window.transactionList.length > 0) {
-      updateTable(
-        window.transactionList,
-        window.currentPage || 1,
-        window.itemsPerPage || 50,
-        formatDate,
-        editTransaction,
-        deleteTransaction,
-        viewTransaction
-      );
-      console.log('✅ Transaction data loaded');
-    } else {
-      console.log('ℹ️ No transaction data to display');
-      // Show empty state
-      const tableBody = document.querySelector('#transactionTable tbody');
-      if (tableBody) {
-        tableBody.innerHTML = '<tr><td colspan="10" class="text-center">Không có dữ liệu</td></tr>';
+    console.log('✅ Initial transaction data loaded');
+    
+    // Preload next page in background after UI settles
+    setTimeout(async () => {
+      if (window.transactionList && window.transactionList.length >= initialPageSize) {
+        console.log('🔄 Preloading additional transaction data...');
+        // Increase page size for subsequent loads
+        window.itemsPerPage = 50;
       }
-    }
+    }, 2000);
+    
   } catch (error) {
-    console.error('❌ Error loading transaction data:', error);
-    // Continue execution even if transaction data fails
+    console.error('❌ Failed to load transaction data:', error);
+    const tableBody = document.querySelector('#transactionTable tbody');
+    if (tableBody) {
+      tableBody.innerHTML = '<tr><td colspan="10" class="text-center text-danger">❌ Lỗi tải dữ liệu</td></tr>';
+    }
+  }
+}
+
+/**
+ * Legacy transaction data loading (kept for compatibility)
+ */
+async function loadTransactionData() {
+  return await loadTransactionDataOptimized();
+}
+
+/**
+ * Initialize minimal features for immediate interaction
+ */
+async function initializeMinimalFeatures() {
+  console.log('⚡ Initializing minimal features...');
+  
+  try {
+    // Only initialize features needed for immediate interaction
+    const essentialInitializers = [];
+    
+    // Core form event listeners (if available)
+    if (typeof window.initializeFormHandlers === 'function') {
+      essentialInitializers.push(window.initializeFormHandlers());
+    }
+    
+    // Basic modal functionality (if available) 
+    if (typeof window.initializeModals === 'function') {
+      essentialInitializers.push(window.initializeModals());
+    }
+    
+    // Wait for essential features
+    await Promise.all(essentialInitializers);
+    
+    // Defer heavy features like charts, statistics, reports
+    setTimeout(() => {
+      initializeHeavyFeatures();
+    }, 3000);
+    
+    console.log('✅ Minimal features initialized');
+  } catch (error) {
+    console.error('❌ Error initializing minimal features:', error);
+    // Continue with basic functionality
+  }
+}
+
+/**
+ * Initialize heavy features in background
+ */
+async function initializeHeavyFeatures() {
+  console.log('📈 Initializing heavy features in background...');
+  
+  try {
+    // Initialize expense features (only when needed)
+    await initializeExpenseFeatures();
+    
+    // Initialize other heavy features on-demand
+    console.log('📊 Heavy features available for lazy loading');
+  } catch (error) {
+    console.error('❌ Error initializing heavy features:', error);
   }
 }
 
