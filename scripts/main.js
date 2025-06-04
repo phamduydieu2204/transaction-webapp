@@ -21,11 +21,12 @@ import { closeProcessingModal } from './closeProcessingModal.js';
 
 // Import tab initialization functions
 import { initExpenseTab } from './initExpenseTab.js';
+import { initTransactionTab } from './initTransactionTab.js';
 
 // Import legacy functions for backward compatibility
 import { logout } from './logout.js';
 import { openCalendar } from './openCalendar.js';
-import { calculateEndDate } from './calculateEndDate.js';
+import { calculateEndDate, initializeDateCalculations } from './calculateEndDate.js';
 import { updateCustomerInfo } from './updateCustomerInfo.js';
 import { handleReset } from './handleReset.js';
 import { loadTransactions } from './loadTransactions.js';
@@ -196,6 +197,12 @@ async function startApp() {
     // Phase 4: Initialize navigation system
     console.log('🧭 Phase 4: Initializing navigation...');
     initializeTabSystem();
+    
+    // Phase 4.5: Initialize date defaults and calculations
+    console.log('📅 Phase 4.5: Initializing date defaults...');
+    setTimeout(() => {
+      initializeDateCalculations();
+    }, 100); // Small delay to ensure DOM is ready
     
     // Phase 5: Apply ultra full-width layout override
     console.log('🔧 Phase 5: Applying ultra full-width layout...');

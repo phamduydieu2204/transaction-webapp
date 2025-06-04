@@ -1,14 +1,13 @@
 import { updatePackageList } from './updatePackageList.js';
 import { updateAccountList } from './updateAccountList.js';
+import { getTodayFormatted, setDefaultDates } from './calculateEndDate.js';
 
 export async function handleReset(fetchSoftwareList, showProcessingModal, showResultModal, todayFormatted, updatePackageList, updateAccountList) {
   showProcessingModal("Đang làm mới dữ liệu...");
-  const startDateInput = document.getElementById("startDate");
-  const transactionDateInput = document.getElementById("transactionDate");
   const form = document.getElementById("transactionForm");
-
-  startDateInput.value = todayFormatted;
-  transactionDateInput.value = todayFormatted;
+  
+  // Use the getTodayFormatted function if todayFormatted is not provided
+  const today = todayFormatted || getTodayFormatted();
 
   // Tạm thời vô hiệu hóa sự kiện onreset để tránh vòng lặp
   const originalOnReset = form.onreset;
@@ -39,6 +38,9 @@ export async function handleReset(fetchSoftwareList, showProcessingModal, showRe
   document.getElementById("deviceCount").value = "";
   document.getElementById("note").value = "";
   document.getElementById("revenue").value = "";
+
+  // Set default dates after reset
+  setDefaultDates();
 
   window.currentEditIndex = -1;
   window.currentEditTransactionId = null;

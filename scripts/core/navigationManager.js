@@ -27,7 +27,7 @@ const TAB_CONFIG = {
     icon: '💰',
     requiresAuth: true,
     preloadData: true,
-    initFunction: null
+    initFunction: 'initTransactionTab'
   },
   'chi-phi': {
     name: 'Chi phí',
