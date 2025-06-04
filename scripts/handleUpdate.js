@@ -19,6 +19,12 @@ export async function handleUpdate(
   updatePackageList,
   updateAccountList
 ) {
+  console.log("🔍 handleUpdate được gọi với:", {
+    currentEditTransactionId,
+    hasUserInfo: !!userInfo,
+    transactionListLength: transactionList?.length
+  });
+  
   showProcessingModal("Đang cập nhật giao dịch...");
   const { BACKEND_URL } = getConstants();
 
@@ -28,6 +34,7 @@ export async function handleUpdate(
   }
 
   if (currentEditTransactionId === null) {
+    console.error("❌ currentEditTransactionId is null");
     showResultModal("Vui lòng chọn một giao dịch để chỉnh sửa!", false);
     return;
   }
@@ -38,12 +45,19 @@ export async function handleUpdate(
     return;
   }
 
-  const transaction = transactionList.find(t => t.transactionId === currentEditTransactionId);
+  // Use window.transactionList instead of parameter for consistency
+  const actualTransactionList = window.transactionList || transactionList;
+  console.log("🔍 Looking for transaction:", currentEditTransactionId, "in list of", actualTransactionList.length);
+  
+  const transaction = actualTransactionList.find(t => t.transactionId === currentEditTransactionId);
   if (!transaction) {
+    console.error("❌ Transaction not found:", currentEditTransactionId);
     showResultModal("Giao dịch không tồn tại hoặc đã bị xóa. Vui lòng thử lại!", false);
     handleReset(fetchSoftwareList, showProcessingModal, showResultModal, window.todayFormatted, updatePackageList, updateAccountList);
     return;
   }
+  
+  console.log("✅ Found transaction:", transaction);
 
   // Kiểm tra các trường bắt buộc
   const requiredFields = {

@@ -267,7 +267,13 @@ window.handleAdd = () => {
   return handleAdd(state.user, state.currentEditTransactionId, window.loadTransactions, window.handleReset, updatePackageList, showProcessingModal, showResultModal);
 };
 window.handleUpdate = () => {
+  console.log("🎯 window.handleUpdate called");
   const state = getState();
+  console.log("📊 State:", {
+    hasUser: !!state.user,
+    currentEditTransactionId: state.currentEditTransactionId,
+    transactionsCount: state.transactions?.length
+  });
   return handleUpdate(state.user, state.currentEditTransactionId, state.transactions, window.loadTransactions, window.handleReset, showProcessingModal, showResultModal, getConstants, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction, fetchSoftwareList, updatePackageList, updateAccountList);
 };
 window.handleSearch = () => {
