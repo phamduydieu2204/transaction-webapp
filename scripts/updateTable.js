@@ -116,9 +116,12 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     const actionSelect = row.querySelector(".action-select");
     actionSelect.addEventListener("change", (e) => {
       const selected = e.target.value;
+      console.log(`🎯 Action selected: ${selected} for index: ${globalIndex}`);
+      
       if (selected === "edit") {
         window.editTransaction(globalIndex, transactionList, window.fetchSoftwareList, window.updatePackageList, window.updateAccountList);
       } else if (selected === "delete") {
+        console.log(`🗑️ Delete action triggered for index: ${globalIndex}`);
         window.deleteTransaction(globalIndex);
       } else if (selected === "view") {
         window.viewTransaction(globalIndex, transactionList, window.formatDate, window.copyToClipboard);

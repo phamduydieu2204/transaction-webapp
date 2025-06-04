@@ -284,9 +284,25 @@ window.editTransaction = (index) => {
 };
 window.deleteTransaction = (index) => {
   const state = getState();
+  // Use window.transactionList instead of state.transactions for consistency
+  const transactionList = window.transactionList || state.transactions || [];
+  
+  console.log('🔍 DeleteTransaction called with:', {
+    index,
+    transactionListLength: transactionList.length,
+    hasTransaction: !!transactionList[index],
+    stackTrace: new Error().stack?.split('\n').slice(1, 4).join('\n')
+  });
+  
+  // Prevent automatic calls during page load
+  if (!transactionList || transactionList.length === 0) {
+    console.warn('⚠️ DeleteTransaction called but no transaction data available. Skipping.');
+    return;
+  }
+  
   return deleteTransaction(
     index,
-    state.transactions,
+    transactionList,
     state.user,
     window.loadTransactions,
     window.handleReset,
@@ -318,7 +334,10 @@ window.editRow = (index) => {
   const state = getState();
   return editRow(index, state.transactions);
 };
-window.deleteRow = (index) => deleteRow(index, window.deleteTransaction);
+window.deleteRow = (index) => {
+  console.log('🔍 Legacy deleteRow called with index:', index);
+  return deleteRow(index, window.deleteTransaction);
+};
 window.closeModal = closeModal;
 window.confirmDelete = confirmDelete;
 window.closeProcessingModal = closeProcessingModal;
