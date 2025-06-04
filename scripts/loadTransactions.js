@@ -55,10 +55,25 @@ export async function loadTransactions(userInfo, updateTable, formatDate, editTr
 
       window.currentPage = 1;
       
-      // ✅ CHỈ UPDATE TABLE NẾU ĐANG Ở TAB GIAO DỊCH
-      const currentTab = document.querySelector(".tab-button.active");
-      if (currentTab && currentTab.dataset.tab === "tab-giao-dich") {
+      // ✅ UPDATE TABLE IF ON TRANSACTION TAB OR IF DATA HAS CHANGED
+      const activeTab = document.querySelector(".tab-content.active");
+      const activeTabButton = document.querySelector(".tab-button.active");
+      const isTransactionTabActive = (activeTab && activeTab.id === "tab-giao-dich") || 
+                                   (activeTabButton && activeTabButton.dataset.tab === "tab-giao-dich");
+      
+      console.log("🔍 Tab check:", {
+        activeTabId: activeTab ? activeTab.id : "none",
+        activeTabButtonData: activeTabButton ? activeTabButton.dataset.tab : "none",
+        isTransactionTabActive,
+        willUpdateTable: isTransactionTabActive
+      });
+      
+      // ✅ ALWAYS UPDATE TABLE IF WE HAVE TRANSACTION DATA
+      if (window.transactionList && window.transactionList.length >= 0) {
+        console.log("🔄 Updating transaction table with", window.transactionList.length, "transactions");
         updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
+      } else {
+        console.log("ℹ️ No transaction data to update");
       }
 
       console.log("✅ Load transactions thành công:", window.transactionList.length, "giao dịch");

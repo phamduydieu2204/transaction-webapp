@@ -128,8 +128,7 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
       document.getElementById("softwarePackage").innerHTML = '<option value="">-- Chọn gói --</option>';
       document.getElementById("accountName").innerHTML = '<option value="">-- Chọn tài khoản --</option>';
       // Cập nhật lại danh sách giao dịch
-      await loadTransactions(userInfo, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction);
-      window.loadTransactions();
+      await window.loadTransactions();
       showResultModal("Giao dịch đã được lưu!", true);
     } else {
       showResultModal(result.message || "Không thể lưu giao dịch!", false);

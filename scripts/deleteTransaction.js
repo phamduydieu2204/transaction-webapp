@@ -93,7 +93,7 @@ export async function deleteTransaction(
         true
       );
 
-      await loadTransactions();
+      await window.loadTransactions();
       handleReset();
     } else {
       console.error("Lỗi từ server:", result.message);
