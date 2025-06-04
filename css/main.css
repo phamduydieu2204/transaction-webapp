@@ -152,12 +152,8 @@ table {
   text-overflow: ellipsis !important;
 }
 
-/* Required field indicator */
-.form-field label.required::after {
-  content: " *" !important;
-  color: #dc3545 !important;
-  font-weight: bold !important;
-}
+/* Required field indicator - removed to prevent duplicate asterisks */
+/* Using HTML span.required-asterisk instead */
 
 .form-field input,
 .form-field select,
@@ -337,6 +333,14 @@ table {
   font-family: inherit !important;
   transition: all 0.3s ease !important;
   background-color: #fff !important;
+}
+
+/* Ensure select uses default arrow */
+.transaction-form-grid .form-field select {
+  appearance: auto !important;
+  -webkit-appearance: auto !important;
+  -moz-appearance: auto !important;
+  background-image: none !important;
 }
 
 /* Focus states */

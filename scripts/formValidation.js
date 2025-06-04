@@ -18,7 +18,8 @@ const validationConfig = {
       { id: 'accountName', required: true, message: 'Vui lòng chọn tên tài khoản' },
       { id: 'duration', required: true, type: 'number', message: 'Vui lòng nhập số tháng đăng ký' },
       { id: 'startDate', required: true, message: 'Vui lòng nhập ngày bắt đầu' },
-      { id: 'endDate', required: true, message: 'Vui lòng nhập ngày kết thúc' }
+      { id: 'endDate', required: true, message: 'Vui lòng nhập ngày kết thúc' },
+      { id: 'deviceCount', required: true, type: 'number', message: 'Vui lòng nhập số thiết bị' }
     ]
   },
   expenseForm: {
