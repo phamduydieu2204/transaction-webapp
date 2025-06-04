@@ -331,7 +331,7 @@ window.goToPage = goToPage;
 // Export state management for modules that need it
 window.getState = getState;
 window.updateState = updateState;
-window.switchToTab = switchToTab;
+window.switchToTab = async (tabName, options) => await switchToTab(tabName, options);
 
 // Legacy global variables (maintained for compatibility)
 window.currentEditIndex = -1;

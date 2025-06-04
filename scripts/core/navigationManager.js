@@ -106,12 +106,12 @@ export function initializeNavigation() {
  */
 function setupTabHandlers() {
   document.querySelectorAll(".tab-button").forEach(button => {
-    button.addEventListener("click", (e) => {
+    button.addEventListener("click", async (e) => {
       e.preventDefault();
       const tabName = button.dataset.tab;
       
       if (tabName && tabName !== currentTab) {
-        switchToTab(tabName);
+        await switchToTab(tabName);
       }
     });
   });
@@ -124,7 +124,7 @@ function setupTabHandlers() {
  * @param {string} tabName - Tab identifier
  * @param {Object} options - Switch options
  */
-export function switchToTab(tabName, options = {}) {
+export async function switchToTab(tabName, options = {}) {
   const {
     updateURL = true,
     addToHistory = true,
@@ -172,7 +172,7 @@ export function switchToTab(tabName, options = {}) {
       notifyTabSwitch(previousTab, tabName);
       
       // Initialize tab if needed
-      initializeTabIfNeeded(tabName);
+      await initializeTabIfNeeded(tabName);
       
       console.log(`✅ Successfully switched to tab: ${tabName}`);
       return true;
@@ -435,12 +435,18 @@ function notifyTabSwitch(fromTab, toTab) {
  * Initialize tab if needed
  * @param {string} tabName - Tab to initialize
  */
-function initializeTabIfNeeded(tabName) {
+async function initializeTabIfNeeded(tabName) {
   const tabConfig = TAB_CONFIG[tabName];
   
   if (tabConfig.initFunction && window[tabConfig.initFunction]) {
     try {
-      window[tabConfig.initFunction]();
+      const result = window[tabConfig.initFunction]();
+      
+      // Handle both sync and async functions
+      if (result && typeof result.then === 'function') {
+        await result;
+      }
+      
       console.log(`✅ Tab ${tabName} initialized`);
     } catch (error) {
       console.error(`❌ Error initializing tab ${tabName}:`, error);

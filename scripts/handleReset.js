@@ -42,6 +42,13 @@ export async function handleReset(fetchSoftwareList, showProcessingModal, showRe
   // Set default dates after reset
   setDefaultDates();
 
+  // Re-initialize transaction tab to ensure event handlers are working
+  if (window.initTransactionTab) {
+    setTimeout(() => {
+      window.initTransactionTab();
+    }, 100);
+  }
+
   window.currentEditIndex = -1;
   window.currentEditTransactionId = null;
 
