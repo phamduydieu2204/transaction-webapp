@@ -34,14 +34,14 @@ let validationInProgress = false;
 export function initializeSessionValidation() {
   console.log('🔐 Initializing session validation system...');
   
-  // Check on page load if user is logged in - TEMPORARILY DISABLED FOR TESTING
-  if (false && VALIDATION_CONFIG.onPageLoadCheck) {
+  // Check on page load if user is logged in
+  if (VALIDATION_CONFIG.onPageLoadCheck) {
     setTimeout(() => {
       validateCurrentSession();
-    }, 2000); // Delay to allow app initialization
+    }, 3000); // Delay to allow app initialization
   }
   
-  console.log('⚠️ Session validation temporarily disabled for testing');
+  console.log('✅ Session validation enabled');
   
   // Set up periodic validation
   setInterval(() => {
@@ -109,6 +109,7 @@ async function validateWithServer(user) {
     action: 'validateSession',
     maNhanVien: user.maNhanVien,
     tenNhanVien: user.tenNhanVien,
+    passwordHash: user.passwordHash, // Include password hash for validation
     currentSessionData: {
       vaiTro: user.vaiTro,
       tabNhinThay: user.tabNhinThay,

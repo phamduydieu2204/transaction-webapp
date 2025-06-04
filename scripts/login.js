@@ -49,7 +49,8 @@ export async function handleLogin() {
       nhinThayGiaoDichCuaAi: result.nhinThayGiaoDichCuaAi || "",
       duocSuaGiaoDichCuaAi: result.duocSuaGiaoDichCuaAi || "chỉ bản thân",
       duocXoaGiaoDichCuaAi: result.duocXoaGiaoDichCuaAi || "chỉ bản thân",
-      duocTimKiemGiaoDichCuaAi: result.duocTimKiemGiaoDichCuaAi || "chỉ bản thân"
+      duocTimKiemGiaoDichCuaAi: result.duocTimKiemGiaoDichCuaAi || "chỉ bản thân",
+      passwordHash: result.passwordHash // Store password hash for session validation
     };
       localStorage.setItem('employeeInfo', JSON.stringify(employeeInfo));
       // Don't redirect if called from login wrapper
