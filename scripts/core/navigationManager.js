@@ -70,6 +70,11 @@ let tabHistory = [];
 let currentTab = NAV_CONFIG.defaultTab;
 
 /**
+ * Intended tab from URL (preserved across authentication)
+ */
+let intendedTab = null;
+
+/**
  * Tab switch event listeners
  */
 const tabSwitchListeners = [];
@@ -250,19 +255,33 @@ function loadInitialTab() {
   const urlParams = new URLSearchParams(window.location.search);
   const urlTab = urlParams.get(NAV_CONFIG.urlParamName);
   
+  // Save intended tab from URL for later use (after auth)
+  if (urlTab && TAB_CONFIG[urlTab]) {
+    intendedTab = urlTab;
+    console.log(`💾 Intended tab from URL: ${intendedTab}`);
+  }
+  
   // Try to get tab from saved state
   const stateTab = getStateProperty('activeTab');
   
-  // Determine initial tab
+  // Determine initial tab - prioritize URL, then state, then default
   const initialTab = urlTab || stateTab || NAV_CONFIG.defaultTab;
   
   // Validate tab exists
   const validTab = TAB_CONFIG[initialTab] ? initialTab : NAV_CONFIG.defaultTab;
   
-  // Switch to initial tab
-  switchToTab(validTab, { updateURL: false, addToHistory: false, skipTransition: true });
+  // Check if user is authenticated
+  const isAuthenticated = !!getStateProperty('user');
   
-  console.log(`🎯 Initial tab loaded: ${validTab}`);
+  if (isAuthenticated) {
+    // User is logged in, switch to intended tab immediately
+    switchToTab(validTab, { updateURL: false, addToHistory: false, skipTransition: true });
+    console.log(`🎯 Initial tab loaded (authenticated): ${validTab}`);
+  } else {
+    // User not logged in, save intended tab and switch to default for now
+    console.log(`🔐 User not authenticated, saving intended tab: ${validTab}`);
+    // Don't switch tab yet, will be handled after authentication
+  }
 }
 
 /**
@@ -481,6 +500,29 @@ export function getAllTabs() {
     id: key,
     ...TAB_CONFIG[key]
   }));
+}
+
+/**
+ * Switch to intended tab after authentication
+ */
+export function switchToIntendedTab() {
+  console.log('🎯 Switching to intended tab after authentication...');
+  
+  // Get intended tab or use URL or default
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlTab = urlParams.get(NAV_CONFIG.urlParamName);
+  const targetTab = intendedTab || urlTab || getStateProperty('activeTab') || NAV_CONFIG.defaultTab;
+  
+  // Validate tab exists
+  const validTab = TAB_CONFIG[targetTab] ? targetTab : NAV_CONFIG.defaultTab;
+  
+  console.log(`🔄 Switching to tab after auth: ${validTab}`);
+  
+  // Switch to the intended tab
+  switchToTab(validTab, { updateURL: true, addToHistory: false, skipTransition: false });
+  
+  // Clear intended tab
+  intendedTab = null;
 }
 
 // Export alias for backward compatibility

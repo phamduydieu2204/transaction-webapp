@@ -11,7 +11,7 @@ console.log('🎯 Main.js: File loaded, starting imports...');
 import { initializeApp } from './core/appInitializer.js';
 import { initializeEventHandlers } from './core/eventManager.js';
 import { initializeStateManager, getState, updateState } from './core/stateManager.js';
-import { switchToTab, initializeTabSystem } from './core/navigationManager.js';
+import { switchToTab, initializeTabSystem, switchToIntendedTab } from './core/navigationManager.js';
 import { authManager } from './core/authManager.js';
 
 // Import essential utilities
@@ -197,6 +197,10 @@ async function startApp() {
     // Phase 4: Initialize navigation system
     console.log('🧭 Phase 4: Initializing navigation...');
     initializeTabSystem();
+    
+    // Phase 4.1: Switch to intended tab after authentication
+    console.log('🎯 Phase 4.1: Switching to intended tab...');
+    switchToIntendedTab();
     
     // Phase 4.5: Initialize date defaults and calculations
     console.log('📅 Phase 4.5: Initializing date defaults...');
