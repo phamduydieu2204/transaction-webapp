@@ -1,57 +1,64 @@
 <!-- Tab Nhập chi phí -->
 <div id="tab-chi-phi" class="tab-content">
+  <!-- Form Container -->
   <div class="form-container">
-    <form id="expenseForm">
-      
+    <form id="expenseForm" onreset="handleResetExpense()">
       <!-- Hidden fields -->
       <input type="hidden" id="expenseId">
       <input type="hidden" id="expenseRecorder">
 
-      <div class="form-grid">
-        <!-- Row 1: Date, Category, SubCategory, Product, Package -->
+      <!-- Expense Form Grid -->
+      <div class="transaction-form-grid">
+        
+        <!-- ✅ Dòng 1: Ngày chi, Loại khoản chi, Danh mục chung, Sản phẩm/Dịch vụ, Gói dịch vụ -->
         <div class="form-field">
-          <label class="required">Ngày chi</label>
+          <label class="required">Ngày chi <span class="required-asterisk">*</span></label>
           <div class="date-input-container">
             <input type="text" id="expenseDate" placeholder="yyyy/mm/dd" required>
             <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseDate')"></i>
           </div>
-          <div class="error-message">Vui lòng nhập ngày chi</div>
+          <div class="error-message" id="expenseDate-error">Vui lòng nhập ngày chi</div>
         </div>
+        
         <div class="form-field">
-          <label class="required">Loại khoản chi</label>
+          <label class="required">Loại khoản chi <span class="required-asterisk">*</span></label>
           <select id="expenseCategory" onchange="handleCategoryChange()" required>
             <option value="">-- Chọn loại --</option>
           </select>
-          <div class="error-message">Vui lòng chọn loại khoản chi</div>
+          <div class="error-message" id="expenseCategory-error">Vui lòng chọn loại khoản chi</div>
         </div>
+        
         <div class="form-field">
           <label>Danh mục chung</label>
           <select id="expenseSubCategory" onchange="handleSubCategoryChange()">
             <option value="">-- Chọn danh mục --</option>
           </select>
-          <div class="error-message">Vui lòng chọn danh mục</div>
+          <div class="error-message" id="expenseSubCategory-error">Vui lòng chọn danh mục</div>
         </div>
+        
         <div class="form-field">
           <label>Sản phẩm/Dịch vụ</label>
           <select id="expenseProduct" onchange="handleProductChange()">
             <option value="">-- Chọn sản phẩm --</option>
           </select>
-          <div class="error-message">Vui lòng chọn sản phẩm</div>
+          <div class="error-message" id="expenseProduct-error">Vui lòng chọn sản phẩm</div>
         </div>
+        
         <div class="form-field">
           <label>Gói dịch vụ</label>
           <select id="expensePackage">
             <option value="">-- Chọn gói --</option>
           </select>
-          <div class="error-message">Vui lòng chọn gói dịch vụ</div>
+          <div class="error-message" id="expensePackage-error">Vui lòng chọn gói dịch vụ</div>
         </div>
 
-        <!-- Row 2: Amount, Currency, Bank, Card, Payment Method -->
+        <!-- ✅ Dòng 2: Số tiền, Tiền tệ, Ngân hàng/Ví, Thông tin thẻ/Tài khoản, Ghi chú (spans 2 rows) -->
         <div class="form-field">
-          <label class="required">Số tiền</label>
-          <input type="number" id="expenseAmount" required>
-          <div class="error-message">Vui lòng nhập số tiền</div>
+          <label class="required">Số tiền <span class="required-asterisk">*</span></label>
+          <input type="number" id="expenseAmount" placeholder="0" step="1000" required>
+          <div class="error-message" id="expenseAmount-error">Vui lòng nhập số tiền</div>
         </div>
+        
         <div class="form-field">
           <label>Tiền tệ</label>
           <select id="expenseCurrency">
@@ -59,22 +66,33 @@
             <option value="USD">USD</option>
             <option value="NGN">NGN</option>
           </select>
-          <div class="error-message">Vui lòng chọn tiền tệ</div>
+          <div class="error-message" id="expenseCurrency-error">Vui lòng chọn tiền tệ</div>
         </div>
+        
         <div class="form-field">
           <label>Ngân hàng/Ví</label>
           <select id="expenseBank" onchange="handleBankChange()">
             <option value="">-- Chọn ngân hàng/ví --</option>
           </select>
-          <div class="error-message">Vui lòng chọn ngân hàng</div>
+          <div class="error-message" id="expenseBank-error">Vui lòng chọn ngân hàng</div>
         </div>
+        
         <div class="form-field">
           <label>Thông tin thẻ/Tài khoản</label>
           <select id="expenseCard">
             <option value="">-- Chọn tài khoản --</option>
           </select>
-          <div class="error-message">Vui lòng chọn tài khoản</div>
+          <div class="error-message" id="expenseCard-error">Vui lòng chọn tài khoản</div>
         </div>
+        
+        <!-- Ghi chú - 1 cột, kéo dài từ dòng 2 đến dòng 3 -->
+        <div class="form-field note-field-tall">
+          <label>Ghi chú</label>
+          <textarea id="expenseNote" placeholder="Nhập ghi chú chi tiết về khoản chi..."></textarea>
+          <div class="error-message" id="expenseNote-error">Vui lòng nhập ghi chú</div>
+        </div>
+
+        <!-- ✅ Dòng 3: Phương thức chi, Ngày tái tục, Trạng thái, Người nhận/Nhà cung cấp -->
         <div class="form-field">
           <label>Phương thức chi</label>
           <select id="expenseRecurring" onchange="handleRecurringChange()">
@@ -83,18 +101,18 @@
             <option value="Hàng quý">Định kỳ hàng quý</option>
             <option value="Hàng năm">Định kỳ hàng năm</option>
           </select>
-          <div class="error-message">Vui lòng chọn phương thức</div>
+          <div class="error-message" id="expenseRecurring-error">Vui lòng chọn phương thức</div>
         </div>
-
-        <!-- Row 3: Renew Date, Status, Supplier, Note (note spans 2 columns) -->
+        
         <div class="form-field">
           <label>Ngày tái tục</label>
           <div class="date-input-container">
             <input type="text" id="expenseRenewDate" placeholder="yyyy/mm/dd">
             <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('expenseRenewDate')"></i>
           </div>
-          <div class="error-message">Vui lòng nhập ngày tái tục</div>
+          <div class="error-message" id="expenseRenewDate-error">Vui lòng nhập ngày tái tục</div>
         </div>
+        
         <div class="form-field">
           <label>Trạng thái</label>
           <select id="expenseStatus">
@@ -102,40 +120,42 @@
             <option>Chưa thanh toán</option>
             <option>Đã hủy</option>
           </select>
-          <div class="error-message">Vui lòng chọn trạng thái</div>
+          <div class="error-message" id="expenseStatus-error">Vui lòng chọn trạng thái</div>
         </div>
+        
         <div class="form-field">
           <label>Người nhận/Nhà cung cấp</label>
-          <input type="text" id="expenseSupplier">
-          <div class="error-message">Vui lòng nhập nhà cung cấp</div>
-        </div>
-        <div class="form-field form-field-span-2">
-          <label>Ghi chú</label>
-          <input type="text" id="expenseNote" placeholder="Nhập ghi chú chi tiết...">
-          <div class="error-message">Vui lòng nhập ghi chú</div>
+          <input type="text" id="expenseSupplier" placeholder="Nhập tên nhà cung cấp">
+          <div class="error-message" id="expenseSupplier-error">Vui lòng nhập nhà cung cấp</div>
         </div>
       </div>
 
-    <!-- Buttons -->
-    <div class="button-row">
-      <button type="button" onclick="handleAddExpense()">Thêm</button>
-      <button type="button" onclick="handleUpdateExpense()">Cập nhật</button>
-      <button type="button" onclick="handleSearchExpense()">Tìm kiếm</button>
-      <button type="button" onclick="handleResetExpense()">Làm mới</button>
-    </div>
-  </form>
+      <!-- Buttons -->
+      <div class="button-row">
+        <button type="button" onclick="handleAddExpense()">Thêm</button>
+        <button type="button" onclick="handleUpdateExpense()">Cập nhật</button>
+        <button type="button" onclick="handleSearchExpense()">Tìm kiếm</button>
+        <button type="reset">Làm mới</button>
+      </div>
+    </form>
+  </div>
   
-  <!-- Expense List Table -->
-  <table id="expenseListTable">
-    <thead>
-      <tr>
-        <!-- Table headers will be dynamically added -->
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Table rows will be dynamically added -->
-    </tbody>
-  </table>
+  <!-- Table Container -->
+  <div class="table-container">
+    <div id="expenseSection">
+      <!-- Expense List Table -->
+      <table id="expenseListTable">
+        <thead>
+          <tr>
+            <!-- Table headers will be dynamically added -->
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Table rows will be dynamically added -->
+        </tbody>
+      </table>
 
-  <div class="pagination" id="expensePagination"></div>
+      <div class="pagination" id="expensePagination"></div>
+    </div>
+  </div>
 </div>
