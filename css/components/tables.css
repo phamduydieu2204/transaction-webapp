@@ -38,9 +38,9 @@ table {
   position: sticky;
   top: 0; /* Stick to top of viewport */
   z-index: 9999; /* Very high z-index to stay above everything */
-  background-color: #f8f9fa;
-  color: #333;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 /* Ensure the sticky header works properly */
@@ -50,25 +50,101 @@ table {
 }
 
 #transactionTable thead th {
-  background-color: #f8f9fa;
+  background: transparent;
+  color: #ffffff;
   font-weight: 600;
   text-transform: uppercase;
-  font-size: 12px;
-  letter-spacing: 0.5px;
-  border-bottom: 2px solid #dee2e6;
+  font-size: 13px;
+  letter-spacing: 0.8px;
+  padding: 16px 12px;
+  border-bottom: 3px solid rgba(255,255,255,0.2);
+  border-right: 1px solid rgba(255,255,255,0.1);
+  position: relative;
+  white-space: nowrap;
 }
 
-#transactionTable th,
+#transactionTable thead th:last-child {
+  border-right: none;
+}
+
+/* Add hover effect for header cells */
+#transactionTable thead th:hover {
+  background-color: rgba(255,255,255,0.1);
+  cursor: pointer;
+}
+
+/* Ensure header text is readable */
+#transactionTable thead th {
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* Table body cells */
 #transactionTable td {
   white-space: normal;
   overflow-wrap: break-word;
   word-break: break-word;
-  resize: horizontal;
   min-width: 100px;
   max-width: 600px;
-  border: 1px solid #ddd;
-  padding: 8px;
+  border: 1px solid #e9ecef;
+  padding: 12px;
   text-align: left;
+  background-color: #ffffff;
+  color: #495057;
+  font-size: 14px;
+}
+
+/* Alternating row colors */
+#transactionTable tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+#transactionTable tbody tr:hover {
+  background-color: #e3f2fd;
+  transition: background-color 0.2s ease;
+}
+
+/* First column styling */
+#transactionTable tbody td:first-child {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+/* Action buttons in table */
+#transactionTable .action-btn {
+  padding: 6px 12px;
+  margin: 0 2px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+#transactionTable .view-btn {
+  background-color: #17a2b8;
+  color: white;
+}
+
+#transactionTable .view-btn:hover {
+  background-color: #138496;
+}
+
+#transactionTable .edit-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+#transactionTable .edit-btn:hover {
+  background-color: #218838;
+}
+
+#transactionTable .delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+#transactionTable .delete-btn:hover {
+  background-color: #c82333;
 }
 
 /* Desktop table optimization */
