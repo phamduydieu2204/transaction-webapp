@@ -30,23 +30,34 @@ export function parseTabPermissions(tabNhinThay) {
     return ['giao-dich'];
   }
 
-  // Split by | and trim
-  const permissions = tabNhinThay.split('|').map(p => p.trim());
-  console.log('🔍 Raw tab permissions:', permissions);
+  console.log('📝 Raw tabNhinThay input:', JSON.stringify(tabNhinThay));
+  
+  // Split by | or , and trim
+  const permissions = tabNhinThay.split(/[|,]/).map(p => p.trim()).filter(p => p.length > 0);
+  console.log('🔍 Parsed permissions array:', permissions);
 
+  // Check for "tất cả" first (gives all permissions)
+  if (permissions.includes('tất cả')) {
+    console.log('✅ Found "tất cả" permission - granting all tabs');
+    return TAB_MAPPING['tất cả'];
+  }
+  
   // Convert to internal tab IDs
   const allowedTabs = new Set();
   
   permissions.forEach(permission => {
+    console.log(`🔎 Checking permission: "${permission}" (length: ${permission.length})`);
     if (TAB_MAPPING[permission]) {
+      console.log(`✅ Found mapping for: "${permission}" -> ${TAB_MAPPING[permission]}`);
       TAB_MAPPING[permission].forEach(tabId => allowedTabs.add(tabId));
     } else {
-      console.warn(`⚠️ Unknown tab permission: ${permission}`);
+      console.warn(`⚠️ Unknown tab permission: "${permission}"`);
+      console.log('📊 Available mappings:', Object.keys(TAB_MAPPING));
     }
   });
 
   const result = Array.from(allowedTabs);
-  console.log('✅ Parsed tab permissions:', result);
+  console.log('✅ Final parsed tab permissions:', result);
   
   return result.length > 0 ? result : ['giao-dich'];
 }
@@ -75,6 +86,14 @@ export function canAccessTab(tabId) {
   const canAccess = allowedTabs.includes(tabId);
   
   console.log(`🔐 Tab access check: ${tabId} = ${canAccess ? '✅ ALLOWED' : '❌ DENIED'}`);
+  console.log(`📊 Allowed tabs:`, allowedTabs);
+  
+  // Fallback: if no tabs are allowed but user exists, allow giao-dich
+  if (!canAccess && allowedTabs.length === 0 && tabId === 'giao-dich') {
+    console.log('⚠️ No tabs allowed, fallback to allowing giao-dich');
+    return true;
+  }
+  
   return canAccess;
 }
 

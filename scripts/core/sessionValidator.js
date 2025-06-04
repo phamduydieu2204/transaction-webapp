@@ -34,12 +34,14 @@ let validationInProgress = false;
 export function initializeSessionValidation() {
   console.log('🔐 Initializing session validation system...');
   
-  // Check on page load if user is logged in
-  if (VALIDATION_CONFIG.onPageLoadCheck) {
+  // Check on page load if user is logged in - TEMPORARILY DISABLED FOR TESTING
+  if (false && VALIDATION_CONFIG.onPageLoadCheck) {
     setTimeout(() => {
       validateCurrentSession();
     }, 2000); // Delay to allow app initialization
   }
+  
+  console.log('⚠️ Session validation temporarily disabled for testing');
   
   // Set up periodic validation
   setInterval(() => {

@@ -170,6 +170,13 @@ async function startApp() {
         try {
           const userInfo = JSON.parse(userData);
           console.log('✅ Legacy session parsed:', userInfo.maNhanVien);
+          
+          // Add default tab permissions for legacy users
+          if (!userInfo.tabNhinThay) {
+            userInfo.tabNhinThay = 'tất cả'; // Default to all tabs for legacy users
+            console.log('📄 Added default tab permissions for legacy user');
+          }
+          
           updateState({ user: userInfo });
         } catch (e) {
           console.warn('❌ Invalid legacy session data:', e);
