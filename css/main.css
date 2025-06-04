@@ -31,6 +31,13 @@
    FULL WIDTH OVERRIDE - HIGHEST PRIORITY
    ======================================== */
 
+/* Ensure html and body allow sticky positioning */
+html, body {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  height: auto !important;
+}
+
 /* Force full width layout */
 .container {
   width: 100vw !important;
@@ -38,6 +45,8 @@
   margin: 0 !important;
   padding: 0 !important;
   box-sizing: border-box !important;
+  /* Ensure no overflow hidden that would break sticky */
+  overflow: visible !important;
 }
 
 .tab-contents {
@@ -57,8 +66,7 @@
   width: 100% !important;
   max-width: none !important;
   overflow-x: auto !important;
-  overflow-y: auto !important;
-  max-height: calc(100vh - 400px) !important; /* Adjust based on form height */
+  /* Removed overflow-y and max-height to allow natural page scrolling */
 }
 
 header {
