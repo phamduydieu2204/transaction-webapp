@@ -789,18 +789,7 @@ body.login-page {
   color: white;
 }
 
-#expenseListTable tbody {
-  display: block;
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-#expenseListTable thead,
-#expenseListTable tbody tr {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-}
+/* Removed scrollable tbody for expense table - now uses same layout as transaction table */
 
 #expenseListTable th,
 #expenseListTable td {

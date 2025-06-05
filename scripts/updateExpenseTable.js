@@ -16,7 +16,7 @@ window.handleDeleteExpense = handleDeleteExpense;
 window.updateExpenseTable = updateExpenseTable;
 
 // Force refresh on load to show new structure
-console.log('🔄 Loading expense table with dropdown actions & single scroll...');
+console.log('🚫 FORCE removing internal scroll from expense table...');
 if (typeof window !== 'undefined') {
   // Schedule refresh after DOM is ready
   setTimeout(() => {
@@ -32,6 +32,8 @@ if (typeof window !== 'undefined') {
       console.log('🎨 Final refresh for expense table styling...');
       updateExpenseTable();
     }
+    // FORCE: Remove any remaining scroll on containers
+    forceRemoveInternalScroll();
   }, 2000);
 }
 
@@ -80,6 +82,39 @@ function handleExpenseAction(selectElement, index) {
 
 // Make dropdown handler available globally
 window.handleExpenseAction = handleExpenseAction;
+
+/**
+ * Force remove internal scroll from expense table containers
+ */
+function forceRemoveInternalScroll() {
+  console.log('🚫 FORCE: Removing internal scroll from expense containers...');
+  
+  // List of selectors that might have scroll
+  const scrollSelectors = [
+    '.expense-table-container',
+    '#expenseSection', 
+    '#tab-chi-phi .table-container',
+    '#tab-chi-phi .expense-table-container',
+    '#expenseListTable'
+  ];
+  
+  scrollSelectors.forEach(selector => {
+    const elements = document.querySelectorAll(selector);
+    elements.forEach(el => {
+      if (el) {
+        el.style.overflow = 'visible';
+        el.style.overflowX = 'visible';
+        el.style.overflowY = 'visible';
+        el.style.maxHeight = 'none';
+        el.style.height = 'auto';
+        console.log(`🚫 Removed scroll from: ${selector}`);
+      }
+    });
+  });
+}
+
+// Make function available globally
+window.forceRemoveInternalScroll = forceRemoveInternalScroll;
 
 /**
  * Update expense table with current data
