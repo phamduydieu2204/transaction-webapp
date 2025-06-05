@@ -1,6 +1,7 @@
 import { getConstants } from './constants.js';
 import { showProcessingModal } from './showProcessingModal.js';
 import { showResultModal } from './showResultModal.js';
+import { closeProcessingModal } from './closeProcessingModal.js';
 import { renderExpenseStats } from './renderExpenseStats.js';
 
 export async function handleSearchExpense() {
