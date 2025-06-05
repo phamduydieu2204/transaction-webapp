@@ -10,7 +10,7 @@ export function openAddOrUpdateModal() {
     modal.style.display = 'none';
   }
   
-  export function handleAddNewTransaction() {
+  export async function handleAddNewTransaction() {
     console.log("🆕 handleAddNewTransaction called - clearing edit state");
     window.currentEditTransactionId = null;
     window.currentEditIndex = -1;
@@ -24,8 +24,18 @@ export function openAddOrUpdateModal() {
     }
     
     closeAddOrUpdateModal();
-    console.log("🆕 Calling handleAdd() for new transaction");
-    window.handleAdd(); // Gọi lại handleAdd() sau khi xóa tiến trình sửa
+    
+    // Reset form and set today's date
+    console.log("🆕 Resetting form to clear old data");
+    if (window.handleReset) {
+      await window.handleReset();
+    } else {
+      // Fallback: manually set today's date
+      const { setDefaultDates } = await import('./calculateEndDate.js');
+      setDefaultDates(true);
+    }
+    
+    console.log("🆕 Form reset complete - ready for new transaction");
   }
   
   export function handleUpdateTransactionFromModal() {

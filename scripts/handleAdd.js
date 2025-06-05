@@ -17,9 +17,11 @@ import { updateAccountList } from './updateAccountList.js'; // <<== thêm
 import { updateState } from './core/stateManager.js';
 import { validateBeforeOperation } from './core/sessionValidator.js';
 
-// Hàm lấy todayFormatted vì không lấy được trực tiếp từ main.js
-const today = new Date();
-const todayFormatted = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
+// Hàm lấy todayFormatted - luôn lấy ngày hiện tại
+function getTodayFormatted() {
+  const today = new Date();
+  return `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
+}
 
 export async function handleAdd(userInfo, currentEditTransactionId, loadTransactions, handleReset, updatePackageList, showProcessingModal, showResultModal) {
   console.log("🔍 handleAdd được gọi");
@@ -37,6 +39,11 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
     return;
   }
   
+  // Always update to today's date for new transactions
+  const { setDefaultDates } = await import('./calculateEndDate.js');
+  setDefaultDates(true);
+  console.log("📅 Updated dates to today for new transaction");
+
   const { BACKEND_URL } = getConstants();
 
   if (!userInfo) {

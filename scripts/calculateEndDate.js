@@ -36,19 +36,20 @@ export function getTodayFormatted() {
 
 /**
  * Set default date values
+ * @param {boolean} forceUpdate - If true, always update dates to today even if fields have values
  */
-export function setDefaultDates() {
+export function setDefaultDates(forceUpdate = false) {
   const today = getTodayFormatted();
   
-  // Set transaction date
+  // Set transaction date - Always update if forceUpdate is true
   const transactionDateInput = document.getElementById('transactionDate');
-  if (transactionDateInput && !transactionDateInput.value) {
+  if (transactionDateInput && (!transactionDateInput.value || forceUpdate)) {
     transactionDateInput.value = today;
   }
   
-  // Set start date
+  // Set start date - Always update if forceUpdate is true
   const startDateInput = document.getElementById('startDate');
-  if (startDateInput && !startDateInput.value) {
+  if (startDateInput && (!startDateInput.value || forceUpdate)) {
     startDateInput.value = today;
   }
   

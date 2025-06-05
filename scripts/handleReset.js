@@ -40,8 +40,8 @@ export async function handleReset(fetchSoftwareList, showProcessingModal, showRe
   document.getElementById("note").value = "";
   document.getElementById("revenue").value = "";
 
-  // Set default dates after reset
-  setDefaultDates();
+  // Set default dates after reset - force update to today's date
+  setDefaultDates(true);
 
   // Event handlers are already attached, no need to re-initialize
 
