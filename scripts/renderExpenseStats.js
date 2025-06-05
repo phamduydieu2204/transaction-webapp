@@ -177,6 +177,24 @@ function renderExpenseTable(data, formatDate) {
     return;
   }
 
+  // ✅ Cập nhật header theo yêu cầu mới
+  const tableHead = document.querySelector("#expenseListTable thead tr");
+  if (tableHead) {
+    tableHead.innerHTML = `
+      <th>Mã chi phí</th>
+      <th>Ngày chi</th>
+      <th>Loại kế toán</th>
+      <th>Phân bổ</th>
+      <th>Thông tin khoản chi</th>
+      <th>Số tiền</th>
+      <th>Chi tiết ngân hàng</th>
+      <th>Ngày tái tục</th>
+      <th>Người nhận/Nhà cung cấp</th>
+      <th>Ghi chú</th>
+      <th>Thao tác</th>
+    `;
+  }
+
   const today = new Date();
 
   // ✅ Sắp xếp chi phí mới nhất lên đầu (timestamp giảm dần)
@@ -218,12 +236,17 @@ function renderExpenseTable(data, formatDate) {
       row.style.backgroundColor = "#fff9c4"; // Màu vàng nhạt
     }
 
-    // ✅ HIỂN THỊ CÁC CELL
+    // ✅ CÁC CỘT THEO THỨ TỰ YÊU CẦU:
+    // 1. Mã chi phí
     row.insertCell().textContent = e.expenseId || "";
+    
+    // 2. Ngày chi
     row.insertCell().textContent = formatDate(e.date);
+    
+    // 3. Loại kế toán
     row.insertCell().textContent = e.accountingType || "";
     
-    // ✅ Hiển thị cột phân bổ định kỳ với icon
+    // 4. Phân bổ (hiển thị với icon)
     const allocationCell = row.insertCell();
     if (e.periodicAllocation === "Có") {
       allocationCell.innerHTML = '<span style="color: #28a745;">✓ Có</span>';
@@ -231,7 +254,7 @@ function renderExpenseTable(data, formatDate) {
       allocationCell.innerHTML = '<span style="color: #6c757d;">✗ Không</span>';
     }
     
-    // ✅ Gộp 4 cột thành 1 cột "Thông tin khoản chi"
+    // 5. Thông tin khoản chi (gộp 4 trường: type, category, product, package)
     const expenseInfoParts = [
       e.type || "",
       e.category || "",
@@ -242,11 +265,28 @@ function renderExpenseTable(data, formatDate) {
     const expenseInfoCell = row.insertCell();
     expenseInfoCell.textContent = expenseInfoParts.join(" - ");
     
+    // 6. Số tiền (với đơn vị tiền tệ)
     row.insertCell().textContent = `${(e.amount || 0).toLocaleString()} ${e.currency || ""}`;
+    
+    // 7. Chi tiết ngân hàng (gộp bank và card/account info)
+    const bankDetailsParts = [
+      e.bank || "",
+      e.cardInfo || e.accountInfo || ""
+    ].filter(part => part.trim() !== "");
+    
+    const bankDetailsCell = row.insertCell();
+    bankDetailsCell.textContent = bankDetailsParts.join(" - ") || "--";
+    
+    // 8. Ngày tái tục
     row.insertCell().textContent = formatDate(e.renewDate);
-    row.insertCell().textContent = e.note || ""; // Hiển thị ghi chú thay vì trạng thái
+    
+    // 9. Người nhận/Nhà cung cấp
+    row.insertCell().textContent = e.supplier || "--";
+    
+    // 10. Ghi chú
+    row.insertCell().textContent = e.note || "";
 
-    // ✅ Action dropdown
+    // 11. Thao tác
     const actionCell = row.insertCell();
     const select = document.createElement("select");
     select.className = "action-select";
