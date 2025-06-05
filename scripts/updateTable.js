@@ -47,21 +47,28 @@ function transactionGoToPage(page) {
 }
 
 /**
- * Handle transaction action dropdown selection
+ * Handle transaction action dropdown selection - using index
  */
-function handleTransactionAction(selectElement, transactionData) {
+function handleTransactionActionByIndex(selectElement) {
   const action = selectElement.value;
   if (!action) return;
+  
+  const globalIndex = parseInt(selectElement.dataset.index);
+  console.log('🔍 Transaction action:', action, 'Index:', globalIndex);
   
   // Reset dropdown to default
   selectElement.value = '';
   
-  // Parse transaction data if it's a string
-  const transaction = typeof transactionData === 'string' ? JSON.parse(transactionData) : transactionData;
+  // Get transaction from window.transactionList
+  const transaction = window.transactionList[globalIndex];
+  if (!transaction) {
+    console.error('❌ Transaction not found at index:', globalIndex);
+    return;
+  }
   
-  console.log('🔍 handleTransactionAction:', {
+  console.log('🔍 Found transaction:', {
     action,
-    transactionData,
+    globalIndex,
     transaction,
     transactionId: transaction.transactionId,
     transactionListLength: window.transactionList ? window.transactionList.length : 0
@@ -71,48 +78,29 @@ function handleTransactionAction(selectElement, transactionData) {
   switch (action) {
     case 'view':
       if (typeof window.viewTransaction === 'function') {
-        // Find index in transactionList
-        const index = window.transactionList.findIndex(t => t.transactionId === transaction.transactionId);
-        console.log('🔍 View action - index found:', index);
-        if (index !== -1) {
-          window.viewTransaction(index, window.transactionList, window.formatDate);
-        } else {
-          console.error('❌ Transaction not found in list, trying direct view with transaction object');
-          // Try passing the transaction object directly
-          window.viewTransaction(transaction, window.transactionList, window.formatDate);
-        }
+        // Pass globalIndex directly - it's already the correct index
+        console.log('🔍 View action - using globalIndex:', globalIndex);
+        window.viewTransaction(globalIndex, window.transactionList, window.formatDate);
       }
       break;
     case 'edit':
       if (typeof window.editTransaction === 'function') {
-        const index = window.transactionList.findIndex(t => t.transactionId === transaction.transactionId);
-        if (index !== -1) {
-          window.editTransaction(index, window.transactionList, window.fetchSoftwareList, window.updatePackageList, window.updateAccountList);
-        }
+        window.editTransaction(globalIndex, window.transactionList, window.fetchSoftwareList, window.updatePackageList, window.updateAccountList);
       }
       break;
     case 'delete':
       if (typeof window.deleteTransaction === 'function') {
-        const index = window.transactionList.findIndex(t => t.transactionId === transaction.transactionId);
-        if (index !== -1) {
-          window.deleteTransaction(index);
-        }
+        window.deleteTransaction(globalIndex);
       }
       break;
     case 'updateCookie':
       if (typeof window.handleUpdateCookie === 'function') {
-        const index = window.transactionList.findIndex(t => t.transactionId === transaction.transactionId);
-        if (index !== -1) {
-          window.handleUpdateCookie(index);
-        }
+        window.handleUpdateCookie(globalIndex);
       }
       break;
     case 'changePassword':
       if (typeof window.handleChangePassword === 'function') {
-        const index = window.transactionList.findIndex(t => t.transactionId === transaction.transactionId);
-        if (index !== -1) {
-          window.handleChangePassword(index);
-        }
+        window.handleChangePassword(globalIndex);
       }
       break;
   }
@@ -124,7 +112,7 @@ window.transactionPrevPage = transactionPrevPage;
 window.transactionNextPage = transactionNextPage;
 window.transactionLastPage = transactionLastPage;
 window.transactionGoToPage = transactionGoToPage;
-window.handleTransactionAction = handleTransactionAction;
+window.handleTransactionActionByIndex = handleTransactionActionByIndex;
 
 /**
  * Update transaction pagination - Giống hoàn toàn expense table
@@ -330,7 +318,7 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
       <td>${transaction.revenue}</td>
       <td>${infoCell}</td>
       <td>
-        <select class="action-select" data-transaction='${JSON.stringify(transaction).replace(/'/g, "&#39;")}' onchange="handleTransactionAction(this, this.dataset.transaction)">
+        <select class="action-select" data-index="${globalIndex}" onchange="handleTransactionActionByIndex(this)">
           ${actionOptions}
         </select>
       </td>
