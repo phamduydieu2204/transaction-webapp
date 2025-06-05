@@ -2,6 +2,150 @@ import { updatePagination } from './pagination.js';
 import { updateTotalDisplay } from './updateTotalDisplay.js';
 import { batchWrite, debounce } from './core/domOptimizer.js';
 
+// Transaction pagination functions - Giống expense table
+function transactionFirstPage() {
+  window.currentPage = 1;
+  if (typeof window.loadTransactions === 'function') {
+    window.loadTransactions();
+  }
+}
+
+function transactionPrevPage() {
+  if (window.currentPage > 1) {
+    window.currentPage--;
+    if (typeof window.loadTransactions === 'function') {
+      window.loadTransactions();
+    }
+  }
+}
+
+function transactionNextPage() {
+  const itemsPerPage = window.itemsPerPage || 10;
+  const totalPages = Math.ceil(window.transactionList.length / itemsPerPage);
+  if (window.currentPage < totalPages) {
+    window.currentPage++;
+    if (typeof window.loadTransactions === 'function') {
+      window.loadTransactions();
+    }
+  }
+}
+
+function transactionLastPage() {
+  const itemsPerPage = window.itemsPerPage || 10;
+  const totalPages = Math.ceil(window.transactionList.length / itemsPerPage);
+  window.currentPage = totalPages;
+  if (typeof window.loadTransactions === 'function') {
+    window.loadTransactions();
+  }
+}
+
+function transactionGoToPage(page) {
+  window.currentPage = page;
+  if (typeof window.loadTransactions === 'function') {
+    window.loadTransactions();
+  }
+}
+
+// Make transaction pagination functions available globally
+window.transactionFirstPage = transactionFirstPage;
+window.transactionPrevPage = transactionPrevPage;
+window.transactionNextPage = transactionNextPage;
+window.transactionLastPage = transactionLastPage;
+window.transactionGoToPage = transactionGoToPage;
+
+/**
+ * Update transaction pagination - Giống hoàn toàn expense table
+ */
+function updateTransactionPagination(totalPages, currentPage) {
+  const pagination = document.getElementById("pagination");
+  if (!pagination) return;
+
+  pagination.innerHTML = "";
+
+  // Thêm nút "Tất cả" nếu đang trong trạng thái tìm kiếm
+  if (window.isSearching) {
+    const allBtn = document.createElement("button");
+    allBtn.textContent = "Tất cả";
+    allBtn.className = "pagination-btn all-btn";
+    allBtn.addEventListener("click", () => {
+      window.isSearching = false;
+      window.currentPage = 1;
+      if (typeof window.loadTransactions === 'function') {
+        window.loadTransactions();
+      }
+    });
+    pagination.appendChild(allBtn);
+  }
+
+  if (totalPages <= 1) return;
+
+  // First button
+  const firstButton = document.createElement("button");
+  firstButton.textContent = "«";
+  firstButton.className = "pagination-btn";
+  firstButton.onclick = transactionFirstPage;
+  firstButton.disabled = currentPage === 1;
+  pagination.appendChild(firstButton);
+
+  // Previous button
+  const prevButton = document.createElement("button");
+  prevButton.textContent = "‹";
+  prevButton.className = "pagination-btn";
+  prevButton.onclick = transactionPrevPage;
+  prevButton.disabled = currentPage === 1;
+  pagination.appendChild(prevButton);
+
+  // Page numbers
+  const maxVisiblePages = 5;
+  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+  let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+  if (endPage - startPage + 1 < maxVisiblePages) {
+    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+  }
+
+  if (startPage > 1) {
+    const dots = document.createElement("span");
+    dots.textContent = "...";
+    dots.className = "pagination-dots";
+    pagination.appendChild(dots);
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
+    const pageButton = document.createElement("button");
+    pageButton.textContent = i;
+    pageButton.className = "pagination-btn";
+    pageButton.onclick = () => transactionGoToPage(i);
+    if (i === currentPage) {
+      pageButton.classList.add("active");
+    }
+    pagination.appendChild(pageButton);
+  }
+
+  if (endPage < totalPages) {
+    const dots = document.createElement("span");
+    dots.textContent = "...";
+    dots.className = "pagination-dots";
+    pagination.appendChild(dots);
+  }
+
+  // Next button
+  const nextButton = document.createElement("button");
+  nextButton.textContent = "›";
+  nextButton.className = "pagination-btn";
+  nextButton.onclick = transactionNextPage;
+  nextButton.disabled = currentPage === totalPages;
+  pagination.appendChild(nextButton);
+
+  // Last button
+  const lastButton = document.createElement("button");
+  lastButton.textContent = "»";
+  lastButton.className = "pagination-btn";
+  lastButton.onclick = transactionLastPage;
+  lastButton.disabled = currentPage === totalPages;
+  pagination.appendChild(lastButton);
+}
+
 export function updateTable(transactionList, currentPage, itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction) {
   const tableBody = document.querySelector("#transactionTable tbody");
   if (!tableBody) return;
@@ -153,19 +297,8 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     tableBody.appendChild(row);
   });
 
-  // ✅ Cập nhật phân trang
-  const refreshTable = () =>
-    updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
-
-  updatePagination(
-    totalPages,
-    window.currentPage,
-    () => window.firstPage(refreshTable),
-    () => window.prevPage(refreshTable),
-    () => window.nextPage(refreshTable, window.itemsPerPage),
-    () => window.lastPage(refreshTable, window.itemsPerPage),
-    (page) => window.goToPage(page, refreshTable)
-  );
+  // ✅ Cập nhật phân trang - Sử dụng structure giống expense table
+  updateTransactionPagination(totalPages, currentPage);
 
   // ✅ Lưu tổng doanh thu vào biến global và cập nhật hiển thị
   window.totalRevenue = totalRevenue;

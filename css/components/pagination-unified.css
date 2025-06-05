@@ -1,0 +1,213 @@
+/* ==========================================================================
+   UNIFIED PAGINATION STYLING - Cho cả transaction và expense tables
+   ========================================================================== */
+
+/* Pagination container chung */
+.pagination,
+#pagination,
+#expensePagination {
+  display: flex;
+  justify-content: flex-end; /* Căn phải */
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  margin-bottom: 30px;
+  padding: 15px 0;
+  flex-wrap: wrap;
+}
+
+/* Button styling chung - Hiện đại và chuyên nghiệp */
+.pagination button,
+.pagination .pagination-btn,
+#pagination button,
+#expensePagination .pagination-btn {
+  min-width: 40px;
+  height: 36px;
+  padding: 8px 12px;
+  border: 1px solid #dee2e6;
+  background-color: #ffffff;
+  color: #495057;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  user-select: none;
+}
+
+/* Hover effects */
+.pagination button:hover:not(:disabled):not(.active),
+.pagination .pagination-btn:hover:not(:disabled):not(.active),
+#pagination button:hover:not(:disabled):not(.active),
+#expensePagination .pagination-btn:hover:not(:disabled):not(.active) {
+  background-color: #f8f9fa;
+  border-color: #3498db;
+  color: #3498db;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(52, 152, 219, 0.15);
+}
+
+/* Active page button - Nổi bật */
+.pagination button.active,
+.pagination .pagination-btn.active,
+#pagination button.active,
+#expensePagination .pagination-btn.active {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  border-color: #2980b9;
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+/* Disabled buttons */
+.pagination button:disabled,
+.pagination .pagination-btn:disabled,
+#pagination button:disabled,
+#expensePagination .pagination-btn:disabled {
+  background-color: #f8f9fa;
+  border-color: #e9ecef;
+  color: #adb5bd;
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Navigation buttons (First, Previous, Next, Last) */
+.pagination button:first-child,
+.pagination button:last-child,
+#pagination button:first-child,
+#pagination button:last-child,
+#expensePagination .pagination-btn:first-child,
+#expensePagination .pagination-btn:last-child {
+  font-weight: bold;
+  min-width: 44px;
+}
+
+/* Special buttons styling */
+#expensePagination .pagination-btn.all-btn {
+  background: linear-gradient(135deg, #28a745 0%, #20a83c 100%);
+  border-color: #20a83c;
+  color: #ffffff;
+  font-weight: 600;
+  margin-right: 15px;
+  padding: 8px 16px;
+  min-width: auto;
+}
+
+#expensePagination .pagination-btn.all-btn:hover {
+  background: linear-gradient(135deg, #20a83c 0%, #1e7e34 100%);
+  border-color: #1e7e34;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+/* Dots styling */
+.pagination-dots,
+.pagination span {
+  padding: 8px 6px;
+  color: #6c757d;
+  font-size: 14px;
+  font-weight: 500;
+  user-select: none;
+}
+
+/* Focus states for accessibility */
+.pagination button:focus,
+.pagination .pagination-btn:focus,
+#pagination button:focus,
+#expensePagination .pagination-btn:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+  .pagination,
+  #pagination,
+  #expensePagination {
+    justify-content: center; /* Căn giữa trên mobile */
+    gap: 6px;
+    margin-bottom: 40px;
+    padding: 10px 0;
+  }
+  
+  .pagination button,
+  .pagination .pagination-btn,
+  #pagination button,
+  #expensePagination .pagination-btn {
+    min-width: 36px;
+    height: 32px;
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+  
+  #expensePagination .pagination-btn.all-btn {
+    padding: 6px 12px;
+    margin-right: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pagination,
+  #pagination,
+  #expensePagination {
+    gap: 4px;
+  }
+  
+  .pagination button,
+  .pagination .pagination-btn,
+  #pagination button,
+  #expensePagination .pagination-btn {
+    min-width: 32px;
+    height: 30px;
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+}
+
+/* ===== ANIMATION EFFECTS ===== */
+@keyframes pageChange {
+  0% { opacity: 0.7; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.pagination button.active,
+.pagination .pagination-btn.active,
+#pagination button.active,
+#expensePagination .pagination-btn.active {
+  animation: pageChange 0.2s ease-out;
+}
+
+/* ===== CUSTOM COLORS FOR DIFFERENT STATES ===== */
+/* Page numbers */
+.pagination button:not(:first-child):not(:last-child):not(.active):not(.all-btn),
+#pagination button:not(:first-child):not(:last-child):not(.active),
+#expensePagination .pagination-btn:not(:first-child):not(:last-child):not(.active):not(.all-btn) {
+  background-color: #ffffff;
+  border-color: #dee2e6;
+}
+
+/* Navigation buttons subtle styling */
+.pagination button:first-child,
+.pagination button:last-child,
+#pagination button:first-child,
+#pagination button:last-child {
+  background-color: #f8f9fa;
+  border-color: #ced4da;
+  color: #495057;
+}
+
+.pagination button:first-child:hover:not(:disabled),
+.pagination button:last-child:hover:not(:disabled),
+#pagination button:first-child:hover:not(:disabled),
+#pagination button:last-child:hover:not(:disabled) {
+  background-color: #e9ecef;
+  border-color: #6c757d;
+  color: #495057;
+}

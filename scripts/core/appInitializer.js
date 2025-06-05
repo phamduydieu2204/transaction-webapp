@@ -34,7 +34,7 @@ export function initializeGlobals() {
   window.today = new Date();
   window.todayFormatted = `${window.today.getFullYear()}/${String(window.today.getMonth() + 1).padStart(2, '0')}/${String(window.today.getDate()).padStart(2, '0')}`;
   window.currentPage = 1;
-  window.itemsPerPage = 50;
+  window.itemsPerPage = 10; // Đồng bộ với yêu cầu: 10 items/trang cho cả transaction và expense
   window.softwareData = [];
   window.confirmCallback = null;
   window.currentSoftwareName = "";
@@ -166,7 +166,7 @@ async function loadTransactionDataOptimized() {
   
   try {
     // Ultra-fast initial load with minimal data
-    const initialPageSize = 15; // Ultra-small for fastest possible load
+    const initialPageSize = 10; // Đồng bộ với yêu cầu: 10 items/trang
     window.currentPage = 1;
     window.itemsPerPage = initialPageSize;
     
@@ -199,7 +199,7 @@ async function loadTransactionDataOptimized() {
       if (window.transactionList && window.transactionList.length >= initialPageSize) {
         console.log('🔄 Preloading additional transaction data...');
         // Increase page size for subsequent loads
-        window.itemsPerPage = 50;
+        window.itemsPerPage = 10; // Đồng bộ: 10 items/trang
       }
     }, 2000);
     

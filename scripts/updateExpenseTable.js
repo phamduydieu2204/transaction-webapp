@@ -17,7 +17,7 @@ window.handleDeleteExpense = handleDeleteExpense;
 window.updateExpenseTable = updateExpenseTable;
 
 // Force refresh on load to show new structure
-console.log('📄 Loading expense table with transaction-style pagination...');
+console.log('🔗 Loading unified pagination: 10 items/page for both tables...');
 if (typeof window !== 'undefined') {
   // Schedule refresh after DOM is ready
   setTimeout(() => {
