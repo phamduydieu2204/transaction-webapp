@@ -16,12 +16,12 @@ window.handleDeleteExpense = handleDeleteExpense;
 window.updateExpenseTable = updateExpenseTable;
 
 // Force refresh on load to show new structure
-console.log('🔄 Loading new expense table structure with STATUS column...');
+console.log('🎨 Loading new expense table with transaction-style UI...');
 if (typeof window !== 'undefined') {
   // Schedule refresh after DOM is ready
   setTimeout(() => {
     if (window.expenseList && window.expenseList.length > 0) {
-      console.log('🔄 Refreshing expense table with new columns including STATUS...');
+      console.log('🎨 Refreshing expense table with transaction-style UI...');
       updateExpenseTable();
     }
   }, 100);
@@ -29,7 +29,7 @@ if (typeof window !== 'undefined') {
   // Also schedule a longer refresh to catch late-loading data
   setTimeout(() => {
     if (window.expenseList && window.expenseList.length > 0) {
-      console.log('🔄 Second refresh for expense table...');
+      console.log('🎨 Final refresh for expense table styling...');
       updateExpenseTable();
     }
   }, 2000);
@@ -80,7 +80,7 @@ export function updateExpenseTable() {
       <th>Người nhận/Nhà cung cấp</th>
       <th>Trạng thái</th>
       <th>Ghi chú</th>
-      <th>Thao tác</th>
+      <th>Hành động</th>
     `;
   }
   
@@ -89,7 +89,7 @@ export function updateExpenseTable() {
   
   // Check if we have data
   if (!window.expenseList || window.expenseList.length === 0) {
-    tableBody.innerHTML = '<tr><td colspan="12" class="text-center">Không có dữ liệu chi phí</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="12" class="text-center" style="padding: 40px; color: #6c757d; font-style: italic;">Không có dữ liệu chi phí</td></tr>';
     updateExpensePagination(0, 0, 0);
     return;
   }
@@ -209,13 +209,13 @@ function createExpenseRow(expense, index) {
     <td>${note}</td>
     <td>
       <button class="btn-icon" onclick="viewExpenseRow(${index})" title="Xem chi tiết">
-        <i class="fas fa-eye"></i>
+        <i class="fas fa-eye"></i> Xem
       </button>
       <button class="btn-icon" onclick="editExpenseRow(${index})" title="Sửa">
-        <i class="fas fa-edit"></i>
+        <i class="fas fa-edit"></i> Sửa
       </button>
       <button class="btn-icon btn-danger" onclick="handleDeleteExpense(${index})" title="Xóa">
-        <i class="fas fa-trash"></i>
+        <i class="fas fa-trash"></i> Xóa
       </button>
     </td>
   `;

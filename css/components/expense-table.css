@@ -1,0 +1,275 @@
+/* ==========================================================================
+   EXPENSE TABLE STYLING - Đồng bộ với transaction table
+   ========================================================================== */
+
+/* Container */
+.expense-table-container {
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: auto;
+  max-height: 70vh;
+}
+
+/* Table Structure */
+#expenseListTable {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+  background: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ===== HEADER STYLING (Giống transaction table) ===== */
+#expenseListTable thead {
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+#expenseListTable thead th {
+  background: transparent;
+  color: #ffffff;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.8px;
+  padding: 16px 12px;
+  border-bottom: 3px solid rgba(255,255,255,0.2);
+  border-right: 1px solid rgba(255,255,255,0.1);
+  white-space: nowrap;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#expenseListTable thead th:hover {
+  background-color: rgba(255,255,255,0.1);
+}
+
+#expenseListTable thead th:last-child {
+  border-right: none;
+}
+
+/* ===== BODY STYLING (Giống transaction table) ===== */
+#expenseListTable td {
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  min-width: 100px;
+  max-width: 600px;
+  border: 1px solid #e9ecef;
+  padding: 12px;
+  text-align: left;
+  background-color: #ffffff;
+  color: #495057;
+  font-size: 14px;
+  line-height: 1.4;
+  vertical-align: top;
+}
+
+/* Row styling */
+#expenseListTable tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+#expenseListTable tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+#expenseListTable tbody tr:hover {
+  background-color: #e3f2fd;
+}
+
+/* ===== COLUMN ALIGNMENT ===== */
+/* Căn giữa cho số tiền */
+#expenseListTable td:nth-child(6) {
+  text-align: right;
+  font-weight: 500;
+}
+
+/* Căn giữa cho phân bổ */
+#expenseListTable td:nth-child(4) {
+  text-align: center;
+}
+
+/* Căn giữa cho trạng thái */
+#expenseListTable td:nth-child(10) {
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Căn giữa cho hành động */
+#expenseListTable td:last-child {
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ===== ACTION BUTTONS STYLING (Giống transaction table) ===== */
+.btn-icon {
+  padding: 6px 12px;
+  margin: 0 2px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  color: #ffffff;
+  min-width: 60px;
+}
+
+.btn-icon:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.btn-icon i {
+  margin-right: 4px;
+}
+
+/* Button colors */
+.btn-icon:first-child {
+  background-color: #17a2b8; /* Xem - Teal */
+}
+
+.btn-icon:first-child:hover {
+  background-color: #138496;
+}
+
+.btn-icon:nth-child(2) {
+  background-color: #28a745; /* Sửa - Green */
+}
+
+.btn-icon:nth-child(2):hover {
+  background-color: #218838;
+}
+
+.btn-icon.btn-danger {
+  background-color: #dc3545; /* Xóa - Red */
+}
+
+.btn-icon.btn-danger:hover {
+  background-color: #c82333;
+}
+
+/* ===== ACTION SELECT DROPDOWN ===== */
+.action-select {
+  padding: 6px 10px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: #ffffff;
+  color: #495057;
+  font-size: 13px;
+  cursor: pointer;
+  min-width: 100px;
+  transition: border-color 0.2s ease;
+}
+
+.action-select:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.action-select:hover {
+  border-color: #3498db;
+}
+
+/* ===== SPECIAL ROW STATES ===== */
+/* Expired row styling */
+.expired-row {
+  font-style: italic;
+  color: #ff0202a2 !important;
+}
+
+.expired-row td {
+  background-color: #fff5f5 !important;
+}
+
+/* Unpaid status row styling */
+#expenseListTable tbody tr[style*="background-color: #fff9c4"] td {
+  background-color: #fff9c4 !important;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (min-width: 1200px) {
+  #expenseListTable thead th {
+    padding: 14px 10px;
+    font-size: 12px;
+  }
+  
+  #expenseListTable td {
+    padding: 10px;
+    font-size: 13px;
+  }
+  
+  .btn-icon {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 768px) {
+  .expense-table-container {
+    padding: 15px;
+  }
+  
+  #expenseListTable thead th {
+    padding: 12px 8px;
+    font-size: 11px;
+  }
+  
+  #expenseListTable td {
+    padding: 8px;
+    font-size: 12px;
+    min-width: 80px;
+  }
+  
+  .btn-icon {
+    padding: 4px 8px;
+    font-size: 10px;
+    margin: 1px;
+  }
+}
+
+/* ===== PAGINATION STYLING ===== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 5px;
+}
+
+.pagination button {
+  padding: 8px 12px;
+  border: 1px solid #dee2e6;
+  background-color: #ffffff;
+  color: #495057;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.pagination button:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.pagination button.active {
+  background-color: #3498db;
+  border-color: #3498db;
+  color: #ffffff;
+}
+
+.pagination button:disabled {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+}
