@@ -1,5 +1,6 @@
 import { getConstants } from './constants.js';
 import { renderExpenseStats } from './renderExpenseStats.js';
+import { refreshExpenseTable } from './updateExpenseTable.js';
 import { showProcessingModal } from './showProcessingModal.js';
 import { closeProcessingModal } from './closeProcessingModal.js';
 import { showResultModal } from './showResultModal.js';
@@ -50,6 +51,11 @@ export async function handleAddExpense() {
       
       // ✅ Refresh danh sách và tổng chi phí sau khi thêm thành công
       renderExpenseStats();
+      
+      // ✅ Force refresh expense table để giao dịch mới xuất hiện ở đầu
+      setTimeout(() => {
+        refreshExpenseTable();
+      }, 500);
     } else {
       showResultModal(`Không thể lưu chi phí: ${result.message}`, false);
     }

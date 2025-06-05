@@ -28,6 +28,19 @@ if (typeof window !== 'undefined') {
 }
 
 /**
+ * Force refresh expense table (useful after adding new expense)
+ */
+export function refreshExpenseTable() {
+  console.log('🔄 Force refreshing expense table...');
+  // Reset to first page to show newest expense
+  window.currentExpensePage = 1;
+  updateExpenseTable();
+}
+
+// Make refresh function available globally
+window.refreshExpenseTable = refreshExpenseTable;
+
+/**
  * Update expense table with current data
  */
 export function updateExpenseTable() {
@@ -79,8 +92,18 @@ export function updateExpenseTable() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = Math.min(startIndex + itemsPerPage, window.expenseList.length);
   
-  // Get paginated items
-  const paginatedExpenses = window.expenseList.slice(startIndex, endIndex);
+  // Sắp xếp theo thời gian từ mới nhất đến cũ nhất (dựa vào mã chi phí)
+  const sortedExpenses = [...window.expenseList].sort((a, b) => {
+    // Lấy timestamp từ mã chi phí (loại bỏ ký tự không phải số)
+    const timestampA = (a.expenseId || a.id || '').replace(/[^0-9]/g, '');
+    const timestampB = (b.expenseId || b.id || '').replace(/[^0-9]/g, '');
+    
+    // Sắp xếp giảm dần (mới nhất lên đầu)
+    return timestampB.localeCompare(timestampA);
+  });
+  
+  // Get paginated items từ danh sách đã sắp xếp
+  const paginatedExpenses = sortedExpenses.slice(startIndex, endIndex);
   
   // Render each expense row
   paginatedExpenses.forEach((expense, index) => {
@@ -89,7 +112,7 @@ export function updateExpenseTable() {
   });
   
   // Update pagination
-  updateExpensePagination(currentPage, totalPages, window.expenseList.length);
+  updateExpensePagination(currentPage, totalPages, sortedExpenses.length);
   
   console.log(`📊 Displayed ${paginatedExpenses.length} expenses (page ${currentPage}/${totalPages})`);
 }
@@ -131,12 +154,18 @@ function createExpenseRow(expense, index) {
   const currency = expense.currency || 'VND';
   const amount = `${(expense.amount || expense.soTien || 0).toLocaleString()} ${currency}`;
   
-  // 7. Chi tiết ngân hàng (gộp ngân hàng + tài khoản)
-  const bankDetailsParts = [
-    expense.bank || expense.nganHang || '',
-    expense.cardInfo || expense.accountInfo || expense.taiKhoan || ''
-  ].filter(part => part.trim() !== '');
-  const bankDetails = bankDetailsParts.join(' - ') || '--';
+  // 7. Chi tiết ngân hàng = Ngân hàng/Ví - Thông tin thẻ/Tài khoản
+  const bankName = expense.bank || expense.nganHang || '';
+  const cardInfo = expense.cardInfo || expense.accountInfo || expense.taiKhoan || '';
+  
+  let bankDetails = '--';
+  if (bankName && cardInfo) {
+    bankDetails = `${bankName} - ${cardInfo}`;
+  } else if (bankName) {
+    bankDetails = bankName;
+  } else if (cardInfo) {
+    bankDetails = cardInfo;
+  }
   
   // 8. Ngày tái tục
   const renewDate = formattedRenewDate || '--';
