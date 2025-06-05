@@ -91,7 +91,18 @@ export async function handleUpdate() {
   console.log("✅ Validation passed");
   
   // Hiển thị processing modal
-  window.showProcessingModal("Đang cập nhật giao dịch...");
+  if (typeof window.showProcessingModal === 'function') {
+    window.showProcessingModal("Đang cập nhật giao dịch...");
+  } else {
+    console.warn('⚠️ showProcessingModal not available, loading function...');
+    // Dynamically load the function if not available
+    import('./showProcessingModal.js').then(({ showProcessingModal }) => {
+      window.showProcessingModal = showProcessingModal;
+      showProcessingModal("Đang cập nhật giao dịch...");
+    }).catch(err => {
+      console.error('❌ Failed to load showProcessingModal:', err);
+    });
+  }
   
   // Chuẩn bị dữ liệu gửi lên server
   const { BACKEND_URL } = getConstants();
@@ -147,13 +158,43 @@ export async function handleUpdate() {
       }
       
       console.log("✅ Cập nhật thành công");
-      window.showResultModal("Giao dịch đã được cập nhật thành công!", true);
+      
+      // Close processing modal
+      if (typeof window.closeProcessingModal === 'function') {
+        window.closeProcessingModal();
+      }
+      
+      if (typeof window.showResultModal === 'function') {
+        window.showResultModal("Giao dịch đã được cập nhật thành công!", true);
+      } else {
+        alert("Giao dịch đã được cập nhật thành công!");
+      }
     } else {
       console.error("❌ Lỗi từ server:", result.message);
-      window.showResultModal(result.message || "Không thể cập nhật giao dịch!", false);
+      
+      // Close processing modal
+      if (typeof window.closeProcessingModal === 'function') {
+        window.closeProcessingModal();
+      }
+      
+      if (typeof window.showResultModal === 'function') {
+        window.showResultModal(result.message || "Không thể cập nhật giao dịch!", false);
+      } else {
+        alert(result.message || "Không thể cập nhật giao dịch!");
+      }
     }
   } catch (err) {
     console.error("❌ Lỗi khi cập nhật:", err);
-    window.showResultModal(`Lỗi kết nối server: ${err.message}`, false);
+    
+    // Close processing modal
+    if (typeof window.closeProcessingModal === 'function') {
+      window.closeProcessingModal();
+    }
+    
+    if (typeof window.showResultModal === 'function') {
+      window.showResultModal(`Lỗi kết nối server: ${err.message}`, false);
+    } else {
+      alert(`Lỗi kết nối server: ${err.message}`);
+    }
   }
 }

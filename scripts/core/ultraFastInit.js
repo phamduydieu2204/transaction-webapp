@@ -13,6 +13,40 @@ import { viewTransaction } from '../viewTransaction.js';
 import { deduplicateRequest } from './requestOptimizer.js';
 
 /**
+ * Load critical functions needed for basic operations
+ */
+async function loadCriticalFunctions() {
+  console.log('⚡ Loading critical functions...');
+  
+  try {
+    // Import and attach modal functions
+    const { showProcessingModal } = await import('../showProcessingModal.js');
+    const { closeProcessingModal } = await import('../closeProcessingModal.js');
+    const { showResultModal } = await import('../showResultModal.js');
+    
+    // Attach to window for global access
+    window.showProcessingModal = showProcessingModal;
+    window.closeProcessingModal = closeProcessingModal;
+    window.showResultModal = showResultModal;
+    
+    console.log('✅ Critical modal functions loaded');
+    
+    // Load other critical functions
+    const { updatePackageList } = await import('../updatePackageList.js');
+    const { updateAccountList } = await import('../updateAccountList.js');
+    
+    window.updatePackageList = updatePackageList;
+    window.updateAccountList = updateAccountList;
+    
+    console.log('✅ Critical utility functions loaded');
+    
+  } catch (error) {
+    console.error('❌ Failed to load critical functions:', error);
+    throw error;
+  }
+}
+
+/**
  * Ultra-fast app initialization - skips everything non-essential
  */
 export async function ultraFastInit(userInfo) {
@@ -25,6 +59,9 @@ export async function ultraFastInit(userInfo) {
     window.currentPage = 1;
     window.itemsPerPage = 15; // Ultra-small
     window.transactionList = [];
+
+    // Step 1.5: Load critical modal functions immediately
+    await loadCriticalFunctions();
 
     // Step 2: Load only the most critical 15 transactions
     console.log('⚡ Loading first 15 transactions only...');

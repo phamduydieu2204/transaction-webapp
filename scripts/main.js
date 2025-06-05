@@ -290,6 +290,12 @@ async function startApp() {
 
 // Legacy global function exports for backward compatibility
 window.logout = logout;
+window.showProcessingModal = showProcessingModal;
+window.closeProcessingModal = closeProcessingModal; 
+window.showResultModal = showResultModal;
+window.updatePackageList = updatePackageList;
+window.updateAccountList = updateAccountList;
+window.fetchSoftwareList = fetchSoftwareList;
 window.openCalendar = (inputId) =>
   openCalendar(inputId, calculateEndDate, document.getElementById("startDate"), document.getElementById("duration"), document.getElementById("endDate"));
 window.updateCustomerInfo = () => {
