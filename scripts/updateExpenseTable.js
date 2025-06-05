@@ -8,6 +8,7 @@ import { formatDateTime } from './formatDateTime.js';
 import { editExpenseRow } from './editExpenseRow.js';
 import { viewExpenseRow } from './viewExpenseRow.js';
 import { handleDeleteExpense } from './handleDeleteExpense.js';
+import { updatePagination, firstPage, prevPage, nextPage, lastPage, goToPage } from './pagination.js';
 
 // Make functions available globally for buttons
 window.viewExpenseRow = viewExpenseRow;
@@ -16,7 +17,7 @@ window.handleDeleteExpense = handleDeleteExpense;
 window.updateExpenseTable = updateExpenseTable;
 
 // Force refresh on load to show new structure
-console.log('🚫 FORCE removing internal scroll from expense table...');
+console.log('📄 Loading expense table with transaction-style pagination...');
 if (typeof window !== 'undefined') {
   // Schedule refresh after DOM is ready
   setTimeout(() => {
@@ -117,6 +118,49 @@ function forceRemoveInternalScroll() {
 window.forceRemoveInternalScroll = forceRemoveInternalScroll;
 
 /**
+ * Expense Pagination Navigation Functions - Giống transaction table
+ */
+function expenseFirstPage() {
+  window.currentExpensePage = 1;
+  updateExpenseTable();
+}
+
+function expensePrevPage() {
+  if (window.currentExpensePage > 1) {
+    window.currentExpensePage--;
+    updateExpenseTable();
+  }
+}
+
+function expenseNextPage() {
+  const itemsPerPage = window.itemsPerPage || 50;
+  const totalPages = Math.ceil(window.expenseList.length / itemsPerPage);
+  if (window.currentExpensePage < totalPages) {
+    window.currentExpensePage++;
+    updateExpenseTable();
+  }
+}
+
+function expenseLastPage() {
+  const itemsPerPage = window.itemsPerPage || 50;
+  const totalPages = Math.ceil(window.expenseList.length / itemsPerPage);
+  window.currentExpensePage = totalPages;
+  updateExpenseTable();
+}
+
+function expenseGoToPage(page) {
+  window.currentExpensePage = page;
+  updateExpenseTable();
+}
+
+// Make expense pagination functions available globally
+window.expenseFirstPage = expenseFirstPage;
+window.expensePrevPage = expensePrevPage;
+window.expenseNextPage = expenseNextPage;
+window.expenseLastPage = expenseLastPage;
+window.expenseGoToPage = expenseGoToPage;
+
+/**
  * Update expense table with current data
  */
 export function updateExpenseTable() {
@@ -162,8 +206,8 @@ export function updateExpenseTable() {
     return;
   }
   
-  // Calculate pagination
-  const itemsPerPage = 50;
+  // Calculate pagination - Sử dụng chung itemsPerPage như transaction table
+  const itemsPerPage = window.itemsPerPage || 50;
   const currentPage = window.currentExpensePage || 1;
   const totalPages = Math.ceil(window.expenseList.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -188,10 +232,10 @@ export function updateExpenseTable() {
     tableBody.appendChild(row);
   });
   
-  // Update pagination
-  updateExpensePagination(currentPage, totalPages, sortedExpenses.length);
+  // Update pagination - Sử dụng component chung như transaction table
+  updateExpensePagination(totalPages, currentPage);
   
-  console.log(`📊 Displayed ${paginatedExpenses.length} expenses (page ${currentPage}/${totalPages})`);
+  console.log(`📄 Displayed ${paginatedExpenses.length} expenses (page ${currentPage}/${totalPages}) with pagination`);
 }
 
 /**
@@ -318,24 +362,92 @@ function formatCurrency(amount) {
 }
 
 /**
- * Update expense pagination info
+ * Update expense pagination - Sử dụng component giống transaction table
  */
-function updateExpensePagination(currentPage, totalPages, totalItems) {
-  // Update page info
-  const pageInfo = document.getElementById('expensePageInfo');
-  if (pageInfo) {
-    pageInfo.textContent = `Trang ${currentPage} / ${totalPages} (Tổng: ${totalItems} chi phí)`;
+function updateExpensePagination(totalPages, currentPage) {
+  const pagination = document.getElementById("expensePagination");
+  if (!pagination) return;
+
+  pagination.innerHTML = "";
+
+  // Thêm nút "Tất cả" nếu đang trong trạng thái tìm kiếm
+  if (window.isExpenseSearching) {
+    const allBtn = document.createElement("button");
+    allBtn.textContent = "Tất cả";
+    allBtn.className = "pagination-btn all-btn";
+    allBtn.addEventListener("click", () => {
+      window.isExpenseSearching = false;
+      window.currentExpensePage = 1;
+      updateExpenseTable();
+    });
+    pagination.appendChild(allBtn);
   }
-  
-  // Update pagination buttons
-  const prevBtn = document.querySelector('.expense-pagination .prev-btn');
-  const nextBtn = document.querySelector('.expense-pagination .next-btn');
-  
-  if (prevBtn) {
-    prevBtn.disabled = currentPage <= 1;
+
+  if (totalPages <= 1) return;
+
+  // First button
+  const firstButton = document.createElement("button");
+  firstButton.textContent = "«";
+  firstButton.className = "pagination-btn";
+  firstButton.onclick = expenseFirstPage;
+  firstButton.disabled = currentPage === 1;
+  pagination.appendChild(firstButton);
+
+  // Previous button
+  const prevButton = document.createElement("button");
+  prevButton.textContent = "‹";
+  prevButton.className = "pagination-btn";
+  prevButton.onclick = expensePrevPage;
+  prevButton.disabled = currentPage === 1;
+  pagination.appendChild(prevButton);
+
+  // Page numbers
+  const maxVisiblePages = 5;
+  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+  let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+  if (endPage - startPage + 1 < maxVisiblePages) {
+    startPage = Math.max(1, endPage - maxVisiblePages + 1);
   }
-  
-  if (nextBtn) {
-    nextBtn.disabled = currentPage >= totalPages;
+
+  if (startPage > 1) {
+    const dots = document.createElement("span");
+    dots.textContent = "...";
+    dots.className = "pagination-dots";
+    pagination.appendChild(dots);
   }
+
+  for (let i = startPage; i <= endPage; i++) {
+    const pageButton = document.createElement("button");
+    pageButton.textContent = i;
+    pageButton.className = "pagination-btn";
+    pageButton.onclick = () => expenseGoToPage(i);
+    if (i === currentPage) {
+      pageButton.classList.add("active");
+    }
+    pagination.appendChild(pageButton);
+  }
+
+  if (endPage < totalPages) {
+    const dots = document.createElement("span");
+    dots.textContent = "...";
+    dots.className = "pagination-dots";
+    pagination.appendChild(dots);
+  }
+
+  // Next button
+  const nextButton = document.createElement("button");
+  nextButton.textContent = "›";
+  nextButton.className = "pagination-btn";
+  nextButton.onclick = expenseNextPage;
+  nextButton.disabled = currentPage === totalPages;
+  pagination.appendChild(nextButton);
+
+  // Last button
+  const lastButton = document.createElement("button");
+  lastButton.textContent = "»";
+  lastButton.className = "pagination-btn";
+  lastButton.onclick = expenseLastPage;
+  lastButton.disabled = currentPage === totalPages;
+  pagination.appendChild(lastButton);
 }

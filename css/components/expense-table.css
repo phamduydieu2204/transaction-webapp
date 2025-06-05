@@ -243,39 +243,63 @@
   }
 }
 
-/* ===== PAGINATION STYLING ===== */
-.pagination {
+/* ===== PAGINATION STYLING - Giống transaction table ===== */
+#expensePagination {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
+  justify-content: flex-end; /* Căn phải giống transaction table */
   gap: 5px;
+  margin-top: 12px; /* Khoảng cách sau table */
+  margin-bottom: 30px; /* Tăng margin-bottom để tránh taskbar */
+  padding-bottom: 10px; /* Thêm padding cho chắc chắn */
+  position: relative;
+  z-index: 10;
 }
 
-.pagination button {
-  padding: 8px 12px;
-  border: 1px solid #dee2e6;
-  background-color: #ffffff;
-  color: #495057;
+#expensePagination .pagination-btn {
+  padding: 4px 8px;
+  font-size: 13px;
+  border: none;
   border-radius: 4px;
+  background-color: #007bff;
+  color: white;
   cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s ease;
+  transition: background-color 0.3s;
+  box-sizing: border-box;
 }
 
-.pagination button:hover {
-  background-color: #e9ecef;
-  border-color: #adb5bd;
+#expensePagination .pagination-btn:hover:not(:disabled) {
+  background-color: #0056b3;
 }
 
-.pagination button.active {
-  background-color: #3498db;
-  border-color: #3498db;
-  color: #ffffff;
+#expensePagination .pagination-btn.active {
+  background-color: #0056b3; /* Màu nền cho trang hiện tại */
+  font-weight: bold;
 }
 
-.pagination button:disabled {
-  background-color: #f8f9fa;
-  color: #6c757d;
+#expensePagination .pagination-btn:disabled {
+  background-color: #6c757d;
   cursor: not-allowed;
+  opacity: 0.6;
+}
+
+#expensePagination .pagination-btn.all-btn {
+  background-color: #28a745;
+  margin-right: 10px;
+}
+
+#expensePagination .pagination-btn.all-btn:hover {
+  background-color: #218838;
+}
+
+#expensePagination .pagination-dots {
+  padding: 4px 8px;
+  color: #6c757d;
+  font-size: 13px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  #expensePagination {
+    margin-bottom: 40px; /* Tăng margin cho mobile */
+  }
 }
