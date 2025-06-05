@@ -2,19 +2,20 @@
    EXPENSE TABLE STYLING - Đồng bộ với transaction table
    ========================================================================== */
 
-/* Container */
+/* Container - Loại bỏ scroll riêng, chỉ để scroll chính */
 .expense-table-container {
   padding: 20px;
   background: #ffffff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  overflow: auto;
-  max-height: 70vh;
+  width: 100%;
+  /* Loại bỏ overflow: auto và max-height để không có scroll riêng */
 }
 
-/* Table Structure */
+/* Table Structure - Mở rộng đầy đủ như transaction table */
 #expenseListTable {
   width: 100%;
+  min-width: 100%;
   border-collapse: collapse;
   table-layout: auto;
   background: #ffffff;
@@ -109,55 +110,10 @@
   white-space: nowrap;
 }
 
-/* ===== ACTION BUTTONS STYLING (Giống transaction table) ===== */
-.btn-icon {
-  padding: 6px 12px;
-  margin: 0 2px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  color: #ffffff;
-  min-width: 60px;
-}
+/* ===== ACTION BUTTONS STYLING - Không cần thiết nữa vì dùng dropdown ===== */
+/* Đã chuyển sang dùng dropdown .action-select */
 
-.btn-icon:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-.btn-icon i {
-  margin-right: 4px;
-}
-
-/* Button colors */
-.btn-icon:first-child {
-  background-color: #17a2b8; /* Xem - Teal */
-}
-
-.btn-icon:first-child:hover {
-  background-color: #138496;
-}
-
-.btn-icon:nth-child(2) {
-  background-color: #28a745; /* Sửa - Green */
-}
-
-.btn-icon:nth-child(2):hover {
-  background-color: #218838;
-}
-
-.btn-icon.btn-danger {
-  background-color: #dc3545; /* Xóa - Red */
-}
-
-.btn-icon.btn-danger:hover {
-  background-color: #c82333;
-}
-
-/* ===== ACTION SELECT DROPDOWN ===== */
+/* ===== ACTION SELECT DROPDOWN (Giống transaction table) ===== */
 .action-select {
   padding: 6px 10px;
   border: 1px solid #ced4da;
@@ -167,7 +123,14 @@
   font-size: 13px;
   cursor: pointer;
   min-width: 100px;
-  transition: border-color 0.2s ease;
+  transition: all 0.2s ease;
+  background-image: linear-gradient(45deg, transparent 50%, #495057 50%), linear-gradient(135deg, #495057 50%, transparent 50%);
+  background-position: calc(100% - 20px) calc(1em + 2px), calc(100% - 15px) calc(1em + 2px);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
 .action-select:focus {
@@ -178,6 +141,7 @@
 
 .action-select:hover {
   border-color: #3498db;
+  background-color: #f8f9fa;
 }
 
 /* ===== SPECIAL ROW STATES ===== */

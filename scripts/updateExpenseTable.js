@@ -16,7 +16,7 @@ window.handleDeleteExpense = handleDeleteExpense;
 window.updateExpenseTable = updateExpenseTable;
 
 // Force refresh on load to show new structure
-console.log('🎨 Loading new expense table with transaction-style UI...');
+console.log('🔄 Loading expense table with dropdown actions & single scroll...');
 if (typeof window !== 'undefined') {
   // Schedule refresh after DOM is ready
   setTimeout(() => {
@@ -47,6 +47,39 @@ export function refreshExpenseTable() {
 
 // Make refresh function available globally
 window.refreshExpenseTable = refreshExpenseTable;
+
+/**
+ * Handle expense action dropdown selection
+ */
+function handleExpenseAction(selectElement, index) {
+  const action = selectElement.value;
+  if (!action) return;
+  
+  // Reset dropdown to default
+  selectElement.value = '';
+  
+  // Execute action based on selection
+  switch (action) {
+    case 'view':
+      if (typeof window.viewExpenseRow === 'function') {
+        window.viewExpenseRow(index);
+      }
+      break;
+    case 'edit':
+      if (typeof window.editExpenseRow === 'function') {
+        window.editExpenseRow(index);
+      }
+      break;
+    case 'delete':
+      if (typeof window.handleDeleteExpense === 'function') {
+        window.handleDeleteExpense(index);
+      }
+      break;
+  }
+}
+
+// Make dropdown handler available globally
+window.handleExpenseAction = handleExpenseAction;
 
 /**
  * Update expense table with current data
@@ -208,15 +241,12 @@ function createExpenseRow(expense, index) {
     <td>${status}</td>
     <td>${note}</td>
     <td>
-      <button class="btn-icon" onclick="viewExpenseRow(${index})" title="Xem chi tiết">
-        <i class="fas fa-eye"></i> Xem
-      </button>
-      <button class="btn-icon" onclick="editExpenseRow(${index})" title="Sửa">
-        <i class="fas fa-edit"></i> Sửa
-      </button>
-      <button class="btn-icon btn-danger" onclick="handleDeleteExpense(${index})" title="Xóa">
-        <i class="fas fa-trash"></i> Xóa
-      </button>
+      <select class="action-select" onchange="handleExpenseAction(this, ${index})">
+        <option value="">-- Chọn --</option>
+        <option value="view">Xem</option>
+        <option value="edit">Sửa</option>
+        <option value="delete">Xóa</option>
+      </select>
     </td>
   `;
   
