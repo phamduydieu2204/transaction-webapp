@@ -1,5 +1,4 @@
-import { showProcessingModal } from './showProcessingModal.js';
-import { closeProcessingModal } from './closeProcessingModal.js';
+import { showProcessingModal, closeProcessingModal } from './modalUnified.js';
 import { updateState } from './core/stateManager.js';
 
 

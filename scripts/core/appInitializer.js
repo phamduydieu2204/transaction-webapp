@@ -300,8 +300,14 @@ export function setupErrorHandling() {
   window.addEventListener('error', (event) => {
     console.error('❌ Global error:', event.error);
     
-    // Show user-friendly error message
-    if (window.showResultModal) {
+    // Only show modal for critical errors, not minor UI issues
+    const errorMessage = event.error?.message || '';
+    const isCriticalError = errorMessage.includes('fetch') || 
+                           errorMessage.includes('network') || 
+                           errorMessage.includes('timeout') ||
+                           errorMessage.includes('Failed to load');
+    
+    if (isCriticalError && window.showResultModal) {
       window.showResultModal('Đã xảy ra lỗi. Vui lòng thử lại sau.', false);
     }
   });
@@ -313,8 +319,14 @@ export function setupErrorHandling() {
     // Prevent default browser behavior
     event.preventDefault();
     
-    // Show user-friendly error message
-    if (window.showResultModal) {
+    // Only show modal for network-related errors
+    const errorMessage = event.reason?.message || '';
+    const isNetworkError = errorMessage.includes('fetch') || 
+                          errorMessage.includes('network') || 
+                          errorMessage.includes('timeout') ||
+                          errorMessage.includes('Failed to');
+    
+    if (isNetworkError && window.showResultModal) {
       window.showResultModal('Đã xảy ra lỗi kết nối. Vui lòng kiểm tra mạng và thử lại.', false);
     }
   });
