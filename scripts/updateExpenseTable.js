@@ -16,15 +16,23 @@ window.handleDeleteExpense = handleDeleteExpense;
 window.updateExpenseTable = updateExpenseTable;
 
 // Force refresh on load to show new structure
-console.log('🔄 Loading new expense table structure...');
+console.log('🔄 Loading new expense table structure with STATUS column...');
 if (typeof window !== 'undefined') {
   // Schedule refresh after DOM is ready
   setTimeout(() => {
     if (window.expenseList && window.expenseList.length > 0) {
-      console.log('🔄 Refreshing expense table with new columns...');
+      console.log('🔄 Refreshing expense table with new columns including STATUS...');
       updateExpenseTable();
     }
   }, 100);
+  
+  // Also schedule a longer refresh to catch late-loading data
+  setTimeout(() => {
+    if (window.expenseList && window.expenseList.length > 0) {
+      console.log('🔄 Second refresh for expense table...');
+      updateExpenseTable();
+    }
+  }, 2000);
 }
 
 /**
@@ -70,6 +78,7 @@ export function updateExpenseTable() {
       <th>Chi tiết ngân hàng</th>
       <th>Ngày tái tục</th>
       <th>Người nhận/Nhà cung cấp</th>
+      <th>Trạng thái</th>
       <th>Ghi chú</th>
       <th>Thao tác</th>
     `;
@@ -80,7 +89,7 @@ export function updateExpenseTable() {
   
   // Check if we have data
   if (!window.expenseList || window.expenseList.length === 0) {
-    tableBody.innerHTML = '<tr><td colspan="11" class="text-center">Không có dữ liệu chi phí</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="12" class="text-center">Không có dữ liệu chi phí</td></tr>';
     updateExpensePagination(0, 0, 0);
     return;
   }
@@ -123,6 +132,12 @@ export function updateExpenseTable() {
 function createExpenseRow(expense, index) {
   const tr = document.createElement('tr');
   
+  // Debug log để xem cấu trúc dữ liệu
+  if (index === 0) {
+    console.log('🔍 DEBUG: Sample expense data structure:', expense);
+    console.log('🔍 Available keys:', Object.keys(expense));
+  }
+  
   // Format dates
   const formattedDate = formatDate(expense.date || expense.ngay);
   const formattedRenewDate = formatDate(expense.renewDate);
@@ -155,8 +170,8 @@ function createExpenseRow(expense, index) {
   const amount = `${(expense.amount || expense.soTien || 0).toLocaleString()} ${currency}`;
   
   // 7. Chi tiết ngân hàng = Ngân hàng/Ví - Thông tin thẻ/Tài khoản
-  const bankName = expense.bank || expense.nganHang || '';
-  const cardInfo = expense.cardInfo || expense.accountInfo || expense.taiKhoan || '';
+  const bankName = expense.bank || expense.expenseBank || expense.nganHang || '';
+  const cardInfo = expense.card || expense.expenseCard || expense.cardInfo || expense.accountInfo || expense.taiKhoan || '';
   
   let bankDetails = '--';
   if (bankName && cardInfo) {
@@ -171,10 +186,13 @@ function createExpenseRow(expense, index) {
   const renewDate = formattedRenewDate || '--';
   
   // 9. Người nhận/Nhà cung cấp
-  const supplier = expense.supplier || expense.nhaCC || expense.nguoiNhan || '--';
+  const supplier = expense.supplier || expense.nhaCC || expense.nguoiNhan || expense.expenseSupplier || '--';
   
-  // 10. Ghi chú
-  const note = expense.note || expense.ghiChu || '';
+  // 10. Trạng thái
+  const status = expense.status || expense.trangThai || expense.expenseStatus || 'Đã thanh toán';
+  
+  // 11. Ghi chú
+  const note = expense.note || expense.ghiChu || expense.expenseNote || '';
   
   // Build row HTML theo thứ tự mới
   tr.innerHTML = `
@@ -187,6 +205,7 @@ function createExpenseRow(expense, index) {
     <td>${bankDetails}</td>
     <td>${renewDate}</td>
     <td>${supplier}</td>
+    <td>${status}</td>
     <td>${note}</td>
     <td>
       <button class="btn-icon" onclick="viewExpenseRow(${index})" title="Xem chi tiết">
@@ -202,7 +221,8 @@ function createExpenseRow(expense, index) {
   `;
   
   // Thêm styling cho các trường hợp đặc biệt
-  if (expense.status && expense.status.toLowerCase().includes('chưa thanh toán')) {
+  const expenseStatus = expense.status || expense.trangThai || expense.expenseStatus || '';
+  if (expenseStatus && expenseStatus.toLowerCase().includes('chưa thanh toán')) {
     tr.style.backgroundColor = '#fff9c4'; // Màu vàng nhạt cho chưa thanh toán
   }
   
