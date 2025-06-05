@@ -4,6 +4,44 @@ import { showProcessingModal } from './showProcessingModal.js';
 import { closeProcessingModal } from './closeProcessingModal.js';
 import { showResultModal } from './showResultModal.js';
 
+/**
+ * Reload expense data from server after update
+ */
+async function reloadExpenseData() {
+  try {
+    console.log('🔄 Reloading expense data from server...');
+    const { BACKEND_URL } = getConstants();
+    
+    const data = {
+      action: "searchExpenses",
+      maNhanVien: window.userInfo?.maNhanVien || "",
+      conditions: {} // Empty conditions = get all expenses
+    };
+
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    
+    if (result.status === "success") {
+      window.expenseList = result.data || [];
+      console.log(`✅ Reloaded ${result.data.length} expenses from server`);
+      
+      // Update table with fresh data
+      if (typeof window.updateExpenseTable === 'function') {
+        window.updateExpenseTable();
+      }
+    } else {
+      console.warn("⚠️ Failed to reload expense data:", result.message);
+    }
+  } catch (error) {
+    console.error("❌ Error reloading expense data:", error);
+  }
+}
+
 export async function handleUpdateExpense() {
   const getValue = (id) => document.getElementById(id)?.value?.trim() || "";
 
@@ -58,6 +96,9 @@ export async function handleUpdateExpense() {
       showResultModal("Đã cập nhật chi phí thành công!", true);
       document.getElementById("expenseForm").reset();
       document.getElementById("expenseDate").value = window.todayFormatted;
+      
+      // ✅ Reload expense list data from server to ensure sync
+      await reloadExpenseData();
     } else {
       showResultModal(`Không thể cập nhật chi phí: ${result.message}`, false);
     }

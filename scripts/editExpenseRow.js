@@ -48,7 +48,7 @@ export async function editExpenseRow(e) {
     setElementValue("expenseAmount", e.amount || "");
     setElementValue("expenseCurrency", e.currency || "VND");
     setElementValue("expenseRecurring", e.recurring || "Chi một lần");
-    setElementValue("expenseRenewDate", formatDateForInput(e.renew));
+    setElementValue("expenseRenewDate", formatDateForInput(e.renew || e.renewDate || e.ngayTaiTuc || e.expenseRenewDate));
     setElementValue("expenseSupplier", e.supplier || "");
     setElementValue("expenseSource", e.source || "");
     setElementValue("expenseStatus", e.status || "Đã thanh toán");
