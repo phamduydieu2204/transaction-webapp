@@ -19,6 +19,9 @@ import { authManager } from './core/authManager.js';
 // Import essential utilities (use unified modal system)
 import { showProcessingModal, showResultModal, closeProcessingModal } from './modalUnified.js';
 
+// Import unified detail modal for view functionality
+import './detailModalUnified.js';
+
 // Import tab initialization functions
 import { initExpenseTab } from './initExpenseTab.js';
 import { initTransactionTab } from './initTransactionTab.js';
@@ -38,6 +41,9 @@ import { handleAdd } from './handleAdd.js';
 import { handleUpdate } from './handleUpdate.js';
 import { handleSearch } from './handleSearch.js';
 import { viewTransaction } from './viewTransaction.js';
+
+// Make view functions available globally
+window.viewTransaction = viewTransaction;
 import { editTransaction } from './editTransaction.js';
 import { deleteTransaction } from './deleteTransaction.js';
 import { fetchSoftwareList } from './fetchSoftwareList.js';

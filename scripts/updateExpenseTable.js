@@ -17,7 +17,7 @@ window.handleDeleteExpense = handleDeleteExpense;
 window.updateExpenseTable = updateExpenseTable;
 
 // Force refresh on load to show new structure
-console.log('🔗 Loading unified pagination: 10 items/page for both tables...');
+console.log('👁️ Loading unified detail modals for view functionality...');
 if (typeof window !== 'undefined') {
   // Schedule refresh after DOM is ready
   setTimeout(() => {
