@@ -393,6 +393,12 @@ window.deleteRow = (index) => {
 window.closeModal = closeModal;
 window.confirmDelete = confirmDelete;
 window.closeProcessingModal = closeProcessingModal;
+// Add/Update modal handlers
+window.openAddOrUpdateModal = openAddOrUpdateModal;
+window.closeAddOrUpdateModal = closeAddOrUpdateModal;
+window.handleAddNewTransaction = handleAddNewTransaction;
+window.handleUpdateTransactionFromModal = handleUpdateTransactionFromModal;
+window.handleCancelModal = handleCancelModal;
 window.firstPage = firstPage;
 window.prevPage = prevPage;
 window.nextPage = nextPage;

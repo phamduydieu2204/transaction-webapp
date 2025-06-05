@@ -4,9 +4,9 @@
     <h2>Bạn đang trong tiến trình sửa giao dịch</h2>
     <p>Bạn muốn thêm giao dịch mới hay cập nhật giao dịch hiện có?</p>
     <div style="text-align: center; margin-top: 20px;">
-      <button id="confirmAddNew" style="margin: 5px;">Thêm giao dịch mới</button>
-      <button id="confirmUpdate" style="margin: 5px;">Cập nhật giao dịch</button>
-      <button id="confirmCancel" style="margin: 5px;">Hủy bỏ</button>
+      <button id="confirmAddNew" onclick="window.handleAddNewTransaction()" style="margin: 5px;">Thêm giao dịch mới</button>
+      <button id="confirmUpdate" onclick="window.handleUpdateTransactionFromModal()" style="margin: 5px;">Cập nhật giao dịch</button>
+      <button id="confirmCancel" onclick="window.handleCancelModal()" style="margin: 5px;">Hủy bỏ</button>
     </div>
   </div>
 </div>

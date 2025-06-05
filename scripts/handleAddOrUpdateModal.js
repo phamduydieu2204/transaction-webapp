@@ -11,17 +11,31 @@ export function openAddOrUpdateModal() {
   }
   
   export function handleAddNewTransaction() {
+    console.log("🆕 handleAddNewTransaction called - clearing edit state");
     window.currentEditTransactionId = null;
+    window.currentEditIndex = -1;
+    
+    // Update state if available
+    if (window.updateState) {
+      window.updateState({ 
+        currentEditTransactionId: null,
+        currentEditIndex: -1 
+      });
+    }
+    
     closeAddOrUpdateModal();
+    console.log("🆕 Calling handleAdd() for new transaction");
     window.handleAdd(); // Gọi lại handleAdd() sau khi xóa tiến trình sửa
   }
   
   export function handleUpdateTransactionFromModal() {
+    console.log("🔄 handleUpdateTransactionFromModal called");
     closeAddOrUpdateModal();
     window.handleUpdate(); // Gọi handleUpdate() luôn
   }
   
   export function handleCancelModal() {
+    console.log("❌ handleCancelModal called");
     closeAddOrUpdateModal();
   }
   
