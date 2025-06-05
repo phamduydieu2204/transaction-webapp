@@ -1,0 +1,31 @@
+<!-- Modern Result Modal -->
+<div id="resultModal" class="modal result-modal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeResultModal()"></button>
+    
+    <div class="modal-body">
+      <!-- Success Icon -->
+      <div class="modal-icon" id="resultIcon">
+        <div class="modal-icon-success" id="successIcon" style="display: none;">
+          <svg width="40" height="40" viewBox="0 0 40 40">
+            <path class="icon-checkmark" d="M10 20 L17 27 L30 13" />
+          </svg>
+        </div>
+        
+        <!-- Error Icon -->
+        <div class="modal-icon-error" id="errorIcon" style="display: none;">
+          <svg width="40" height="40" viewBox="0 0 40 40">
+            <path class="icon-cross" d="M12 12 L28 28 M28 12 L12 28" />
+          </svg>
+        </div>
+      </div>
+      
+      <h2 id="resultTitle">Thông báo</h2>
+      <p id="resultMessage">Nội dung thông báo</p>
+    </div>
+    
+    <div class="modal-buttons">
+      <button class="modal-btn modal-btn-primary" onclick="closeResultModal()">Đóng</button>
+    </div>
+  </div>
+</div>

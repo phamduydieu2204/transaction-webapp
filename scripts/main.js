@@ -16,10 +16,10 @@ import { initializeTabPermissions } from './core/tabPermissions.js';
 import { initializeSessionValidation, validateSessionImmediate } from './core/sessionValidator.js';
 import { authManager } from './core/authManager.js';
 
-// Import essential utilities
-import { showProcessingModal } from './showProcessingModal.js';
-import { showResultModal } from './showResultModal.js';
-import { closeProcessingModal } from './closeProcessingModal.js';
+// Import essential utilities (use modern versions)
+import { showProcessingModal } from './showProcessingModalModern.js';
+import { showResultModal } from './showResultModalModern.js';
+import { closeProcessingModal } from './closeProcessingModalModern.js';
 
 // Import tab initialization functions
 import { initExpenseTab } from './initExpenseTab.js';

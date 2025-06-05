@@ -1,12 +1,41 @@
-<!-- Modal xác nhận thêm hoặc cập nhật giao dịch -->
+<!-- Modern Add/Update Modal -->
 <div id="addOrUpdateModal" class="modal">
   <div class="modal-content">
-    <h2>Bạn đang trong tiến trình sửa giao dịch</h2>
-    <p>Bạn muốn thêm giao dịch mới hay cập nhật giao dịch hiện có?</p>
-    <div style="text-align: center; margin-top: 20px;">
-      <button id="confirmAddNew" onclick="window.handleAddNewTransaction()" style="margin: 5px;">Thêm giao dịch mới</button>
-      <button id="confirmUpdate" onclick="window.handleUpdateTransactionFromModal()" style="margin: 5px;">Cập nhật giao dịch</button>
-      <button id="confirmCancel" onclick="window.handleCancelModal()" style="margin: 5px;">Hủy bỏ</button>
+    <div class="modal-header">
+      <h2>Chọn hành động</h2>
+      <button class="modal-close" onclick="window.handleCancelModal()"></button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="modal-icon">
+        <div style="width: 80px; height: 80px; margin: 0 auto; background: var(--info-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="white">
+            <path d="M20 8 L20 25 M20 32 L20 32" stroke="white" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+      <p style="text-align: center; margin-top: 16px;">
+        Bạn đang trong tiến trình sửa giao dịch.<br>
+        Vui lòng chọn hành động bạn muốn thực hiện:
+      </p>
+    </div>
+    
+    <div class="modal-buttons">
+      <button id="confirmAddNew" onclick="window.handleAddNewTransaction()" class="modal-btn modal-btn-success">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 6px; vertical-align: -2px;">
+          <path d="M8 2 L8 14 M2 8 L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Thêm mới
+      </button>
+      <button id="confirmUpdate" onclick="window.handleUpdateTransactionFromModal()" class="modal-btn modal-btn-primary">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 6px; vertical-align: -2px;">
+          <path d="M2 8 L6 12 L14 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        Cập nhật
+      </button>
+      <button id="confirmCancel" onclick="window.handleCancelModal()" class="modal-btn modal-btn-secondary">
+        Hủy bỏ
+      </button>
     </div>
   </div>
 </div>
