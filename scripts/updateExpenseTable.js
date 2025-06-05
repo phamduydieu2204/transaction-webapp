@@ -54,28 +54,31 @@ window.refreshExpenseTable = refreshExpenseTable;
 /**
  * Handle expense action dropdown selection
  */
-function handleExpenseAction(selectElement, index) {
+function handleExpenseAction(selectElement, expenseData) {
   const action = selectElement.value;
   if (!action) return;
   
   // Reset dropdown to default
   selectElement.value = '';
   
+  // Parse expense data if it's a string
+  const expense = typeof expenseData === 'string' ? JSON.parse(expenseData) : expenseData;
+  
   // Execute action based on selection
   switch (action) {
     case 'view':
       if (typeof window.viewExpenseRow === 'function') {
-        window.viewExpenseRow(index);
+        window.viewExpenseRow(expense);
       }
       break;
     case 'edit':
       if (typeof window.editExpenseRow === 'function') {
-        window.editExpenseRow(index);
+        window.editExpenseRow(expense);
       }
       break;
     case 'delete':
       if (typeof window.handleDeleteExpense === 'function') {
-        window.handleDeleteExpense(index);
+        window.handleDeleteExpense(expense.expenseId);
       }
       break;
   }
@@ -320,7 +323,7 @@ function createExpenseRow(expense, index) {
     <td>${status}</td>
     <td>${note}</td>
     <td>
-      <select class="action-select" onchange="handleExpenseAction(this, ${index})">
+      <select class="action-select" data-expense='${JSON.stringify(expense).replace(/'/g, "&apos;")}' onchange="handleExpenseAction(this, this.dataset.expense)">
         <option value="">-- Chọn --</option>
         <option value="view">Xem</option>
         <option value="edit">Sửa</option>

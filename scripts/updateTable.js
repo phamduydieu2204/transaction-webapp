@@ -46,12 +46,72 @@ function transactionGoToPage(page) {
   }
 }
 
+/**
+ * Handle transaction action dropdown selection
+ */
+function handleTransactionAction(selectElement, transactionData) {
+  const action = selectElement.value;
+  if (!action) return;
+  
+  // Reset dropdown to default
+  selectElement.value = '';
+  
+  // Parse transaction data if it's a string
+  const transaction = typeof transactionData === 'string' ? JSON.parse(transactionData) : transactionData;
+  
+  // Execute action based on selection
+  switch (action) {
+    case 'view':
+      if (typeof window.viewTransaction === 'function') {
+        // Find index in transactionList
+        const index = window.transactionList.findIndex(t => t.transactionId === transaction.transactionId);
+        if (index !== -1) {
+          window.viewTransaction(index, window.transactionList, window.formatDate);
+        }
+      }
+      break;
+    case 'edit':
+      if (typeof window.editTransaction === 'function') {
+        const index = window.transactionList.findIndex(t => t.transactionId === transaction.transactionId);
+        if (index !== -1) {
+          window.editTransaction(index, window.transactionList, window.fetchSoftwareList, window.updatePackageList, window.updateAccountList);
+        }
+      }
+      break;
+    case 'delete':
+      if (typeof window.deleteTransaction === 'function') {
+        const index = window.transactionList.findIndex(t => t.transactionId === transaction.transactionId);
+        if (index !== -1) {
+          window.deleteTransaction(index);
+        }
+      }
+      break;
+    case 'updateCookie':
+      if (typeof window.handleUpdateCookie === 'function') {
+        const index = window.transactionList.findIndex(t => t.transactionId === transaction.transactionId);
+        if (index !== -1) {
+          window.handleUpdateCookie(index);
+        }
+      }
+      break;
+    case 'changePassword':
+      if (typeof window.handleChangePassword === 'function') {
+        const index = window.transactionList.findIndex(t => t.transactionId === transaction.transactionId);
+        if (index !== -1) {
+          window.handleChangePassword(index);
+        }
+      }
+      break;
+  }
+}
+
 // Make transaction pagination functions available globally
 window.transactionFirstPage = transactionFirstPage;
 window.transactionPrevPage = transactionPrevPage;
 window.transactionNextPage = transactionNextPage;
 window.transactionLastPage = transactionLastPage;
 window.transactionGoToPage = transactionGoToPage;
+window.handleTransactionAction = handleTransactionAction;
 
 /**
  * Update transaction pagination - Giống hoàn toàn expense table
@@ -257,33 +317,11 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
       <td>${transaction.revenue}</td>
       <td>${infoCell}</td>
       <td>
-        <select class="action-select">
+        <select class="action-select" data-transaction='${JSON.stringify(transaction).replace(/'/g, "&apos;")}' onchange="handleTransactionAction(this, this.dataset.transaction)">
           ${actionOptions}
         </select>
       </td>
     `;
-
-    const actionSelect = row.querySelector(".action-select");
-    actionSelect.addEventListener("change", (e) => {
-      const selected = e.target.value;
-      console.log(`🎯 Action selected: ${selected} for index: ${globalIndex}`);
-      
-      if (selected === "edit") {
-        window.editTransaction(globalIndex, transactionList, window.fetchSoftwareList, window.updatePackageList, window.updateAccountList);
-      } else if (selected === "delete") {
-        console.log(`🗑️ Delete action triggered for index: ${globalIndex}`);
-        window.deleteTransaction(globalIndex);
-      } else if (selected === "view") {
-        window.viewTransaction(globalIndex, transactionList, window.formatDate, window.copyToClipboard);
-      } else if (selected === "updateCookie") {
-        if (typeof window.handleUpdateCookie === 'function') window.handleUpdateCookie(globalIndex);
-        else alert("Chức năng Cập nhật Cookie chưa được triển khai.");
-      } else if (selected === "changePassword") {
-        if (typeof window.handleChangePassword === 'function') window.handleChangePassword(globalIndex);
-        else alert("Chức năng Đổi mật khẩu chưa được triển khai.");
-      }
-      e.target.value = "";
-    });
 
     const copyBtn = row.querySelector(".copy-btn");
     if (copyBtn) {

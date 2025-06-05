@@ -3,12 +3,29 @@
 import { detailModal } from './detailModalUnified.js';
 import { getConstants } from './constants.js';
 
-export async function viewTransaction(index, transactionList, formatDate) {
-  const transaction = transactionList[index];
+export async function viewTransaction(indexOrTransaction, transactionList, formatDate) {
+  // Handle both old way (index) and new way (transaction object)
+  let transaction;
+  
+  if (typeof indexOrTransaction === 'number') {
+    // Old way: index was passed
+    transaction = transactionList ? transactionList[indexOrTransaction] : null;
+  } else {
+    // New way: transaction object was passed
+    transaction = indexOrTransaction;
+  }
   
   if (!transaction) {
     console.error("Không tìm thấy giao dịch");
     return;
+  }
+  
+  // If formatDate not provided, use default
+  if (!formatDate) {
+    formatDate = (date) => {
+      if (!date) return '';
+      return new Date(date).toLocaleDateString('vi-VN');
+    };
   }
 
   // Chuẩn bị dữ liệu cho modal
