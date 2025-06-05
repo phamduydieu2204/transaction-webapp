@@ -80,17 +80,22 @@ export function openAddOrUpdateModal() {
     
     closeAddOrUpdateModal();
     
-    // Reset form and set today's date
-    console.log("🆕 Resetting form to clear old data");
-    if (window.handleReset) {
-      await window.handleReset();
-    } else {
-      // Fallback: manually set today's date
+    // Don't reset the form - user wants to keep the data they entered
+    // Just update the date to today and proceed with adding
+    console.log("🆕 Updating date to today and proceeding with add");
+    try {
       const { setDefaultDates } = await import('./calculateEndDate.js');
-      setDefaultDates(true);
+      setDefaultDates(true); // Force update dates to today
+    } catch (error) {
+      console.warn("Could not update dates:", error);
     }
     
-    console.log("🆕 Form reset complete - ready for new transaction");
+    console.log("🆕 Calling handleAdd() for new transaction with current form data");
+    if (window.handleAdd) {
+      window.handleAdd();
+    } else {
+      console.error("❌ window.handleAdd is not available");
+    }
   }
   
   export function handleUpdateTransactionFromModal() {
