@@ -111,12 +111,14 @@ export async function handleSearch(
         viewTransaction
       );
 
+      console.log('✅ Search successful, showing result modal');
       showResultModal(`Tìm kiếm thành công! Tìm thấy ${result.data.length} giao dịch.`, true);
     } else {
+      console.log('❌ Search failed, showing error modal');
       showResultModal(result.message || "Không thể tìm kiếm giao dịch!", false);
     }
   } catch (err) {
-    console.error("Lỗi khi tìm kiếm giao dịch", err);
+    console.error("❌ Search error:", err);
     showResultModal(`Lỗi khi tìm kiếm giao dịch: ${err.message}`, false);
   }
 }

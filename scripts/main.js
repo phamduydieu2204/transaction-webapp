@@ -16,10 +16,8 @@ import { initializeTabPermissions } from './core/tabPermissions.js';
 import { initializeSessionValidation, validateSessionImmediate } from './core/sessionValidator.js';
 import { authManager } from './core/authManager.js';
 
-// Import essential utilities (use modern versions)
-import { showProcessingModal } from './showProcessingModalModern.js';
-import { showResultModal } from './showResultModalModern.js';
-import { closeProcessingModal } from './closeProcessingModalModern.js';
+// Import essential utilities (use unified modal system)
+import { showProcessingModal, showResultModal, closeProcessingModal } from './modalUnified.js';
 
 // Import tab initialization functions
 import { initExpenseTab } from './initExpenseTab.js';
@@ -293,6 +291,8 @@ window.logout = logout;
 window.showProcessingModal = showProcessingModal;
 window.closeProcessingModal = closeProcessingModal; 
 window.showResultModal = showResultModal;
+// Make close function available globally
+window.closeProcessingModalUnified = closeProcessingModal;
 window.updatePackageList = updatePackageList;
 window.updateAccountList = updateAccountList;
 window.fetchSoftwareList = fetchSoftwareList;
