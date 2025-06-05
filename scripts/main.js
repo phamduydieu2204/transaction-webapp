@@ -330,9 +330,12 @@ window.handleSearch = () => {
   const state = getState();
   return handleSearch(state.user, state.transactions, showProcessingModal, showResultModal, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction);
 };
-window.viewTransaction = (index) => {
+window.viewTransaction = (indexOrTransaction, transactionList, formatDateFn) => {
   const state = getState();
-  return viewTransaction(index, state.transactions, formatDate, copyToClipboard);
+  // Use passed parameters or defaults
+  const list = transactionList || state.transactions || window.transactionList;
+  const formatter = formatDateFn || formatDate;
+  return viewTransaction(indexOrTransaction, list, formatter);
 };
 window.editTransaction = (index) => {
   const state = getState();

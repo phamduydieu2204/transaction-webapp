@@ -59,14 +59,27 @@ function handleTransactionAction(selectElement, transactionData) {
   // Parse transaction data if it's a string
   const transaction = typeof transactionData === 'string' ? JSON.parse(transactionData) : transactionData;
   
+  console.log('🔍 handleTransactionAction:', {
+    action,
+    transactionData,
+    transaction,
+    transactionId: transaction.transactionId,
+    transactionListLength: window.transactionList ? window.transactionList.length : 0
+  });
+  
   // Execute action based on selection
   switch (action) {
     case 'view':
       if (typeof window.viewTransaction === 'function') {
         // Find index in transactionList
         const index = window.transactionList.findIndex(t => t.transactionId === transaction.transactionId);
+        console.log('🔍 View action - index found:', index);
         if (index !== -1) {
           window.viewTransaction(index, window.transactionList, window.formatDate);
+        } else {
+          console.error('❌ Transaction not found in list, trying direct view with transaction object');
+          // Try passing the transaction object directly
+          window.viewTransaction(transaction, window.transactionList, window.formatDate);
         }
       }
       break;
@@ -317,7 +330,7 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
       <td>${transaction.revenue}</td>
       <td>${infoCell}</td>
       <td>
-        <select class="action-select" data-transaction='${JSON.stringify(transaction).replace(/'/g, "&apos;")}' onchange="handleTransactionAction(this, this.dataset.transaction)">
+        <select class="action-select" data-transaction='${JSON.stringify(transaction).replace(/'/g, "&#39;")}' onchange="handleTransactionAction(this, this.dataset.transaction)">
           ${actionOptions}
         </select>
       </td>
