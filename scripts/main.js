@@ -82,6 +82,7 @@ import {
   copyCurrentCookie,
   closeUpdateCookieModal
 } from './handleUpdateCookie.js';
+import { checkSheetAccess } from './checkSheetAccess.js';
 import { editRow, deleteRow } from './legacy.js';
 import { getConstants } from './constants.js';
 

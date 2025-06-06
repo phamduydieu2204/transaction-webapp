@@ -75,6 +75,11 @@ export function updateTableOptimized(transactionList, currentPage, itemsPerPage,
     } else {
       actionOptions += `<option value="changePassword">Đổi mật khẩu</option>`;
     }
+    
+    // Add check access option if accountSheetId exists
+    if (transaction.accountSheetId && transaction.accountSheetId.trim() !== '') {
+      actionOptions += `<option value="checkAccess">Kiểm tra quyền truy cập</option>`;
+    }
 
     // Create usage cycle cell with icons and 3 lines
     const usageCycleCell = `
@@ -151,6 +156,14 @@ export function updateTableOptimized(transactionList, currentPage, itemsPerPage,
               window.handleChangePassword(globalIndex);
             } else {
               alert("Chức năng Đổi mật khẩu chưa được triển khai.");
+            }
+            break;
+          case 'checkAccess':
+            const transaction = transactionList[globalIndex];
+            if (transaction && typeof window.checkSheetAccess === 'function') {
+              window.checkSheetAccess(transaction);
+            } else {
+              console.error('checkSheetAccess function not found or transaction not found');
             }
             break;
         }

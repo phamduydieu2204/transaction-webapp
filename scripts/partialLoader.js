@@ -88,7 +88,8 @@ export async function initializePartials() {
       { elementId: 'transaction-detail-modal-placeholder', partialPath: './partials/modals/transaction-detail-modal.html', priority: 3 },
       { elementId: 'add-update-modal-placeholder', partialPath: './partials/modals/add-update-modal.html', priority: 3 },
       { elementId: 'cookie-modal-placeholder', partialPath: './partials/modals/cookie-modal.html', priority: 3 },
-      { elementId: 'password-modal-placeholder', partialPath: './partials/modals/password-modal.html', priority: 3 }
+      { elementId: 'password-modal-placeholder', partialPath: './partials/modals/password-modal.html', priority: 3 },
+      { elementId: 'access-check-modal-placeholder', partialPath: './partials/modals/access-check-modal.html', priority: 3 }
     ];
     
     // Preload all HTML files in parallel

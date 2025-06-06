@@ -1,0 +1,189 @@
+<!-- Access Check Modal -->
+<div id="accessCheckModal" class="modal" style="display: none;">
+  <div class="modal-content access-check-modal">
+    <div class="modal-header">
+      <h2>Kiểm tra quyền truy cập</h2>
+      <span class="close" onclick="closeAccessCheckModal()">&times;</span>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Loading state -->
+      <div id="accessCheckLoading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Đang kiểm tra quyền truy cập...</p>
+      </div>
+      
+      <!-- Results table -->
+      <div id="accessCheckResults" style="display: none;">
+        <div class="sheet-info">
+          <strong>File ID:</strong> <span id="sheetIdDisplay"></span>
+          <button class="copy-btn" onclick="copySheetId()">📋</button>
+        </div>
+        
+        <table id="accessCheckTable">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Quyền</th>
+              <th>Cấp quyền</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Rows will be dynamically added here -->
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Error state -->
+      <div id="accessCheckError" class="error-state" style="display: none;">
+        <p class="error-message"></p>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeAccessCheckModal()">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.access-check-modal {
+  max-width: 700px;
+  width: 90%;
+}
+
+.sheet-info {
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sheet-info .copy-btn {
+  background: none;
+  border: 1px solid #dee2e6;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.sheet-info .copy-btn:hover {
+  background: #e9ecef;
+}
+
+#accessCheckTable {
+  width: 100%;
+  margin-top: 16px;
+}
+
+#accessCheckTable th {
+  background: #f8f9fa;
+  font-weight: 600;
+  text-align: left;
+  padding: 12px;
+  border-bottom: 2px solid #dee2e6;
+}
+
+#accessCheckTable td {
+  padding: 12px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.access-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.access-none {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.access-viewer {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.access-editor {
+  background: #d4edda;
+  color: #155724;
+}
+
+.access-owner {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.btn-grant {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.btn-grant:hover {
+  background: #218838;
+}
+
+.btn-revoke {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.btn-revoke:hover {
+  background: #c82333;
+}
+
+.btn-grant:disabled,
+.btn-revoke:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 40px;
+}
+
+.spinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-state {
+  text-align: center;
+  padding: 40px;
+}
+
+.error-state .error-message {
+  color: #dc3545;
+  font-size: 16px;
+}
+</style>

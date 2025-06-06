@@ -103,6 +103,13 @@ function handleTransactionActionByIndex(selectElement) {
         window.handleChangePassword(globalIndex);
       }
       break;
+    case 'checkAccess':
+      if (typeof window.checkSheetAccess === 'function') {
+        window.checkSheetAccess(transaction);
+      } else {
+        console.error('checkSheetAccess function not found');
+      }
+      break;
   }
 }
 
@@ -288,6 +295,11 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
       actions.push({ value: "updateCookie", label: "Cập nhật Cookie" });
     } else {
       actions.push({ value: "changePassword", label: "Đổi mật khẩu" });
+    }
+    
+    // Add "Check access" option if transaction has accountSheetId
+    if (transaction.accountSheetId && transaction.accountSheetId.trim() !== '') {
+      actions.push({ value: "checkAccess", label: "Kiểm tra quyền truy cập" });
     }
 
     const actionOptions = actions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join("\n");

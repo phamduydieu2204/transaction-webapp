@@ -74,10 +74,19 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       </div>
     `;
 
-    // Minimal action dropdown
-    const actionOptions = shouldShowCookie
-      ? `<option value="">--</option><option value="view">Xem</option><option value="edit">Sửa</option><option value="delete">Xóa</option><option value="updateCookie">Cookie</option>`
-      : `<option value="">--</option><option value="view">Xem</option><option value="edit">Sửa</option><option value="delete">Xóa</option><option value="changePassword">Đổi MK</option>`;
+    // Build action options
+    let actionOptions = `<option value="">--</option><option value="view">Xem</option><option value="edit">Sửa</option><option value="delete">Xóa</option>`;
+    
+    if (shouldShowCookie) {
+      actionOptions += `<option value="updateCookie">Cookie</option>`;
+    } else {
+      actionOptions += `<option value="changePassword">Đổi MK</option>`;
+    }
+    
+    // Add check access option if accountSheetId exists
+    if (transaction.accountSheetId && transaction.accountSheetId.trim() !== '') {
+      actionOptions += `<option value="checkAccess">Kiểm tra quyền</option>`;
+    }
 
     // Create usage cycle cell with icons and 3 lines
     const usageCycleCell = `
@@ -203,6 +212,12 @@ function handleTableAction(action, index, transactionList) {
       break;
     case 'changePassword':
       window.handleChangePassword?.(index);
+      break;
+    case 'checkAccess':
+      const transaction = transactionList[index];
+      if (transaction && window.checkSheetAccess) {
+        window.checkSheetAccess(transaction);
+      }
       break;
   }
 }
