@@ -13,6 +13,9 @@ let currentSearchResults = [];
  * Initialize expense quick search
  */
 export function initExpenseQuickSearch() {
+  // DISABLED - Using initExpenseQuickSearchNew instead
+  return;
+  
   const searchInput = document.getElementById('expenseQuickSearch');
   const clearBtn = document.getElementById('clearExpenseSearch');
   const resultsDiv = document.getElementById('expenseSearchResults');
