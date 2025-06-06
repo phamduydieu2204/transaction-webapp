@@ -49,7 +49,13 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
 
   // ✅ Build minimal HTML for visible rows only
   const rowsHtml = paginatedItems.map((transaction, index) => {
-    const globalIndex = startIndex + index;
+    // For search results, use the actual index in the current list
+    // For normal view, use globalIndex for pagination
+    const actualIndex = window.isSearching ? 
+      transactionList.findIndex(t => t.transactionId === transaction.transactionId) : 
+      startIndex + index;
+    
+    const globalIndex = actualIndex;
     const endDate = parseDate(transaction.endDate);
     const isExpired = endDate < today;
     

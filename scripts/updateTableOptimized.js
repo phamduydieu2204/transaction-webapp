@@ -38,7 +38,12 @@ export function updateTableOptimized(transactionList, currentPage, itemsPerPage,
   };
 
   const rowsHtml = paginatedItems.map((transaction, index) => {
-    const globalIndex = startIndex + index;
+    // For search results, use the actual index in the current list
+    const actualIndex = window.isSearching ? 
+      transactionList.findIndex(t => t.transactionId === transaction.transactionId) : 
+      startIndex + index;
+    
+    const globalIndex = actualIndex;
     const endDate = parseDate(transaction.endDate);
     const isExpired = endDate < today;
     

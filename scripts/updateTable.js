@@ -265,7 +265,12 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
   // ✅ Build all rows HTML first (no DOM manipulation yet)
   const rowsHtml = paginatedItems.map((transaction, index) => {
-    const globalIndex = startIndex + index;
+    // For search results, use the actual index in the current list
+    const actualIndex = window.isSearching ? 
+      transactionList.findIndex(t => t.transactionId === transaction.transactionId) : 
+      startIndex + index;
+    
+    const globalIndex = actualIndex;
     const row = document.createElement("tr");
 
     const parseDate = (str) => {
