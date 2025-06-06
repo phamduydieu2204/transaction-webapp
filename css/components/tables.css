@@ -49,6 +49,39 @@ table {
   z-index: 1;
 }
 
+/* Usage cycle cell styling */
+.usage-cycle-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+  line-height: 1.4;
+}
+
+.cycle-line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #495057;
+  white-space: nowrap;
+}
+
+.cycle-line:first-child {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Software info cell - allow wrapping */
+.software-info-cell {
+  white-space: normal;
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 250px;
+  line-height: 1.5;
+  padding: 8px 0;
+}
+
 #transactionTable thead th {
   background: transparent;
   color: #ffffff;
