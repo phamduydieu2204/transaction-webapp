@@ -18,7 +18,6 @@ export async function viewTransaction(indexOrTransaction, transactionList, forma
   }
   
   if (!transaction) {
-    console.error("Không tìm thấy giao dịch");
     return;
   }
   
@@ -140,7 +139,6 @@ export async function viewTransaction(indexOrTransaction, transactionList, forma
       })      
     });
     const result = await res.json();
-    console.log("✅ Kết quả lấy thông tin tài khoản:", result);
     if (result.status === "success") {
       fields.push({ 
         label: "Tên đăng nhập", 
@@ -160,10 +158,8 @@ export async function viewTransaction(indexOrTransaction, transactionList, forma
         showCopy: true 
       });
     } else {
-      console.warn("Không thể lấy thông tin tài khoản:", result.message);
     }
   } catch (error) {
-    console.error("Lỗi khi lấy thông tin tài khoản từ PhanMem:", error);
   }
 
   // Hiển thị modal với dữ liệu

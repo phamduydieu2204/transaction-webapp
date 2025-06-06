@@ -99,7 +99,6 @@ export async function handleSearch(
       showResultModal(result.message || "Không thể tìm kiếm giao dịch!", false);
     }
   } catch (err) {
-    console.error("❌ Search error:", err);
     showResultModal(`Lỗi khi tìm kiếm giao dịch: ${err.message}`, false);
   }
 }

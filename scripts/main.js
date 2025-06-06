@@ -5,7 +5,6 @@
  * Imports and initializes core application functionality
  */
 
-console.log('🎯 Main.js: File loaded, starting imports...');
 
 // Import core modules
 import { initializeApp } from './core/appInitializer.js';
@@ -91,7 +90,6 @@ import { getConstants } from './constants.js';
  * Show login form when user is not authenticated
  */
 function showLoginForm() {
-  console.log('🔐 Showing login form...');
   
   // Hide main content
   document.querySelector('.container').style.display = 'none';
@@ -142,7 +140,6 @@ function showLoginForm() {
       window.location.reload();
       
     } catch (error) {
-      console.error('Login error:', error);
       document.getElementById('loginError').style.display = 'block';
       document.getElementById('loginError').textContent = 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.';
       
@@ -158,24 +155,18 @@ function showLoginForm() {
  * Application startup sequence
  */
 async function startApp() {
-  console.log('🚀 Starting Transaction WebApp...');
   
   try {
     // Phase 1: Initialize state and authentication
-    console.log('📊 Phase 1: Initializing state and auth...');
     initializeStateManager();
     
     // Check authentication
-    console.log('🔐 Checking authentication...');
     const hasSession = authManager.loadSession();
-    console.log('📌 Session loaded:', hasSession);
     
     if (hasSession) {
       // Phase 1.5: Immediate session validation for authenticated users
-      console.log('🔐 Phase 1.5: Immediate session validation...');
       const sessionValid = await validateSessionImmediate();
       if (!sessionValid) {
-        console.log('❌ Session invalid - stopping app initialization');
         return; // Stop app initialization
       }
       // Setup periodic validation after immediate check passes
@@ -183,85 +174,67 @@ async function startApp() {
     }
     
     if (!hasSession) {
-      console.log('❌ No valid session found, checking legacy format...');
       // Try legacy session format
       const userData = localStorage.getItem("employeeInfo");
-      console.log('📌 Legacy user data:', userData ? 'Found' : 'Not found');
       
       if (userData) {
         try {
           const userInfo = JSON.parse(userData);
-          console.log('✅ Legacy session parsed:', userInfo.maNhanVien);
           
           // Add default tab permissions for legacy users
           if (!userInfo.tabNhinThay) {
             userInfo.tabNhinThay = 'tất cả'; // Default to all tabs for legacy users
-            console.log('📄 Added default tab permissions for legacy user');
           }
           
           updateState({ user: userInfo });
           
           // Phase 1.5: Immediate session validation for legacy users
-          console.log('🔐 Phase 1.5: Immediate session validation...');
           const sessionValid = await validateSessionImmediate();
           if (!sessionValid) {
-            console.log('❌ Legacy session invalid - stopping app initialization');
             return; // Stop app initialization
           }
           // Setup periodic validation after immediate check passes
           initializeSessionValidation();
         } catch (e) {
-          console.warn('❌ Invalid legacy session data:', e);
           // Show login form instead of redirect
-          console.log('🔐 Showing login form (invalid legacy data)...');
           showLoginForm();
           return;
         }
       } else {
         // Show login form instead of redirect
-        console.log('🔐 Showing login form (no auth data)...');
         showLoginForm();
         return;
       }
     } else {
-      console.log('✅ Valid session found, continuing...');
     }
     
     // Phase 2: Initialize core application
-    console.log('🏗️ Phase 2: Initializing core application...');
     await initializeApp();
     
     // Phase 3: Setup event handlers
-    console.log('🎮 Phase 3: Setting up event handlers...');
     initializeEventHandlers();
     
     // Phase 4: Initialize navigation system
-    console.log('🧭 Phase 4: Initializing navigation...');
     initializeTabSystem();
     
     // Phase 4.1: Switch to intended tab after authentication
-    console.log('🎯 Phase 4.1: Switching to intended tab...');
     switchToIntendedTab();
     
     
     // Phase 4.5: Initialize date defaults and calculations
-    console.log('📅 Phase 4.5: Initializing date defaults...');
     setTimeout(() => {
       initializeDateCalculations();
     }, 100); // Small delay to ensure DOM is ready
     
     // Phase 5: Apply ultra full-width layout override
-    console.log('🔧 Phase 5: Applying ultra full-width layout...');
     setTimeout(async () => {
       try {
         // Import and run the force full-width script
         const { forceFullWidth } = await import('./forceFullWidth.js');
         forceFullWidth();
       } catch (error) {
-        console.error('❌ Error loading forceFullWidth:', error);
         
         // Fallback: Apply basic full-width override directly
-        console.log('🔧 Applying fallback full-width override...');
         const container = document.querySelector('.container');
         if (container) {
           container.style.cssText = `
@@ -276,16 +249,13 @@ async function startApp() {
           `;
           
           setTimeout(() => {
-            console.log('✅ Fallback applied - Container width:', container.getBoundingClientRect().width, '/', window.innerWidth);
           }, 100);
         }
       }
     }, 500);
     
-    console.log('✅ Application startup complete!');
     
   } catch (error) {
-    console.error('❌ Application startup failed:', error);
     showResultModal(
       'Lỗi khởi tạo ứng dụng',
       'Có lỗi xảy ra khi khởi tạo ứng dụng. Vui lòng tải lại trang.',
@@ -325,7 +295,6 @@ window.handleAdd = () => {
   return handleAdd(state.user, state.currentEditTransactionId, window.loadTransactions, window.handleReset, updatePackageList, showProcessingModal, showResultModal);
 };
 window.handleUpdate = () => {
-  console.log("🎯 window.handleUpdate called");
   return handleUpdate();
 };
 window.handleSearch = () => {
@@ -350,16 +319,8 @@ window.deleteTransaction = (index) => {
   // Use window.transactionList instead of state.transactions for consistency
   const transactionList = window.transactionList || state.transactions || [];
   
-  console.log('🔍 DeleteTransaction called with:', {
-    index,
-    transactionListLength: transactionList.length,
-    hasTransaction: !!transactionList[index],
-    stackTrace: new Error().stack?.split('\n').slice(1, 4).join('\n')
-  });
-  
   // Prevent automatic calls during page load
   if (!transactionList || transactionList.length === 0) {
-    console.warn('⚠️ DeleteTransaction called but no transaction data available. Skipping.');
     return;
   }
   
@@ -398,7 +359,6 @@ window.editRow = (index) => {
   return editRow(index, state.transactions);
 };
 window.deleteRow = (index) => {
-  console.log('🔍 Legacy deleteRow called with index:', index);
   return deleteRow(index, window.deleteTransaction);
 };
 window.closeModal = closeModal;
@@ -439,7 +399,5 @@ window.expenseList = [];
 window.currentExpensePage = 1;
 
 // Start the app immediately when module loads
-console.log('🚀 Main.js: Starting app...');
 startApp().catch(error => {
-  console.error('❌ Main.js: Failed to start app:', error);
 });

@@ -8,7 +8,6 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
   const tableBody = document.querySelector("#transactionTable tbody");
   if (!tableBody) return;
 
-  console.log(`🚀 Ultra-fast table update: ${transactionList.length} total transactions`);
 
   // For ultra-fast loading, limit initial render to 25 rows max
   const FAST_LIMIT = 25;
@@ -21,7 +20,6 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
   // Only process visible items
   const paginatedItems = transactionList.slice(startIndex, endIndex);
   
-  console.log(`⚡ Rendering ${paginatedItems.length} rows out of ${transactionList.length} total`);
 
   let totalRevenue = 0;
   const today = new Date();
@@ -183,7 +181,6 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
 
   // ✅ Save revenue and log performance
   window.totalRevenue = totalRevenue;
-  console.log(`⚡ Ultra-fast render complete: ${paginatedItems.length} rows, revenue: ${totalRevenue}`);
   
   // ✅ Schedule background calculation of full revenue if needed
   if (!window.isSearching && paginatedItems.length < transactionList.length) {
@@ -195,7 +192,6 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
         return sum;
       }, 0);
       window.totalRevenue = fullRevenue;
-      console.log(`📊 Background revenue calculation complete: ${fullRevenue}`);
     }, 100);
   }
 }
@@ -209,7 +205,6 @@ function handleTableAction(action, index, transactionList) {
   const transaction = transactionList[index];
   
   if (!transaction) {
-    console.error('Transaction not found at index:', index);
     return;
   }
   
