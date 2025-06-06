@@ -57,19 +57,6 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     
     const globalIndex = actualIndex;
     
-    // DEBUG: Log index calculations
-    if (index === 0) {
-      console.log('🔍 DEBUG - Index calculation:', {
-        isSearching: window.isSearching,
-        transactionId: transaction.transactionId,
-        localIndex: index,
-        startIndex: startIndex,
-        actualIndex: actualIndex,
-        globalIndex: globalIndex,
-        transactionListLength: transactionList.length,
-        windowTransactionListLength: window.transactionList ? window.transactionList.length : 0
-      });
-    }
     const endDate = parseDate(transaction.endDate);
     const isExpired = endDate < today;
     
@@ -162,13 +149,6 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
           const action = e.target.value;
           const index = parseInt(e.target.dataset.index);
           
-          console.log('🎯 DEBUG - Action triggered:', {
-            action: action,
-            dataIndex: index,
-            transactionListLength: transactionList.length,
-            windowTransactionListLength: window.transactionList ? window.transactionList.length : 0,
-            isSearching: window.isSearching
-          });
           
           if (action && index >= 0) {
             handleTableAction(action, index, transactionList);
@@ -225,39 +205,64 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
  * Handle table actions efficiently
  */
 function handleTableAction(action, index, transactionList) {
-  console.log('🔧 DEBUG - handleTableAction called:', {
-    action: action,
-    index: index,
-    transactionAtIndex: transactionList[index] ? {
-      id: transactionList[index].transactionId,
-      name: transactionList[index].customerName
-    } : 'NOT FOUND',
-    transactionListLength: transactionList.length
-  });
+  
+  // Get the actual transaction object
+  const transaction = transactionList[index];
+  if (!transaction) {
+    console.error('Transaction not found at index:', index);
+    return;
+  }
   
   switch(action) {
     case 'edit':
-      window.editTransaction?.(index, transactionList, window.fetchSoftwareList, window.updatePackageList, window.updateAccountList);
+      // For edit, pass the correct list and index
+      if (window.isSearching) {
+        // When searching, pass the search results list and the index within that list
+        window.editTransaction?.(index, transactionList, window.fetchSoftwareList, window.updatePackageList, window.updateAccountList);
+      } else {
+        // Normal view, pass global list and index
+        window.editTransaction?.(index, window.transactionList, window.fetchSoftwareList, window.updatePackageList, window.updateAccountList);
+      }
       break;
     case 'delete':
-      window.deleteTransaction?.(index);
+      // For delete, we need to find the index in the global list
+      if (window.isSearching && window.transactionList) {
+        const globalIndex = window.transactionList.findIndex(t => t.transactionId === transaction.transactionId);
+        if (globalIndex !== -1) {
+          window.deleteTransaction?.(globalIndex);
+        }
+      } else {
+        window.deleteTransaction?.(index);
+      }
       break;
     case 'view':
-      console.log('👁️ DEBUG - Calling viewTransaction with:', {
-        index: index,
-        transaction: transactionList[index]
-      });
-      window.viewTransaction?.(index, transactionList, window.formatDate, window.copyToClipboard);
+      // Pass the transaction object directly, not the index
+      window.viewTransaction?.(transaction, null, window.formatDate, window.copyToClipboard);
       break;
     case 'updateCookie':
-      window.handleUpdateCookie?.(index);
+      // For cookie update, find global index if searching
+      if (window.isSearching && window.transactionList) {
+        const globalIndex = window.transactionList.findIndex(t => t.transactionId === transaction.transactionId);
+        if (globalIndex !== -1) {
+          window.handleUpdateCookie?.(globalIndex);
+        }
+      } else {
+        window.handleUpdateCookie?.(index);
+      }
       break;
     case 'changePassword':
-      window.handleChangePassword?.(index);
+      // For password change, find global index if searching
+      if (window.isSearching && window.transactionList) {
+        const globalIndex = window.transactionList.findIndex(t => t.transactionId === transaction.transactionId);
+        if (globalIndex !== -1) {
+          window.handleChangePassword?.(globalIndex);
+        }
+      } else {
+        window.handleChangePassword?.(index);
+      }
       break;
     case 'checkAccess':
-      const transaction = transactionList[index];
-      if (transaction && window.checkSheetAccess) {
+      if (window.checkSheetAccess) {
         window.checkSheetAccess(transaction);
       }
       break;
