@@ -79,6 +79,22 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       ? `<option value="">--</option><option value="view">Xem</option><option value="edit">Sửa</option><option value="delete">Xóa</option><option value="updateCookie">Cookie</option>`
       : `<option value="">--</option><option value="view">Xem</option><option value="edit">Sửa</option><option value="delete">Xóa</option><option value="changePassword">Đổi MK</option>`;
 
+    // Create usage cycle cell with icons and 3 lines
+    const usageCycleCell = `
+      <div class="usage-cycle-cell">
+        <div class="cycle-line">📅 ${transaction.duration || 0} tháng</div>
+        <div class="cycle-line">▶️ ${formatDate(transaction.startDate)}</div>
+        <div class="cycle-line">⏹️ ${formatDate(transaction.endDate)}</div>
+      </div>
+    `;
+    
+    // Software info - allow full content and wrap
+    const softwareInfo = `
+      <div class="software-info-cell">
+        ${transaction.softwareName} - ${transaction.softwarePackage}${transaction.accountName ? ` - ${transaction.accountName}` : ""}
+      </div>
+    `;
+
     return `
       <tr class="${isExpired ? 'expired-row' : ''}" data-index="${globalIndex}">
         <td>${transaction.transactionId}</td>
@@ -86,12 +102,11 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
         <td>${transaction.transactionType}</td>
         <td>${transaction.customerName}</td>
         <td>${transaction.customerEmail}</td>
-        <td>${transaction.duration}</td>
-        <td>${formatDate(transaction.startDate)}</td>
-        <td>${formatDate(transaction.endDate)}</td>
+        <td>${usageCycleCell}</td>
         <td>${transaction.deviceCount}</td>
-        <td title="${transaction.softwareName} - ${transaction.softwarePackage} - ${transaction.accountName || ""}">${transaction.softwareName.substring(0, 15)}...</td>
+        <td>${softwareInfo}</td>
         <td>${transaction.revenue}</td>
+        <td>${transaction.note || ""}</td>
         <td>${infoCell}</td>
         <td>
           <select class="action-select" data-index="${globalIndex}">
