@@ -1,5 +1,24 @@
 <!-- Tab Nhập chi phí -->
 <div id="tab-chi-phi" class="tab-content">
+  <!-- Quick Search Container -->
+  <div class="expense-quick-search-container">
+    <div class="quick-search-wrapper">
+      <div class="quick-search-input-group">
+        <i class="fas fa-search search-icon"></i>
+        <input 
+          type="text" 
+          id="expenseQuickSearch" 
+          class="quick-search-input"
+          placeholder="Tìm nhanh chi phí... (mã chi phí, nhà cung cấp, ghi chú...)"
+          autocomplete="off"
+        >
+        <div id="expenseSearchDropdown" class="search-dropdown" style="display: none;">
+          <!-- Search results will be displayed here -->
+        </div>
+      </div>
+    </div>
+  </div>
+  
   <!-- Form Container -->
   <div class="form-container">
     <form id="expenseForm" onreset="handleResetExpense()">

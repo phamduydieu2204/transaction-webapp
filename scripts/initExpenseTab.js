@@ -27,6 +27,12 @@ export async function initExpenseTab() {
       // Render expense statistics
       renderExpenseStats();
       
+      // Initialize quick search
+      if (typeof window.initExpenseQuickSearchNew === 'function') {
+        window.initExpenseQuickSearchNew();
+        console.log('🔍 Expense quick search initialized');
+      }
+      
       console.log('✅ Expense tab initialized');
     } catch (error) {
       console.error('❌ Error initializing expense tab:', error);

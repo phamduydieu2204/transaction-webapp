@@ -65,6 +65,7 @@ import { handleSearchExpense } from './handleSearchExpense.js';
 import { handleResetExpense } from './handleResetExpense.js';
 import { initTotalDisplay } from './updateTotalDisplay.js';
 import { initExpenseQuickSearch } from './expenseQuickSearch.js';
+import { initExpenseQuickSearchNew } from './expenseQuickSearchNew.js';
 import { handleChangePassword, closeChangePasswordModal, confirmChangePassword } from './handleChangePassword.js';
 import { formatDateTime } from './formatDateTime.js';
 import { openConfirmModal, closeConfirmModal, confirmDelete } from './confirmModal.js';
