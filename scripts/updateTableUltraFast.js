@@ -150,12 +150,13 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
           const action = e.target.value;
           const index = parseInt(e.target.dataset.index);
           
-          // DEBUG: Log khi click action
-          const selectedTransaction = transactionList[index];
-          console.log(`🎯 ACTION CLICK: Action = ${action}, Index = ${index}, Mã giao dịch = ${selectedTransaction ? selectedTransaction.transactionId : 'NOT FOUND'}`);
+          // DEBUG: Log khi click action - use current active list
+          const currentList = window.isSearching ? window.transactionList : transactionList;
+          const selectedTransaction = currentList[index];
+          console.log(`🎯 ACTION CLICK: Action = ${action}, Index = ${index}, Mã giao dịch = ${selectedTransaction ? selectedTransaction.transactionId : 'NOT FOUND'}, Using ${window.isSearching ? 'SEARCH' : 'NORMAL'} list`);
           
           if (action && index >= 0) {
-            handleTableAction(action, index, transactionList);
+            handleTableAction(action, index, currentList);
             e.target.value = "";
           }
         }
