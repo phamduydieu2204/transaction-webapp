@@ -56,6 +56,20 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       startIndex + index;
     
     const globalIndex = actualIndex;
+    
+    // DEBUG: Log index calculations
+    if (index === 0) {
+      console.log('🔍 DEBUG - Index calculation:', {
+        isSearching: window.isSearching,
+        transactionId: transaction.transactionId,
+        localIndex: index,
+        startIndex: startIndex,
+        actualIndex: actualIndex,
+        globalIndex: globalIndex,
+        transactionListLength: transactionList.length,
+        windowTransactionListLength: window.transactionList ? window.transactionList.length : 0
+      });
+    }
     const endDate = parseDate(transaction.endDate);
     const isExpired = endDate < today;
     
@@ -148,6 +162,14 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
           const action = e.target.value;
           const index = parseInt(e.target.dataset.index);
           
+          console.log('🎯 DEBUG - Action triggered:', {
+            action: action,
+            dataIndex: index,
+            transactionListLength: transactionList.length,
+            windowTransactionListLength: window.transactionList ? window.transactionList.length : 0,
+            isSearching: window.isSearching
+          });
+          
           if (action && index >= 0) {
             handleTableAction(action, index, transactionList);
             e.target.value = "";
@@ -203,6 +225,16 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
  * Handle table actions efficiently
  */
 function handleTableAction(action, index, transactionList) {
+  console.log('🔧 DEBUG - handleTableAction called:', {
+    action: action,
+    index: index,
+    transactionAtIndex: transactionList[index] ? {
+      id: transactionList[index].transactionId,
+      name: transactionList[index].customerName
+    } : 'NOT FOUND',
+    transactionListLength: transactionList.length
+  });
+  
   switch(action) {
     case 'edit':
       window.editTransaction?.(index, transactionList, window.fetchSoftwareList, window.updatePackageList, window.updateAccountList);
@@ -211,6 +243,10 @@ function handleTableAction(action, index, transactionList) {
       window.deleteTransaction?.(index);
       break;
     case 'view':
+      console.log('👁️ DEBUG - Calling viewTransaction with:', {
+        index: index,
+        transaction: transactionList[index]
+      });
       window.viewTransaction?.(index, transactionList, window.formatDate, window.copyToClipboard);
       break;
     case 'updateCookie':

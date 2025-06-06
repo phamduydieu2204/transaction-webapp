@@ -4,12 +4,24 @@ import { detailModal } from './detailModalUnified.js';
 import { getConstants } from './constants.js';
 
 export async function viewTransaction(indexOrTransaction, transactionList, formatDate) {
+  console.log('🔍 DEBUG - viewTransaction called with:', {
+    indexOrTransaction: indexOrTransaction,
+    isNumber: typeof indexOrTransaction === 'number',
+    transactionListLength: transactionList ? transactionList.length : 0,
+    transactionListSample: transactionList ? transactionList.slice(0, 3).map(t => ({id: t.transactionId, name: t.customerName})) : null
+  });
+  
   // Handle both old way (index) and new way (transaction object)
   let transaction;
   
   if (typeof indexOrTransaction === 'number') {
     // Old way: index was passed
     transaction = transactionList ? transactionList[indexOrTransaction] : null;
+    console.log('📍 DEBUG - Got transaction by index:', {
+      index: indexOrTransaction,
+      found: !!transaction,
+      transactionId: transaction ? transaction.transactionId : 'NOT FOUND'
+    });
   } else {
     // New way: transaction object was passed
     transaction = indexOrTransaction;
