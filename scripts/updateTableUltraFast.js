@@ -49,17 +49,13 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
 
   // ✅ Build minimal HTML for visible rows only
   const rowsHtml = paginatedItems.map((transaction, index) => {
-    // For search results, use the actual index in the current list
+    // For search results, use the local index in the search results
     // For normal view, use globalIndex for pagination
-    const actualIndex = window.isSearching ? 
-      transactionList.findIndex(t => t.transactionId === transaction.transactionId) : 
-      startIndex + index;
-    
-    const globalIndex = actualIndex;
+    const dataIndex = window.isSearching ? index : startIndex + index;
     
     // DEBUG: Log mã giao dịch khi render bảng
     if (window.isSearching && index < 5) {
-      console.log(`🏷️ RENDER ROW ${index}: Mã giao dịch = ${transaction.transactionId}, Local Index = ${index}, Global Index = ${globalIndex}`);
+      console.log(`🏷️ RENDER ROW ${index}: Mã giao dịch = ${transaction.transactionId}, Local Index = ${index}, Data Index = ${dataIndex}`);
     }
     
     const endDate = parseDate(transaction.endDate);
@@ -117,7 +113,7 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     `;
 
     return `
-      <tr class="${isExpired ? 'expired-row' : ''}" data-index="${globalIndex}">
+      <tr class="${isExpired ? 'expired-row' : ''}" data-index="${dataIndex}">
         <td>${transaction.transactionId}</td>
         <td>${formatDate(transaction.transactionDate)}</td>
         <td>${transaction.transactionType}</td>
@@ -130,7 +126,7 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
         <td>${transaction.note || ""}</td>
         <td>${infoCell}</td>
         <td>
-          <select class="action-select" data-index="${globalIndex}">
+          <select class="action-select" data-index="${dataIndex}">
             ${actionOptions}
           </select>
         </td>
