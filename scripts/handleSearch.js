@@ -25,15 +25,7 @@ export async function handleSearch(
   // Kiểm tra có phải admin không
   const isAdmin = userInfo.vaiTro && userInfo.vaiTro.toLowerCase() === "admin";
   
-  console.log("🔍 DEBUG admin check:", {
-    vaiTro: userInfo.vaiTro,
-    vaiTroLowerCase: userInfo.vaiTro ? userInfo.vaiTro.toLowerCase() : null,
-    isAdmin: isAdmin
-  });
   
-  if (!isAdmin) {
-    console.log("⚠️ Không phải admin - một số điều kiện tìm kiếm sẽ bị bỏ qua: tên phần mềm, gói phần mềm, tên tài khoản, ngày giao dịch, ngày bắt đầu");
-  }
 
   const transactionType = getValue("transactionType");
   const transactionDate = isAdmin ? getValue("transactionDate") : "";
@@ -48,14 +40,6 @@ export async function handleSearch(
   const softwarePackage = isAdmin ? getValue("softwarePackage") : "";
   const accountName = isAdmin ? getValue("accountName") : "";
   
-  console.log("🔍 DEBUG restricted fields:", {
-    isAdmin: isAdmin,
-    softwareName: softwareName,
-    softwarePackage: softwarePackage,
-    accountName: accountName,
-    transactionDate: transactionDate,
-    startDate: startDate
-  });
   const revenue = getValue("revenue");
   const note = getValue("note");
 
@@ -81,7 +65,6 @@ export async function handleSearch(
     conditions: conditions
   };
 
-  console.log("📤 Dữ liệu tìm kiếm gửi đi:", JSON.stringify(data, null, 2));
 
   try {
     const response = await fetch(BACKEND_URL, {
@@ -111,10 +94,8 @@ export async function handleSearch(
         viewTransaction
       );
 
-      console.log('✅ Search successful, showing result modal');
       showResultModal(`Tìm kiếm thành công! Tìm thấy ${result.data.length} giao dịch.`, true);
     } else {
-      console.log('❌ Search failed, showing error modal');
       showResultModal(result.message || "Không thể tìm kiếm giao dịch!", false);
     }
   } catch (err) {

@@ -5,8 +5,6 @@ import { getConstants } from './constants.js';
 
 export async function viewTransaction(indexOrTransaction, transactionList, formatDate) {
   
-  // DEBUG: Log tham số nhận được
-  console.log(`👁️ VIEW TRANSACTION: Nhận được = ${typeof indexOrTransaction === 'object' ? 'OBJECT với mã: ' + indexOrTransaction.transactionId : 'INDEX: ' + indexOrTransaction}`);
   
   // Handle both old way (index) and new way (transaction object)
   let transaction;

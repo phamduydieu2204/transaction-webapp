@@ -53,10 +53,6 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     // For normal view, use globalIndex for pagination
     const dataIndex = window.isSearching ? index : startIndex + index;
     
-    // DEBUG: Log mã giao dịch khi render bảng
-    if (window.isSearching && index < 5) {
-      console.log(`🏷️ RENDER ROW ${index}: Mã giao dịch = ${transaction.transactionId}, Local Index = ${index}, Data Index = ${dataIndex}`);
-    }
     
     const endDate = parseDate(transaction.endDate);
     const isExpired = endDate < today;
@@ -150,10 +146,8 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
           const action = e.target.value;
           const index = parseInt(e.target.dataset.index);
           
-          // DEBUG: Log khi click action - use current active list
+          // Use current active list
           const currentList = window.isSearching ? window.transactionList : transactionList;
-          const selectedTransaction = currentList[index];
-          console.log(`🎯 ACTION CLICK: Action = ${action}, Index = ${index}, Mã giao dịch = ${selectedTransaction ? selectedTransaction.transactionId : 'NOT FOUND'}, Using ${window.isSearching ? 'SEARCH' : 'NORMAL'} list`);
           
           if (action && index >= 0) {
             handleTableAction(action, index, currentList);
@@ -213,7 +207,6 @@ function handleTableAction(action, index, transactionList) {
   
   // Get the actual transaction object
   const transaction = transactionList[index];
-  console.log(`🔧 HANDLE ACTION: Action = ${action}, Index = ${index}, Mã giao dịch = ${transaction ? transaction.transactionId : 'NOT FOUND'}`);
   
   if (!transaction) {
     console.error('Transaction not found at index:', index);
