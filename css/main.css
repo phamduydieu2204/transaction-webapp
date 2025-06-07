@@ -604,3 +604,22 @@ table {
     flex: none !important;
   }
 }
+
+/* Customer info cell styles */
+.customer-info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.customer-info-cell .customer-name {
+  font-weight: 600;
+  color: #2c3e50;
+  line-height: 1.2;
+}
+
+.customer-info-cell .customer-email {
+  font-size: 0.9em;
+  color: #7f8c8d;
+  line-height: 1.2;
+}

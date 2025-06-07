@@ -106,13 +106,20 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       </div>
     `;
 
+    // Create customer info cell with name and email
+    const customerInfoCell = `
+      <div class="customer-info-cell">
+        <div class="customer-name"><strong>${transaction.customerName}</strong></div>
+        <div class="customer-email">${transaction.customerEmail}</div>
+      </div>
+    `;
+
     return `
       <tr class="${isExpired ? 'expired-row' : ''}" data-index="${dataIndex}">
         <td>${transaction.transactionId}</td>
         <td>${formatDate(transaction.transactionDate)}</td>
         <td>${transaction.transactionType}</td>
-        <td>${transaction.customerName}</td>
-        <td>${transaction.customerEmail}</td>
+        <td>${customerInfoCell}</td>
         <td>${usageCycleCell}</td>
         <td>${transaction.deviceCount}</td>
         <td>${softwareInfo}</td>
@@ -239,10 +246,10 @@ function handleTableAction(action, index, transactionList) {
       if (window.isSearching && window.transactionList) {
         const globalIndex = window.transactionList.findIndex(t => t.transactionId === transaction.transactionId);
         if (globalIndex !== -1) {
-          window.handleUpdateCookie?.(globalIndex);
+          window.handleUpdateCookie?.(globalIndex, window.transactionList);
         }
       } else {
-        window.handleUpdateCookie?.(index);
+        window.handleUpdateCookie?.(index, transactionList);
       }
       break;
     case 'changePassword':
@@ -250,10 +257,10 @@ function handleTableAction(action, index, transactionList) {
       if (window.isSearching && window.transactionList) {
         const globalIndex = window.transactionList.findIndex(t => t.transactionId === transaction.transactionId);
         if (globalIndex !== -1) {
-          window.handleChangePassword?.(globalIndex);
+          window.handleChangePassword?.(globalIndex, window.transactionList);
         }
       } else {
-        window.handleChangePassword?.(index);
+        window.handleChangePassword?.(index, transactionList);
       }
       break;
     case 'checkAccess':
