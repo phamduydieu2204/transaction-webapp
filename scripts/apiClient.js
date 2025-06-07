@@ -1,6 +1,6 @@
 import { getConstants } from './constants.js';
 
-// API key for authentication
+// API key for vidieu.vn proxy authentication
 const API_KEY = 'vidieu_vn_transaction_proxy_2024_secure';
 
 /**
