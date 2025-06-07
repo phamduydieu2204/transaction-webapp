@@ -1,6 +1,8 @@
 export function getConstants() {
   return {
-    BACKEND_URL: 'https://vidieu.vn/api/proxy.php'
+    // Temporary: Use Heroku proxy for GitHub Pages testing
+    BACKEND_URL: 'https://transaction-webapp-proxy-4b2c79e5db75.herokuapp.com/proxy'
+    // Production will use: 'https://vidieu.vn/api/proxy.php'
   };
 }
 
