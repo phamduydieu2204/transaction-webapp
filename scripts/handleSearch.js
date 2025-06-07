@@ -1,4 +1,4 @@
-import { getConstants } from './constants.js';
+import { apiRequestJson } from './apiClient.js';
 
 export async function handleSearch(
   userInfo,
@@ -17,7 +17,6 @@ export async function handleSearch(
   }
 
   showProcessingModal("Đang tìm kiếm giao dịch...");
-  const { BACKEND_URL } = getConstants();
   const conditions = {};
 
   const getValue = (id) => document.getElementById(id)?.value?.trim() || "";
@@ -67,13 +66,7 @@ export async function handleSearch(
 
 
   try {
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-
-    const result = await response.json();
+    const result = await apiRequestJson(data);
     window.isSearching = true;
     if (result.status === "success") {
       window.transactionList = result.data || [];
