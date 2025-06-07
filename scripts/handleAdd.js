@@ -1,6 +1,6 @@
 // handleAdd.js
 
-import { getConstants } from './constants.js';
+import { apiRequestJson } from './apiClient.js';
 import { showProcessingModal } from './showProcessingModal.js';
 import { showResultModal } from './showResultModal.js';
 import { loadTransactions } from './loadTransactions.js';
@@ -43,8 +43,6 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
   const { setDefaultDates } = await import('./calculateEndDate.js');
   setDefaultDates(true);
   console.log("📅 Updated dates to today for new transaction");
-
-  const { BACKEND_URL } = getConstants();
 
   if (!userInfo) {
     showResultModal("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.", false);
@@ -126,15 +124,7 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
   console.log("📤 Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
 
   try {
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
-    });
-
-    const result = await response.json();
+    const result = await apiRequestJson(data);
     if (result.status === "success") {
       // Reset form về giá trị mặc định
       document.getElementById("transactionForm").reset();

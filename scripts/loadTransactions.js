@@ -1,6 +1,6 @@
 // CÁCH 2: Cải thiện hàm loadTransactions trong file loadTransactions.js
 
-import { getConstants } from './constants.js';
+import { apiRequestJson } from './apiClient.js';
 import { deduplicateRequest } from './core/requestOptimizer.js';
 
 /**
@@ -29,7 +29,6 @@ export async function loadTransactionsOptimized(userInfo, updateTable, formatDat
 
   console.log(`🔄 Loading transactions (page ${page}, limit ${limit})...`);
   
-  const { BACKEND_URL } = getConstants();
   const data = {
     action: "getTransactions",
     maNhanVien: userInfo.maNhanVien,
@@ -60,22 +59,17 @@ export async function loadTransactionsOptimized(userInfo, updateTable, formatDat
         const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
 
         try {
-          const response = await fetch(BACKEND_URL, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data),
-            signal: controller.signal
-          });
+          // Create a custom fetch with timeout since apiRequestJson doesn't support signal
+          const response = await Promise.race([
+            apiRequestJson(data),
+            new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('Request timeout')), 10000)
+            )
+          ]);
 
           clearTimeout(timeoutId);
 
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-          }
-
-          return await response.json();
+          return response;
         } catch (error) {
           clearTimeout(timeoutId);
           throw error;

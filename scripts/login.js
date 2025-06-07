@@ -1,4 +1,4 @@
-import { getConstants } from './constants.js';
+import { apiRequestJson } from './apiClient.js';
 
 export function togglePassword() {
   const passwordInput = document.getElementById('password');
@@ -8,7 +8,6 @@ export function togglePassword() {
 export async function handleLogin() {
   console.log("Bắt đầu đăng nhập...");
 
-  const { BACKEND_URL } = getConstants();
   const employeeCode = document.getElementById('employeeCode').value.trim().toUpperCase();
   const password = document.getElementById('password').value.trim();
   const errorEl = document.getElementById('errorMessage');
@@ -25,19 +24,7 @@ export async function handleLogin() {
   };
 
   try {
-    const response = await fetch(BACKEND_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const result = await response.json();
+    const result = await apiRequestJson(body);
 
     if (result.status === 'success') {
     const employeeInfo = {

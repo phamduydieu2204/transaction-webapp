@@ -613,13 +613,13 @@ table {
 }
 
 .customer-info-cell .customer-name {
-  font-weight: 600;
-  color: #2c3e50;
+  font-weight: bold;
+  color: inherit;
   line-height: 1.2;
 }
 
 .customer-info-cell .customer-email {
-  font-size: 0.9em;
-  color: #7f8c8d;
+  font-size: inherit;
+  color: inherit;
   line-height: 1.2;
 }
