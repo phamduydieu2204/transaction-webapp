@@ -19,6 +19,7 @@
     
     <button onclick="testProxy()">Test Proxy Connection</button>
     <button onclick="testLogin()">Test Login</button>
+    <button onclick="testGASDirectly()">Test Google Apps Script Directly</button>
     
     <div id="result"></div>
 
@@ -89,6 +90,40 @@ Response: ${JSON.stringify(data, null, 2)}
             } catch (error) {
                 resultDiv.className = 'result error';
                 resultDiv.innerHTML = `Error: ${error.message}`;
+            }
+        };
+        
+        window.testGASDirectly = async function() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing Google Apps Script directly...';
+            
+            try {
+                // Test direct connection to Google Apps Script (will likely be blocked by CORS)
+                const gasUrl = 'https://script.google.com/macros/s/AKfycbzgiZ8jgMcrfFokTlneXk7vqWaYAtAVAXe7QgGzLKA5lbjoveDrq8kpNogSHOvgwDry/exec';
+                
+                const response = await fetch(gasUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ action: 'test' })
+                });
+                
+                const data = await response.text(); // Use text() instead of json() for HTML responses
+                
+                resultDiv.className = 'result ' + (response.ok ? 'success' : 'error');
+                resultDiv.innerHTML = `
+Direct GAS Test:
+Status: ${response.status}
+Response: ${data.substring(0, 500)}...
+                `;
+                
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+Direct GAS Test Error: ${error.message}
+Note: Đây là bình thường vì CORS. Google Apps Script cần proxy.
+                `;
             }
         };
     </script>
