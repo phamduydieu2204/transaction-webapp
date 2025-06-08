@@ -1,8 +1,5 @@
 import { getConstants } from './constants.js';
 
-// API key for vidieu.vn proxy authentication
-const API_KEY = 'vidieu_vn_transaction_proxy_2024_secure';
-
 /**
  * Helper function to make API requests with proper headers
  * @param {Object} data - Request data
@@ -14,8 +11,7 @@ export async function apiRequest(data) {
   return fetch(BACKEND_URL, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      'X-API-Key': API_KEY
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify(data)
   });
