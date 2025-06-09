@@ -8,8 +8,7 @@
   <!-- CSS Files -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="css/full-width-override.css">
+  <!-- Local CSS will be loaded with version control -->
 </head>
 <body>
   <div class="container">
@@ -46,9 +45,19 @@
     <div id="modals-container"></div>
   </div>
 
+  <!-- Version Manager - Load first -->
+  <script src="scripts/versionManager.js"></script>
+  
   <!-- Scripts -->
   <script>
     console.log('🔥 Index.html: Basic script loaded');
+    
+    // Load CSS with version control
+    versionManager.loadCSS('css/main.css', 'main-css');
+    versionManager.loadCSS('css/full-width-override.css', 'override-css');
+    
+    // Start auto-check for updates
+    versionManager.startAutoCheck();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script type="module">
