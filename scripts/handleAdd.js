@@ -1,23 +1,22 @@
 // handleAdd.js
 
 import { apiRequestJson } from './apiClient.js';
-import { showProcessingModal } from './showProcessingModal.js';
 import { showResultModal } from './showResultModal.js';
-import { loadTransactions } from './loadTransactions.js';
-import { updatePackageList } from './updatePackageList.js';
-import { handleReset } from './handleReset.js';
 import { updateTable } from './updateTable.js';
 import { formatDate } from './formatDate.js';
 import { editTransaction } from './editTransaction.js';
 import { deleteTransaction } from './deleteTransaction.js';
 import { viewTransaction } from './viewTransaction.js';
 import { openAddOrUpdateModal } from './handleAddOrUpdateModal.js';
-import { fetchSoftwareList } from './fetchSoftwareList.js'; // <<== thêm
-import { updateAccountList } from './updateAccountList.js'; // <<== thêm
 import { updateState } from './core/stateManager.js';
 import { validateBeforeOperation } from './core/sessionValidator.js';
 import { cacheManager } from './core/cacheManager.js';
 import { uiBlocker } from './uiBlocker.js';
+import { updateTable } from './updateTable.js';
+import { formatDate } from './formatDate.js';
+import { editTransaction } from './editTransaction.js';
+import { deleteTransaction } from './deleteTransaction.js';
+import { viewTransaction } from './viewTransaction.js';
 
 // Hàm lấy todayFormatted - luôn lấy ngày hiện tại
 function getTodayFormatted() {
@@ -141,35 +140,44 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
   try {
     const result = await apiRequestJson(data);
     if (result.status === "success") {
-      // Reset form về giá trị mặc định
+      // Tạo object giao dịch mới với data từ server
+      const newTransaction = {
+        transactionId: result.transactionId || `GD${Date.now()}`,
+        ...data,
+        transactionDate: data.transactionDate,
+        timestamp: Date.now()
+      };
+      
+      // Thêm giao dịch mới vào đầu danh sách (optimistic update)
+      if (!window.transactionList) {
+        window.transactionList = [];
+      }
+      window.transactionList.unshift(newTransaction);
+      
+      // Update table ngay lập tức
+      updateTable(window.transactionList, 1, window.itemsPerPage || 10, 
+                 formatDate, editTransaction, deleteTransaction, viewTransaction);
+      
+      // Reset form và các dropdown
       document.getElementById("transactionForm").reset();
-      // Reset các dropdown
       document.getElementById("softwareName").value = "";
       document.getElementById("softwarePackage").innerHTML = '<option value="">-- Chọn gói --</option>';
       document.getElementById("accountName").innerHTML = '<option value="">-- Chọn tài khoản --</option>';
-      // Reset currentEditTransactionId sau khi thêm thành công
+      
+      // Reset currentEditTransactionId
       window.currentEditTransactionId = null;
       updateState({ currentEditTransactionId: null });
       
-      // Force clear all caches trước khi load lại
+      // Clear cache
       cacheManager.clearTransactionCaches();
       
-      // Cập nhật lại danh sách giao dịch từ server
-      await window.loadTransactions();
-      
-      // Double check để đảm bảo table được update
-      if (window.transactionList && window.transactionList.length > 0) {
-        const { updateTable } = await import('./updateTable.js');
-        const { formatDate } = await import('./formatDate.js');
-        const { editTransaction } = await import('./editTransaction.js');
-        const { deleteTransaction } = await import('./deleteTransaction.js');
-        const { viewTransaction } = await import('./viewTransaction.js');
-        
-        updateTable(window.transactionList, window.currentPage || 1, window.itemsPerPage || 10, 
-                   formatDate, editTransaction, deleteTransaction, viewTransaction);
-      }
-      
+      // Hiển thị thông báo thành công
       showResultModal("Giao dịch đã được lưu!", true);
+      
+      // Load lại data từ server trong background để đồng bộ
+      setTimeout(() => {
+        window.loadTransactions();
+      }, 1000);
     } else {
       showResultModal(result.message || "Không thể lưu giao dịch!", false);
     }

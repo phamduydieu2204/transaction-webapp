@@ -16,8 +16,13 @@ const VALIDATION_CONFIG = {
   onPageLoadCheck: true, // Check immediately on page load
   retryAttempts: 3,
   retryDelay: 2000,
-  immediateTimeout: 5000 // Faster timeout for immediate validation
+  immediateTimeout: 5000, // Faster timeout for immediate validation
+  operationCacheTime: 30 * 1000 // Cache validation for 30 seconds for operations
 };
+
+// Cache for operation validations
+let lastOperationValidation = 0;
+let lastOperationResult = false;
 
 /**
  * Last validation timestamp
@@ -402,8 +407,20 @@ export async function validateBeforeOperation() {
     return false;
   }
   
+  // Check cache first
+  const now = Date.now();
+  if (now - lastOperationValidation < VALIDATION_CONFIG.operationCacheTime) {
+    console.log('✅ Using cached validation result:', lastOperationResult);
+    return lastOperationResult;
+  }
+  
   try {
     const isValid = await validateWithServer(user);
+    
+    // Update cache
+    lastOperationValidation = now;
+    lastOperationResult = isValid;
+    
     if (!isValid) {
       console.error('❌ Session invalid for operation');
       await handleInvalidSession();
