@@ -221,7 +221,6 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
         </div>
         <div class="customer-email" style="display: flex; align-items: center;">
           <button class="copy-btn" data-content="${(transaction.customerEmail || "").replace(/"/g, '&quot;')}" title="Sao chép email khách hàng" style="margin-right: 4px; padding: 1px 3px; font-size: 10px; border: none; background: none; cursor: pointer;">📋</button>
-          <span style="margin-right: 4px; font-size: 12px;">📧</span>
           <span style="flex: 1;">${transaction.customerEmail}</span>
         </div>
       </div>
