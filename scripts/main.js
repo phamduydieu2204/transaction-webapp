@@ -14,6 +14,7 @@ import { switchToTab, initializeTabSystem, switchToIntendedTab } from './core/na
 import { initializeTabPermissions } from './core/tabPermissions.js';
 import { initializeSessionValidation, validateSessionImmediate } from './core/sessionValidator.js';
 import { authManager } from './core/authManager.js';
+import './debugAuth.js'; // Debug functions
 
 // Import essential utilities (use unified modal system)
 import { showProcessingModal, showResultModal, closeProcessingModal } from './modalUnified.js';
