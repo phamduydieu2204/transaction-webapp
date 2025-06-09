@@ -58,6 +58,7 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
 
   if (!userInfo) {
     showResultModal("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.", false);
+    uiBlocker.unblock();
     return;
   }
 
@@ -91,6 +92,7 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
       if (isNaN(numValue) || numValue <= 0) {
         showResultModal("Thiếu dữ liệu bắt buộc, vui lòng kiểm tra lại", false);
         element.focus();
+        uiBlocker.unblock();
         return;
       }
     } else {
@@ -98,12 +100,13 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
       if (!value || value.trim() === "" || value === "0") {
         showResultModal("Thiếu dữ liệu bắt buộc, vui lòng kiểm tra lại", false);
         element.focus();
+        uiBlocker.unblock();
         return;
       }
     }
   }
 
-  showProcessingModal("Đang thêm giao dịch...");
+  // Không cần gọi showProcessingModal vì đã có uiBlocker
 
   const transactionType = document.getElementById("transactionType").value;
   let note = document.getElementById("note").value;

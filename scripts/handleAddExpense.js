@@ -36,7 +36,7 @@ export async function handleAddExpense() {
 
   const { BACKEND_URL } = getConstants();
 
-  showProcessingModal("Đang lưu chi phí...");
+  // Không cần gọi showProcessingModal vì đã có uiBlocker
 
   try {
     const response = await fetch(BACKEND_URL, {
@@ -46,7 +46,7 @@ export async function handleAddExpense() {
     });
 
     const result = await response.json();
-    closeProcessingModal();
+    // Không cần closeProcessingModal vì dùng uiBlocker
     
     if (result.status === "success") {
       showResultModal(`Chi phí đã được lưu! Mã chi phí: ${result.chiPhiId}`, true);
@@ -66,7 +66,7 @@ export async function handleAddExpense() {
       showResultModal(`Không thể lưu chi phí: ${result.message}`, false);
     }
   } catch (err) {
-    closeProcessingModal();
+    // Không cần closeProcessingModal vì dùng uiBlocker
     showResultModal(`Lỗi khi gửi dữ liệu: ${err.message}`, false);
   } finally {
     // Luôn mở khóa UI khi kết thúc
