@@ -64,9 +64,34 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     );
 
     // Simplified phone display
-    const phoneDisplay = isLink(transaction.customerPhone)
-      ? `<a href="${transaction.customerPhone}" target="_blank">🔗</a>`
-      : (transaction.customerPhone || "").substring(0, 20);
+    // Process contact info with proper icons and formatting
+    const contactInfo = transaction.customerPhone || "";
+    const isContactLink = isLink(contactInfo);
+    
+    let contactIcon = '📞'; // Default phone icon
+    let contactDisplay = contactInfo;
+    
+    if (isContactLink) {
+      if (contactInfo.includes('mailto:')) {
+        contactIcon = '📧';
+        contactDisplay = `<a href="${contactInfo}" target="_blank" style="color: inherit; text-decoration: underline;">${contactInfo.replace('mailto:', '')}</a>`;
+      } else if (contactInfo.includes('tel:')) {
+        contactIcon = '📞';
+        contactDisplay = `<a href="${contactInfo}" target="_blank" style="color: inherit; text-decoration: underline;">${contactInfo.replace('tel:', '')}</a>`;
+      } else {
+        contactIcon = '🔗';
+        contactDisplay = `<a href="${contactInfo}" target="_blank" style="color: inherit; text-decoration: underline;">${contactInfo}</a>`;
+      }
+    } else if (contactInfo.includes('@')) {
+      contactIcon = '📧';
+      contactDisplay = contactInfo;
+    } else if (contactInfo.match(/^\+?[\d\s\-\(\)]+$/)) {
+      contactIcon = '📞';
+      contactDisplay = contactInfo;
+    } else {
+      contactIcon = '👤';
+      contactDisplay = contactInfo;
+    }
 
     // Get employee code from various possible fields
     const employeeCode = transaction.maNhanVien || 
@@ -123,15 +148,24 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       console.log('🔍 [UltraFast] Employee code determined:', employeeCode);
     }
 
-    // Info cell with employee badge
+    // Info cell with employee badge and improved layout
     const infoCell = `
-      <div class="info-cell-container" style="position: relative; min-height: 40px; padding-top: 12px;">
+      <div class="info-cell-container" style="position: relative; min-height: 50px; padding-top: 14px; line-height: 1.2;">
         <span class="employee-badge" style="position: absolute; top: 2px; right: 2px; font-size: 11px; color: ${employeeColor.textColor}; font-weight: bold; background: ${employeeColor.bg}; padding: 2px 6px; border-radius: 4px; z-index: 10; border: 1px solid ${employeeColor.border}; box-shadow: 0 1px 2px rgba(0,0,0,0.2); display: block !important;">${employeeCode}</span>
-        <div class="info-cell-content">
-          <div>${phoneDisplay}</div>
-          <div>
-            Thông tin đơn hàng
-            <button class="copy-btn" data-content="${(transaction.orderInfo || "").replace(/"/g, '&quot;')}" title="Copy order info">📋</button>
+        
+        <div class="info-cell-content" style="position: relative; z-index: 1;">
+          <!-- Contact Info Line -->
+          <div class="contact-info-line" style="display: flex; align-items: center; margin-bottom: 3px; white-space: nowrap; overflow: hidden;">
+            <span style="margin-right: 4px; font-size: 12px;">${contactIcon}</span>
+            <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; font-size: 12px;">${contactDisplay}</span>
+            <button class="copy-btn" data-content="${contactInfo.replace(/"/g, '&quot;')}" title="Sao chép thông tin liên hệ" style="margin-left: 4px; padding: 1px 3px; font-size: 10px; border: none; background: none; cursor: pointer;">📋</button>
+          </div>
+          
+          <!-- Order Info Line -->
+          <div class="order-info-line" style="display: flex; align-items: center; white-space: nowrap; overflow: hidden;">
+            <span style="margin-right: 4px; font-size: 12px;">📦</span>
+            <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; font-size: 12px;">Thông tin đơn hàng</span>
+            <button class="copy-btn" data-content="${(transaction.orderInfo || "").replace(/"/g, '&quot;')}" title="Sao chép thông tin đơn hàng" style="margin-left: 4px; padding: 1px 3px; font-size: 10px; border: none; background: none; cursor: pointer;">📋</button>
           </div>
         </div>
       </div>
