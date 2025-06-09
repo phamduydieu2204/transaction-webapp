@@ -170,14 +170,14 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
         <div class="contact-info-line" style="display: flex; align-items: center; margin-bottom: 2px; white-space: nowrap; overflow: hidden;">
           <span style="margin-right: 4px; font-size: 12px;">${contactIcon}</span>
           <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; font-size: 12px;">${contactDisplay}</span>
-          <button class="copy-btn" data-content="${contactInfo.replace(/"/g, '&quot;')}" title="Sao chép thông tin liên hệ" style="margin-left: 4px; padding: 1px 3px; font-size: 10px; border: none; background: none; cursor: pointer;">📋</button>
+          <button class="copy-btn" data-content="${contactInfo.replace(/"/g, '&quot;')}" title="Sao chép thông tin liên hệ" style="margin-left: 4px; padding: 2px; font-size: 12px; border: 1px solid #ccc; background: #f8f9fa; cursor: pointer; border-radius: 3px;">📄</button>
         </div>
         
         <!-- Line 3: Order Info -->
         <div class="order-info-line" style="display: flex; align-items: center; white-space: nowrap; overflow: hidden;">
           <span style="margin-right: 4px; font-size: 12px;">📦</span>
           <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; font-size: 12px;">Thông tin đơn hàng</span>
-          <button class="copy-btn" data-content="${(transaction.orderInfo || "").replace(/"/g, '&quot;')}" title="Sao chép thông tin đơn hàng" style="margin-left: 4px; padding: 1px 3px; font-size: 10px; border: none; background: none; cursor: pointer;">📋</button>
+          <button class="copy-btn" data-content="${(transaction.orderInfo || "").replace(/"/g, '&quot;')}" title="Sao chép thông tin đơn hàng" style="margin-left: 4px; padding: 2px; font-size: 12px; border: 1px solid #ccc; background: #f8f9fa; cursor: pointer; border-radius: 3px;">📄</button>
         </div>
       </div>
     `;
@@ -216,11 +216,11 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     const customerInfoCell = `
       <div class="customer-info-cell">
         <div class="customer-name" style="display: flex; align-items: center; margin-bottom: 2px;">
-          <span style="margin-right: 4px; font-size: 12px;">👤</span>
+          <span style="display: inline-block; width: 16px; text-align: center; margin-right: 4px; font-size: 12px;">👤</span>
           <strong style="flex: 1;">${transaction.customerName}</strong>
         </div>
         <div class="customer-email" style="display: flex; align-items: center;">
-          <button class="copy-btn" data-content="${(transaction.customerEmail || "").replace(/"/g, '&quot;')}" title="Sao chép email khách hàng" style="margin-right: 4px; padding: 1px 3px; font-size: 10px; border: none; background: none; cursor: pointer;">📋</button>
+          <button class="copy-btn" data-content="${(transaction.customerEmail || "").replace(/"/g, '&quot;')}" title="Sao chép email khách hàng" style="display: inline-block; width: 16px; text-align: center; margin-right: 4px; padding: 2px; font-size: 12px; border: 1px solid #ccc; background: #f8f9fa; cursor: pointer; border-radius: 3px;">📄</button>
           <span style="flex: 1;">${transaction.customerEmail}</span>
         </div>
       </div>

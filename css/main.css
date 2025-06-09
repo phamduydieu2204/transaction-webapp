@@ -635,20 +635,31 @@ table {
   flex: 1;
 }
 
-/* Copy button styling in customer cell */
-.customer-info-cell .copy-btn {
-  margin-right: 4px;
-  padding: 1px 3px;
-  font-size: 10px;
-  border: none;
-  background: none;
+/* Global copy button styling */
+.copy-btn {
+  padding: 2px 4px;
+  font-size: 12px;
+  border: 1px solid #ccc;
+  background: #f8f9fa;
   cursor: pointer;
-  opacity: 0.7;
-  transition: opacity 0.2s;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+  color: #333;
 }
 
-.customer-info-cell .copy-btn:hover {
-  opacity: 1;
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 2px;
+.copy-btn:hover {
+  background: #e9ecef;
+  border-color: #999;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.copy-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Specific copy button styling in customer cell */
+.customer-info-cell .copy-btn {
+  margin-right: 4px;
 }
