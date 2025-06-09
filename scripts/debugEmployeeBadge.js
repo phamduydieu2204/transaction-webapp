@@ -105,20 +105,28 @@ export function forceTableUpdateAndDebug() {
   console.log('🔄 Forcing table update and debug...');
   
   // Trigger table update if possible
-  if (window.transactionList && window.updateTable && window.formatDate) {
+  if (window.transactionList && window.formatDate) {
     const currentPage = window.currentPage || 1;
     const itemsPerPage = window.itemsPerPage || 10;
     
     console.log('🔄 Updating table with current data...');
-    window.updateTable(
-      window.transactionList, 
-      currentPage, 
-      itemsPerPage, 
-      window.formatDate, 
-      window.editTransaction, 
-      window.deleteTransaction, 
-      window.viewTransaction
-    );
+    
+    // Try to use the correct update function
+    const updateFn = window.updateTableUltraFast || window.updateTable;
+    if (updateFn && typeof updateFn === 'function') {
+      console.log('🔄 Using update function:', updateFn.name);
+      updateFn(
+        window.transactionList, 
+        currentPage, 
+        itemsPerPage, 
+        window.formatDate, 
+        window.editTransaction, 
+        window.deleteTransaction, 
+        window.viewTransaction
+      );
+    } else {
+      console.log('❌ No update function found');
+    }
     
     // Debug after update
     setTimeout(() => {

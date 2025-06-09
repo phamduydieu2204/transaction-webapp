@@ -68,11 +68,36 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       ? `<a href="${transaction.customerPhone}" target="_blank">🔗</a>`
       : (transaction.customerPhone || "").substring(0, 20);
 
-    // Simplified info cell
+    // Get employee code from various possible fields
+    const employeeCode = transaction.maNhanVien || 
+                        transaction.employeeCode || 
+                        transaction.staffCode || 
+                        transaction.user || 
+                        transaction.creator || 
+                        'ADMIN';
+
+    // Debug employee code for first transaction
+    if (index === 0) {
+      console.log('🔍 [UltraFast] First transaction employee data:', {
+        maNhanVien: transaction.maNhanVien,
+        tenNhanVien: transaction.tenNhanVien,
+        employeeCode: employeeCode,
+        allKeys: Object.keys(transaction)
+      });
+      console.log('🔍 [UltraFast] Employee code determined:', employeeCode);
+    }
+
+    // Info cell with employee badge
     const infoCell = `
-      <div>${phoneDisplay}</div>
-      <div>
-        <button class="copy-btn" data-content="${(transaction.orderInfo || "").replace(/"/g, '&quot;')}" title="Copy order info">📋</button>
+      <div class="info-cell-container" style="position: relative; min-height: 40px; padding-top: 12px;">
+        <span class="employee-badge" style="position: absolute; top: 2px; right: 2px; font-size: 11px; color: #fff; font-weight: bold; background: #007bff; padding: 2px 6px; border-radius: 4px; z-index: 10; border: 1px solid #0056b3; box-shadow: 0 1px 2px rgba(0,0,0,0.2); display: block !important;">${employeeCode}</span>
+        <div class="info-cell-content">
+          <div>${phoneDisplay}</div>
+          <div>
+            Thông tin đơn hàng
+            <button class="copy-btn" data-content="${(transaction.orderInfo || "").replace(/"/g, '&quot;')}" title="Copy order info">📋</button>
+          </div>
+        </div>
       </div>
     `;
 
