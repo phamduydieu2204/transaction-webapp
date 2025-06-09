@@ -17,8 +17,8 @@ class VersionManager {
     if (this.isDevelopment) {
       return Date.now();
     }
-    // Version production - cập nhật khi deploy
-    return '1.0.0';
+    // Version production - cập nhật khi deploy (incremented for new layout)
+    return '1.1.0';
   }
 
   // Thêm version vào URL

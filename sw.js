@@ -2,8 +2,8 @@
  * Service Worker - Smart Cache Management
  */
 
-const CACHE_NAME = 'transaction-app-v1';
-const DYNAMIC_CACHE = 'transaction-app-dynamic-v1';
+const CACHE_NAME = 'transaction-app-v1.1.0';
+const DYNAMIC_CACHE = 'transaction-app-dynamic-v1.1.0';
 
 // Files to cache on install
 const STATIC_ASSETS = [
