@@ -104,6 +104,35 @@ export function debugEmployeeBadgeAfterRender() {
 export function forceTableUpdateAndDebug() {
   console.log('🔄 Forcing table update and debug...');
   
+  // Try to trigger loadTransactions to refresh data and table
+  if (window.loadTransactions && typeof window.loadTransactions === 'function' && window.userInfo) {
+    console.log('🔄 Triggering loadTransactions to refresh table...');
+    
+    window.loadTransactions(
+      window.userInfo,
+      window.updateTableUltraFast || window.updateTable,
+      window.formatDate,
+      window.editTransaction,
+      window.deleteTransaction,
+      window.viewTransaction
+    ).then(() => {
+      console.log('✅ Load transactions completed');
+      setTimeout(() => {
+        debugEmployeeBadge();
+      }, 300);
+    }).catch(err => {
+      console.log('❌ Load transactions failed:', err);
+      fallbackTableUpdate();
+    });
+  } else {
+    fallbackTableUpdate();
+  }
+}
+
+// Fallback table update method
+function fallbackTableUpdate() {
+  console.log('🔄 Using fallback table update...');
+  
   // Trigger table update if possible
   if (window.transactionList && window.formatDate) {
     const currentPage = window.currentPage || 1;
@@ -181,8 +210,33 @@ export function testEmployeeColors() {
   console.log('🎨 === COLOR TEST END ===');
 }
 
+// Quick reload to see new layout
+export function quickReload() {
+  console.log('🔄 Reloading page to see new layout...');
+  window.location.reload(true);
+}
+
+// Check which update function is being used
+export function checkUpdateFunction() {
+  console.log('🔍 === UPDATE FUNCTION CHECK ===');
+  console.log('🔍 window.updateTable exists:', typeof window.updateTable);
+  console.log('🔍 window.updateTableUltraFast exists:', typeof window.updateTableUltraFast);
+  console.log('🔍 window.loadTransactions exists:', typeof window.loadTransactions);
+  console.log('🔍 window.userInfo exists:', !!window.userInfo);
+  console.log('🔍 window.formatDate exists:', typeof window.formatDate);
+  
+  // Check main.js imports
+  console.log('🔍 Checking imports in main.js...');
+  const scripts = document.querySelectorAll('script[src*="main.js"]');
+  console.log('🔍 Main.js scripts found:', scripts.length);
+  
+  console.log('🔍 === END CHECK ===');
+}
+
 // Make available globally
 window.debugEmployeeBadge = debugEmployeeBadge;
 window.debugEmployeeBadgeAfterRender = debugEmployeeBadgeAfterRender;
 window.forceTableUpdateAndDebug = forceTableUpdateAndDebug;
 window.testEmployeeColors = testEmployeeColors;
+window.quickReload = quickReload;
+window.checkUpdateFunction = checkUpdateFunction;
