@@ -50,6 +50,8 @@
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 120px; /* Additional safety limit */
 }
 
 /* Copy buttons in info cell */

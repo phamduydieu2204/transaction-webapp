@@ -316,27 +316,37 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     
     let contactIcon = '📞'; // Default phone icon
     let contactDisplay = contactInfo;
+    let truncatedContactDisplay = contactInfo;
+    
+    // Truncate contact info to 15 characters for display
+    if (contactInfo.length > 15) {
+      truncatedContactDisplay = contactInfo.substring(0, 15) + '...';
+    }
     
     if (isContactLink) {
       if (contactInfo.includes('mailto:')) {
         contactIcon = '📧';
-        contactDisplay = `<a href="${contactInfo}" target="_blank" style="color: inherit; text-decoration: underline;">${contactInfo.replace('mailto:', '')}</a>`;
+        const emailContent = contactInfo.replace('mailto:', '');
+        const truncatedEmail = emailContent.length > 15 ? emailContent.substring(0, 15) + '...' : emailContent;
+        contactDisplay = `<a href="${contactInfo}" target="_blank" style="color: inherit; text-decoration: underline;" title="${emailContent}">${truncatedEmail}</a>`;
       } else if (contactInfo.includes('tel:')) {
         contactIcon = '📞';
-        contactDisplay = `<a href="${contactInfo}" target="_blank" style="color: inherit; text-decoration: underline;">${contactInfo.replace('tel:', '')}</a>`;
+        const telContent = contactInfo.replace('tel:', '');
+        const truncatedTel = telContent.length > 15 ? telContent.substring(0, 15) + '...' : telContent;
+        contactDisplay = `<a href="${contactInfo}" target="_blank" style="color: inherit; text-decoration: underline;" title="${telContent}">${truncatedTel}</a>`;
       } else {
         contactIcon = '🔗';
-        contactDisplay = `<a href="${contactInfo}" target="_blank" style="color: inherit; text-decoration: underline;">${contactInfo}</a>`;
+        contactDisplay = `<a href="${contactInfo}" target="_blank" style="color: inherit; text-decoration: underline;" title="${contactInfo}">${truncatedContactDisplay}</a>`;
       }
     } else if (contactInfo.includes('@')) {
       contactIcon = '📧';
-      contactDisplay = contactInfo;
+      contactDisplay = `<span title="${contactInfo}">${truncatedContactDisplay}</span>`;
     } else if (contactInfo.match(/^\+?[\d\s\-\(\)]+$/)) {
       contactIcon = '📞';
-      contactDisplay = contactInfo;
+      contactDisplay = `<span title="${contactInfo}">${truncatedContactDisplay}</span>`;
     } else {
       contactIcon = '👤';
-      contactDisplay = contactInfo;
+      contactDisplay = `<span title="${contactInfo}">${truncatedContactDisplay}</span>`;
     }
 
     // Get employee code from various possible fields

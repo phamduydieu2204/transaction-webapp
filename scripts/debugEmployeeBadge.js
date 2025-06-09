@@ -233,6 +233,27 @@ export function checkUpdateFunction() {
   console.log('🔍 === END CHECK ===');
 }
 
+// Test contact truncation
+export function testContactTruncation() {
+  console.log('✂️ === CONTACT TRUNCATION TEST ===');
+  
+  const testContacts = [
+    'user@example.com',
+    'verylongusername@verylongdomain.com',
+    'https://example.com/very/long/url/path',
+    '+1-234-567-8900',
+    'Short text',
+    'This is a very long contact information that should be truncated'
+  ];
+  
+  testContacts.forEach(contact => {
+    const truncated = contact.length > 15 ? contact.substring(0, 15) + '...' : contact;
+    console.log(`✂️ "${contact}" → "${truncated}" (${contact.length} → ${truncated.length} chars)`);
+  });
+  
+  console.log('✂️ === TRUNCATION TEST END ===');
+}
+
 // Make available globally
 window.debugEmployeeBadge = debugEmployeeBadge;
 window.debugEmployeeBadgeAfterRender = debugEmployeeBadgeAfterRender;
@@ -240,3 +261,4 @@ window.forceTableUpdateAndDebug = forceTableUpdateAndDebug;
 window.testEmployeeColors = testEmployeeColors;
 window.quickReload = quickReload;
 window.checkUpdateFunction = checkUpdateFunction;
+window.testContactTruncation = testContactTruncation;
