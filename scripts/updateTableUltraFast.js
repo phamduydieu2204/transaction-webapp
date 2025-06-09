@@ -158,25 +158,26 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       console.log('🔍 [UltraFast] Employee code determined:', employeeCode);
     }
 
-    // Info cell with employee badge and improved layout
+    // Info cell with 3-line layout: employee code (right), contact, order info
     const infoCell = `
       <div class="info-cell-container" style="position: relative; line-height: 1.2;">
-        <span class="employee-badge" style="position: absolute; top: 0; right: 0; font-size: 10px; color: ${employeeColor.textColor}; font-weight: bold; background: ${employeeColor.bg}; padding: 1px 4px; border-radius: 0 0 0 3px; z-index: 20; border: 1px solid ${employeeColor.border}; box-shadow: 0 1px 2px rgba(0,0,0,0.2); display: block !important; pointer-events: none;">${employeeCode}</span>
+        <!-- Line 1: Employee Code (right aligned) -->
+        <div class="employee-line" style="display: flex; align-items: center; justify-content: flex-end; margin-bottom: 2px; white-space: nowrap; overflow: hidden;">
+          <span class="employee-badge" style="font-size: 10px; color: ${employeeColor.textColor}; font-weight: bold; background: ${employeeColor.bg}; padding: 1px 4px; border-radius: 3px; border: 1px solid ${employeeColor.border}; box-shadow: 0 1px 2px rgba(0,0,0,0.2);">${employeeCode}</span>
+        </div>
         
-        <div class="info-cell-content" style="position: relative; z-index: 1;">
-          <!-- Contact Info Line -->
-          <div class="contact-info-line" style="display: flex; align-items: center; margin-bottom: 3px; white-space: nowrap; overflow: hidden;">
-            <span style="margin-right: 4px; font-size: 12px;">${contactIcon}</span>
-            <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; font-size: 12px;">${contactDisplay}</span>
-            <button class="copy-btn" data-content="${contactInfo.replace(/"/g, '&quot;')}" title="Sao chép thông tin liên hệ" style="margin-left: 4px; padding: 1px 3px; font-size: 10px; border: none; background: none; cursor: pointer;">📋</button>
-          </div>
-          
-          <!-- Order Info Line -->
-          <div class="order-info-line" style="display: flex; align-items: center; white-space: nowrap; overflow: hidden;">
-            <span style="margin-right: 4px; font-size: 12px;">📦</span>
-            <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; font-size: 12px;">Thông tin đơn hàng</span>
-            <button class="copy-btn" data-content="${(transaction.orderInfo || "").replace(/"/g, '&quot;')}" title="Sao chép thông tin đơn hàng" style="margin-left: 4px; padding: 1px 3px; font-size: 10px; border: none; background: none; cursor: pointer;">📋</button>
-          </div>
+        <!-- Line 2: Contact Info -->
+        <div class="contact-info-line" style="display: flex; align-items: center; margin-bottom: 2px; white-space: nowrap; overflow: hidden;">
+          <span style="margin-right: 4px; font-size: 12px;">${contactIcon}</span>
+          <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; font-size: 12px;">${contactDisplay}</span>
+          <button class="copy-btn" data-content="${contactInfo.replace(/"/g, '&quot;')}" title="Sao chép thông tin liên hệ" style="margin-left: 4px; padding: 1px 3px; font-size: 10px; border: none; background: none; cursor: pointer;">📋</button>
+        </div>
+        
+        <!-- Line 3: Order Info -->
+        <div class="order-info-line" style="display: flex; align-items: center; white-space: nowrap; overflow: hidden;">
+          <span style="margin-right: 4px; font-size: 12px;">📦</span>
+          <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; font-size: 12px;">Thông tin đơn hàng</span>
+          <button class="copy-btn" data-content="${(transaction.orderInfo || "").replace(/"/g, '&quot;')}" title="Sao chép thông tin đơn hàng" style="margin-left: 4px; padding: 1px 3px; font-size: 10px; border: none; background: none; cursor: pointer;">📋</button>
         </div>
       </div>
     `;
