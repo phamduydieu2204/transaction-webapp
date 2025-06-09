@@ -1,7 +1,6 @@
 import { updatePagination } from './pagination.js';
 import { updateTotalDisplay } from './updateTotalDisplay.js';
 import { batchWrite, debounce } from './core/domOptimizer.js';
-import { debugTable } from './debugTable.js';
 
 // Transaction pagination functions - Giống expense table
 function transactionFirstPage() {
@@ -382,7 +381,5 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
   // Không cần cập nhật hiển thị totals nữa - đã xóa
   console.log("✅ Đã lưu totalRevenue:", totalRevenue, "- Không hiển thị totals");
   
-  // Debug table visibility
-  console.log("🔍 Running table debug after update...");
-  debugTable();
+  // Đã loại bỏ debugTable để tăng performance
 }

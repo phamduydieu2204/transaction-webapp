@@ -1,6 +1,10 @@
 import { validateBeforeOperation } from './core/sessionValidator.js';
 import { cacheManager } from './core/cacheManager.js';
 import { uiBlocker } from './uiBlocker.js';
+import { updateTable } from './updateTable.js';
+import { formatDate } from './formatDate.js';
+import { editTransaction } from './editTransaction.js';
+import { viewTransaction } from './viewTransaction.js';
 
 export async function deleteTransaction(
   index,
@@ -68,9 +72,21 @@ export async function deleteTransaction(
   // Khóa UI ngay sau khi user confirm
   uiBlocker.block();
 
-  // Validate session sau khi confirm
+  // Xóa giao dịch khỏi UI ngay lập tức (optimistic update)
+  const removedTransaction = window.transactionList[index];
+  window.transactionList.splice(index, 1);
+  
+  // Update table ngay để user thấy giao dịch đã biến mất
+  updateTable(window.transactionList, window.currentPage || 1, window.itemsPerPage || 10,
+             formatDate, editTransaction, window.deleteTransaction, viewTransaction);
+
+  // Validate session sau khi đã update UI
   const sessionValid = await validateBeforeOperation();
   if (!sessionValid) {
+    // Rollback nếu session invalid
+    window.transactionList.splice(index, 0, removedTransaction);
+    updateTable(window.transactionList, window.currentPage || 1, window.itemsPerPage || 10,
+               formatDate, editTransaction, window.deleteTransaction, viewTransaction);
     uiBlocker.unblock();
     return;
   }
@@ -99,22 +115,8 @@ export async function deleteTransaction(
     console.log("Kết quả từ server:", result);
 
     if (result.status === "success") {
-      // Xóa giao dịch khỏi UI ngay lập tức
-      if (window.transactionList) {
-        window.transactionList.splice(index, 1);
-        
-        // Update table ngay lập tức với danh sách mới
-        if (window.updateTable && typeof window.updateTable === 'function') {
-          const { updateTable } = await import('./updateTable.js');
-          const { formatDate } = await import('./formatDate.js');
-          const { editTransaction } = await import('./editTransaction.js');
-          const { viewTransaction } = await import('./viewTransaction.js');
-          
-          updateTable(window.transactionList, window.currentPage || 1, window.itemsPerPage || 10,
-                     formatDate, editTransaction, window.deleteTransaction, viewTransaction);
-        }
-      }
-
+      // Giao dịch đã được xóa khỏi UI trước đó (optimistic update)
+      
       // Clear cache để đảm bảo sync với server
       cacheManager.clearTransactionCaches();
       
@@ -126,15 +128,30 @@ export async function deleteTransaction(
         true
       );
       
-      // Load lại data từ server trong background
-      window.loadTransactions();
+      // Load lại data từ server trong background để đồng bộ
+      setTimeout(() => {
+        window.loadTransactions();
+      }, 500);
+      
       handleReset();
     } else {
       console.error("Lỗi từ server:", result.message);
+      
+      // Rollback - thêm lại giao dịch vào danh sách
+      window.transactionList.splice(index, 0, removedTransaction);
+      updateTable(window.transactionList, window.currentPage || 1, window.itemsPerPage || 10,
+                 formatDate, editTransaction, window.deleteTransaction, viewTransaction);
+      
       showResultModal(result.message || "Không thể xóa giao dịch!", false);
     }
   } catch (err) {
     console.error("Lỗi trong deleteTransaction:", err);
+    
+    // Rollback - thêm lại giao dịch vào danh sách
+    window.transactionList.splice(index, 0, removedTransaction);
+    updateTable(window.transactionList, window.currentPage || 1, window.itemsPerPage || 10,
+               formatDate, editTransaction, window.deleteTransaction, viewTransaction);
+    
     showResultModal(`Lỗi kết nối server: ${err.message}`, false);
   } finally {
     // Luôn mở khóa UI khi kết thúc
