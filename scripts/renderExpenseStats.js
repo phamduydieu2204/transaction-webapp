@@ -37,8 +37,8 @@ export async function renderExpenseStats() {
   console.log("🔄 Bắt đầu load expense data bằng module mới...");
   
   try {
-    // ✅ SỬ DỤNG MODULE MỚI ĐỂ FETCH DATA
-    const expenseData = await fetchExpenseData({ forceRefresh: false });
+    // ✅ Force refresh để lấy data mới nhất từ server
+    const expenseData = await fetchExpenseData({ forceRefresh: true });
     
     window.expenseList = expenseData || [];
     window.isExpenseSearching = false;

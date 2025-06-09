@@ -4,6 +4,7 @@ import { refreshExpenseTable } from './updateExpenseTable.js';
 import { showProcessingModal } from './showProcessingModal.js';
 import { closeProcessingModal } from './closeProcessingModal.js';
 import { showResultModal } from './showResultModal.js';
+import { cacheManager } from './core/cacheManager.js';
 
 export async function handleAddExpense() {
   const getValue = (id) => document.getElementById(id)?.value?.trim() || "";
@@ -49,13 +50,14 @@ export async function handleAddExpense() {
       document.getElementById("expenseDate").value = window.todayFormatted;
       document.getElementById("expenseRecorder").value = window.userInfo?.tenNhanVien || "";
       
-      // ✅ Refresh danh sách và tổng chi phí sau khi thêm thành công
-      renderExpenseStats();
+      // ✅ Clear cache để đảm bảo lấy data mới nhất
+      cacheManager.clearExpenseCaches();
       
-      // ✅ Force refresh expense table để giao dịch mới xuất hiện ở đầu
-      setTimeout(() => {
-        refreshExpenseTable();
-      }, 500);
+      // ✅ Refresh danh sách chi phí từ server để lấy data mới nhất
+      await renderExpenseStats();
+      
+      // ✅ Sau khi có data mới, refresh table
+      refreshExpenseTable();
     } else {
       showResultModal(`Không thể lưu chi phí: ${result.message}`, false);
     }

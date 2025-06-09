@@ -16,6 +16,7 @@ import { fetchSoftwareList } from './fetchSoftwareList.js'; // <<== thêm
 import { updateAccountList } from './updateAccountList.js'; // <<== thêm
 import { updateState } from './core/stateManager.js';
 import { validateBeforeOperation } from './core/sessionValidator.js';
+import { cacheManager } from './core/cacheManager.js';
 
 // Hàm lấy todayFormatted - luôn lấy ngày hiện tại
 function getTodayFormatted() {
@@ -135,8 +136,25 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
       // Reset currentEditTransactionId sau khi thêm thành công
       window.currentEditTransactionId = null;
       updateState({ currentEditTransactionId: null });
-      // Cập nhật lại danh sách giao dịch
+      
+      // Force clear all caches trước khi load lại
+      cacheManager.clearTransactionCaches();
+      
+      // Cập nhật lại danh sách giao dịch từ server
       await window.loadTransactions();
+      
+      // Double check để đảm bảo table được update
+      if (window.transactionList && window.transactionList.length > 0) {
+        const { updateTable } = await import('./updateTable.js');
+        const { formatDate } = await import('./formatDate.js');
+        const { editTransaction } = await import('./editTransaction.js');
+        const { deleteTransaction } = await import('./deleteTransaction.js');
+        const { viewTransaction } = await import('./viewTransaction.js');
+        
+        updateTable(window.transactionList, window.currentPage || 1, window.itemsPerPage || 10, 
+                   formatDate, editTransaction, deleteTransaction, viewTransaction);
+      }
+      
       showResultModal("Giao dịch đã được lưu!", true);
     } else {
       showResultModal(result.message || "Không thể lưu giao dịch!", false);
