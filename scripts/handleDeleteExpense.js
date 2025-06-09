@@ -1,5 +1,6 @@
 import { getConstants } from './constants.js';
 import { renderExpenseStats } from './renderExpenseStats.js';
+import { cacheManager } from './core/cacheManager.js';
 
 export async function handleDeleteExpense(expenseId) {
   if (!confirm("❗ Bạn có chắc chắn muốn xoá chi phí này?")) return;
@@ -19,7 +20,11 @@ export async function handleDeleteExpense(expenseId) {
     const result = await res.json();
     if (result.status === "success") {
       alert("✅ Đã xoá chi phí.");
-      renderExpenseStats(); // reload danh sách
+      
+      // Clear cache để đảm bảo load data mới
+      cacheManager.clearExpenseCaches();
+      
+      await renderExpenseStats(); // reload danh sách
     } else {
       alert("❌ Không thể xoá chi phí: " + result.message);
     }

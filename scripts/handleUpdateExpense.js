@@ -3,6 +3,8 @@ import { determineAccountingType } from './accountingTypeManager.js';
 import { showProcessingModal } from './showProcessingModal.js';
 import { closeProcessingModal } from './closeProcessingModal.js';
 import { showResultModal } from './showResultModal.js';
+import { cacheManager } from './core/cacheManager.js';
+import { renderExpenseStats } from './renderExpenseStats.js';
 
 /**
  * Reload expense data from server after update
@@ -97,8 +99,9 @@ export async function handleUpdateExpense() {
       document.getElementById("expenseForm").reset();
       document.getElementById("expenseDate").value = window.todayFormatted;
       
-      // ✅ Reload expense list data from server to ensure sync
-      await reloadExpenseData();
+      // ✅ Clear cache và reload expense data
+      cacheManager.clearExpenseCaches();
+      await renderExpenseStats();
     } else {
       showResultModal(`Không thể cập nhật chi phí: ${result.message}`, false);
     }

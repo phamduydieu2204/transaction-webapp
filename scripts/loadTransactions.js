@@ -2,6 +2,7 @@
 
 import { apiRequestJson } from './apiClient.js';
 import { deduplicateRequest } from './core/requestOptimizer.js';
+import { getConstants } from './constants.js';
 
 /**
  * Optimized transaction loading with pagination support

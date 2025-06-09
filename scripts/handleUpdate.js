@@ -1,6 +1,7 @@
 import { getConstants } from './constants.js';
 import { updateState } from './core/stateManager.js';
 import { validateBeforeOperation } from './core/sessionValidator.js';
+import { cacheManager } from './core/cacheManager.js';
 
 export async function handleUpdate() {
   console.log("🔄 handleUpdate được gọi");
@@ -151,6 +152,9 @@ export async function handleUpdate() {
       if (window.handleReset) {
         window.handleReset();
       }
+      
+      // Clear cache để đảm bảo load data mới
+      cacheManager.clearTransactionCaches();
       
       // Reload transactions
       if (window.loadTransactions) {

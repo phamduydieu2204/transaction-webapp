@@ -1,4 +1,5 @@
 import { validateBeforeOperation } from './core/sessionValidator.js';
+import { cacheManager } from './core/cacheManager.js';
 
 export async function deleteTransaction(
   index,
@@ -101,6 +102,9 @@ export async function deleteTransaction(
         true
       );
 
+      // Clear cache để đảm bảo load data mới
+      cacheManager.clearTransactionCaches();
+      
       await window.loadTransactions();
       handleReset();
     } else {
