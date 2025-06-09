@@ -1,5 +1,6 @@
 import { validateBeforeOperation } from './core/sessionValidator.js';
 import { cacheManager } from './core/cacheManager.js';
+import { uiBlocker } from './uiBlocker.js';
 
 export async function deleteTransaction(
   index,
@@ -18,14 +19,8 @@ export async function deleteTransaction(
     transactionListLength: transactionList ? transactionList.length : 0,
     hasUserInfo: !!userInfo
   });
-  
-  // Validate session before deleting transaction
-  const sessionValid = await validateBeforeOperation();
-  if (!sessionValid) {
-    return;
-  }
 
-  // Additional validation
+  // Validation cơ bản trước
   if (!transactionList || !Array.isArray(transactionList)) {
     console.error("❌ TransactionList không hợp lệ:", transactionList);
     if (showResultModal) {
@@ -60,6 +55,7 @@ export async function deleteTransaction(
       : ""
   }`;
 
+  // Hiển thị confirm modal ngay lập tức
   const confirmDelete = await new Promise((resolve) => {
     openConfirmModal(confirmMessage, resolve);
   });
@@ -69,7 +65,15 @@ export async function deleteTransaction(
     return;
   }
 
-  showProcessingModal("Đang xóa giao dịch...");
+  // Khóa UI ngay sau khi user confirm
+  uiBlocker.block();
+
+  // Validate session sau khi confirm
+  const sessionValid = await validateBeforeOperation();
+  if (!sessionValid) {
+    uiBlocker.unblock();
+    return;
+  }
 
   const { BACKEND_URL } = getConstants();
 
@@ -95,17 +99,35 @@ export async function deleteTransaction(
     console.log("Kết quả từ server:", result);
 
     if (result.status === "success") {
+      // Xóa giao dịch khỏi UI ngay lập tức
+      if (window.transactionList) {
+        window.transactionList.splice(index, 1);
+        
+        // Update table ngay lập tức với danh sách mới
+        if (window.updateTable && typeof window.updateTable === 'function') {
+          const { updateTable } = await import('./updateTable.js');
+          const { formatDate } = await import('./formatDate.js');
+          const { editTransaction } = await import('./editTransaction.js');
+          const { viewTransaction } = await import('./viewTransaction.js');
+          
+          updateTable(window.transactionList, window.currentPage || 1, window.itemsPerPage || 10,
+                     formatDate, editTransaction, window.deleteTransaction, viewTransaction);
+        }
+      }
+
+      // Clear cache để đảm bảo sync với server
+      cacheManager.clearTransactionCaches();
+      
+      // Hiển thị thông báo thành công
       showResultModal(
         transaction.accountSheetId && transaction.customerEmail
           ? "Giao dịch đã được xóa và quyền chia sẻ đã được hủy!"
           : "Giao dịch đã được xóa!",
         true
       );
-
-      // Clear cache để đảm bảo load data mới
-      cacheManager.clearTransactionCaches();
       
-      await window.loadTransactions();
+      // Load lại data từ server trong background
+      window.loadTransactions();
       handleReset();
     } else {
       console.error("Lỗi từ server:", result.message);
@@ -114,5 +136,8 @@ export async function deleteTransaction(
   } catch (err) {
     console.error("Lỗi trong deleteTransaction:", err);
     showResultModal(`Lỗi kết nối server: ${err.message}`, false);
+  } finally {
+    // Luôn mở khóa UI khi kết thúc
+    uiBlocker.unblock();
   }
 }
