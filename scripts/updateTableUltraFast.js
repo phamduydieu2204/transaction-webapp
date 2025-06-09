@@ -161,9 +161,9 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     // Info cell with employee badge and improved layout
     const infoCell = `
       <div class="info-cell-container" style="position: relative; line-height: 1.2;">
-        <span class="employee-badge" style="position: absolute; top: 0; right: 0; font-size: 11px; color: ${employeeColor.textColor}; font-weight: bold; background: ${employeeColor.bg}; padding: 2px 6px; border-radius: 0 0 0 4px; z-index: 10; border: 1px solid ${employeeColor.border}; box-shadow: 0 1px 2px rgba(0,0,0,0.2); display: block !important;">${employeeCode}</span>
+        <span class="employee-badge" style="position: absolute; top: 0; right: 0; font-size: 10px; color: ${employeeColor.textColor}; font-weight: bold; background: ${employeeColor.bg}; padding: 1px 4px; border-radius: 0 0 0 3px; z-index: 20; border: 1px solid ${employeeColor.border}; box-shadow: 0 1px 2px rgba(0,0,0,0.2); display: block !important; pointer-events: none;">${employeeCode}</span>
         
-        <div class="info-cell-content" style="position: relative; z-index: 1; padding-right: 50px;">
+        <div class="info-cell-content" style="position: relative; z-index: 1;">
           <!-- Contact Info Line -->
           <div class="contact-info-line" style="display: flex; align-items: center; margin-bottom: 3px; white-space: nowrap; overflow: hidden;">
             <span style="margin-right: 4px; font-size: 12px;">${contactIcon}</span>
