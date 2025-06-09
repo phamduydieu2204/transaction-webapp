@@ -5,8 +5,12 @@ import { showProcessingModal } from './showProcessingModal.js';
 import { closeProcessingModal } from './closeProcessingModal.js';
 import { showResultModal } from './showResultModal.js';
 import { cacheManager } from './core/cacheManager.js';
+import { uiBlocker } from './uiBlocker.js';
 
 export async function handleAddExpense() {
+  // Khóa UI ngay khi bắt đầu xử lý
+  uiBlocker.block();
+  
   const getValue = (id) => document.getElementById(id)?.value?.trim() || "";
 
   const data = {
@@ -64,5 +68,8 @@ export async function handleAddExpense() {
   } catch (err) {
     closeProcessingModal();
     showResultModal(`Lỗi khi gửi dữ liệu: ${err.message}`, false);
+  } finally {
+    // Luôn mở khóa UI khi kết thúc
+    uiBlocker.unblock();
   }
 }

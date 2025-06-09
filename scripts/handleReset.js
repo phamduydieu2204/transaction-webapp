@@ -53,7 +53,7 @@ export async function handleReset(fetchSoftwareList, showProcessingModal, showRe
   try {
     await fetchSoftwareList(null, window.softwareData, updatePackageList, updateAccountList);
     // Don't reload transactions here, it's handled by the caller
-    showResultModal("Dữ liệu đã được làm mới!", true);
+    // Removed "Dữ liệu đã được làm mới!" notification as requested
   } catch (err) {
     showResultModal(`Lỗi khi làm mới dữ liệu: ${err.message}`, false);
   }

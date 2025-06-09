@@ -17,6 +17,7 @@ import { updateAccountList } from './updateAccountList.js'; // <<== thêm
 import { updateState } from './core/stateManager.js';
 import { validateBeforeOperation } from './core/sessionValidator.js';
 import { cacheManager } from './core/cacheManager.js';
+import { uiBlocker } from './uiBlocker.js';
 
 // Hàm lấy todayFormatted - luôn lấy ngày hiện tại
 function getTodayFormatted() {
@@ -27,16 +28,26 @@ function getTodayFormatted() {
 export async function handleAdd(userInfo, currentEditTransactionId, loadTransactions, handleReset, updatePackageList, showProcessingModal, showResultModal) {
   console.log("🔍 handleAdd được gọi");
   
-  // Validate session before adding transaction
-  const sessionValid = await validateBeforeOperation();
-  if (!sessionValid) {
-    return;
-  }
-  
-  // Nếu đang trong tiến trình sửa thì mở modal xác nhận
+  // Kiểm tra nếu đang trong tiến trình sửa thì hiển thị modal ngay tức thì
   if (window.currentEditTransactionId !== null) {
     console.log("Đang trong tiến trình sửa, mở modal lựa chọn thêm/cập nhật...");
     openAddOrUpdateModal();
+    return;
+  }
+  
+  // Khóa UI ngay khi bắt đầu xử lý
+  uiBlocker.block();
+  
+  try {
+    // Validate session before adding transaction
+    const sessionValid = await validateBeforeOperation();
+    if (!sessionValid) {
+      uiBlocker.unblock();
+      return;
+    }
+  } catch (error) {
+    uiBlocker.unblock();
+    showResultModal(`Lỗi xác thực phiên: ${error.message}`, false);
     return;
   }
   
@@ -162,5 +173,8 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
   } catch (err) {
     showResultModal(`Lỗi kết nối server: ${err.message}`, false);
     console.error("Lỗi:", err);
+  } finally {
+    // Luôn mở khóa UI khi kết thúc
+    uiBlocker.unblock();
   }
 }

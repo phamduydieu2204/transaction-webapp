@@ -339,12 +339,14 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
       </div>
     `;
 
+    // Gộp tên và email khách hàng trong 1 ô
+    const customerInfo = `${transaction.customerName}<br><small>${transaction.customerEmail}</small>`;
+    
     row.innerHTML = `
       <td>${transaction.transactionId}</td>
       <td>${formatDate(transaction.transactionDate)}</td>
       <td>${transaction.transactionType}</td>
-      <td>${transaction.customerName}</td>
-      <td>${transaction.customerEmail}</td>
+      <td>${customerInfo}</td>
       <td>${usageCycleCell}</td>
       <td>${transaction.deviceCount}</td>
       <td>${softwareInfo}</td>
