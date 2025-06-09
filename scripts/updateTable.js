@@ -314,9 +314,18 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
       ? `<a href="${transaction.customerPhone}" target="_blank" title="${transaction.customerPhone}">Liên hệ 🔗</a>`
       : transaction.customerPhone || "";
 
+    // Debug employee code
+    if (index === 0) {
+      console.log('🔍 First transaction employee data:', {
+        maNhanVien: transaction.maNhanVien,
+        tenNhanVien: transaction.tenNhanVien,
+        allKeys: Object.keys(transaction)
+      });
+    }
+
     const infoCell = `
-      <div class="info-cell-container">
-        <span class="employee-badge">${transaction.maNhanVien || ''}</span>
+      <div class="info-cell-container" style="position: relative; min-height: 40px; padding-top: 12px;">
+        <span class="employee-badge" style="position: absolute; top: 2px; right: 2px; font-size: 9px; color: #666; font-weight: bold; background: rgba(0,0,0,0.05); padding: 1px 4px; border-radius: 3px; z-index: 1;">${transaction.maNhanVien || transaction.employeeCode || 'TEST'}</span>
         <div class="info-cell-content">
           <div>${linkHtml}</div>
           <div>
