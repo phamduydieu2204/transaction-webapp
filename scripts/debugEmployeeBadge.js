@@ -12,8 +12,25 @@ export function debugEmployeeBadge() {
       transactionId: firstTransaction.transactionId,
       maNhanVien: firstTransaction.maNhanVien,
       tenNhanVien: firstTransaction.tenNhanVien,
+      employeeCode: firstTransaction.employeeCode,
+      employeeName: firstTransaction.employeeName,
+      staffCode: firstTransaction.staffCode,
+      staffName: firstTransaction.staffName,
+      user: firstTransaction.user,
+      creator: firstTransaction.creator,
       allKeys: Object.keys(firstTransaction)
     });
+    
+    // Check ALL possible employee-related fields
+    const employeeFields = Object.keys(firstTransaction).filter(key => 
+      key.toLowerCase().includes('nhan') || 
+      key.toLowerCase().includes('emp') || 
+      key.toLowerCase().includes('staff') || 
+      key.toLowerCase().includes('user') || 
+      key.toLowerCase().includes('create') ||
+      key.toLowerCase().includes('ma')
+    );
+    console.log('📄 Possible employee fields:', employeeFields);
     
     // Check multiple transactions
     const sampleTransactions = window.transactionList.slice(0, 3);
@@ -22,7 +39,11 @@ export function debugEmployeeBadge() {
       console.log(`  Transaction ${i + 1}:`, {
         id: t.transactionId,
         maNhanVien: t.maNhanVien,
-        tenNhanVien: t.tenNhanVien
+        tenNhanVien: t.tenNhanVien,
+        employeeCode: t.employeeCode,
+        employeeName: t.employeeName,
+        staffCode: t.staffCode,
+        user: t.user
       });
     });
   } else {
