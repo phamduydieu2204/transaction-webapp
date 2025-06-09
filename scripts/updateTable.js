@@ -1,6 +1,7 @@
 import { updatePagination } from './pagination.js';
 import { updateTotalDisplay } from './updateTotalDisplay.js';
 import { batchWrite, debounce } from './core/domOptimizer.js';
+import { debugTable } from './debugTable.js';
 
 // Transaction pagination functions - Giống expense table
 function transactionFirstPage() {
@@ -216,12 +217,13 @@ function updateTransactionPagination(totalPages, currentPage) {
 
 export function updateTable(transactionList, currentPage, itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction) {
   const tableBody = document.querySelector("#transactionTable tbody");
-  if (!tableBody) return;
+  if (!tableBody) {
+    console.error("❌ Không tìm thấy tbody của transactionTable");
+    return;
+  }
   
-  // Batch DOM operations
-  batchWrite(() => {
-    tableBody.innerHTML = "";
-  });
+  // Clear table immediately (not in batch)
+  tableBody.innerHTML = "";
 
   const totalPages = Math.ceil(transactionList.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -263,8 +265,8 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     console.log("📅 Không tìm kiếm - Tổng doanh thu hôm nay:", totalRevenue);
   }
 
-  // ✅ Build all rows HTML first (no DOM manipulation yet)
-  const rowsHtml = paginatedItems.map((transaction, index) => {
+  // ✅ Build and append rows
+  paginatedItems.forEach((transaction, index) => {
     // For search results, use the actual index in the current list
     const actualIndex = window.isSearching ? 
       transactionList.findIndex(t => t.transactionId === transaction.transactionId) : 
@@ -377,4 +379,8 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
   // Không cần cập nhật hiển thị totals nữa - đã xóa
   console.log("✅ Đã lưu totalRevenue:", totalRevenue, "- Không hiển thị totals");
+  
+  // Debug table visibility
+  console.log("🔍 Running table debug after update...");
+  debugTable();
 }
