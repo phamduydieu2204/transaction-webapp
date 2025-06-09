@@ -76,12 +76,48 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
                         transaction.creator || 
                         'ADMIN';
 
+    // Generate consistent color for employee code
+    const getEmployeeColor = (code) => {
+      // Predefined colors that work well with white text
+      const colors = [
+        { bg: '#007bff', border: '#0056b3' }, // Blue
+        { bg: '#28a745', border: '#1e7e34' }, // Green
+        { bg: '#dc3545', border: '#bd2130' }, // Red
+        { bg: '#fd7e14', border: '#e65100' }, // Orange
+        { bg: '#6f42c1', border: '#5a3597' }, // Purple
+        { bg: '#20c997', border: '#17a085' }, // Teal
+        { bg: '#e83e8c', border: '#d21b7c' }, // Pink
+        { bg: '#6c757d', border: '#545b62' }, // Gray
+        { bg: '#17a2b8', border: '#138496' }, // Cyan
+        { bg: '#ffc107', border: '#d39e00' }, // Yellow (darker text)
+      ];
+      
+      // Simple hash function to get consistent color for same employee code
+      let hash = 0;
+      for (let i = 0; i < code.length; i++) {
+        const char = code.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32-bit integer
+      }
+      
+      const colorIndex = Math.abs(hash) % colors.length;
+      const color = colors[colorIndex];
+      
+      // Use black text for yellow background
+      const textColor = colorIndex === 9 ? '#000' : '#fff';
+      
+      return { ...color, textColor };
+    };
+
+    const employeeColor = getEmployeeColor(employeeCode);
+
     // Debug employee code for first transaction
     if (index === 0) {
       console.log('🔍 [UltraFast] First transaction employee data:', {
         maNhanVien: transaction.maNhanVien,
         tenNhanVien: transaction.tenNhanVien,
         employeeCode: employeeCode,
+        color: employeeColor,
         allKeys: Object.keys(transaction)
       });
       console.log('🔍 [UltraFast] Employee code determined:', employeeCode);
@@ -90,7 +126,7 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     // Info cell with employee badge
     const infoCell = `
       <div class="info-cell-container" style="position: relative; min-height: 40px; padding-top: 12px;">
-        <span class="employee-badge" style="position: absolute; top: 2px; right: 2px; font-size: 11px; color: #fff; font-weight: bold; background: #007bff; padding: 2px 6px; border-radius: 4px; z-index: 10; border: 1px solid #0056b3; box-shadow: 0 1px 2px rgba(0,0,0,0.2); display: block !important;">${employeeCode}</span>
+        <span class="employee-badge" style="position: absolute; top: 2px; right: 2px; font-size: 11px; color: ${employeeColor.textColor}; font-weight: bold; background: ${employeeColor.bg}; padding: 2px 6px; border-radius: 4px; z-index: 10; border: 1px solid ${employeeColor.border}; box-shadow: 0 1px 2px rgba(0,0,0,0.2); display: block !important;">${employeeCode}</span>
         <div class="info-cell-content">
           <div>${phoneDisplay}</div>
           <div>

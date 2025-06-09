@@ -138,7 +138,51 @@ export function forceTableUpdateAndDebug() {
   }
 }
 
+// Test employee colors
+export function testEmployeeColors() {
+  console.log('🎨 === EMPLOYEE COLOR TEST ===');
+  
+  const testCodes = ['ADMIN', 'NV01', 'NV02', 'MANAGER', 'SALE01', 'TECH01', 'SUPPORT', 'QA01', 'DEV01', 'HR01'];
+  
+  testCodes.forEach(code => {
+    // Generate consistent color for employee code
+    const getEmployeeColor = (code) => {
+      const colors = [
+        { bg: '#007bff', border: '#0056b3', name: 'Blue' },
+        { bg: '#28a745', border: '#1e7e34', name: 'Green' },
+        { bg: '#dc3545', border: '#bd2130', name: 'Red' },
+        { bg: '#fd7e14', border: '#e65100', name: 'Orange' },
+        { bg: '#6f42c1', border: '#5a3597', name: 'Purple' },
+        { bg: '#20c997', border: '#17a085', name: 'Teal' },
+        { bg: '#e83e8c', border: '#d21b7c', name: 'Pink' },
+        { bg: '#6c757d', border: '#545b62', name: 'Gray' },
+        { bg: '#17a2b8', border: '#138496', name: 'Cyan' },
+        { bg: '#ffc107', border: '#d39e00', name: 'Yellow' },
+      ];
+      
+      let hash = 0;
+      for (let i = 0; i < code.length; i++) {
+        const char = code.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+      }
+      
+      const colorIndex = Math.abs(hash) % colors.length;
+      const color = colors[colorIndex];
+      const textColor = colorIndex === 9 ? '#000' : '#fff';
+      
+      return { ...color, textColor, index: colorIndex };
+    };
+    
+    const color = getEmployeeColor(code);
+    console.log(`🎨 ${code}: ${color.name} (${color.bg}) - Index: ${color.index}`);
+  });
+  
+  console.log('🎨 === COLOR TEST END ===');
+}
+
 // Make available globally
 window.debugEmployeeBadge = debugEmployeeBadge;
 window.debugEmployeeBadgeAfterRender = debugEmployeeBadgeAfterRender;
 window.forceTableUpdateAndDebug = forceTableUpdateAndDebug;
+window.testEmployeeColors = testEmployeeColors;
