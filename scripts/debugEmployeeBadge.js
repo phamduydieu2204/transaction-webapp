@@ -54,6 +54,17 @@ export function debugEmployeeBadge() {
   const infoCells = document.querySelectorAll('.info-cell-container');
   console.log('📄 Found info cells:', infoCells.length);
   
+  // Check for table rows
+  const tableRows = document.querySelectorAll('#transactionTable tbody tr');
+  console.log('📄 Found table rows:', tableRows.length);
+  
+  // Check table body specifically
+  const tableBody = document.querySelector('#transactionTable tbody');
+  console.log('📄 Table body exists:', !!tableBody);
+  if (tableBody) {
+    console.log('📄 Table body HTML preview:', tableBody.innerHTML.substring(0, 500));
+  }
+  
   const employeeBadges = document.querySelectorAll('.employee-badge');
   console.log('📄 Found employee badges:', employeeBadges.length);
   
@@ -79,5 +90,47 @@ export function debugEmployeeBadge() {
   console.log('🔍 === EMPLOYEE BADGE DEBUG END ===');
 }
 
+// Debug after table render
+export function debugEmployeeBadgeAfterRender() {
+  console.log('🔍 === EMPLOYEE BADGE DEBUG AFTER RENDER ===');
+  
+  // Wait a bit for DOM to settle
+  setTimeout(() => {
+    debugEmployeeBadge();
+  }, 100);
+}
+
+// Force table update and then debug
+export function forceTableUpdateAndDebug() {
+  console.log('🔄 Forcing table update and debug...');
+  
+  // Trigger table update if possible
+  if (window.transactionList && window.updateTable && window.formatDate) {
+    const currentPage = window.currentPage || 1;
+    const itemsPerPage = window.itemsPerPage || 10;
+    
+    console.log('🔄 Updating table with current data...');
+    window.updateTable(
+      window.transactionList, 
+      currentPage, 
+      itemsPerPage, 
+      window.formatDate, 
+      window.editTransaction, 
+      window.deleteTransaction, 
+      window.viewTransaction
+    );
+    
+    // Debug after update
+    setTimeout(() => {
+      debugEmployeeBadge();
+    }, 200);
+  } else {
+    console.log('❌ Cannot force table update - missing dependencies');
+    debugEmployeeBadge();
+  }
+}
+
 // Make available globally
 window.debugEmployeeBadge = debugEmployeeBadge;
+window.debugEmployeeBadgeAfterRender = debugEmployeeBadgeAfterRender;
+window.forceTableUpdateAndDebug = forceTableUpdateAndDebug;

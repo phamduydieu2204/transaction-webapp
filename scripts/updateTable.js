@@ -314,15 +314,6 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
       ? `<a href="${transaction.customerPhone}" target="_blank" title="${transaction.customerPhone}">Liên hệ 🔗</a>`
       : transaction.customerPhone || "";
 
-    // Debug employee code
-    if (index === 0) {
-      console.log('🔍 First transaction employee data:', {
-        maNhanVien: transaction.maNhanVien,
-        tenNhanVien: transaction.tenNhanVien,
-        allKeys: Object.keys(transaction)
-      });
-    }
-
     // Get employee code from various possible fields
     const employeeCode = transaction.maNhanVien || 
                         transaction.employeeCode || 
@@ -330,6 +321,17 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
                         transaction.user || 
                         transaction.creator || 
                         'DEBUG';
+
+    // Debug employee code
+    if (index === 0) {
+      console.log('🔍 First transaction employee data:', {
+        maNhanVien: transaction.maNhanVien,
+        tenNhanVien: transaction.tenNhanVien,
+        employeeCode: employeeCode,
+        allKeys: Object.keys(transaction)
+      });
+      console.log('🔍 Employee code determined:', employeeCode);
+    }
     
     const infoCell = `
       <div class="info-cell-container" style="position: relative; min-height: 40px; padding-top: 12px;">
