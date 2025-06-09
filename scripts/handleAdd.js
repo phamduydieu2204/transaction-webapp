@@ -12,11 +12,6 @@ import { updateState } from './core/stateManager.js';
 import { validateBeforeOperation } from './core/sessionValidator.js';
 import { cacheManager } from './core/cacheManager.js';
 import { uiBlocker } from './uiBlocker.js';
-import { updateTable } from './updateTable.js';
-import { formatDate } from './formatDate.js';
-import { editTransaction } from './editTransaction.js';
-import { deleteTransaction } from './deleteTransaction.js';
-import { viewTransaction } from './viewTransaction.js';
 
 // Hàm lấy todayFormatted - luôn lấy ngày hiện tại
 function getTodayFormatted() {
