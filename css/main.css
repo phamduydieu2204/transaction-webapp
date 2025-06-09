@@ -614,13 +614,41 @@ table {
 }
 
 .customer-info-cell .customer-name {
-  font-weight: bold;
-  color: inherit;
+  display: flex;
+  align-items: center;
+  margin-bottom: 2px;
   line-height: 1.2;
 }
 
+.customer-info-cell .customer-name strong {
+  flex: 1;
+  font-weight: bold;
+}
+
 .customer-info-cell .customer-email {
-  font-size: inherit;
-  color: inherit;
+  display: flex;
+  align-items: center;
   line-height: 1.2;
+}
+
+.customer-info-cell .customer-email span {
+  flex: 1;
+}
+
+/* Copy button styling in customer cell */
+.customer-info-cell .copy-btn {
+  margin-right: 4px;
+  padding: 1px 3px;
+  font-size: 10px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.customer-info-cell .copy-btn:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 2px;
 }

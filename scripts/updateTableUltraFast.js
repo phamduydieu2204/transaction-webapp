@@ -215,8 +215,15 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     // Create customer info cell with name and email
     const customerInfoCell = `
       <div class="customer-info-cell">
-        <div class="customer-name"><strong>${transaction.customerName}</strong></div>
-        <div class="customer-email">${transaction.customerEmail}</div>
+        <div class="customer-name" style="display: flex; align-items: center; margin-bottom: 2px;">
+          <span style="margin-right: 4px; font-size: 12px;">👤</span>
+          <strong style="flex: 1;">${transaction.customerName}</strong>
+        </div>
+        <div class="customer-email" style="display: flex; align-items: center;">
+          <button class="copy-btn" data-content="${(transaction.customerEmail || "").replace(/"/g, '&quot;')}" title="Sao chép email khách hàng" style="margin-right: 4px; padding: 1px 3px; font-size: 10px; border: none; background: none; cursor: pointer;">📋</button>
+          <span style="margin-right: 4px; font-size: 12px;">📧</span>
+          <span style="flex: 1;">${transaction.customerEmail}</span>
+        </div>
       </div>
     `;
 
