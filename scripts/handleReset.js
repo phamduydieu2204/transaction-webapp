@@ -4,7 +4,7 @@ import { getTodayFormatted, setDefaultDates } from './calculateEndDate.js';
 import { updateState } from './core/stateManager.js';
 
 export async function handleReset(fetchSoftwareList, showProcessingModal, showResultModal, todayFormatted, updatePackageList, updateAccountList) {
-  showProcessingModal("Đang làm mới dữ liệu...");
+  // Đã loại bỏ showProcessingModal để tránh trùng lặp với uiBlocker
   const form = document.getElementById("transactionForm");
   
   // Use the getTodayFormatted function if todayFormatted is not provided

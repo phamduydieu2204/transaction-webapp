@@ -54,8 +54,7 @@ console.log("📥 editTransaction - gọi fetchSoftwareList với:", {
   accountNameValue
 });
 console.log("🔎 typeof fetchSoftwareList =", typeof fetchSoftwareList);
-  // ✅ Hiển thị modal "Đang tải"
-  showProcessingModal("Đang tải dữ liệu giao dịch...");
+  // Đã loại bỏ showProcessingModal để tránh trùng lặp với uiBlocker
 
   // ✅ Cập nhật danh sách dropdown với các giá trị gốc cần giữ lại
   await fetchSoftwareList(
@@ -67,8 +66,7 @@ console.log("🔎 typeof fetchSoftwareList =", typeof fetchSoftwareList);
     accountNameValue
   );
   
-    // ✅ Đóng modal sau khi load xong
-    closeProcessingModal();
+    // Đã loại bỏ closeProcessingModal để tránh trùng lặp với uiBlocker
 
   // Gán loại giao dịch (không phân biệt hoa/thường)
   if (transactionTypeSelect) {
