@@ -276,6 +276,9 @@ async function initializeHeavyFeatures() {
  */
 async function initializeExpenseFeatures() {
   try {
+    // Wait a bit for DOM to be ready
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
     // Initialize expense dropdowns
     await initExpenseDropdowns();
     

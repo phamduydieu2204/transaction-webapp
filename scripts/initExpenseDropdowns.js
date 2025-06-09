@@ -16,6 +16,11 @@ export async function initExpenseDropdowns() {
 
     // Đổ loại khoản chi
     const categorySelect = document.getElementById("expenseCategory");
+    if (!categorySelect) {
+      console.warn('⚠️ expenseCategory element not found, skipping dropdown init');
+      return;
+    }
+    
     Object.keys(expenseMap).forEach(loai => {
       const opt = document.createElement("option");
       opt.value = loai;
@@ -27,8 +32,17 @@ export async function initExpenseDropdowns() {
     window.handleCategoryChange = () => {
       const loai = categorySelect.value;
       const danhMucSelect = document.getElementById("expenseSubCategory");
+      if (!danhMucSelect) {
+        console.warn('⚠️ expenseSubCategory element not found');
+        return;
+      }
       const productSelect = document.getElementById("expenseProduct");
       const packageSelect = document.getElementById("expensePackage");
+
+      if (!productSelect || !packageSelect) {
+        console.warn('⚠️ Some expense dropdown elements not found');
+        return;
+      }
 
       danhMucSelect.innerHTML = '<option value="">-- Chọn danh mục --</option>';
       productSelect.innerHTML = '<option value="">-- Chọn sản phẩm --</option>';

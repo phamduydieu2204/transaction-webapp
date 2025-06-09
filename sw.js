@@ -7,12 +7,11 @@ const DYNAMIC_CACHE = 'transaction-app-dynamic-v1';
 
 // Files to cache on install
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/favicon.ico',
+  './',
+  './index.html',
+  './favicon.ico',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
-  'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css',
-  'https://cdn.jsdelivr.net/npm/flatpickr'
+  'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css'
 ];
 
 // Install event - cache static assets
