@@ -1,0 +1,38 @@
+/* Employee Badge in Info Cell */
+.info-cell-container {
+  position: relative;
+  min-height: 40px;
+  padding-top: 12px;
+}
+
+.employee-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 9px;
+  color: #666;
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 1px 4px;
+  border-radius: 3px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.info-cell-content {
+  position: relative;
+  z-index: 0;
+}
+
+/* Đảm bảo nội dung không bị đè */
+.info-cell-container .copy-btn {
+  margin-left: 5px;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .employee-badge {
+    color: #ccc;
+    background: rgba(255, 255, 255, 0.1);
+  }
+}

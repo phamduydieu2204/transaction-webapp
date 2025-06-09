@@ -21,6 +21,7 @@
 @import url('components/pagination-unified.css'); /* Unified pagination for all tables */
 @import url('components/detail-modal.css'); /* Unified detail modal for view functionality */
 @import url('components/expense-quick-search.css'); /* Expense quick search component */
+@import url('components/employee-badge.css'); /* Employee badge in info cell */
 @import url('components/tabs.css');
 @import url('components/cards.css');
 @import url('components/charts.css');

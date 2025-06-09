@@ -315,10 +315,15 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
       : transaction.customerPhone || "";
 
     const infoCell = `
-      <div>${linkHtml}</div>
-      <div>
-        Thông tin đơn hàng
-        <button class="copy-btn" data-content="${(transaction.orderInfo || "").replace(/"/g, '&quot;')}">📋</button>
+      <div class="info-cell-container">
+        <span class="employee-badge">${transaction.maNhanVien || ''}</span>
+        <div class="info-cell-content">
+          <div>${linkHtml}</div>
+          <div>
+            Thông tin đơn hàng
+            <button class="copy-btn" data-content="${(transaction.orderInfo || "").replace(/"/g, '&quot;')}">📋</button>
+          </div>
+        </div>
       </div>
     `;
 
