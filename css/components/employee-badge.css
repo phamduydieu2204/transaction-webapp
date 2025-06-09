@@ -1,8 +1,6 @@
 /* Employee Badge in Info Cell */
 .info-cell-container {
   position: relative;
-  min-height: 50px;
-  padding-top: 14px;
   line-height: 1.2;
 }
 
@@ -22,7 +20,7 @@
 .info-cell-content {
   position: relative;
   z-index: 1;
-  padding-right: 60px; /* Reserve space for employee badge */
+  padding-right: 50px; /* Reserve space for employee badge */
 }
 
 /* Contact and Order Info Lines */
