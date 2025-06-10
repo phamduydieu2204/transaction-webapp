@@ -30,6 +30,7 @@ table {
   border-collapse: separate;
   border-spacing: 0;
   table-layout: auto;
+  background: transparent !important;
 }
 
 /* Sticky table header that sticks to viewport */
