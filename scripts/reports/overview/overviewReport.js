@@ -351,13 +351,29 @@ async function updateKPICards(kpis) {
  * Update individual KPI card
  */
 function updateKPICard(type, data) {
-  const card = document.querySelector(`.kpi-card.${type}-card`);
-  if (!card) return;
+  let valueElement, changeElement;
   
-  const valueElement = card.querySelector('.kpi-value');
-  const growthElement = card.querySelector('.kpi-growth');
-  const iconElement = card.querySelector('.kpi-icon');
-  const titleElement = card.querySelector('.kpi-title');
+  // Map to HTML IDs
+  switch (type) {
+    case 'revenue':
+      valueElement = document.getElementById('total-revenue');
+      changeElement = document.getElementById('revenue-change');
+      break;
+    case 'expense':
+      valueElement = document.getElementById('total-expenses');
+      changeElement = document.getElementById('expense-change');
+      break;
+    case 'profit':
+      valueElement = document.getElementById('total-profit');
+      changeElement = document.getElementById('profit-change');
+      break;
+    case 'transaction':
+      valueElement = document.getElementById('total-transactions');
+      changeElement = document.getElementById('transaction-change');
+      break;
+  }
+  
+  if (!valueElement) return;
   
   if (valueElement) {
     if (type === 'transaction') {
@@ -367,21 +383,15 @@ function updateKPICard(type, data) {
     }
   }
   
-  if (growthElement) {
+  if (changeElement) {
     const isPositive = data.growth >= 0;
-    const growthClass = isPositive ? 'positive' : 'negative';
-    const growthIcon = isPositive ? '📈' : '📉';
+    const arrow = isPositive ? 'fa-arrow-up' : 'fa-arrow-down';
+    const sign = data.growth >= 0 ? '+' : '';
     
-    growthElement.textContent = `${growthIcon} ${data.growth >= 0 ? '+' : ''}${data.growth.toFixed(1)}%`;
-    growthElement.className = `kpi-growth ${growthClass}`;
-  }
-  
-  if (iconElement) {
-    iconElement.textContent = data.icon;
-  }
-  
-  if (titleElement) {
-    titleElement.textContent = data.title;
+    changeElement.innerHTML = `
+      <i class="fas ${arrow}"></i> ${sign}${data.growth.toFixed(1)}%
+    `;
+    changeElement.className = `kpi-change ${isPositive ? 'positive' : 'negative'}`;
   }
 }
 
@@ -430,7 +440,7 @@ function loadChartJS() {
  * Render revenue trend chart
  */
 function renderRevenueTrendChart(transactions) {
-  const canvas = document.getElementById('revenueTrendChart');
+  const canvas = document.getElementById('revenue-trend-chart');
   if (!canvas) return;
   
   const ctx = canvas.getContext('2d');
@@ -478,7 +488,7 @@ function renderRevenueTrendChart(transactions) {
  * Render expense distribution chart
  */
 function renderExpenseDistributionChart(expenses) {
-  const canvas = document.getElementById('expenseDistributionChart');
+  const canvas = document.getElementById('expense-distribution-chart');
   if (!canvas) return;
   
   const ctx = canvas.getContext('2d');
@@ -675,7 +685,7 @@ function updateTopExpensesTable(expenses) {
  */
 async function loadTopProducts() {
   try {
-    const container = document.getElementById('topProducts');
+    const container = document.getElementById('top-software-body');
     if (!container) {
       console.warn('❌ Top products container not found');
       return;
@@ -706,32 +716,20 @@ async function loadTopProducts() {
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 5);
 
-    // Render top products
-    let html = `
-      <div class="metric-card">
-        <div class="metric-content">
-          <h4>🏆 Top 5 Sản phẩm</h4>
-          <div class="product-list">
-    `;
-
-    topProducts.forEach((product, index) => {
-      html += `
-        <div class="product-item">
-          <span class="product-rank">#${index + 1}</span>
-          <span class="product-name">${product.name}</span>
-          <span class="product-revenue">${formatRevenue(product.revenue)}</span>
-          <span class="product-count">(${product.count} giao dịch)</span>
-        </div>
+    // Render top products as table rows
+    const totalRevenue = topProducts.reduce((sum, p) => sum + p.revenue, 0);
+    
+    container.innerHTML = topProducts.map(product => {
+      const percentage = totalRevenue > 0 ? ((product.revenue / totalRevenue) * 100).toFixed(1) : 0;
+      return `
+        <tr>
+          <td>${product.name}</td>
+          <td>${product.count}</td>
+          <td>${formatRevenue(product.revenue)}</td>
+          <td>${percentage}%</td>
+        </tr>
       `;
-    });
-
-    html += `
-          </div>
-        </div>
-      </div>
-    `;
-
-    container.innerHTML = html;
+    }).join('');
     console.log('✅ Top products loaded');
   } catch (error) {
     console.error('❌ Error loading top products:', error);
@@ -744,7 +742,7 @@ async function loadTopProducts() {
  */
 async function loadTopCustomers() {
   try {
-    const container = document.getElementById('topCustomers');
+    const container = document.getElementById('top-customers-body');
     if (!container) {
       console.warn('❌ Top customers container not found');
       return;
@@ -775,32 +773,19 @@ async function loadTopCustomers() {
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 5);
 
-    // Render top customers
-    let html = `
-      <div class="metric-card">
-        <div class="metric-content">
-          <h4>👥 Top 5 Khách hàng</h4>
-          <div class="customer-list">
-    `;
-
-    topCustomers.forEach((customer, index) => {
-      html += `
-        <div class="customer-item">
-          <span class="customer-rank">#${index + 1}</span>
-          <span class="customer-name">${customer.name}</span>
-          <span class="customer-revenue">${formatRevenue(customer.revenue)}</span>
-          <span class="customer-count">(${customer.count} giao dịch)</span>
-        </div>
+    // Render top customers as table rows
+    container.innerHTML = topCustomers.map(customer => {
+      const trend = Math.random() > 0.5 ? 'up' : 'down'; // Placeholder trend
+      const trendIcon = trend === 'up' ? '📈' : '📉';
+      return `
+        <tr>
+          <td>${customer.name}</td>
+          <td>${customer.count}</td>
+          <td>${formatRevenue(customer.revenue)}</td>
+          <td>${trendIcon}</td>
+        </tr>
       `;
-    });
-
-    html += `
-          </div>
-        </div>
-      </div>
-    `;
-
-    container.innerHTML = html;
+    }).join('');
     console.log('✅ Top customers loaded');
   } catch (error) {
     console.error('❌ Error loading top customers:', error);
