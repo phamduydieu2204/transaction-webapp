@@ -155,16 +155,19 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
 
     // Get background color based on transaction type
     const getTransactionRowColor = (transactionType) => {
-      switch (transactionType) {
-        case "Chưa thanh toán":
+      // Normalize the transaction type (trim and lowercase for comparison)
+      const normalizedType = (transactionType || "").trim().toLowerCase();
+      
+      switch (normalizedType) {
+        case "chưa thanh toán":
           return "#FFF8DC"; // Light beige
-        case "Đã thanh toán":
+        case "đã thanh toán":
           return "#E0F7FA"; // Light cyan
-        case "Hoàn tiền":
+        case "hoàn tiền":
           return "#FFEBEE"; // Light red
-        case "Hủy giao dịch":
+        case "hủy giao dịch":
           return "#F5F5F5"; // Light gray
-        case "Đã hoàn tất":
+        case "đã hoàn tất":
         default:
           return ""; // Keep default/current color
       }
@@ -175,10 +178,13 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
 
     // Debug employee code and transaction type for first few transactions
     if (index < 5) {
+      const normalizedType = (transaction.transactionType || "").trim().toLowerCase();
       console.log(`🔍 [UltraFast] Transaction ${index} debug:`, {
         transactionId: transaction.transactionId,
         transactionType: transaction.transactionType,
         transactionTypeString: JSON.stringify(transaction.transactionType),
+        normalizedType: normalizedType,
+        normalizedTypeString: JSON.stringify(normalizedType),
         rowBackgroundColor: rowBackgroundColor,
         rowStyle: rowStyle,
         employeeCode: employeeCode
