@@ -174,7 +174,7 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     };
 
     const rowBackgroundColor = getTransactionRowColor(transaction.transactionType);
-    const rowStyle = rowBackgroundColor ? `style="background-color: ${rowBackgroundColor};"` : "";
+    const rowStyle = rowBackgroundColor ? `style="background-color: ${rowBackgroundColor} !important;"` : "";
 
     // Debug employee code and transaction type for first few transactions
     if (index < 5) {
