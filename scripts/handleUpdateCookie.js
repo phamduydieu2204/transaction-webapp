@@ -89,7 +89,8 @@ export async function confirmUpdateCookie() {
     if (!newCookie) {
       console.log('❌ Empty cookie');
       enableInteraction();
-      showResultModal("⚠️ Vui lòng nhập cookie mới trước khi cập nhật!", false);
+      console.log('🔔 Showing alert for empty cookie');
+      alert("⚠️ Vui lòng nhập cookie mới trước khi cập nhật!");
       return; // Không đóng modal, để user sửa
     }
     
@@ -97,7 +98,8 @@ export async function confirmUpdateCookie() {
     if (newCookie.length < 10) {
       console.log('❌ Cookie too short');
       enableInteraction();
-      showResultModal("⚠️ Cookie có vẻ quá ngắn. Vui lòng kiểm tra lại!", false);
+      console.log('🔔 Showing alert for short cookie');
+      alert("⚠️ Cookie có vẻ quá ngắn. Vui lòng kiểm tra lại!");
       return; // Không đóng modal, để user sửa
     }
     
@@ -105,7 +107,7 @@ export async function confirmUpdateCookie() {
     if (!newCookie.includes('=')) {
       console.log('❌ Cookie invalid format');
       enableInteraction();
-      showResultModal("⚠️ Cookie có vẻ không đúng định dạng. Cookie thường chứa dấu '='.", false);
+      alert("⚠️ Cookie có vẻ không đúng định dạng. Cookie thường chứa dấu '='.");
       return; // Không đóng modal, để user sửa
     }
 
