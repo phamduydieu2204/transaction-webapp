@@ -42,6 +42,10 @@ export async function loadOverviewReport() {
     
     // Update all components
     console.log('🚀 Loading overview components...');
+    
+    // Wait a moment for DOM to be ready
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     await Promise.all([
       updateKPICards(kpis),
       loadTopProducts(),
@@ -75,7 +79,16 @@ async function loadOverviewHTML() {
     }
     
     const html = await response.text();
-    container.innerHTML = html;
+    
+    // Find the overview report container and add content to it
+    const overviewPage = document.getElementById('report-overview');
+    if (overviewPage) {
+      overviewPage.innerHTML = html;
+      overviewPage.classList.add('active');
+    } else {
+      // Fallback: create the structure
+      container.innerHTML = `<div id="report-overview" class="report-page active">${html}</div>`;
+    }
     
     console.log('📄 Overview HTML template loaded');
   } catch (error) {
@@ -688,6 +701,11 @@ async function loadTopProducts() {
     const container = document.getElementById('top-software-body');
     if (!container) {
       console.warn('❌ Top products container not found');
+      console.warn('🔍 Available elements:', {
+        'top-software-body': !!document.getElementById('top-software-body'),
+        'topProducts': !!document.getElementById('topProducts'),
+        'top-software-table': !!document.getElementById('top-software-table')
+      });
       return;
     }
 
@@ -745,6 +763,11 @@ async function loadTopCustomers() {
     const container = document.getElementById('top-customers-body');
     if (!container) {
       console.warn('❌ Top customers container not found');
+      console.warn('🔍 Available elements:', {
+        'top-customers-body': !!document.getElementById('top-customers-body'),
+        'topCustomers': !!document.getElementById('topCustomers'),
+        'top-customers-table': !!document.getElementById('top-customers-table')
+      });
       return;
     }
 
