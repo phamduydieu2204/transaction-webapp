@@ -47,8 +47,17 @@ export async function handleUpdateCookie(index, transactionList) {
 
 export function copyCurrentCookie() {
   const val = document.getElementById("currentCookie").value;
-  navigator.clipboard.writeText(val);
-  alert("Đã copy Cookie hiện tại.");
+  
+  if (!val || val === "(Không có dữ liệu)") {
+    showResultModal("⚠️ Không có cookie để sao chép!", false);
+    return;
+  }
+  
+  navigator.clipboard.writeText(val).then(() => {
+    showResultModal("✅ Đã sao chép cookie thành công!", true);
+  }).catch(() => {
+    showResultModal("❌ Không thể sao chép cookie!", false);
+  });
 }
 
 export async function confirmUpdateCookie() {
@@ -56,8 +65,31 @@ disableInteraction();
   const transaction = window.currentCookieTransaction;
   const newCookie = document.getElementById("newCookie").value.trim();
 
-  if (!transaction || !transaction.transactionId) return;
-  if (!newCookie) return alert("Vui lòng nhập cookie mới.");
+  if (!transaction || !transaction.transactionId) {
+    enableInteraction();
+    return;
+  }
+  
+  // Kiểm tra cookie mới có rỗng không
+  if (!newCookie) {
+    enableInteraction();
+    showResultModal("⚠️ Vui lòng nhập cookie mới trước khi cập nhật!", false);
+    return;
+  }
+  
+  // Kiểm tra cookie có quá ngắn không (có thể là lỗi)
+  if (newCookie.length < 10) {
+    enableInteraction();
+    showResultModal("⚠️ Cookie có vẻ quá ngắn. Vui lòng kiểm tra lại!", false);
+    return;
+  }
+  
+  // Kiểm tra cookie có chứa ký tự đặc biệt cần thiết không
+  if (!newCookie.includes('=')) {
+    enableInteraction();
+    showResultModal("⚠️ Cookie có vẻ không đúng định dạng. Cookie thường chứa dấu '='.", false);
+    return;
+  }
 
   const { BACKEND_URL } = getConstants();
   try {
@@ -76,9 +108,9 @@ disableInteraction();
     const result = await response.json();
     closeProcessingModal();
     if (result.status === "success") {
-      showResultModal("Cập nhật cookie thành công!", true);
+      showResultModal("✅ Cập nhật cookie thành công!\n\nCookie mới đã được lưu cho giao dịch " + transaction.transactionId, true);
     } else {
-      showResultModal(result.message || "Không thể cập nhật cookie", false);
+      showResultModal("❌ " + (result.message || "Không thể cập nhật cookie"), false);
     }
   } catch (err) {
     closeProcessingModal();
