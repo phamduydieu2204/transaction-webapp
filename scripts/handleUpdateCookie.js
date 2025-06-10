@@ -200,9 +200,22 @@ export function closeUpdateCookieModal() {
 }
 
 function disableInteraction() {
-    document.getElementById("formOverlay").style.display = "block";
+  console.log('🔒 Disabling interaction');
+  const overlay = document.getElementById("formOverlay");
+  if (overlay) {
+    overlay.style.display = "block";
+  } else {
+    console.error('❌ formOverlay not found');
   }
-  function enableInteraction() {
-    document.getElementById("formOverlay").style.display = "none";
+}
+
+function enableInteraction() {
+  console.log('🔓 Enabling interaction'); 
+  const overlay = document.getElementById("formOverlay");
+  if (overlay) {
+    overlay.style.display = "none";
+  } else {
+    console.error('❌ formOverlay not found');
   }
+}
   
