@@ -45,6 +45,12 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     return new Date(y, m - 1, d);
   };
 
+  // Debug: Log unique transaction types
+  if (paginatedItems.length > 0) {
+    const uniqueTypes = [...new Set(paginatedItems.map(t => t.transactionType))];
+    console.log('🎨 [UltraFast] Unique transaction types in current page:', uniqueTypes);
+  }
+
   // ✅ Build minimal HTML for visible rows only
   const rowsHtml = paginatedItems.map((transaction, index) => {
     // For search results, use the local index in the search results
