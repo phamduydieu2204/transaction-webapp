@@ -215,6 +215,7 @@ function updateTransactionPagination(totalPages, currentPage) {
 }
 
 export function updateTable(transactionList, currentPage, itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction) {
+  console.log('🚀 MAIN updateTable CALLED with', transactionList.length, 'transactions');
   const tableBody = document.querySelector("#transactionTable tbody");
   if (!tableBody) {
     console.error("❌ Không tìm thấy tbody của transactionTable");
@@ -281,6 +282,42 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     const endDate = parseDate(transaction.endDate);
     if (endDate < today) {
       row.classList.add("expired-row");
+    }
+
+    // Get background color based on transaction type
+    const getTransactionRowColor = (transactionType) => {
+      // Normalize the transaction type (trim and lowercase for comparison)
+      const normalizedType = (transactionType || "").trim().toLowerCase();
+      
+      switch (normalizedType) {
+        case "chưa thanh toán":
+          return "#FFF8DC"; // Light beige
+        case "đã thanh toán":
+          return "#E0F7FA"; // Light cyan
+        case "hoàn tiền":
+          return "#FFEBEE"; // Light red
+        case "hủy giao dịch":
+          return "#F5F5F5"; // Light gray
+        case "đã hoàn tất":
+        default:
+          return ""; // Keep default/current color
+      }
+    };
+
+    // Apply background color
+    const rowBackgroundColor = getTransactionRowColor(transaction.transactionType);
+    if (rowBackgroundColor) {
+      row.style.backgroundColor = rowBackgroundColor;
+    }
+
+    // DEBUG: Log for first few rows
+    if (index < 3) {
+      console.log(`🎨 MAIN updateTable ROW ${index}:`, {
+        transactionType: transaction.transactionType,
+        normalizedType: (transaction.transactionType || "").trim().toLowerCase(),
+        rowBackgroundColor: rowBackgroundColor,
+        appliedStyle: row.style.backgroundColor
+      });
     }
 
     const software = (transaction.softwareName || '').toLowerCase();
