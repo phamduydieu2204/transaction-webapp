@@ -160,13 +160,13 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       
       switch (normalizedType) {
         case "chưa thanh toán":
-          return "#FFF8DC"; // Light beige
+          return "#FFD700"; // Bright gold for testing
         case "đã thanh toán":
-          return "#E0F7FA"; // Light cyan
+          return "#00FFFF"; // Bright cyan for testing
         case "hoàn tiền":
-          return "#FFEBEE"; // Light red
+          return "#FF0000"; // Bright red for testing
         case "hủy giao dịch":
-          return "#F5F5F5"; // Light gray
+          return "#808080"; // Gray for testing
         case "đã hoàn tất":
         default:
           return ""; // Keep default/current color
