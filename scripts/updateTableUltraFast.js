@@ -166,16 +166,15 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     const rowBackgroundColor = getTransactionRowColor(transaction.transactionType);
     const rowStyle = rowBackgroundColor ? `style="background-color: ${rowBackgroundColor};"` : "";
 
-    // Debug employee code for first transaction
-    if (index === 0) {
-      console.log('🔍 [UltraFast] First transaction employee data:', {
-        maNhanVien: transaction.maNhanVien,
-        tenNhanVien: transaction.tenNhanVien,
-        employeeCode: employeeCode,
-        color: employeeColor,
-        allKeys: Object.keys(transaction)
+    // Debug employee code and transaction type for first few transactions
+    if (index < 5) {
+      console.log(`🔍 [UltraFast] Transaction ${index} debug:`, {
+        transactionId: transaction.transactionId,
+        transactionType: transaction.transactionType,
+        rowBackgroundColor: rowBackgroundColor,
+        rowStyle: rowStyle,
+        employeeCode: employeeCode
       });
-      console.log('🔍 [UltraFast] Employee code determined:', employeeCode);
     }
 
     // Info cell with 3-line layout: employee code (right), contact, order info
