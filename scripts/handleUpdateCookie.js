@@ -90,7 +90,7 @@ export async function confirmUpdateCookie() {
       console.log('❌ Empty cookie');
       enableInteraction();
       showResultModal("⚠️ Vui lòng nhập cookie mới trước khi cập nhật!", false);
-      return;
+      return; // Không đóng modal, để user sửa
     }
     
     // Kiểm tra cookie có quá ngắn không (có thể là lỗi)
@@ -98,7 +98,7 @@ export async function confirmUpdateCookie() {
       console.log('❌ Cookie too short');
       enableInteraction();
       showResultModal("⚠️ Cookie có vẻ quá ngắn. Vui lòng kiểm tra lại!", false);
-      return;
+      return; // Không đóng modal, để user sửa
     }
     
     // Kiểm tra cookie có chứa ký tự đặc biệt cần thiết không
@@ -106,7 +106,7 @@ export async function confirmUpdateCookie() {
       console.log('❌ Cookie invalid format');
       enableInteraction();
       showResultModal("⚠️ Cookie có vẻ không đúng định dạng. Cookie thường chứa dấu '='.", false);
-      return;
+      return; // Không đóng modal, để user sửa
     }
 
     console.log('✅ All validations passed, proceeding with update');
@@ -133,17 +133,21 @@ export async function confirmUpdateCookie() {
     
     if (result.status === "success") {
       showResultModal("✅ Cập nhật cookie thành công!\n\nCookie mới đã được lưu cho giao dịch " + transaction.transactionId, true);
+      // Chỉ đóng modal khi thành công
+      enableInteraction();
+      closeUpdateCookieModal();
     } else {
       showResultModal("❌ " + (result.message || "Không thể cập nhật cookie"), false);
+      // Không đóng modal khi thất bại, để user thử lại
+      enableInteraction();
     }
     
   } catch (err) {
     console.error('❌ Error in confirmUpdateCookie:', err);
     closeProcessingModal();
     showResultModal("❌ Lỗi khi cập nhật cookie: " + err.message, false);
-  } finally {
+    // Không đóng modal khi có lỗi, để user thử lại
     enableInteraction();
-    closeUpdateCookieModal();
   }
 }
 
