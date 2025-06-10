@@ -174,7 +174,7 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     };
 
     const rowBackgroundColor = getTransactionRowColor(transaction.transactionType);
-    const rowStyle = rowBackgroundColor ? `style="background-color: ${rowBackgroundColor} !important;"` : "";
+    const rowStyleAttr = rowBackgroundColor ? ` style="background-color: ${rowBackgroundColor} !important;"` : "";
 
     // Debug employee code and transaction type for first few transactions
     if (index < 5) {
@@ -186,7 +186,7 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
         normalizedType: normalizedType,
         normalizedTypeString: JSON.stringify(normalizedType),
         rowBackgroundColor: rowBackgroundColor,
-        rowStyle: rowStyle,
+        rowStyleAttr: rowStyleAttr,
         employeeCode: employeeCode
       });
     }
@@ -260,7 +260,7 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     `;
 
     return `
-      <tr class="${isExpired ? 'expired-row' : ''}" data-index="${dataIndex}" ${rowStyle}>
+      <tr class="${isExpired ? 'expired-row' : ''}" data-index="${dataIndex}"${rowStyleAttr}>
         <td>${transaction.transactionId}</td>
         <td>${formatDate(transaction.transactionDate)}</td>
         <td>${transaction.transactionType}</td>

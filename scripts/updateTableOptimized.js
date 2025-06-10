@@ -123,10 +123,10 @@ export function updateTableOptimized(transactionList, currentPage, itemsPerPage,
     };
 
     const rowBackgroundColor = getTransactionRowColor(transaction.transactionType);
-    const rowStyle = rowBackgroundColor ? `style="background-color: ${rowBackgroundColor} !important;"` : "";
+    const rowStyleAttr = rowBackgroundColor ? ` style="background-color: ${rowBackgroundColor} !important;"` : "";
 
     return `
-      <tr class="${isExpired ? 'expired-row' : ''}" data-index="${globalIndex}" ${rowStyle}>
+      <tr class="${isExpired ? 'expired-row' : ''}" data-index="${globalIndex}"${rowStyleAttr}>
         <td>${transaction.transactionId}</td>
         <td>${formatDate(transaction.transactionDate)}</td>
         <td>${transaction.transactionType}</td>
