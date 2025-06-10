@@ -258,31 +258,3 @@ export function groupByTimePeriod(data = [], period = 'month', dateField = 'ngay
 }
 
 
-
-/**
- * Calculate growth rate between two values
- * @param {number} currentValue - Current value
- * @param {number} previousValue - Previous value
- * @returns {number} Growth rate as percentage
- */
-export function calculateGrowthRate(currentValue, previousValue) {
-  if (!previousValue || previousValue === 0) return 0;
-  
-  return ((currentValue - previousValue) / Math.abs(previousValue)) * 100;
-}
-
-/**
- * Calculate average value from array
- * @param {Array} values - Array of numbers
- * @returns {number} Average value
- */
-export function calculateAverage(values = []) {
-  if (!Array.isArray(values) || values.length === 0) return 0;
-  
-  const sum = values.reduce((total, value) => {
-    const num = parseFloat(value) || 0;
-    return total + num;
-  }, 0);
-  
-  return sum / values.length;
-}
