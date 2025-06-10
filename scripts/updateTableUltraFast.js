@@ -169,6 +169,16 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
 
     const rowBackgroundColor = getTransactionRowColor(transaction.transactionType);
     const rowStyleAttr = rowBackgroundColor ? ` style="background-color: ${rowBackgroundColor} !important;"` : "";
+    
+    // DEBUG: Log for first few rows
+    if (index < 3) {
+      console.log(`🎨 ROW ${index}:`, {
+        transactionType: transaction.transactionType,
+        normalizedType: (transaction.transactionType || "").trim().toLowerCase(),
+        rowBackgroundColor: rowBackgroundColor,
+        rowStyleAttr: rowStyleAttr
+      });
+    }
 
 
     // Info cell with 3-line layout: employee code (right), contact, order info
@@ -263,6 +273,13 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
   // ✅ Single ultra-fast DOM update
   batchWrite(() => {
     tableBody.innerHTML = rowsHtml;
+    
+    // DEBUG: Check actual DOM after insertion
+    const firstRow = tableBody.querySelector('tr');
+    if (firstRow) {
+      console.log('🎨 ACTUAL FIRST ROW HTML:', firstRow.outerHTML.substring(0, 300));
+      console.log('🎨 FIRST ROW STYLE ATTR:', firstRow.getAttribute('style'));
+    }
   });
 
   // ✅ Single event delegation setup (if not already done)
