@@ -39,7 +39,11 @@ export async function loadOverviewReport() {
     
     // Calculate KPIs
     const kpis = calculateOverviewKPIs(transactions, expenses);
-    console.log('💰 Calculated KPIs:', kpis);
+    console.log('💰 Calculated KPIs:');
+    console.log('  - Revenue:', kpis.revenue);
+    console.log('  - Expense:', kpis.expense);
+    console.log('  - Profit:', kpis.profit);
+    console.log('  - Transactions:', kpis.transactions);
     
     // Update all components
     console.log('🚀 Loading overview components...');
@@ -266,19 +270,26 @@ function calculateOverviewKPIs(transactions, expenses) {
     return sum + expense;
   }, 0);
   
-  console.log('📊 Revenue calculation:', {
-    currentMonthTransactions: currentMonthTransactions.length,
-    totalRevenue,
-    sampleTransaction: currentMonthTransactions[0],
-    firstTransactionFields: currentMonthTransactions[0] ? Object.keys(currentMonthTransactions[0]) : [],
-    revenueFields: currentMonthTransactions.slice(0, 3).map(t => ({
-      doanhThu: t.doanhThu,
-      revenue: t.revenue, 
-      Revenue: t.Revenue,
-      doanh_thu: t.doanh_thu,
-      allFields: Object.keys(t)
-    }))
-  });
+  console.log('📊 Revenue calculation:');
+  console.log('  - Current month transactions:', currentMonthTransactions.length);
+  console.log('  - Total revenue calculated:', totalRevenue);
+  console.log('  - Sample transaction:', currentMonthTransactions[0]);
+  console.log('  - Available fields:', currentMonthTransactions[0] ? Object.keys(currentMonthTransactions[0]) : []);
+  
+  if (currentMonthTransactions.length > 0) {
+    console.log('  - Revenue field analysis:');
+    currentMonthTransactions.slice(0, 3).forEach((t, i) => {
+      console.log(`    Transaction ${i + 1}:`, {
+        doanhThu: t.doanhThu,
+        revenue: t.revenue, 
+        Revenue: t.Revenue,
+        doanh_thu: t.doanh_thu,
+        soTien: t.soTien,
+        amount: t.amount,
+        giaTri: t.giaTri
+      });
+    });
+  }
   
   const totalProfit = totalRevenue - totalExpense;
   const totalTransactions = currentMonthTransactions.length;
@@ -408,11 +419,11 @@ function updateKPICard(type, data) {
     return;
   }
   
-  console.log(`💰 Updating KPI ${type}:`, {
-    element: valueElement.id,
-    value: data.value,
-    growth: data.growth
-  });
+  console.log(`💰 Updating KPI ${type}:`);
+  console.log(`  - Element ID: ${valueElement ? valueElement.id : 'NOT FOUND'}`);
+  console.log(`  - Raw value: ${data.value}`);
+  console.log(`  - Formatted value: ${type === 'transaction' ? data.value.toLocaleString() : formatRevenue(data.value)}`);
+  console.log(`  - Growth: ${data.growth}%`);
   
   if (valueElement) {
     if (type === 'transaction') {
