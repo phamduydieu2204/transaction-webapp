@@ -127,11 +127,11 @@ export function renderFinancialPerformance(metrics) {
         <div class="performance-card pnl-card">
           <h3>📋 Báo Cáo Lãi Lỗ</h3>
           <div class="pnl-items">
-            <div class="pnl-item revenue" data-tooltip="Tổng tiền thu được từ bán hàng và dịch vụ trong kỳ">
+            <div class="pnl-item revenue" data-tooltip="Tổng tiền thu được từ các giao dịch đã hoàn tất và dịch vụ trong kỳ">
               <span class="label">Doanh thu</span>
               <span class="value positive">${formatCurrency(metrics.financial.totalRevenue, 'VND')}</span>
             </div>
-            <div class="pnl-item cogs" data-tooltip="Chi phí trực tiếp để tạo ra sản phẩm/dịch vụ đã bán (Cost of Goods Sold)">
+            <div class="pnl-item cogs" data-tooltip="Chi phí trực tiếp để tạo ra sản phẩm/dịch vụ đã hoàn tất (Cost of Goods Sold)">
               <span class="label">Giá vốn hàng bán (COGS)</span>
               <span class="value negative">-${formatCurrency(metrics.costs.costOfRevenue, 'VND')}</span>
             </div>

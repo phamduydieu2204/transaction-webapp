@@ -104,7 +104,7 @@ describe('User Workflow Integration Tests', () => {
       customer: 'Công ty ABC',
       software: 'Phần mềm quản lý',
       package: 'Gói cơ bản',
-      loaiKeToAn: 'Doanh thu bán hàng'
+      loaiKeToAn: 'Doanh thu đã hoàn tất'
     },
     {
       id: 'TXN002',
@@ -126,7 +126,7 @@ describe('User Workflow Integration Tests', () => {
       customer: 'Doanh nghiệp XYZ',
       software: 'Phần mềm quản lý',
       package: 'Gói nâng cao',
-      loaiKeToAn: 'Doanh thu bán hàng'
+      loaiKeToAn: 'Doanh thu đã hoàn tất'
     }
   ];
 

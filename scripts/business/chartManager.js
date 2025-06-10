@@ -66,7 +66,7 @@ export function renderRevenueAnalysis(metrics) {
                 <div class="metric-value">${formatCurrency(metrics.costs.costPerTransaction, 'VND')}</div>
               </div>
             </div>
-            <div class="metric-item" data-tooltip="Doanh thu trung bình trên mỗi giao dịch, thể hiện hiệu quả bán hàng">
+            <div class="metric-item" data-tooltip="Doanh thu trung bình trên mỗi giao dịch, thể hiện hiệu quả hoàn tất giao dịch">
               <div class="metric-icon">🚀</div>
               <div class="metric-content">
                 <div class="metric-label">Chỉ số năng suất</div>

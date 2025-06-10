@@ -75,12 +75,12 @@ console.log("🔎 typeof fetchSoftwareList =", typeof fetchSoftwareList);
                                .find(opt => opt.value.toLowerCase() === normalizedType);
     transactionTypeSelect.value = matchedOption ? matchedOption.value : "";
     
-    // Thêm cảnh báo nếu đang sửa từ Bán hàng sang Hoàn tiền
+    // Thêm cảnh báo nếu đang sửa từ Đã hoàn tất sang Hoàn tiền
     transactionTypeSelect.addEventListener("change", function() {
       if (transaction.transactionType !== "Hoàn Tiền" && this.value === "Hoàn Tiền") {
-        alert("⚠️ Lưu ý: Khi chuyển từ 'Bán hàng' sang 'Hoàn Tiền':\n\n" +
+        alert("⚠️ Lưu ý: Khi chuyển từ 'Đã hoàn tất' sang 'Hoàn Tiền':\n\n" +
               "1. Hệ thống sẽ tự động tạo giao dịch hoàn tiền MỚI\n" +
-              "2. Giao dịch gốc vẫn giữ là 'Bán hàng' với doanh thu ban đầu\n" +
+              "2. Giao dịch gốc vẫn giữ là 'Đã hoàn tất' với doanh thu ban đầu\n" +
               "3. Nhập số tiền hoàn lại vào ô Doanh thu (VD: hoàn 11 VNĐ thì nhập 11)\n" +
               "4. Hệ thống sẽ tự động chuyển thành số âm (-11)\n\n" +
               "💡 Ví dụ: Giao dịch gốc 1122 VNĐ, hoàn lại 11 VNĐ:\n" +

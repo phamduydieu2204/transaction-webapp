@@ -79,7 +79,7 @@ const generateTransactionData = (count) => {
     khachHang: `Customer_${i % 100}`,
     phanMem: `Software_${String.fromCharCode(65 + (i % 10))}`, // Software_A to Software_J
     goiDichVu: ['Basic', 'Premium', 'Enterprise'][i % 3],
-    loaiKeToAn: ['Doanh thu bán hàng', 'Doanh thu dịch vụ'][i % 2]
+    loaiKeToAn: ['Doanh thu đã hoàn tất', 'Doanh thu dịch vụ'][i % 2]
   }));
 };
 
