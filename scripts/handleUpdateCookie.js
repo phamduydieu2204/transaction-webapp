@@ -4,10 +4,18 @@ import { showProcessingModal } from './showProcessingModal.js';
 import { closeProcessingModal } from './closeProcessingModal.js';
 
 export async function handleUpdateCookie(index, transactionList) {
+  console.log('🍪 handleUpdateCookie called with:', { index, transactionListLength: transactionList?.length });
+  
   const transaction = transactionList?.[index];
-  if (!transaction) return alert("Không tìm thấy giao dịch.");
+  console.log('🍪 Found transaction:', transaction);
+  
+  if (!transaction) {
+    console.error('❌ No transaction found at index:', index);
+    return alert("Không tìm thấy giao dịch.");
+  }
 
   const modal = document.getElementById("updateCookieModal");
+  console.log('🍪 Modal found:', !!modal);
   const currentCookieEl = document.getElementById("currentCookie");
   const newCookieEl = document.getElementById("newCookie");
 

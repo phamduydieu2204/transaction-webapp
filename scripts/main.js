@@ -340,8 +340,8 @@ window.deleteTransaction = (index) => {
   );
 };
 window.handleUpdateCookie = (index) => {
-  const state = getState();
-  return handleUpdateCookie(index, state.transactions);
+  // Use window.transactionList for consistency with updateTable.js
+  return handleUpdateCookie(index, window.transactionList);
 };
 window.handleChangePassword = handleChangePassword;
 window.handleAddExpense = handleAddExpense;

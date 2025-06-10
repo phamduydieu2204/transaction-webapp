@@ -94,8 +94,13 @@ function handleTransactionActionByIndex(selectElement) {
       }
       break;
     case 'updateCookie':
+      console.log('🍪 Update cookie action triggered for index:', globalIndex);
+      console.log('🍪 Transaction:', transaction);
+      console.log('🍪 handleUpdateCookie function exists:', typeof window.handleUpdateCookie === 'function');
       if (typeof window.handleUpdateCookie === 'function') {
         window.handleUpdateCookie(globalIndex);
+      } else {
+        console.error('❌ handleUpdateCookie function not found');
       }
       break;
     case 'changePassword':
