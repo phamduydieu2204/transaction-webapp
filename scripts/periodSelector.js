@@ -13,10 +13,10 @@ let currentReportPeriod = 'this_month';
 window.togglePeriodDropdown = function() {
   const dropdown = document.querySelector('.period-dropdown');
   if (dropdown) {
-    dropdown.classList.toggle('active');
+    dropdown.classList.toggle('open');
     
     // Close dropdown when clicking outside
-    if (dropdown.classList.contains('active')) {
+    if (dropdown.classList.contains('open')) {
       document.addEventListener('click', closePeriodDropdown);
     }
   }
@@ -28,7 +28,7 @@ window.togglePeriodDropdown = function() {
 function closePeriodDropdown(event) {
   const dropdown = document.querySelector('.period-dropdown');
   if (dropdown && !dropdown.contains(event.target)) {
-    dropdown.classList.remove('active');
+    dropdown.classList.remove('open');
     document.removeEventListener('click', closePeriodDropdown);
   }
 }
@@ -69,7 +69,7 @@ window.selectReportPeriod = function(period) {
   // Close dropdown
   const dropdown = document.querySelector('.period-dropdown');
   if (dropdown) {
-    dropdown.classList.remove('active');
+    dropdown.classList.remove('open');
   }
 }
 
@@ -291,8 +291,8 @@ export function initPeriodSelector() {
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
       const dropdown = document.querySelector('.period-dropdown');
-      if (dropdown && dropdown.classList.contains('active')) {
-        dropdown.classList.remove('active');
+      if (dropdown && dropdown.classList.contains('open')) {
+        dropdown.classList.remove('open');
       }
     }
   });
