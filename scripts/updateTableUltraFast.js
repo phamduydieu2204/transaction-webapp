@@ -49,6 +49,7 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
   if (paginatedItems.length > 0) {
     const uniqueTypes = [...new Set(paginatedItems.map(t => t.transactionType))];
     console.log('🎨 [UltraFast] Unique transaction types in current page:', uniqueTypes);
+    console.log('🎨 [UltraFast] Raw unique transaction types:', JSON.stringify(uniqueTypes, null, 2));
   }
 
   // ✅ Build minimal HTML for visible rows only
@@ -177,6 +178,7 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       console.log(`🔍 [UltraFast] Transaction ${index} debug:`, {
         transactionId: transaction.transactionId,
         transactionType: transaction.transactionType,
+        transactionTypeString: JSON.stringify(transaction.transactionType),
         rowBackgroundColor: rowBackgroundColor,
         rowStyle: rowStyle,
         employeeCode: employeeCode
