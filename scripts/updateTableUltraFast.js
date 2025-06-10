@@ -283,6 +283,9 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
   // ✅ Single ultra-fast DOM update
   batchWrite(() => {
     tableBody.innerHTML = rowsHtml;
+    
+    // Debug: Check actual HTML after insertion
+    console.log('🎨 [UltraFast] Sample row HTML after insertion:', tableBody.querySelector('tr')?.outerHTML?.substring(0, 200) + '...');
   });
 
   // ✅ Single event delegation setup (if not already done)
