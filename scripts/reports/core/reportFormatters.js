@@ -195,3 +195,38 @@ export function truncateText(text, maxLength = 50) {
   
   return text.slice(0, maxLength - 3) + '...';
 }
+
+/**
+ * Format date for display
+ * @param {Date|string} date - Date to format
+ * @param {string} format - Format type ('short', 'long', 'date-only')
+ * @returns {string} Formatted date
+ */
+export function formatDate(date, format = 'short') {
+  if (!date) return '';
+  
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return '';
+  
+  switch (format) {
+    case 'short':
+      return d.toLocaleDateString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    case 'long':
+      return d.toLocaleDateString('vi-VN', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+    case 'date-only':
+      return d.toLocaleDateString('vi-VN');
+    case 'datetime':
+      return d.toLocaleString('vi-VN');
+    default:
+      return d.toLocaleDateString('vi-VN');
+  }
+}

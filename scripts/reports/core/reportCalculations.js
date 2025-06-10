@@ -256,3 +256,65 @@ export function groupByTimePeriod(data = [], period = 'month', dateField = 'ngay
   
   return grouped;
 }
+
+/**
+ * Calculate customer lifetime value
+ * @param {Array} transactions - Customer's transactions
+ * @returns {number} Lifetime value
+ */
+export function calculateCustomerLifetimeValue(transactions = []) {
+  if (!Array.isArray(transactions)) return 0;
+  
+  return transactions.reduce((total, transaction) => {
+    const revenue = parseFloat(transaction.revenue || transaction.doanhThu) || 0;
+    return total + revenue;
+  }, 0);
+}
+
+/**
+ * Calculate days between two dates
+ * @param {Date|string} startDate - Start date
+ * @param {Date|string} endDate - End date
+ * @returns {number} Number of days
+ */
+export function calculateDaysBetween(startDate, endDate) {
+  if (!startDate || !endDate) return 0;
+  
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) return 0;
+  
+  const diffTime = Math.abs(end - start);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  return diffDays;
+}
+
+/**
+ * Calculate growth rate between two values
+ * @param {number} currentValue - Current value
+ * @param {number} previousValue - Previous value
+ * @returns {number} Growth rate as percentage
+ */
+export function calculateGrowthRate(currentValue, previousValue) {
+  if (!previousValue || previousValue === 0) return 0;
+  
+  return ((currentValue - previousValue) / Math.abs(previousValue)) * 100;
+}
+
+/**
+ * Calculate average value from array
+ * @param {Array} values - Array of numbers
+ * @returns {number} Average value
+ */
+export function calculateAverage(values = []) {
+  if (!Array.isArray(values) || values.length === 0) return 0;
+  
+  const sum = values.reduce((total, value) => {
+    const num = parseFloat(value) || 0;
+    return total + num;
+  }, 0);
+  
+  return sum / values.length;
+}
