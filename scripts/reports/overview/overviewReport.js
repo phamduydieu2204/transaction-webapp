@@ -269,7 +269,15 @@ function calculateOverviewKPIs(transactions, expenses) {
   console.log('📊 Revenue calculation:', {
     currentMonthTransactions: currentMonthTransactions.length,
     totalRevenue,
-    sampleTransaction: currentMonthTransactions[0]
+    sampleTransaction: currentMonthTransactions[0],
+    firstTransactionFields: currentMonthTransactions[0] ? Object.keys(currentMonthTransactions[0]) : [],
+    revenueFields: currentMonthTransactions.slice(0, 3).map(t => ({
+      doanhThu: t.doanhThu,
+      revenue: t.revenue, 
+      Revenue: t.Revenue,
+      doanh_thu: t.doanh_thu,
+      allFields: Object.keys(t)
+    }))
   });
   
   const totalProfit = totalRevenue - totalExpense;
