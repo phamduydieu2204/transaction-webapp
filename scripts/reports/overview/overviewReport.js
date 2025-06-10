@@ -246,11 +246,45 @@ function calculateOverviewKPIs(transactions, expenses) {
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
   
+  console.log('📅 Date filtering setup:');
+  console.log(`  - Current date: ${now.toISOString()}`);
+  console.log(`  - Current month: ${currentMonth} (${now.getMonth() + 1})`);
+  console.log(`  - Current year: ${currentYear}`);
+  console.log(`  - Total transactions to filter: ${transactions.length}`);
+  
+  // Check date field names in first few transactions
+  if (transactions.length > 0) {
+    console.log('  - Sample transaction date fields:');
+    transactions.slice(0, 3).forEach((t, i) => {
+      console.log(`    Transaction ${i + 1}:`, {
+        ngayGiaoDich: t.ngayGiaoDich,
+        date: t.date,
+        ngay: t.ngay,
+        dateTime: t.dateTime,
+        timestamp: t.timestamp,
+        allFields: Object.keys(t).filter(key => key.toLowerCase().includes('date') || key.toLowerCase().includes('ngay'))
+      });
+    });
+  }
+  
   // Filter current month data
   const currentMonthTransactions = transactions.filter(t => {
     const transactionDate = new Date(t.ngayGiaoDich || t.date);
-    return transactionDate.getMonth() === currentMonth && 
-           transactionDate.getFullYear() === currentYear;
+    const isCurrentMonth = transactionDate.getMonth() === currentMonth && 
+                          transactionDate.getFullYear() === currentYear;
+    
+    // Debug first few matches/mismatches
+    if (transactions.indexOf(t) < 3) {
+      console.log(`    Filter check ${transactions.indexOf(t) + 1}:`, {
+        rawDate: t.ngayGiaoDich || t.date,
+        parsedDate: transactionDate.toISOString(),
+        transactionMonth: transactionDate.getMonth(),
+        transactionYear: transactionDate.getFullYear(),
+        isCurrentMonth
+      });
+    }
+    
+    return isCurrentMonth;
   });
   
   const currentMonthExpenses = expenses.filter(e => {
