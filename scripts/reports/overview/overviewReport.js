@@ -256,14 +256,15 @@ function calculateOverviewKPIs(transactions, expenses) {
   if (transactions.length > 0) {
     console.log('  - Sample transaction date fields:');
     transactions.slice(0, 3).forEach((t, i) => {
-      console.log(`    Transaction ${i + 1}:`, {
+      console.log(`    Transaction ${i + 1} date fields:`, {
         ngayGiaoDich: t.ngayGiaoDich,
         date: t.date,
         ngay: t.ngay,
         dateTime: t.dateTime,
-        timestamp: t.timestamp,
-        allFields: Object.keys(t).filter(key => key.toLowerCase().includes('date') || key.toLowerCase().includes('ngay'))
+        timestamp: t.timestamp
       });
+      console.log(`    Transaction ${i + 1} all keys:`, Object.keys(t));
+      console.log(`    Transaction ${i + 1} full object:`, JSON.stringify(t, null, 2));
     });
   }
   
@@ -297,9 +298,9 @@ function calculateOverviewKPIs(transactions, expenses) {
     if (transactions.indexOf(t) < 3) {
       console.log(`    Filter check ${transactions.indexOf(t) + 1}:`, {
         rawDate,
-        parsedDate: transactionDate.toISOString(),
-        transactionMonth: transactionDate.getMonth(),
-        transactionYear: transactionDate.getFullYear(),
+        parsedDate: isNaN(transactionDate.getTime()) ? 'INVALID DATE' : transactionDate.toISOString(),
+        transactionMonth: isNaN(transactionDate.getTime()) ? 'INVALID' : transactionDate.getMonth(),
+        transactionYear: isNaN(transactionDate.getTime()) ? 'INVALID' : transactionDate.getFullYear(),
         isCurrentMonth
       });
     }
