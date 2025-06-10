@@ -270,7 +270,7 @@ function calculateOverviewKPIs(transactions, expenses) {
   
   // Filter current month data
   const currentMonthTransactions = transactions.filter(t => {
-    const rawDate = t.ngayGiaoDich || t.date;
+    const rawDate = t.transactionDate || t.ngayGiaoDich || t.date;
     const transactionDate = new Date(rawDate);
     
     // Check if date is valid
@@ -361,7 +361,7 @@ function calculateOverviewKPIs(transactions, expenses) {
   const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
   
   const prevMonthTransactions = transactions.filter(t => {
-    const transactionDate = new Date(t.ngayGiaoDich || t.date);
+    const transactionDate = new Date(t.transactionDate || t.ngayGiaoDich || t.date);
     if (isNaN(transactionDate.getTime())) return false;
     return transactionDate.getMonth() === prevMonth && 
            transactionDate.getFullYear() === prevYear;
