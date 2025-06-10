@@ -45,12 +45,6 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     return new Date(y, m - 1, d);
   };
 
-  // Debug: Log unique transaction types
-  if (paginatedItems.length > 0) {
-    const uniqueTypes = [...new Set(paginatedItems.map(t => t.transactionType))];
-    console.log('🎨 [UltraFast] Unique transaction types in current page:', uniqueTypes);
-    console.log('🎨 [UltraFast] Raw unique transaction types:', JSON.stringify(uniqueTypes, null, 2));
-  }
 
   // ✅ Build minimal HTML for visible rows only
   const rowsHtml = paginatedItems.map((transaction, index) => {
@@ -160,13 +154,13 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       
       switch (normalizedType) {
         case "chưa thanh toán":
-          return "#FFD700"; // Bright gold for testing
+          return "#FFF8DC"; // Light beige
         case "đã thanh toán":
-          return "#00FFFF"; // Bright cyan for testing
+          return "#E0F7FA"; // Light cyan
         case "hoàn tiền":
-          return "#FF0000"; // Bright red for testing
+          return "#FFEBEE"; // Light red
         case "hủy giao dịch":
-          return "#808080"; // Gray for testing
+          return "#F5F5F5"; // Light gray
         case "đã hoàn tất":
         default:
           return ""; // Keep default/current color
@@ -176,20 +170,6 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     const rowBackgroundColor = getTransactionRowColor(transaction.transactionType);
     const rowStyleAttr = rowBackgroundColor ? ` style="background-color: ${rowBackgroundColor} !important;"` : "";
 
-    // Debug employee code and transaction type for first few transactions
-    if (index < 5) {
-      const normalizedType = (transaction.transactionType || "").trim().toLowerCase();
-      console.log(`🔍 [UltraFast] Transaction ${index} debug:`, {
-        transactionId: transaction.transactionId,
-        transactionType: transaction.transactionType,
-        transactionTypeString: JSON.stringify(transaction.transactionType),
-        normalizedType: normalizedType,
-        normalizedTypeString: JSON.stringify(normalizedType),
-        rowBackgroundColor: rowBackgroundColor,
-        rowStyleAttr: rowStyleAttr,
-        employeeCode: employeeCode
-      });
-    }
 
     // Info cell with 3-line layout: employee code (right), contact, order info
     const infoCell = `
@@ -283,9 +263,6 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
   // ✅ Single ultra-fast DOM update
   batchWrite(() => {
     tableBody.innerHTML = rowsHtml;
-    
-    // Debug: Check actual HTML after insertion
-    console.log('🎨 [UltraFast] Sample row HTML after insertion:', tableBody.querySelector('tr')?.outerHTML?.substring(0, 200) + '...');
   });
 
   // ✅ Single event delegation setup (if not already done)
