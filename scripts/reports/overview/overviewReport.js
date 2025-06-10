@@ -39,6 +39,7 @@ export async function loadOverviewReport() {
     
     // Calculate KPIs
     const kpis = calculateOverviewKPIs(transactions, expenses);
+    console.log('💰 Calculated KPIs:', kpis);
     
     // Update all components
     console.log('🚀 Loading overview components...');
@@ -254,14 +255,22 @@ function calculateOverviewKPIs(transactions, expenses) {
            expenseDate.getFullYear() === currentYear;
   });
   
-  // Calculate totals
+  // Calculate totals - check various field names
   const totalRevenue = currentMonthTransactions.reduce((sum, t) => {
-    return sum + (parseFloat(t.doanhThu || t.revenue) || 0);
+    const revenue = parseFloat(t.doanhThu || t.revenue || t.Revenue || t.doanh_thu) || 0;
+    return sum + revenue;
   }, 0);
   
   const totalExpense = currentMonthExpenses.reduce((sum, e) => {
-    return sum + (parseFloat(e.soTien || e.amount) || 0);
+    const expense = parseFloat(e.soTien || e.amount || e.Amount || e.so_tien) || 0;
+    return sum + expense;
   }, 0);
+  
+  console.log('📊 Revenue calculation:', {
+    currentMonthTransactions: currentMonthTransactions.length,
+    totalRevenue,
+    sampleTransaction: currentMonthTransactions[0]
+  });
   
   const totalProfit = totalRevenue - totalExpense;
   const totalTransactions = currentMonthTransactions.length;
@@ -386,7 +395,16 @@ function updateKPICard(type, data) {
       break;
   }
   
-  if (!valueElement) return;
+  if (!valueElement) {
+    console.warn(`❌ KPI element not found for ${type}`);
+    return;
+  }
+  
+  console.log(`💰 Updating KPI ${type}:`, {
+    element: valueElement.id,
+    value: data.value,
+    growth: data.growth
+  });
   
   if (valueElement) {
     if (type === 'transaction') {
