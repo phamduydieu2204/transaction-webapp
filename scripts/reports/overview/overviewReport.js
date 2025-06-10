@@ -26,9 +26,16 @@ export async function loadOverviewReport() {
       expenseList: window.expenseList ? window.expenseList.length : 0
     });
     
-    // Get data from storage or global variables
+    // Get data from global variables (primary) or storage (fallback)
     const transactions = window.transactionList || getFromStorage('transactions') || [];
     const expenses = window.expenseList || getFromStorage('expenses') || [];
+    
+    console.log('📊 Data found:', {
+      transactions: transactions.length,
+      expenses: expenses.length,
+      sampleTransaction: transactions[0] ? Object.keys(transactions[0]) : [],
+      sampleExpense: expenses[0] ? Object.keys(expenses[0]) : []
+    });
     
     // Calculate KPIs
     const kpis = calculateOverviewKPIs(transactions, expenses);

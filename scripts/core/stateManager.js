@@ -438,6 +438,60 @@ export function cleanupStateManager() {
   console.log('✅ State manager cleanup complete');
 }
 
+/**
+ * Get data from localStorage with fallback to state
+ * @param {string} key - Key to retrieve
+ * @returns {*} Retrieved data
+ */
+export function getFromStorage(key) {
+  try {
+    // First try to get from current state
+    if (appState[key] !== undefined) {
+      return appState[key];
+    }
+    
+    // Then try localStorage with prefix
+    const storageKey = STATE_CONFIG.storagePrefix + key;
+    const storedValue = localStorage.getItem(storageKey);
+    
+    if (storedValue) {
+      return JSON.parse(storedValue);
+    }
+    
+    // Fallback to direct localStorage (for backward compatibility)
+    const directValue = localStorage.getItem(key);
+    if (directValue) {
+      return JSON.parse(directValue);
+    }
+    
+    return null;
+  } catch (error) {
+    console.warn(`⚠️ Error getting ${key} from storage:`, error);
+    return null;
+  }
+}
+
+/**
+ * Save data to localStorage with state sync
+ * @param {string} key - Key to save
+ * @param {*} value - Value to save
+ */
+export function saveToStorage(key, value) {
+  try {
+    // Update state
+    if (appState.hasOwnProperty(key)) {
+      updateState({ [key]: value });
+    }
+    
+    // Save to localStorage with prefix
+    const storageKey = STATE_CONFIG.storagePrefix + key;
+    localStorage.setItem(storageKey, JSON.stringify(value));
+    
+  } catch (error) {
+    console.error(`❌ Error saving ${key} to storage:`, error);
+  }
+}
+
 // Setup cleanup on page unload
 if (typeof window !== 'undefined') {
   window.addEventListener('beforeunload', cleanupStateManager);
@@ -450,7 +504,9 @@ if (typeof window !== 'undefined') {
       persistState,
       clearPersistedState,
       resetState,
-      getStateStats
+      getStateStats,
+      getFromStorage,
+      saveToStorage
     };
   }
 }
