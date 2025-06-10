@@ -215,7 +215,6 @@ function updateTransactionPagination(totalPages, currentPage) {
 }
 
 export function updateTable(transactionList, currentPage, itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction) {
-  console.log('🚀 MAIN updateTable CALLED with', transactionList.length, 'transactions');
   const tableBody = document.querySelector("#transactionTable tbody");
   if (!tableBody) {
     console.error("❌ Không tìm thấy tbody của transactionTable");
@@ -310,15 +309,6 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
       row.style.backgroundColor = rowBackgroundColor;
     }
 
-    // DEBUG: Log for first few rows
-    if (index < 3) {
-      console.log(`🎨 MAIN updateTable ROW ${index}:`, {
-        transactionType: transaction.transactionType,
-        normalizedType: (transaction.transactionType || "").trim().toLowerCase(),
-        rowBackgroundColor: rowBackgroundColor,
-        appliedStyle: row.style.backgroundColor
-      });
-    }
 
     const software = (transaction.softwareName || '').toLowerCase();
     const softwarePackage = (transaction.softwarePackage || '').trim().toLowerCase();
