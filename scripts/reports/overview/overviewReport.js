@@ -5,8 +5,7 @@
  */
 
 import { ensureDataIsLoaded, showError } from '../core/reportHelpers.js';
-import { formatRevenue, formatPercentage } from '../core/reportFormatters.js';
-import { calculateTotalRevenue, calculateTotalExpenses, calculateProfit, calculateProfitMargin } from '../core/reportCalculations.js';
+import { formatRevenue, formatCurrency } from '../../formatDate.js';
 import { getFromStorage } from '../../core/stateManager.js';
 
 /**
@@ -354,7 +353,11 @@ function updateKPICard(type, data) {
   const titleElement = card.querySelector('.kpi-title');
   
   if (valueElement) {
-    valueElement.textContent = formatRevenue(data.value);
+    if (type === 'transaction') {
+      valueElement.textContent = data.value.toLocaleString();
+    } else {
+      valueElement.textContent = formatRevenue(data.value);
+    }
   }
   
   if (growthElement) {

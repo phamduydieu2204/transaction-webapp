@@ -26,6 +26,7 @@ import './detailModalUnified.js';
 // Import tab initialization functions
 import { initExpenseTab } from './initExpenseTab.js';
 import { initTransactionTab } from './initTransactionTab.js';
+import { initStatisticsTab } from './initStatisticsTab.js';
 
 // Import performance optimizers
 import './core/requestOptimizer.js';
