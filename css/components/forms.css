@@ -46,6 +46,32 @@ textarea:focus {
   height: 30px;
 }
 
+/* Enhanced tooltip support for select options */
+select option[title] {
+  padding: 8px 12px;
+  line-height: 1.4;
+}
+
+select option[title]:hover {
+  background-color: #f0f8ff;
+}
+
+/* Custom tooltip styles for form elements */
+.form-field select[title],
+.form-field select option[title] {
+  position: relative;
+}
+
+/* Tooltip styling for better UX */
+[title] {
+  cursor: help;
+}
+
+select option {
+  padding: 6px 8px;
+  margin: 2px 0;
+}
+
 .form-grid textarea {
   resize: none;
   height: auto;

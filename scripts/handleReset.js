@@ -2,6 +2,7 @@ import { updatePackageList } from './updatePackageList.js';
 import { updateAccountList } from './updateAccountList.js';
 import { getTodayFormatted, setDefaultDates } from './calculateEndDate.js';
 import { updateState } from './core/stateManager.js';
+import { initTransactionTypeDropdown } from './transactionTypeManager.js';
 
 export async function handleReset(fetchSoftwareList, showProcessingModal, showResultModal, todayFormatted, updatePackageList, updateAccountList) {
   // Đã loại bỏ showProcessingModal để tránh trùng lặp với uiBlocker
@@ -42,6 +43,9 @@ export async function handleReset(fetchSoftwareList, showProcessingModal, showRe
 
   // Set default dates after reset - force update to today's date
   setDefaultDates(true);
+  
+  // Reset transaction type dropdown to default options
+  initTransactionTypeDropdown();
 
   // Event handlers are already attached, no need to re-initialize
 

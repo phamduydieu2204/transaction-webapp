@@ -48,8 +48,9 @@
           <label class="required">Loại giao dịch <span class="required-asterisk">*</span></label>
           <select id="transactionType" required>
             <option value="">-- Chọn loại --</option>
-            <option value="Đã hoàn tất">Đã hoàn tất</option>
-            <option value="Hoàn Tiền">Hoàn Tiền</option>
+            <option value="Chưa thanh toán" title="Bên bán đã giao hàng nhưng khách hàng chưa thực hiện chuyển khoản">Chưa thanh toán</option>
+            <option value="Đã thanh toán" title="Khách hàng đã thực hiện thanh toán nhưng bên bán chưa giao hàng">Đã thanh toán</option>
+            <option value="Đã hoàn tất" title="Giao dịch đã được thanh toán và đã giao hàng cho khách">Đã hoàn tất</option>
           </select>
           <div class="error-message" id="transactionType-error"></div>
         </div>
