@@ -1,0 +1,189 @@
+<!-- Overview Report - Tổng quan kinh doanh -->
+<div id="overview-report" class="report-page">
+  <div class="report-header">
+    <h2 class="report-title">
+      <i class="fas fa-chart-line"></i> 
+      Tổng quan kinh doanh
+    </h2>
+    <div class="report-subtitle">
+      <span id="overview-period-display">Tháng này</span>
+      <span class="refresh-status" id="overview-refresh-status">
+        <i class="fas fa-sync-alt"></i> Đã cập nhật
+      </span>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card revenue-card">
+      <div class="kpi-icon">
+        <i class="fas fa-dollar-sign"></i>
+      </div>
+      <div class="kpi-content">
+        <div class="kpi-label">Doanh thu</div>
+        <div class="kpi-value" id="total-revenue">0 ₫</div>
+        <div class="kpi-change" id="revenue-change">
+          <i class="fas fa-arrow-up"></i> +0%
+        </div>
+      </div>
+    </div>
+
+    <div class="kpi-card expense-card">
+      <div class="kpi-icon">
+        <i class="fas fa-wallet"></i>
+      </div>
+      <div class="kpi-content">
+        <div class="kpi-label">Chi phí</div>
+        <div class="kpi-value" id="total-expenses">0 ₫</div>
+        <div class="kpi-change" id="expense-change">
+          <i class="fas fa-arrow-down"></i> +0%
+        </div>
+      </div>
+    </div>
+
+    <div class="kpi-card profit-card">
+      <div class="kpi-icon">
+        <i class="fas fa-chart-line"></i>
+      </div>
+      <div class="kpi-content">
+        <div class="kpi-label">Lợi nhuận</div>
+        <div class="kpi-value" id="total-profit">0 ₫</div>
+        <div class="kpi-change" id="profit-change">
+          <i class="fas fa-arrow-up"></i> +0%
+        </div>
+      </div>
+    </div>
+
+    <div class="kpi-card transaction-card">
+      <div class="kpi-icon">
+        <i class="fas fa-handshake"></i>
+      </div>
+      <div class="kpi-content">
+        <div class="kpi-label">Giao dịch</div>
+        <div class="kpi-value" id="total-transactions">0</div>
+        <div class="kpi-change" id="transaction-change">
+          <i class="fas fa-arrow-up"></i> +0%
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="charts-row">
+    <!-- Revenue Trend Chart -->
+    <div class="chart-container">
+      <div class="chart-header">
+        <h3 class="chart-title">
+          <i class="fas fa-line-chart"></i> 
+          Xu hướng doanh thu
+        </h3>
+        <div class="chart-controls">
+          <button class="chart-btn" data-period="7days">7 ngày</button>
+          <button class="chart-btn active" data-period="30days">30 ngày</button>
+          <button class="chart-btn" data-period="90days">90 ngày</button>
+        </div>
+      </div>
+      <div class="chart-content">
+        <canvas id="revenue-trend-chart" width="400" height="200"></canvas>
+      </div>
+    </div>
+
+    <!-- Expense Distribution Chart -->
+    <div class="chart-container">
+      <div class="chart-header">
+        <h3 class="chart-title">
+          <i class="fas fa-pie-chart"></i> 
+          Phân bố chi phí
+        </h3>
+        <div class="chart-legend" id="expense-legend"></div>
+      </div>
+      <div class="chart-content">
+        <canvas id="expense-distribution-chart" width="400" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Tables Row -->
+  <div class="tables-row">
+    <!-- Top Customers -->
+    <div class="data-table-container">
+      <div class="table-header">
+        <h3 class="table-title">
+          <i class="fas fa-users"></i> 
+          Khách hàng hàng đầu
+        </h3>
+        <div class="table-controls">
+          <button class="table-btn" onclick="exportCustomerData()">
+            <i class="fas fa-download"></i> Xuất
+          </button>
+        </div>
+      </div>
+      <div class="table-content">
+        <table class="data-table" id="top-customers-table">
+          <thead>
+            <tr>
+              <th>Khách hàng</th>
+              <th>Giao dịch</th>
+              <th>Doanh thu</th>
+              <th>Xu hướng</th>
+            </tr>
+          </thead>
+          <tbody id="top-customers-body">
+            <tr>
+              <td colspan="4" class="loading-row">
+                <i class="fas fa-spinner fa-spin"></i> Đang tải...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Top Software -->
+    <div class="data-table-container">
+      <div class="table-header">
+        <h3 class="table-title">
+          <i class="fas fa-laptop-code"></i> 
+          Phần mềm phổ biến
+        </h3>
+        <div class="table-controls">
+          <button class="table-btn" onclick="exportSoftwareData()">
+            <i class="fas fa-download"></i> Xuất
+          </button>
+        </div>
+      </div>
+      <div class="table-content">
+        <table class="data-table" id="top-software-table">
+          <thead>
+            <tr>
+              <th>Phần mềm</th>
+              <th>Số lượng</th>
+              <th>Doanh thu</th>
+              <th>Tỷ lệ</th>
+            </tr>
+          </thead>
+          <tbody id="top-software-body">
+            <tr>
+              <td colspan="4" class="loading-row">
+                <i class="fas fa-spinner fa-spin"></i> Đang tải...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export Controls -->
+  <div class="report-actions">
+    <button class="action-btn primary" onclick="exportOverviewReport()">
+      <i class="fas fa-file-excel"></i> Xuất báo cáo Excel
+    </button>
+    <button class="action-btn secondary" onclick="printOverviewReport()">
+      <i class="fas fa-print"></i> In báo cáo
+    </button>
+    <button class="action-btn secondary" onclick="refreshOverviewReport()">
+      <i class="fas fa-sync-alt"></i> Làm mới
+    </button>
+  </div>
+</div>

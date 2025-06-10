@@ -25,6 +25,7 @@
 @import url('components/tabs.css');
 @import url('components/cards.css');
 @import url('components/charts.css');
+@import url('components/reports.css');
 
 /* Page specific styles */
 @import url('pages/login.css');

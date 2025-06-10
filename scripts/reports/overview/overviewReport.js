@@ -7,35 +7,657 @@
 import { ensureDataIsLoaded, showError } from '../core/reportHelpers.js';
 import { formatRevenue, formatPercentage } from '../core/reportFormatters.js';
 import { calculateTotalRevenue, calculateTotalExpenses, calculateProfit, calculateProfitMargin } from '../core/reportCalculations.js';
+import { getFromStorage } from '../../core/stateManager.js';
 
 /**
  * Load overview report (Tổng quan kinh doanh)
  */
 export async function loadOverviewReport() {
   console.log('📈 Loading overview report');
-  console.log('🔍 Checking data availability:', {
-    transactionList: window.transactionList ? window.transactionList.length : 0,
-    expenseList: window.expenseList ? window.expenseList.length : 0
-  });
   
-  // Ensure data is loaded before proceeding
-  await ensureDataIsLoaded();
+  try {
+    // Load the overview report HTML template
+    await loadOverviewHTML();
+    
+    // Ensure data is loaded before proceeding
+    await ensureDataIsLoaded();
+    
+    console.log('🔍 Checking data availability:', {
+      transactionList: window.transactionList ? window.transactionList.length : 0,
+      expenseList: window.expenseList ? window.expenseList.length : 0
+    });
+    
+    // Get data from storage or global variables
+    const transactions = window.transactionList || getFromStorage('transactions') || [];
+    const expenses = window.expenseList || getFromStorage('expenses') || [];
+    
+    // Calculate KPIs
+    const kpis = calculateOverviewKPIs(transactions, expenses);
+    
+    // Update all components
+    console.log('🚀 Loading overview components...');
+    await Promise.all([
+      updateKPICards(kpis),
+      loadTopProducts(),
+      loadTopCustomers(),
+      loadCharts(transactions, expenses),
+      updateDataTables(transactions, expenses)
+    ]);
+    
+    console.log('✅ Overview report loaded successfully');
+    
+  } catch (error) {
+    console.error('❌ Error loading overview report:', error);
+    showOverviewError(error.message);
+  }
+}
+
+/**
+ * Load the overview report HTML template
+ */
+async function loadOverviewHTML() {
+  const container = document.getElementById('report-overview');
+  if (!container) return;
   
-  // Financial dashboard đã được render từ statisticsUIController
-  // Chỉ cần trigger refresh nếu cần
-  if (window.refreshStatisticsWithFilters) {
-    window.refreshStatisticsWithFilters(window.globalFilters);
+  try {
+    const response = await fetch('./partials/tabs/report-pages/overview-report.html');
+    if (!response.ok) {
+      console.warn('⚠️ Overview template not found, using fallback');
+      // Use existing structure but enhance it
+      enhanceExistingStructure(container);
+      return;
+    }
+    
+    const html = await response.text();
+    container.innerHTML = html;
+    
+    console.log('📄 Overview HTML template loaded');
+  } catch (error) {
+    console.warn('⚠️ Using existing structure with enhancements');
+    enhanceExistingStructure(container);
+  }
+}
+
+/**
+ * Enhance existing structure with KPI cards
+ */
+function enhanceExistingStructure(container) {
+  // Check if container already has the KPI structure
+  if (container.querySelector('.kpi-grid')) {
+    console.log('📄 KPI structure already exists');
+    return;
   }
   
-  // Load additional overview components
-  console.log('🚀 Loading overview components...');
-  await Promise.all([
-    loadTopProducts(),
-    loadTopCustomers(),
-    loadSummaryStats(),
-    loadRevenueChart()
-  ]);
-  console.log('✅ Overview components loaded');
+  // Add KPI cards to the beginning of the container
+  const kpiHTML = `
+    <div class="page-header">
+      <h2>📊 Tổng quan kinh doanh</h2>
+      <div class="header-actions">
+        <button class="btn-refresh" onclick="refreshCurrentReport()">
+          <i class="fas fa-sync-alt"></i> Làm mới
+        </button>
+        <button class="btn-export" onclick="exportCurrentReport()">
+          <i class="fas fa-download"></i> Xuất báo cáo
+        </button>
+      </div>
+    </div>
+    
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card revenue-card">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-content">
+          <div class="kpi-value">0 VNĐ</div>
+          <div class="kpi-title">Doanh thu tháng này</div>
+          <div class="kpi-growth positive">📈 +0.0%</div>
+        </div>
+      </div>
+      
+      <div class="kpi-card expense-card">
+        <div class="kpi-icon">💸</div>
+        <div class="kpi-content">
+          <div class="kpi-value">0 VNĐ</div>
+          <div class="kpi-title">Chi phí tháng này</div>
+          <div class="kpi-growth positive">📈 +0.0%</div>
+        </div>
+      </div>
+      
+      <div class="kpi-card profit-card">
+        <div class="kpi-icon">📈</div>
+        <div class="kpi-content">
+          <div class="kpi-value">0 VNĐ</div>
+          <div class="kpi-title">Lợi nhuận tháng này</div>
+          <div class="kpi-growth positive">📈 +0.0%</div>
+        </div>
+      </div>
+      
+      <div class="kpi-card transaction-card">
+        <div class="kpi-icon">📋</div>
+        <div class="kpi-content">
+          <div class="kpi-value">0</div>
+          <div class="kpi-title">Giao dịch tháng này</div>
+          <div class="kpi-growth positive">📈 +0.0%</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Charts Section -->
+    <div class="charts-section">
+      <div class="chart-row">
+        <div class="chart-container">
+          <h3>📈 Xu hướng doanh thu</h3>
+          <canvas id="revenueTrendChart"></canvas>
+        </div>
+        <div class="chart-container">
+          <h3>🍰 Phân bổ chi phí</h3>
+          <canvas id="expenseDistributionChart"></canvas>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Data Tables Section -->
+    <div class="data-tables-section">
+      <div class="table-row">
+        <div class="data-table-container">
+          <h3>👥 Top khách hàng</h3>
+          <table id="topCustomersTable" class="data-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Khách hàng</th>
+                <th>Doanh thu</th>
+                <th>Giao dịch</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        
+        <div class="data-table-container">
+          <h3>📋 Giao dịch gần đây</h3>
+          <table id="recentTransactionsTable" class="data-table">
+            <thead>
+              <tr>
+                <th>Ngày</th>
+                <th>Khách hàng</th>
+                <th>Sản phẩm</th>
+                <th>Doanh thu</th>
+                <th>Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div class="data-table-container">
+        <h3>💸 Chi phí lớn nhất tháng này</h3>
+        <table id="topExpensesTable" class="data-table">
+          <thead>
+            <tr>
+              <th>Ngày</th>
+              <th>Danh mục</th>
+              <th>Mô tả</th>
+              <th>Số tiền</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  `;
+  
+  // Insert KPI structure at the beginning, keeping existing content
+  const existingContent = container.innerHTML;
+  container.innerHTML = kpiHTML + existingContent;
+  
+  console.log('📄 Overview structure enhanced with KPI cards');
+}
+
+/**
+ * Calculate overview KPIs
+ */
+function calculateOverviewKPIs(transactions, expenses) {
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  
+  // Filter current month data
+  const currentMonthTransactions = transactions.filter(t => {
+    const transactionDate = new Date(t.ngayGiaoDich || t.date);
+    return transactionDate.getMonth() === currentMonth && 
+           transactionDate.getFullYear() === currentYear;
+  });
+  
+  const currentMonthExpenses = expenses.filter(e => {
+    const expenseDate = new Date(e.ngayChiTieu || e.date);
+    return expenseDate.getMonth() === currentMonth && 
+           expenseDate.getFullYear() === currentYear;
+  });
+  
+  // Calculate totals
+  const totalRevenue = currentMonthTransactions.reduce((sum, t) => {
+    return sum + (parseFloat(t.doanhThu || t.revenue) || 0);
+  }, 0);
+  
+  const totalExpense = currentMonthExpenses.reduce((sum, e) => {
+    return sum + (parseFloat(e.soTien || e.amount) || 0);
+  }, 0);
+  
+  const totalProfit = totalRevenue - totalExpense;
+  const totalTransactions = currentMonthTransactions.length;
+  
+  // Calculate previous month for comparison
+  const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+  const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+  
+  const prevMonthTransactions = transactions.filter(t => {
+    const transactionDate = new Date(t.ngayGiaoDich || t.date);
+    return transactionDate.getMonth() === prevMonth && 
+           transactionDate.getFullYear() === prevYear;
+  });
+  
+  const prevMonthExpenses = expenses.filter(e => {
+    const expenseDate = new Date(e.ngayChiTieu || e.date);
+    return expenseDate.getMonth() === prevMonth && 
+           expenseDate.getFullYear() === prevYear;
+  });
+  
+  const prevRevenue = prevMonthTransactions.reduce((sum, t) => {
+    return sum + (parseFloat(t.doanhThu || t.revenue) || 0);
+  }, 0);
+  
+  const prevExpense = prevMonthExpenses.reduce((sum, e) => {
+    return sum + (parseFloat(e.soTien || e.amount) || 0);
+  }, 0);
+  
+  const prevProfit = prevRevenue - prevExpense;
+  const prevTransactionCount = prevMonthTransactions.length;
+  
+  // Calculate growth percentages
+  const revenueGrowth = prevRevenue > 0 ? ((totalRevenue - prevRevenue) / prevRevenue * 100) : 0;
+  const expenseGrowth = prevExpense > 0 ? ((totalExpense - prevExpense) / prevExpense * 100) : 0;
+  const profitGrowth = prevProfit > 0 ? ((totalProfit - prevProfit) / prevProfit * 100) : 0;
+  const transactionGrowth = prevTransactionCount > 0 ? ((totalTransactions - prevTransactionCount) / prevTransactionCount * 100) : 0;
+  
+  return {
+    revenue: {
+      current: totalRevenue,
+      previous: prevRevenue,
+      growth: revenueGrowth
+    },
+    expense: {
+      current: totalExpense,
+      previous: prevExpense,
+      growth: expenseGrowth
+    },
+    profit: {
+      current: totalProfit,
+      previous: prevProfit,
+      growth: profitGrowth
+    },
+    transactions: {
+      current: totalTransactions,
+      previous: prevTransactionCount,
+      growth: transactionGrowth
+    }
+  };
+}
+
+/**
+ * Update KPI cards with calculated data
+ */
+async function updateKPICards(kpis) {
+  // Revenue card
+  updateKPICard('revenue', {
+    value: kpis.revenue.current,
+    growth: kpis.revenue.growth,
+    icon: '💰',
+    title: 'Doanh thu tháng này'
+  });
+  
+  // Expense card
+  updateKPICard('expense', {
+    value: kpis.expense.current,
+    growth: kpis.expense.growth,
+    icon: '💸',
+    title: 'Chi phí tháng này'
+  });
+  
+  // Profit card
+  updateKPICard('profit', {
+    value: kpis.profit.current,
+    growth: kpis.profit.growth,
+    icon: '📈',
+    title: 'Lợi nhuận tháng này'
+  });
+  
+  // Transaction card
+  updateKPICard('transaction', {
+    value: kpis.transactions.current,
+    growth: kpis.transactions.growth,
+    icon: '📋',
+    title: 'Giao dịch tháng này'
+  });
+}
+
+/**
+ * Update individual KPI card
+ */
+function updateKPICard(type, data) {
+  const card = document.querySelector(`.kpi-card.${type}-card`);
+  if (!card) return;
+  
+  const valueElement = card.querySelector('.kpi-value');
+  const growthElement = card.querySelector('.kpi-growth');
+  const iconElement = card.querySelector('.kpi-icon');
+  const titleElement = card.querySelector('.kpi-title');
+  
+  if (valueElement) {
+    valueElement.textContent = formatRevenue(data.value);
+  }
+  
+  if (growthElement) {
+    const isPositive = data.growth >= 0;
+    const growthClass = isPositive ? 'positive' : 'negative';
+    const growthIcon = isPositive ? '📈' : '📉';
+    
+    growthElement.textContent = `${growthIcon} ${data.growth >= 0 ? '+' : ''}${data.growth.toFixed(1)}%`;
+    growthElement.className = `kpi-growth ${growthClass}`;
+  }
+  
+  if (iconElement) {
+    iconElement.textContent = data.icon;
+  }
+  
+  if (titleElement) {
+    titleElement.textContent = data.title;
+  }
+}
+
+/**
+ * Load charts
+ */
+async function loadCharts(transactions, expenses) {
+  try {
+    // Check if Chart.js is available
+    if (typeof Chart === 'undefined') {
+      console.warn('⚠️ Chart.js not available, loading from CDN');
+      await loadChartJS();
+    }
+    
+    // Render revenue trend chart
+    renderRevenueTrendChart(transactions);
+    
+    // Render expense distribution chart
+    renderExpenseDistributionChart(expenses);
+    
+  } catch (error) {
+    console.error('❌ Error loading charts:', error);
+    showChartError();
+  }
+}
+
+/**
+ * Load Chart.js library dynamically
+ */
+function loadChartJS() {
+  return new Promise((resolve, reject) => {
+    if (typeof Chart !== 'undefined') {
+      resolve();
+      return;
+    }
+    
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js';
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
+
+/**
+ * Render revenue trend chart
+ */
+function renderRevenueTrendChart(transactions) {
+  const canvas = document.getElementById('revenueTrendChart');
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  
+  // Prepare data for last 6 months
+  const monthsData = getLastSixMonthsData(transactions);
+  
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: monthsData.labels,
+      datasets: [{
+        label: 'Doanh thu',
+        data: monthsData.revenue,
+        borderColor: '#3498db',
+        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+        borderWidth: 3,
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return formatRevenue(value);
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+/**
+ * Render expense distribution chart
+ */
+function renderExpenseDistributionChart(expenses) {
+  const canvas = document.getElementById('expenseDistributionChart');
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  
+  // Group expenses by category
+  const categoryData = getExpensesByCategory(expenses);
+  
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: categoryData.labels,
+      datasets: [{
+        data: categoryData.values,
+        backgroundColor: [
+          '#e74c3c',
+          '#f39c12',
+          '#f1c40f',
+          '#27ae60',
+          '#3498db',
+          '#9b59b6',
+          '#34495e',
+          '#e67e22'
+        ],
+        borderWidth: 2,
+        borderColor: '#fff'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right'
+        }
+      }
+    }
+  });
+}
+
+/**
+ * Get revenue data for last 6 months
+ */
+function getLastSixMonthsData(transactions) {
+  const months = [];
+  const revenue = [];
+  const now = new Date();
+  
+  for (let i = 5; i >= 0; i--) {
+    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const monthName = date.toLocaleDateString('vi-VN', { month: 'short', year: 'numeric' });
+    
+    const monthRevenue = transactions
+      .filter(t => {
+        const transactionDate = new Date(t.ngayGiaoDich || t.date);
+        return transactionDate.getMonth() === date.getMonth() && 
+               transactionDate.getFullYear() === date.getFullYear();
+      })
+      .reduce((sum, t) => sum + (parseFloat(t.doanhThu || t.revenue) || 0), 0);
+    
+    months.push(monthName);
+    revenue.push(monthRevenue);
+  }
+  
+  return {
+    labels: months,
+    revenue: revenue
+  };
+}
+
+/**
+ * Get expenses grouped by category
+ */
+function getExpensesByCategory(expenses) {
+  const categories = {};
+  
+  expenses.forEach(expense => {
+    const category = expense.danhMuc || expense.category || 'Khác';
+    categories[category] = (categories[category] || 0) + (parseFloat(expense.soTien || expense.amount) || 0);
+  });
+  
+  return {
+    labels: Object.keys(categories),
+    values: Object.values(categories)
+  };
+}
+
+/**
+ * Update data tables
+ */
+function updateDataTables(transactions, expenses) {
+  updateTopCustomersTable(transactions);
+  updateRecentTransactionsTable(transactions);
+  updateTopExpensesTable(expenses);
+}
+
+/**
+ * Update top customers table
+ */
+function updateTopCustomersTable(transactions) {
+  const table = document.querySelector('#topCustomersTable tbody');
+  if (!table) return;
+  
+  // Group by customer and calculate totals
+  const customers = {};
+  transactions.forEach(t => {
+    const customer = t.tenKhachHang || t.customer || 'Không xác định';
+    if (!customers[customer]) {
+      customers[customer] = {
+        name: customer,
+        revenue: 0,
+        transactions: 0
+      };
+    }
+    customers[customer].revenue += parseFloat(t.doanhThu || t.revenue) || 0;
+    customers[customer].transactions += 1;
+  });
+  
+  // Sort by revenue and take top 5
+  const topCustomers = Object.values(customers)
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 5);
+  
+  // Update table
+  table.innerHTML = topCustomers.map((customer, index) => `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${customer.name}</td>
+      <td>${formatRevenue(customer.revenue)}</td>
+      <td>${customer.transactions}</td>
+    </tr>
+  `).join('');
+}
+
+/**
+ * Update recent transactions table
+ */
+function updateRecentTransactionsTable(transactions) {
+  const table = document.querySelector('#recentTransactionsTable tbody');
+  if (!table) return;
+  
+  // Get last 5 transactions
+  const recentTransactions = transactions
+    .sort((a, b) => new Date(b.ngayGiaoDich || b.date) - new Date(a.ngayGiaoDich || a.date))
+    .slice(0, 5);
+  
+  // Update table
+  table.innerHTML = recentTransactions.map(t => `
+    <tr>
+      <td>${new Date(t.ngayGiaoDich || t.date).toLocaleDateString('vi-VN')}</td>
+      <td>${t.tenKhachHang || t.customer || 'N/A'}</td>
+      <td>${t.tenSanPham || t.product || 'N/A'}</td>
+      <td>${formatRevenue(parseFloat(t.doanhThu || t.revenue) || 0)}</td>
+      <td>
+        <span class="status-badge ${(t.trangThai || t.status || 'pending').toLowerCase()}">${t.trangThai || t.status || 'Pending'}</span>
+      </td>
+    </tr>
+  `).join('');
+}
+
+/**
+ * Update top expenses table
+ */
+function updateTopExpensesTable(expenses) {
+  const table = document.querySelector('#topExpensesTable tbody');
+  if (!table) return;
+  
+  // Get largest expenses this month
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  
+  const currentMonthExpenses = expenses
+    .filter(e => {
+      const expenseDate = new Date(e.ngayChiTieu || e.date);
+      return expenseDate.getMonth() === currentMonth && 
+             expenseDate.getFullYear() === currentYear;
+    })
+    .sort((a, b) => (parseFloat(b.soTien || b.amount) || 0) - (parseFloat(a.soTien || a.amount) || 0))
+    .slice(0, 5);
+  
+  // Update table
+  table.innerHTML = currentMonthExpenses.map(e => `
+    <tr>
+      <td>${new Date(e.ngayChiTieu || e.date).toLocaleDateString('vi-VN')}</td>
+      <td>${e.danhMuc || e.category || 'N/A'}</td>
+      <td>${e.moTa || e.description || 'N/A'}</td>
+      <td>${formatRevenue(parseFloat(e.soTien || e.amount) || 0)}</td>
+    </tr>
+  `).join('');
 }
 
 /**
@@ -54,8 +676,8 @@ async function loadTopProducts() {
     // Group by software and calculate totals
     const softwareStats = {};
     transactions.forEach(transaction => {
-      const software = transaction.software || 'Không xác định';
-      const revenue = parseFloat(transaction.revenue) || 0;
+      const software = transaction.software || transaction.tenSanPham || 'Không xác định';
+      const revenue = parseFloat(transaction.revenue || transaction.doanhThu) || 0;
       
       if (!softwareStats[software]) {
         softwareStats[software] = {
@@ -123,8 +745,8 @@ async function loadTopCustomers() {
     // Group by customer and calculate totals
     const customerStats = {};
     transactions.forEach(transaction => {
-      const customer = transaction.customer || 'Không xác định';
-      const revenue = parseFloat(transaction.revenue) || 0;
+      const customer = transaction.customer || transaction.tenKhachHang || 'Không xác định';
+      const revenue = parseFloat(transaction.revenue || transaction.doanhThu) || 0;
       
       if (!customerStats[customer]) {
         customerStats[customer] = {
@@ -256,31 +878,35 @@ async function loadSummaryStats() {
 }
 
 /**
- * Load revenue chart
+ * Show error in overview report
  */
-async function loadRevenueChart() {
-  try {
-    const container = document.getElementById('revenueChart');
-    if (!container) {
-      console.warn('❌ Revenue chart container not found');
-      return;
-    }
-
-    // For now, show a placeholder or use existing chart functionality
-    if (window.renderRevenueExpenseChart) {
-      await window.renderRevenueExpenseChart();
-      console.log('✅ Revenue chart loaded via existing function');
-    } else {
-      container.innerHTML = `
-        <div class="chart-placeholder">
-          <div class="chart-icon">📈</div>
-          <div class="chart-text">Biểu đồ doanh thu sẽ được hiển thị ở đây</div>
-        </div>
-      `;
-      console.log('ℹ️ Revenue chart placeholder displayed');
-    }
-  } catch (error) {
-    console.error('❌ Error loading revenue chart:', error);
-    showError('Không thể tải biểu đồ doanh thu');
+function showOverviewError(message) {
+  const container = document.getElementById('report-overview');
+  if (container) {
+    container.innerHTML = `
+      <div class="report-error">
+        <h3>⚠️ Lỗi tải báo cáo</h3>
+        <p>${message}</p>
+        <button onclick="loadOverviewReport()" class="btn btn-primary">Thử lại</button>
+      </div>
+    `;
   }
 }
+
+/**
+ * Show chart error
+ */
+function showChartError() {
+  const chartContainers = document.querySelectorAll('.chart-container canvas');
+  chartContainers.forEach(canvas => {
+    const container = canvas.parentElement;
+    container.innerHTML = `
+      <div class="chart-error">
+        <p>⚠️ Không thể tải biểu đồ</p>
+      </div>
+    `;
+  });
+}
+
+// Make function available globally
+window.loadOverviewReport = loadOverviewReport;
