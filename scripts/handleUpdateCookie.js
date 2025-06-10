@@ -387,6 +387,7 @@ export async function runCookieTest() {
   `;
   
   try {
+    // Check if backend supports testCookie action
     const { BACKEND_URL } = getConstants();
     
     const response = await fetch(BACKEND_URL, {
@@ -403,6 +404,38 @@ export async function runCookieTest() {
     const result = await response.json();
     console.log('🧪 Test result:', result);
     
+    // Check if backend doesn't support testCookie yet
+    if (result.message && result.message.includes("không hợp lệ")) {
+      // Mock response for demonstration
+      const mockSuccess = cookieData.keyInfo.importantCookies?.length > 0;
+      
+      if (mockSuccess) {
+        resultsDiv.className = "test-results success";
+        resultsContent.innerHTML = `
+          ✅ <strong>Cookie phân tích thành công!</strong><br>
+          🌐 Website: ${targetWebsite}<br>
+          📊 Format: ${cookieData.format.toUpperCase()} (${cookieData.cookies.length} cookies)<br>
+          🔐 Trạng thái: Đã tìm thấy auth cookies<br>
+          🔑 Key cookies: ${cookieData.keyInfo.importantCookies.map(c => c.name).join(', ')}<br>
+          <br>
+          <em>💡 Chức năng test thực tế đang được phát triển. Hiện tại chỉ phân tích cấu trúc cookie.</em>
+        `;
+      } else {
+        resultsDiv.className = "test-results error";
+        resultsContent.innerHTML = `
+          ⚠️ <strong>Cookie thiếu thông tin quan trọng</strong><br>
+          🌐 Website: ${targetWebsite}<br>
+          📊 Format: ${cookieData.format.toUpperCase()} (${cookieData.cookies.length} cookies)<br>
+          ❌ Không tìm thấy auth cookies quan trọng<br>
+          💡 Gợi ý: Cần có cookies như _identity, sid, _csrf cho Helium10<br>
+          <br>
+          <em>💡 Chức năng test thực tế đang được phát triển.</em>
+        `;
+      }
+      return;
+    }
+    
+    // Normal backend response
     if (result.status === "success") {
       resultsDiv.className = "test-results success";
       resultsContent.innerHTML = `
