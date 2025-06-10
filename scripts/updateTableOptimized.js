@@ -37,6 +37,26 @@ export function updateTableOptimized(transactionList, currentPage, itemsPerPage,
     return new Date(y, m - 1, d);
   };
 
+  // Get background color based on transaction type
+  const getTransactionRowColor = (transactionType) => {
+    // Normalize the transaction type (trim and lowercase for comparison)
+    const normalizedType = (transactionType || "").trim().toLowerCase();
+    
+    switch (normalizedType) {
+      case "chưa thanh toán":
+        return "#FFF8DC"; // Light beige
+      case "đã thanh toán":
+        return "#E0F7FA"; // Light cyan
+      case "hoàn tiền":
+        return "#FFEBEE"; // Light red
+      case "hủy giao dịch":
+        return "#F5F5F5"; // Light gray
+      case "đã hoàn tất":
+      default:
+        return ""; // Keep default/current color
+    }
+  };
+
   const rowsHtml = paginatedItems.map((transaction, index) => {
     // For search results, use the actual index in the current list
     const actualIndex = window.isSearching ? 
@@ -102,32 +122,8 @@ export function updateTableOptimized(transactionList, currentPage, itemsPerPage,
       </div>
     `;
 
-    // Get background color based on transaction type
-    const getTransactionRowColor = (transactionType) => {
-      // Normalize the transaction type (trim and lowercase for comparison)
-      const normalizedType = (transactionType || "").trim().toLowerCase();
-      
-      switch (normalizedType) {
-        case "chưa thanh toán":
-          return "#FFF8DC"; // Light beige
-        case "đã thanh toán":
-          return "#E0F7FA"; // Light cyan
-        case "hoàn tiền":
-          return "#FFEBEE"; // Light red
-        case "hủy giao dịch":
-          return "#F5F5F5"; // Light gray
-        case "đã hoàn tất":
-        default:
-          return ""; // Keep default/current color
-      }
-    };
-
-    const rowBackgroundColor = getTransactionRowColor(transaction.transactionType);
-    const rowStyleAttr = rowBackgroundColor ? ` style="background-color: ${rowBackgroundColor} !important;"` : "";
-    
-
     return `
-      <tr class="${isExpired ? 'expired-row' : ''}" data-index="${globalIndex}"${rowStyleAttr}>
+      <tr class="${isExpired ? 'expired-row' : ''}" data-index="${globalIndex}">
         <td>${transaction.transactionId}</td>
         <td>${formatDate(transaction.transactionDate)}</td>
         <td>${transaction.transactionType}</td>
@@ -151,6 +147,19 @@ export function updateTableOptimized(transactionList, currentPage, itemsPerPage,
   // ✅ Single DOM update with all rows
   batchWrite(() => {
     tableBody.innerHTML = rowsHtml;
+    
+    // Apply background colors to rows after they're in the DOM
+    const rows = tableBody.querySelectorAll('tr');
+    rows.forEach((row, index) => {
+      if (index < paginatedItems.length) {
+        const transaction = paginatedItems[index];
+        const rowBackgroundColor = getTransactionRowColor(transaction.transactionType);
+        if (rowBackgroundColor) {
+          row.style.backgroundColor = rowBackgroundColor;
+          row.style.setProperty('background-color', rowBackgroundColor, 'important');
+        }
+      }
+    });
   });
 
   // ✅ Add event listeners using event delegation (more efficient)

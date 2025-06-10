@@ -45,6 +45,25 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     return new Date(y, m - 1, d);
   };
 
+  // Get background color based on transaction type
+  const getTransactionRowColor = (transactionType) => {
+    // Normalize the transaction type (trim and lowercase for comparison)
+    const normalizedType = (transactionType || "").trim().toLowerCase();
+    
+    switch (normalizedType) {
+      case "chưa thanh toán":
+        return "#FFF8DC"; // Light beige
+      case "đã thanh toán":
+        return "#E0F7FA"; // Light cyan
+      case "hoàn tiền":
+        return "#FFEBEE"; // Light red
+      case "hủy giao dịch":
+        return "#F5F5F5"; // Light gray
+      case "đã hoàn tất":
+      default:
+        return ""; // Keep default/current color
+    }
+  };
 
   // ✅ Build minimal HTML for visible rows only
   const rowsHtml = paginatedItems.map((transaction, index) => {
@@ -147,31 +166,6 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
 
     const employeeColor = getEmployeeColor(employeeCode);
 
-    // Get background color based on transaction type
-    const getTransactionRowColor = (transactionType) => {
-      // Normalize the transaction type (trim and lowercase for comparison)
-      const normalizedType = (transactionType || "").trim().toLowerCase();
-      
-      switch (normalizedType) {
-        case "chưa thanh toán":
-          return "#FFF8DC"; // Light beige
-        case "đã thanh toán":
-          return "#E0F7FA"; // Light cyan
-        case "hoàn tiền":
-          return "#FFEBEE"; // Light red
-        case "hủy giao dịch":
-          return "#F5F5F5"; // Light gray
-        case "đã hoàn tất":
-        default:
-          return ""; // Keep default/current color
-      }
-    };
-
-    const rowBackgroundColor = getTransactionRowColor(transaction.transactionType);
-    const rowStyleAttr = rowBackgroundColor ? ` style="background-color: ${rowBackgroundColor} !important;"` : "";
-    
-
-
     // Info cell with 3-line layout: employee code (right), contact, order info
     const infoCell = `
       <div class="info-cell-container" style="position: relative; line-height: 1.2;">
@@ -241,7 +235,7 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     `;
 
     return `
-      <tr class="${isExpired ? 'expired-row' : ''}" data-index="${dataIndex}"${rowStyleAttr}>
+      <tr class="${isExpired ? 'expired-row' : ''}" data-index="${dataIndex}">
         <td>${transaction.transactionId}</td>
         <td>${formatDate(transaction.transactionDate)}</td>
         <td>${transaction.transactionType}</td>
@@ -264,6 +258,19 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
   // ✅ Single ultra-fast DOM update
   batchWrite(() => {
     tableBody.innerHTML = rowsHtml;
+    
+    // Apply background colors to rows after they're in the DOM
+    const rows = tableBody.querySelectorAll('tr');
+    rows.forEach((row, index) => {
+      if (index < paginatedItems.length) {
+        const transaction = paginatedItems[index];
+        const rowBackgroundColor = getTransactionRowColor(transaction.transactionType);
+        if (rowBackgroundColor) {
+          row.style.backgroundColor = rowBackgroundColor;
+          row.style.setProperty('background-color', rowBackgroundColor, 'important');
+        }
+      }
+    });
   });
 
   // ✅ Single event delegation setup (if not already done)

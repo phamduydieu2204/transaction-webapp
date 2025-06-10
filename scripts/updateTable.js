@@ -240,6 +240,25 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
   console.log("🟢 isSearching:", window.isSearching);
   console.log("🟢 todayFormatted:", todayFormatted);
 
+  // Get background color based on transaction type
+  const getTransactionRowColor = (transactionType) => {
+    // Normalize the transaction type (trim and lowercase for comparison)
+    const normalizedType = (transactionType || "").trim().toLowerCase();
+    
+    switch (normalizedType) {
+      case "chưa thanh toán":
+        return "#FFF8DC"; // Light beige
+      case "đã thanh toán":
+        return "#E0F7FA"; // Light cyan
+      case "hoàn tiền":
+        return "#FFEBEE"; // Light red
+      case "hủy giao dịch":
+        return "#F5F5F5"; // Light gray
+      case "đã hoàn tất":
+      default:
+        return ""; // Keep default/current color
+    }
+  };
   
       // ✅ Sắp xếp giao dịch mới nhất lên đầu (timestamp giảm dần)
       window.transactionList.sort((a, b) => {
@@ -282,33 +301,6 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     if (endDate < today) {
       row.classList.add("expired-row");
     }
-
-    // Get background color based on transaction type
-    const getTransactionRowColor = (transactionType) => {
-      // Normalize the transaction type (trim and lowercase for comparison)
-      const normalizedType = (transactionType || "").trim().toLowerCase();
-      
-      switch (normalizedType) {
-        case "chưa thanh toán":
-          return "#FFF8DC"; // Light beige
-        case "đã thanh toán":
-          return "#E0F7FA"; // Light cyan
-        case "hoàn tiền":
-          return "#FFEBEE"; // Light red
-        case "hủy giao dịch":
-          return "#F5F5F5"; // Light gray
-        case "đã hoàn tất":
-        default:
-          return ""; // Keep default/current color
-      }
-    };
-
-    // Apply background color
-    const rowBackgroundColor = getTransactionRowColor(transaction.transactionType);
-    if (rowBackgroundColor) {
-      row.style.backgroundColor = rowBackgroundColor;
-    }
-
 
     const software = (transaction.softwareName || '').toLowerCase();
     const softwarePackage = (transaction.softwarePackage || '').trim().toLowerCase();
@@ -501,6 +493,13 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     }
 
     tableBody.appendChild(row);
+    
+    // Apply background color after the row is appended to DOM
+    const rowBackgroundColor = getTransactionRowColor(transaction.transactionType);
+    if (rowBackgroundColor) {
+      row.style.backgroundColor = rowBackgroundColor;
+      row.style.setProperty('background-color', rowBackgroundColor, 'important');
+    }
   });
 
   // ✅ Cập nhật phân trang - Sử dụng structure giống expense table

@@ -121,9 +121,14 @@ table {
   border: 1px solid #e9ecef;
   padding: 12px;
   text-align: left;
-  background-color: #ffffff;
+  background-color: transparent;
   color: #495057;
   font-size: 14px;
+}
+
+/* Default row background */
+#transactionTable tbody tr {
+  background-color: #ffffff;
 }
 
 /* Alternating row colors - only apply if no inline style exists */
