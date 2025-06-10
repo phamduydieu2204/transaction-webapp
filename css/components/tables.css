@@ -126,14 +126,26 @@ table {
   font-size: 14px;
 }
 
-/* Alternating row colors */
-#transactionTable tbody tr:nth-child(even) {
+/* Alternating row colors - only apply if no inline style exists */
+#transactionTable tbody tr:nth-child(even):not([style*="background-color"]) {
   background-color: #f8f9fa;
 }
 
-#transactionTable tbody tr:hover {
+/* Hover effect - maintain but allow inline styles to override */
+#transactionTable tbody tr:hover:not([style*="background-color"]) {
   background-color: #e3f2fd;
   transition: background-color 0.2s ease;
+}
+
+/* Transaction type specific background colors - high specificity */
+#transactionTable tbody tr[style*="background-color"] {
+  /* Inline styles will override zebra striping */
+}
+
+#transactionTable tbody tr[style*="background-color"]:hover {
+  /* Slightly darken the background on hover while maintaining transaction type color */
+  filter: brightness(0.95);
+  transition: filter 0.2s ease;
 }
 
 /* First column styling */
