@@ -251,6 +251,86 @@ export function closeTestCookieModal() {
   }
 }
 
+// Helper function to parse and analyze cookie format
+function parseCookieData(cookieString) {
+  console.log('🍪 Parsing cookie data...');
+  
+  let cookieData = {
+    format: 'unknown',
+    cookies: [],
+    isValid: false,
+    keyInfo: {}
+  };
+  
+  // Try to parse as JSON first (Edit This Cookie format)
+  try {
+    const jsonCookies = JSON.parse(cookieString.trim());
+    if (Array.isArray(jsonCookies) && jsonCookies.length > 0) {
+      cookieData.format = 'json';
+      cookieData.cookies = jsonCookies;
+      cookieData.isValid = true;
+      
+      // Analyze key cookies for Helium10
+      cookieData.keyInfo = analyzeCookiesForSite(jsonCookies);
+      
+      console.log('✅ Parsed as JSON format:', cookieData);
+      return cookieData;
+    }
+  } catch (e) {
+    console.log('Not JSON format, trying string format...');
+  }
+  
+  // Try to parse as cookie string format
+  if (cookieString.includes('=')) {
+    cookieData.format = 'string';
+    cookieData.isValid = true;
+    
+    // Convert string to array format
+    const pairs = cookieString.split(';').map(pair => {
+      const [name, value] = pair.trim().split('=');
+      return { name: name?.trim(), value: value?.trim() };
+    }).filter(cookie => cookie.name && cookie.value);
+    
+    cookieData.cookies = pairs;
+    console.log('✅ Parsed as string format:', cookieData);
+    return cookieData;
+  }
+  
+  console.log('❌ Unknown cookie format');
+  return cookieData;
+}
+
+// Analyze cookies for specific sites
+function analyzeCookiesForSite(cookies) {
+  const analysis = {
+    authCookies: [],
+    sessionCookies: [],
+    importantCookies: [],
+    totalCount: cookies.length
+  };
+  
+  cookies.forEach(cookie => {
+    const name = cookie.name?.toLowerCase() || '';
+    
+    // Authentication related cookies
+    if (name.includes('identity') || name.includes('auth') || name.includes('session') || name === 'sid') {
+      analysis.authCookies.push(cookie);
+    }
+    
+    // Session related cookies  
+    if (name.includes('session') || name === 'sid' || name.includes('csrf')) {
+      analysis.sessionCookies.push(cookie);
+    }
+    
+    // Important cookies for Helium10
+    if (['_identity', 'sid', '_csrf', 'dsik'].includes(name)) {
+      analysis.importantCookies.push(cookie);
+    }
+  });
+  
+  return analysis;
+}
+
 export async function runCookieTest() {
   console.log('🧪 runCookieTest called');
   
@@ -282,11 +362,31 @@ export async function runCookieTest() {
   
   resultsDiv.style.display = "block";
   resultsDiv.className = "test-results";
-  resultsContent.innerHTML = "🔄 Đang kiểm tra cookie...";
+  resultsContent.innerHTML = "🔄 Đang phân tích cookie...";
+  
+  // Parse cookie data first
+  const cookieData = parseCookieData(cookie);
+  
+  if (!cookieData.isValid) {
+    resultsDiv.className = "test-results error";
+    resultsContent.innerHTML = `
+      ❌ <strong>Cookie không hợp lệ</strong><br>
+      Định dạng không được nhận diện. Vui lòng sử dụng:<br>
+      • JSON Array từ Edit This Cookie<br>
+      • Hoặc string format: name=value; name2=value2
+    `;
+    return;
+  }
+  
+  // Show initial analysis
+  resultsContent.innerHTML = `
+    🔄 Đang kiểm tra cookie...<br>
+    📊 Định dạng: ${cookieData.format.toUpperCase()}<br>
+    📈 Tổng số cookies: ${cookieData.cookies.length}<br>
+    ${cookieData.keyInfo.authCookies?.length > 0 ? `🔐 Auth cookies: ${cookieData.keyInfo.authCookies.length}<br>` : ''}
+  `;
   
   try {
-    // Since we can't actually test cookies cross-origin from frontend,
-    // we'll simulate the test or send to backend
     const { BACKEND_URL } = getConstants();
     
     const response = await fetch(BACKEND_URL, {
@@ -295,7 +395,8 @@ export async function runCookieTest() {
       body: JSON.stringify({
         action: "testCookie",
         website: targetWebsite,
-        cookie: cookie
+        cookieData: cookieData,
+        originalCookie: cookie
       })
     });
     
@@ -306,17 +407,22 @@ export async function runCookieTest() {
       resultsDiv.className = "test-results success";
       resultsContent.innerHTML = `
         ✅ <strong>Cookie hoạt động tốt!</strong><br>
-        Website: ${targetWebsite}<br>
-        Status: ${result.loginStatus || "Đã đăng nhập"}<br>
-        ${result.details ? `Chi tiết: ${result.details}` : ""}
+        🌐 Website: ${targetWebsite}<br>
+        📊 Format: ${cookieData.format.toUpperCase()} (${cookieData.cookies.length} cookies)<br>
+        🔐 Trạng thái: ${result.loginStatus || "Đã đăng nhập"}<br>
+        ${result.userInfo ? `👤 User: ${result.userInfo}<br>` : ''}
+        ${result.details ? `📝 Chi tiết: ${result.details}<br>` : ''}
+        ${cookieData.keyInfo.importantCookies?.length > 0 ? `🔑 Key cookies: ${cookieData.keyInfo.importantCookies.map(c => c.name).join(', ')}` : ''}
       `;
     } else {
       resultsDiv.className = "test-results error";
       resultsContent.innerHTML = `
         ❌ <strong>Cookie không hoạt động</strong><br>
-        Website: ${targetWebsite}<br>
-        Lỗi: ${result.message || "Không thể đăng nhập"}<br>
-        ${result.details ? `Chi tiết: ${result.details}` : ""}
+        🌐 Website: ${targetWebsite}<br>
+        📊 Format: ${cookieData.format.toUpperCase()} (${cookieData.cookies.length} cookies)<br>
+        ❌ Lỗi: ${result.message || "Không thể đăng nhập"}<br>
+        ${result.details ? `📝 Chi tiết: ${result.details}<br>` : ''}
+        ${result.suggestions ? `💡 Gợi ý: ${result.suggestions}` : ''}
       `;
     }
     
@@ -325,8 +431,9 @@ export async function runCookieTest() {
     resultsDiv.className = "test-results error";
     resultsContent.innerHTML = `
       ❌ <strong>Lỗi khi test cookie</strong><br>
-      Chi tiết: ${err.message}<br>
-      <em>Có thể do vấn đề kết nối hoặc website không hỗ trợ test từ xa.</em>
+      📊 Đã phân tích: ${cookieData.format.toUpperCase()} format (${cookieData.cookies.length} cookies)<br>
+      ❌ Chi tiết lỗi: ${err.message}<br>
+      <em>💡 Cookie đã được phân tích thành công, nhưng không thể kết nối với server test.</em>
     `;
   }
 }
