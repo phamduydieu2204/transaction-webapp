@@ -50,7 +50,7 @@ export function renderExecutiveSummary(metrics) {
       <div class="summary-cards">
         
         <!-- Revenue Card -->
-        <div class="summary-card revenue-card" data-tooltip="Tổng doanh thu trong kỳ báo cáo, bao gồm tất cả các giao dịch bán hàng. AOV (Average Order Value) là giá trị trung bình mỗi đơn hàng.">
+        <div class="summary-card revenue-card" data-tooltip="Tổng doanh thu trong kỳ báo cáo, bao gồm tất cả các giao dịch đã hoàn tất. AOV (Average Order Value) là giá trị trung bình mỗi đơn hàng.">
           <div class="card-icon">💰</div>
           <div class="card-content">
             <h3>Doanh Thu</h3>
