@@ -269,14 +269,34 @@ function calculateOverviewKPIs(transactions, expenses) {
   
   // Filter current month data
   const currentMonthTransactions = transactions.filter(t => {
-    const transactionDate = new Date(t.ngayGiaoDich || t.date);
+    const rawDate = t.ngayGiaoDich || t.date;
+    const transactionDate = new Date(rawDate);
+    
+    // Check if date is valid
+    if (isNaN(transactionDate.getTime())) {
+      // Debug first few invalid dates
+      if (transactions.indexOf(t) < 3) {
+        console.log(`    Invalid date found in transaction ${transactions.indexOf(t) + 1}:`, {
+          rawDate,
+          allDateFields: {
+            ngayGiaoDich: t.ngayGiaoDich,
+            date: t.date,
+            ngay: t.ngay,
+            dateTime: t.dateTime,
+            timestamp: t.timestamp
+          }
+        });
+      }
+      return false;
+    }
+    
     const isCurrentMonth = transactionDate.getMonth() === currentMonth && 
                           transactionDate.getFullYear() === currentYear;
     
-    // Debug first few matches/mismatches
+    // Debug first few matches/mismatches  
     if (transactions.indexOf(t) < 3) {
       console.log(`    Filter check ${transactions.indexOf(t) + 1}:`, {
-        rawDate: t.ngayGiaoDich || t.date,
+        rawDate,
         parsedDate: transactionDate.toISOString(),
         transactionMonth: transactionDate.getMonth(),
         transactionYear: transactionDate.getFullYear(),
@@ -288,7 +308,14 @@ function calculateOverviewKPIs(transactions, expenses) {
   });
   
   const currentMonthExpenses = expenses.filter(e => {
-    const expenseDate = new Date(e.ngayChiTieu || e.date);
+    const rawDate = e.ngayChiTieu || e.date;
+    const expenseDate = new Date(rawDate);
+    
+    // Check if date is valid
+    if (isNaN(expenseDate.getTime())) {
+      return false;
+    }
+    
     return expenseDate.getMonth() === currentMonth && 
            expenseDate.getFullYear() === currentYear;
   });
@@ -334,12 +361,14 @@ function calculateOverviewKPIs(transactions, expenses) {
   
   const prevMonthTransactions = transactions.filter(t => {
     const transactionDate = new Date(t.ngayGiaoDich || t.date);
+    if (isNaN(transactionDate.getTime())) return false;
     return transactionDate.getMonth() === prevMonth && 
            transactionDate.getFullYear() === prevYear;
   });
   
   const prevMonthExpenses = expenses.filter(e => {
     const expenseDate = new Date(e.ngayChiTieu || e.date);
+    if (isNaN(expenseDate.getTime())) return false;
     return expenseDate.getMonth() === prevMonth && 
            expenseDate.getFullYear() === prevYear;
   });
