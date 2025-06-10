@@ -102,8 +102,28 @@ export function updateTableOptimized(transactionList, currentPage, itemsPerPage,
       </div>
     `;
 
+    // Get background color based on transaction type
+    const getTransactionRowColor = (transactionType) => {
+      switch (transactionType) {
+        case "Chưa thanh toán":
+          return "#FFF8DC"; // Light beige
+        case "Đã thanh toán":
+          return "#E0F7FA"; // Light cyan
+        case "Hoàn tiền":
+          return "#FFEBEE"; // Light red
+        case "Hủy giao dịch":
+          return "#F5F5F5"; // Light gray
+        case "Đã hoàn tất":
+        default:
+          return ""; // Keep default/current color
+      }
+    };
+
+    const rowBackgroundColor = getTransactionRowColor(transaction.transactionType);
+    const rowStyle = rowBackgroundColor ? `style="background-color: ${rowBackgroundColor};"` : "";
+
     return `
-      <tr class="${isExpired ? 'expired-row' : ''}" data-index="${globalIndex}">
+      <tr class="${isExpired ? 'expired-row' : ''}" data-index="${globalIndex}" ${rowStyle}>
         <td>${transaction.transactionId}</td>
         <td>${formatDate(transaction.transactionDate)}</td>
         <td>${transaction.transactionType}</td>
