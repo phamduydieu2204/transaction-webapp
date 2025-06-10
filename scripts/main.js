@@ -83,7 +83,10 @@ import {
   confirmUpdateCookie,
   cancelUpdateCookie,
   copyCurrentCookie,
-  closeUpdateCookieModal
+  closeUpdateCookieModal,
+  testCurrentCookie,
+  closeTestCookieModal,
+  runCookieTest
 } from './handleUpdateCookie.js';
 import { checkSheetAccess } from './checkSheetAccess.js';
 import { editRow, deleteRow } from './legacy.js';
@@ -351,6 +354,9 @@ window.confirmUpdateCookie = confirmUpdateCookie;
 window.cancelUpdateCookie = cancelUpdateCookie;
 window.copyCurrentCookie = copyCurrentCookie;
 window.closeUpdateCookieModal = closeUpdateCookieModal;
+window.testCurrentCookie = testCurrentCookie;
+window.closeTestCookieModal = closeTestCookieModal;
+window.runCookieTest = runCookieTest;
 window.editExpenseRow = editExpenseRow;
 window.handleDeleteExpense = handleDeleteExpense;
 window.handleUpdateExpense = handleUpdateExpense;

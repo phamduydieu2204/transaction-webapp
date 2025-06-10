@@ -6,7 +6,10 @@
 
     <label for="currentCookie">Cookie hiện tại:</label>
     <textarea id="currentCookie" readonly rows="6"></textarea>
-    <button onclick="copyCurrentCookie()">📋 Copy Cookie</button>
+    <div class="cookie-actions">
+      <button onclick="copyCurrentCookie()">📋 Copy Cookie</button>
+      <button onclick="testCurrentCookie()">🧪 Test Cookie</button>
+    </div>
 
     <label for="newCookie">Cookie cập nhật:</label>
     <textarea id="newCookie" rows="6" placeholder="Nhập cookie mới..."></textarea>
@@ -14,6 +17,37 @@
     <div class="button-row">
       <button onclick="confirmUpdateCookie()">Cập nhật</button>
       <button onclick="cancelUpdateCookie()">Hủy bỏ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal test cookie -->
+<div id="testCookieModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeTestCookieModal()">&times;</span>
+    <h2>🧪 Test Cookie</h2>
+    
+    <label for="testWebsite">Chọn website để kiểm tra:</label>
+    <select id="testWebsite">
+      <option value="">-- Chọn website --</option>
+      <option value="helium10.com">Helium10 (helium10.com)</option>
+      <option value="netflix.com">Netflix (netflix.com)</option>
+      <option value="custom">Website khác...</option>
+    </select>
+    
+    <div id="customWebsiteDiv" style="display: none; margin-top: 10px;">
+      <label for="customWebsite">URL website:</label>
+      <input type="text" id="customWebsite" placeholder="Nhập URL website (vd: example.com)">
+    </div>
+    
+    <div class="test-results" id="testResults" style="display: none; margin-top: 15px; padding: 10px; border-radius: 5px;">
+      <h4>Kết quả kiểm tra:</h4>
+      <div id="testResultsContent"></div>
+    </div>
+    
+    <div class="button-row">
+      <button onclick="runCookieTest()">🚀 Chạy Test</button>
+      <button onclick="closeTestCookieModal()">Đóng</button>
     </div>
   </div>
 </div>

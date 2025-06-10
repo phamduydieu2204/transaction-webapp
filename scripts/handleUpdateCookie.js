@@ -65,6 +65,47 @@ export function copyCurrentCookie() {
   });
 }
 
+export function testCurrentCookie() {
+  console.log('🧪 testCurrentCookie called');
+  
+  const val = document.getElementById("currentCookie").value;
+  console.log('🧪 Cookie to test:', val);
+  
+  if (!val || val === "(Không có dữ liệu)") {
+    showResultModal("⚠️ Không có cookie để test!", false);
+    return;
+  }
+  
+  // Store cookie for testing
+  window.currentTestCookie = val;
+  
+  // Show test modal
+  const testModal = document.getElementById("testCookieModal");
+  if (testModal) {
+    testModal.style.display = "block";
+    
+    // Reset form
+    document.getElementById("testWebsite").value = "";
+    document.getElementById("customWebsite").value = "";
+    document.getElementById("customWebsiteDiv").style.display = "none";
+    document.getElementById("testResults").style.display = "none";
+    
+    // Add website change handler
+    const websiteSelect = document.getElementById("testWebsite");
+    websiteSelect.onchange = function() {
+      const customDiv = document.getElementById("customWebsiteDiv");
+      if (this.value === "custom") {
+        customDiv.style.display = "block";
+      } else {
+        customDiv.style.display = "none";
+      }
+    };
+  } else {
+    console.error('❌ Test cookie modal not found');
+    showResultModal("❌ Không tìm thấy modal test cookie!", false);
+  }
+}
+
 export async function confirmUpdateCookie() {
   console.log('🍪 confirmUpdateCookie called');
   
@@ -196,6 +237,97 @@ export function closeUpdateCookieModal() {
     console.log('✅ Modal closed');
   } else {
     console.error('❌ Modal not found');
+  }
+}
+
+export function closeTestCookieModal() {
+  console.log('🧪 closeTestCookieModal called');
+  const modal = document.getElementById("testCookieModal");
+  if (modal) {
+    modal.style.display = "none";
+    console.log('✅ Test modal closed');
+  } else {
+    console.error('❌ Test modal not found');
+  }
+}
+
+export async function runCookieTest() {
+  console.log('🧪 runCookieTest called');
+  
+  const websiteSelect = document.getElementById("testWebsite");
+  const customWebsite = document.getElementById("customWebsite");
+  const cookie = window.currentTestCookie;
+  
+  if (!websiteSelect.value) {
+    showResultModal("⚠️ Vui lòng chọn website để test!", false);
+    return;
+  }
+  
+  let targetWebsite = "";
+  if (websiteSelect.value === "custom") {
+    if (!customWebsite.value.trim()) {
+      showResultModal("⚠️ Vui lòng nhập URL website!", false);
+      return;
+    }
+    targetWebsite = customWebsite.value.trim();
+  } else {
+    targetWebsite = websiteSelect.value;
+  }
+  
+  console.log('🧪 Testing cookie on:', targetWebsite);
+  
+  // Show loading
+  const resultsDiv = document.getElementById("testResults");
+  const resultsContent = document.getElementById("testResultsContent");
+  
+  resultsDiv.style.display = "block";
+  resultsDiv.className = "test-results";
+  resultsContent.innerHTML = "🔄 Đang kiểm tra cookie...";
+  
+  try {
+    // Since we can't actually test cookies cross-origin from frontend,
+    // we'll simulate the test or send to backend
+    const { BACKEND_URL } = getConstants();
+    
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "testCookie",
+        website: targetWebsite,
+        cookie: cookie
+      })
+    });
+    
+    const result = await response.json();
+    console.log('🧪 Test result:', result);
+    
+    if (result.status === "success") {
+      resultsDiv.className = "test-results success";
+      resultsContent.innerHTML = `
+        ✅ <strong>Cookie hoạt động tốt!</strong><br>
+        Website: ${targetWebsite}<br>
+        Status: ${result.loginStatus || "Đã đăng nhập"}<br>
+        ${result.details ? `Chi tiết: ${result.details}` : ""}
+      `;
+    } else {
+      resultsDiv.className = "test-results error";
+      resultsContent.innerHTML = `
+        ❌ <strong>Cookie không hoạt động</strong><br>
+        Website: ${targetWebsite}<br>
+        Lỗi: ${result.message || "Không thể đăng nhập"}<br>
+        ${result.details ? `Chi tiết: ${result.details}` : ""}
+      `;
+    }
+    
+  } catch (err) {
+    console.error('❌ Test failed:', err);
+    resultsDiv.className = "test-results error";
+    resultsContent.innerHTML = `
+      ❌ <strong>Lỗi khi test cookie</strong><br>
+      Chi tiết: ${err.message}<br>
+      <em>Có thể do vấn đề kết nối hoặc website không hỗ trợ test từ xa.</em>
+    `;
   }
 }
 
