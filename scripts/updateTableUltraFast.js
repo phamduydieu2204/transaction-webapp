@@ -5,6 +5,7 @@ import { batchWrite } from './core/domOptimizer.js';
  * Ultra-fast table update - only renders first page immediately
  */
 export function updateTableUltraFast(transactionList, currentPage, itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction) {
+  console.log('🚀 updateTableUltraFast CALLED with', transactionList.length, 'transactions');
   const tableBody = document.querySelector("#transactionTable tbody");
   if (!tableBody) return;
 

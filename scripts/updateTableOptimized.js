@@ -3,6 +3,7 @@ import { updateTotalDisplay } from './updateTotalDisplay.js';
 import { batchWrite } from './core/domOptimizer.js';
 
 export function updateTableOptimized(transactionList, currentPage, itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction) {
+  console.log('🚀 updateTableOptimized CALLED with', transactionList.length, 'transactions');
   const tableBody = document.querySelector("#transactionTable tbody");
   if (!tableBody) return;
 
@@ -124,6 +125,16 @@ export function updateTableOptimized(transactionList, currentPage, itemsPerPage,
 
     const rowBackgroundColor = getTransactionRowColor(transaction.transactionType);
     const rowStyleAttr = rowBackgroundColor ? ` style="background-color: ${rowBackgroundColor} !important;"` : "";
+    
+    // DEBUG: Log for first few rows
+    if (index < 3) {
+      console.log(`🎨 OPTIMIZED ROW ${index}:`, {
+        transactionType: transaction.transactionType,
+        normalizedType: (transaction.transactionType || "").trim().toLowerCase(),
+        rowBackgroundColor: rowBackgroundColor,
+        rowStyleAttr: rowStyleAttr
+      });
+    }
 
     return `
       <tr class="${isExpired ? 'expired-row' : ''}" data-index="${globalIndex}"${rowStyleAttr}>
