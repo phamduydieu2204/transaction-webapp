@@ -54,14 +54,17 @@ window.selectReportPeriod = function(period) {
     return;
   }
   
-  // Update global filters
-  if (window.globalFilters) {
-    window.globalFilters.dateRange = dateRange;
-    window.globalFilters.period = period;
-    
-    // Save to localStorage
-    localStorage.setItem('dashboardFilters', JSON.stringify(window.globalFilters));
+  // Initialize global filters if not exists
+  if (!window.globalFilters) {
+    window.globalFilters = {};
   }
+  
+  // Update global filters
+  window.globalFilters.dateRange = dateRange;
+  window.globalFilters.period = period;
+  
+  // Save to localStorage
+  localStorage.setItem('dashboardFilters', JSON.stringify(window.globalFilters));
   
   // Refresh all reports with new date range
   refreshAllReports(dateRange);
@@ -261,7 +264,7 @@ function refreshAllReports(dateRange) {
     if (window.loadOverviewReport) {
       const options = {
         dateRange: dateRange,
-        period: period
+        period: currentReportPeriod
       };
       window.loadOverviewReport(options);
     }
