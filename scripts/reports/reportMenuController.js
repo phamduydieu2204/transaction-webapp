@@ -99,7 +99,12 @@ async function loadReport(reportType) {
   try {
     switch (reportType) {
       case 'overview':
-        await loadOverviewReport();
+        // Pass current date range and period
+        const options = {
+          dateRange: window.globalFilters?.dateRange || null,
+          period: window.globalFilters?.period || 'this_month'
+        };
+        await loadOverviewReport(options);
         break;
       case 'revenue':
         await loadRevenueReport();

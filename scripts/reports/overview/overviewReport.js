@@ -10,9 +10,12 @@ import { getFromStorage } from '../../core/stateManager.js';
 
 /**
  * Load overview report (Tổng quan kinh doanh)
+ * @param {Object} options - Options for loading report
+ * @param {Object} options.dateRange - Date range filter {start: 'yyyy/mm/dd', end: 'yyyy/mm/dd'}
+ * @param {string} options.period - Period name (e.g., 'this_month', 'last_month')
  */
-export async function loadOverviewReport() {
-  console.log('📈 Loading overview report');
+export async function loadOverviewReport(options = {}) {
+  console.log('📈 Loading overview report with options:', options);
   
   try {
     // Load the overview report HTML template
@@ -37,13 +40,27 @@ export async function loadOverviewReport() {
       sampleExpense: expenses[0] ? Object.keys(expenses[0]) : []
     });
     
-    // Calculate KPIs
-    const kpis = calculateOverviewKPIs(transactions, expenses);
+    // Get date range from options or global filters
+    const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
+    const period = options.period || window.globalFilters?.period || 'this_month';
+    
+    console.log('📅 Using date range:', dateRange);
+    console.log('📅 Period:', period);
+    
+    // Update period display
+    updatePeriodDisplay(period);
+    
+    // Calculate KPIs with date range
+    const kpis = calculateOverviewKPIs(transactions, expenses, dateRange);
     console.log('💰 Calculated KPIs:');
     console.log('  - Revenue:', kpis.revenue);
     console.log('  - Expense:', kpis.expense);
     console.log('  - Profit:', kpis.profit);
     console.log('  - Transactions:', kpis.transactions);
+    
+    // Filter data for charts and tables
+    const filteredTransactions = filterDataByDateRange(transactions, dateRange);
+    const filteredExpenses = filterDataByDateRange(expenses, dateRange);
     
     // Update all components
     console.log('🚀 Loading overview components...');
@@ -53,10 +70,10 @@ export async function loadOverviewReport() {
     
     await Promise.all([
       updateKPICards(kpis),
-      loadTopProducts(),
-      loadTopCustomers(),
-      loadCharts(transactions, expenses),
-      updateDataTables(transactions, expenses)
+      loadTopProducts(filteredTransactions),
+      loadTopCustomers(filteredTransactions),
+      loadCharts(filteredTransactions, filteredExpenses),
+      updateDataTables(filteredTransactions, filteredExpenses)
     ]);
     
     console.log('✅ Overview report loaded successfully');
@@ -239,156 +256,172 @@ function enhanceExistingStructure(container) {
 }
 
 /**
- * Calculate overview KPIs
+ * Update period display
  */
-function calculateOverviewKPIs(transactions, expenses) {
+function updatePeriodDisplay(period) {
+  const displayElement = document.getElementById('overview-period-display');
+  if (displayElement) {
+    const periodLabels = {
+      'today': 'Hôm nay',
+      'yesterday': 'Hôm qua',
+      'this_week': 'Tuần này',
+      'last_week': 'Tuần trước',
+      'last_7_days': '7 ngày qua',
+      'this_month': 'Tháng này',
+      'last_month': 'Tháng trước',
+      'last_30_days': '30 ngày qua',
+      'this_quarter': 'Quý này',
+      'last_quarter': 'Quý trước',
+      'this_year': 'Năm nay',
+      'last_year': 'Năm trước',
+      'all_time': 'Tất cả thời gian',
+      'custom': 'Tùy chỉnh'
+    };
+    displayElement.textContent = periodLabels[period] || period;
+  }
+}
+
+/**
+ * Filter data by date range
+ */
+function filterDataByDateRange(data, dateRange) {
+  if (!dateRange || !dateRange.start || !dateRange.end) {
+    return data;
+  }
+  
+  const startDate = new Date(dateRange.start);
+  const endDate = new Date(dateRange.end);
+  endDate.setHours(23, 59, 59, 999); // Include full end date
+  
+  return data.filter(item => {
+    const itemDate = new Date(item.ngayGiaoDich || item.ngayChiTieu || item.date || item.transactionDate);
+    return itemDate >= startDate && itemDate <= endDate;
+  });
+}
+
+/**
+ * Calculate overview KPIs
+ * @param {Array} transactions - All transactions
+ * @param {Array} expenses - All expenses  
+ * @param {Object} dateRange - Date range filter {start, end}
+ */
+function calculateOverviewKPIs(transactions, expenses, dateRange) {
   const now = new Date();
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
   
   console.log('📅 Date filtering setup:');
-  console.log(`  - Current date: ${now.toISOString()}`);
-  console.log(`  - Current month: ${currentMonth} (${now.getMonth() + 1})`);
-  console.log(`  - Current year: ${currentYear}`);
+  console.log(`  - Using date range:`, dateRange);
   console.log(`  - Total transactions to filter: ${transactions.length}`);
+  console.log(`  - Total expenses to filter: ${expenses.length}`);
   
-  // Check date field names in first few transactions
-  if (transactions.length > 0) {
-    console.log('  - Sample transaction date fields:');
-    transactions.slice(0, 3).forEach((t, i) => {
-      console.log(`    Transaction ${i + 1} date fields:`, {
-        ngayGiaoDich: t.ngayGiaoDich,
-        date: t.date,
-        ngay: t.ngay,
-        dateTime: t.dateTime,
-        timestamp: t.timestamp
-      });
-      console.log(`    Transaction ${i + 1} all keys:`, Object.keys(t));
-      console.log(`    Transaction ${i + 1} full object:`, JSON.stringify(t, null, 2));
+  // Filter data based on date range
+  let filteredTransactions, filteredExpenses;
+  
+  if (dateRange && dateRange.start && dateRange.end) {
+    // Use provided date range
+    filteredTransactions = filterDataByDateRange(transactions, dateRange);
+    filteredExpenses = filterDataByDateRange(expenses, dateRange);
+    
+    console.log('📊 Filtered by date range:');
+    console.log(`  - Transactions: ${transactions.length} → ${filteredTransactions.length}`);
+    console.log(`  - Expenses: ${expenses.length} → ${filteredExpenses.length}`);
+  } else {
+    // Default to current month if no date range
+    console.log('📅 No date range provided, using current month');
+    
+    filteredTransactions = transactions.filter(t => {
+      const rawDate = t.transactionDate || t.ngayGiaoDich || t.date;
+      const transactionDate = new Date(rawDate);
+      
+      if (isNaN(transactionDate.getTime())) {
+        return false;
+      }
+      
+      return transactionDate.getMonth() === currentMonth && 
+             transactionDate.getFullYear() === currentYear;
+    });
+    
+    filteredExpenses = expenses.filter(e => {
+      const rawDate = e.ngayChiTieu || e.date;
+      const expenseDate = new Date(rawDate);
+      
+      if (isNaN(expenseDate.getTime())) {
+        return false;
+      }
+      
+      return expenseDate.getMonth() === currentMonth && 
+             expenseDate.getFullYear() === currentYear;
     });
   }
   
-  // Filter current month data
-  const currentMonthTransactions = transactions.filter(t => {
-    const rawDate = t.transactionDate || t.ngayGiaoDich || t.date;
-    const transactionDate = new Date(rawDate);
-    
-    // Check if date is valid
-    if (isNaN(transactionDate.getTime())) {
-      // Debug first few invalid dates
-      if (transactions.indexOf(t) < 3) {
-        console.log(`    Invalid date found in transaction ${transactions.indexOf(t) + 1}:`, {
-          rawDate,
-          allDateFields: {
-            ngayGiaoDich: t.ngayGiaoDich,
-            date: t.date,
-            ngay: t.ngay,
-            dateTime: t.dateTime,
-            timestamp: t.timestamp
-          }
-        });
-      }
-      return false;
-    }
-    
-    const isCurrentMonth = transactionDate.getMonth() === currentMonth && 
-                          transactionDate.getFullYear() === currentYear;
-    
-    // Debug first few matches/mismatches  
-    if (transactions.indexOf(t) < 3) {
-      console.log(`    Filter check ${transactions.indexOf(t) + 1}:`, {
-        rawDate,
-        parsedDate: isNaN(transactionDate.getTime()) ? 'INVALID DATE' : transactionDate.toISOString(),
-        transactionMonth: isNaN(transactionDate.getTime()) ? 'INVALID' : transactionDate.getMonth(),
-        transactionYear: isNaN(transactionDate.getTime()) ? 'INVALID' : transactionDate.getFullYear(),
-        isCurrentMonth
-      });
-    }
-    
-    return isCurrentMonth;
-  });
-  
-  const currentMonthExpenses = expenses.filter(e => {
-    const rawDate = e.ngayChiTieu || e.date;
-    const expenseDate = new Date(rawDate);
-    
-    // Check if date is valid
-    if (isNaN(expenseDate.getTime())) {
-      return false;
-    }
-    
-    return expenseDate.getMonth() === currentMonth && 
-           expenseDate.getFullYear() === currentYear;
-  });
-  
   // Calculate totals - check various field names
-  const totalRevenue = currentMonthTransactions.reduce((sum, t) => {
+  const totalRevenue = filteredTransactions.reduce((sum, t) => {
     const revenue = parseFloat(t.doanhThu || t.revenue || t.Revenue || t.doanh_thu) || 0;
     return sum + revenue;
   }, 0);
   
-  const totalExpense = currentMonthExpenses.reduce((sum, e) => {
+  const totalExpense = filteredExpenses.reduce((sum, e) => {
     const expense = parseFloat(e.soTien || e.amount || e.Amount || e.so_tien) || 0;
     return sum + expense;
   }, 0);
   
   console.log('📊 Revenue calculation:');
-  console.log('  - Current month transactions:', currentMonthTransactions.length);
+  console.log('  - Filtered transactions:', filteredTransactions.length);
   console.log('  - Total revenue calculated:', totalRevenue);
-  console.log('  - Sample transaction:', currentMonthTransactions[0]);
-  console.log('  - Available fields:', currentMonthTransactions[0] ? Object.keys(currentMonthTransactions[0]) : []);
-  
-  if (currentMonthTransactions.length > 0) {
-    console.log('  - Revenue field analysis:');
-    currentMonthTransactions.slice(0, 3).forEach((t, i) => {
-      console.log(`    Transaction ${i + 1}:`, {
-        doanhThu: t.doanhThu,
-        revenue: t.revenue, 
-        Revenue: t.Revenue,
-        doanh_thu: t.doanh_thu,
-        soTien: t.soTien,
-        amount: t.amount,
-        giaTri: t.giaTri
-      });
-    });
-  }
+  console.log('  - Total expense calculated:', totalExpense);
   
   const totalProfit = totalRevenue - totalExpense;
-  const totalTransactions = currentMonthTransactions.length;
+  const totalTransactions = filteredTransactions.length;
   
-  // Calculate previous month for comparison
-  const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-  const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+  // Calculate previous period for comparison
+  let prevDateRange = null;
   
-  const prevMonthTransactions = transactions.filter(t => {
-    const transactionDate = new Date(t.transactionDate || t.ngayGiaoDich || t.date);
-    if (isNaN(transactionDate.getTime())) return false;
-    return transactionDate.getMonth() === prevMonth && 
-           transactionDate.getFullYear() === prevYear;
-  });
+  if (dateRange && dateRange.start && dateRange.end) {
+    // Calculate previous period based on current date range
+    const startDate = new Date(dateRange.start);
+    const endDate = new Date(dateRange.end);
+    const daysDiff = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+    
+    const prevEndDate = new Date(startDate);
+    prevEndDate.setDate(prevEndDate.getDate() - 1);
+    const prevStartDate = new Date(prevEndDate);
+    prevStartDate.setDate(prevStartDate.getDate() - daysDiff);
+    
+    prevDateRange = {
+      start: `${prevStartDate.getFullYear()}/${String(prevStartDate.getMonth() + 1).padStart(2, '0')}/${String(prevStartDate.getDate()).padStart(2, '0')}`,
+      end: `${prevEndDate.getFullYear()}/${String(prevEndDate.getMonth() + 1).padStart(2, '0')}/${String(prevEndDate.getDate()).padStart(2, '0')}`
+    };
+  } else {
+    // Previous month
+    const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+    
+    prevDateRange = {
+      start: `${prevYear}/${String(prevMonth + 1).padStart(2, '0')}/01`,
+      end: `${prevYear}/${String(prevMonth + 1).padStart(2, '0')}/${new Date(prevYear, prevMonth + 1, 0).getDate()}`
+    };
+  }
   
-  const prevMonthExpenses = expenses.filter(e => {
-    const expenseDate = new Date(e.ngayChiTieu || e.date);
-    if (isNaN(expenseDate.getTime())) return false;
-    return expenseDate.getMonth() === prevMonth && 
-           expenseDate.getFullYear() === prevYear;
-  });
+  // Filter previous period data
+  const prevTransactions = filterDataByDateRange(transactions, prevDateRange);
+  const prevExpenses = filterDataByDateRange(expenses, prevDateRange);
   
-  const prevRevenue = prevMonthTransactions.reduce((sum, t) => {
+  const prevRevenue = prevTransactions.reduce((sum, t) => {
     return sum + (parseFloat(t.doanhThu || t.revenue) || 0);
   }, 0);
   
-  const prevExpense = prevMonthExpenses.reduce((sum, e) => {
+  const prevExpense = prevExpenses.reduce((sum, e) => {
     return sum + (parseFloat(e.soTien || e.amount) || 0);
   }, 0);
   
   const prevProfit = prevRevenue - prevExpense;
-  const prevTransactionCount = prevMonthTransactions.length;
+  const prevTransactionCount = prevTransactions.length;
   
   // Calculate growth percentages
   const revenueGrowth = prevRevenue > 0 ? ((totalRevenue - prevRevenue) / prevRevenue * 100) : 0;
   const expenseGrowth = prevExpense > 0 ? ((totalExpense - prevExpense) / prevExpense * 100) : 0;
-  const profitGrowth = prevProfit > 0 ? ((totalProfit - prevProfit) / prevProfit * 100) : 0;
+  const profitGrowth = prevProfit !== 0 ? ((totalProfit - prevProfit) / Math.abs(prevProfit) * 100) : 0;
   const transactionGrowth = prevTransactionCount > 0 ? ((totalTransactions - prevTransactionCount) / prevTransactionCount * 100) : 0;
   
   return {
@@ -796,8 +829,9 @@ function updateTopExpensesTable(expenses) {
 
 /**
  * Load top products data
+ * @param {Array} transactions - Filtered transactions
  */
-async function loadTopProducts() {
+async function loadTopProducts(transactions = []) {
   try {
     const container = document.getElementById('top-software-body');
     if (!container) {
@@ -810,7 +844,10 @@ async function loadTopProducts() {
       return;
     }
 
-    const transactions = window.transactionList || [];
+    // Use provided transactions or fallback to global
+    if (!transactions || transactions.length === 0) {
+      transactions = window.transactionList || [];
+    }
     
     // Group by software and calculate totals
     const softwareStats = {};
@@ -858,8 +895,9 @@ async function loadTopProducts() {
 
 /**
  * Load top customers data
+ * @param {Array} transactions - Filtered transactions
  */
-async function loadTopCustomers() {
+async function loadTopCustomers(transactions = []) {
   try {
     const container = document.getElementById('top-customers-body');
     if (!container) {
@@ -872,7 +910,10 @@ async function loadTopCustomers() {
       return;
     }
 
-    const transactions = window.transactionList || [];
+    // Use provided transactions or fallback to global
+    if (!transactions || transactions.length === 0) {
+      transactions = window.transactionList || [];
+    }
     
     // Group by customer and calculate totals
     const customerStats = {};

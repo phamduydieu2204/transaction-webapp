@@ -253,9 +253,18 @@ function refreshAllReports(dateRange) {
     });
   }
   
-  // Refresh current report
+  // Refresh current report with new date range
   if (window.refreshCurrentReport) {
     window.refreshCurrentReport();
+  } else if (window.reportState?.currentReport === 'overview') {
+    // If refreshCurrentReport not available, try to reload overview directly
+    if (window.loadOverviewReport) {
+      const options = {
+        dateRange: dateRange,
+        period: period
+      };
+      window.loadOverviewReport(options);
+    }
   }
 }
 
