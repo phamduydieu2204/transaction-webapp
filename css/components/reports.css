@@ -548,6 +548,287 @@
   height: 300px !important;
 }
 
+/* Status Chart Specific Styles */
+.status-chart-content {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 30px;
+  align-items: start;
+}
+
+.status-chart-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+.status-detail-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.detail-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f8f9fa;
+}
+
+/* Status Detail Table */
+.status-detail-table-container {
+  background: #f8f9fa;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e9ecef;
+}
+
+.status-detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.status-detail-table th {
+  background: #e9ecef;
+  padding: 12px 10px;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 2px solid #dee2e6;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.status-detail-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #dee2e6;
+  vertical-align: middle;
+}
+
+.status-detail-table tr:hover {
+  background: #ffffff;
+}
+
+/* Status Row Styling */
+.status-completed {
+  background: rgba(39, 174, 96, 0.05);
+}
+
+.status-paid {
+  background: rgba(52, 152, 219, 0.05);
+}
+
+.status-refunded {
+  background: rgba(231, 76, 60, 0.1);
+  border-left: 4px solid #e74c3c;
+}
+
+.total-row {
+  background: #e9ecef !important;
+  border-top: 2px solid #dee2e6;
+  font-weight: 600;
+}
+
+/* Status Cell Styling */
+.status-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-name {
+  font-weight: 500;
+}
+
+.count-cell {
+  text-align: center;
+  font-weight: 600;
+  color: #495057;
+}
+
+.amount-cell {
+  text-align: right;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+.amount-cell.positive-amount {
+  color: #27ae60;
+}
+
+.amount-cell.negative-amount {
+  color: #e74c3c;
+  position: relative;
+}
+
+.negative-icon {
+  margin-left: 5px;
+  color: #e74c3c;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.percentage-cell {
+  text-align: center;
+  font-weight: 500;
+  color: #6c757d;
+}
+
+.avg-cell {
+  text-align: right;
+  font-family: 'Courier New', monospace;
+  color: #6c757d;
+}
+
+/* Status Highlights */
+.status-highlights {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+.highlight-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 15px;
+  border: 1px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.highlight-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.refund-highlight {
+  border-left: 4px solid #e74c3c;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+}
+
+.success-highlight {
+  border-left: 4px solid #27ae60;
+  background: linear-gradient(135deg, #f0fff4 0%, #ffffff 100%);
+}
+
+.net-highlight {
+  border-left: 4px solid #3498db;
+  background: linear-gradient(135deg, #f0f8ff 0%, #ffffff 100%);
+}
+
+.highlight-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 16px;
+}
+
+.refund-highlight .highlight-icon {
+  background: #fecaca;
+  color: #dc2626;
+}
+
+.success-highlight .highlight-icon {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.net-highlight .highlight-icon {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.highlight-content {
+  flex: 1;
+}
+
+.highlight-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 2px;
+}
+
+.highlight-desc {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.highlight-value {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+}
+
+.highlight-value.positive {
+  color: #16a34a;
+}
+
+.highlight-value.negative {
+  color: #dc2626;
+}
+
+/* Chart Actions */
+.chart-actions {
+  display: flex;
+  gap: 5px;
+}
+
+/* Responsive Design for Status Chart */
+@media (max-width: 1200px) {
+  .status-chart-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .status-highlights {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .status-detail-table {
+    font-size: 11px;
+  }
+  
+  .status-detail-table th,
+  .status-detail-table td {
+    padding: 8px 6px;
+  }
+  
+  .highlight-card {
+    padding: 12px;
+    gap: 10px;
+  }
+  
+  .highlight-value {
+    font-size: 16px;
+  }
+  
+  .status-highlights {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Data Tables Section Layout */
 .data-tables-section {
   margin-top: 30px;

@@ -959,7 +959,7 @@ function renderRevenueStatusChart(transactions) {
 }
 
 /**
- * Render status distribution chart with refund support
+ * Render status distribution chart with detailed breakdown
  */
 function renderStatusDistributionChart(transactions) {
   const canvas = document.getElementById('status-distribution-chart');
@@ -967,8 +967,8 @@ function renderStatusDistributionChart(transactions) {
   
   const ctx = canvas.getContext('2d');
   
-  // Calculate status distribution with refund
-  const statusData = getStatusDistributionWithRefund(transactions);
+  // Calculate detailed status breakdown with amounts
+  const statusBreakdown = calculateDetailedStatusBreakdown(transactions);
   
   // Destroy existing chart if it exists
   if (window.statusDistributionChart instanceof Chart) {
@@ -980,85 +980,79 @@ function renderStatusDistributionChart(transactions) {
     data: {
       labels: ['Đã hoàn tất', 'Đã thanh toán', 'Hoàn tiền'],
       datasets: [{
-        data: [statusData.completed, statusData.paid, statusData.refunded],
+        data: [statusBreakdown.completed.count, statusBreakdown.paid.count, statusBreakdown.refunded.count],
         backgroundColor: [
           '#27ae60', // Completed - Green
           '#3498db', // Paid - Blue  
-          '#e74c3c'  // Refunded - Red
+          '#e74c3c'  // Refunded - Red (highlighted)
         ],
         borderColor: [
           '#229954', // Darker green
           '#2980b9', // Darker blue
           '#c0392b'  // Darker red
         ],
-        borderWidth: 2,
+        borderWidth: function(context) {
+          // Make refund border thicker to highlight
+          return context.dataIndex === 2 ? 4 : 2;
+        },
         hoverBackgroundColor: [
           '#2ecc71',
           '#5dade2', 
           '#ec7063'
         ],
-        hoverBorderWidth: 3
+        hoverBorderWidth: function(context) {
+          return context.dataIndex === 2 ? 6 : 3;
+        }
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: '60%', // Make it a donut chart
+      cutout: '50%', // Slightly smaller cutout for better visibility
       plugins: {
         legend: {
-          position: 'bottom',
-          labels: {
-            padding: 15,
-            usePointStyle: true,
-            pointStyle: 'circle',
-            font: {
-              size: 12,
-              weight: '500'
-            },
-            generateLabels: function(chart) {
-              const data = chart.data;
-              const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
-              
-              return data.labels.map((label, index) => {
-                const value = data.datasets[0].data[index];
-                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                
-                return {
-                  text: `${label}: ${value} (${percentage}%)`,
-                  fillStyle: data.datasets[0].backgroundColor[index],
-                  strokeStyle: data.datasets[0].borderColor[index],
-                  lineWidth: 2,
-                  hidden: false,
-                  index: index
-                };
-              });
-            }
-          }
+          display: false // Hide default legend, we'll use custom table
         },
         tooltip: {
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          backgroundColor: 'rgba(0, 0, 0, 0.9)',
           titleColor: '#fff',
           bodyColor: '#fff',
           borderColor: '#fff',
           borderWidth: 1,
+          padding: 12,
           callbacks: {
-            title: function() {
-              return 'Phân bố trạng thái giao dịch';
+            title: function(tooltipItems) {
+              const item = tooltipItems[0];
+              return `${item.label} - Chi tiết`;
             },
             label: function(context) {
               const label = context.label || '';
-              const value = context.parsed || 0;
-              const total = context.dataset.data.reduce((a, b) => a + b, 0);
-              const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+              const dataIndex = context.dataIndex;
+              const breakdown = statusBreakdown;
+              let statusData;
+              
+              if (dataIndex === 0) statusData = breakdown.completed;
+              else if (dataIndex === 1) statusData = breakdown.paid;
+              else statusData = breakdown.refunded;
+              
+              const total = breakdown.completed.count + breakdown.paid.count + breakdown.refunded.count;
+              const percentage = total > 0 ? ((statusData.count / total) * 100).toFixed(1) : 0;
               
               return [
-                `${label}: ${value} giao dịch`,
-                `Tỷ lệ: ${percentage}%`
+                `Số lượng: ${statusData.count} giao dịch`,
+                `Tỷ lệ: ${percentage}%`,
+                `Tổng tiền: ${formatRevenue(statusData.amount)}`,
+                `Trung bình: ${formatRevenue(statusData.count > 0 ? statusData.amount / statusData.count : 0)}`
               ];
             },
             footer: function(tooltipItems) {
-              const total = tooltipItems.reduce((sum, item) => sum + item.parsed, 0);
-              return `Tổng: ${total} giao dịch`;
+              const totalCount = statusBreakdown.completed.count + statusBreakdown.paid.count + statusBreakdown.refunded.count;
+              const totalAmount = statusBreakdown.completed.amount + statusBreakdown.paid.amount + statusBreakdown.refunded.amount;
+              return [
+                ``,
+                `Tổng cộng: ${totalCount} giao dịch`,
+                `Tổng giá trị: ${formatRevenue(totalAmount)}`
+              ];
             }
           }
         }
@@ -1066,12 +1060,132 @@ function renderStatusDistributionChart(transactions) {
       animation: {
         animateScale: true,
         animateRotate: true,
-        duration: 1000
+        duration: 1200
+      },
+      elements: {
+        arc: {
+          borderWidth: function(context) {
+            // Highlight refund slice
+            return context.dataIndex === 2 ? 4 : 2;
+          }
+        }
       }
     }
   });
   
-  console.log('🍰 Status distribution chart rendered:', statusData);
+  // Update the detailed status table
+  updateStatusDetailTable(statusBreakdown);
+  
+  console.log('🍰 Status distribution chart with details rendered:', statusBreakdown);
+}
+
+/**
+ * Calculate detailed status breakdown with counts and amounts
+ * @param {Array} transactions - Transactions to analyze
+ * @returns {Object} Detailed breakdown with counts and amounts
+ */
+function calculateDetailedStatusBreakdown(transactions) {
+  const breakdown = {
+    completed: { count: 0, amount: 0 },
+    paid: { count: 0, amount: 0 },
+    refunded: { count: 0, amount: 0 }
+  };
+  
+  transactions.forEach(t => {
+    const amount = parseFloat(t.doanhThu || t.revenue || t.Revenue || t.doanh_thu || t.amount) || 0;
+    const status = (t.loaiGiaoDich || t.transactionType || t.status || '').toLowerCase();
+    
+    if (status.includes('hoàn tất') || status.includes('completed')) {
+      breakdown.completed.count++;
+      breakdown.completed.amount += amount;
+    } else if (status.includes('đã thanh toán') || status.includes('paid')) {
+      breakdown.paid.count++;
+      breakdown.paid.amount += amount;
+    } else if (status.includes('hoàn tiền') || status.includes('refund')) {
+      breakdown.refunded.count++;
+      // Refund amounts should be negative to highlight the loss
+      breakdown.refunded.amount += Math.abs(amount) * -1;
+    }
+  });
+  
+  return breakdown;
+}
+
+/**
+ * Update status detail table with breakdown data
+ * @param {Object} statusBreakdown - Status breakdown data
+ */
+function updateStatusDetailTable(statusBreakdown) {
+  const tableBody = document.getElementById('status-detail-tbody');
+  if (!tableBody) return;
+  
+  const total = {
+    count: statusBreakdown.completed.count + statusBreakdown.paid.count + statusBreakdown.refunded.count,
+    amount: statusBreakdown.completed.amount + statusBreakdown.paid.amount + statusBreakdown.refunded.amount
+  };
+  
+  const tableRows = [
+    {
+      status: 'Đã hoàn tất',
+      icon: '<i class="fas fa-check-circle" style="color: #27ae60;"></i>',
+      count: statusBreakdown.completed.count,
+      amount: statusBreakdown.completed.amount,
+      percentage: total.count > 0 ? ((statusBreakdown.completed.count / total.count) * 100).toFixed(1) : 0,
+      className: 'status-completed'
+    },
+    {
+      status: 'Đã thanh toán',
+      icon: '<i class="fas fa-clock" style="color: #3498db;"></i>',
+      count: statusBreakdown.paid.count,
+      amount: statusBreakdown.paid.amount,
+      percentage: total.count > 0 ? ((statusBreakdown.paid.count / total.count) * 100).toFixed(1) : 0,
+      className: 'status-paid'
+    },
+    {
+      status: 'Hoàn tiền',
+      icon: '<i class="fas fa-undo-alt" style="color: #e74c3c;"></i>',
+      count: statusBreakdown.refunded.count,
+      amount: statusBreakdown.refunded.amount,
+      percentage: total.count > 0 ? ((statusBreakdown.refunded.count / total.count) * 100).toFixed(1) : 0,
+      className: 'status-refunded' // Special class for highlighting
+    }
+  ];
+  
+  tableBody.innerHTML = tableRows.map(row => `
+    <tr class="${row.className}">
+      <td class="status-cell">
+        ${row.icon}
+        <span class="status-name">${row.status}</span>
+      </td>
+      <td class="count-cell">${row.count.toLocaleString()}</td>
+      <td class="amount-cell ${row.amount < 0 ? 'negative-amount' : 'positive-amount'}">
+        ${formatRevenue(row.amount)}
+        ${row.amount < 0 ? '<i class="fas fa-exclamation-triangle negative-icon"></i>' : ''}
+      </td>
+      <td class="percentage-cell">${row.percentage}%</td>
+      <td class="avg-cell">${formatRevenue(row.count > 0 ? row.amount / row.count : 0)}</td>
+    </tr>
+  `).join('');
+  
+  // Add total row
+  const totalRow = `
+    <tr class="total-row">
+      <td class="status-cell total-label">
+        <i class="fas fa-calculator" style="color: #6c757d;"></i>
+        <span class="status-name"><strong>Tổng cộng</strong></span>
+      </td>
+      <td class="count-cell"><strong>${total.count.toLocaleString()}</strong></td>
+      <td class="amount-cell ${total.amount < 0 ? 'negative-amount' : 'positive-amount'}">
+        <strong>${formatRevenue(total.amount)}</strong>
+      </td>
+      <td class="percentage-cell"><strong>100.0%</strong></td>
+      <td class="avg-cell"><strong>${formatRevenue(total.count > 0 ? total.amount / total.count : 0)}</strong></td>
+    </tr>
+  `;
+  
+  tableBody.innerHTML += totalRow;
+  
+  console.log('📊 Status detail table updated with breakdown:', statusBreakdown);
 }
 
 /**
@@ -2118,9 +2232,47 @@ function updateStatusBreakdownWithRefund(kpis) {
     updateElementText('completed-summary', statusBreakdown.completed.count);
     updateElementText('paid-summary', statusBreakdown.paid.count);
     updateElementText('refund-summary', statusBreakdown.refunded.count);
+    
+    // Update status highlights
+    updateStatusHighlights(statusBreakdown, total);
   }
   
   console.log('📊 Status breakdown updated:', statusBreakdown);
+}
+
+/**
+ * Update status highlights with key metrics
+ * @param {Object} statusBreakdown - Status breakdown data
+ * @param {number} total - Total transaction count
+ */
+function updateStatusHighlights(statusBreakdown, total) {
+  // Calculate key metrics
+  const refundImpact = statusBreakdown.refunded.amount; // Should be negative
+  const successRate = total > 0 ? ((statusBreakdown.completed.count / total) * 100).toFixed(1) : 0;
+  const netRevenue = statusBreakdown.completed.amount + statusBreakdown.paid.amount + statusBreakdown.refunded.amount;
+  
+  // Update refund impact (highlighted as negative)
+  const refundElement = document.getElementById('refund-impact');
+  if (refundElement) {
+    refundElement.textContent = formatRevenue(refundImpact);
+    refundElement.className = refundImpact < 0 ? 'highlight-value negative' : 'highlight-value';
+  }
+  
+  // Update success rate
+  const successElement = document.getElementById('success-rate-display');
+  if (successElement) {
+    successElement.textContent = `${successRate}%`;
+    successElement.className = parseFloat(successRate) >= 80 ? 'highlight-value positive' : 'highlight-value';
+  }
+  
+  // Update net revenue
+  const netElement = document.getElementById('net-revenue');
+  if (netElement) {
+    netElement.textContent = formatRevenue(netRevenue);
+    netElement.className = netRevenue >= 0 ? 'highlight-value positive' : 'highlight-value negative';
+  }
+  
+  console.log('📈 Status highlights updated:', { refundImpact, successRate, netRevenue });
 }
 
 /**
@@ -2148,8 +2300,63 @@ function updateElementStyle(elementId, property, value) {
   }
 }
 
+/**
+ * Export status data to CSV
+ */
+function exportStatusData() {
+  console.log('💾 Exporting status data...');
+  
+  try {
+    const transactions = window.transactionList || [];
+    const breakdown = calculateDetailedStatusBreakdown(transactions);
+    
+    // Prepare CSV data
+    const csvData = [
+      ['Trạng thái', 'Số lượng', 'Tổng tiền (VNĐ)', 'Tỷ lệ (%)', 'Trung bình (VNĐ)'],
+      ['Hoàn tất', breakdown.completed.count, breakdown.completed.amount, 
+       ((breakdown.completed.count / (breakdown.completed.count + breakdown.paid.count + breakdown.refunded.count)) * 100).toFixed(1),
+       breakdown.completed.count > 0 ? (breakdown.completed.amount / breakdown.completed.count).toFixed(0) : 0],
+      ['Thanh toán', breakdown.paid.count, breakdown.paid.amount,
+       ((breakdown.paid.count / (breakdown.completed.count + breakdown.paid.count + breakdown.refunded.count)) * 100).toFixed(1),
+       breakdown.paid.count > 0 ? (breakdown.paid.amount / breakdown.paid.count).toFixed(0) : 0],
+      ['Hoàn tiền', breakdown.refunded.count, breakdown.refunded.amount,
+       ((breakdown.refunded.count / (breakdown.completed.count + breakdown.paid.count + breakdown.refunded.count)) * 100).toFixed(1),
+       breakdown.refunded.count > 0 ? (breakdown.refunded.amount / breakdown.refunded.count).toFixed(0) : 0],
+      ['Tổng cộng', 
+       breakdown.completed.count + breakdown.paid.count + breakdown.refunded.count,
+       breakdown.completed.amount + breakdown.paid.amount + breakdown.refunded.amount,
+       '100.0',
+       ((breakdown.completed.amount + breakdown.paid.amount + breakdown.refunded.amount) / 
+        (breakdown.completed.count + breakdown.paid.count + breakdown.refunded.count)).toFixed(0)]
+    ];
+    
+    // Convert to CSV string
+    const csvString = csvData.map(row => row.join(',')).join('\n');
+    
+    // Create and download file
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `phan-loai-trang-thai-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    console.log('✅ Status data exported successfully');
+  } catch (error) {
+    console.error('❌ Error exporting status data:', error);
+    alert('Lỗi xuất dữ liệu. Vui lòng thử lại.');
+  }
+}
+
 // Make functions available globally
 window.loadOverviewReport = loadOverviewReport;
 window.updateStatusBreakdownWithRefund = updateStatusBreakdownWithRefund;
 window.updateChartPeriod = updateChartPeriod;
 window.calculateRevenueByStatus = calculateRevenueByStatus;
+window.exportStatusData = exportStatusData;
+window.calculateDetailedStatusBreakdown = calculateDetailedStatusBreakdown;

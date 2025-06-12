@@ -163,24 +163,78 @@
       <div class="chart-header">
         <h3 class="chart-title">
           <i class="fas fa-chart-pie"></i> 
-          Phân bố trạng thái
+          Phân bố trạng thái giao dịch
         </h3>
-        <div class="chart-legend" id="status-legend"></div>
+        <div class="chart-actions">
+          <button class="chart-btn" onclick="exportStatusData()">
+            <i class="fas fa-download"></i> Xuất
+          </button>
+        </div>
       </div>
-      <div class="chart-content">
-        <canvas id="status-distribution-chart" width="400" height="200"></canvas>
-        <div class="chart-summary">
-          <div class="summary-item">
-            <span class="summary-label">Đã hoàn tất:</span>
-            <span class="summary-value" id="completed-summary">0</span>
+      <div class="chart-content status-chart-content">
+        <div class="status-chart-wrapper">
+          <canvas id="status-distribution-chart" width="300" height="300"></canvas>
+        </div>
+        <div class="status-detail-wrapper">
+          <h4 class="detail-title">
+            <i class="fas fa-table"></i> 
+            Chi tiết theo trạng thái
+          </h4>
+          <div class="status-detail-table-container">
+            <table class="status-detail-table">
+              <thead>
+                <tr>
+                  <th>Trạng thái</th>
+                  <th>Số lượng</th>
+                  <th>Tổng tiền</th>
+                  <th>Tỷ lệ</th>
+                  <th>Trung bình</th>
+                </tr>
+              </thead>
+              <tbody id="status-detail-tbody">
+                <tr>
+                  <td colspan="5" class="loading-row">
+                    <i class="fas fa-spinner fa-spin"></i> Đang tải...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <div class="summary-item">
-            <span class="summary-label">Đã thanh toán:</span>
-            <span class="summary-value" id="paid-summary">0</span>
-          </div>
-          <div class="summary-item">
-            <span class="summary-label">Hoàn tiền:</span>
-            <span class="summary-value" id="refund-summary">0</span>
+          
+          <!-- Status Highlights -->
+          <div class="status-highlights">
+            <div class="highlight-card refund-highlight">
+              <div class="highlight-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+              </div>
+              <div class="highlight-content">
+                <div class="highlight-title">Cảnh báo Hoàn tiền</div>
+                <div class="highlight-desc">Giao dịch hoàn tiền hiển thị số âm</div>
+                <div class="highlight-value" id="refund-impact">-0 ₫</div>
+              </div>
+            </div>
+            
+            <div class="highlight-card success-highlight">
+              <div class="highlight-icon">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <div class="highlight-content">
+                <div class="highlight-title">Tỷ lệ thành công</div>
+                <div class="highlight-desc">Giao dịch hoàn tất thành công</div>
+                <div class="highlight-value" id="success-rate-display">0%</div>
+              </div>
+            </div>
+            
+            <div class="highlight-card net-highlight">
+              <div class="highlight-icon">
+                <i class="fas fa-calculator"></i>
+              </div>
+              <div class="highlight-content">
+                <div class="highlight-title">Doanh thu ròng</div>
+                <div class="highlight-desc">Sau khi trừ hoàn tiền</div>
+                <div class="highlight-value" id="net-revenue">0 ₫</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
