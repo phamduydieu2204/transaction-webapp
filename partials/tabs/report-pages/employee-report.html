@@ -1,0 +1,393 @@
+<!-- Employee Report Template -->
+<div class="employee-report-container">
+    <!-- Header Section -->
+    <div class="report-header">
+        <div class="header-content">
+            <h2 class="report-title">👔 Báo cáo nhân viên</h2>
+            <p class="report-subtitle">Quản lý hiệu suất và phân tích doanh số nhân viên</p>
+        </div>
+        <div class="header-actions">
+            <button id="refreshEmployeeData" class="action-btn primary">
+                <i class="icon">🔄</i>
+                <span>Làm mới</span>
+            </button>
+            <button id="exportEmployeeReport" class="action-btn secondary">
+                <i class="icon">📊</i>
+                <span>Xuất báo cáo</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Employee KPI Dashboard -->
+    <div class="employee-kpi-dashboard">
+        <!-- Employee KPI Cards will be rendered here -->
+    </div>
+
+    <!-- Employee Performance Overview -->
+    <div class="employee-overview-section">
+        <h3 class="section-title">📈 Tổng quan hiệu suất</h3>
+        <div class="overview-cards">
+            <!-- Overview cards will be rendered here -->
+        </div>
+    </div>
+
+    <!-- Employee Analytics Charts -->
+    <div class="employee-analytics-section">
+        <div class="analytics-grid">
+            <div class="analytics-card">
+                <div class="card-header">
+                    <h4>💰 Doanh thu theo nhân viên</h4>
+                    <div class="chart-controls">
+                        <select id="revenueChartPeriod" class="chart-period-select">
+                            <option value="month">Theo tháng</option>
+                            <option value="quarter">Theo quý</option>
+                            <option value="year">Theo năm</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="employeeRevenueChart"></canvas>
+                </div>
+            </div>
+
+            <div class="analytics-card">
+                <div class="card-header">
+                    <h4>📊 Tỷ lệ hoa hồng</h4>
+                    <div class="chart-controls">
+                        <select id="commissionChartPeriod" class="chart-period-select">
+                            <option value="month">Theo tháng</option>
+                            <option value="quarter">Theo quý</option>
+                            <option value="year">Theo năm</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="employeeCommissionChart"></canvas>
+                </div>
+            </div>
+
+            <div class="analytics-card">
+                <div class="card-header">
+                    <h4>📈 Xu hướng hiệu suất</h4>
+                </div>
+                <div class="chart-container">
+                    <canvas id="performanceTrendChart"></canvas>
+                </div>
+            </div>
+
+            <div class="analytics-card">
+                <div class="card-header">
+                    <h4>🎯 Phân bổ KPI</h4>
+                </div>
+                <div class="chart-container">
+                    <canvas id="kpiDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employee Performance Table -->
+    <div class="employee-performance-section">
+        <div class="section-header">
+            <h3 class="section-title">📋 Bảng hiệu suất nhân viên</h3>
+            <div class="table-controls">
+                <div class="search-filter-group">
+                    <input type="text" id="employeeSearchInput" placeholder="Tìm kiếm nhân viên..." class="search-input">
+                    <select id="performanceFilter" class="filter-select">
+                        <option value="all">Tất cả hiệu suất</option>
+                        <option value="excellent">Xuất sắc (>120%)</option>
+                        <option value="good">Tốt (100-120%)</option>
+                        <option value="average">Trung bình (80-100%)</option>
+                        <option value="below">Dưới mức (<80%)</option>
+                    </select>
+                    <select id="departmentFilter" class="filter-select">
+                        <option value="all">Tất cả phòng ban</option>
+                        <option value="sales">Kinh doanh</option>
+                        <option value="support">Hỗ trợ</option>
+                        <option value="marketing">Marketing</option>
+                        <option value="admin">Quản trị</option>
+                    </select>
+                </div>
+                <div class="action-group">
+                    <button id="addEmployeeKPI" class="action-btn success">
+                        <i class="icon">➕</i>
+                        <span>Thêm KPI</span>
+                    </button>
+                    <button id="exportEmployeeData" class="action-btn secondary">
+                        <i class="icon">📄</i>
+                        <span>Xuất Excel</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="employee-performance-table">
+                <thead>
+                    <tr>
+                        <th class="sortable" data-sort="tenNhanVien">Nhân viên</th>
+                        <th class="sortable" data-sort="maNhanVien">Mã NV</th>
+                        <th class="sortable" data-sort="totalRevenue">Doanh thu</th>
+                        <th class="sortable" data-sort="totalCommission">Hoa hồng</th>
+                        <th class="sortable" data-sort="transactionCount">Số GD</th>
+                        <th class="sortable" data-sort="avgTransactionValue">TB/GD</th>
+                        <th class="sortable" data-sort="performanceRatio">Hiệu suất</th>
+                        <th class="sortable" data-sort="lastActivity">Hoạt động</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="employeePerformanceTableBody">
+                    <!-- Table rows will be rendered here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination-container">
+            <!-- Pagination will be rendered here -->
+        </div>
+    </div>
+
+    <!-- Employee Details Analysis -->
+    <div class="employee-details-section">
+        <div class="details-grid">
+            <!-- Top Performers -->
+            <div class="details-card">
+                <div class="card-header">
+                    <h4>🏆 Top performers</h4>
+                    <span class="card-subtitle">Nhân viên xuất sắc nhất</span>
+                </div>
+                <div class="details-content">
+                    <div id="topPerformersContent">
+                        <!-- Top performers content will be rendered here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Department Performance -->
+            <div class="details-card">
+                <div class="card-header">
+                    <h4>🏢 Hiệu suất phòng ban</h4>
+                    <span class="card-subtitle">So sánh giữa các phòng ban</span>
+                </div>
+                <div class="details-content">
+                    <div id="departmentPerformanceContent">
+                        <!-- Department performance content will be rendered here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Commission Analysis -->
+            <div class="details-card">
+                <div class="card-header">
+                    <h4>💵 Phân tích hoa hồng</h4>
+                    <span class="card-subtitle">Tổng hợp hoa hồng và xu hướng</span>
+                </div>
+                <div class="details-content">
+                    <div id="commissionAnalysisContent">
+                        <!-- Commission analysis content will be rendered here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Tracking -->
+            <div class="details-card">
+                <div class="card-header">
+                    <h4>⏰ Theo dõi hoạt động</h4>
+                    <span class="card-subtitle">Hoạt động và tần suất làm việc</span>
+                </div>
+                <div class="details-content">
+                    <div id="activityTrackingContent">
+                        <!-- Activity tracking content will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employee Goals & KPIs -->
+    <div class="employee-goals-section">
+        <div class="section-header">
+            <h3 class="section-title">🎯 Mục tiêu & KPIs</h3>
+            <button id="setEmployeeGoals" class="action-btn primary">Thiết lập mục tiêu</button>
+        </div>
+        <div class="goals-container">
+            <div id="employeeGoalsContent">
+                <!-- Employee goals content will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Employee Management Tools -->
+    <div class="employee-management-tools">
+        <h3 class="panel-title">⚡ Công cụ quản lý nhân viên</h3>
+        <div class="management-tools-grid">
+            <button class="management-tool-btn" id="performanceReview">
+                <div class="tool-icon">📋</div>
+                <div class="tool-text">
+                    <span class="tool-title">Đánh giá hiệu suất</span>
+                    <span class="tool-desc">Tạo báo cáo đánh giá chi tiết</span>
+                </div>
+            </button>
+
+            <button class="management-tool-btn" id="commissionCalculator">
+                <div class="tool-icon">💰</div>
+                <div class="tool-text">
+                    <span class="tool-title">Tính hoa hồng</span>
+                    <span class="tool-desc">Tính toán hoa hồng tự động</span>
+                </div>
+            </button>
+
+            <button class="management-tool-btn" id="goalSetting">
+                <div class="tool-icon">🎯</div>
+                <div class="tool-text">
+                    <span class="tool-title">Thiết lập mục tiêu</span>
+                    <span class="tool-desc">Đặt KPI và mục tiêu cá nhân</span>
+                </div>
+            </button>
+
+            <button class="management-tool-btn" id="trainingPlan">
+                <div class="tool-icon">📚</div>
+                <div class="tool-text">
+                    <span class="tool-title">Kế hoạch đào tạo</span>
+                    <span class="tool-desc">Lập kế hoạch phát triển</span>
+                </div>
+            </button>
+
+            <button class="management-tool-btn" id="teamAnalytics">
+                <div class="tool-icon">👥</div>
+                <div class="tool-text">
+                    <span class="tool-title">Phân tích team</span>
+                    <span class="tool-desc">Báo cáo hiệu suất nhóm</span>
+                </div>
+            </button>
+
+            <button class="management-tool-btn" id="incentiveProgram">
+                <div class="tool-icon">🏅</div>
+                <div class="tool-text">
+                    <span class="tool-title">Chương trình thưởng</span>
+                    <span class="tool-desc">Quản lý khuyến khích</span>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Employee Ranking Board -->
+    <div class="employee-ranking-section">
+        <div class="section-header">
+            <h3 class="section-title">🏆 Bảng xếp hạng</h3>
+            <div class="ranking-controls">
+                <select id="rankingPeriod" class="filter-select">
+                    <option value="month">Tháng này</option>
+                    <option value="quarter">Quý này</option>
+                    <option value="year">Năm này</option>
+                    <option value="all">Tất cả</option>
+                </select>
+                <select id="rankingMetric" class="filter-select">
+                    <option value="revenue">Doanh thu</option>
+                    <option value="commission">Hoa hồng</option>
+                    <option value="transactions">Số giao dịch</option>
+                    <option value="performance">Hiệu suất</option>
+                </select>
+            </div>
+        </div>
+        <div class="ranking-container">
+            <div id="employeeRankingContent">
+                <!-- Employee ranking content will be rendered here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Employee Detail Modal -->
+<div id="employeeDetailModal" class="employee-modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">Chi tiết nhân viên</h3>
+            <button class="modal-close-btn" id="closeEmployeeModal">✕</button>
+        </div>
+        <div class="modal-body">
+            <div id="employeeDetailContent">
+                <!-- Employee details will be rendered here -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="action-btn secondary" id="editEmployee">Chỉnh sửa</button>
+            <button class="action-btn primary" id="saveEmployee">Lưu thay đổi</button>
+            <button class="action-btn ghost" id="cancelEmployeeModal">Hủy</button>
+        </div>
+    </div>
+</div>
+
+<!-- KPI Setting Modal -->
+<div id="kpiSettingModal" class="employee-modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>🎯 Thiết lập KPI & Mục tiêu</h3>
+            <button class="modal-close-btn" id="closeKpiModal">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="kpi-form">
+                <div class="form-group">
+                    <label for="employeeSelect">Chọn nhân viên:</label>
+                    <select id="employeeSelect" class="form-control">
+                        <option value="">-- Chọn nhân viên --</option>
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="revenueTarget">Mục tiêu doanh thu (VNĐ):</label>
+                    <input type="number" id="revenueTarget" class="form-control" placeholder="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="transactionTarget">Mục tiêu số giao dịch:</label>
+                    <input type="number" id="transactionTarget" class="form-control" placeholder="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="commissionRate">Tỷ lệ hoa hồng (%):</label>
+                    <input type="number" id="commissionRate" class="form-control" placeholder="0" step="0.1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="targetPeriod">Kỳ hạn:</label>
+                    <select id="targetPeriod" class="form-control">
+                        <option value="month">Tháng</option>
+                        <option value="quarter">Quý</option>
+                        <option value="year">Năm</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="action-btn primary" id="saveKpiSettings">Lưu KPI</button>
+            <button class="action-btn ghost" id="cancelKpiModal">Hủy</button>
+        </div>
+    </div>
+</div>
+
+<!-- Employee Alerts Section -->
+<div class="employee-alerts-section">
+    <div class="employee-alerts-header">
+        <h3 class="employee-alerts-title">🚨 Cảnh báo & Thông báo</h3>
+        <span class="employee-alerts-count">3</span>
+    </div>
+    <div class="employee-alert-list">
+        <!-- Alerts will be rendered here -->
+    </div>
+</div>
+
+<!-- Load Chart.js if not already loaded -->
+<script>
+    if (typeof Chart === 'undefined') {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        script.onload = function() {
+            console.log('📊 Chart.js loaded for employee report');
+        };
+        document.head.appendChild(script);
+    }
+</script>
