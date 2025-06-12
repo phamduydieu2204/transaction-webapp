@@ -974,25 +974,67 @@ function renderRevenueStatusChart(transactions) {
             },
             maxTicksLimit: 8 // Limit ticks for better readability
           },
-          // Auto-scale based on data range
+          // Advanced auto-scale for small values visibility
           afterDataLimits: function(scale) {
+            const originalRange = scale.max - scale.min;
+            
+            // Calculate minimum visible bar height (at least 50k VND)
+            const minVisibleValue = 50000;
+            
+            // If range is too small, expand it
+            if (originalRange < minVisibleValue * 10) {
+              const center = (scale.max + scale.min) / 2;
+              const newRange = Math.max(minVisibleValue * 10, originalRange * 2);
+              scale.max = center + newRange / 2;
+              scale.min = center - newRange / 2;
+            }
+            
+            // Add substantial padding for small values
             const range = scale.max - scale.min;
-            const padding = Math.max(range * 0.1, 100000); // At least 100k padding
+            const padding = Math.max(range * 0.15, 200000); // Increased padding
             scale.max += padding;
             scale.min -= padding;
             
-            // Ensure refunds (negative values) are properly visible
-            if (scale.min > -100000 && scale.max > 0) {
-              scale.min = Math.min(scale.min, -Math.abs(scale.max) * 0.2);
+            // Special handling for negative values (refunds)
+            if (scale.min > -minVisibleValue && scale.max > 0) {
+              scale.min = Math.min(scale.min, -Math.max(scale.max * 0.3, minVisibleValue * 2));
+            }
+            
+            // Ensure zero line is visible if data crosses zero
+            if (scale.min < 0 && scale.max > 0) {
+              scale.min = Math.min(scale.min, -scale.max * 0.2);
             }
           }
         }
       },
       elements: {
         bar: {
-          borderRadius: 3
+          borderRadius: 3,
+          // Ensure minimum bar height for visibility
+          minBarLength: 3
         }
-      }
+      },
+      // Plugin to ensure small bars are visible
+      plugins: [
+        {
+          id: 'minBarHeight',
+          beforeDatasetDraw: function(chart, args, options) {
+            const dataset = args.dataset;
+            const meta = args.meta;
+            
+            // Adjust bars that are too small to see
+            meta.data.forEach((bar, index) => {
+              if (bar && dataset.data[index] !== 0) {
+                const barHeight = Math.abs(bar.height);
+                if (barHeight < 5) { // If bar is less than 5 pixels
+                  const sign = dataset.data[index] >= 0 ? 1 : -1;
+                  bar.height = 5 * sign; // Set minimum height
+                }
+              }
+            });
+          }
+        }
+      ]
     }
   });
   
@@ -1021,27 +1063,43 @@ function renderStatusDistributionChart(transactions) {
       labels: ['Đã hoàn tất', 'Đã thanh toán', 'Hoàn tiền'],
       datasets: [{
         data: [statusBreakdown.completed.count, statusBreakdown.paid.count, statusBreakdown.refunded.count],
-        backgroundColor: [
-          '#27ae60', // Completed - Green
-          '#3498db', // Paid - Blue  
-          '#e74c3c'  // Refunded - Red (highlighted)
-        ],
-        borderColor: [
-          '#229954', // Darker green
-          '#2980b9', // Darker blue
-          '#c0392b'  // Darker red
-        ],
-        borderWidth: function(context) {
-          // Make all borders thicker for better visibility
-          const data = context.parsed || context.chart.data.datasets[0].data[context.dataIndex];
+        backgroundColor: function(context) {
+          const colors = [
+            '#27ae60', // Completed - Green
+            '#3498db', // Paid - Blue  
+            '#e74c3c'  // Refunded - Red (highlighted)
+          ];
+          const data = context.chart.data.datasets[0].data[context.dataIndex];
           const total = context.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
           const percentage = total > 0 ? (data / total) * 100 : 0;
           
-          // Thicker borders for small segments (< 5%) and refunds
-          if (percentage < 5 || context.dataIndex === 2) {
-            return 4;
+          // Use brighter colors for small segments to make them more visible
+          if (percentage < 5) {
+            const brightColors = ['#2ecc71', '#5dade2', '#ff6b6b'];
+            return brightColors[context.dataIndex];
           }
-          return 2;
+          return colors[context.dataIndex];
+        },
+        borderColor: [
+          '#1e8449', // Darker green for better contrast
+          '#1f618d', // Darker blue for better contrast
+          '#922b21'  // Much darker red for better contrast
+        ],
+        borderWidth: function(context) {
+          // Make all borders thicker for better visibility
+          const data = context.chart.data.datasets[0].data[context.dataIndex];
+          const total = context.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+          const percentage = total > 0 ? (data / total) * 100 : 0;
+          
+          // Progressive border thickness based on segment size
+          if (percentage < 2) {
+            return 6; // Very thick for tiny segments
+          } else if (percentage < 5) {
+            return 5; // Thick for small segments
+          } else if (context.dataIndex === 2) {
+            return 4; // Thick for refunds (always highlight)
+          }
+          return 3; // Standard thick border for all segments
         },
         hoverBackgroundColor: [
           '#2ecc71',
@@ -1064,7 +1122,7 @@ function renderStatusDistributionChart(transactions) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: '40%', // Reduced cutout for better visibility of small segments
+      cutout: '30%', // Further reduced cutout for maximum visibility of small segments
       layout: {
         padding: {
           top: 20,
@@ -1078,12 +1136,60 @@ function renderStatusDistributionChart(transactions) {
           display: false // Hide default legend, we'll use custom table
         },
         tooltip: {
-          backgroundColor: 'rgba(0, 0, 0, 0.9)',
-          titleColor: '#fff',
-          bodyColor: '#fff',
-          borderColor: '#fff',
-          borderWidth: 1,
-          padding: 12,
+          backgroundColor: function(context) {
+            const dataIndex = context.tooltip.dataPoints[0].dataIndex;
+            const data = context.tooltip.chart.data.datasets[0].data[dataIndex];
+            const total = context.tooltip.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+            const percentage = total > 0 ? (data / total) * 100 : 0;
+            
+            // Brighter background for small segments
+            if (percentage < 5) {
+              return 'rgba(255, 255, 255, 0.95)';
+            }
+            return 'rgba(0, 0, 0, 0.9)';
+          },
+          titleColor: function(context) {
+            const dataIndex = context.tooltip.dataPoints[0].dataIndex;
+            const data = context.tooltip.chart.data.datasets[0].data[dataIndex];
+            const total = context.tooltip.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+            const percentage = total > 0 ? (data / total) * 100 : 0;
+            
+            return percentage < 5 ? '#000' : '#fff';
+          },
+          bodyColor: function(context) {
+            const dataIndex = context.tooltip.dataPoints[0].dataIndex;
+            const data = context.tooltip.chart.data.datasets[0].data[dataIndex];
+            const total = context.tooltip.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+            const percentage = total > 0 ? (data / total) * 100 : 0;
+            
+            return percentage < 5 ? '#000' : '#fff';
+          },
+          borderColor: function(context) {
+            const dataIndex = context.tooltip.dataPoints[0].dataIndex;
+            const data = context.tooltip.chart.data.datasets[0].data[dataIndex];
+            const total = context.tooltip.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+            const percentage = total > 0 ? (data / total) * 100 : 0;
+            
+            return percentage < 5 ? '#000' : '#fff';
+          },
+          borderWidth: function(context) {
+            const dataIndex = context.tooltip.dataPoints[0].dataIndex;
+            const data = context.tooltip.chart.data.datasets[0].data[dataIndex];
+            const total = context.tooltip.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+            const percentage = total > 0 ? (data / total) * 100 : 0;
+            
+            // Thicker border for small segments
+            return percentage < 5 ? 3 : 1;
+          },
+          padding: function(context) {
+            const dataIndex = context.tooltip.dataPoints[0].dataIndex;
+            const data = context.tooltip.chart.data.datasets[0].data[dataIndex];
+            const total = context.tooltip.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+            const percentage = total > 0 ? (data / total) * 100 : 0;
+            
+            // Larger padding for small segments
+            return percentage < 5 ? 16 : 12;
+          },
           callbacks: {
             title: function(tooltipItems) {
               const item = tooltipItems[0];
@@ -1102,12 +1208,26 @@ function renderStatusDistributionChart(transactions) {
               const total = breakdown.completed.count + breakdown.paid.count + breakdown.refunded.count;
               const percentage = total > 0 ? ((statusData.count / total) * 100).toFixed(1) : 0;
               
-              return [
+              const lines = [
                 `Số lượng: ${statusData.count} giao dịch`,
                 `Tỷ lệ: ${percentage}%`,
                 `Tổng tiền: ${formatRevenue(statusData.amount)}`,
                 `Trung bình: ${formatRevenue(statusData.count > 0 ? statusData.amount / statusData.count : 0)}`
               ];
+              
+              // Add special note for small segments
+              if (percentage < 5 && statusData.count > 0) {
+                lines.push(''); // Empty line
+                lines.push('⚠️ Phân khúc nhỏ - đã tăng cường hiển thị');
+              }
+              
+              // Add special note for refunds
+              if (dataIndex === 2 && statusData.amount < 0) {
+                lines.push(''); // Empty line
+                lines.push('🔴 Hoàn tiền - ảnh hưởng tiêu cực đến doanh thu');
+              }
+              
+              return lines;
             },
             footer: function(tooltipItems) {
               const totalCount = statusBreakdown.completed.count + statusBreakdown.paid.count + statusBreakdown.refunded.count;
@@ -1129,7 +1249,7 @@ function renderStatusDistributionChart(transactions) {
       // Ensure small segments are always visible
       circumference: Math.PI * 2,
       rotation: 0,
-      // Custom plugin to ensure minimum angle for segments
+      // Enhanced interaction for small segments
       onHover: function(event, activeElements) {
         if (activeElements.length > 0) {
           event.native.target.style.cursor = 'pointer';
@@ -1139,12 +1259,41 @@ function renderStatusDistributionChart(transactions) {
       },
       elements: {
         arc: {
-          borderWidth: function(context) {
-            // Highlight refund slice
-            return context.dataIndex === 2 ? 4 : 2;
+          // Ensure minimum angle for small segments
+          borderAlign: 'outer',
+          spacing: 2, // Add spacing between segments for better visibility
+          offset: function(context) {
+            const data = context.chart.data.datasets[0].data[context.dataIndex];
+            const total = context.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+            const percentage = total > 0 ? (data / total) * 100 : 0;
+            
+            // Slightly offset small segments to make them more visible
+            if (percentage < 5) {
+              return 5;
+            }
+            return 0;
           }
         }
-      }
+      },
+      // Plugin to ensure minimum visibility for small segments
+      plugins: [
+        {
+          id: 'minSegmentAngle',
+          beforeDraw: function(chart) {
+            const dataset = chart.data.datasets[0];
+            const total = dataset.data.reduce((sum, val) => sum + val, 0);
+            
+            // Ensure minimum 3% visibility for any non-zero segment
+            dataset.data.forEach((value, index) => {
+              if (value > 0 && (value / total) < 0.03) {
+                const minValue = total * 0.03;
+                dataset._originalData = dataset._originalData || [...dataset.data];
+                dataset.data[index] = minValue;
+              }
+            });
+          }
+        }
+      ]
     }
   });
   
