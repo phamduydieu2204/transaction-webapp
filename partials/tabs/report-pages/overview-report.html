@@ -311,6 +311,142 @@
       </div>
     </div>
   </div>
+  
+  <!-- Pending Transactions Section -->
+  <div class="pending-transactions-section">
+    <div class="section-header">
+      <h3 class="section-title">
+        <i class="fas fa-exclamation-circle"></i> 
+        Giao dịch cần xử lý
+      </h3>
+      <div class="section-summary">
+        <span class="summary-badge needs-delivery" id="needs-delivery-count">
+          <i class="fas fa-truck"></i> Cần giao hàng: <strong>0</strong>
+        </span>
+        <span class="summary-badge needs-payment" id="needs-payment-count">
+          <i class="fas fa-money-bill-wave"></i> Cần thu tiền: <strong>0</strong>
+        </span>
+      </div>
+    </div>
+    
+    <div class="pending-tables-row">
+      <!-- Needs Delivery: Paid but not completed -->
+      <div class="pending-table-container needs-delivery-container">
+        <div class="pending-table-header">
+          <h4 class="pending-table-title">
+            <i class="fas fa-truck"></i> 
+            Đã thanh toán - Cần giao hàng
+          </h4>
+          <div class="pending-table-controls">
+            <span class="priority-indicator high">
+              <i class="fas fa-exclamation-triangle"></i> Ưu tiên cao
+            </span>
+            <button class="table-btn" onclick="exportNeedsDelivery()">
+              <i class="fas fa-download"></i> Xuất
+            </button>
+          </div>
+        </div>
+        <div class="pending-table-content">
+          <table class="pending-table" id="needs-delivery-table">
+            <thead>
+              <tr>
+                <th>Ngày</th>
+                <th>Khách hàng</th>
+                <th>Sản phẩm</th>
+                <th>Số tiền</th>
+                <th>Thời gian chờ</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="needs-delivery-tbody">
+              <tr>
+                <td colspan="6" class="loading-row">
+                  <i class="fas fa-spinner fa-spin"></i> Đang tải...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Needs Payment: Delivered but not paid -->
+      <div class="pending-table-container needs-payment-container">
+        <div class="pending-table-header">
+          <h4 class="pending-table-title">
+            <i class="fas fa-money-bill-wave"></i> 
+            Đã giao hàng - Cần thu tiền
+          </h4>
+          <div class="pending-table-controls">
+            <span class="priority-indicator medium">
+              <i class="fas fa-clock"></i> Theo dõi
+            </span>
+            <button class="table-btn" onclick="exportNeedsPayment()">
+              <i class="fas fa-download"></i> Xuất
+            </button>
+          </div>
+        </div>
+        <div class="pending-table-content">
+          <table class="pending-table" id="needs-payment-table">
+            <thead>
+              <tr>
+                <th>Ngày giao</th>
+                <th>Khách hàng</th>
+                <th>Sản phẩm</th>
+                <th>Số tiền</th>
+                <th>Quá hạn</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="needs-payment-tbody">
+              <tr>
+                <td colspan="6" class="loading-row">
+                  <i class="fas fa-spinner fa-spin"></i> Đang tải...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Quick Actions Panel -->
+    <div class="quick-actions-panel">
+      <div class="action-group">
+        <h5 class="action-group-title">
+          <i class="fas fa-bolt"></i> Hành động nhanh
+        </h5>
+        <div class="action-buttons">
+          <button class="action-btn delivery" onclick="markAllAsDelivered()">
+            <i class="fas fa-check-circle"></i> Đánh dấu đã giao hàng
+          </button>
+          <button class="action-btn payment" onclick="markAllAsPaid()">
+            <i class="fas fa-money-check-alt"></i> Đánh dấu đã thanh toán
+          </button>
+          <button class="action-btn reminder" onclick="sendPaymentReminders()">
+            <i class="fas fa-bell"></i> Gửi nhắc nhở thanh toán
+          </button>
+        </div>
+      </div>
+      
+      <div class="alert-group">
+        <div class="alert-item overdue" id="overdue-alert" style="display: none;">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span class="alert-text">Có <strong id="overdue-count">0</strong> giao dịch quá hạn thanh toán!</span>
+          <button class="alert-btn" onclick="showOverdueDetails()">
+            <i class="fas fa-eye"></i> Xem chi tiết
+          </button>
+        </div>
+        
+        <div class="alert-item urgent" id="urgent-alert" style="display: none;">
+          <i class="fas fa-shipping-fast"></i>
+          <span class="alert-text">Có <strong id="urgent-delivery-count">0</strong> đơn hàng cần giao gấp!</span>
+          <button class="alert-btn" onclick="showUrgentDeliveries()">
+            <i class="fas fa-truck-fast"></i> Xử lý ngay
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Export Controls -->
   <div class="report-actions">

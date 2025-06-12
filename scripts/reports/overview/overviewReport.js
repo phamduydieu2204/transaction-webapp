@@ -97,7 +97,8 @@ export async function loadOverviewReport(options = {}) {
       loadTopProducts(filteredTransactions),
       loadTopCustomers(filteredTransactions),
       loadCharts(filteredTransactions, filteredExpenses),
-      updateDataTables(filteredTransactions, filteredExpenses)
+      updateDataTables(filteredTransactions, filteredExpenses),
+      loadPendingTransactions(filteredTransactions)
     ]);
     
     // PERFORMANCE: Initialize lazy loading for non-critical elements
@@ -2301,6 +2302,281 @@ function updateElementStyle(elementId, property, value) {
 }
 
 /**
+ * Load and display pending transactions that need action
+ * @param {Array} transactions - Filtered transactions for current period
+ */
+async function loadPendingTransactions(transactions = []) {
+  try {
+    console.log('📋 Loading pending transactions...');
+    
+    // Use provided transactions or fallback to global
+    if (!transactions || transactions.length === 0) {
+      transactions = window.transactionList || [];
+    }
+    
+    // Categorize pending transactions
+    const pendingCategories = categorizePendingTransactions(transactions);
+    
+    // Update summary badges
+    updatePendingSummary(pendingCategories);
+    
+    // Load pending tables
+    await Promise.all([
+      loadNeedsDeliveryTable(pendingCategories.needsDelivery),
+      loadNeedsPaymentTable(pendingCategories.needsPayment)
+    ]);
+    
+    // Update alerts
+    updatePendingAlerts(pendingCategories);
+    
+    console.log('✅ Pending transactions loaded:', pendingCategories);
+  } catch (error) {
+    console.error('❌ Error loading pending transactions:', error);
+    showError('Không thể tải giao dịch cần xử lý');
+  }
+}
+
+/**
+ * Categorize transactions into pending types
+ * @param {Array} transactions - All transactions
+ * @returns {Object} Categorized pending transactions
+ */
+function categorizePendingTransactions(transactions) {
+  const needsDelivery = []; // Đã thanh toán nhưng chưa hoàn tất
+  const needsPayment = [];  // Chưa thanh toán nhưng đã giao hàng
+  
+  transactions.forEach(t => {
+    const status = (t.loaiGiaoDich || t.transactionType || t.status || '').toLowerCase();
+    const paymentStatus = (t.trangThaiThanhToan || t.paymentStatus || '').toLowerCase();
+    const deliveryStatus = (t.trangThaiGiaoHang || t.deliveryStatus || '').toLowerCase();
+    const orderDate = new Date(t.ngayGiaoDich || t.orderDate || t.date);
+    const deliveryDate = t.ngayGiaoHang || t.deliveryDate ? new Date(t.ngayGiaoHang || t.deliveryDate) : null;
+    
+    // Case 1: Đã thanh toán nhưng chưa hoàn tất (cần giao hàng)
+    if ((status.includes('đã thanh toán') || paymentStatus.includes('paid') || paymentStatus.includes('đã thanh toán')) &&
+        (!status.includes('hoàn tất') && !status.includes('completed'))) {
+      
+      // Calculate waiting time
+      const waitingDays = Math.floor((new Date() - orderDate) / (1000 * 60 * 60 * 24));
+      const isUrgent = waitingDays >= 3; // Urgent if waiting 3+ days
+      
+      needsDelivery.push({
+        ...t,
+        waitingDays,
+        isUrgent,
+        priority: isUrgent ? 'high' : 'normal'
+      });
+    }
+    
+    // Case 2: Chưa thanh toán nhưng đã giao hàng (cần thu tiền)
+    else if ((deliveryStatus.includes('delivered') || deliveryStatus.includes('đã giao') || status.includes('giao hàng')) &&
+             (!status.includes('đã thanh toán') && !paymentStatus.includes('paid'))) {
+      
+      // Calculate overdue days
+      const overdueDays = deliveryDate ? Math.floor((new Date() - deliveryDate) / (1000 * 60 * 60 * 24)) : 0;
+      const isOverdue = overdueDays > 7; // Overdue if 7+ days since delivery
+      
+      needsPayment.push({
+        ...t,
+        overdueDays,
+        isOverdue,
+        deliveryDate,
+        priority: isOverdue ? 'high' : 'normal'
+      });
+    }
+  });
+  
+  // Sort by priority and date
+  needsDelivery.sort((a, b) => {
+    if (a.isUrgent !== b.isUrgent) return b.isUrgent - a.isUrgent;
+    return b.waitingDays - a.waitingDays;
+  });
+  
+  needsPayment.sort((a, b) => {
+    if (a.isOverdue !== b.isOverdue) return b.isOverdue - a.isOverdue;
+    return b.overdueDays - a.overdueDays;
+  });
+  
+  return {
+    needsDelivery,
+    needsPayment,
+    urgentDelivery: needsDelivery.filter(t => t.isUrgent),
+    overduePayment: needsPayment.filter(t => t.isOverdue)
+  };
+}
+
+/**
+ * Update pending summary badges
+ * @param {Object} categories - Categorized pending transactions
+ */
+function updatePendingSummary(categories) {
+  const deliveryBadge = document.getElementById('needs-delivery-count');
+  const paymentBadge = document.getElementById('needs-payment-count');
+  
+  if (deliveryBadge) {
+    const urgentCount = categories.urgentDelivery.length;
+    deliveryBadge.innerHTML = `
+      <i class="fas fa-truck"></i> Cần giao hàng: <strong>${categories.needsDelivery.length}</strong>
+      ${urgentCount > 0 ? `<span class="urgent-indicator">❗ ${urgentCount} gấp</span>` : ''}
+    `;
+    
+    deliveryBadge.className = `summary-badge needs-delivery ${urgentCount > 0 ? 'has-urgent' : ''}`;
+  }
+  
+  if (paymentBadge) {
+    const overdueCount = categories.overduePayment.length;
+    paymentBadge.innerHTML = `
+      <i class="fas fa-money-bill-wave"></i> Cần thu tiền: <strong>${categories.needsPayment.length}</strong>
+      ${overdueCount > 0 ? `<span class="overdue-indicator">⚠️ ${overdueCount} quá hạn</span>` : ''}
+    `;
+    
+    paymentBadge.className = `summary-badge needs-payment ${overdueCount > 0 ? 'has-overdue' : ''}`;
+  }
+}
+
+/**
+ * Load needs delivery table
+ * @param {Array} needsDelivery - Transactions that need delivery
+ */
+async function loadNeedsDeliveryTable(needsDelivery) {
+  const tbody = document.getElementById('needs-delivery-tbody');
+  if (!tbody) return;
+  
+  if (needsDelivery.length === 0) {
+    tbody.innerHTML = `
+      <tr class="empty-row">
+        <td colspan="6" class="empty-message">
+          <i class="fas fa-check-circle"></i> 
+          Không có giao dịch nào cần giao hàng
+        </td>
+      </tr>
+    `;
+    return;
+  }
+  
+  tbody.innerHTML = needsDelivery.map(transaction => {
+    const orderDate = new Date(transaction.ngayGiaoDich || transaction.date);
+    const customer = transaction.tenKhachHang || transaction.customer || 'Không xác định';
+    const product = transaction.tenSanPham || transaction.software || transaction.product || 'N/A';
+    const amount = parseFloat(transaction.doanhThu || transaction.revenue || transaction.amount) || 0;
+    const waitingTime = transaction.waitingDays;
+    const isUrgent = transaction.isUrgent;
+    
+    return `
+      <tr class="pending-row ${isUrgent ? 'urgent-row' : ''}" data-transaction-id="${transaction.id || ''}">
+        <td class="date-cell">
+          ${orderDate.toLocaleDateString('vi-VN')}
+          ${isUrgent ? '<span class="urgent-badge">🔥 Gấp</span>' : ''}
+        </td>
+        <td class="customer-cell">${customer}</td>
+        <td class="product-cell">${product}</td>
+        <td class="amount-cell">${formatRevenue(amount)}</td>
+        <td class="waiting-cell ${isUrgent ? 'urgent-waiting' : ''}">
+          ${waitingTime} ngày
+          ${isUrgent ? '<i class="fas fa-exclamation-triangle urgent-icon"></i>' : ''}
+        </td>
+        <td class="action-cell">
+          <button class="action-btn-small delivery" onclick="markAsDelivered('${transaction.id || ''}')" title="Đánh dấu đã giao hàng">
+            <i class="fas fa-check"></i>
+          </button>
+          <button class="action-btn-small details" onclick="viewTransactionDetails('${transaction.id || ''}')" title="Xem chi tiết">
+            <i class="fas fa-eye"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+/**
+ * Load needs payment table
+ * @param {Array} needsPayment - Transactions that need payment
+ */
+async function loadNeedsPaymentTable(needsPayment) {
+  const tbody = document.getElementById('needs-payment-tbody');
+  if (!tbody) return;
+  
+  if (needsPayment.length === 0) {
+    tbody.innerHTML = `
+      <tr class="empty-row">
+        <td colspan="6" class="empty-message">
+          <i class="fas fa-check-circle"></i> 
+          Không có giao dịch nào cần thu tiền
+        </td>
+      </tr>
+    `;
+    return;
+  }
+  
+  tbody.innerHTML = needsPayment.map(transaction => {
+    const deliveryDate = transaction.deliveryDate ? new Date(transaction.deliveryDate) : new Date(transaction.ngayGiaoDich || transaction.date);
+    const customer = transaction.tenKhachHang || transaction.customer || 'Không xác định';
+    const product = transaction.tenSanPham || transaction.software || transaction.product || 'N/A';
+    const amount = parseFloat(transaction.doanhThu || transaction.revenue || transaction.amount) || 0;
+    const overdueDays = transaction.overdueDays;
+    const isOverdue = transaction.isOverdue;
+    
+    return `
+      <tr class="pending-row ${isOverdue ? 'overdue-row' : ''}" data-transaction-id="${transaction.id || ''}">
+        <td class="date-cell">
+          ${deliveryDate.toLocaleDateString('vi-VN')}
+          ${isOverdue ? '<span class="overdue-badge">⚠️ Quá hạn</span>' : ''}
+        </td>
+        <td class="customer-cell">${customer}</td>
+        <td class="product-cell">${product}</td>
+        <td class="amount-cell">${formatRevenue(amount)}</td>
+        <td class="overdue-cell ${isOverdue ? 'overdue-days' : ''}">
+          ${overdueDays > 0 ? `${overdueDays} ngày` : 'Mới giao'}
+          ${isOverdue ? '<i class="fas fa-exclamation-triangle overdue-icon"></i>' : ''}
+        </td>
+        <td class="action-cell">
+          <button class="action-btn-small payment" onclick="markAsPaid('${transaction.id || ''}')" title="Đánh dấu đã thanh toán">
+            <i class="fas fa-dollar-sign"></i>
+          </button>
+          <button class="action-btn-small reminder" onclick="sendPaymentReminder('${transaction.id || ''}')" title="Gửi nhắc nhở">
+            <i class="fas fa-bell"></i>
+          </button>
+          <button class="action-btn-small details" onclick="viewTransactionDetails('${transaction.id || ''}')" title="Xem chi tiết">
+            <i class="fas fa-eye"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+/**
+ * Update pending alerts
+ * @param {Object} categories - Categorized pending transactions
+ */
+function updatePendingAlerts(categories) {
+  const overdueAlert = document.getElementById('overdue-alert');
+  const urgentAlert = document.getElementById('urgent-alert');
+  
+  // Update overdue payment alert
+  if (overdueAlert) {
+    const overdueCount = categories.overduePayment.length;
+    if (overdueCount > 0) {
+      document.getElementById('overdue-count').textContent = overdueCount;
+      overdueAlert.style.display = 'flex';
+    } else {
+      overdueAlert.style.display = 'none';
+    }
+  }
+  
+  // Update urgent delivery alert
+  if (urgentAlert) {
+    const urgentCount = categories.urgentDelivery.length;
+    if (urgentCount > 0) {
+      document.getElementById('urgent-delivery-count').textContent = urgentCount;
+      urgentAlert.style.display = 'flex';
+    } else {
+      urgentAlert.style.display = 'none';
+    }
+  }
+}
+
+/**
  * Export status data to CSV
  */
 function exportStatusData() {
@@ -2353,6 +2629,172 @@ function exportStatusData() {
   }
 }
 
+/**
+ * Action functions for pending transactions
+ */
+function markAsDelivered(transactionId) {
+  console.log('🚚 Marking as delivered:', transactionId);
+  // Implementation would update transaction status
+  alert(`Gả lập: Đánh dấu giao dịch ${transactionId} đã giao hàng`);
+  // Reload pending transactions
+  loadPendingTransactions();
+}
+
+function markAsPaid(transactionId) {
+  console.log('💰 Marking as paid:', transactionId);
+  // Implementation would update payment status
+  alert(`Gả lập: Đánh dấu giao dịch ${transactionId} đã thanh toán`);
+  // Reload pending transactions
+  loadPendingTransactions();
+}
+
+function sendPaymentReminder(transactionId) {
+  console.log('🔔 Sending payment reminder:', transactionId);
+  // Implementation would send reminder
+  alert(`Gả lập: Gửi nhắc nhở thanh toán cho giao dịch ${transactionId}`);
+}
+
+function viewTransactionDetails(transactionId) {
+  console.log('👁️ Viewing transaction details:', transactionId);
+  // Implementation would show transaction detail modal
+  alert(`Gả lập: Hiển thị chi tiết giao dịch ${transactionId}`);
+}
+
+function markAllAsDelivered() {
+  console.log('🚚 Marking all as delivered');
+  const checkedRows = document.querySelectorAll('.needs-delivery-table input[type="checkbox"]:checked');
+  if (checkedRows.length === 0) {
+    alert('Vui lòng chọn ít nhất một giao dịch');
+    return;
+  }
+  alert(`Gả lập: Đánh dấu ${checkedRows.length} giao dịch đã giao hàng`);
+  loadPendingTransactions();
+}
+
+function markAllAsPaid() {
+  console.log('💰 Marking all as paid');
+  const checkedRows = document.querySelectorAll('.needs-payment-table input[type="checkbox"]:checked');
+  if (checkedRows.length === 0) {
+    alert('Vui lòng chọn ít nhất một giao dịch');
+    return;
+  }
+  alert(`Gả lập: Đánh dấu ${checkedRows.length} giao dịch đã thanh toán`);
+  loadPendingTransactions();
+}
+
+function sendPaymentReminders() {
+  console.log('🔔 Sending payment reminders');
+  const overdueCount = document.getElementById('overdue-count')?.textContent || 0;
+  alert(`Gả lập: Gửi nhắc nhở thanh toán cho ${overdueCount} giao dịch quá hạn`);
+}
+
+function showOverdueDetails() {
+  console.log('📄 Showing overdue details');
+  alert('Gả lập: Hiển thị chi tiết các giao dịch quá hạn thanh toán');
+}
+
+function showUrgentDeliveries() {
+  console.log('🎆 Showing urgent deliveries');
+  alert('Gả lập: Hiển thị danh sách giao hàng gấp');
+}
+
+/**
+ * Export functions for pending transactions
+ */
+function exportNeedsDelivery() {
+  console.log('💾 Exporting needs delivery data...');
+  
+  try {
+    const transactions = window.transactionList || [];
+    const categories = categorizePendingTransactions(transactions);
+    const needsDelivery = categories.needsDelivery;
+    
+    if (needsDelivery.length === 0) {
+      alert('Không có giao dịch nào cần giao hàng');
+      return;
+    }
+    
+    // Prepare CSV data
+    const csvData = [
+      ['Ngày đặt hàng', 'Khách hàng', 'Sản phẩm', 'Số tiền (VNĐ)', 'Ngày chờ', 'Trạng thái', 'Ghi chú'],
+      ...needsDelivery.map(t => [
+        new Date(t.ngayGiaoDich || t.date).toLocaleDateString('vi-VN'),
+        t.tenKhachHang || t.customer || 'N/A',
+        t.tenSanPham || t.software || t.product || 'N/A',
+        parseFloat(t.doanhThu || t.revenue || t.amount) || 0,
+        t.waitingDays,
+        t.isUrgent ? 'Gấp' : 'Bình thường',
+        t.isUrgent ? 'Cần giao gấp - quá 3 ngày' : 'Trong thời hạn'
+      ])
+    ];
+    
+    const csvString = csvData.map(row => row.join(',')).join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `can-giao-hang-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    console.log('✅ Needs delivery data exported successfully');
+  } catch (error) {
+    console.error('❌ Error exporting needs delivery data:', error);
+    alert('Lỗi xuất dữ liệu. Vui lòng thử lại.');
+  }
+}
+
+function exportNeedsPayment() {
+  console.log('💾 Exporting needs payment data...');
+  
+  try {
+    const transactions = window.transactionList || [];
+    const categories = categorizePendingTransactions(transactions);
+    const needsPayment = categories.needsPayment;
+    
+    if (needsPayment.length === 0) {
+      alert('Không có giao dịch nào cần thu tiền');
+      return;
+    }
+    
+    // Prepare CSV data
+    const csvData = [
+      ['Ngày giao hàng', 'Khách hàng', 'Sản phẩm', 'Số tiền (VNĐ)', 'Ngày quá hạn', 'Trạng thái', 'Ghi chú'],
+      ...needsPayment.map(t => [
+        t.deliveryDate ? new Date(t.deliveryDate).toLocaleDateString('vi-VN') : 'N/A',
+        t.tenKhachHang || t.customer || 'N/A',
+        t.tenSanPham || t.software || t.product || 'N/A',
+        parseFloat(t.doanhThu || t.revenue || t.amount) || 0,
+        t.overdueDays,
+        t.isOverdue ? 'Quá hạn' : 'Trong hạn',
+        t.isOverdue ? 'Cần liên hệ gấp' : 'Theo dõi bình thường'
+      ])
+    ];
+    
+    const csvString = csvData.map(row => row.join(',')).join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `can-thu-tien-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    console.log('✅ Needs payment data exported successfully');
+  } catch (error) {
+    console.error('❌ Error exporting needs payment data:', error);
+    alert('Lỗi xuất dữ liệu. Vui lòng thử lại.');
+  }
+}
+
 // Make functions available globally
 window.loadOverviewReport = loadOverviewReport;
 window.updateStatusBreakdownWithRefund = updateStatusBreakdownWithRefund;
@@ -2360,3 +2802,18 @@ window.updateChartPeriod = updateChartPeriod;
 window.calculateRevenueByStatus = calculateRevenueByStatus;
 window.exportStatusData = exportStatusData;
 window.calculateDetailedStatusBreakdown = calculateDetailedStatusBreakdown;
+window.loadPendingTransactions = loadPendingTransactions;
+window.categorizePendingTransactions = categorizePendingTransactions;
+
+// Pending transaction actions
+window.markAsDelivered = markAsDelivered;
+window.markAsPaid = markAsPaid;
+window.sendPaymentReminder = sendPaymentReminder;
+window.viewTransactionDetails = viewTransactionDetails;
+window.markAllAsDelivered = markAllAsDelivered;
+window.markAllAsPaid = markAllAsPaid;
+window.sendPaymentReminders = sendPaymentReminders;
+window.showOverdueDetails = showOverdueDetails;
+window.showUrgentDeliveries = showUrgentDeliveries;
+window.exportNeedsDelivery = exportNeedsDelivery;
+window.exportNeedsPayment = exportNeedsPayment;
