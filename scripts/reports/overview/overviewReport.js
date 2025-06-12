@@ -754,41 +754,19 @@ function updateConversionRates(conversion) {
  */
 async function loadCharts(transactions, expenses) {
   try {
-    // Check if Chart.js is available
-    if (typeof Chart === 'undefined') {
-      console.warn('⚠️ Chart.js not available, loading from CDN');
-      await loadChartJS();
-    }
+    // Since charts were removed, directly update the status detail table
+    console.log('📊 Updating status detail table (charts removed)');
     
-    // Check which charts are available in the template
-    const hasNewCharts = document.getElementById('revenue-status-chart') !== null;
-    const hasOldCharts = document.getElementById('revenueTrendChart') !== null;
+    // Calculate detailed status breakdown with amounts
+    const statusBreakdown = calculateDetailedStatusBreakdown(transactions);
     
-    console.log('📊 Chart template check:', {
-      hasNewCharts,
-      hasOldCharts,
-      'revenue-status-chart': !!document.getElementById('revenue-status-chart'),
-      'status-distribution-chart': !!document.getElementById('status-distribution-chart'),
-      'revenueTrendChart': !!document.getElementById('revenueTrendChart'),
-      'expenseDistributionChart': !!document.getElementById('expenseDistributionChart')
-    });
+    // Update the status detail table
+    updateStatusDetailTable(statusBreakdown);
     
-    if (hasNewCharts) {
-      // Render new charts
-      renderRevenueStatusChart(transactions);
-      renderStatusDistributionChart(transactions);
-    } else if (hasOldCharts) {
-      // Render old charts
-      console.log('⚠️ Using old chart template');
-      renderRevenueTrendChart(transactions);
-      renderExpenseDistributionChart(expenses);
-    } else {
-      console.warn('⚠️ No chart containers found');
-    }
+    console.log('✅ Status detail table updated with breakdown:', statusBreakdown);
     
   } catch (error) {
-    console.error('❌ Error loading charts:', error);
-    showChartError();
+    console.error('❌ Error updating status details:', error);
   }
 }
 
