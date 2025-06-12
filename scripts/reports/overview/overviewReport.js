@@ -5,7 +5,7 @@
  */
 
 import { ensureDataIsLoaded, showError } from '../core/reportHelpers.js';
-import { formatRevenue, formatCurrency } from '../../formatDate.js';
+import { formatRevenue, formatCurrency, formatDate } from '../../formatDate.js';
 import { getFromStorage } from '../../core/stateManager.js';
 import { 
   calculateBusinessMetrics,
@@ -15,6 +15,12 @@ import {
   normalizeDate,
   getDateRange
 } from '../../statisticsCore.js';
+import { 
+  getTransactionField, 
+  normalizeTransaction, 
+  getTransactionTypeDisplay,
+  hasTransactionStatus 
+} from '../../core/dataMapping.js';
 import { initOverviewLazyLoading, preloadCriticalElements } from '../../utils/lazyLoader.js';
 import { initCSSOptimizations, optimizeFontLoading, addResourceHints } from '../../utils/cssOptimizer.js';
 
@@ -403,9 +409,11 @@ function calculateOverviewKPIs(transactions, expenses, dateRange, period = 'this
     console.log('📅 Using current month fallback for period:', period);
     console.log('📅 ❌ CURRENT MONTH FALLBACK ACTIVATED');
     
-    filteredTransactions = transactions.filter(t => {
-      const rawDate = t.transactionDate || t.ngayGiaoDich || t.date;
-      const transactionDate = new Date(rawDate);
+    filteredTransactions = transactions.filter(rawTransaction => {
+      const t = normalizeTransaction(rawTransaction);
+      if (!t) return false;
+      
+      const transactionDate = new Date(t.transactionDate);
       
       if (isNaN(transactionDate.getTime())) {
         return false;
@@ -517,9 +525,12 @@ function calculateOverviewKPIs(transactions, expenses, dateRange, period = 'this
     unpaid: { count: 0, revenue: 0 }
   };
   
-  prevTransactions.forEach(t => {
-    const revenue = parseFloat(t.doanhThu || t.revenue) || 0;
-    const status = t.loaiGiaoDich || t.transactionType || t.status || '';
+  prevTransactions.forEach(rawTransaction => {
+    const t = normalizeTransaction(rawTransaction);
+    if (!t) return;
+    
+    const revenue = t.revenue || 0;
+    const status = t.transactionType || '';
     
     if (status.toLowerCase().includes('hoàn tất')) {
       prevStatusBreakdown.completed.count++;
@@ -1092,17 +1103,21 @@ function calculateDetailedStatusBreakdown(transactions) {
     refunded: { count: 0, amount: 0 }
   };
   
-  transactions.forEach(t => {
-    const amount = parseFloat(t.doanhThu || t.revenue || t.Revenue || t.doanh_thu || t.amount) || 0;
-    const status = (t.loaiGiaoDich || t.transactionType || t.status || '').toLowerCase();
+  transactions.forEach(rawTransaction => {
+    // Normalize transaction data
+    const t = normalizeTransaction(rawTransaction);
+    if (!t) return;
     
-    if (status.includes('hoàn tất') || status.includes('completed')) {
+    const amount = t.revenue || 0;
+    const status = getTransactionTypeDisplay(t.transactionType);
+    
+    if (status === 'Đã hoàn tất') {
       breakdown.completed.count++;
       breakdown.completed.amount += amount;
-    } else if (status.includes('đã thanh toán') || status.includes('paid')) {
+    } else if (status === 'Đã thanh toán') {
       breakdown.paid.count++;
       breakdown.paid.amount += amount;
-    } else if (status.includes('hoàn tiền') || status.includes('refund')) {
+    } else if (status === 'Hoàn tiền') {
       breakdown.refunded.count++;
       // Refund amounts should be negative to highlight the loss
       breakdown.refunded.amount += Math.abs(amount) * -1;
@@ -1349,8 +1364,10 @@ function getMonthlyDataByStatus(transactions, period) {
     const date = new Date(targetYear, month, 1);
     const monthName = date.toLocaleDateString('vi-VN', { month: 'short' });
     
-    const monthTransactions = transactions.filter(t => {
-      const transactionDate = new Date(t.ngayGiaoDich || t.date);
+    const monthTransactions = transactions.filter(rawTransaction => {
+      const t = normalizeTransaction(rawTransaction);
+      if (!t) return false;
+      const transactionDate = new Date(t.transactionDate);
       return transactionDate.getMonth() === month && 
              transactionDate.getFullYear() === targetYear;
     });
@@ -1388,8 +1405,10 @@ function getWeeklyDataByStatus(transactions, period) {
   const weeks = getWeeksInMonth(targetDate);
   
   weeks.forEach((week, index) => {
-    const weekTransactions = transactions.filter(t => {
-      const transactionDate = new Date(t.ngayGiaoDich || t.date);
+    const weekTransactions = transactions.filter(rawTransaction => {
+      const t = normalizeTransaction(rawTransaction);
+      if (!t) return false;
+      const transactionDate = new Date(t.transactionDate);
       return transactionDate >= week.start && transactionDate <= week.end;
     });
     
@@ -1432,8 +1451,10 @@ function getDailyDataByStatus(transactions, period) {
   // Generate daily data
   const current = new Date(startDate);
   while (current <= endDate) {
-    const dayTransactions = transactions.filter(t => {
-      const transactionDate = new Date(t.ngayGiaoDich || t.date);
+    const dayTransactions = transactions.filter(rawTransaction => {
+      const t = normalizeTransaction(rawTransaction);
+      if (!t) return false;
+      const transactionDate = new Date(t.transactionDate);
       return transactionDate.toDateString() === current.toDateString();
     });
     
@@ -1686,12 +1707,17 @@ function getLastSixMonthsData(transactions) {
     const monthName = date.toLocaleDateString('vi-VN', { month: 'short', year: 'numeric' });
     
     const monthRevenue = transactions
-      .filter(t => {
-        const transactionDate = new Date(t.ngayGiaoDich || t.date);
+      .filter(rawTransaction => {
+        const t = normalizeTransaction(rawTransaction);
+        if (!t) return false;
+        const transactionDate = new Date(t.transactionDate);
         return transactionDate.getMonth() === date.getMonth() && 
                transactionDate.getFullYear() === date.getFullYear();
       })
-      .reduce((sum, t) => sum + (parseFloat(t.doanhThu || t.revenue) || 0), 0);
+      .reduce((sum, rawTransaction) => {
+        const t = normalizeTransaction(rawTransaction);
+        return sum + (t ? t.revenue || 0 : 0);
+      }, 0);
     
     months.push(monthName);
     values.push(monthRevenue);
@@ -1729,8 +1755,11 @@ function updateTopCustomersTable(transactions) {
   
   // Group by customer and calculate totals
   const customers = {};
-  transactions.forEach(t => {
-    const customer = t.tenKhachHang || t.customer || 'Không xác định';
+  transactions.forEach(rawTransaction => {
+    const t = normalizeTransaction(rawTransaction);
+    if (!t) return;
+    
+    const customer = t.customerName || 'Không xác định';
     if (!customers[customer]) {
       customers[customer] = {
         name: customer,
@@ -1738,7 +1767,7 @@ function updateTopCustomersTable(transactions) {
         transactions: 0
       };
     }
-    customers[customer].revenue += parseFloat(t.doanhThu || t.revenue) || 0;
+    customers[customer].revenue += t.revenue || 0;
     customers[customer].transactions += 1;
   });
   
@@ -1767,18 +1796,20 @@ function updateRecentTransactionsTable(transactions) {
   
   // Get last 5 transactions
   const recentTransactions = transactions
-    .sort((a, b) => new Date(b.ngayGiaoDich || b.date) - new Date(a.ngayGiaoDich || a.date))
+    .map(rawTransaction => normalizeTransaction(rawTransaction))
+    .filter(t => t !== null)
+    .sort((a, b) => new Date(b.transactionDate) - new Date(a.transactionDate))
     .slice(0, 5);
   
   // Update table
   table.innerHTML = recentTransactions.map(t => `
     <tr>
-      <td>${new Date(t.ngayGiaoDich || t.date).toLocaleDateString('vi-VN')}</td>
-      <td>${t.tenKhachHang || t.customer || 'N/A'}</td>
-      <td>${t.tenSanPham || t.product || 'N/A'}</td>
-      <td>${formatRevenue(parseFloat(t.doanhThu || t.revenue) || 0)}</td>
+      <td>${new Date(t.transactionDate).toLocaleDateString('vi-VN')}</td>
+      <td>${t.customerName || 'N/A'}</td>
+      <td>${t.softwareName || 'N/A'}</td>
+      <td>${formatRevenue(t.revenue || 0)}</td>
       <td>
-        <span class="status-badge ${(t.trangThai || t.status || 'pending').toLowerCase()}">${t.trangThai || t.status || 'Pending'}</span>
+        <span class="status-badge ${(t.transactionType || 'pending').toLowerCase()}">${t.transactionType || 'Pending'}</span>
       </td>
     </tr>
   `).join('');
@@ -2822,16 +2853,19 @@ function categorizePendingTransactions(transactions) {
   const needsDelivery = []; // Đã thanh toán nhưng chưa hoàn tất
   const needsPayment = [];  // Chưa thanh toán nhưng đã giao hàng
   
-  transactions.forEach(t => {
-    const status = (t.loaiGiaoDich || t.transactionType || t.status || '').toLowerCase();
-    const paymentStatus = (t.trangThaiThanhToan || t.paymentStatus || '').toLowerCase();
-    const deliveryStatus = (t.trangThaiGiaoHang || t.deliveryStatus || '').toLowerCase();
-    const orderDate = new Date(t.ngayGiaoDich || t.orderDate || t.date);
-    const deliveryDate = t.ngayGiaoHang || t.deliveryDate ? new Date(t.ngayGiaoHang || t.deliveryDate) : null;
+  transactions.forEach(rawTransaction => {
+    // Normalize transaction data
+    const t = normalizeTransaction(rawTransaction);
+    if (!t) return;
+    
+    const status = getTransactionTypeDisplay(t.transactionType);
+    const paymentStatus = t.transactionType || '';
+    const deliveryStatus = t.transactionType || '';
+    const orderDate = t.transactionDate ? new Date(t.transactionDate) : new Date();
+    const deliveryDate = t.endDate ? new Date(t.endDate) : null;
     
     // Case 1: Đã thanh toán nhưng chưa hoàn tất (cần giao hàng)
-    if ((status.includes('đã thanh toán') || paymentStatus.includes('paid') || paymentStatus.includes('đã thanh toán')) &&
-        (!status.includes('hoàn tất') && !status.includes('completed'))) {
+    if (status === 'Đã thanh toán') {
       
       // Calculate waiting time
       const waitingDays = Math.floor((new Date() - orderDate) / (1000 * 60 * 60 * 24));
@@ -2845,9 +2879,8 @@ function categorizePendingTransactions(transactions) {
       });
     }
     
-    // Case 2: Chưa thanh toán nhưng đã giao hàng (cần thu tiền)
-    else if ((deliveryStatus.includes('delivered') || deliveryStatus.includes('đã giao') || status.includes('giao hàng')) &&
-             (!status.includes('đã thanh toán') && !paymentStatus.includes('paid'))) {
+    // Case 2: Chưa thanh toán (cần thu tiền)
+    else if (status === 'Chưa thanh toán') {
       
       // Calculate overdue days
       const overdueDays = deliveryDate ? Math.floor((new Date() - deliveryDate) / (1000 * 60 * 60 * 24)) : 0;
@@ -2931,13 +2964,14 @@ async function loadNeedsDeliveryTable(needsDelivery) {
     return;
   }
   
-  tbody.innerHTML = needsDelivery.map(transaction => {
-    const orderDate = new Date(transaction.ngayGiaoDich || transaction.date);
-    const customer = transaction.tenKhachHang || transaction.customer || 'Không xác định';
-    const product = transaction.tenSanPham || transaction.software || transaction.product || 'N/A';
-    const amount = parseFloat(transaction.doanhThu || transaction.revenue || transaction.amount) || 0;
-    const waitingTime = transaction.waitingDays;
-    const isUrgent = transaction.isUrgent;
+  tbody.innerHTML = needsDelivery.map(rawTransaction => {
+    const transaction = normalizeTransaction(rawTransaction);
+    const orderDate = transaction.transactionDate ? new Date(transaction.transactionDate) : new Date();
+    const customer = transaction.customerName || 'Không xác định';
+    const product = transaction.softwareName || 'N/A';
+    const amount = transaction.revenue || 0;
+    const waitingTime = rawTransaction.waitingDays;
+    const isUrgent = rawTransaction.isUrgent;
     
     return `
       <tr class="pending-row ${isUrgent ? 'urgent-row' : ''}" data-transaction-id="${transaction.id || ''}">
@@ -2985,13 +3019,15 @@ async function loadNeedsPaymentTable(needsPayment) {
     return;
   }
   
-  tbody.innerHTML = needsPayment.map(transaction => {
-    const deliveryDate = transaction.deliveryDate ? new Date(transaction.deliveryDate) : new Date(transaction.ngayGiaoDich || transaction.date);
-    const customer = transaction.tenKhachHang || transaction.customer || 'Không xác định';
-    const product = transaction.tenSanPham || transaction.software || transaction.product || 'N/A';
-    const amount = parseFloat(transaction.doanhThu || transaction.revenue || transaction.amount) || 0;
-    const overdueDays = transaction.overdueDays;
-    const isOverdue = transaction.isOverdue;
+  tbody.innerHTML = needsPayment.map(rawTransaction => {
+    const transaction = normalizeTransaction(rawTransaction);
+    const deliveryDate = rawTransaction.deliveryDate ? new Date(rawTransaction.deliveryDate) : 
+                        transaction.transactionDate ? new Date(transaction.transactionDate) : new Date();
+    const customer = transaction.customerName || 'Không xác định';
+    const product = transaction.softwareName || 'N/A';
+    const amount = transaction.revenue || 0;
+    const overdueDays = rawTransaction.overdueDays;
+    const isOverdue = rawTransaction.isOverdue;
     
     return `
       <tr class="pending-row ${isOverdue ? 'overdue-row' : ''}" data-transaction-id="${transaction.id || ''}">
@@ -3176,6 +3212,285 @@ function showUrgentDeliveries() {
 }
 
 /**
+ * Calculate pending transactions
+ */
+function calculatePendingTransactions(transactions) {
+    const pending = {
+        paidNotDelivered: [],
+        deliveredNotPaid: [],
+        summary: {
+            paidNotDeliveredCount: 0,
+            paidNotDeliveredAmount: 0,
+            deliveredNotPaidCount: 0,
+            deliveredNotPaidAmount: 0
+        }
+    };
+    
+    transactions.forEach(rawTransaction => {
+        const t = normalizeTransaction(rawTransaction);
+        if (!t) return;
+        
+        const status = t.transactionType;
+        const amount = t.revenue || 0;
+        
+        if (status === 'Đã thanh toán') {
+            pending.paidNotDelivered.push(t);
+            pending.summary.paidNotDeliveredCount++;
+            pending.summary.paidNotDeliveredAmount += amount;
+        } else if (status === 'Chưa thanh toán') {
+            pending.deliveredNotPaid.push(t);
+            pending.summary.deliveredNotPaidCount++;
+            pending.summary.deliveredNotPaidAmount += amount;
+        }
+    });
+    
+    return pending;
+}
+
+/**
+ * Update pending transactions section
+ */
+function updatePendingTransactionsSection(pending) {
+    const section = document.getElementById('pendingTransactionsSection');
+    if (!section) return;
+    
+    // Update summary cards
+    const paidNotDeliveredCard = section.querySelector('.pending-card:nth-child(1)');
+    if (paidNotDeliveredCard) {
+        paidNotDeliveredCard.querySelector('.metric-value').textContent = pending.summary.paidNotDeliveredCount;
+        paidNotDeliveredCard.querySelector('.metric-amount').textContent = formatCurrency(pending.summary.paidNotDeliveredAmount);
+    }
+    
+    const deliveredNotPaidCard = section.querySelector('.pending-card:nth-child(2)');
+    if (deliveredNotPaidCard) {
+        deliveredNotPaidCard.querySelector('.metric-value').textContent = pending.summary.deliveredNotPaidCount;
+        deliveredNotPaidCard.querySelector('.metric-amount').textContent = formatCurrency(pending.summary.deliveredNotPaidAmount);
+    }
+    
+    // Update tables
+    updatePendingTable('paidNotDeliveredTable', pending.paidNotDelivered, 'paid');
+    updatePendingTable('deliveredNotPaidTable', pending.deliveredNotPaid, 'delivered');
+}
+
+/**
+ * Update pending table
+ */
+function updatePendingTable(tableId, transactions, type) {
+    const tbody = document.querySelector(`#${tableId} tbody`);
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    
+    if (transactions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center">Không có giao dịch</td></tr>';
+        return;
+    }
+    
+    transactions.slice(0, 10).forEach(t => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${t.transactionId || ''}</td>
+            <td>${formatDate(t.transactionDate || '')}</td>
+            <td>${t.customerName || ''}</td>
+            <td>${t.softwareName || ''}</td>
+            <td class="text-right">${formatCurrency(t.revenue || 0)}</td>
+        `;
+        tbody.appendChild(row);
+    });
+    
+    // Update table footer with total
+    const tfoot = document.querySelector(`#${tableId} tfoot`);
+    if (tfoot) {
+        const total = transactions.reduce((sum, t) => sum + (t.revenue || 0), 0);
+        tfoot.querySelector('.total-amount').textContent = formatCurrency(total);
+    }
+}
+
+/**
+ * Calculate customer analytics
+ */
+function calculateCustomerAnalytics(transactions) {
+    const customerMap = new Map();
+    
+    transactions.forEach(rawTransaction => {
+        const t = normalizeTransaction(rawTransaction);
+        if (!t) return;
+        
+        const customerName = t.customerName || 'Không xác định';
+        const revenue = t.revenue || 0;
+        const status = t.transactionType;
+        const softwareName = t.softwareName || '';
+        const transactionDate = t.transactionDate || '';
+        
+        if (!customerMap.has(customerName)) {
+            customerMap.set(customerName, {
+                name: customerName,
+                revenue: 0,
+                transactionCount: 0,
+                products: new Set(),
+                lastTransaction: null,
+                firstTransaction: null,
+                averageOrderValue: 0,
+                refundCount: 0,
+                refundAmount: 0
+            });
+        }
+        
+        const customer = customerMap.get(customerName);
+        customer.transactionCount++;
+        
+        if (status === 'Hoàn tiền') {
+            customer.refundCount++;
+            customer.refundAmount += Math.abs(revenue);
+            customer.revenue -= Math.abs(revenue);
+        } else {
+            customer.revenue += revenue;
+        }
+        
+        if (softwareName) {
+            customer.products.add(softwareName);
+        }
+        
+        // Update first and last transaction dates
+        const date = new Date(transactionDate);
+        if (!customer.firstTransaction || date < new Date(customer.firstTransaction)) {
+            customer.firstTransaction = transactionDate;
+        }
+        if (!customer.lastTransaction || date > new Date(customer.lastTransaction)) {
+            customer.lastTransaction = transactionDate;
+        }
+    });
+    
+    // Calculate additional metrics and convert to array
+    const customers = Array.from(customerMap.values()).map(customer => {
+        customer.averageOrderValue = customer.transactionCount > 0 ? 
+            customer.revenue / customer.transactionCount : 0;
+        customer.productCount = customer.products.size;
+        customer.products = Array.from(customer.products);
+        
+        // Calculate customer score (for ranking)
+        customer.score = calculateCustomerScore(customer);
+        
+        return customer;
+    });
+    
+    // Sort by revenue (descending)
+    customers.sort((a, b) => b.revenue - a.revenue);
+    
+    return customers;
+}
+
+/**
+ * Calculate product analytics
+ */
+function calculateProductAnalytics(transactions) {
+    const productMap = new Map();
+    
+    transactions.forEach(rawTransaction => {
+        const t = normalizeTransaction(rawTransaction);
+        if (!t) return;
+        
+        const productName = t.softwareName || 'Không xác định';
+        const revenue = t.revenue || 0;
+        const status = t.transactionType;
+        const customerName = t.customerName || '';
+        const packageName = t.packageName || '';
+        const months = t.months || 0;
+        
+        if (!productMap.has(productName)) {
+            productMap.set(productName, {
+                name: productName,
+                revenue: 0,
+                transactionCount: 0,
+                customers: new Set(),
+                packages: new Map(),
+                averageMonths: 0,
+                totalMonths: 0,
+                refundCount: 0,
+                refundAmount: 0
+            });
+        }
+        
+        const product = productMap.get(productName);
+        product.transactionCount++;
+        
+        if (status === 'Hoàn tiền') {
+            product.refundCount++;
+            product.refundAmount += Math.abs(revenue);
+            product.revenue -= Math.abs(revenue);
+        } else {
+            product.revenue += revenue;
+        }
+        
+        if (customerName) {
+            product.customers.add(customerName);
+        }
+        
+        if (packageName) {
+            const packageCount = product.packages.get(packageName) || 0;
+            product.packages.set(packageName, packageCount + 1);
+        }
+        
+        if (months > 0) {
+            product.totalMonths += months;
+        }
+    });
+    
+    // Calculate additional metrics and convert to array
+    const products = Array.from(productMap.values()).map(product => {
+        product.customerCount = product.customers.size;
+        product.customers = Array.from(product.customers);
+        product.averageMonths = product.transactionCount > 0 ? 
+            product.totalMonths / product.transactionCount : 0;
+        product.averageRevenue = product.transactionCount > 0 ? 
+            product.revenue / product.transactionCount : 0;
+        
+        // Convert packages map to array for display
+        product.topPackages = Array.from(product.packages.entries())
+            .map(([name, count]) => ({ name, count }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 3);
+        
+        // Calculate product score
+        product.score = calculateProductScore(product);
+        
+        return product;
+    });
+    
+    // Sort by revenue (descending)
+    products.sort((a, b) => b.revenue - a.revenue);
+    
+    return products;
+}
+
+/**
+ * Calculate customer score
+ */
+function calculateCustomerScore(customer) {
+  // Simple scoring algorithm based on multiple factors
+  const revenueScore = customer.revenue / 1000000; // 1 point per million
+  const frequencyScore = customer.transactionCount * 10; // 10 points per transaction
+  const diversityScore = customer.productCount * 20; // 20 points per unique product
+  const loyaltyScore = customer.firstTransaction ? 
+    (new Date() - new Date(customer.firstTransaction)) / (1000 * 60 * 60 * 24 * 30) * 5 : 0; // 5 points per month
+  
+  return revenueScore + frequencyScore + diversityScore + loyaltyScore;
+}
+
+/**
+ * Calculate product score
+ */
+function calculateProductScore(product) {
+  // Simple scoring algorithm based on multiple factors
+  const revenueScore = product.revenue / 1000000; // 1 point per million
+  const popularityScore = product.transactionCount * 10; // 10 points per transaction
+  const reachScore = product.customerCount * 15; // 15 points per unique customer
+  const retentionScore = product.averageMonths * 20; // 20 points per average month
+  
+  return revenueScore + popularityScore + reachScore + retentionScore;
+}
+
+/**
  * Export functions for pending transactions
  */
 function exportNeedsDelivery() {
@@ -3274,6 +3589,11 @@ function exportNeedsPayment() {
 
 // Make functions available globally
 window.loadOverviewReport = loadOverviewReport;
+window.calculatePendingTransactions = calculatePendingTransactions;
+window.updatePendingTransactionsSection = updatePendingTransactionsSection;
+window.updatePendingTable = updatePendingTable;
+window.calculateCustomerAnalytics = calculateCustomerAnalytics;
+window.calculateProductAnalytics = calculateProductAnalytics;
 window.updateStatusBreakdownWithRefund = updateStatusBreakdownWithRefund;
 window.updateChartPeriod = updateChartPeriod;
 window.calculateRevenueByStatus = calculateRevenueByStatus;
@@ -3300,6 +3620,8 @@ window.viewCustomerDetails = viewCustomerDetails;
 window.viewProductDetails = viewProductDetails;
 window.exportCustomerData = exportCustomerData;
 window.exportSoftwareData = exportSoftwareData;
+window.calculateCustomerScore = calculateCustomerScore;
+window.calculateProductScore = calculateProductScore;
 
 /**
  * View customer details modal/page
@@ -3309,12 +3631,13 @@ function viewCustomerDetails(customerName) {
   console.log('👥 Viewing customer details:', customerName);
   
   const transactions = window.transactionList || [];
-  const customerTransactions = transactions.filter(t => 
-    (t.customer || t.tenKhachHang) === customerName
-  );
+  const customerTransactions = transactions.filter(rawTransaction => {
+    const t = normalizeTransaction(rawTransaction);
+    return t && t.customerName === customerName;
+  });
   
-  const customerStats = calculateCustomerAnalytics(transactions).customers
-    .find(c => c.name === customerName);
+  const customerAnalytics = calculateCustomerAnalytics(transactions);
+  const customerStats = customerAnalytics.find(c => c.name === customerName);
   
   if (!customerStats) {
     alert('Không tìm thấy thông tin khách hàng');
@@ -3346,12 +3669,13 @@ function viewProductDetails(productName) {
   console.log('📺 Viewing product details:', productName);
   
   const transactions = window.transactionList || [];
-  const productTransactions = transactions.filter(t => 
-    (t.software || t.tenSanPham || t.product) === productName
-  );
+  const productTransactions = transactions.filter(rawTransaction => {
+    const t = normalizeTransaction(rawTransaction);
+    return t && t.softwareName === productName;
+  });
   
-  const productStats = calculateProductAnalytics(transactions).products
-    .find(p => p.name === productName);
+  const productAnalytics = calculateProductAnalytics(transactions);
+  const productStats = productAnalytics.find(p => p.name === productName);
   
   if (!productStats) {
     alert('Không tìm thấy thông tin sản phẩm');
