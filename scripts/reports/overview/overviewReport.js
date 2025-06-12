@@ -2218,17 +2218,23 @@ function calculateCustomerAnalytics(transactions) {
   const customerStats = {};
   let totalRevenue = 0;
   
-  // Group and analyze by customer
-  transactions.forEach(transaction => {
-    const customer = transaction.customer || transaction.tenKhachHang || 'Không xác định';
-    const revenue = parseFloat(transaction.revenue || transaction.doanhThu || transaction.amount) || 0;
-    const transactionDate = new Date(transaction.ngayGiaoDich || transaction.date);
+  // Group and analyze by customer using email as unique identifier
+  transactions.forEach(rawTransaction => {
+    const t = normalizeTransaction(rawTransaction);
+    if (!t) return;
+    
+    // Use email as unique identifier, display name as label
+    const customerEmail = t.email || 'no-email@unknown.com';
+    const customerName = t.customerName || 'Không xác định';
+    const revenue = t.revenue || 0;
+    const transactionDate = new Date(t.transactionDate);
     
     totalRevenue += revenue;
     
-    if (!customerStats[customer]) {
-      customerStats[customer] = {
-        name: customer,
+    if (!customerStats[customerEmail]) {
+      customerStats[customerEmail] = {
+        email: customerEmail,
+        name: customerName,
         totalRevenue: 0,
         transactionCount: 0,
         transactions: [],
@@ -2237,13 +2243,17 @@ function calculateCustomerAnalytics(transactions) {
       };
     }
     
-    const customerData = customerStats[customer];
+    const customerData = customerStats[customerEmail];
+    // Update display name in case it changed
+    if (customerName !== 'Không xác định') {
+      customerData.name = customerName;
+    }
     customerData.totalRevenue += revenue;
     customerData.transactionCount += 1;
     customerData.transactions.push({
       date: transactionDate,
       revenue: revenue,
-      product: transaction.tenSanPham || transaction.software || transaction.product
+      product: t.softwareName
     });
     
     // Update date range
@@ -2368,14 +2378,23 @@ function renderEnhancedCustomerTable(customers, totalRevenue) {
   }
   
   container.innerHTML = topCustomers.map((customer, index) => {
-    const percentage = totalRevenue > 0 ? ((customer.totalRevenue / totalRevenue) * 100).toFixed(1) : 0;
-    const trendIcon = customer.growthRate > 0 ? '📈' : customer.growthRate < -10 ? '📉' : '➡️';
-    const trendClass = customer.growthRate > 0 ? 'positive' : customer.growthRate < -10 ? 'negative' : 'neutral';
+    // Support both old and new customer data structures
+    const revenue = customer.revenue || customer.totalRevenue || 0;
+    const avgValue = customer.averageOrderValue || customer.avgTransactionValue || 0;
+    const growthRate = customer.growthRate || 0;
+    const firstTransaction = customer.firstTransaction ? new Date(customer.firstTransaction) : null;
+    const frequency = customer.frequency || 0;
+    const recentRevenue = customer.recentRevenue || 0;
+    const daysSinceLast = customer.daysSinceLast || 0;
+    
+    const percentage = totalRevenue > 0 ? ((revenue / totalRevenue) * 100).toFixed(1) : 0;
+    const trendIcon = growthRate > 0 ? '📈' : growthRate < -10 ? '📉' : '➡️';
+    const trendClass = growthRate > 0 ? 'positive' : growthRate < -10 ? 'negative' : 'neutral';
     const statusBadges = [];
     
     if (customer.isVIP) statusBadges.push('<span class="badge vip">🎆 VIP</span>');
     if (!customer.isActive) statusBadges.push('<span class="badge inactive">⏸️ Ngừng</span>');
-    if (customer.daysSinceLast <= 7) statusBadges.push('<span class="badge recent">🔥 Mới</span>');
+    if (daysSinceLast <= 7) statusBadges.push('<span class="badge recent">🔥 Mới</span>');
     
     return `
       <tr class="customer-row ${customer.isVIP ? 'vip-customer' : ''} ${!customer.isActive ? 'inactive-customer' : ''}">
@@ -2388,26 +2407,27 @@ function renderEnhancedCustomerTable(customers, totalRevenue) {
         <td class="customer-cell">
           <div class="customer-info">
             <div class="customer-name">${customer.name}</div>
+            ${customer.email ? `<div class="customer-email"><small>📧 ${customer.email}</small></div>` : ''}
             <div class="customer-badges">${statusBadges.join(' ')}</div>
             <div class="customer-meta">
-              <small>Khách hàng từ ${customer.firstTransaction.toLocaleDateString('vi-VN')}</small>
+              <small>Khách hàng từ ${firstTransaction ? firstTransaction.toLocaleDateString('vi-VN') : 'N/A'}</small>
             </div>
           </div>
         </td>
         <td class="transactions-cell">
           <div class="transaction-info">
-            <span class="transaction-count">${customer.transactionCount}</span>
-            <small class="frequency-info">${customer.frequency.toFixed(1)}/tháng</small>
+            <span class="transaction-count">${customer.transactionCount || 0}</span>
+            <small class="frequency-info">${frequency.toFixed(1)}/tháng</small>
           </div>
         </td>
         <td class="revenue-cell">
           <div class="revenue-info">
-            <span class="revenue-amount">${formatRevenue(customer.totalRevenue)}</span>
-            ${customer.recentRevenue > 0 ? `<small class="recent-revenue">30 ngày: ${formatRevenue(customer.recentRevenue)}</small>` : ''}
+            <span class="revenue-amount">${formatRevenue(revenue)}</span>
+            ${recentRevenue > 0 ? `<small class="recent-revenue">30 ngày: ${formatRevenue(recentRevenue)}</small>` : ''}
           </div>
         </td>
         <td class="avg-cell">
-          <span class="avg-value">${formatRevenue(customer.avgTransactionValue)}</span>
+          <span class="avg-value">${formatRevenue(avgValue)}</span>
         </td>
         <td class="percentage-cell">
           <div class="percentage-info">
@@ -2420,12 +2440,12 @@ function renderEnhancedCustomerTable(customers, totalRevenue) {
         <td class="trend-cell ${trendClass}">
           <div class="trend-info">
             <span class="trend-icon">${trendIcon}</span>
-            <span class="trend-value">${customer.growthRate > 0 ? '+' : ''}${customer.growthRate.toFixed(1)}%</span>
-            <small class="trend-desc">${customer.daysSinceLast} ngày trước</small>
+            <span class="trend-value">${growthRate > 0 ? '+' : ''}${growthRate.toFixed(1)}%</span>
+            <small class="trend-desc">${daysSinceLast} ngày trước</small>
           </div>
         </td>
         <td class="action-cell">
-          <button class="action-btn-small details" onclick="viewCustomerDetails('${customer.name}')" title="Xem chi tiết khách hàng">
+          <button class="action-btn-small details" onclick="viewCustomerDetails('${customer.email || customer.name}')" title="Xem chi tiết khách hàng">
             <i class="fas fa-user-circle"></i>
           </button>
         </td>
@@ -3316,15 +3336,19 @@ function calculateNormalizedCustomerAnalytics(transactions) {
         const t = normalizeTransaction(rawTransaction);
         if (!t) return;
         
+        // Use email as unique identifier, display name as label
+        const customerEmail = t.email || 'no-email@unknown.com';
         const customerName = t.customerName || 'Không xác định';
         const revenue = t.revenue || 0;
         const status = t.transactionType;
         const softwareName = t.softwareName || '';
         const transactionDate = t.transactionDate || '';
         
-        if (!customerMap.has(customerName)) {
-            customerMap.set(customerName, {
-                name: customerName,
+        // Use email as key but store display name
+        if (!customerMap.has(customerEmail)) {
+            customerMap.set(customerEmail, {
+                email: customerEmail,
+                name: customerName, // Display name
                 revenue: 0,
                 transactionCount: 0,
                 products: new Set(),
@@ -3336,7 +3360,11 @@ function calculateNormalizedCustomerAnalytics(transactions) {
             });
         }
         
-        const customer = customerMap.get(customerName);
+        const customer = customerMap.get(customerEmail);
+        // Update display name in case it changed
+        if (customerName !== 'Không xác định') {
+            customer.name = customerName;
+        }
         customer.transactionCount++;
         
         if (status === 'Hoàn tiền') {
@@ -3627,19 +3655,19 @@ window.calculateProductScore = calculateProductScore;
 
 /**
  * View customer details modal/page
- * @param {string} customerName - Customer name to view
+ * @param {string} customerIdentifier - Customer email or name to view
  */
-function viewCustomerDetails(customerName) {
-  console.log('👥 Viewing customer details:', customerName);
+function viewCustomerDetails(customerIdentifier) {
+  console.log('👥 Viewing customer details:', customerIdentifier);
   
   const transactions = window.transactionList || [];
   const customerTransactions = transactions.filter(rawTransaction => {
     const t = normalizeTransaction(rawTransaction);
-    return t && t.customerName === customerName;
+    return t && (t.email === customerIdentifier || t.customerName === customerIdentifier);
   });
   
   const customerAnalytics = calculateNormalizedCustomerAnalytics(transactions);
-  const customerStats = customerAnalytics.find(c => c.name === customerName);
+  const customerStats = customerAnalytics.find(c => c.email === customerIdentifier || c.name === customerIdentifier);
   
   if (!customerStats) {
     alert('Không tìm thấy thông tin khách hàng');
@@ -3648,7 +3676,8 @@ function viewCustomerDetails(customerName) {
   
   // For now, show basic info in alert (can be enhanced to modal)
   const info = `
-    Thông tin chi tiết: ${customerName}
+    Thông tin chi tiết: ${customerStats.name}
+    📧 Email: ${customerStats.email}
     
     💰 Tổng doanh thu: ${formatRevenue(customerStats.revenue || customerStats.totalRevenue || 0)}
     📋 Số giao dịch: ${customerStats.transactionCount}

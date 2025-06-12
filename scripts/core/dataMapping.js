@@ -140,6 +140,16 @@ export function normalizeTransaction(rawTransaction) {
     normalized.endDate = normalizeDate(normalized.endDate);
   }
   
+  // Debug log for customer data
+  if (normalized.customerName || normalized.email) {
+    console.log('🔍 Normalized transaction:', {
+      customerName: normalized.customerName,
+      email: normalized.email,
+      revenue: normalized.revenue,
+      originalData: rawTransaction
+    });
+  }
+  
   return normalized;
 }
 
