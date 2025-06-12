@@ -1817,7 +1817,7 @@ function updateTopExpensesTable(expenses) {
 }
 
 /**
- * Load top products data
+ * Load enhanced top products/software data with bestseller analytics
  * @param {Array} transactions - Filtered transactions
  */
 async function loadTopProducts(transactions = []) {
@@ -1825,11 +1825,6 @@ async function loadTopProducts(transactions = []) {
     const container = document.getElementById('top-software-body');
     if (!container) {
       console.warn('❌ Top products container not found');
-      console.warn('🔍 Available elements:', {
-        'top-software-body': !!document.getElementById('top-software-body'),
-        'topProducts': !!document.getElementById('topProducts'),
-        'top-software-table': !!document.getElementById('top-software-table')
-      });
       return;
     }
 
@@ -1838,44 +1833,25 @@ async function loadTopProducts(transactions = []) {
       transactions = window.transactionList || [];
     }
     
-    // Group by software and calculate totals
-    const softwareStats = {};
-    transactions.forEach(transaction => {
-      const software = transaction.software || transaction.tenSanPham || 'Không xác định';
-      const revenue = parseFloat(transaction.revenue || transaction.doanhThu) || 0;
-      
-      if (!softwareStats[software]) {
-        softwareStats[software] = {
-          name: software,
-          revenue: 0,
-          count: 0
-        };
-      }
-      
-      softwareStats[software].revenue += revenue;
-      softwareStats[software].count += 1;
-    });
-
-    // Sort by revenue and get top 5
-    const topProducts = Object.values(softwareStats)
-      .sort((a, b) => b.revenue - a.revenue)
-      .slice(0, 5);
-
-    // Render top products as table rows
-    const totalRevenue = topProducts.reduce((sum, p) => sum + p.revenue, 0);
+    // Enhanced product analytics
+    const productAnalytics = calculateProductAnalytics(transactions);
     
-    container.innerHTML = topProducts.map(product => {
-      const percentage = totalRevenue > 0 ? ((product.revenue / totalRevenue) * 100).toFixed(1) : 0;
-      return `
-        <tr>
-          <td>${product.name}</td>
-          <td>${product.count}</td>
-          <td>${formatRevenue(product.revenue)}</td>
-          <td>${percentage}%</td>
-        </tr>
-      `;
-    }).join('');
-    console.log('✅ Top products loaded');
+    // Update summary statistics
+    updateProductSummary(productAnalytics);
+    
+    // Get current view mode
+    const viewMode = document.querySelector('.top-software-enhanced .toggle-btn.active')?.dataset?.view || 'bestseller';
+    
+    // Sort products based on view mode
+    const sortedProducts = sortProductsByView(productAnalytics.products, viewMode);
+    
+    // Render enhanced product table
+    renderEnhancedProductTable(sortedProducts, productAnalytics);
+    
+    // Initialize view toggle handlers
+    initProductViewToggle();
+    
+    console.log('✅ Enhanced top products loaded:', productAnalytics);
   } catch (error) {
     console.error('❌ Error loading top products:', error);
     showError('Không thể tải dữ liệu sản phẩm hàng đầu');
@@ -1883,7 +1859,285 @@ async function loadTopProducts(transactions = []) {
 }
 
 /**
- * Load top customers data
+ * Calculate comprehensive product analytics
+ * @param {Array} transactions - All transactions
+ * @returns {Object} Product analytics data
+ */
+function calculateProductAnalytics(transactions) {
+  const productStats = {};
+  let totalQuantity = 0;
+  let totalRevenue = 0;
+  
+  // Group and analyze by product
+  transactions.forEach(transaction => {
+    const product = transaction.software || transaction.tenSanPham || transaction.product || 'Không xác định';
+    const revenue = parseFloat(transaction.revenue || transaction.doanhThu || transaction.amount) || 0;
+    const quantity = parseFloat(transaction.quantity || transaction.soLuong) || 1; // Default 1 if not specified
+    const transactionDate = new Date(transaction.ngayGiaoDich || transaction.date);
+    
+    totalQuantity += quantity;
+    totalRevenue += revenue;
+    
+    if (!productStats[product]) {
+      productStats[product] = {
+        name: product,
+        totalRevenue: 0,
+        totalQuantity: 0,
+        transactionCount: 0,
+        transactions: [],
+        firstSale: transactionDate,
+        lastSale: transactionDate
+      };
+    }
+    
+    const productData = productStats[product];
+    productData.totalRevenue += revenue;
+    productData.totalQuantity += quantity;
+    productData.transactionCount += 1;
+    productData.transactions.push({
+      date: transactionDate,
+      revenue: revenue,
+      quantity: quantity,
+      customer: transaction.tenKhachHang || transaction.customer
+    });
+    
+    // Update date range
+    if (transactionDate < productData.firstSale) {
+      productData.firstSale = transactionDate;
+    }
+    if (transactionDate > productData.lastSale) {
+      productData.lastSale = transactionDate;
+    }
+  });
+  
+  // Calculate additional metrics for each product
+  const products = Object.values(productStats).map(product => {
+    const avgPrice = product.totalRevenue / product.totalQuantity;
+    const daysSinceFirst = Math.floor((new Date() - product.firstSale) / (1000 * 60 * 60 * 24));
+    const daysSinceLast = Math.floor((new Date() - product.lastSale) / (1000 * 60 * 60 * 24));
+    const salesVelocity = daysSinceFirst > 0 ? product.totalQuantity / (daysSinceFirst / 30) : 0; // sales per month
+    
+    // Calculate recent performance (last 30 days)
+    const recentTransactions = product.transactions.filter(t => {
+      const daysSince = Math.floor((new Date() - t.date) / (1000 * 60 * 60 * 24));
+      return daysSince <= 30;
+    });
+    const recentQuantity = recentTransactions.reduce((sum, t) => sum + t.quantity, 0);
+    const recentRevenue = recentTransactions.reduce((sum, t) => sum + t.revenue, 0);
+    
+    // Growth calculation (compare recent vs previous period)
+    const previousTransactions = product.transactions.filter(t => {
+      const daysSince = Math.floor((new Date() - t.date) / (1000 * 60 * 60 * 24));
+      return daysSince > 30 && daysSince <= 60;
+    });
+    const previousQuantity = previousTransactions.reduce((sum, t) => sum + t.quantity, 0);
+    const growthRate = previousQuantity > 0 ? ((recentQuantity - previousQuantity) / previousQuantity * 100) : 0;
+    
+    // Market share calculation
+    const marketShare = totalQuantity > 0 ? (product.totalQuantity / totalQuantity * 100) : 0;
+    const revenueShare = totalRevenue > 0 ? (product.totalRevenue / totalRevenue * 100) : 0;
+    
+    // Performance score (combines sales volume, revenue, growth, recency)
+    const recentWeight = Math.max(0, 1 - (daysSinceLast / 180)); // Less weight if not sold recently
+    const performanceScore = (product.totalQuantity * 0.3) + (product.totalRevenue * 0.0001) + (growthRate * 0.2) + (recentWeight * 100);
+    
+    // Product status classification
+    const isBestseller = marketShare >= 15; // Top 15% market share
+    const isHot = recentQuantity > 0 && daysSinceLast <= 7; // Sold in last week
+    const isSlow = daysSinceLast > 90; // No sales in 90 days
+    const isTrending = growthRate > 50; // 50%+ growth
+    
+    return {
+      ...product,
+      avgPrice,
+      daysSinceFirst,
+      daysSinceLast,
+      salesVelocity,
+      growthRate,
+      marketShare,
+      revenueShare,
+      performanceScore,
+      recentQuantity,
+      recentRevenue,
+      isBestseller,
+      isHot,
+      isSlow,
+      isTrending
+    };
+  });
+  
+  return {
+    products,
+    totalRevenue,
+    totalQuantity,
+    totalProducts: products.length,
+    bestsellers: products.filter(p => p.isBestseller),
+    hotProducts: products.filter(p => p.isHot),
+    slowProducts: products.filter(p => p.isSlow),
+    trendingProducts: products.filter(p => p.isTrending)
+  };
+}
+
+/**
+ * Update product summary statistics
+ * @param {Object} analytics - Product analytics data
+ */
+function updateProductSummary(analytics) {
+  const totalProductsEl = document.getElementById('total-products');
+  const hottestProductEl = document.getElementById('hottest-product');
+  const top3MarketShareEl = document.getElementById('top3-market-share');
+  
+  if (totalProductsEl) {
+    totalProductsEl.textContent = analytics.totalProducts;
+  }
+  
+  if (hottestProductEl) {
+    const hottest = analytics.products.sort((a, b) => b.recentQuantity - a.recentQuantity)[0];
+    hottestProductEl.textContent = hottest ? hottest.name : 'N/A';
+  }
+  
+  if (top3MarketShareEl) {
+    const top3Share = analytics.products
+      .sort((a, b) => b.marketShare - a.marketShare)
+      .slice(0, 3)
+      .reduce((sum, p) => sum + p.marketShare, 0);
+    top3MarketShareEl.textContent = `${top3Share.toFixed(1)}%`;
+  }
+}
+
+/**
+ * Sort products by view mode
+ * @param {Array} products - Product data
+ * @param {string} viewMode - Sort criteria
+ * @returns {Array} Sorted products
+ */
+function sortProductsByView(products, viewMode) {
+  switch (viewMode) {
+    case 'revenue':
+      return products.sort((a, b) => b.totalRevenue - a.totalRevenue);
+    case 'growth':
+      return products.sort((a, b) => b.growthRate - a.growthRate);
+    case 'bestseller':
+    default:
+      return products.sort((a, b) => b.totalQuantity - a.totalQuantity);
+  }
+}
+
+/**
+ * Render enhanced product table
+ * @param {Array} products - Sorted product data
+ * @param {Object} analytics - Product analytics
+ */
+function renderEnhancedProductTable(products, analytics) {
+  const container = document.getElementById('top-software-body');
+  if (!container) return;
+  
+  const topProducts = products.slice(0, 10); // Show top 10
+  
+  if (topProducts.length === 0) {
+    container.innerHTML = `
+      <tr class="empty-row">
+        <td colspan="8" class="empty-message">
+          <i class="fas fa-box-open"></i> 
+          Chưa có dữ liệu sản phẩm
+        </td>
+      </tr>
+    `;
+    return;
+  }
+  
+  container.innerHTML = topProducts.map((product, index) => {
+    const performanceClass = product.performanceScore > 100 ? 'excellent' : product.performanceScore > 50 ? 'good' : 'average';
+    const statusBadges = [];
+    
+    if (product.isBestseller) statusBadges.push('<span class="badge bestseller">🏆 Bán chạy</span>');
+    if (product.isHot) statusBadges.push('<span class="badge hot">🔥 Hót</span>');
+    if (product.isTrending) statusBadges.push('<span class="badge trending">📈 Xu hướng</span>');
+    if (product.isSlow) statusBadges.push('<span class="badge slow">🐢 Chậm</span>');
+    
+    const performanceIcon = performanceClass === 'excellent' ? '🎆' : performanceClass === 'good' ? '✅' : '📈';
+    
+    return `
+      <tr class="product-row ${performanceClass}-performance ${product.isBestseller ? 'bestseller-product' : ''}">
+        <td class="rank-cell">
+          <div class="rank-display">
+            <span class="rank-number">${index + 1}</span>
+            ${index < 3 ? `<i class="fas fa-trophy rank-trophy rank-${index + 1}"></i>` : ''}
+          </div>
+        </td>
+        <td class="product-cell">
+          <div class="product-info">
+            <div class="product-name">${product.name}</div>
+            <div class="product-badges">${statusBadges.join(' ')}</div>
+            <div class="product-meta">
+              <small>Bán từ ${product.firstSale.toLocaleDateString('vi-VN')}</small>
+            </div>
+          </div>
+        </td>
+        <td class="quantity-cell">
+          <div class="quantity-info">
+            <span class="quantity-total">${product.totalQuantity}</span>
+            <small class="velocity-info">${product.salesVelocity.toFixed(1)}/tháng</small>
+            ${product.recentQuantity > 0 ? `<small class="recent-sales">30 ngày: ${product.recentQuantity}</small>` : ''}
+          </div>
+        </td>
+        <td class="revenue-cell">
+          <span class="revenue-amount">${formatRevenue(product.totalRevenue)}</span>
+        </td>
+        <td class="avg-price-cell">
+          <span class="avg-price">${formatRevenue(product.avgPrice)}</span>
+        </td>
+        <td class="market-share-cell">
+          <div class="share-info">
+            <span class="share-value">${product.marketShare.toFixed(1)}%</span>
+            <div class="share-bar">
+              <div class="share-fill" style="width: ${Math.min(product.marketShare * 3, 100)}%"></div>
+            </div>
+            <small class="revenue-share">DT: ${product.revenueShare.toFixed(1)}%</small>
+          </div>
+        </td>
+        <td class="performance-cell ${performanceClass}">
+          <div class="performance-info">
+            <span class="performance-icon">${performanceIcon}</span>
+            <span class="performance-score">${product.performanceScore.toFixed(0)}</span>
+            <small class="growth-rate ${product.growthRate > 0 ? 'positive' : 'negative'}">
+              ${product.growthRate > 0 ? '+' : ''}${product.growthRate.toFixed(1)}%
+            </small>
+          </div>
+        </td>
+        <td class="action-cell">
+          <button class="action-btn-small details" onclick="viewProductDetails('${product.name}')" title="Xem chi tiết sản phẩm">
+            <i class="fas fa-chart-bar"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+/**
+ * Initialize product view toggle handlers
+ */
+function initProductViewToggle() {
+  const toggleButtons = document.querySelectorAll('.top-software-enhanced .toggle-btn');
+  
+  toggleButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      // Remove active class from all buttons
+      toggleButtons.forEach(btn => btn.classList.remove('active'));
+      
+      // Add active class to clicked button
+      this.classList.add('active');
+      
+      // Reload products with new view
+      const transactions = window.transactionList || [];
+      loadTopProducts(transactions);
+    });
+  });
+}
+
+/**
+ * Load enhanced top customers data with detailed analytics
  * @param {Array} transactions - Filtered transactions
  */
 async function loadTopCustomers(transactions = []) {
@@ -1891,11 +2145,6 @@ async function loadTopCustomers(transactions = []) {
     const container = document.getElementById('top-customers-body');
     if (!container) {
       console.warn('❌ Top customers container not found');
-      console.warn('🔍 Available elements:', {
-        'top-customers-body': !!document.getElementById('top-customers-body'),
-        'topCustomers': !!document.getElementById('topCustomers'),
-        'top-customers-table': !!document.getElementById('top-customers-table')
-      });
       return;
     }
 
@@ -1904,47 +2153,275 @@ async function loadTopCustomers(transactions = []) {
       transactions = window.transactionList || [];
     }
     
-    // Group by customer and calculate totals
-    const customerStats = {};
-    transactions.forEach(transaction => {
-      const customer = transaction.customer || transaction.tenKhachHang || 'Không xác định';
-      const revenue = parseFloat(transaction.revenue || transaction.doanhThu) || 0;
-      
-      if (!customerStats[customer]) {
-        customerStats[customer] = {
-          name: customer,
-          revenue: 0,
-          count: 0
-        };
-      }
-      
-      customerStats[customer].revenue += revenue;
-      customerStats[customer].count += 1;
-    });
-
-    // Sort by revenue and get top 5
-    const topCustomers = Object.values(customerStats)
-      .sort((a, b) => b.revenue - a.revenue)
-      .slice(0, 5);
-
-    // Render top customers as table rows
-    container.innerHTML = topCustomers.map(customer => {
-      const trend = Math.random() > 0.5 ? 'up' : 'down'; // Placeholder trend
-      const trendIcon = trend === 'up' ? '📈' : '📉';
-      return `
-        <tr>
-          <td>${customer.name}</td>
-          <td>${customer.count}</td>
-          <td>${formatRevenue(customer.revenue)}</td>
-          <td>${trendIcon}</td>
-        </tr>
-      `;
-    }).join('');
-    console.log('✅ Top customers loaded');
+    // Enhanced customer analytics
+    const customerAnalytics = calculateCustomerAnalytics(transactions);
+    
+    // Update summary statistics
+    updateCustomerSummary(customerAnalytics);
+    
+    // Get current view mode
+    const viewMode = document.querySelector('.top-customers-enhanced .toggle-btn.active')?.dataset?.view || 'revenue';
+    
+    // Sort customers based on view mode
+    const sortedCustomers = sortCustomersByView(customerAnalytics.customers, viewMode);
+    
+    // Render enhanced customer table
+    renderEnhancedCustomerTable(sortedCustomers, customerAnalytics.totalRevenue);
+    
+    // Initialize view toggle handlers
+    initCustomerViewToggle();
+    
+    console.log('✅ Enhanced top customers loaded:', customerAnalytics);
   } catch (error) {
     console.error('❌ Error loading top customers:', error);
     showError('Không thể tải dữ liệu khách hàng hàng đầu');
   }
+}
+
+/**
+ * Calculate comprehensive customer analytics
+ * @param {Array} transactions - All transactions
+ * @returns {Object} Customer analytics data
+ */
+function calculateCustomerAnalytics(transactions) {
+  const customerStats = {};
+  let totalRevenue = 0;
+  
+  // Group and analyze by customer
+  transactions.forEach(transaction => {
+    const customer = transaction.customer || transaction.tenKhachHang || 'Không xác định';
+    const revenue = parseFloat(transaction.revenue || transaction.doanhThu || transaction.amount) || 0;
+    const transactionDate = new Date(transaction.ngayGiaoDich || transaction.date);
+    
+    totalRevenue += revenue;
+    
+    if (!customerStats[customer]) {
+      customerStats[customer] = {
+        name: customer,
+        totalRevenue: 0,
+        transactionCount: 0,
+        transactions: [],
+        firstTransaction: transactionDate,
+        lastTransaction: transactionDate
+      };
+    }
+    
+    const customerData = customerStats[customer];
+    customerData.totalRevenue += revenue;
+    customerData.transactionCount += 1;
+    customerData.transactions.push({
+      date: transactionDate,
+      revenue: revenue,
+      product: transaction.tenSanPham || transaction.software || transaction.product
+    });
+    
+    // Update date range
+    if (transactionDate < customerData.firstTransaction) {
+      customerData.firstTransaction = transactionDate;
+    }
+    if (transactionDate > customerData.lastTransaction) {
+      customerData.lastTransaction = transactionDate;
+    }
+  });
+  
+  // Calculate additional metrics for each customer
+  const customers = Object.values(customerStats).map(customer => {
+    const avgTransactionValue = customer.totalRevenue / customer.transactionCount;
+    const daysSinceFirst = Math.floor((new Date() - customer.firstTransaction) / (1000 * 60 * 60 * 24));
+    const daysSinceLast = Math.floor((new Date() - customer.lastTransaction) / (1000 * 60 * 60 * 24));
+    const frequency = daysSinceFirst > 0 ? customer.transactionCount / (daysSinceFirst / 30) : 0; // transactions per month
+    
+    // Calculate trend (simple growth rate based on recent vs old transactions)
+    const recentTransactions = customer.transactions.filter(t => {
+      const daysSince = Math.floor((new Date() - t.date) / (1000 * 60 * 60 * 24));
+      return daysSince <= 30; // Last 30 days
+    });
+    const recentRevenue = recentTransactions.reduce((sum, t) => sum + t.revenue, 0);
+    const oldRevenue = customer.totalRevenue - recentRevenue;
+    const growthRate = oldRevenue > 0 ? ((recentRevenue - oldRevenue) / oldRevenue * 100) : 0;
+    
+    // Customer value score (weighted combination of revenue, frequency, recency)
+    const recentWeight = Math.max(0, 1 - (daysSinceLast / 365)); // Less weight if inactive
+    const valueScore = (customer.totalRevenue * 0.5) + (frequency * 1000 * 0.3) + (recentWeight * avgTransactionValue * 0.2);
+    
+    return {
+      ...customer,
+      avgTransactionValue,
+      daysSinceFirst,
+      daysSinceLast,
+      frequency,
+      growthRate,
+      valueScore,
+      recentRevenue,
+      isActive: daysSinceLast <= 90, // Active if transaction within 90 days
+      isVIP: customer.totalRevenue >= totalRevenue * 0.1 // VIP if >10% of total revenue
+    };
+  });
+  
+  return {
+    customers,
+    totalRevenue,
+    totalCustomers: customers.length,
+    avgCustomerRevenue: totalRevenue / customers.length,
+    activeCustomers: customers.filter(c => c.isActive).length,
+    vipCustomers: customers.filter(c => c.isVIP).length
+  };
+}
+
+/**
+ * Update customer summary statistics
+ * @param {Object} analytics - Customer analytics data
+ */
+function updateCustomerSummary(analytics) {
+  const totalCustomersEl = document.getElementById('total-customers');
+  const avgRevenueEl = document.getElementById('avg-customer-revenue');
+  const top5PercentageEl = document.getElementById('top5-percentage');
+  
+  if (totalCustomersEl) {
+    totalCustomersEl.textContent = analytics.totalCustomers;
+  }
+  
+  if (avgRevenueEl) {
+    avgRevenueEl.textContent = formatRevenue(analytics.avgCustomerRevenue);
+  }
+  
+  if (top5PercentageEl) {
+    const top5Revenue = analytics.customers
+      .sort((a, b) => b.totalRevenue - a.totalRevenue)
+      .slice(0, 5)
+      .reduce((sum, c) => sum + c.totalRevenue, 0);
+    const top5Percentage = analytics.totalRevenue > 0 ? ((top5Revenue / analytics.totalRevenue) * 100).toFixed(1) : 0;
+    top5PercentageEl.textContent = `${top5Percentage}%`;
+  }
+}
+
+/**
+ * Sort customers by view mode
+ * @param {Array} customers - Customer data
+ * @param {string} viewMode - Sort criteria
+ * @returns {Array} Sorted customers
+ */
+function sortCustomersByView(customers, viewMode) {
+  switch (viewMode) {
+    case 'quantity':
+      return customers.sort((a, b) => b.transactionCount - a.transactionCount);
+    case 'avg':
+      return customers.sort((a, b) => b.avgTransactionValue - a.avgTransactionValue);
+    case 'revenue':
+    default:
+      return customers.sort((a, b) => b.totalRevenue - a.totalRevenue);
+  }
+}
+
+/**
+ * Render enhanced customer table
+ * @param {Array} customers - Sorted customer data
+ * @param {number} totalRevenue - Total revenue for percentage calculation
+ */
+function renderEnhancedCustomerTable(customers, totalRevenue) {
+  const container = document.getElementById('top-customers-body');
+  if (!container) return;
+  
+  const topCustomers = customers.slice(0, 10); // Show top 10
+  
+  if (topCustomers.length === 0) {
+    container.innerHTML = `
+      <tr class="empty-row">
+        <td colspan="8" class="empty-message">
+          <i class="fas fa-users-slash"></i> 
+          Chưa có dữ liệu khách hàng
+        </td>
+      </tr>
+    `;
+    return;
+  }
+  
+  container.innerHTML = topCustomers.map((customer, index) => {
+    const percentage = totalRevenue > 0 ? ((customer.totalRevenue / totalRevenue) * 100).toFixed(1) : 0;
+    const trendIcon = customer.growthRate > 0 ? '📈' : customer.growthRate < -10 ? '📉' : '➡️';
+    const trendClass = customer.growthRate > 0 ? 'positive' : customer.growthRate < -10 ? 'negative' : 'neutral';
+    const statusBadges = [];
+    
+    if (customer.isVIP) statusBadges.push('<span class="badge vip">🎆 VIP</span>');
+    if (!customer.isActive) statusBadges.push('<span class="badge inactive">⏸️ Ngừng</span>');
+    if (customer.daysSinceLast <= 7) statusBadges.push('<span class="badge recent">🔥 Mới</span>');
+    
+    return `
+      <tr class="customer-row ${customer.isVIP ? 'vip-customer' : ''} ${!customer.isActive ? 'inactive-customer' : ''}">
+        <td class="rank-cell">
+          <div class="rank-display">
+            <span class="rank-number">${index + 1}</span>
+            ${index < 3 ? `<i class="fas fa-medal rank-medal rank-${index + 1}"></i>` : ''}
+          </div>
+        </td>
+        <td class="customer-cell">
+          <div class="customer-info">
+            <div class="customer-name">${customer.name}</div>
+            <div class="customer-badges">${statusBadges.join(' ')}</div>
+            <div class="customer-meta">
+              <small>Khách hàng từ ${customer.firstTransaction.toLocaleDateString('vi-VN')}</small>
+            </div>
+          </div>
+        </td>
+        <td class="transactions-cell">
+          <div class="transaction-info">
+            <span class="transaction-count">${customer.transactionCount}</span>
+            <small class="frequency-info">${customer.frequency.toFixed(1)}/tháng</small>
+          </div>
+        </td>
+        <td class="revenue-cell">
+          <div class="revenue-info">
+            <span class="revenue-amount">${formatRevenue(customer.totalRevenue)}</span>
+            ${customer.recentRevenue > 0 ? `<small class="recent-revenue">30 ngày: ${formatRevenue(customer.recentRevenue)}</small>` : ''}
+          </div>
+        </td>
+        <td class="avg-cell">
+          <span class="avg-value">${formatRevenue(customer.avgTransactionValue)}</span>
+        </td>
+        <td class="percentage-cell">
+          <div class="percentage-info">
+            <span class="percentage-value">${percentage}%</span>
+            <div class="percentage-bar">
+              <div class="percentage-fill" style="width: ${Math.min(percentage * 2, 100)}%"></div>
+            </div>
+          </div>
+        </td>
+        <td class="trend-cell ${trendClass}">
+          <div class="trend-info">
+            <span class="trend-icon">${trendIcon}</span>
+            <span class="trend-value">${customer.growthRate > 0 ? '+' : ''}${customer.growthRate.toFixed(1)}%</span>
+            <small class="trend-desc">${customer.daysSinceLast} ngày trước</small>
+          </div>
+        </td>
+        <td class="action-cell">
+          <button class="action-btn-small details" onclick="viewCustomerDetails('${customer.name}')" title="Xem chi tiết khách hàng">
+            <i class="fas fa-user-circle"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+/**
+ * Initialize customer view toggle handlers
+ */
+function initCustomerViewToggle() {
+  const toggleButtons = document.querySelectorAll('.top-customers-enhanced .toggle-btn');
+  
+  toggleButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      // Remove active class from all buttons
+      toggleButtons.forEach(btn => btn.classList.remove('active'));
+      
+      // Add active class to clicked button
+      this.classList.add('active');
+      
+      // Reload customers with new view
+      const transactions = window.transactionList || [];
+      loadTopCustomers(transactions);
+    });
+  });
 }
 
 /**
@@ -2817,3 +3294,220 @@ window.showOverdueDetails = showOverdueDetails;
 window.showUrgentDeliveries = showUrgentDeliveries;
 window.exportNeedsDelivery = exportNeedsDelivery;
 window.exportNeedsPayment = exportNeedsPayment;
+
+// Top customers and products functions
+window.viewCustomerDetails = viewCustomerDetails;
+window.viewProductDetails = viewProductDetails;
+window.exportCustomerData = exportCustomerData;
+window.exportSoftwareData = exportSoftwareData;
+
+/**
+ * View customer details modal/page
+ * @param {string} customerName - Customer name to view
+ */
+function viewCustomerDetails(customerName) {
+  console.log('👥 Viewing customer details:', customerName);
+  
+  const transactions = window.transactionList || [];
+  const customerTransactions = transactions.filter(t => 
+    (t.customer || t.tenKhachHang) === customerName
+  );
+  
+  const customerStats = calculateCustomerAnalytics(transactions).customers
+    .find(c => c.name === customerName);
+  
+  if (!customerStats) {
+    alert('Không tìm thấy thông tin khách hàng');
+    return;
+  }
+  
+  // For now, show basic info in alert (can be enhanced to modal)
+  const info = `
+    Thông tin chi tiết: ${customerName}
+    
+    💰 Tổng doanh thu: ${formatRevenue(customerStats.totalRevenue)}
+    📋 Số giao dịch: ${customerStats.transactionCount}
+    📈 Giá trị trung bình: ${formatRevenue(customerStats.avgTransactionValue)}
+    📅 Khách hàng từ: ${customerStats.firstTransaction.toLocaleDateString('vi-VN')}
+    ⏰ Giao dịch cuối: ${customerStats.lastTransaction.toLocaleDateString('vi-VN')}
+    📈 Tăng trưởng: ${customerStats.growthRate.toFixed(1)}%
+    🎯 Tần suất: ${customerStats.frequency.toFixed(1)} giao dịch/tháng
+    ⭐ Trạng thái: ${customerStats.isVIP ? 'VIP' : 'Thường'} | ${customerStats.isActive ? 'Hoạt động' : 'Ngừng hoạt động'}
+  `;
+  
+  alert(info);
+}
+
+/**
+ * View product details modal/page
+ * @param {string} productName - Product name to view
+ */
+function viewProductDetails(productName) {
+  console.log('📺 Viewing product details:', productName);
+  
+  const transactions = window.transactionList || [];
+  const productTransactions = transactions.filter(t => 
+    (t.software || t.tenSanPham || t.product) === productName
+  );
+  
+  const productStats = calculateProductAnalytics(transactions).products
+    .find(p => p.name === productName);
+  
+  if (!productStats) {
+    alert('Không tìm thấy thông tin sản phẩm');
+    return;
+  }
+  
+  // For now, show basic info in alert (can be enhanced to modal)
+  const info = `
+    Chi tiết sản phẩm: ${productName}
+    
+    📺 Số lượng bán: ${productStats.totalQuantity}
+    💰 Tổng doanh thu: ${formatRevenue(productStats.totalRevenue)}
+    💲 Giá trung bình: ${formatRevenue(productStats.avgPrice)}
+    📈 Tăng trưởng: ${productStats.growthRate.toFixed(1)}%
+    🎢 Thị phần: ${productStats.marketShare.toFixed(1)}%
+    🚀 Tốc độ bán: ${productStats.salesVelocity.toFixed(1)} sản phẩm/tháng
+    📅 Bán từ: ${productStats.firstSale.toLocaleDateString('vi-VN')}
+    ⏰ Bán cuối: ${productStats.lastSale.toLocaleDateString('vi-VN')}
+    ⭐ Trạng thái: ${productStats.isBestseller ? 'Bán chạy' : 'Bình thường'} | ${productStats.isHot ? 'Hót' : productStats.isSlow ? 'Chậm' : 'Vừa'}
+  `;
+  
+  alert(info);
+}
+
+/**
+ * Export enhanced customer data to CSV
+ */
+function exportCustomerData() {
+  console.log('💾 Exporting customer data...');
+  
+  try {
+    const transactions = window.transactionList || [];
+    const analytics = calculateCustomerAnalytics(transactions);
+    
+    if (analytics.customers.length === 0) {
+      alert('Không có dữ liệu khách hàng để xuất');
+      return;
+    }
+    
+    // Prepare CSV data with comprehensive customer metrics
+    const csvData = [
+      [
+        'Hạng', 'Tên khách hàng', 'Tổng giao dịch', 'Tổng doanh thu (VNĐ)', 
+        'Giá trị TB (VNĐ)', '% Tổng doanh thu', 'Tần suất/tháng', 
+        'Tăng trưởng (%)', 'Ngày từ khi là KH', 'Ngày giao dịch cuối', 
+        'Trạng thái', 'Loại khách hàng', 'Điểm đánh giá'
+      ],
+      ...analytics.customers
+        .sort((a, b) => b.totalRevenue - a.totalRevenue)
+        .map((customer, index) => [
+          index + 1,
+          customer.name,
+          customer.transactionCount,
+          customer.totalRevenue,
+          customer.avgTransactionValue.toFixed(0),
+          ((customer.totalRevenue / analytics.totalRevenue) * 100).toFixed(1),
+          customer.frequency.toFixed(1),
+          customer.growthRate.toFixed(1),
+          customer.daysSinceFirst,
+          customer.daysSinceLast,
+          customer.isActive ? 'Hoạt động' : 'Ngừng hoạt động',
+          customer.isVIP ? 'VIP' : 'Thường',
+          customer.valueScore.toFixed(0)
+        ])
+    ];
+    
+    const csvString = csvData.map(row => row.join(',')).join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `top-khach-hang-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    console.log('✅ Customer data exported successfully');
+  } catch (error) {
+    console.error('❌ Error exporting customer data:', error);
+    alert('Lỗi xuất dữ liệu khách hàng. Vui lòng thử lại.');
+  }
+}
+
+/**
+ * Export enhanced software/product data to CSV
+ */
+function exportSoftwareData() {
+  console.log('💾 Exporting software/product data...');
+  
+  try {
+    const transactions = window.transactionList || [];
+    const analytics = calculateProductAnalytics(transactions);
+    
+    if (analytics.products.length === 0) {
+      alert('Không có dữ liệu sản phẩm để xuất');
+      return;
+    }
+    
+    // Prepare CSV data with comprehensive product metrics
+    const csvData = [
+      [
+        'Hạng', 'Tên sản phẩm', 'Số lượng bán', 'Tổng doanh thu (VNĐ)', 
+        'Giá trung bình (VNĐ)', 'Thị phần (%)', '% Doanh thu', 
+        'Tốc độ bán/tháng', 'Tăng trưởng (%)', 'Ngày bán đầu tiên', 
+        'Ngày bán cuối', 'Trạng thái', 'Đánh giá hiệu suất'
+      ],
+      ...analytics.products
+        .sort((a, b) => b.totalQuantity - a.totalQuantity)
+        .map((product, index) => {
+          let status = 'Bình thường';
+          if (product.isBestseller) status = 'Bán chạy';
+          if (product.isHot) status += ' - Hót';
+          if (product.isTrending) status += ' - Xu hướng';
+          if (product.isSlow) status = 'Chậm';
+          
+          let performance = 'Trung bình';
+          if (product.performanceScore > 100) performance = 'Xuất sắc';
+          else if (product.performanceScore > 50) performance = 'Tốt';
+          
+          return [
+            index + 1,
+            product.name,
+            product.totalQuantity,
+            product.totalRevenue,
+            product.avgPrice.toFixed(0),
+            product.marketShare.toFixed(1),
+            product.revenueShare.toFixed(1),
+            product.salesVelocity.toFixed(1),
+            product.growthRate.toFixed(1),
+            product.firstSale.toLocaleDateString('vi-VN'),
+            product.lastSale.toLocaleDateString('vi-VN'),
+            status,
+            performance
+          ];
+        })
+    ];
+    
+    const csvString = csvData.map(row => row.join(',')).join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `san-pham-ban-chay-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    console.log('✅ Software/product data exported successfully');
+  } catch (error) {
+    console.error('❌ Error exporting software data:', error);
+    alert('Lỗi xuất dữ liệu sản phẩm. Vui lòng thử lại.');
+  }
+}

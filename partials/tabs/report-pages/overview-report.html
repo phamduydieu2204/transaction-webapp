@@ -244,31 +244,62 @@
   <!-- Data Tables Row -->
   <div class="tables-row">
     <!-- Top Customers -->
-    <div class="data-table-container">
+    <div class="data-table-container top-customers-enhanced">
       <div class="table-header">
         <h3 class="table-title">
           <i class="fas fa-users"></i> 
-          Khách hàng hàng đầu
+          Top Khách hàng theo Doanh thu
         </h3>
         <div class="table-controls">
+          <div class="view-toggle">
+            <button class="toggle-btn active" data-view="revenue" title="Sắp xếp theo doanh thu">
+              <i class="fas fa-dollar-sign"></i>
+            </button>
+            <button class="toggle-btn" data-view="quantity" title="Sắp xếp theo số lượng">
+              <i class="fas fa-sort-numeric-down"></i>
+            </button>
+            <button class="toggle-btn" data-view="avg" title="Sắp xếp theo giá trị trung bình">
+              <i class="fas fa-chart-line"></i>
+            </button>
+          </div>
           <button class="table-btn" onclick="exportCustomerData()">
             <i class="fas fa-download"></i> Xuất
           </button>
         </div>
       </div>
       <div class="table-content">
-        <table class="data-table" id="top-customers-table">
+        <div class="table-summary">
+          <div class="summary-stats">
+            <div class="stat-item">
+              <span class="stat-label">Tổng khách hàng:</span>
+              <span class="stat-value" id="total-customers">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Doanh thu trung bình:</span>
+              <span class="stat-value" id="avg-customer-revenue">0 ₫</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Top 5 chiếm:</span>
+              <span class="stat-value" id="top5-percentage">0%</span>
+            </div>
+          </div>
+        </div>
+        <table class="data-table enhanced-table" id="top-customers-table">
           <thead>
             <tr>
-              <th>Khách hàng</th>
-              <th>Giao dịch</th>
-              <th>Doanh thu</th>
-              <th>Xu hướng</th>
+              <th class="rank-col">#</th>
+              <th class="customer-col">Khách hàng</th>
+              <th class="transactions-col">Giao dịch</th>
+              <th class="revenue-col">Tổng doanh thu</th>
+              <th class="avg-col">Giá trị TB</th>
+              <th class="percentage-col">% Tổng</th>
+              <th class="trend-col">Xu hướng</th>
+              <th class="action-col">Thêm</th>
             </tr>
           </thead>
           <tbody id="top-customers-body">
             <tr>
-              <td colspan="4" class="loading-row">
+              <td colspan="8" class="loading-row">
                 <i class="fas fa-spinner fa-spin"></i> Đang tải...
               </td>
             </tr>
@@ -278,31 +309,62 @@
     </div>
 
     <!-- Top Software -->
-    <div class="data-table-container">
+    <div class="data-table-container top-software-enhanced">
       <div class="table-header">
         <h3 class="table-title">
           <i class="fas fa-laptop-code"></i> 
-          Phần mềm phổ biến
+          Sản phẩm Bán chạy nhất
         </h3>
         <div class="table-controls">
+          <div class="view-toggle">
+            <button class="toggle-btn active" data-view="bestseller" title="Sắp xếp theo số lượng bán">
+              <i class="fas fa-fire"></i>
+            </button>
+            <button class="toggle-btn" data-view="revenue" title="Sắp xếp theo doanh thu">
+              <i class="fas fa-dollar-sign"></i>
+            </button>
+            <button class="toggle-btn" data-view="growth" title="Sắp xếp theo tăng trưởng">
+              <i class="fas fa-trending-up"></i>
+            </button>
+          </div>
           <button class="table-btn" onclick="exportSoftwareData()">
             <i class="fas fa-download"></i> Xuất
           </button>
         </div>
       </div>
       <div class="table-content">
-        <table class="data-table" id="top-software-table">
+        <div class="table-summary">
+          <div class="summary-stats">
+            <div class="stat-item">
+              <span class="stat-label">Tổng sản phẩm:</span>
+              <span class="stat-value" id="total-products">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Sản phẩm hót nhất:</span>
+              <span class="stat-value" id="hottest-product">N/A</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Top 3 chiếm:</span>
+              <span class="stat-value" id="top3-market-share">0%</span>
+            </div>
+          </div>
+        </div>
+        <table class="data-table enhanced-table" id="top-software-table">
           <thead>
             <tr>
-              <th>Phần mềm</th>
-              <th>Số lượng</th>
-              <th>Doanh thu</th>
-              <th>Tỷ lệ</th>
+              <th class="rank-col">#</th>
+              <th class="product-col">Sản phẩm / Phần mềm</th>
+              <th class="quantity-col">Số bán</th>
+              <th class="revenue-col">Doanh thu</th>
+              <th class="avg-price-col">Giá TB</th>
+              <th class="market-share-col">Thị phần</th>
+              <th class="performance-col">Hiệu suất</th>
+              <th class="action-col">Chi tiết</th>
             </tr>
           </thead>
           <tbody id="top-software-body">
             <tr>
-              <td colspan="4" class="loading-row">
+              <td colspan="8" class="loading-row">
                 <i class="fas fa-spinner fa-spin"></i> Đang tải...
               </td>
             </tr>
