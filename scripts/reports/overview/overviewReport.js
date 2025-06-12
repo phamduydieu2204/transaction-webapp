@@ -3307,9 +3307,9 @@ function updatePendingTable(tableId, transactions, type) {
 }
 
 /**
- * Calculate customer analytics
+ * Calculate customer analytics (normalized data version)
  */
-function calculateCustomerAnalytics(transactions) {
+function calculateNormalizedCustomerAnalytics(transactions) {
     const customerMap = new Map();
     
     transactions.forEach(rawTransaction => {
@@ -3381,9 +3381,9 @@ function calculateCustomerAnalytics(transactions) {
 }
 
 /**
- * Calculate product analytics
+ * Calculate product analytics (normalized data version)
  */
-function calculateProductAnalytics(transactions) {
+function calculateNormalizedProductAnalytics(transactions) {
     const productMap = new Map();
     
     transactions.forEach(rawTransaction => {
@@ -3594,6 +3594,8 @@ window.updatePendingTransactionsSection = updatePendingTransactionsSection;
 window.updatePendingTable = updatePendingTable;
 window.calculateCustomerAnalytics = calculateCustomerAnalytics;
 window.calculateProductAnalytics = calculateProductAnalytics;
+window.calculateNormalizedCustomerAnalytics = calculateNormalizedCustomerAnalytics;
+window.calculateNormalizedProductAnalytics = calculateNormalizedProductAnalytics;
 window.updateStatusBreakdownWithRefund = updateStatusBreakdownWithRefund;
 window.updateChartPeriod = updateChartPeriod;
 window.calculateRevenueByStatus = calculateRevenueByStatus;
@@ -3636,7 +3638,7 @@ function viewCustomerDetails(customerName) {
     return t && t.customerName === customerName;
   });
   
-  const customerAnalytics = calculateCustomerAnalytics(transactions);
+  const customerAnalytics = calculateNormalizedCustomerAnalytics(transactions);
   const customerStats = customerAnalytics.find(c => c.name === customerName);
   
   if (!customerStats) {
@@ -3648,13 +3650,13 @@ function viewCustomerDetails(customerName) {
   const info = `
     Thông tin chi tiết: ${customerName}
     
-    💰 Tổng doanh thu: ${formatRevenue(customerStats.totalRevenue)}
+    💰 Tổng doanh thu: ${formatRevenue(customerStats.revenue || customerStats.totalRevenue || 0)}
     📋 Số giao dịch: ${customerStats.transactionCount}
-    📈 Giá trị trung bình: ${formatRevenue(customerStats.avgTransactionValue)}
-    📅 Khách hàng từ: ${customerStats.firstTransaction.toLocaleDateString('vi-VN')}
-    ⏰ Giao dịch cuối: ${customerStats.lastTransaction.toLocaleDateString('vi-VN')}
-    📈 Tăng trưởng: ${customerStats.growthRate.toFixed(1)}%
-    🎯 Tần suất: ${customerStats.frequency.toFixed(1)} giao dịch/tháng
+    📈 Giá trị trung bình: ${formatRevenue(customerStats.averageOrderValue || customerStats.avgTransactionValue || 0)}
+    📅 Khách hàng từ: ${customerStats.firstTransaction ? new Date(customerStats.firstTransaction).toLocaleDateString('vi-VN') : 'N/A'}
+    ⏰ Giao dịch cuối: ${customerStats.lastTransaction ? new Date(customerStats.lastTransaction).toLocaleDateString('vi-VN') : 'N/A'}
+    📈 Tăng trưởng: ${(customerStats.growthRate || 0).toFixed(1)}%
+    🎯 Tần suất: ${(customerStats.frequency || 0).toFixed(1)} giao dịch/tháng
     ⭐ Trạng thái: ${customerStats.isVIP ? 'VIP' : 'Thường'} | ${customerStats.isActive ? 'Hoạt động' : 'Ngừng hoạt động'}
   `;
   
@@ -3674,7 +3676,7 @@ function viewProductDetails(productName) {
     return t && t.softwareName === productName;
   });
   
-  const productAnalytics = calculateProductAnalytics(transactions);
+  const productAnalytics = calculateNormalizedProductAnalytics(transactions);
   const productStats = productAnalytics.find(p => p.name === productName);
   
   if (!productStats) {
@@ -3686,14 +3688,14 @@ function viewProductDetails(productName) {
   const info = `
     Chi tiết sản phẩm: ${productName}
     
-    📺 Số lượng bán: ${productStats.totalQuantity}
-    💰 Tổng doanh thu: ${formatRevenue(productStats.totalRevenue)}
-    💲 Giá trung bình: ${formatRevenue(productStats.avgPrice)}
-    📈 Tăng trưởng: ${productStats.growthRate.toFixed(1)}%
-    🎢 Thị phần: ${productStats.marketShare.toFixed(1)}%
-    🚀 Tốc độ bán: ${productStats.salesVelocity.toFixed(1)} sản phẩm/tháng
-    📅 Bán từ: ${productStats.firstSale.toLocaleDateString('vi-VN')}
-    ⏰ Bán cuối: ${productStats.lastSale.toLocaleDateString('vi-VN')}
+    📺 Số lượng bán: ${productStats.transactionCount || productStats.totalQuantity || 0}
+    💰 Tổng doanh thu: ${formatRevenue(productStats.revenue || productStats.totalRevenue || 0)}
+    💲 Giá trung bình: ${formatRevenue(productStats.averageRevenue || productStats.avgPrice || 0)}
+    📈 Tăng trưởng: ${(productStats.growthRate || 0).toFixed(1)}%
+    🎢 Thị phần: ${(productStats.marketShare || 0).toFixed(1)}%
+    🚀 Tốc độ bán: ${(productStats.salesVelocity || 0).toFixed(1)} sản phẩm/tháng
+    📅 Bán từ: ${productStats.firstSale ? new Date(productStats.firstSale).toLocaleDateString('vi-VN') : 'N/A'}
+    ⏰ Bán cuối: ${productStats.lastSale ? new Date(productStats.lastSale).toLocaleDateString('vi-VN') : 'N/A'}
     ⭐ Trạng thái: ${productStats.isBestseller ? 'Bán chạy' : 'Bình thường'} | ${productStats.isHot ? 'Hót' : productStats.isSlow ? 'Chậm' : 'Vừa'}
   `;
   
