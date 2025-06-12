@@ -11,6 +11,7 @@ import { showError, refreshCurrentReport, exportCurrentReport } from './core/rep
 // Import report modules
 import { loadOverviewReport } from './overview/overviewReport.js';
 import { loadRevenueAnalysis } from './revenue/revenueAnalysis.js';
+import { loadExpenseAnalysis } from './expense/expenseAnalysis.js';
 import { loadCustomerReport } from './customer/customerReport.js';
 import { loadRenewalReport } from './renewal/renewalReport.js';
 import { loadEmployeeReport } from './employee/employeeReport.js';
@@ -115,7 +116,12 @@ async function loadReport(reportType) {
         await loadRevenueAnalysis(revenueOptions);
         break;
       case 'expense':
-        await loadExpenseReport();
+        // Pass current date range and period
+        const expenseOptions = {
+          dateRange: window.globalFilters?.dateRange || null,
+          period: window.globalFilters?.period || 'this_month'
+        };
+        await loadExpenseAnalysis(expenseOptions);
         break;
       case 'customer':
         await loadCustomerReport();
@@ -143,22 +149,6 @@ async function loadReport(reportType) {
   }
 }
 
-/**
- * Load expense report (placeholder for now)
- */
-async function loadExpenseReport() {
-  console.log('💸 Loading expense report');
-  // Expense report functionality will be implemented in separate module
-  const container = document.getElementById('report-expense');
-  if (container) {
-    container.innerHTML = `
-      <div class="report-placeholder">
-        <h3>📊 Báo cáo Chi phí</h3>
-        <p>Báo cáo chi phí đang được phát triển...</p>
-      </div>
-    `;
-  }
-}
 
 /**
  * Load software report (placeholder for now)

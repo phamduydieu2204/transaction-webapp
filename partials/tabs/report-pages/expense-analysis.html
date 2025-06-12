@@ -1,0 +1,362 @@
+<!-- Expense Analysis Report Template -->
+<div class="expense-analysis-container">
+  <!-- Header Section -->
+  <div class="report-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h2 class="report-title">
+          <i class="fas fa-wallet"></i>
+          Phân tích Chi phí Chi tiết
+        </h2>
+        <p class="report-subtitle">Phân tích xu hướng, danh mục và kiểm soát chi phí</p>
+      </div>
+      <div class="header-actions">
+        <button class="header-btn" onclick="refreshExpenseAnalysis()">
+          <i class="fas fa-sync-alt"></i> Làm mới
+        </button>
+        <button class="header-btn" onclick="exportExpenseReport()">
+          <i class="fas fa-download"></i> Xuất báo cáo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expense KPI Cards -->
+  <div class="expense-kpi-grid">
+    <div class="kpi-card total-expense">
+      <div class="kpi-icon">
+        <i class="fas fa-credit-card"></i>
+      </div>
+      <div class="kpi-content">
+        <h3 class="kpi-label">Tổng Chi phí</h3>
+        <p class="kpi-value" id="total-expense-value">0 ₫</p>
+        <span class="kpi-change" id="total-expense-change">+0%</span>
+      </div>
+    </div>
+
+    <div class="kpi-card avg-expense">
+      <div class="kpi-icon">
+        <i class="fas fa-receipt"></i>
+      </div>
+      <div class="kpi-content">
+        <h3 class="kpi-label">Chi phí TB/Khoản</h3>
+        <p class="kpi-value" id="avg-expense-value">0 ₫</p>
+        <span class="kpi-change" id="avg-expense-change">+0%</span>
+      </div>
+    </div>
+
+    <div class="kpi-card expense-ratio">
+      <div class="kpi-icon">
+        <i class="fas fa-percentage"></i>
+      </div>
+      <div class="kpi-content">
+        <h3 class="kpi-label">Tỷ lệ Chi phí/Doanh thu</h3>
+        <p class="kpi-value" id="expense-ratio-value">0%</p>
+        <span class="kpi-period" id="expense-ratio-period">so với doanh thu</span>
+      </div>
+    </div>
+
+    <div class="kpi-card largest-expense">
+      <div class="kpi-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <div class="kpi-content">
+        <h3 class="kpi-label">Chi phí Lớn nhất</h3>
+        <p class="kpi-value" id="largest-expense">0 ₫</p>
+        <span class="kpi-detail" id="largest-expense-detail">N/A</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="charts-grid">
+    <!-- Expense Trend Chart -->
+    <div class="chart-container expense-trend-chart">
+      <div class="chart-header">
+        <h3 class="chart-title">
+          <i class="fas fa-line-chart"></i>
+          Xu hướng Chi phí
+        </h3>
+        <div class="chart-controls">
+          <div class="period-selector">
+            <button class="period-btn active" data-period="7days">7 ngày</button>
+            <button class="period-btn" data-period="30days">30 ngày</button>
+            <button class="period-btn" data-period="90days">90 ngày</button>
+            <button class="period-btn" data-period="year">Năm</button>
+          </div>
+        </div>
+      </div>
+      <div class="chart-content">
+        <canvas id="expense-trend-chart" width="400" height="200"></canvas>
+      </div>
+    </div>
+
+    <!-- Expense by Category -->
+    <div class="chart-container expense-category-chart">
+      <div class="chart-header">
+        <h3 class="chart-title">
+          <i class="fas fa-pie-chart"></i>
+          Chi phí theo Danh mục
+        </h3>
+        <div class="chart-controls">
+          <button class="toggle-btn" onclick="toggleExpenseChartView('category', 'pie')">
+            <i class="fas fa-chart-pie"></i>
+          </button>
+          <button class="toggle-btn" onclick="toggleExpenseChartView('category', 'bar')">
+            <i class="fas fa-chart-bar"></i>
+          </button>
+        </div>
+      </div>
+      <div class="chart-content">
+        <canvas id="expense-category-chart" width="400" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expense vs Budget Comparison -->
+  <div class="budget-comparison-container">
+    <div class="chart-container budget-vs-actual">
+      <div class="chart-header">
+        <h3 class="chart-title">
+          <i class="fas fa-balance-scale"></i>
+          So sánh Ngân sách vs Thực tế
+        </h3>
+        <div class="chart-controls">
+          <div class="view-selector">
+            <button class="view-btn active" data-view="monthly">Theo tháng</button>
+            <button class="view-btn" data-view="category">Theo danh mục</button>
+            <button class="view-btn" data-view="quarterly">Theo quý</button>
+          </div>
+        </div>
+      </div>
+      <div class="chart-content">
+        <canvas id="budget-comparison-chart" width="400" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analysis Tables -->
+  <div class="analysis-tables">
+    <!-- Top Expense Categories -->
+    <div class="table-container top-categories-expense">
+      <div class="table-header">
+        <h3 class="table-title">
+          <i class="fas fa-tags"></i>
+          Top Danh mục Chi phí
+        </h3>
+        <div class="table-controls">
+          <div class="view-selector">
+            <button class="view-btn active" data-view="amount">Số tiền</button>
+            <button class="view-btn" data-view="frequency">Tần suất</button>
+            <button class="view-btn" data-view="growth">Tăng trưởng</button>
+          </div>
+          <button class="table-btn" onclick="exportCategoryExpenseData()">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
+      </div>
+      <div class="table-content">
+        <table class="analysis-table" id="top-categories-expense-table">
+          <thead>
+            <tr>
+              <th class="rank-col">#</th>
+              <th class="category-col">Danh mục</th>
+              <th class="count-col">Số khoản</th>
+              <th class="amount-col">Tổng Chi phí</th>
+              <th class="avg-col">Giá trị TB</th>
+              <th class="percentage-col">% Tổng</th>
+              <th class="trend-col">Xu hướng</th>
+            </tr>
+          </thead>
+          <tbody id="categories-expense-tbody">
+            <tr>
+              <td colspan="7" class="loading-row">
+                <i class="fas fa-spinner fa-spin"></i> Đang tải...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Recurring vs One-time Expenses -->
+    <div class="table-container expense-types">
+      <div class="table-header">
+        <h3 class="table-title">
+          <i class="fas fa-repeat"></i>
+          Chi phí Định kỳ vs Một lần
+        </h3>
+        <div class="table-controls">
+          <div class="filter-selector">
+            <button class="filter-btn active" data-filter="all">Tất cả</button>
+            <button class="filter-btn" data-filter="recurring">Định kỳ</button>
+            <button class="filter-btn" data-filter="onetime">Một lần</button>
+          </div>
+          <button class="table-btn" onclick="exportExpenseTypesData()">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
+      </div>
+      <div class="table-content">
+        <table class="analysis-table" id="expense-types-table">
+          <thead>
+            <tr>
+              <th class="type-col">Loại</th>
+              <th class="description-col">Mô tả</th>
+              <th class="frequency-col">Tần suất</th>
+              <th class="amount-col">Số tiền</th>
+              <th class="next-col">Kỳ tiếp theo</th>
+              <th class="action-col">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="expense-types-tbody">
+            <tr>
+              <td colspan="6" class="loading-row">
+                <i class="fas fa-spinner fa-spin"></i> Đang tải...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expense Control Dashboard -->
+  <div class="expense-control-dashboard">
+    <div class="dashboard-header">
+      <h3 class="dashboard-title">
+        <i class="fas fa-shield-alt"></i>
+        Kiểm soát Chi phí
+      </h3>
+    </div>
+    
+    <div class="control-grid">
+      <!-- Budget Alerts -->
+      <div class="control-card budget-alerts">
+        <div class="card-header">
+          <h4 class="card-title">
+            <i class="fas fa-bell"></i>
+            Cảnh báo Ngân sách
+          </h4>
+        </div>
+        <div class="card-content">
+          <div class="alert-list" id="budget-alerts-list">
+            <div class="alert-item">
+              <div class="alert-icon warning">
+                <i class="fas fa-exclamation-triangle"></i>
+              </div>
+              <div class="alert-content">
+                <div class="alert-title">Đang tải...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cost Optimization -->
+      <div class="control-card cost-optimization">
+        <div class="card-header">
+          <h4 class="card-title">
+            <i class="fas fa-chart-line"></i>
+            Tối ưu Chi phí
+          </h4>
+        </div>
+        <div class="card-content">
+          <div class="optimization-list" id="optimization-suggestions">
+            <div class="optimization-item">
+              <div class="optimization-icon">
+                <i class="fas fa-lightbulb"></i>
+              </div>
+              <div class="optimization-content">
+                <div class="optimization-title">Đang phân tích...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expense Forecasting -->
+      <div class="control-card expense-forecast">
+        <div class="card-header">
+          <h4 class="card-title">
+            <i class="fas fa-crystal-ball"></i>
+            Dự báo Chi phí
+          </h4>
+        </div>
+        <div class="card-content">
+          <div class="forecast-metrics">
+            <div class="forecast-item">
+              <span class="forecast-label">Chi phí dự kiến tháng tới:</span>
+              <span class="forecast-value" id="next-month-forecast">0 ₫</span>
+            </div>
+            <div class="forecast-item">
+              <span class="forecast-label">Xu hướng:</span>
+              <span class="forecast-trend" id="expense-trend-direction">→</span>
+            </div>
+            <div class="forecast-item">
+              <span class="forecast-label">Mức độ tin cậy:</span>
+              <span class="forecast-confidence" id="forecast-confidence">0%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expense Insights -->
+      <div class="control-card expense-insights">
+        <div class="card-header">
+          <h4 class="card-title">
+            <i class="fas fa-brain"></i>
+            Thông tin Chi tiết
+          </h4>
+        </div>
+        <div class="card-content">
+          <div class="insights-list">
+            <div class="insight-item saving-opportunity">
+              <div class="insight-icon">
+                <i class="fas fa-piggy-bank"></i>
+              </div>
+              <div class="insight-content">
+                <h5 class="insight-title">Cơ hội Tiết kiệm</h5>
+                <p class="insight-value" id="saving-opportunity-value">N/A</p>
+                <span class="insight-desc" id="saving-opportunity-desc">Đang phân tích...</span>
+              </div>
+            </div>
+
+            <div class="insight-item spending-pattern">
+              <div class="insight-icon">
+                <i class="fas fa-chart-area"></i>
+              </div>
+              <div class="insight-content">
+                <h5 class="insight-title">Mô hình Chi tiêu</h5>
+                <p class="insight-value" id="spending-pattern-value">N/A</p>
+                <span class="insight-desc" id="spending-pattern-desc">Đang phân tích...</span>
+              </div>
+            </div>
+
+            <div class="insight-item cost-efficiency">
+              <div class="insight-icon">
+                <i class="fas fa-tachometer-alt"></i>
+              </div>
+              <div class="insight-content">
+                <h5 class="insight-title">Hiệu quả Chi phí</h5>
+                <p class="insight-value" id="cost-efficiency-value">N/A</p>
+                <span class="insight-desc" id="cost-efficiency-desc">Đang phân tích...</span>
+              </div>
+            </div>
+
+            <div class="insight-item expense-risk">
+              <div class="insight-icon">
+                <i class="fas fa-shield-alt"></i>
+              </div>
+              <div class="insight-content">
+                <h5 class="insight-title">Rủi ro Chi phí</h5>
+                <p class="insight-value" id="expense-risk-value">N/A</p>
+                <span class="insight-desc" id="expense-risk-desc">Đang phân tích...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
