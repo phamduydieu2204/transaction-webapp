@@ -38,8 +38,8 @@ export const TRANSACTION_FIELD_MAPPING = {
   // Column J: Số thiết bị
   deviceCount: ['Số thiết bị', 'soThietBi', 'devices', 'deviceCount'],
   
-  // Column K: Tên phần mềm
-  softwareName: ['Tên phần mềm', 'tenPhanMem', 'software', 'product', 'softwareName'],
+  // Column K: Tên phần mềm (prioritize Column T: Tên chuẩn)
+  softwareName: ['Tên chuẩn', 'tenChuan', 'standardName', 'Tên phần mềm', 'tenPhanMem', 'software', 'product', 'softwareName'],
   
   // Column L: Gói phần mềm
   softwarePackage: ['Gói phần mềm', 'goiPhanMem', 'package', 'softwarePackage'],
@@ -87,28 +87,28 @@ export function getTransactionField(transaction, fieldName) {
   const possibleKeys = TRANSACTION_FIELD_MAPPING[fieldName];
   if (!possibleKeys) return null;
   
-  // Debug log for customer and email fields - disabled
-  // if (fieldName === 'customerName' || fieldName === 'email') {
-  //   console.log(`🔍 Looking for ${fieldName}:`, {
-  //     possibleKeys,
-  //     availableKeys: Object.keys(transaction),
-  //     transaction: transaction
-  //   });
-  // }
+  // Debug log for customer, email, and softwareName fields
+  if (fieldName === 'customerName' || fieldName === 'email' || fieldName === 'softwareName') {
+    console.log(`🔍 Looking for ${fieldName}:`, {
+      possibleKeys,
+      availableKeys: Object.keys(transaction),
+      transaction: transaction
+    });
+  }
   
   // Try each possible key until we find a value
   for (const key of possibleKeys) {
     if (transaction.hasOwnProperty(key) && transaction[key] !== undefined && transaction[key] !== null) {
-      // if (fieldName === 'customerName' || fieldName === 'email') {
-      //   console.log(`✅ Found ${fieldName} with key "${key}":`, transaction[key]);
-      // }
+      if (fieldName === 'customerName' || fieldName === 'email' || fieldName === 'softwareName') {
+        console.log(`✅ Found ${fieldName} with key "${key}":`, transaction[key]);
+      }
       return transaction[key];
     }
   }
   
-  // if (fieldName === 'customerName' || fieldName === 'email') {
-  //   console.log(`❌ No value found for ${fieldName}`);
-  // }
+  if (fieldName === 'customerName' || fieldName === 'email' || fieldName === 'softwareName') {
+    console.log(`❌ No value found for ${fieldName}`);
+  }
   
   return null;
 }

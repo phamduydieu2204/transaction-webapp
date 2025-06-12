@@ -1900,11 +1900,12 @@ function calculateProductAnalytics(transactions) {
   let totalRevenue = 0;
   
   // Group and analyze by product
-  transactions.forEach(transaction => {
-    const product = transaction.software || transaction.tenSanPham || transaction.product || 'Không xác định';
-    const revenue = parseFloat(transaction.revenue || transaction.doanhThu || transaction.amount) || 0;
+  transactions.forEach(rawTransaction => {
+    const transaction = normalizeTransaction(rawTransaction);
+    const product = getTransactionField(transaction, 'softwareName') || 'Không xác định';
+    const revenue = getTransactionField(transaction, 'revenue') || 0;
     const quantity = parseFloat(transaction.quantity || transaction.soLuong) || 1; // Default 1 if not specified
-    const transactionDate = new Date(transaction.ngayGiaoDich || transaction.date);
+    const transactionDate = new Date(getTransactionField(transaction, 'transactionDate') || transaction.ngayGiaoDich || transaction.date);
     
     totalQuantity += quantity;
     totalRevenue += revenue;
@@ -3541,15 +3542,18 @@ function exportNeedsDelivery() {
     // Prepare CSV data
     const csvData = [
       ['Ngày đặt hàng', 'Khách hàng', 'Sản phẩm', 'Số tiền (VNĐ)', 'Ngày chờ', 'Trạng thái', 'Ghi chú'],
-      ...needsDelivery.map(t => [
-        new Date(t.ngayGiaoDich || t.date).toLocaleDateString('vi-VN'),
-        t.tenKhachHang || t.customer || 'N/A',
-        t.tenSanPham || t.software || t.product || 'N/A',
-        parseFloat(t.doanhThu || t.revenue || t.amount) || 0,
-        t.waitingDays,
-        t.isUrgent ? 'Gấp' : 'Bình thường',
-        t.isUrgent ? 'Cần giao gấp - quá 3 ngày' : 'Trong thời hạn'
-      ])
+      ...needsDelivery.map(rawT => {
+        const t = normalizeTransaction(rawT);
+        return [
+        new Date(t.transactionDate || rawT.ngayGiaoDich || rawT.date).toLocaleDateString('vi-VN'),
+        t.customerName || 'N/A',
+        t.softwareName || 'N/A',
+        t.revenue || 0,
+        rawT.waitingDays,
+        rawT.isUrgent ? 'Gấp' : 'Bình thường',
+        rawT.isUrgent ? 'Cần giao gấp - quá 3 ngày' : 'Trong thời hạn'
+      ]
+      })
     ];
     
     const csvString = csvData.map(row => row.join(',')).join('\n');
@@ -3588,15 +3592,18 @@ function exportNeedsPayment() {
     // Prepare CSV data
     const csvData = [
       ['Ngày giao hàng', 'Khách hàng', 'Sản phẩm', 'Số tiền (VNĐ)', 'Ngày quá hạn', 'Trạng thái', 'Ghi chú'],
-      ...needsPayment.map(t => [
-        t.deliveryDate ? new Date(t.deliveryDate).toLocaleDateString('vi-VN') : 'N/A',
-        t.tenKhachHang || t.customer || 'N/A',
-        t.tenSanPham || t.software || t.product || 'N/A',
-        parseFloat(t.doanhThu || t.revenue || t.amount) || 0,
-        t.overdueDays,
-        t.isOverdue ? 'Quá hạn' : 'Trong hạn',
-        t.isOverdue ? 'Cần liên hệ gấp' : 'Theo dõi bình thường'
-      ])
+      ...needsPayment.map(rawT => {
+        const t = normalizeTransaction(rawT);
+        return [
+        rawT.deliveryDate ? new Date(rawT.deliveryDate).toLocaleDateString('vi-VN') : 'N/A',
+        t.customerName || 'N/A',
+        t.softwareName || 'N/A',
+        t.revenue || 0,
+        rawT.overdueDays,
+        rawT.isOverdue ? 'Quá hạn' : 'Trong hạn',
+        rawT.isOverdue ? 'Cần liên hệ gấp' : 'Theo dõi bình thường'
+      ]
+      })
     ];
     
     const csvString = csvData.map(row => row.join(',')).join('\n');
