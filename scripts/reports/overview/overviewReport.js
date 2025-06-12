@@ -1121,7 +1121,8 @@ function renderStatusDistributionChart(transactions) {
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false,
+      maintainAspectRatio: true,
+      aspectRatio: 1, // Force 1:1 aspect ratio for perfect circle
       cutout: '30%', // Further reduced cutout for maximum visibility of small segments
       layout: {
         padding: {
@@ -1275,7 +1276,7 @@ function renderStatusDistributionChart(transactions) {
           }
         }
       },
-      // Plugin to ensure minimum visibility for small segments
+      // Plugin to ensure minimum visibility and full circle display
       plugins: [
         {
           id: 'minSegmentAngle',
@@ -1292,10 +1293,40 @@ function renderStatusDistributionChart(transactions) {
               }
             });
           }
+        },
+        {
+          id: 'forceFullCircle',
+          beforeDraw: function(chart) {
+            // Force chart to display full 360 degrees
+            const chartArea = chart.chartArea;
+            if (chartArea) {
+              const ctx = chart.ctx;
+              ctx.save();
+              
+              // Ensure the chart uses full canvas area
+              const size = Math.min(chartArea.width, chartArea.height);
+              const centerX = chartArea.left + chartArea.width / 2;
+              const centerY = chartArea.top + chartArea.height / 2;
+              
+              // Force circular constraint
+              chart.options.circumference = Math.PI * 2;
+              chart.options.rotation = 0;
+              
+              ctx.restore();
+            }
+          }
         }
       ]
     }
   });
+  
+  // Force chart to render with full circle
+  setTimeout(() => {
+    if (window.statusDistributionChart) {
+      window.statusDistributionChart.resize();
+      window.statusDistributionChart.update('none');
+    }
+  }, 100);
   
   // Update the detailed status table
   updateStatusDetailTable(statusBreakdown);

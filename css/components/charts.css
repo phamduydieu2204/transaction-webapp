@@ -147,16 +147,19 @@ canvas {
 }
 
 .status-chart-wrapper {
-  flex: 0 0 320px; /* Fixed width for pie chart */
-  height: 320px; /* Fixed height to prevent overflow */
+  flex: 0 0 340px; /* Increased width for full circle */
+  height: 340px; /* Increased height for full circle */
   position: relative;
+  overflow: visible; /* Allow chart to display fully */
 }
 
 .status-chart-wrapper canvas {
-  max-width: 100% !important;
-  max-height: 100% !important;
-  width: 300px !important;
-  height: 300px !important;
+  max-width: none !important;
+  max-height: none !important;
+  width: 320px !important;
+  height: 320px !important;
+  display: block !important;
+  margin: 0 auto !important;
 }
 
 .status-detail-wrapper {
@@ -226,13 +229,16 @@ canvas {
   .status-chart-wrapper {
     flex: none;
     width: 100%;
-    height: 280px;
+    height: 300px;
     margin: 0 auto;
+    overflow: visible;
   }
   
   .status-chart-wrapper canvas {
-    width: 250px !important;
-    height: 250px !important;
+    width: 280px !important;
+    height: 280px !important;
+    max-width: none !important;
+    max-height: none !important;
   }
   
   .trend-chart {
