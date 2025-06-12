@@ -966,8 +966,6 @@ function renderRevenueStatusChart(transactions) {
     }
   });
   
-  // Add chart period controls event listeners
-  addChartPeriodControls();
 }
 
 /**
@@ -1553,76 +1551,7 @@ function getPeriodDisplayName(period) {
   return periodNames[period] || period;
 }
 
-/**
- * Add chart period controls event listeners
- */
-function addChartPeriodControls() {
-  const chartButtons = document.querySelectorAll('.chart-btn[data-period]');
-  
-  chartButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      // Remove active class from all buttons
-      chartButtons.forEach(btn => btn.classList.remove('active'));
-      
-      // Add active class to clicked button
-      this.classList.add('active');
-      
-      // Get period and update chart
-      const period = this.getAttribute('data-period');
-      updateChartPeriod(period);
-    });
-  });
-}
 
-/**
- * Update chart based on selected period
- * @param {string} period - Selected period (7days, 30days, 90days)
- */
-function updateChartPeriod(period) {
-  console.log('📊 Updating chart for period:', period);
-  
-  // Get current transactions
-  const transactions = window.transactionList || [];
-  
-  // Filter transactions based on period
-  let filteredTransactions;
-  const now = new Date();
-  
-  switch (period) {
-    case '7days':
-      const sevenDaysAgo = new Date(now);
-      sevenDaysAgo.setDate(now.getDate() - 7);
-      filteredTransactions = transactions.filter(t => {
-        const transactionDate = new Date(t.ngayGiaoDich || t.date);
-        return transactionDate >= sevenDaysAgo;
-      });
-      break;
-      
-    case '30days':
-      const thirtyDaysAgo = new Date(now);
-      thirtyDaysAgo.setDate(now.getDate() - 30);
-      filteredTransactions = transactions.filter(t => {
-        const transactionDate = new Date(t.ngayGiaoDich || t.date);
-        return transactionDate >= thirtyDaysAgo;
-      });
-      break;
-      
-    case '90days':
-      const ninetyDaysAgo = new Date(now);
-      ninetyDaysAgo.setDate(now.getDate() - 90);
-      filteredTransactions = transactions.filter(t => {
-        const transactionDate = new Date(t.ngayGiaoDich || t.date);
-        return transactionDate >= ninetyDaysAgo;
-      });
-      break;
-      
-    default:
-      filteredTransactions = transactions;
-  }
-  
-  // Re-render chart with filtered data
-  renderRevenueStatusChart(filteredTransactions);
-}
 
 // Legacy function - kept for backward compatibility
 function getStatusDistribution(transactions) {
