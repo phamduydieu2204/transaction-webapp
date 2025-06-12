@@ -1,7 +1,8 @@
 // Software Account Management Module
 // Xử lý dữ liệu và logic cho trang quản lý tài khoản phần mềm
 
-import { formatDate, formatDateTime } from '../../formatDate.js';
+import { formatDate } from '../../formatDate.js';
+import { formatDateTime } from '../../formatDateTime.js';
 import { formatCurrency } from '../../statistics/formatters.js';
 
 export class SoftwareManagement {
