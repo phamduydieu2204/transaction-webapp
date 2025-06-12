@@ -978,8 +978,8 @@ function renderRevenueStatusChart(transactions) {
           afterDataLimits: function(scale) {
             const originalRange = scale.max - scale.min;
             
-            // Calculate minimum visible bar height (at least 50k VND)
-            const minVisibleValue = 50000;
+            // Calculate minimum visible bar height (at least 50 units = 50k VND)
+            const minVisibleValue = 50;
             
             // If range is too small, expand it
             if (originalRange < minVisibleValue * 10) {
@@ -991,7 +991,7 @@ function renderRevenueStatusChart(transactions) {
             
             // Add substantial padding for small values
             const range = scale.max - scale.min;
-            const padding = Math.max(range * 0.15, 200000); // Increased padding
+            const padding = Math.max(range * 0.15, 200); // Increased padding (200 units = 200k VND)
             scale.max += padding;
             scale.min -= padding;
             
