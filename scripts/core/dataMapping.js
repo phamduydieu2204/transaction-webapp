@@ -87,28 +87,28 @@ export function getTransactionField(transaction, fieldName) {
   const possibleKeys = TRANSACTION_FIELD_MAPPING[fieldName];
   if (!possibleKeys) return null;
   
-  // Debug log for customer and email fields
-  if (fieldName === 'customerName' || fieldName === 'email') {
-    console.log(`🔍 Looking for ${fieldName}:`, {
-      possibleKeys,
-      availableKeys: Object.keys(transaction),
-      transaction: transaction
-    });
-  }
+  // Debug log for customer and email fields - disabled
+  // if (fieldName === 'customerName' || fieldName === 'email') {
+  //   console.log(`🔍 Looking for ${fieldName}:`, {
+  //     possibleKeys,
+  //     availableKeys: Object.keys(transaction),
+  //     transaction: transaction
+  //   });
+  // }
   
   // Try each possible key until we find a value
   for (const key of possibleKeys) {
     if (transaction.hasOwnProperty(key) && transaction[key] !== undefined && transaction[key] !== null) {
-      if (fieldName === 'customerName' || fieldName === 'email') {
-        console.log(`✅ Found ${fieldName} with key "${key}":`, transaction[key]);
-      }
+      // if (fieldName === 'customerName' || fieldName === 'email') {
+      //   console.log(`✅ Found ${fieldName} with key "${key}":`, transaction[key]);
+      // }
       return transaction[key];
     }
   }
   
-  if (fieldName === 'customerName' || fieldName === 'email') {
-    console.log(`❌ No value found for ${fieldName}`);
-  }
+  // if (fieldName === 'customerName' || fieldName === 'email') {
+  //   console.log(`❌ No value found for ${fieldName}`);
+  // }
   
   return null;
 }
@@ -156,15 +156,15 @@ export function normalizeTransaction(rawTransaction) {
     normalized.endDate = normalizeDate(normalized.endDate);
   }
   
-  // Debug log for customer data
-  if (normalized.customerName || normalized.email) {
-    console.log('🔍 Normalized transaction:', {
-      customerName: normalized.customerName,
-      email: normalized.email,
-      revenue: normalized.revenue,
-      originalData: rawTransaction
-    });
-  }
+  // Debug log for customer data - disabled
+  // if (normalized.customerName || normalized.email) {
+  //   console.log('🔍 Normalized transaction:', {
+  //     customerName: normalized.customerName,
+  //     email: normalized.email,
+  //     revenue: normalized.revenue,
+  //     originalData: rawTransaction
+  //   });
+  // }
   
   return normalized;
 }

@@ -2223,18 +2223,20 @@ function calculateCustomerAnalytics(transactions) {
     const t = normalizeTransaction(rawTransaction);
     if (!t) return;
     
-    // Use email as unique identifier, display name as label
-    const customerEmail = t.email || 'no-email@unknown.com';
+    // Use email as unique identifier if available, otherwise fallback to customerName
+    const customerEmail = t.email;
     const customerName = t.customerName || 'Không xác định';
+    const customerKey = customerEmail || customerName || 'unknown-customer';
     const revenue = t.revenue || 0;
     const transactionDate = new Date(t.transactionDate);
     
     totalRevenue += revenue;
     
-    if (!customerStats[customerEmail]) {
-      customerStats[customerEmail] = {
-        email: customerEmail,
+    if (!customerStats[customerKey]) {
+      customerStats[customerKey] = {
+        email: customerEmail || null,
         name: customerName,
+        key: customerKey,
         totalRevenue: 0,
         transactionCount: 0,
         transactions: [],
@@ -2243,7 +2245,7 @@ function calculateCustomerAnalytics(transactions) {
       };
     }
     
-    const customerData = customerStats[customerEmail];
+    const customerData = customerStats[customerKey];
     // Update display name in case it changed
     if (customerName !== 'Không xác định') {
       customerData.name = customerName;
@@ -2445,7 +2447,7 @@ function renderEnhancedCustomerTable(customers, totalRevenue) {
           </div>
         </td>
         <td class="action-cell">
-          <button class="action-btn-small details" onclick="viewCustomerDetails('${customer.email || customer.name}')" title="Xem chi tiết khách hàng">
+          <button class="action-btn-small details" onclick="viewCustomerDetails('${customer.key || customer.email || customer.name}')" title="Xem chi tiết khách hàng">
             <i class="fas fa-user-circle"></i>
           </button>
         </td>
@@ -3336,19 +3338,21 @@ function calculateNormalizedCustomerAnalytics(transactions) {
         const t = normalizeTransaction(rawTransaction);
         if (!t) return;
         
-        // Use email as unique identifier, display name as label
-        const customerEmail = t.email || 'no-email@unknown.com';
+        // Use email as unique identifier if available, otherwise fallback to customerName
+        const customerEmail = t.email;
         const customerName = t.customerName || 'Không xác định';
+        const customerKey = customerEmail || customerName || 'unknown-customer';
         const revenue = t.revenue || 0;
         const status = t.transactionType;
         const softwareName = t.softwareName || '';
         const transactionDate = t.transactionDate || '';
         
-        // Use email as key but store display name
-        if (!customerMap.has(customerEmail)) {
-            customerMap.set(customerEmail, {
-                email: customerEmail,
-                name: customerName, // Display name
+        // Use customerKey (email or name) as unique identifier
+        if (!customerMap.has(customerKey)) {
+            customerMap.set(customerKey, {
+                email: customerEmail || null,
+                name: customerName,
+                key: customerKey,
                 revenue: 0,
                 transactionCount: 0,
                 products: new Set(),
@@ -3360,7 +3364,7 @@ function calculateNormalizedCustomerAnalytics(transactions) {
             });
         }
         
-        const customer = customerMap.get(customerEmail);
+        const customer = customerMap.get(customerKey);
         // Update display name in case it changed
         if (customerName !== 'Không xác định') {
             customer.name = customerName;
@@ -3667,7 +3671,7 @@ function viewCustomerDetails(customerIdentifier) {
   });
   
   const customerAnalytics = calculateNormalizedCustomerAnalytics(transactions);
-  const customerStats = customerAnalytics.find(c => c.email === customerIdentifier || c.name === customerIdentifier);
+  const customerStats = customerAnalytics.find(c => c.key === customerIdentifier || c.email === customerIdentifier || c.name === customerIdentifier);
   
   if (!customerStats) {
     alert('Không tìm thấy thông tin khách hàng');
@@ -3676,8 +3680,8 @@ function viewCustomerDetails(customerIdentifier) {
   
   // For now, show basic info in alert (can be enhanced to modal)
   const info = `
-    Thông tin chi tiết: ${customerStats.name}
-    📧 Email: ${customerStats.email}
+    Thông tin chi tiết: ${customerStats.name}${customerStats.email ? `
+    📧 Email: ${customerStats.email}` : ''}
     
     💰 Tổng doanh thu: ${formatRevenue(customerStats.revenue || customerStats.totalRevenue || 0)}
     📋 Số giao dịch: ${customerStats.transactionCount}
