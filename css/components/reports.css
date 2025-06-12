@@ -582,12 +582,6 @@
 }
 
 /* Status Detail Table */
-.status-detail-table-container {
-  background: #f8f9fa;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid #e9ecef;
-}
 
 .status-detail-table {
   width: 100%;

@@ -197,13 +197,6 @@ canvas {
   gap: 24px;
 }
 
-.status-detail-table-container {
-  background: #f8fafc;
-  border-radius: 12px;
-  padding: 20px;
-  border: 1px solid #e2e8f0;
-  overflow-x: auto;
-}
 
 .status-detail-table {
   width: 100%;
@@ -324,9 +317,6 @@ canvas {
     gap: 20px;
   }
   
-  .status-detail-table-container {
-    padding: 16px;
-  }
   
   .status-detail-table {
     font-size: 12px;
