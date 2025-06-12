@@ -10,7 +10,7 @@ import { showError, refreshCurrentReport, exportCurrentReport } from './core/rep
 
 // Import report modules
 import { loadOverviewReport } from './overview/overviewReport.js';
-import { loadRevenueReport } from './revenue/revenueReport.js';
+import { loadRevenueAnalysis } from './revenue/revenueAnalysis.js';
 import { loadCustomerReport } from './customer/customerReport.js';
 import { loadRenewalReport } from './renewal/renewalReport.js';
 import { loadEmployeeReport } from './employee/employeeReport.js';
@@ -107,7 +107,12 @@ async function loadReport(reportType) {
         await loadOverviewReport(options);
         break;
       case 'revenue':
-        await loadRevenueReport();
+        // Pass current date range and period
+        const revenueOptions = {
+          dateRange: window.globalFilters?.dateRange || null,
+          period: window.globalFilters?.period || 'this_month'
+        };
+        await loadRevenueAnalysis(revenueOptions);
         break;
       case 'expense':
         await loadExpenseReport();

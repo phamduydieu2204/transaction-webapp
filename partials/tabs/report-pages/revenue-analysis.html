@@ -1,0 +1,257 @@
+<!-- Revenue Analysis Report Template -->
+<div class="revenue-analysis-container">
+  <!-- Header Section -->
+  <div class="report-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h2 class="report-title">
+          <i class="fas fa-chart-line"></i>
+          Phân tích Doanh thu Chi tiết
+        </h2>
+        <p class="report-subtitle">Phân tích xu hướng, khách hàng và sản phẩm theo doanh thu</p>
+      </div>
+      <div class="header-actions">
+        <button class="header-btn" onclick="refreshRevenueAnalysis()">
+          <i class="fas fa-sync-alt"></i> Làm mới
+        </button>
+        <button class="header-btn" onclick="exportRevenueReport()">
+          <i class="fas fa-download"></i> Xuất báo cáo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revenue KPI Cards -->
+  <div class="revenue-kpi-grid">
+    <div class="kpi-card total-revenue">
+      <div class="kpi-icon">
+        <i class="fas fa-dollar-sign"></i>
+      </div>
+      <div class="kpi-content">
+        <h3 class="kpi-label">Tổng Doanh thu</h3>
+        <p class="kpi-value" id="total-revenue-value">0 ₫</p>
+        <span class="kpi-change" id="total-revenue-change">+0%</span>
+      </div>
+    </div>
+
+    <div class="kpi-card avg-revenue">
+      <div class="kpi-icon">
+        <i class="fas fa-chart-bar"></i>
+      </div>
+      <div class="kpi-content">
+        <h3 class="kpi-label">Doanh thu TB/Giao dịch</h3>
+        <p class="kpi-value" id="avg-transaction-value">0 ₫</p>
+        <span class="kpi-change" id="avg-transaction-change">+0%</span>
+      </div>
+    </div>
+
+    <div class="kpi-card growth-rate">
+      <div class="kpi-icon">
+        <i class="fas fa-trending-up"></i>
+      </div>
+      <div class="kpi-content">
+        <h3 class="kpi-label">Tốc độ Tăng trưởng</h3>
+        <p class="kpi-value" id="growth-rate-value">0%</p>
+        <span class="kpi-period" id="growth-period">so với kỳ trước</span>
+      </div>
+    </div>
+
+    <div class="kpi-card high-value">
+      <div class="kpi-icon">
+        <i class="fas fa-gem"></i>
+      </div>
+      <div class="kpi-content">
+        <h3 class="kpi-label">Giao dịch Cao nhất</h3>
+        <p class="kpi-value" id="highest-transaction">0 ₫</p>
+        <span class="kpi-detail" id="highest-transaction-detail">N/A</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="charts-grid">
+    <!-- Revenue Trend Chart -->
+    <div class="chart-container revenue-trend-chart">
+      <div class="chart-header">
+        <h3 class="chart-title">
+          <i class="fas fa-line-chart"></i>
+          Xu hướng Doanh thu
+        </h3>
+        <div class="chart-controls">
+          <div class="period-selector">
+            <button class="period-btn active" data-period="7days">7 ngày</button>
+            <button class="period-btn" data-period="30days">30 ngày</button>
+            <button class="period-btn" data-period="90days">90 ngày</button>
+            <button class="period-btn" data-period="year">Năm</button>
+          </div>
+        </div>
+      </div>
+      <div class="chart-content">
+        <canvas id="revenue-trend-chart" width="400" height="200"></canvas>
+      </div>
+    </div>
+
+    <!-- Revenue by Category -->
+    <div class="chart-container revenue-category-chart">
+      <div class="chart-header">
+        <h3 class="chart-title">
+          <i class="fas fa-pie-chart"></i>
+          Doanh thu theo Danh mục
+        </h3>
+        <div class="chart-controls">
+          <button class="toggle-btn" onclick="toggleChartView('category', 'pie')">
+            <i class="fas fa-chart-pie"></i>
+          </button>
+          <button class="toggle-btn" onclick="toggleChartView('category', 'bar')">
+            <i class="fas fa-chart-bar"></i>
+          </button>
+        </div>
+      </div>
+      <div class="chart-content">
+        <canvas id="revenue-category-chart" width="400" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analysis Tables -->
+  <div class="analysis-tables">
+    <!-- Top Revenue Customers -->
+    <div class="table-container top-customers-revenue">
+      <div class="table-header">
+        <h3 class="table-title">
+          <i class="fas fa-users"></i>
+          Top Khách hàng theo Doanh thu
+        </h3>
+        <div class="table-controls">
+          <div class="view-selector">
+            <button class="view-btn active" data-view="revenue">Doanh thu</button>
+            <button class="view-btn" data-view="frequency">Tần suất</button>
+            <button class="view-btn" data-view="value">Giá trị TB</button>
+          </div>
+          <button class="table-btn" onclick="exportCustomerRevenueData()">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
+      </div>
+      <div class="table-content">
+        <table class="analysis-table" id="top-customers-revenue-table">
+          <thead>
+            <tr>
+              <th class="rank-col">#</th>
+              <th class="customer-col">Khách hàng</th>
+              <th class="transactions-col">Số GD</th>
+              <th class="revenue-col">Tổng Doanh thu</th>
+              <th class="avg-col">Giá trị TB</th>
+              <th class="percentage-col">% Tổng</th>
+              <th class="trend-col">Xu hướng</th>
+            </tr>
+          </thead>
+          <tbody id="customers-revenue-tbody">
+            <tr>
+              <td colspan="7" class="loading-row">
+                <i class="fas fa-spinner fa-spin"></i> Đang tải...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Top Revenue Products -->
+    <div class="table-container top-products-revenue">
+      <div class="table-header">
+        <h3 class="table-title">
+          <i class="fas fa-laptop-code"></i>
+          Top Sản phẩm theo Doanh thu
+        </h3>
+        <div class="table-controls">
+          <div class="sort-selector">
+            <button class="sort-btn active" data-sort="revenue">Doanh thu</button>
+            <button class="sort-btn" data-sort="quantity">Số lượng</button>
+            <button class="sort-btn" data-sort="margin">Biên lợi nhuận</button>
+          </div>
+          <button class="table-btn" onclick="exportProductRevenueData()">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
+      </div>
+      <div class="table-content">
+        <table class="analysis-table" id="top-products-revenue-table">
+          <thead>
+            <tr>
+              <th class="rank-col">#</th>
+              <th class="product-col">Sản phẩm</th>
+              <th class="sold-col">Đã bán</th>
+              <th class="revenue-col">Doanh thu</th>
+              <th class="price-col">Giá TB</th>
+              <th class="share-col">Thị phần</th>
+              <th class="performance-col">Hiệu suất</th>
+            </tr>
+          </thead>
+          <tbody id="products-revenue-tbody">
+            <tr>
+              <td colspan="7" class="loading-row">
+                <i class="fas fa-spinner fa-spin"></i> Đang tải...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revenue Insights -->
+  <div class="revenue-insights">
+    <div class="insights-header">
+      <h3 class="insights-title">
+        <i class="fas fa-lightbulb"></i>
+        Thông tin Chi tiết
+      </h3>
+    </div>
+    <div class="insights-grid">
+      <div class="insight-card best-performer">
+        <div class="insight-icon">
+          <i class="fas fa-trophy"></i>
+        </div>
+        <div class="insight-content">
+          <h4 class="insight-title">Hiệu suất Tốt nhất</h4>
+          <p class="insight-value" id="best-performer-value">N/A</p>
+          <span class="insight-desc" id="best-performer-desc">Sản phẩm/Khách hàng có doanh thu cao nhất</span>
+        </div>
+      </div>
+
+      <div class="insight-card growth-trend">
+        <div class="insight-icon">
+          <i class="fas fa-rocket"></i>
+        </div>
+        <div class="insight-content">
+          <h4 class="insight-title">Xu hướng Tăng trưởng</h4>
+          <p class="insight-value" id="growth-trend-value">N/A</p>
+          <span class="insight-desc" id="growth-trend-desc">Phân tích xu hướng tăng/giảm</span>
+        </div>
+      </div>
+
+      <div class="insight-card revenue-concentration">
+        <div class="insight-icon">
+          <i class="fas fa-bullseye"></i>
+        </div>
+        <div class="insight-content">
+          <h4 class="insight-title">Tập trung Doanh thu</h4>
+          <p class="insight-value" id="concentration-value">N/A</p>
+          <span class="insight-desc" id="concentration-desc">Top 20% khách hàng đóng góp</span>
+        </div>
+      </div>
+
+      <div class="insight-card potential-risk">
+        <div class="insight-icon">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="insight-content">
+          <h4 class="insight-title">Rủi ro Tiềm ẩn</h4>
+          <p class="insight-value" id="risk-value">N/A</p>
+          <span class="insight-desc" id="risk-desc">Phụ thuộc quá nhiều vào 1 nguồn</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
