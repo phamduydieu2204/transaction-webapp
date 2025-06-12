@@ -16,7 +16,7 @@ import {
 } from '../statisticsRenderer.js';
 
 import { renderFinancialDashboard } from '../financialDashboard.js';
-import { renderBusinessOverviewDashboard } from '../businessOverviewDashboard.js';
+// DISABLED: import { renderBusinessOverviewDashboard } from '../businessOverviewDashboard.js';
 
 /**
  * Renders overview tab content
@@ -134,10 +134,12 @@ export async function renderEnhancedStatistics(expenseData, transactionData, fin
     }
     
     // 1. Render NEW Business Overview Dashboard
+    /* DISABLED: Business Overview Dashboard 
     renderBusinessOverviewDashboard(transactionData, expenseData, {
       containerId: "financialDashboard",
       dateRange: dateRange
     });
+    */
     
     // Refresh report menu components if active
     if (window.refreshCurrentReport && document.querySelector('.report-page.active')) {

@@ -1,185 +1,41 @@
 /**
- * statisticsOrchestrator.js
+ * statisticsOrchestrator.js - DISABLED
  * 
- * Core statistics orchestration and exports
- * Main entry point that imports and re-exports all statistics modules
+ * ⚠️ This file has been disabled during cleanup to prevent conflicts.
+ * Direct imports should use statisticsCore.js instead
+ * 
+ * Reason: Orchestration layer adds unnecessary complexity
+ * Date: 2025-01-16
  */
 
-// Import all modules
-import {
-  normalizeDate,
-  groupTransactionsByTenChuan,
-  groupExpensesByTenChuan,
-  groupExpensesByMonth,
-  groupRevenueByMonth
-} from './statistics/dataUtilities.js';
+console.warn('⚠️ statisticsOrchestrator.js is disabled - import directly from statisticsCore.js instead');
 
-import {
-  formatCurrency,
-  formatNumber,
-  formatPercentage,
-  formatLargeNumber,
-  formatDateDisplay,
-  formatMonthYear,
-  formatDuration,
-  formatGrowthRate,
-  formatROI,
-  formatProfitMargin
-} from './statistics/formatters.js';
-
-import {
-  calculateTotalExpenses,
-  calculateTotalRevenue,
-  calculateFinancialAnalysis,
-  calculateGrowthRate,
-  calculateAllocatedExpense,
-  calculateActualExpense,
-  calculateMonthlyExpenseBreakdown
-} from './statistics/calculations.js';
-
-import {
-  getDateRange,
-  getCustomDateRange,
-  getPreviousPeriodRange,
-  getSamePeriodLastYear,
-  getDaysBetween,
-  isDateInPeriod,
-  getMonthsInRange,
-  getFiscalYear,
-  getFiscalYearRange,
-  formatPeriodName
-} from './statistics/periodHandlers.js';
-
-import {
-  COLOR_SCHEMES,
-  getColor,
-  generateColors,
-  prepareRevenueChartData,
-  prepareExpenseChartData,
-  prepareROIChartData,
-  generateChartConfig,
-  prepareComparisonChartData
-} from './statistics/chartHelpers.js';
-
-// Re-export all functions for backward compatibility
+// Re-export main functions from statisticsCore for backward compatibility
 export {
-  // Data utilities
   normalizeDate,
-  groupTransactionsByTenChuan,
-  groupExpensesByTenChuan,
-  groupExpensesByMonth,
-  groupRevenueByMonth,
-  
-  // Formatters
-  formatCurrency,
-  formatNumber,
-  formatPercentage,
-  formatLargeNumber,
-  formatDateDisplay,
-  formatMonthYear,
-  formatDuration,
-  formatGrowthRate,
-  formatROI,
-  formatProfitMargin,
-  
-  // Calculations
   calculateTotalExpenses,
   calculateTotalRevenue,
-  calculateFinancialAnalysis,
-  calculateGrowthRate,
-  calculateAllocatedExpense,
-  calculateActualExpense,
-  calculateMonthlyExpenseBreakdown,
-  
-  // Period handlers
+  formatCurrency,
   getDateRange,
-  getCustomDateRange,
-  getPreviousPeriodRange,
-  getSamePeriodLastYear,
-  getDaysBetween,
-  isDateInPeriod,
-  getMonthsInRange,
-  getFiscalYear,
-  getFiscalYearRange,
-  formatPeriodName,
-  
-  // Chart helpers
-  COLOR_SCHEMES,
-  getColor,
-  generateColors,
-  prepareRevenueChartData,
-  prepareExpenseChartData,
-  prepareROIChartData,
-  generateChartConfig,
-  prepareComparisonChartData
-};
+  calculateFinancialAnalysis,
+  groupTransactionsByTenChuan,
+  groupExpensesByTenChuan
+} from './statisticsCore.js';
 
 /**
- * Main statistics API object for easy access to all functions
+ * DISABLED - StatisticsAPI object redirects to core functions
  */
 export const StatisticsAPI = {
-  // Data utilities
   data: {
-    normalizeDate,
-    groupTransactionsByTenChuan,
-    groupExpensesByTenChuan,
-    groupExpensesByMonth,
-    groupRevenueByMonth
+    message: 'Use direct imports from statisticsCore.js instead'
   },
-  
-  // Formatters
   format: {
-    currency: formatCurrency,
-    number: formatNumber,
-    percentage: formatPercentage,
-    largeNumber: formatLargeNumber,
-    date: formatDateDisplay,
-    monthYear: formatMonthYear,
-    duration: formatDuration,
-    growthRate: formatGrowthRate,
-    roi: formatROI,
-    profitMargin: formatProfitMargin
+    message: 'Use direct imports from statisticsCore.js instead'  
   },
-  
-  // Calculations
   calculate: {
-    totalExpenses: calculateTotalExpenses,
-    totalRevenue: calculateTotalRevenue,
-    financialAnalysis: calculateFinancialAnalysis,
-    growthRate: calculateGrowthRate,
-    allocatedExpense: calculateAllocatedExpense,
-    actualExpense: calculateActualExpense,
-    monthlyExpenseBreakdown: calculateMonthlyExpenseBreakdown
-  },
-  
-  // Period handlers
-  period: {
-    getDateRange,
-    getCustomDateRange,
-    getPreviousPeriodRange,
-    getSamePeriodLastYear,
-    getDaysBetween,
-    isDateInPeriod,
-    getMonthsInRange,
-    getFiscalYear,
-    getFiscalYearRange,
-    formatPeriodName
-  },
-  
-  // Chart helpers
-  chart: {
-    COLOR_SCHEMES,
-    getColor,
-    generateColors,
-    prepareRevenueChartData,
-    prepareExpenseChartData,
-    prepareROIChartData,
-    generateChartConfig,
-    prepareComparisonChartData
+    message: 'Use direct imports from statisticsCore.js instead'
   }
 };
 
-console.log('📊 Statistics Core modules loaded successfully');
-
-// Make API available globally for backward compatibility
+console.log('📊 Statistics functions available directly from statisticsCore.js');
 window.StatisticsAPI = StatisticsAPI;

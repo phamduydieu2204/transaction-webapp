@@ -7,6 +7,16 @@
 import { ensureDataIsLoaded, showError } from '../core/reportHelpers.js';
 import { formatRevenue, formatCurrency } from '../../formatDate.js';
 import { getFromStorage } from '../../core/stateManager.js';
+import { 
+  calculateBusinessMetrics,
+  calculateTotalRevenue,
+  calculateTotalExpenses,
+  formatCurrency as formatCurrencyCore,
+  normalizeDate,
+  getDateRange
+} from '../../statisticsCore.js';
+import { initOverviewLazyLoading, preloadCriticalElements } from '../../utils/lazyLoader.js';
+import { initCSSOptimizations, optimizeFontLoading, addResourceHints } from '../../utils/cssOptimizer.js';
 
 /**
  * Load overview report (Tổng quan kinh doanh)
@@ -18,8 +28,21 @@ export async function loadOverviewReport(options = {}) {
   console.log('📈 Loading overview report with options:', options);
   
   try {
-    // Load the overview report HTML template
-    await loadOverviewHTML();
+    // PERFORMANCE: Initialize optimizations early
+    const optimizationPromises = [
+      initCSSOptimizations(),
+      optimizeFontLoading(),
+      addResourceHints()
+    ];
+    
+    // Load template and optimizations in parallel
+    const [templateResult] = await Promise.all([
+      loadOverviewHTML(),
+      ...optimizationPromises
+    ]);
+    
+    // Preload critical elements immediately
+    preloadCriticalElements();
     
     // Ensure data is loaded before proceeding
     await ensureDataIsLoaded();
@@ -50,8 +73,9 @@ export async function loadOverviewReport(options = {}) {
     // Update period display
     updatePeriodDisplay(period);
     
-    // Calculate KPIs with date range
-    const kpis = calculateOverviewKPIs(transactions, expenses, dateRange);
+    // Calculate KPIs with date range or period - USING NEW FUNCTION
+    // Use consolidated business metrics calculation from statisticsCore.js
+    const kpis = calculateBusinessMetrics(transactions, expenses, dateRange);
     console.log('💰 Calculated KPIs:');
     console.log('  - Revenue:', kpis.revenue);
     console.log('  - Expense:', kpis.expense);
@@ -76,7 +100,11 @@ export async function loadOverviewReport(options = {}) {
       updateDataTables(filteredTransactions, filteredExpenses)
     ]);
     
-    console.log('✅ Overview report loaded successfully');
+    // PERFORMANCE: Initialize lazy loading for non-critical elements
+    initOverviewLazyLoading();
+    
+    console.log('🔄 FORCE CACHE REFRESH - v2.0.1');
+    console.log('✅ Overview report loaded successfully with optimizations');
     
   } catch (error) {
     console.error('❌ Error loading overview report:', error);
@@ -94,28 +122,59 @@ async function loadOverviewHTML() {
   try {
     const response = await fetch('./partials/tabs/report-pages/overview-report.html');
     if (!response.ok) {
-      console.warn('⚠️ Overview template not found, using fallback');
-      // Use existing structure but enhance it
-      enhanceExistingStructure(container);
-      return;
+      console.error('❌ Overview template not found at:', response.url);
+      throw new Error('Template not found');
     }
     
     const html = await response.text();
+    console.log('✅ Template HTML loaded, length:', html.length);
     
     // Find the overview report container and add content to it
     const overviewPage = document.getElementById('report-overview');
     if (overviewPage) {
+      console.log('📝 Applying template to existing container');
       overviewPage.innerHTML = html;
       overviewPage.classList.add('active');
+      console.log('✅ Template applied to existing container');
+      
+      // Verify template was applied
+      setTimeout(() => {
+        const hasCompleted = !!document.getElementById('completed-revenue');
+        const hasChart = !!document.getElementById('revenue-status-chart');
+        console.log('🗖️ Template verification after apply:', { hasCompleted, hasChart });
+      }, 10);
     } else {
       // Fallback: create the structure
       container.innerHTML = `<div id="report-overview" class="report-page active">${html}</div>`;
+      console.log('✅ Template applied to new container');
     }
     
-    console.log('📄 Overview HTML template loaded');
+    console.log('📄 NEW Overview HTML template loaded successfully');
+    
+    // Verify new elements exist
+    setTimeout(() => {
+      const completedElement = document.getElementById('completed-revenue');
+      const paidElement = document.getElementById('paid-revenue');
+      const unpaidElement = document.getElementById('unpaid-revenue');
+      const revenueStatusChart = document.getElementById('revenue-status-chart');
+      const statusDistChart = document.getElementById('status-distribution-chart');
+      console.log('🔍 Template verification:', {
+        'completed-revenue': !!completedElement,
+        'paid-revenue': !!paidElement,
+        'unpaid-revenue': !!unpaidElement,
+        'revenue-status-chart': !!revenueStatusChart,
+        'status-distribution-chart': !!statusDistChart
+      });
+      
+      // Debug: check what's actually in the container
+      const container = document.getElementById('report-overview');
+      console.log('📝 Container content preview:', container?.innerHTML?.substring(0, 200) + '...');
+    }, 50);
+    
   } catch (error) {
-    console.warn('⚠️ Using existing structure with enhancements');
-    enhanceExistingStructure(container);
+    console.error('❌ CRITICAL: Could not load new template:', error);
+    console.warn('🚫 NOT using fallback - forcing error to fix issue');
+    throw error;  // Force error instead of using fallback
   }
 }
 
@@ -304,22 +363,34 @@ function filterDataByDateRange(data, dateRange) {
  * @param {Array} transactions - All transactions
  * @param {Array} expenses - All expenses  
  * @param {Object} dateRange - Date range filter {start, end}
+ * @param {string} period - Period name (e.g., 'all_time', 'this_month')
  */
-function calculateOverviewKPIs(transactions, expenses, dateRange) {
+function calculateOverviewKPIs(transactions, expenses, dateRange, period = 'this_month') {
   const now = new Date();
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
   
-  console.log('📅 Date filtering setup:');
+  console.log('📅 🆕 NEW FIXED Date filtering setup:');
+  console.log(`  - Period parameter: "${period}"`);
+  console.log(`  - Period === 'all_time':`, period === 'all_time');
   console.log(`  - Using date range:`, dateRange);
   console.log(`  - Total transactions to filter: ${transactions.length}`);
   console.log(`  - Total expenses to filter: ${expenses.length}`);
   
-  // Filter data based on date range
+  // NEW SIMPLIFIED LOGIC - Filter data based on period first
   let filteredTransactions, filteredExpenses;
   
-  if (dateRange && dateRange.start && dateRange.end) {
+  // Check period FIRST
+  console.log('📅 📝 Checking period value...');
+  if (period && period.toString() === 'all_time') {
+    // No filtering for all time
+    console.log('📅 🔥 💯 🆕 ALL TIME BRANCH ACTIVATED - NO FILTERING!');
+    filteredTransactions = transactions;
+    filteredExpenses = expenses;
+    console.log('📅 💯 Result: transactions =', filteredTransactions.length, ', expenses =', filteredExpenses.length);
+  } else if (dateRange && dateRange.start && dateRange.end) {
     // Use provided date range
+    console.log('📊 Using date range filtering');
     filteredTransactions = filterDataByDateRange(transactions, dateRange);
     filteredExpenses = filterDataByDateRange(expenses, dateRange);
     
@@ -328,7 +399,8 @@ function calculateOverviewKPIs(transactions, expenses, dateRange) {
     console.log(`  - Expenses: ${expenses.length} → ${filteredExpenses.length}`);
   } else {
     // Default to current month if no date range
-    console.log('📅 No date range provided, using current month');
+    console.log('📅 Using current month fallback for period:', period);
+    console.log('📅 ❌ CURRENT MONTH FALLBACK ACTIVATED');
     
     filteredTransactions = transactions.filter(t => {
       const rawDate = t.transactionDate || t.ngayGiaoDich || t.date;
@@ -355,24 +427,55 @@ function calculateOverviewKPIs(transactions, expenses, dateRange) {
     });
   }
   
-  // Calculate totals - check various field names
-  const totalRevenue = filteredTransactions.reduce((sum, t) => {
+  // Calculate totals by transaction status
+  const statusBreakdown = {
+    completed: { count: 0, revenue: 0 },
+    paid: { count: 0, revenue: 0 },
+    unpaid: { count: 0, revenue: 0 }
+  };
+  
+  filteredTransactions.forEach(t => {
     const revenue = parseFloat(t.doanhThu || t.revenue || t.Revenue || t.doanh_thu) || 0;
-    return sum + revenue;
-  }, 0);
+    const status = t.loaiGiaoDich || t.transactionType || t.status || '';
+    
+    if (status.toLowerCase().includes('hoàn tất')) {
+      statusBreakdown.completed.count++;
+      statusBreakdown.completed.revenue += revenue;
+    } else if (status.toLowerCase().includes('đã thanh toán')) {
+      statusBreakdown.paid.count++;
+      statusBreakdown.paid.revenue += revenue;
+    } else if (status.toLowerCase().includes('chưa thanh toán')) {
+      statusBreakdown.unpaid.count++;
+      statusBreakdown.unpaid.revenue += revenue;
+    }
+  });
   
-  const totalExpense = filteredExpenses.reduce((sum, e) => {
-    const expense = parseFloat(e.soTien || e.amount || e.Amount || e.so_tien) || 0;
-    return sum + expense;
-  }, 0);
-  
-  console.log('📊 Revenue calculation:');
-  console.log('  - Filtered transactions:', filteredTransactions.length);
-  console.log('  - Total revenue calculated:', totalRevenue);
-  console.log('  - Total expense calculated:', totalExpense);
-  
-  const totalProfit = totalRevenue - totalExpense;
+  const totalRevenue = statusBreakdown.completed.revenue + statusBreakdown.paid.revenue + statusBreakdown.unpaid.revenue;
   const totalTransactions = filteredTransactions.length;
+  
+  console.log('📊 Revenue calculation by status:');
+  console.log('  - Completed:', statusBreakdown.completed);
+  console.log('  - Paid:', statusBreakdown.paid);
+  console.log('  - Unpaid:', statusBreakdown.unpaid);
+  console.log('  - Total revenue:', totalRevenue);
+  console.log('  - Total transactions:', totalTransactions);
+  
+  // Calculate conversion rates
+  const paymentRate = statusBreakdown.unpaid.count > 0 
+    ? ((statusBreakdown.paid.count + statusBreakdown.completed.count) / totalTransactions * 100) 
+    : 0;
+  const completionRate = statusBreakdown.paid.count > 0 
+    ? (statusBreakdown.completed.count / (statusBreakdown.paid.count + statusBreakdown.completed.count) * 100)
+    : 0;
+  const successRate = totalTransactions > 0 
+    ? (statusBreakdown.completed.count / totalTransactions * 100)
+    : 0;
+  
+  console.log('📊 Revenue calculation by status:');
+  console.log('  - Completed:', statusBreakdown.completed);
+  console.log('  - Paid:', statusBreakdown.paid);
+  console.log('  - Unpaid:', statusBreakdown.unpaid);
+  console.log('  - Total transactions:', totalTransactions);
   
   // Calculate previous period for comparison
   let prevDateRange = null;
@@ -405,46 +508,77 @@ function calculateOverviewKPIs(transactions, expenses, dateRange) {
   
   // Filter previous period data
   const prevTransactions = filterDataByDateRange(transactions, prevDateRange);
-  const prevExpenses = filterDataByDateRange(expenses, prevDateRange);
   
-  const prevRevenue = prevTransactions.reduce((sum, t) => {
-    return sum + (parseFloat(t.doanhThu || t.revenue) || 0);
-  }, 0);
+  // Calculate previous period status breakdown
+  const prevStatusBreakdown = {
+    completed: { count: 0, revenue: 0 },
+    paid: { count: 0, revenue: 0 },
+    unpaid: { count: 0, revenue: 0 }
+  };
   
-  const prevExpense = prevExpenses.reduce((sum, e) => {
-    return sum + (parseFloat(e.soTien || e.amount) || 0);
-  }, 0);
+  prevTransactions.forEach(t => {
+    const revenue = parseFloat(t.doanhThu || t.revenue) || 0;
+    const status = t.loaiGiaoDich || t.transactionType || t.status || '';
+    
+    if (status.toLowerCase().includes('hoàn tất')) {
+      prevStatusBreakdown.completed.count++;
+      prevStatusBreakdown.completed.revenue += revenue;
+    } else if (status.toLowerCase().includes('đã thanh toán')) {
+      prevStatusBreakdown.paid.count++;
+      prevStatusBreakdown.paid.revenue += revenue;
+    } else if (status.toLowerCase().includes('chưa thanh toán')) {
+      prevStatusBreakdown.unpaid.count++;
+      prevStatusBreakdown.unpaid.revenue += revenue;
+    }
+  });
   
-  const prevProfit = prevRevenue - prevExpense;
   const prevTransactionCount = prevTransactions.length;
   
   // Calculate growth percentages
-  const revenueGrowth = prevRevenue > 0 ? ((totalRevenue - prevRevenue) / prevRevenue * 100) : 0;
-  const expenseGrowth = prevExpense > 0 ? ((totalExpense - prevExpense) / prevExpense * 100) : 0;
-  const profitGrowth = prevProfit !== 0 ? ((totalProfit - prevProfit) / Math.abs(prevProfit) * 100) : 0;
-  const transactionGrowth = prevTransactionCount > 0 ? ((totalTransactions - prevTransactionCount) / prevTransactionCount * 100) : 0;
+  const completedGrowth = prevStatusBreakdown.completed.revenue > 0 
+    ? ((statusBreakdown.completed.revenue - prevStatusBreakdown.completed.revenue) / prevStatusBreakdown.completed.revenue * 100) 
+    : 0;
+  const paidGrowth = prevStatusBreakdown.paid.revenue > 0 
+    ? ((statusBreakdown.paid.revenue - prevStatusBreakdown.paid.revenue) / prevStatusBreakdown.paid.revenue * 100) 
+    : 0;
+  const unpaidGrowth = prevStatusBreakdown.unpaid.revenue > 0 
+    ? ((statusBreakdown.unpaid.revenue - prevStatusBreakdown.unpaid.revenue) / prevStatusBreakdown.unpaid.revenue * 100) 
+    : 0;
+  const transactionGrowth = prevTransactionCount > 0 
+    ? ((totalTransactions - prevTransactionCount) / prevTransactionCount * 100) 
+    : 0;
   
   return {
-    revenue: {
-      current: totalRevenue,
-      previous: prevRevenue,
-      growth: revenueGrowth
+    statusBreakdown: statusBreakdown,
+    completed: {
+      current: statusBreakdown.completed.revenue,
+      previous: prevStatusBreakdown.completed.revenue,
+      growth: completedGrowth,
+      count: statusBreakdown.completed.count
     },
-    expense: {
-      current: totalExpense,
-      previous: prevExpense,
-      growth: expenseGrowth
+    paid: {
+      current: statusBreakdown.paid.revenue,
+      previous: prevStatusBreakdown.paid.revenue,
+      growth: paidGrowth,
+      count: statusBreakdown.paid.count
     },
-    profit: {
-      current: totalProfit,
-      previous: prevProfit,
-      growth: profitGrowth
+    unpaid: {
+      current: statusBreakdown.unpaid.revenue,
+      previous: prevStatusBreakdown.unpaid.revenue,
+      growth: unpaidGrowth,
+      count: statusBreakdown.unpaid.count
     },
     transactions: {
       current: totalTransactions,
       previous: prevTransactionCount,
       growth: transactionGrowth
-    }
+    },
+    conversion: {
+      paymentRate: paymentRate,
+      completionRate: completionRate,
+      successRate: successRate
+    },
+    totalRevenue: totalRevenue
   };
 }
 
@@ -452,74 +586,101 @@ function calculateOverviewKPIs(transactions, expenses, dateRange) {
  * Update KPI cards with calculated data
  */
 async function updateKPICards(kpis) {
-  // Revenue card
-  updateKPICard('revenue', {
-    value: kpis.revenue.current,
-    growth: kpis.revenue.growth,
-    icon: '💰',
-    title: 'Doanh thu tháng này'
-  });
+  console.log('✨ UPDATED updateKPICards - Using consolidated business metrics');
+  console.log('📊 KPIs data structure:', kpis);
   
-  // Expense card
-  updateKPICard('expense', {
-    value: kpis.expense.current,
-    growth: kpis.expense.growth,
-    icon: '💸',
-    title: 'Chi phí tháng này'
-  });
+  // Check if we're using the new template with status-based elements
+  const newTemplate = document.getElementById('completed-revenue') !== null;
   
-  // Profit card
-  updateKPICard('profit', {
-    value: kpis.profit.current,
-    growth: kpis.profit.growth,
-    icon: '📈',
-    title: 'Lợi nhuận tháng này'
-  });
-  
-  // Transaction card
-  updateKPICard('transaction', {
-    value: kpis.transactions.current,
-    growth: kpis.transactions.growth,
-    icon: '📋',
-    title: 'Giao dịch tháng này'
-  });
+  if (newTemplate) {
+    // New template - Use business metrics structure
+    console.log('🆕 Using new template with business metrics structure');
+    
+    // Map business metrics to KPI cards
+    updateKPICard('completed', {
+      value: kpis.financial.totalRevenue || 0,
+      growth: 0, // Growth calculation can be added later
+      elementId: 'completed-revenue',
+      changeId: 'completed-change'
+    });
+    
+    updateKPICard('paid', {
+      value: kpis.financial.totalRevenue || 0, // All revenue assumed paid for now
+      growth: 0,
+      elementId: 'paid-revenue', 
+      changeId: 'paid-change'
+    });
+    
+    updateKPICard('refund', {
+      value: 0, // Refund can be calculated separately if needed
+      growth: 0,
+      elementId: 'refund-revenue',
+      changeId: 'refund-change'
+    });
+    
+    updateKPICard('transaction', {
+      value: kpis.revenue.totalTransactions || 0,
+      growth: 0,
+      elementId: 'total-transactions',
+      changeId: 'transaction-change'
+    });
+    
+    // Update status breakdown using simplified data
+    updateStatusBreakdownWithRefund(kpis);
+    
+  } else {
+    // Old template fallback - Use business metrics structure
+    console.log('⚠️ Using old template with business metrics');
+    updateKPICard('revenue', {
+      value: kpis.financial.totalRevenue || 0,
+      growth: 0,
+      elementId: 'total-revenue',
+      changeId: 'revenue-change'
+    });
+    
+    updateKPICard('expense', {
+      value: kpis.expense?.current || 0,
+      growth: kpis.expense?.growth || 0,
+      elementId: 'total-expenses',
+      changeId: 'expense-change'
+    });
+    
+    updateKPICard('profit', {
+      value: kpis.profit?.current || 0,
+      growth: kpis.profit?.growth || 0,
+      elementId: 'total-profit',
+      changeId: 'profit-change'
+    });
+    
+    updateKPICard('transaction', {
+      value: kpis.transactions.current,
+      growth: kpis.transactions.growth,
+      elementId: 'total-transactions',
+      changeId: 'transaction-change'
+    });
+  }
 }
 
 /**
  * Update individual KPI card
  */
 function updateKPICard(type, data) {
-  let valueElement, changeElement;
+  const valueElement = document.getElementById(data.elementId);
+  const changeElement = document.getElementById(data.changeId);
   
-  // Map to HTML IDs
-  switch (type) {
-    case 'revenue':
-      valueElement = document.getElementById('total-revenue');
-      changeElement = document.getElementById('revenue-change');
-      break;
-    case 'expense':
-      valueElement = document.getElementById('total-expenses');
-      changeElement = document.getElementById('expense-change');
-      break;
-    case 'profit':
-      valueElement = document.getElementById('total-profit');
-      changeElement = document.getElementById('profit-change');
-      break;
-    case 'transaction':
-      valueElement = document.getElementById('total-transactions');
-      changeElement = document.getElementById('transaction-change');
-      break;
-  }
+  console.log(`🔍 Looking for element: ${data.elementId}`);
+  console.log(`🔍 Element found:`, !!valueElement);
   
   if (!valueElement) {
-    console.warn(`❌ KPI element not found for ${type}`);
+    console.warn(`❌ KPI element not found: ${data.elementId}`);
+    console.warn(`🔍 Available elements with 'revenue' in ID:`, 
+      Array.from(document.querySelectorAll('[id*="revenue"]')).map(el => el.id));
     return;
   }
   
   console.log(`💰 Updating KPI ${type}:`);
-  console.log(`  - Element ID: ${valueElement ? valueElement.id : 'NOT FOUND'}`);
+  console.log(`  - Element ID: ${data.elementId}`);
   console.log(`  - Raw value: ${data.value}`);
-  console.log(`  - Formatted value: ${type === 'transaction' ? data.value.toLocaleString() : formatRevenue(data.value)}`);
   console.log(`  - Growth: ${data.growth}%`);
   
   if (valueElement) {
@@ -543,6 +704,40 @@ function updateKPICard(type, data) {
 }
 
 /**
+ * Update status breakdown display
+ */
+function updateStatusBreakdown(kpis) {
+  const total = kpis.transactions.current;
+  
+  // Update counts
+  document.getElementById('completed-count').textContent = kpis.completed.count;
+  document.getElementById('paid-count').textContent = kpis.paid.count;
+  document.getElementById('unpaid-count').textContent = kpis.unpaid.count;
+  
+  // Update percentages and bars
+  const completedPercent = total > 0 ? (kpis.completed.count / total * 100) : 0;
+  const paidPercent = total > 0 ? (kpis.paid.count / total * 100) : 0;
+  const unpaidPercent = total > 0 ? (kpis.unpaid.count / total * 100) : 0;
+  
+  document.getElementById('completed-percentage').textContent = completedPercent.toFixed(1) + '%';
+  document.getElementById('paid-percentage').textContent = paidPercent.toFixed(1) + '%';
+  document.getElementById('unpaid-percentage').textContent = unpaidPercent.toFixed(1) + '%';
+  
+  document.getElementById('completed-bar').style.width = completedPercent + '%';
+  document.getElementById('paid-bar').style.width = paidPercent + '%';
+  document.getElementById('unpaid-bar').style.width = unpaidPercent + '%';
+}
+
+/**
+ * Update conversion rates
+ */
+function updateConversionRates(conversion) {
+  document.getElementById('payment-rate').textContent = conversion.paymentRate.toFixed(1) + '%';
+  document.getElementById('completion-rate').textContent = conversion.completionRate.toFixed(1) + '%';
+  document.getElementById('success-rate').textContent = conversion.successRate.toFixed(1) + '%';
+}
+
+/**
  * Load charts
  */
 async function loadCharts(transactions, expenses) {
@@ -553,11 +748,31 @@ async function loadCharts(transactions, expenses) {
       await loadChartJS();
     }
     
-    // Render revenue trend chart
-    renderRevenueTrendChart(transactions);
+    // Check which charts are available in the template
+    const hasNewCharts = document.getElementById('revenue-status-chart') !== null;
+    const hasOldCharts = document.getElementById('revenueTrendChart') !== null;
     
-    // Render expense distribution chart
-    renderExpenseDistributionChart(expenses);
+    console.log('📊 Chart template check:', {
+      hasNewCharts,
+      hasOldCharts,
+      'revenue-status-chart': !!document.getElementById('revenue-status-chart'),
+      'status-distribution-chart': !!document.getElementById('status-distribution-chart'),
+      'revenueTrendChart': !!document.getElementById('revenueTrendChart'),
+      'expenseDistributionChart': !!document.getElementById('expenseDistributionChart')
+    });
+    
+    if (hasNewCharts) {
+      // Render new charts
+      renderRevenueStatusChart(transactions);
+      renderStatusDistributionChart(transactions);
+    } else if (hasOldCharts) {
+      // Render old charts
+      console.log('⚠️ Using old chart template');
+      renderRevenueTrendChart(transactions);
+      renderExpenseDistributionChart(expenses);
+    } else {
+      console.warn('⚠️ No chart containers found');
+    }
     
   } catch (error) {
     console.error('❌ Error loading charts:', error);
@@ -584,51 +799,308 @@ function loadChartJS() {
 }
 
 /**
- * Render revenue trend chart
+ * Render revenue by status chart - Hiển thị xu hướng doanh thu theo chu kỳ báo cáo
+ * @param {Array} transactions - Filtered transactions for current period
  */
-function renderRevenueTrendChart(transactions) {
-  const canvas = document.getElementById('revenue-trend-chart');
+function renderRevenueStatusChart(transactions) {
+  const canvas = document.getElementById('revenue-status-chart');
   if (!canvas) return;
   
   const ctx = canvas.getContext('2d');
   
-  // Prepare data for last 6 months
-  const monthsData = getLastSixMonthsData(transactions);
+  // Get current report period from global filters
+  const currentPeriod = window.globalFilters?.period || 'this_month';
+  const dateRange = window.globalFilters?.dateRange || null;
   
+  console.log('📈 Rendering revenue trend chart for period:', currentPeriod);
+  
+  // Prepare data based on current report cycle
+  let chartData;
+  if (currentPeriod === 'all_time') {
+    // Show yearly data for all time
+    chartData = getYearlyDataByStatus(transactions);
+  } else if (['this_year', 'last_year'].includes(currentPeriod)) {
+    // Show monthly data for year periods
+    chartData = getMonthlyDataByStatus(transactions, currentPeriod);
+  } else if (['this_month', 'last_month', 'last_30_days'].includes(currentPeriod)) {
+    // Show weekly data for month periods
+    chartData = getWeeklyDataByStatus(transactions, currentPeriod);
+  } else if (['this_week', 'last_week', 'last_7_days'].includes(currentPeriod)) {
+    // Show daily data for week periods
+    chartData = getDailyDataByStatus(transactions, currentPeriod);
+  } else {
+    // Default: show last 6 months
+    chartData = getLastSixMonthsDataByStatus(transactions);
+  }
+  
+  // Create stacked bar chart showing revenue by status over time
   new Chart(ctx, {
-    type: 'line',
+    type: 'bar',
     data: {
-      labels: monthsData.labels,
+      labels: chartData.labels,
+      datasets: [
+        {
+          label: 'Đã hoàn tất',
+          data: chartData.completed,
+          backgroundColor: '#27ae60',
+          borderColor: '#229954',
+          borderWidth: 1,
+          order: 1
+        },
+        {
+          label: 'Đã thanh toán',
+          data: chartData.paid,
+          backgroundColor: '#3498db',
+          borderColor: '#2980b9',
+          borderWidth: 1,
+          order: 2
+        },
+        {
+          label: 'Hoàn tiền',
+          data: chartData.refunded || chartData.unpaid,
+          backgroundColor: '#e74c3c',
+          borderColor: '#c0392b',
+          borderWidth: 1,
+          order: 3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
+      plugins: {
+        title: {
+          display: true,
+          text: `Xu hướng doanh thu theo trạng thái - ${getPeriodDisplayName(currentPeriod)}`,
+          font: {
+            size: 14,
+            weight: 'bold'
+          },
+          padding: 20
+        },
+        legend: {
+          position: 'top',
+          labels: {
+            usePointStyle: true,
+            padding: 15,
+            font: {
+              size: 12
+            }
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          borderColor: '#fff',
+          borderWidth: 1,
+          callbacks: {
+            title: function(tooltipItems) {
+              return `Kỳ báo cáo: ${tooltipItems[0].label}`;
+            },
+            label: function(context) {
+              const value = formatRevenue(context.parsed.y);
+              const total = context.chart.data.datasets.reduce((sum, dataset) => {
+                return sum + (dataset.data[context.dataIndex] || 0);
+              }, 0);
+              const percentage = total > 0 ? ((context.parsed.y / total) * 100).toFixed(1) : 0;
+              return `${context.dataset.label}: ${value} (${percentage}%)`;
+            },
+            footer: function(tooltipItems) {
+              const total = tooltipItems.reduce((sum, item) => sum + item.parsed.y, 0);
+              return `Tổng: ${formatRevenue(total)}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          stacked: true,
+          grid: {
+            display: false
+          },
+          ticks: {
+            font: {
+              size: 11
+            }
+          }
+        },
+        y: {
+          stacked: true,
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.1)',
+            drawBorder: false
+          },
+          ticks: {
+            callback: function(value) {
+              return formatRevenue(value);
+            },
+            font: {
+              size: 11
+            }
+          }
+        }
+      },
+      elements: {
+        bar: {
+          borderRadius: 3
+        }
+      }
+    }
+  });
+  
+  // Add chart period controls event listeners
+  addChartPeriodControls();
+}
+
+/**
+ * Render status distribution chart with refund support
+ */
+function renderStatusDistributionChart(transactions) {
+  const canvas = document.getElementById('status-distribution-chart');
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  
+  // Calculate status distribution with refund
+  const statusData = getStatusDistributionWithRefund(transactions);
+  
+  // Destroy existing chart if it exists
+  if (window.statusDistributionChart instanceof Chart) {
+    window.statusDistributionChart.destroy();
+  }
+  
+  window.statusDistributionChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Đã hoàn tất', 'Đã thanh toán', 'Hoàn tiền'],
       datasets: [{
-        label: 'Doanh thu',
-        data: monthsData.revenue,
-        borderColor: '#3498db',
-        backgroundColor: 'rgba(52, 152, 219, 0.1)',
-        borderWidth: 3,
-        fill: true,
-        tension: 0.4
+        data: [statusData.completed, statusData.paid, statusData.refunded],
+        backgroundColor: [
+          '#27ae60', // Completed - Green
+          '#3498db', // Paid - Blue  
+          '#e74c3c'  // Refunded - Red
+        ],
+        borderColor: [
+          '#229954', // Darker green
+          '#2980b9', // Darker blue
+          '#c0392b'  // Darker red
+        ],
+        borderWidth: 2,
+        hoverBackgroundColor: [
+          '#2ecc71',
+          '#5dade2', 
+          '#ec7063'
+        ],
+        hoverBorderWidth: 3
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      cutout: '60%', // Make it a donut chart
       plugins: {
         legend: {
-          display: false
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: function(value) {
-              return formatRevenue(value);
+          position: 'bottom',
+          labels: {
+            padding: 15,
+            usePointStyle: true,
+            pointStyle: 'circle',
+            font: {
+              size: 12,
+              weight: '500'
+            },
+            generateLabels: function(chart) {
+              const data = chart.data;
+              const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+              
+              return data.labels.map((label, index) => {
+                const value = data.datasets[0].data[index];
+                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                
+                return {
+                  text: `${label}: ${value} (${percentage}%)`,
+                  fillStyle: data.datasets[0].backgroundColor[index],
+                  strokeStyle: data.datasets[0].borderColor[index],
+                  lineWidth: 2,
+                  hidden: false,
+                  index: index
+                };
+              });
+            }
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          borderColor: '#fff',
+          borderWidth: 1,
+          callbacks: {
+            title: function() {
+              return 'Phân bố trạng thái giao dịch';
+            },
+            label: function(context) {
+              const label = context.label || '';
+              const value = context.parsed || 0;
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+              
+              return [
+                `${label}: ${value} giao dịch`,
+                `Tỷ lệ: ${percentage}%`
+              ];
+            },
+            footer: function(tooltipItems) {
+              const total = tooltipItems.reduce((sum, item) => sum + item.parsed, 0);
+              return `Tổng: ${total} giao dịch`;
             }
           }
         }
+      },
+      animation: {
+        animateScale: true,
+        animateRotate: true,
+        duration: 1000
       }
     }
   });
+  
+  console.log('🍰 Status distribution chart rendered:', statusData);
+}
+
+/**
+ * Get status distribution with refund support
+ * @param {Array} transactions - Transactions to analyze
+ * @returns {Object} Status distribution counts
+ */
+function getStatusDistributionWithRefund(transactions) {
+  let completed = 0;
+  let paid = 0;
+  let refunded = 0;
+  
+  transactions.forEach(t => {
+    const status = (t.loaiGiaoDich || t.transactionType || t.status || '').toLowerCase();
+    
+    if (status.includes('hoàn tất') || status.includes('completed')) {
+      completed++;
+    } else if (status.includes('đã thanh toán') || status.includes('paid')) {
+      paid++;
+    } else if (status.includes('hoàn tiền') || status.includes('refund')) {
+      refunded++;
+    }
+  });
+  
+  return {
+    completed: completed,
+    paid: paid,
+    refunded: refunded
+  };
 }
 
 /**
@@ -676,33 +1148,349 @@ function renderExpenseDistributionChart(expenses) {
 }
 
 /**
- * Get revenue data for last 6 months
+ * Get revenue data for last 6 months grouped by status
  */
-function getLastSixMonthsData(transactions) {
+function getLastSixMonthsDataByStatus(transactions) {
   const months = [];
-  const revenue = [];
+  const completed = [];
+  const paid = [];
+  const refunded = [];
   const now = new Date();
   
   for (let i = 5; i >= 0; i--) {
     const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const monthName = date.toLocaleDateString('vi-VN', { month: 'short', year: 'numeric' });
     
-    const monthRevenue = transactions
-      .filter(t => {
-        const transactionDate = new Date(t.ngayGiaoDich || t.date);
-        return transactionDate.getMonth() === date.getMonth() && 
-               transactionDate.getFullYear() === date.getFullYear();
-      })
-      .reduce((sum, t) => sum + (parseFloat(t.doanhThu || t.revenue) || 0), 0);
+    const monthTransactions = transactions.filter(t => {
+      const transactionDate = new Date(t.ngayGiaoDich || t.date);
+      return transactionDate.getMonth() === date.getMonth() && 
+             transactionDate.getFullYear() === date.getFullYear();
+    });
+    
+    const statusRevenue = calculateRevenueByStatus(monthTransactions);
     
     months.push(monthName);
-    revenue.push(monthRevenue);
+    completed.push(statusRevenue.completed);
+    paid.push(statusRevenue.paid);
+    refunded.push(statusRevenue.refunded);
   }
   
   return {
     labels: months,
-    revenue: revenue
+    completed: completed,
+    paid: paid,
+    refunded: refunded,
+    unpaid: refunded // Backward compatibility
   };
+}
+
+/**
+ * Get yearly data grouped by status (for all_time period)
+ */
+function getYearlyDataByStatus(transactions) {
+  const years = new Set();
+  transactions.forEach(t => {
+    const transactionDate = new Date(t.ngayGiaoDich || t.date);
+    if (!isNaN(transactionDate.getTime())) {
+      years.add(transactionDate.getFullYear());
+    }
+  });
+  
+  const sortedYears = Array.from(years).sort();
+  const labels = sortedYears.map(year => year.toString());
+  const completed = [];
+  const paid = [];
+  const refunded = [];
+  
+  sortedYears.forEach(year => {
+    const yearTransactions = transactions.filter(t => {
+      const transactionDate = new Date(t.ngayGiaoDich || t.date);
+      return transactionDate.getFullYear() === year;
+    });
+    
+    const statusRevenue = calculateRevenueByStatus(yearTransactions);
+    completed.push(statusRevenue.completed);
+    paid.push(statusRevenue.paid);
+    refunded.push(statusRevenue.refunded);
+  });
+  
+  return { labels, completed, paid, refunded };
+}
+
+/**
+ * Get monthly data grouped by status (for yearly periods)
+ */
+function getMonthlyDataByStatus(transactions, period) {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const targetYear = period === 'last_year' ? currentYear - 1 : currentYear;
+  
+  const labels = [];
+  const completed = [];
+  const paid = [];
+  const refunded = [];
+  
+  for (let month = 0; month < 12; month++) {
+    const date = new Date(targetYear, month, 1);
+    const monthName = date.toLocaleDateString('vi-VN', { month: 'short' });
+    
+    const monthTransactions = transactions.filter(t => {
+      const transactionDate = new Date(t.ngayGiaoDich || t.date);
+      return transactionDate.getMonth() === month && 
+             transactionDate.getFullYear() === targetYear;
+    });
+    
+    const statusRevenue = calculateRevenueByStatus(monthTransactions);
+    
+    labels.push(monthName);
+    completed.push(statusRevenue.completed);
+    paid.push(statusRevenue.paid);
+    refunded.push(statusRevenue.refunded);
+  }
+  
+  return { labels, completed, paid, refunded };
+}
+
+/**
+ * Get weekly data grouped by status (for monthly periods)
+ */
+function getWeeklyDataByStatus(transactions, period) {
+  const now = new Date();
+  const labels = [];
+  const completed = [];
+  const paid = [];
+  const refunded = [];
+  
+  // Get target month based on period
+  let targetDate;
+  if (period === 'last_month') {
+    targetDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  } else {
+    targetDate = new Date(now.getFullYear(), now.getMonth(), 1);
+  }
+  
+  // Get weeks in the target month
+  const weeks = getWeeksInMonth(targetDate);
+  
+  weeks.forEach((week, index) => {
+    const weekTransactions = transactions.filter(t => {
+      const transactionDate = new Date(t.ngayGiaoDich || t.date);
+      return transactionDate >= week.start && transactionDate <= week.end;
+    });
+    
+    const statusRevenue = calculateRevenueByStatus(weekTransactions);
+    
+    labels.push(`Tuần ${index + 1}`);
+    completed.push(statusRevenue.completed);
+    paid.push(statusRevenue.paid);
+    refunded.push(statusRevenue.refunded);
+  });
+  
+  return { labels, completed, paid, refunded };
+}
+
+/**
+ * Get daily data grouped by status (for weekly periods)
+ */
+function getDailyDataByStatus(transactions, period) {
+  const now = new Date();
+  const labels = [];
+  const completed = [];
+  const paid = [];
+  const refunded = [];
+  
+  // Get target week based on period
+  let startDate, endDate;
+  if (period === 'last_week') {
+    const lastWeekStart = new Date(now);
+    lastWeekStart.setDate(now.getDate() - now.getDay() - 7);
+    startDate = lastWeekStart;
+    endDate = new Date(lastWeekStart);
+    endDate.setDate(lastWeekStart.getDate() + 6);
+  } else {
+    const thisWeekStart = new Date(now);
+    thisWeekStart.setDate(now.getDate() - now.getDay());
+    startDate = thisWeekStart;
+    endDate = new Date(now);
+  }
+  
+  // Generate daily data
+  const current = new Date(startDate);
+  while (current <= endDate) {
+    const dayTransactions = transactions.filter(t => {
+      const transactionDate = new Date(t.ngayGiaoDich || t.date);
+      return transactionDate.toDateString() === current.toDateString();
+    });
+    
+    const statusRevenue = calculateRevenueByStatus(dayTransactions);
+    
+    labels.push(current.toLocaleDateString('vi-VN', { weekday: 'short', day: 'numeric' }));
+    completed.push(statusRevenue.completed);
+    paid.push(statusRevenue.paid);
+    refunded.push(statusRevenue.refunded);
+    
+    current.setDate(current.getDate() + 1);
+  }
+  
+  return { labels, completed, paid, refunded };
+}
+
+/**
+ * Calculate revenue by status for given transactions
+ * @param {Array} transactions - Transactions to calculate
+ * @returns {Object} Revenue breakdown by status
+ */
+function calculateRevenueByStatus(transactions) {
+  let completed = 0;
+  let paid = 0;
+  let refunded = 0;
+  
+  transactions.forEach(t => {
+    const revenue = parseFloat(t.doanhThu || t.revenue || t.Revenue || t.doanh_thu) || 0;
+    const status = (t.loaiGiaoDich || t.transactionType || t.status || '').toLowerCase();
+    
+    if (status.includes('hoàn tất') || status.includes('completed')) {
+      completed += revenue;
+    } else if (status.includes('đã thanh toán') || status.includes('paid')) {
+      paid += revenue;
+    } else if (status.includes('hoàn tiền') || status.includes('refund') || status.includes('chưa thanh toán')) {
+      refunded += revenue;
+    }
+  });
+  
+  return { completed, paid, refunded };
+}
+
+/**
+ * Get weeks in a given month
+ * @param {Date} monthDate - Date in the target month
+ * @returns {Array} Array of week objects with start and end dates
+ */
+function getWeeksInMonth(monthDate) {
+  const year = monthDate.getFullYear();
+  const month = monthDate.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  
+  const weeks = [];
+  let currentWeekStart = new Date(firstDay);
+  
+  while (currentWeekStart <= lastDay) {
+    const weekEnd = new Date(currentWeekStart);
+    weekEnd.setDate(currentWeekStart.getDate() + 6);
+    
+    if (weekEnd > lastDay) {
+      weekEnd.setTime(lastDay.getTime());
+    }
+    
+    weeks.push({
+      start: new Date(currentWeekStart),
+      end: new Date(weekEnd)
+    });
+    
+    currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+  }
+  
+  return weeks;
+}
+
+/**
+ * Get display name for period
+ * @param {string} period - Period identifier
+ * @returns {string} Display name in Vietnamese
+ */
+function getPeriodDisplayName(period) {
+  const periodNames = {
+    'all_time': 'Tất cả thời gian',
+    'this_year': 'Năm nay',
+    'last_year': 'Năm trước',
+    'this_month': 'Tháng này',
+    'last_month': 'Tháng trước',
+    'last_30_days': '30 ngày qua',
+    'this_week': 'Tuần này',
+    'last_week': 'Tuần trước',
+    'last_7_days': '7 ngày qua',
+    'today': 'Hôm nay',
+    'yesterday': 'Hôm qua'
+  };
+  
+  return periodNames[period] || period;
+}
+
+/**
+ * Add chart period controls event listeners
+ */
+function addChartPeriodControls() {
+  const chartButtons = document.querySelectorAll('.chart-btn[data-period]');
+  
+  chartButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      // Remove active class from all buttons
+      chartButtons.forEach(btn => btn.classList.remove('active'));
+      
+      // Add active class to clicked button
+      this.classList.add('active');
+      
+      // Get period and update chart
+      const period = this.getAttribute('data-period');
+      updateChartPeriod(period);
+    });
+  });
+}
+
+/**
+ * Update chart based on selected period
+ * @param {string} period - Selected period (7days, 30days, 90days)
+ */
+function updateChartPeriod(period) {
+  console.log('📊 Updating chart for period:', period);
+  
+  // Get current transactions
+  const transactions = window.transactionList || [];
+  
+  // Filter transactions based on period
+  let filteredTransactions;
+  const now = new Date();
+  
+  switch (period) {
+    case '7days':
+      const sevenDaysAgo = new Date(now);
+      sevenDaysAgo.setDate(now.getDate() - 7);
+      filteredTransactions = transactions.filter(t => {
+        const transactionDate = new Date(t.ngayGiaoDich || t.date);
+        return transactionDate >= sevenDaysAgo;
+      });
+      break;
+      
+    case '30days':
+      const thirtyDaysAgo = new Date(now);
+      thirtyDaysAgo.setDate(now.getDate() - 30);
+      filteredTransactions = transactions.filter(t => {
+        const transactionDate = new Date(t.ngayGiaoDich || t.date);
+        return transactionDate >= thirtyDaysAgo;
+      });
+      break;
+      
+    case '90days':
+      const ninetyDaysAgo = new Date(now);
+      ninetyDaysAgo.setDate(now.getDate() - 90);
+      filteredTransactions = transactions.filter(t => {
+        const transactionDate = new Date(t.ngayGiaoDich || t.date);
+        return transactionDate >= ninetyDaysAgo;
+      });
+      break;
+      
+    default:
+      filteredTransactions = transactions;
+  }
+  
+  // Re-render chart with filtered data
+  renderRevenueStatusChart(filteredTransactions);
+}
+
+// Legacy function - kept for backward compatibility
+function getStatusDistribution(transactions) {
+  return getStatusDistributionWithRefund(transactions);
 }
 
 /**
@@ -723,12 +1511,98 @@ function getExpensesByCategory(expenses) {
 }
 
 /**
+ * Render revenue trend chart (old template)
+ */
+function renderRevenueTrendChart(transactions) {
+  const canvas = document.getElementById('revenueTrendChart');
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  
+  // Prepare data for last 6 months
+  const monthsData = getLastSixMonthsData(transactions);
+  
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: monthsData.labels,
+      datasets: [{
+        label: 'Doanh thu',
+        data: monthsData.values,
+        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+        borderColor: '#3498db',
+        borderWidth: 2,
+        tension: 0.4,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top'
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return formatRevenue(value);
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+/**
+ * Get revenue data for last 6 months
+ */
+function getLastSixMonthsData(transactions) {
+  const months = [];
+  const values = [];
+  const now = new Date();
+  
+  for (let i = 5; i >= 0; i--) {
+    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const monthName = date.toLocaleDateString('vi-VN', { month: 'short', year: 'numeric' });
+    
+    const monthRevenue = transactions
+      .filter(t => {
+        const transactionDate = new Date(t.ngayGiaoDich || t.date);
+        return transactionDate.getMonth() === date.getMonth() && 
+               transactionDate.getFullYear() === date.getFullYear();
+      })
+      .reduce((sum, t) => sum + (parseFloat(t.doanhThu || t.revenue) || 0), 0);
+    
+    months.push(monthName);
+    values.push(monthRevenue);
+  }
+  
+  return { labels: months, values: values };
+}
+
+/**
  * Update data tables
  */
 function updateDataTables(transactions, expenses) {
-  updateTopCustomersTable(transactions);
-  updateRecentTransactionsTable(transactions);
-  updateTopExpensesTable(expenses);
+  // Check which template we're using
+  const hasNewTables = document.getElementById('top-customers-body') !== null;
+  const hasOldTables = document.getElementById('topCustomersTable') !== null;
+  
+  if (hasNewTables) {
+    // New template - tables are updated via loadTopCustomers and loadTopProducts
+    console.log('📊 Using new table template');
+  } else if (hasOldTables) {
+    // Old template
+    console.log('📊 Using old table template');
+    updateTopCustomersTable(transactions);
+    updateRecentTransactionsTable(transactions);
+    updateTopExpensesTable(expenses);
+  }
 }
 
 /**
@@ -1068,5 +1942,214 @@ function showChartError() {
   });
 }
 
-// Make function available globally
+/**
+ * NEW FIXED Calculate overview KPIs with proper all_time handling
+ */
+function calculateOverviewKPIsNew(transactions, expenses, dateRange, period = 'this_month') {
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  
+  console.log('🆕 🔥 NEW FUNCTION - Date filtering setup:');
+  console.log(`  - Period parameter: "${period}"`);
+  console.log(`  - Period === 'all_time':`, period === 'all_time');
+  console.log(`  - Total transactions to filter: ${transactions.length}`);
+  console.log(`  - Total expenses to filter: ${expenses.length}`);
+  
+  // Filter data based on period - SIMPLIFIED LOGIC
+  let filteredTransactions, filteredExpenses;
+  
+  if (period === 'all_time') {
+    console.log('🆕 💯 ALL TIME ACTIVATED - NO FILTERING!');
+    filteredTransactions = transactions;
+    filteredExpenses = expenses;
+    console.log('🆕 💯 RESULT: transactions =', filteredTransactions.length);
+  } else {
+    console.log('🆕 Using current month filter for period:', period);
+    filteredTransactions = transactions.filter(t => {
+      const rawDate = t.transactionDate || t.ngayGiaoDich || t.date;
+      const transactionDate = new Date(rawDate);
+      
+      if (isNaN(transactionDate.getTime())) {
+        return false;
+      }
+      
+      return transactionDate.getMonth() === currentMonth && 
+             transactionDate.getFullYear() === currentYear;
+    });
+    
+    filteredExpenses = expenses.filter(e => {
+      const rawDate = e.ngayChiTieu || e.date;
+      const expenseDate = new Date(rawDate);
+      
+      if (isNaN(expenseDate.getTime())) {
+        return false;
+      }
+      
+      return expenseDate.getMonth() === currentMonth && 
+             expenseDate.getFullYear() === currentYear;
+    });
+  }
+  
+  // Calculate totals by transaction status
+  const statusBreakdown = {
+    completed: { count: 0, revenue: 0 },
+    paid: { count: 0, revenue: 0 },
+    unpaid: { count: 0, revenue: 0 }
+  };
+  
+  filteredTransactions.forEach(t => {
+    const revenue = parseFloat(t.doanhThu || t.revenue || t.Revenue || t.doanh_thu) || 0;
+    const status = t.loaiGiaoDich || t.transactionType || t.status || '';
+    
+    if (status.toLowerCase().includes('hoàn tất')) {
+      statusBreakdown.completed.count++;
+      statusBreakdown.completed.revenue += revenue;
+    } else if (status.toLowerCase().includes('đã thanh toán')) {
+      statusBreakdown.paid.count++;
+      statusBreakdown.paid.revenue += revenue;
+    } else if (status.toLowerCase().includes('chưa thanh toán')) {
+      statusBreakdown.unpaid.count++;
+      statusBreakdown.unpaid.revenue += revenue;
+    }
+  });
+  
+  const totalRevenue = statusBreakdown.completed.revenue + statusBreakdown.paid.revenue + statusBreakdown.unpaid.revenue;
+  const totalTransactions = filteredTransactions.length;
+  
+  console.log('🆕 📊 NEW FUNCTION Revenue calculation:');
+  console.log('  - Filtered transactions:', totalTransactions);
+  console.log('  - Total revenue calculated:', totalRevenue);
+  
+  return {
+    statusBreakdown: statusBreakdown,
+    completed: {
+      current: statusBreakdown.completed.revenue,
+      previous: 0,
+      growth: 0,
+      count: statusBreakdown.completed.count
+    },
+    paid: {
+      current: statusBreakdown.paid.revenue,
+      previous: 0,
+      growth: 0,
+      count: statusBreakdown.paid.count
+    },
+    unpaid: {
+      current: statusBreakdown.unpaid.revenue,
+      previous: 0,
+      growth: 0,
+      count: statusBreakdown.unpaid.count
+    },
+    transactions: {
+      current: totalTransactions,
+      previous: 0,
+      growth: 0
+    },
+    conversion: {
+      paymentRate: 0,
+      completionRate: 0,
+      successRate: 0
+    },
+    totalRevenue: totalRevenue
+  };
+}
+
+/**
+ * Status breakdown update with refund support
+ * @param {Object} kpis - Business metrics from statisticsCore
+ */
+function updateStatusBreakdownWithRefund(kpis) {
+  console.log('📊 Updating status breakdown with refund support');
+  
+  // Get current transactions for real status calculation
+  const transactions = window.transactionList || [];
+  const dateRange = window.globalFilters?.dateRange || null;
+  const period = window.globalFilters?.period || 'this_month';
+  
+  // Filter transactions based on current period
+  const filteredTransactions = filterDataByDateRange(transactions, dateRange);
+  
+  // Calculate real status breakdown
+  const statusBreakdown = {
+    completed: { count: 0, revenue: 0 },
+    paid: { count: 0, revenue: 0 },
+    refunded: { count: 0, revenue: 0 }
+  };
+  
+  filteredTransactions.forEach(t => {
+    const revenue = parseFloat(t.doanhThu || t.revenue || t.Revenue || t.doanh_thu) || 0;
+    const status = (t.loaiGiaoDich || t.transactionType || t.status || '').toLowerCase();
+    
+    if (status.includes('hoàn tất') || status.includes('completed')) {
+      statusBreakdown.completed.count++;
+      statusBreakdown.completed.revenue += revenue;
+    } else if (status.includes('đã thanh toán') || status.includes('paid')) {
+      statusBreakdown.paid.count++;
+      statusBreakdown.paid.revenue += revenue;
+    } else if (status.includes('hoàn tiền') || status.includes('refund')) {
+      statusBreakdown.refunded.count++;
+      statusBreakdown.refunded.revenue += revenue;
+    }
+  });
+  
+  const total = statusBreakdown.completed.count + statusBreakdown.paid.count + statusBreakdown.refunded.count;
+  
+  // Update counts
+  updateElementText('completed-count', statusBreakdown.completed.count);
+  updateElementText('paid-count', statusBreakdown.paid.count);
+  updateElementText('refund-count', statusBreakdown.refunded.count);
+  
+  // Update percentages and bars
+  if (total > 0) {
+    const completedPercent = (statusBreakdown.completed.count / total * 100);
+    const paidPercent = (statusBreakdown.paid.count / total * 100);
+    const refundPercent = (statusBreakdown.refunded.count / total * 100);
+    
+    updateElementText('completed-percentage', completedPercent.toFixed(1) + '%');
+    updateElementText('paid-percentage', paidPercent.toFixed(1) + '%');
+    updateElementText('refund-percentage', refundPercent.toFixed(1) + '%');
+    
+    updateElementStyle('completed-bar', 'width', completedPercent + '%');
+    updateElementStyle('paid-bar', 'width', paidPercent + '%');
+    updateElementStyle('refund-bar', 'width', refundPercent + '%');
+    
+    // Update summary in distribution chart
+    updateElementText('completed-summary', statusBreakdown.completed.count);
+    updateElementText('paid-summary', statusBreakdown.paid.count);
+    updateElementText('refund-summary', statusBreakdown.refunded.count);
+  }
+  
+  console.log('📊 Status breakdown updated:', statusBreakdown);
+}
+
+/**
+ * Helper function to update element text content
+ * @param {string} elementId - Element ID
+ * @param {string|number} value - Value to set
+ */
+function updateElementText(elementId, value) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.textContent = value;
+  }
+}
+
+/**
+ * Helper function to update element style
+ * @param {string} elementId - Element ID
+ * @param {string} property - CSS property
+ * @param {string} value - CSS value
+ */
+function updateElementStyle(elementId, property, value) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.style[property] = value;
+  }
+}
+
+// Make functions available globally
 window.loadOverviewReport = loadOverviewReport;
+window.updateStatusBreakdownWithRefund = updateStatusBreakdownWithRefund;
+window.updateChartPeriod = updateChartPeriod;
+window.calculateRevenueByStatus = calculateRevenueByStatus;

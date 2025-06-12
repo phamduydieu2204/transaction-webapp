@@ -1,15 +1,29 @@
 /**
- * financialDashboard.js
+ * financialDashboard.js - DISABLED
  * 
- * Main financial dashboard controller - using modular architecture
- * This file now imports functionality from separate modules
+ * ⚠️ This file has been disabled during cleanup to prevent conflicts.
+ * Functionality integrated into: reports/overview/overviewReport.js
+ * 
+ * Reason: Complex modular system not needed for current requirements
+ * Date: 2025-01-16
  */
 
-// Import from the new modular structure
-export { default as renderFinancialDashboard } from './financial/financialDashboard.js';
+console.warn('⚠️ financialDashboard.js is disabled - use reports/overview/overviewReport.js instead');
 
-// For backward compatibility, also make available globally
-import renderFinancialDashboardModular from './financial/financialDashboard.js';
+/**
+ * DISABLED - Export stub function to prevent import errors
+ */
+export function renderFinancialDashboard(transactionData, expenseData, options = {}) {
+  console.error('❌ renderFinancialDashboard is disabled. Use reports/overview/overviewReport.js instead');
+  return;
+}
 
-// Make available globally
-window.renderFinancialDashboard = renderFinancialDashboardModular;
+export function addFinancialDashboardStyles() {
+  console.error('❌ addFinancialDashboardStyles is disabled. Styles moved to main CSS files');
+  return;
+}
+
+export default renderFinancialDashboard;
+
+// Make available globally for backward compatibility
+window.renderFinancialDashboard = renderFinancialDashboard;

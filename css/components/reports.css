@@ -89,9 +89,13 @@
 }
 
 .revenue-card { --kpi-color: #27ae60; }
+.completed-card { --kpi-color: #27ae60; }
 .expense-card { --kpi-color: #e74c3c; }
 .profit-card { --kpi-color: #3498db; }
+.paid-card { --kpi-color: #3498db; }
 .transaction-card { --kpi-color: #f39c12; }
+.unpaid-card { --kpi-color: #e74c3c; }
+.refund-card { --kpi-color: #e67e22; }
 
 .kpi-icon {
   display: flex;
@@ -639,4 +643,152 @@
   background: #0056b3;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Status Breakdown Section */
+.status-breakdown-section {
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.status-breakdown-section h3 {
+  margin: 0 0 20px 0;
+  color: #2c3e50;
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.status-item {
+  text-align: center;
+}
+
+.status-name {
+  font-size: 14px;
+  color: #6c757d;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.status-count {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 8px;
+}
+
+.status-count.completed { color: #27ae60; }
+.status-count.paid { color: #3498db; }
+.status-count.unpaid { color: #e74c3c; }
+
+.status-percentage {
+  font-size: 14px;
+  color: #6c757d;
+  margin-bottom: 10px;
+}
+
+.status-bar {
+  height: 8px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.status-bar-fill {
+  height: 100%;
+  transition: width 0.5s ease;
+  border-radius: 4px;
+}
+
+.status-bar-fill.completed { background: #27ae60; }
+.status-bar-fill.paid { background: #3498db; }
+.status-bar-fill.unpaid { background: #e74c3c; }
+
+/* Conversion Rates Section */
+.conversion-rates-section {
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.conversion-rates-section h3 {
+  margin: 0 0 20px 0;
+  color: #2c3e50;
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.conversion-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.conversion-item {
+  text-align: center;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.conversion-item:hover {
+  background: #e9ecef;
+  transform: translateY(-2px);
+}
+
+.conversion-label {
+  font-size: 14px;
+  color: #6c757d;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.conversion-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.conversion-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+/* KPI Sub-label */
+.kpi-sub-label {
+  font-size: 12px;
+  color: #6c757d;
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+/* Responsive adjustments for status sections */
+@media (max-width: 768px) {
+  .status-breakdown-grid,
+  .conversion-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .status-item,
+  .conversion-item {
+    margin-bottom: 15px;
+  }
 }

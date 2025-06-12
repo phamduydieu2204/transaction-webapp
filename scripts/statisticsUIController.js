@@ -47,7 +47,7 @@ import {
 // Legacy imports for backward compatibility
 import { exportData } from './statisticsDataManager.js';
 import { addFinancialDashboardStyles } from './financialDashboard.js';
-import { addBusinessDashboardStyles } from './businessOverviewDashboard.js';
+// DISABLED: import { addBusinessDashboardStyles } from './businessOverviewDashboard.js';
 
 /**
  * UI state management
@@ -77,7 +77,7 @@ export function initializeStatisticsUI() {
   
   // Add dashboard styles
   addFinancialDashboardStyles();
-  addBusinessDashboardStyles();
+  // DISABLED: addBusinessDashboardStyles();
   
   // Initialize view controllers
   initializeViewControllers();

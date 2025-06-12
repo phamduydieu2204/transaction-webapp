@@ -1,0 +1,170 @@
+<div class="report-header">
+<h2 class="report-title"><i class="fas fa-chart-line"></i> Tổng quan kinh doanh</h2>
+<div class="report-subtitle">
+<span id="overview-period-display">Tháng này</span>
+<span class="refresh-status" id="overview-refresh-status"><i class="fas fa-sync-alt"></i> Đã cập nhật</span>
+</div>
+</div>
+
+<div class="kpi-grid">
+<div class="kpi-card revenue-card">
+<div class="kpi-icon"><i class="fas fa-check-circle"></i></div>
+<div class="kpi-content">
+<div class="kpi-label">Doanh thu thực</div>
+<div class="kpi-value" id="completed-revenue">0 ₫</div>
+<div class="kpi-change" id="completed-change"><i class="fas fa-arrow-up"></i> +0%</div>
+<div class="kpi-sub-label">Đã hoàn tất</div>
+</div>
+</div>
+
+<div class="kpi-card paid-card">
+<div class="kpi-icon"><i class="fas fa-clock"></i></div>
+<div class="kpi-content">
+<div class="kpi-label">Đang chờ giao</div>
+<div class="kpi-value" id="paid-revenue">0 ₫</div>
+<div class="kpi-change" id="paid-change"><i class="fas fa-arrow-up"></i> +0%</div>
+<div class="kpi-sub-label">Đã thanh toán</div>
+</div>
+</div>
+
+<div class="kpi-card unpaid-card">
+<div class="kpi-icon"><i class="fas fa-exclamation-circle"></i></div>
+<div class="kpi-content">
+<div class="kpi-label">Chưa thu</div>
+<div class="kpi-value" id="unpaid-revenue">0 ₫</div>
+<div class="kpi-change" id="unpaid-change"><i class="fas fa-arrow-up"></i> +0%</div>
+<div class="kpi-sub-label">Chưa thanh toán</div>
+</div>
+</div>
+
+<div class="kpi-card transaction-card">
+<div class="kpi-icon"><i class="fas fa-handshake"></i></div>
+<div class="kpi-content">
+<div class="kpi-label">Tổng giao dịch</div>
+<div class="kpi-value" id="total-transactions">0</div>
+<div class="kpi-change" id="transaction-change"><i class="fas fa-arrow-up"></i> +0%</div>
+<div class="kpi-sub-label">Tất cả trạng thái</div>
+</div>
+</div>
+</div>
+
+<div class="status-summary-grid">
+<div class="status-card">
+<h4>Phân bố trạng thái giao dịch</h4>
+<div class="status-breakdown">
+<div class="status-item completed">
+<div class="status-info">
+<span class="status-label">Đã hoàn tất</span>
+<span class="status-count" id="completed-count">0</span>
+</div>
+<div class="status-bar"><div class="status-fill" id="completed-bar" style="width: 0%"></div></div>
+<div class="status-percentage" id="completed-percentage">0%</div>
+</div>
+
+<div class="status-item paid">
+<div class="status-info">
+<span class="status-label">Đã thanh toán</span>
+<span class="status-count" id="paid-count">0</span>
+</div>
+<div class="status-bar"><div class="status-fill" id="paid-bar" style="width: 0%"></div></div>
+<div class="status-percentage" id="paid-percentage">0%</div>
+</div>
+
+<div class="status-item unpaid">
+<div class="status-info">
+<span class="status-label">Chưa thanh toán</span>
+<span class="status-count" id="unpaid-count">0</span>
+</div>
+<div class="status-bar"><div class="status-fill" id="unpaid-bar" style="width: 0%"></div></div>
+<div class="status-percentage" id="unpaid-percentage">0%</div>
+</div>
+</div>
+</div>
+
+<div class="status-card">
+<h4>Tỷ lệ chuyển đổi</h4>
+<div class="conversion-metrics">
+<div class="conversion-item">
+<div class="conversion-label">Tỷ lệ thanh toán</div>
+<div class="conversion-value" id="payment-rate">0%</div>
+<div class="conversion-desc">Chưa TT → Đã TT</div>
+</div>
+<div class="conversion-item">
+<div class="conversion-label">Tỷ lệ hoàn tất</div>
+<div class="conversion-value" id="completion-rate">0%</div>
+<div class="conversion-desc">Đã TT → Hoàn tất</div>
+</div>
+<div class="conversion-item">
+<div class="conversion-label">Tỷ lệ thành công</div>
+<div class="conversion-value" id="success-rate">0%</div>
+<div class="conversion-desc">Chưa TT → Hoàn tất</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="charts-row" data-lazy="true">
+<div class="chart-container">
+<div class="chart-header">
+<h3 class="chart-title"><i class="fas fa-chart-line"></i> Xu hướng doanh thu theo trạng thái</h3>
+<div class="chart-controls">
+<button class="chart-btn" data-period="7days">7 ngày</button>
+<button class="chart-btn active" data-period="30days">30 ngày</button>
+<button class="chart-btn" data-period="90days">90 ngày</button>
+</div>
+</div>
+<div class="chart-content">
+<canvas id="revenue-status-chart" width="400" height="200"></canvas>
+</div>
+</div>
+
+<div class="chart-container">
+<div class="chart-header">
+<h3 class="chart-title"><i class="fas fa-chart-pie"></i> Phân bố trạng thái</h3>
+<div class="chart-legend" id="status-legend"></div>
+</div>
+<div class="chart-content">
+<canvas id="status-distribution-chart" width="400" height="200"></canvas>
+</div>
+</div>
+</div>
+
+<div class="tables-row" data-lazy="true">
+<div class="data-table-container">
+<div class="table-header">
+<h3 class="table-title"><i class="fas fa-users"></i> Khách hàng hàng đầu</h3>
+<div class="table-controls">
+<button class="table-btn" onclick="exportCustomerData()"><i class="fas fa-download"></i> Xuất</button>
+</div>
+</div>
+<div class="table-content">
+<table class="data-table" id="top-customers-table">
+<thead>
+<tr><th>Khách hàng</th><th>Giao dịch</th><th>Doanh thu</th><th>Xu hướng</th></tr>
+</thead>
+<tbody id="top-customers-body">
+<tr><td colspan="4" class="loading-row"><i class="fas fa-spinner fa-spin"></i> Đang tải...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="data-table-container">
+<div class="table-header">
+<h3 class="table-title"><i class="fas fa-laptop-code"></i> Phần mềm phổ biến</h3>
+<div class="table-controls">
+<button class="table-btn" onclick="exportSoftwareData()"><i class="fas fa-download"></i> Xuất</button>
+</div>
+</div>
+<div class="table-content">
+<table class="data-table" id="top-software-table">
+<thead>
+<tr><th>Phần mềm</th><th>Số lượng</th><th>Doanh thu</th><th>Tỷ lệ</th></tr>
+</thead>
+<tbody id="top-software-body">
+<tr><td colspan="4" class="loading-row"><i class="fas fa-spinner fa-spin"></i> Đang tải...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>

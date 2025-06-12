@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tổng quan kinh doanh - DISABLED</title>
+    <!-- DISABLED: <link rel="stylesheet" href="business-overview.css"> -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+            <h1><i class="fas fa-chart-line"></i> Tổng quan kinh doanh</h1>
+            <div class="header-actions">
+                <button class="btn-refresh" onclick="refreshData()">
+                    <i class="fas fa-sync-alt"></i> Làm mới
+                </button>
+                <select id="periodSelector" onchange="changePeriod()">
+                    <option value="week">Tuần này</option>
+                    <option value="month" selected>Tháng này</option>
+                    <option value="quarter">Quý này</option>
+                    <option value="year">Năm này</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- Dashboard Cards -->
+        <div class="dashboard-cards">
+            <!-- Doanh thu -->
+            <div class="card revenue-card">
+                <div class="card-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-title">Doanh thu</div>
+                    <div class="card-value" id="revenue-value">0 ₫</div>
+                    <div class="card-change" id="revenue-change">
+                        <i class="fas fa-arrow-up"></i> +0%
+                    </div>
+                    <div class="card-subtitle">Đã hoàn tất</div>
+                </div>
+            </div>
+
+            <!-- Chi phí -->
+            <div class="card expense-card">
+                <div class="card-icon">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-title">Chi phí</div>
+                    <div class="card-value" id="expense-value">0 ₫</div>
+                    <div class="card-change" id="expense-change">
+                        <i class="fas fa-arrow-down"></i> +0%
+                    </div>
+                    <div class="card-subtitle">Tổng chi tiêu</div>
+                </div>
+            </div>
+
+            <!-- Lợi nhuận -->
+            <div class="card profit-card">
+                <div class="card-icon">
+                    <i class="fas fa-piggy-bank"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-title">Lợi nhuận</div>
+                    <div class="card-value" id="profit-value">0 ₫</div>
+                    <div class="card-change" id="profit-change">
+                        <i class="fas fa-arrow-up"></i> +0%
+                    </div>
+                    <div class="card-subtitle">Doanh thu - Chi phí</div>
+                </div>
+            </div>
+
+            <!-- Tổng giao dịch -->
+            <div class="card transaction-card">
+                <div class="card-icon">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-title">Giao dịch</div>
+                    <div class="card-value" id="transaction-value">0</div>
+                    <div class="card-change" id="transaction-change">
+                        <i class="fas fa-arrow-up"></i> +0%
+                    </div>
+                    <div class="card-subtitle">Đã xử lý</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transaction Status Summary -->
+        <div class="status-overview">
+            <h2><i class="fas fa-pie-chart"></i> Phân bố trạng thái giao dịch</h2>
+            <div class="status-grid">
+                <div class="status-item completed">
+                    <div class="status-info">
+                        <div class="status-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="status-details">
+                            <span class="status-label">Đã hoàn tất</span>
+                            <span class="status-count" id="completed-count">0</span>
+                            <span class="status-amount" id="completed-amount">0 ₫</span>
+                        </div>
+                    </div>
+                    <div class="status-bar">
+                        <div class="status-fill" id="completed-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="status-item paid">
+                    <div class="status-info">
+                        <div class="status-icon"><i class="fas fa-credit-card"></i></div>
+                        <div class="status-details">
+                            <span class="status-label">Đã thanh toán</span>
+                            <span class="status-count" id="paid-count">0</span>
+                            <span class="status-amount" id="paid-amount">0 ₫</span>
+                        </div>
+                    </div>
+                    <div class="status-bar">
+                        <div class="status-fill" id="paid-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="status-item unpaid">
+                    <div class="status-info">
+                        <div class="status-icon"><i class="fas fa-clock"></i></div>
+                        <div class="status-details">
+                            <span class="status-label">Chưa thanh toán</span>
+                            <span class="status-count" id="unpaid-count">0</span>
+                            <span class="status-amount" id="unpaid-amount">0 ₫</span>
+                        </div>
+                    </div>
+                    <div class="status-bar">
+                        <div class="status-fill" id="unpaid-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="status-item refund">
+                    <div class="status-info">
+                        <div class="status-icon"><i class="fas fa-undo"></i></div>
+                        <div class="status-details">
+                            <span class="status-label">Hoàn tiền</span>
+                            <span class="status-count" id="refund-count">0</span>
+                            <span class="status-amount" id="refund-amount">0 ₫</span>
+                        </div>
+                    </div>
+                    <div class="status-bar">
+                        <div class="status-fill" id="refund-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="status-item cancelled">
+                    <div class="status-info">
+                        <div class="status-icon"><i class="fas fa-times-circle"></i></div>
+                        <div class="status-details">
+                            <span class="status-label">Đã hủy</span>
+                            <span class="status-count" id="cancelled-count">0</span>
+                            <span class="status-amount" id="cancelled-amount">0 ₫</span>
+                        </div>
+                    </div>
+                    <div class="status-bar">
+                        <div class="status-fill" id="cancelled-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="charts-header">
+                <h2><i class="fas fa-chart-bar"></i> Xu hướng doanh thu</h2>
+                <div class="chart-controls">
+                    <div class="time-range-selector">
+                        <button class="range-btn active" data-range="7days" onclick="changeChartRange('7days')">7 ngày</button>
+                        <button class="range-btn" data-range="30days" onclick="changeChartRange('30days')">30 ngày</button>
+                        <button class="range-btn" data-range="3months" onclick="changeChartRange('3months')">3 tháng</button>
+                        <button class="range-btn" data-range="6months" onclick="changeChartRange('6months')">6 tháng</button>
+                    </div>
+                    <div class="chart-type-selector">
+                        <button class="type-btn active" data-type="column" onclick="changeChartType('column')">
+                            <i class="fas fa-chart-column"></i> Cột
+                        </button>
+                        <button class="type-btn" data-type="line" onclick="changeChartType('line')">
+                            <i class="fas fa-chart-line"></i> Đường
+                        </button>
+                        <button class="type-btn" data-type="area" onclick="changeChartType('area')">
+                            <i class="fas fa-chart-area"></i> Vùng
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue Trend Chart -->
+            <div class="chart-container">
+                <canvas id="revenueTrendChart"></canvas>
+            </div>
+
+            <!-- Chart Legend & Stats -->
+            <div class="chart-stats">
+                <div class="legend-container">
+                    <div class="legend-item">
+                        <span class="legend-color completed"></span>
+                        <span class="legend-label">Đã hoàn tất</span>
+                        <span class="legend-value" id="legend-completed">0 ₫</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color paid"></span>
+                        <span class="legend-label">Đã thanh toán</span>
+                        <span class="legend-value" id="legend-paid">0 ₫</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color unpaid"></span>
+                        <span class="legend-label">Chưa thanh toán</span>
+                        <span class="legend-value" id="legend-unpaid">0 ₫</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color refund"></span>
+                        <span class="legend-label">Hoàn tiền</span>
+                        <span class="legend-value" id="legend-refund">0 ₫</span>
+                    </div>
+                </div>
+                
+                <div class="chart-summary">
+                    <div class="summary-item">
+                        <span class="summary-label">Trung bình/ngày:</span>
+                        <span class="summary-value" id="avg-daily">0 ₫</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Cao nhất:</span>
+                        <span class="summary-value" id="max-daily">0 ₫</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Tăng trưởng:</span>
+                        <span class="summary-value" id="growth-rate">+0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pie Charts Section -->
+        <div class="pie-charts-section">
+            <div class="pie-charts-header">
+                <h2><i class="fas fa-chart-pie"></i> Phân tích theo trạng thái</h2>
+                <div class="pie-chart-controls">
+                    <div class="view-selector">
+                        <button class="view-btn active" data-view="count" onclick="changePieView('count')">
+                            <i class="fas fa-hashtag"></i> Số lượng
+                        </button>
+                        <button class="view-btn" data-view="amount" onclick="changePieView('amount')">
+                            <i class="fas fa-dollar-sign"></i> Giá trị
+                        </button>
+                    </div>
+                    <div class="period-filter">
+                        <select id="pieChartPeriod" onchange="changePiePeriod()">
+                            <option value="today">Hôm nay</option>
+                            <option value="week">Tuần này</option>
+                            <option value="month" selected>Tháng này</option>
+                            <option value="quarter">Quý này</option>
+                            <option value="year">Năm này</option>
+                            <option value="all">Tất cả</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pie-charts-grid">
+                <!-- Main Pie Chart -->
+                <div class="pie-chart-container main-chart">
+                    <div class="chart-header">
+                        <h3 id="pie-chart-title">Phân bố theo số lượng</h3>
+                        <div class="chart-info">
+                            <span class="total-label">Tổng:</span>
+                            <span class="total-value" id="pie-total-value">0</span>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="statusPieChart"></canvas>
+                        <div class="chart-center-text">
+                            <div class="center-title">Giao dịch</div>
+                            <div class="center-period" id="pie-center-period">Tháng này</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Statistics -->
+                <div class="pie-stats-container">
+                    <h3>Chi tiết thống kê</h3>
+                    
+                    <!-- Status Breakdown Cards -->
+                    <div class="status-cards">
+                        <div class="status-card completed">
+                            <div class="status-card-header">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Đã hoàn tất</span>
+                            </div>
+                            <div class="status-card-body">
+                                <div class="stat-item">
+                                    <span class="stat-label">Số lượng:</span>
+                                    <span class="stat-value" id="pie-completed-count">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Giá trị:</span>
+                                    <span class="stat-value" id="pie-completed-amount">0 ₫</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Tỷ lệ:</span>
+                                    <span class="stat-value" id="pie-completed-percentage">0%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="status-card paid">
+                            <div class="status-card-header">
+                                <i class="fas fa-credit-card"></i>
+                                <span>Đã thanh toán</span>
+                            </div>
+                            <div class="status-card-body">
+                                <div class="stat-item">
+                                    <span class="stat-label">Số lượng:</span>
+                                    <span class="stat-value" id="pie-paid-count">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Giá trị:</span>
+                                    <span class="stat-value" id="pie-paid-amount">0 ₫</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Tỷ lệ:</span>
+                                    <span class="stat-value" id="pie-paid-percentage">0%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="status-card unpaid">
+                            <div class="status-card-header">
+                                <i class="fas fa-clock"></i>
+                                <span>Chưa thanh toán</span>
+                            </div>
+                            <div class="status-card-body">
+                                <div class="stat-item">
+                                    <span class="stat-label">Số lượng:</span>
+                                    <span class="stat-value" id="pie-unpaid-count">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Giá trị:</span>
+                                    <span class="stat-value" id="pie-unpaid-amount">0 ₫</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Tỷ lệ:</span>
+                                    <span class="stat-value" id="pie-unpaid-percentage">0%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="status-card refund highlight">
+                            <div class="status-card-header">
+                                <i class="fas fa-undo"></i>
+                                <span>Hoàn tiền</span>
+                                <span class="warning-badge">⚠️</span>
+                            </div>
+                            <div class="status-card-body">
+                                <div class="stat-item">
+                                    <span class="stat-label">Số lượng:</span>
+                                    <span class="stat-value" id="pie-refund-count">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Số tiền mất:</span>
+                                    <span class="stat-value negative" id="pie-refund-amount">0 ₫</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Tỷ lệ:</span>
+                                    <span class="stat-value" id="pie-refund-percentage">0%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="status-card cancelled">
+                            <div class="status-card-header">
+                                <i class="fas fa-times-circle"></i>
+                                <span>Đã hủy</span>
+                            </div>
+                            <div class="status-card-body">
+                                <div class="stat-item">
+                                    <span class="stat-label">Số lượng:</span>
+                                    <span class="stat-value" id="pie-cancelled-count">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Giá trị:</span>
+                                    <span class="stat-value" id="pie-cancelled-amount">0 ₫</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Tỷ lệ:</span>
+                                    <span class="stat-value" id="pie-cancelled-percentage">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Key Insights -->
+                    <div class="insights-container">
+                        <h4><i class="fas fa-lightbulb"></i> Thông tin quan trọng</h4>
+                        <div class="insights-list">
+                            <div class="insight-item success" id="insight-success-rate">
+                                <i class="fas fa-check"></i>
+                                <span>Tỷ lệ thành công: <strong id="success-rate-value">0%</strong></span>
+                            </div>
+                            <div class="insight-item warning" id="insight-pending">
+                                <i class="fas fa-clock"></i>
+                                <span>Cần theo dõi: <strong id="pending-transactions-value">0 giao dịch</strong></span>
+                            </div>
+                            <div class="insight-item danger" id="insight-refund">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Tổn thất hoàn tiền: <strong id="refund-loss-value">0 ₫</strong></span>
+                            </div>
+                            <div class="insight-item info" id="insight-potential">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>Tiềm năng thu: <strong id="potential-revenue-value">0 ₫</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Required Tables Section -->
+        <div class="action-tables-section">
+            <div class="action-tables-header">
+                <h2><i class="fas fa-exclamation-triangle"></i> Giao dịch cần xử lý</h2>
+                <div class="action-controls">
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" data-filter="all" onclick="changeActionFilter('all')">
+                            <i class="fas fa-list"></i> Tất cả <span class="tab-count" id="all-count">0</span>
+                        </button>
+                        <button class="filter-tab urgent" data-filter="delivery" onclick="changeActionFilter('delivery')">
+                            <i class="fas fa-truck"></i> Cần giao hàng <span class="tab-count" id="delivery-count">0</span>
+                        </button>
+                        <button class="filter-tab warning" data-filter="payment" onclick="changeActionFilter('payment')">
+                            <i class="fas fa-money-bill-wave"></i> Cần thu tiền <span class="tab-count" id="payment-count">0</span>
+                        </button>
+                        <button class="filter-tab danger" data-filter="refund" onclick="changeActionFilter('refund')">
+                            <i class="fas fa-undo"></i> Hoàn tiền <span class="tab-count" id="refund-count">0</span>
+                        </button>
+                    </div>
+                    <div class="table-actions">
+                        <button class="btn-bulk-action" onclick="showBulkActions()">
+                            <i class="fas fa-tasks"></i> Xử lý hàng loạt
+                        </button>
+                        <button class="btn-export-table" onclick="exportActionTable()">
+                            <i class="fas fa-file-excel"></i> Xuất Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Statistics Cards -->
+            <div class="action-stats-grid">
+                <div class="action-stat-card delivery">
+                    <div class="stat-icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-title">Cần giao hàng</div>
+                        <div class="stat-value" id="delivery-stat-count">0</div>
+                        <div class="stat-subtitle">Đã thanh toán, chưa giao</div>
+                        <div class="stat-amount" id="delivery-stat-amount">0 ₫</div>
+                    </div>
+                    <div class="stat-action">
+                        <button class="quick-action-btn" onclick="processDeliveries()">
+                            <i class="fas fa-shipping-fast"></i> Xử lý
+                        </button>
+                    </div>
+                </div>
+
+                <div class="action-stat-card payment">
+                    <div class="stat-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-title">Cần thu tiền</div>
+                        <div class="stat-value" id="payment-stat-count">0</div>
+                        <div class="stat-subtitle">Đã giao, chưa thanh toán</div>
+                        <div class="stat-amount" id="payment-stat-amount">0 ₫</div>
+                    </div>
+                    <div class="stat-action">
+                        <button class="quick-action-btn" onclick="processPayments()">
+                            <i class="fas fa-credit-card"></i> Thu tiền
+                        </button>
+                    </div>
+                </div>
+
+                <div class="action-stat-card refund highlight">
+                    <div class="stat-icon">
+                        <i class="fas fa-undo"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-title">Hoàn tiền</div>
+                        <div class="stat-value" id="refund-stat-count">0</div>
+                        <div class="stat-subtitle">Yêu cầu hoàn trả</div>
+                        <div class="stat-amount negative" id="refund-stat-amount">0 ₫</div>
+                    </div>
+                    <div class="stat-action">
+                        <button class="quick-action-btn danger" onclick="processRefunds()">
+                            <i class="fas fa-exclamation-triangle"></i> Xử lý
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Required Table -->
+            <div class="action-table-container">
+                <div class="table-toolbar">
+                    <div class="table-info">
+                        <span class="current-filter" id="current-filter-text">Tất cả giao dịch cần xử lý</span>
+                        <span class="table-count">(<span id="filtered-count">0</span> giao dịch)</span>
+                    </div>
+                    <div class="table-tools">
+                        <div class="search-box">
+                            <input type="text" id="action-search" placeholder="Tìm kiếm khách hàng, sản phẩm..." onkeyup="searchActionTable()">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <select id="action-sort" onchange="sortActionTable()">
+                            <option value="date-desc">Ngày gần nhất</option>
+                            <option value="date-asc">Ngày cũ nhất</option>
+                            <option value="amount-desc">Số tiền cao nhất</option>
+                            <option value="amount-asc">Số tiền thấp nhất</option>
+                            <option value="priority">Độ ưu tiên</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="action-table" id="actionTable">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-col">
+                                    <input type="checkbox" id="select-all" onchange="toggleSelectAll()">
+                                </th>
+                                <th class="priority-col">
+                                    <i class="fas fa-flag" title="Độ ưu tiên"></i>
+                                </th>
+                                <th class="date-col">Ngày</th>
+                                <th class="customer-col">Khách hàng</th>
+                                <th class="product-col">Sản phẩm</th>
+                                <th class="amount-col">Số tiền</th>
+                                <th class="status-col">Trạng thái</th>
+                                <th class="action-col">Hành động cần làm</th>
+                                <th class="days-col">Số ngày</th>
+                                <th class="actions-col">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="action-table-body">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Table Pagination -->
+                <div class="table-pagination">
+                    <div class="pagination-info">
+                        Hiển thị <span id="start-record">0</span> - <span id="end-record">0</span> 
+                        trong tổng số <span id="total-records">0</span> giao dịch
+                    </div>
+                    <div class="pagination-controls">
+                        <button class="page-btn" id="prev-page" onclick="previousPage()" disabled>
+                            <i class="fas fa-chevron-left"></i> Trước
+                        </button>
+                        <span class="page-numbers" id="page-numbers"></span>
+                        <button class="page-btn" id="next-page" onclick="nextPage()" disabled>
+                            Tiếp <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Customers & Products Section -->
+        <div class="top-performers-section">
+            <div class="top-performers-header">
+                <h2><i class="fas fa-trophy"></i> Top khách hàng & sản phẩm</h2>
+                <div class="top-performers-controls">
+                    <div class="period-selector">
+                        <select id="topPerformersPeriod" onchange="changeTopPerformersPeriod()">
+                            <option value="week">Tuần này</option>
+                            <option value="month" selected>Tháng này</option>
+                            <option value="quarter">Quý này</option>
+                            <option value="year">Năm này</option>
+                            <option value="all">Tất cả thời gian</option>
+                        </select>
+                    </div>
+                    <div class="view-toggle">
+                        <button class="toggle-btn active" data-view="revenue" onclick="changeTopView('revenue')">
+                            <i class="fas fa-dollar-sign"></i> Doanh thu
+                        </button>
+                        <button class="toggle-btn" data-view="quantity" onclick="changeTopView('quantity')">
+                            <i class="fas fa-hashtag"></i> Số lượng
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="top-performers-grid">
+                <!-- Top Customers -->
+                <div class="top-customers-container">
+                    <div class="section-header">
+                        <h3><i class="fas fa-users"></i> Top khách hàng</h3>
+                        <div class="section-info">
+                            <span class="period-label" id="customers-period">Tháng này</span>
+                            <span class="metric-label" id="customers-metric">theo doanh thu</span>
+                        </div>
+                    </div>
+
+                    <!-- Top Customers Stats -->
+                    <div class="top-stats-cards">
+                        <div class="top-stat-card">
+                            <div class="stat-icon customer">
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-label">Khách hàng VIP</div>
+                                <div class="stat-value" id="vip-customers-count">0</div>
+                                <div class="stat-detail" id="vip-customers-revenue">0 ₫</div>
+                            </div>
+                        </div>
+                        <div class="top-stat-card">
+                            <div class="stat-icon repeat">
+                                <i class="fas fa-redo"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-label">Khách quay lại</div>
+                                <div class="stat-value" id="repeat-customers-count">0</div>
+                                <div class="stat-detail" id="repeat-customers-rate">0%</div>
+                            </div>
+                        </div>
+                        <div class="top-stat-card">
+                            <div class="stat-icon average">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-label">Trung bình/KH</div>
+                                <div class="stat-value" id="avg-customer-value">0 ₫</div>
+                                <div class="stat-detail" id="avg-customer-orders">0 đơn</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Customers Table -->
+                    <div class="top-table-container">
+                        <div class="top-table-header">
+                            <div class="table-title">
+                                <span>Xếp hạng khách hàng</span>
+                                <span class="table-count" id="customers-table-count">(0 khách hàng)</span>
+                            </div>
+                            <div class="table-actions">
+                                <button class="btn-expand" onclick="expandCustomersTable()">
+                                    <i class="fas fa-expand"></i> Xem tất cả
+                                </button>
+                                <button class="btn-export" onclick="exportCustomersTable()">
+                                    <i class="fas fa-file-csv"></i> Xuất CSV
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="top-table-wrapper">
+                            <table class="top-table" id="customersTable">
+                                <thead>
+                                    <tr>
+                                        <th class="rank-col">#</th>
+                                        <th class="customer-col">Khách hàng</th>
+                                        <th class="orders-col">Đơn hàng</th>
+                                        <th class="revenue-col">Doanh thu</th>
+                                        <th class="avg-col">TB/đơn</th>
+                                        <th class="last-order-col">Đơn cuối</th>
+                                        <th class="status-col">Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customers-table-body">
+                                    <!-- Data populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="table-footer">
+                            <div class="show-more">
+                                <button class="btn-show-more" onclick="showMoreCustomers()" id="show-more-customers">
+                                    <i class="fas fa-chevron-down"></i> Hiển thị thêm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Products -->
+                <div class="top-products-container">
+                    <div class="section-header">
+                        <h3><i class="fas fa-box"></i> Top sản phẩm</h3>
+                        <div class="section-info">
+                            <span class="period-label" id="products-period">Tháng này</span>
+                            <span class="metric-label" id="products-metric">theo doanh thu</span>
+                        </div>
+                    </div>
+
+                    <!-- Top Products Stats -->
+                    <div class="top-stats-cards">
+                        <div class="top-stat-card">
+                            <div class="stat-icon bestseller">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-label">Sản phẩm hot</div>
+                                <div class="stat-value" id="bestseller-count">0</div>
+                                <div class="stat-detail" id="bestseller-revenue">0 ₫</div>
+                            </div>
+                        </div>
+                        <div class="top-stat-card">
+                            <div class="stat-icon trending">
+                                <i class="fas fa-trending-up"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-label">Tăng trưởng</div>
+                                <div class="stat-value" id="trending-products-count">0</div>
+                                <div class="stat-detail" id="trending-growth-rate">+0%</div>
+                            </div>
+                        </div>
+                        <div class="top-stat-card">
+                            <div class="stat-icon margin">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-label">Lợi nhuận TB</div>
+                                <div class="stat-value" id="avg-profit-margin">0%</div>
+                                <div class="stat-detail" id="best-margin-product">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Products Table -->
+                    <div class="top-table-container">
+                        <div class="top-table-header">
+                            <div class="table-title">
+                                <span>Xếp hạng sản phẩm</span>
+                                <span class="table-count" id="products-table-count">(0 sản phẩm)</span>
+                            </div>
+                            <div class="table-actions">
+                                <button class="btn-expand" onclick="expandProductsTable()">
+                                    <i class="fas fa-expand"></i> Xem tất cả
+                                </button>
+                                <button class="btn-export" onclick="exportProductsTable()">
+                                    <i class="fas fa-file-csv"></i> Xuất CSV
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="top-table-wrapper">
+                            <table class="top-table" id="productsTable">
+                                <thead>
+                                    <tr>
+                                        <th class="rank-col">#</th>
+                                        <th class="product-col">Sản phẩm</th>
+                                        <th class="sold-col">Đã bán</th>
+                                        <th class="revenue-col">Doanh thu</th>
+                                        <th class="avg-price-col">Giá TB</th>
+                                        <th class="trend-col">Xu hướng</th>
+                                        <th class="performance-col">Hiệu suất</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="products-table-body">
+                                    <!-- Data populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="table-footer">
+                            <div class="show-more">
+                                <button class="btn-show-more" onclick="showMoreProducts()" id="show-more-products">
+                                    <i class="fas fa-chevron-down"></i> Hiển thị thêm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Insights -->
+            <div class="performance-insights">
+                <h3><i class="fas fa-lightbulb"></i> Phân tích hiệu suất</h3>
+                <div class="insights-grid">
+                    <div class="insight-card customer-insights">
+                        <div class="insight-header">
+                            <i class="fas fa-users"></i>
+                            <span>Khách hàng</span>
+                        </div>
+                        <div class="insight-content">
+                            <div class="insight-item">
+                                <span class="insight-label">Tỷ lệ khách quay lại:</span>
+                                <span class="insight-value" id="insight-return-rate">0%</span>
+                            </div>
+                            <div class="insight-item">
+                                <span class="insight-label">Khách hàng mới:</span>
+                                <span class="insight-value" id="insight-new-customers">0</span>
+                            </div>
+                            <div class="insight-item">
+                                <span class="insight-label">Giá trị trung bình:</span>
+                                <span class="insight-value" id="insight-avg-customer-ltv">0 ₫</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="insight-card product-insights">
+                        <div class="insight-header">
+                            <i class="fas fa-box"></i>
+                            <span>Sản phẩm</span>
+                        </div>
+                        <div class="insight-content">
+                            <div class="insight-item">
+                                <span class="insight-label">Sản phẩm bán chạy:</span>
+                                <span class="insight-value" id="insight-top-product">-</span>
+                            </div>
+                            <div class="insight-item">
+                                <span class="insight-label">Tăng trưởng mạnh nhất:</span>
+                                <span class="insight-value" id="insight-fastest-growing">-</span>
+                            </div>
+                            <div class="insight-item">
+                                <span class="insight-label">Lợi nhuận cao nhất:</span>
+                                <span class="insight-value" id="insight-most-profitable">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="insight-card trend-insights">
+                        <div class="insight-header">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Xu hướng</span>
+                        </div>
+                        <div class="insight-content">
+                            <div class="insight-item">
+                                <span class="insight-label">Tăng trưởng doanh thu:</span>
+                                <span class="insight-value" id="insight-revenue-growth">+0%</span>
+                            </div>
+                            <div class="insight-item">
+                                <span class="insight-label">Sản phẩm mới hiệu quả:</span>
+                                <span class="insight-value" id="insight-new-products">0</span>
+                            </div>
+                            <div class="insight-item">
+                                <span class="insight-label">Mùa cao điểm:</span>
+                                <span class="insight-value" id="insight-peak-season">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="business-overview.js"></script>
+</body>
+</html>

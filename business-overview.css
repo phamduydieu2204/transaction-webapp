@@ -1,0 +1,12 @@
+/* 
+ * business-overview.css - DISABLED
+ * 
+ * ⚠️ This CSS file has been disabled during cleanup.
+ * Associated with businessOverviewDashboard.js which has been disabled.
+ * 
+ * Styles moved to: css/components/ and main.css
+ * Date: 2025-01-16
+ */
+
+/* No styles - file disabled */
+console.warn && console.warn('⚠️ business-overview.css is disabled - styles moved to component CSS files');

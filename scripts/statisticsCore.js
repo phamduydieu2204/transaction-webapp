@@ -1101,3 +1101,178 @@ export function calculateROIByTenChuan(transactions, expenses, dateRange = null)
   
   return roiAnalysis;
 }
+
+/**
+ * Calculate revenue by source (software) using Tên chuẩn
+ * Consolidated from business/dataAnalytics.js
+ * @param {Array} transactionData - Transaction records
+ * @returns {Array} - Revenue by source sorted by amount
+ */
+export function calculateRevenueBySource(transactionData) {
+  const bySource = {};
+  
+  if (!Array.isArray(transactionData)) return [];
+  
+  transactionData.forEach(transaction => {
+    const source = transaction.tenChuan || transaction.softwareName || 'Khác';
+    const amount = parseFloat(transaction.revenue || transaction.amount || 0);
+    bySource[source] = (bySource[source] || 0) + amount;
+  });
+  
+  return Object.entries(bySource)
+    .map(([source, amount]) => ({ source, amount }))
+    .sort((a, b) => b.amount - a.amount);
+}
+
+/**
+ * Calculate expenses by category using improved categorization logic
+ * Consolidated from business/dataAnalytics.js
+ * @param {Array} expenseData - Expense records
+ * @returns {Array} - Expenses by category sorted by amount
+ */
+export function calculateExpensesByCategory(expenseData) {
+  const categories = {};
+  
+  if (!Array.isArray(expenseData)) return [];
+  
+  expenseData.forEach(expense => {
+    const amount = parseFloat(expense.amount || expense['Số tiền'] || 0);
+    
+    // Skip non-related expenses
+    const accountingType = expense.accountingType || expense['Loại kế toán'] || '';
+    if (accountingType === 'Không liên quan') {
+      categories['Sinh hoạt cá nhân'] = (categories['Sinh hoạt cá nhân'] || 0) + amount;
+      return;
+    }
+    
+    // Use Tên chuẩn for categorization if available
+    if (expense.standardName || expense.tenChuan) {
+      const categoryName = expense.standardName || expense.tenChuan;
+      categories[categoryName] = (categories[categoryName] || 0) + amount;
+    } else {
+      // Fallback to smart categorization
+      const type = expense.type || '';
+      const category = expense.category || '';
+      
+      let assignedCategory = 'Khác';
+      if (type.includes('phần mềm') || category.includes('phần mềm')) {
+        assignedCategory = 'Kinh doanh phần mềm';
+      } else if (type.includes('cá nhân') || type.includes('Sinh hoạt')) {
+        assignedCategory = 'Sinh hoạt cá nhân';
+      } else if (type.includes('Amazon') || category.includes('Amazon')) {
+        assignedCategory = 'Kinh doanh Amazon';
+      } else if (category.includes('Marketing') || category.includes('Quảng cáo')) {
+        assignedCategory = 'Marketing & Quảng cáo';
+      } else if (category.includes('Vận hành') || category.includes('Operational')) {
+        assignedCategory = 'Vận hành';
+      }
+      
+      categories[assignedCategory] = (categories[assignedCategory] || 0) + amount;
+    }
+  });
+  
+  return Object.entries(categories)
+    .map(([category, amount]) => ({ category, amount }))
+    .filter(item => item.amount > 0)
+    .sort((a, b) => b.amount - a.amount);
+}
+
+/**
+ * Calculate comprehensive business metrics
+ * Simplified version consolidated from business/dataAnalytics.js
+ * @param {Array} transactionData - Transaction records
+ * @param {Array} expenseData - Expense records
+ * @param {Object} dateRange - Optional date range filter
+ * @returns {Object} - Comprehensive business metrics
+ */
+export function calculateBusinessMetrics(transactionData, expenseData, dateRange = null) {
+  console.log("📊 Calculating business metrics for period:", dateRange);
+  
+  // Apply date range filtering if specified
+  let filteredTransactions = transactionData;
+  let filteredExpenses = expenseData;
+  
+  if (dateRange && dateRange.start && dateRange.end) {
+    filteredTransactions = transactionData.filter(t => {
+      const tDate = normalizeDate(t.transactionDate || t.date);
+      return tDate >= dateRange.start && tDate <= dateRange.end;
+    });
+    
+    filteredExpenses = expenseData.filter(e => {
+      const eDate = normalizeDate(e.date || e['Ngày chi']);
+      return eDate >= dateRange.start && eDate <= dateRange.end;
+    });
+  }
+  
+  // Basic calculations
+  const revenueData = calculateTotalRevenue(filteredTransactions);
+  const expenseData_calc = calculateTotalExpenses(filteredExpenses);
+  
+  const totalRevenue = revenueData.VND + (revenueData.USD * 25000) + (revenueData.NGN * 50);
+  const totalExpenses = expenseData_calc.VND + (expenseData_calc.USD * 25000) + (expenseData_calc.NGN * 50);
+  
+  const netProfit = totalRevenue - totalExpenses;
+  const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
+  const grossMargin = totalRevenue > 0 ? ((totalRevenue - totalExpenses * 0.3) / totalRevenue) * 100 : 0; // Simplified COGS
+  
+  // Revenue analysis
+  const revenueBySource = calculateRevenueBySource(filteredTransactions);
+  const averageOrderValue = filteredTransactions.length > 0 ? totalRevenue / filteredTransactions.length : 0;
+  
+  // Cost analysis
+  const expensesByCategory = calculateExpensesByCategory(filteredExpenses);
+  
+  // KPIs
+  const days = dateRange ? getDaysBetween(new Date(dateRange.start), new Date(dateRange.end)) : 30;
+  const revenuePerDay = totalRevenue / days;
+  const burnRate = totalExpenses / days;
+  
+  // Cash flow (simplified)
+  const operatingCashFlow = netProfit * 1.2; // Simplified calculation
+  const freeCashFlow = operatingCashFlow * 0.9;
+  
+  return {
+    financial: {
+      totalRevenue,
+      totalExpenses,
+      netProfit,
+      profitMargin,
+      grossProfit: totalRevenue - (totalExpenses * 0.3),
+      grossMargin
+    },
+    revenue: {
+      totalTransactions: filteredTransactions.length,
+      averageOrderValue,
+      revenueBySource: revenueBySource.slice(0, 10) // Top 10 sources
+    },
+    costs: {
+      expensesByCategory: expensesByCategory.slice(0, 10), // Top 10 categories
+      costOfRevenue: totalExpenses * 0.3, // Simplified COGS
+      operating: totalExpenses * 0.7 // Simplified OPEX
+    },
+    kpis: {
+      revenuePerDay,
+      burnRate,
+      netProfitMargin: profitMargin
+    },
+    efficiency: {
+      costEfficiencyRatio: totalRevenue > 0 ? (totalExpenses / totalRevenue) * 100 : 0
+    },
+    cashFlow: {
+      netCashFlow: netProfit,
+      operatingCashFlow,
+      freeCashFlow
+    }
+  };
+}
+
+/**
+ * Calculate days between two dates
+ * @param {Date} startDate - Start date
+ * @param {Date} endDate - End date  
+ * @returns {number} - Number of days
+ */
+export function getDaysBetween(startDate, endDate) {
+  const timeDiff = endDate.getTime() - startDate.getTime();
+  return Math.ceil(timeDiff / (1000 * 3600 * 24));
+}
