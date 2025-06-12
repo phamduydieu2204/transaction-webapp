@@ -845,8 +845,13 @@ function renderRevenueStatusChart(transactions) {
     chartData = getLastSixMonthsDataByStatus(transactions);
   }
   
-  // Create stacked bar chart showing revenue by status over time
-  new Chart(ctx, {
+  // Destroy existing chart if it exists
+  if (window.revenueChart instanceof Chart) {
+    window.revenueChart.destroy();
+  }
+
+  // Create modern revenue trend chart
+  window.revenueChart = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: chartData.labels,
@@ -1123,7 +1128,7 @@ function renderStatusDistributionChart(transactions) {
       responsive: true,
       maintainAspectRatio: true,
       aspectRatio: 1, // Force 1:1 aspect ratio for perfect circle
-      cutout: '30%', // Further reduced cutout for maximum visibility of small segments
+      cutout: '40%', // Optimal cutout for modern design
       layout: {
         padding: {
           top: 20,
