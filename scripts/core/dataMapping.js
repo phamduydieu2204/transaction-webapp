@@ -18,10 +18,10 @@ export const TRANSACTION_FIELD_MAPPING = {
   transactionType: ['Loại giao dịch', 'loaiGiaoDich', 'status', 'transactionType'],
   
   // Column D: Tên khách hàng
-  customerName: ['Tên khách hàng', 'tenKhachHang', 'customer', 'customerName'],
+  customerName: ['Tên khách hàng', 'tenKhachHang', 'customer', 'customerName', 'Ten khach hang'],
   
   // Column E: Email
-  email: ['Email', 'email'],
+  email: ['Email', 'email', 'EMAIL', 'Email Address', 'emailAddress'],
   
   // Column F: Liên hệ
   contact: ['Liên hệ', 'lienHe', 'contact', 'phone'],
@@ -87,11 +87,27 @@ export function getTransactionField(transaction, fieldName) {
   const possibleKeys = TRANSACTION_FIELD_MAPPING[fieldName];
   if (!possibleKeys) return null;
   
+  // Debug log for customer and email fields
+  if (fieldName === 'customerName' || fieldName === 'email') {
+    console.log(`🔍 Looking for ${fieldName}:`, {
+      possibleKeys,
+      availableKeys: Object.keys(transaction),
+      transaction: transaction
+    });
+  }
+  
   // Try each possible key until we find a value
   for (const key of possibleKeys) {
     if (transaction.hasOwnProperty(key) && transaction[key] !== undefined && transaction[key] !== null) {
+      if (fieldName === 'customerName' || fieldName === 'email') {
+        console.log(`✅ Found ${fieldName} with key "${key}":`, transaction[key]);
+      }
       return transaction[key];
     }
+  }
+  
+  if (fieldName === 'customerName' || fieldName === 'email') {
+    console.log(`❌ No value found for ${fieldName}`);
   }
   
   return null;
