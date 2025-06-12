@@ -1,0 +1,510 @@
+<!-- Customer Management Report Template -->
+<div class="customer-management-container">
+  <!-- Header Section -->
+  <div class="report-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h2 class="report-title">
+          <i class="fas fa-users"></i>
+          Quản lý Khách hàng
+        </h2>
+        <p class="report-subtitle">Phân tích lifecycle, hành vi và mối quan hệ khách hàng</p>
+      </div>
+      <div class="header-actions">
+        <button class="header-btn" onclick="refreshCustomerManagement()">
+          <i class="fas fa-sync-alt"></i> Làm mới
+        </button>
+        <button class="header-btn" onclick="exportCustomerReport()">
+          <i class="fas fa-download"></i> Xuất báo cáo
+        </button>
+        <button class="header-btn primary" onclick="openAddCustomerModal()">
+          <i class="fas fa-user-plus"></i> Thêm khách hàng
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer KPI Cards -->
+  <div class="customer-kpi-grid">
+    <div class="kpi-card total-customers">
+      <div class="kpi-icon">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="kpi-content">
+        <h3 class="kpi-label">Tổng Khách hàng</h3>
+        <p class="kpi-value" id="total-customers-value">0</p>
+        <span class="kpi-change" id="total-customers-change">+0</span>
+      </div>
+    </div>
+
+    <div class="kpi-card active-customers">
+      <div class="kpi-icon">
+        <i class="fas fa-user-check"></i>
+      </div>
+      <div class="kpi-content">
+        <h3 class="kpi-label">Khách hàng Hoạt động</h3>
+        <p class="kpi-value" id="active-customers-value">0</p>
+        <span class="kpi-change" id="active-customers-change">+0%</span>
+      </div>
+    </div>
+
+    <div class="kpi-card new-customers">
+      <div class="kpi-icon">
+        <i class="fas fa-user-plus"></i>
+      </div>
+      <div class="kpi-content">
+        <h3 class="kpi-label">Khách hàng Mới</h3>
+        <p class="kpi-value" id="new-customers-value">0</p>
+        <span class="kpi-period" id="new-customers-period">trong kỳ</span>
+      </div>
+    </div>
+
+    <div class="kpi-card customer-ltv">
+      <div class="kpi-icon">
+        <i class="fas fa-gem"></i>
+      </div>
+      <div class="kpi-content">
+        <h3 class="kpi-label">LTV Trung bình</h3>
+        <p class="kpi-value" id="customer-ltv-value">0 ₫</p>
+        <span class="kpi-detail" id="customer-ltv-detail">Lifetime Value</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Analytics Section -->
+  <div class="customer-analytics-grid">
+    <!-- Customer Acquisition Chart -->
+    <div class="chart-container customer-acquisition">
+      <div class="chart-header">
+        <h3 class="chart-title">
+          <i class="fas fa-chart-line"></i>
+          Xu hướng Thu hút Khách hàng
+        </h3>
+        <div class="chart-controls">
+          <div class="view-selector">
+            <button class="view-btn active" data-view="monthly">Theo tháng</button>
+            <button class="view-btn" data-view="weekly">Theo tuần</button>
+            <button class="view-btn" data-view="daily">Theo ngày</button>
+          </div>
+        </div>
+      </div>
+      <div class="chart-content">
+        <canvas id="customer-acquisition-chart" width="400" height="200"></canvas>
+      </div>
+    </div>
+
+    <!-- Customer Lifecycle Distribution -->
+    <div class="chart-container customer-lifecycle">
+      <div class="chart-header">
+        <h3 class="chart-title">
+          <i class="fas fa-recycle"></i>
+          Phân bố Lifecycle
+        </h3>
+        <div class="chart-controls">
+          <button class="toggle-btn" onclick="toggleCustomerLifecycleView('pie')">
+            <i class="fas fa-chart-pie"></i>
+          </button>
+          <button class="toggle-btn" onclick="toggleCustomerLifecycleView('funnel')">
+            <i class="fas fa-filter"></i>
+          </button>
+        </div>
+      </div>
+      <div class="chart-content">
+        <canvas id="customer-lifecycle-chart" width="400" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Segmentation Section -->
+  <div class="customer-segmentation">
+    <div class="section-header">
+      <h3 class="section-title">
+        <i class="fas fa-layer-group"></i>
+        Phân khúc Khách hàng
+      </h3>
+      <div class="segmentation-controls">
+        <div class="segment-selector">
+          <button class="segment-btn active" data-segment="value">Theo giá trị</button>
+          <button class="segment-btn" data-segment="frequency">Theo tần suất</button>
+          <button class="segment-btn" data-segment="recency">Theo thời gian</button>
+          <button class="segment-btn" data-segment="rfm">RFM Analysis</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="segmentation-grid">
+      <!-- VIP Customers -->
+      <div class="segment-card vip-customers">
+        <div class="segment-header">
+          <div class="segment-icon">
+            <i class="fas fa-crown"></i>
+          </div>
+          <div class="segment-info">
+            <h4 class="segment-title">Khách hàng VIP</h4>
+            <p class="segment-description">Giá trị cao, tần suất mua thường xuyên</p>
+          </div>
+        </div>
+        <div class="segment-metrics">
+          <div class="metric-item">
+            <span class="metric-label">Số lượng:</span>
+            <span class="metric-value" id="vip-customers-count">0</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Đóng góp:</span>
+            <span class="metric-value" id="vip-customers-revenue">0%</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">LTV TB:</span>
+            <span class="metric-value" id="vip-customers-ltv">0 ₫</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Regular Customers -->
+      <div class="segment-card regular-customers">
+        <div class="segment-header">
+          <div class="segment-icon">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="segment-info">
+            <h4 class="segment-title">Khách hàng Thường</h4>
+            <p class="segment-description">Giao dịch ổn định, tiềm năng phát triển</p>
+          </div>
+        </div>
+        <div class="segment-metrics">
+          <div class="metric-item">
+            <span class="metric-label">Số lượng:</span>
+            <span class="metric-value" id="regular-customers-count">0</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Đóng góp:</span>
+            <span class="metric-value" id="regular-customers-revenue">0%</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">LTV TB:</span>
+            <span class="metric-value" id="regular-customers-ltv">0 ₫</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- At-Risk Customers -->
+      <div class="segment-card risk-customers">
+        <div class="segment-header">
+          <div class="segment-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+          <div class="segment-info">
+            <h4 class="segment-title">Khách hàng Rủi ro</h4>
+            <p class="segment-description">Giảm tần suất, nguy cơ rời bỏ</p>
+          </div>
+        </div>
+        <div class="segment-metrics">
+          <div class="metric-item">
+            <span class="metric-label">Số lượng:</span>
+            <span class="metric-value" id="risk-customers-count">0</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Nguy cơ:</span>
+            <span class="metric-value" id="risk-customers-percentage">0%</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Thời gian:</span>
+            <span class="metric-value" id="risk-customers-days">0 ngày</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- New Customers -->
+      <div class="segment-card new-customers-segment">
+        <div class="segment-header">
+          <div class="segment-icon">
+            <i class="fas fa-seedling"></i>
+          </div>
+          <div class="segment-info">
+            <h4 class="segment-title">Khách hàng Mới</h4>
+            <p class="segment-description">Cần nurturing và chăm sóc đặc biệt</p>
+          </div>
+        </div>
+        <div class="segment-metrics">
+          <div class="metric-item">
+            <span class="metric-label">Số lượng:</span>
+            <span class="metric-value" id="new-customers-segment-count">0</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Conversion:</span>
+            <span class="metric-value" id="new-customers-conversion">0%</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Tiềm năng:</span>
+            <span class="metric-value" id="new-customers-potential">Cao</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Data Tables -->
+  <div class="customer-tables">
+    <!-- Active Customers Table -->
+    <div class="table-container active-customers-table">
+      <div class="table-header">
+        <h3 class="table-title">
+          <i class="fas fa-users-cog"></i>
+          Danh sách Khách hàng Hoạt động
+        </h3>
+        <div class="table-controls">
+          <div class="search-box">
+            <input type="text" placeholder="Tìm kiếm khách hàng..." id="customer-search" onkeyup="filterCustomers()">
+            <i class="fas fa-search"></i>
+          </div>
+          <div class="filter-dropdown">
+            <select id="customer-status-filter" onchange="filterByStatus()">
+              <option value="all">Tất cả trạng thái</option>
+              <option value="active">Hoạt động</option>
+              <option value="inactive">Không hoạt động</option>
+              <option value="new">Mới</option>
+              <option value="vip">VIP</option>
+            </select>
+          </div>
+          <button class="table-btn" onclick="exportCustomerData()">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
+      </div>
+      <div class="table-content">
+        <table class="customer-table" id="active-customers-data-table">
+          <thead>
+            <tr>
+              <th class="select-col">
+                <input type="checkbox" id="select-all-customers" onchange="toggleSelectAll()">
+              </th>
+              <th class="customer-col">Khách hàng</th>
+              <th class="status-col">Trạng thái</th>
+              <th class="transactions-col">Giao dịch</th>
+              <th class="revenue-col">Doanh thu</th>
+              <th class="last-activity-col">Hoạt động cuối</th>
+              <th class="ltv-col">LTV</th>
+              <th class="segment-col">Phân khúc</th>
+              <th class="action-col">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="active-customers-tbody">
+            <tr>
+              <td colspan="9" class="loading-row">
+                <i class="fas fa-spinner fa-spin"></i> Đang tải...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-pagination">
+        <div class="pagination-info">
+          Hiển thị <span id="customers-showing">0</span> trong tổng số <span id="customers-total">0</span> khách hàng
+        </div>
+        <div class="pagination-controls">
+          <button class="pagination-btn" onclick="previousCustomerPage()">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <div class="pagination-numbers" id="customer-pagination-numbers"></div>
+          <button class="pagination-btn" onclick="nextCustomerPage()">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customer Insights Table -->
+    <div class="table-container customer-insights-table">
+      <div class="table-header">
+        <h3 class="table-title">
+          <i class="fas fa-chart-bar"></i>
+          Thông tin Chi tiết Khách hàng
+        </h3>
+        <div class="table-controls">
+          <div class="insight-selector">
+            <button class="insight-btn active" data-insight="recent">Hoạt động gần đây</button>
+            <button class="insight-btn" data-insight="churned">Nguy cơ rời bỏ</button>
+            <button class="insight-btn" data-insight="opportunities">Cơ hội bán thêm</button>
+          </div>
+        </div>
+      </div>
+      <div class="table-content">
+        <table class="insights-table" id="customer-insights-data-table">
+          <thead id="insights-table-head">
+            <tr>
+              <th class="customer-col">Khách hàng</th>
+              <th class="insight-col">Thông tin</th>
+              <th class="priority-col">Ưu tiên</th>
+              <th class="action-col">Hành động đề xuất</th>
+            </tr>
+          </thead>
+          <tbody id="customer-insights-tbody">
+            <tr>
+              <td colspan="4" class="loading-row">
+                <i class="fas fa-spinner fa-spin"></i> Đang tải...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Relationship Management Tools -->
+  <div class="customer-crm-tools">
+    <div class="crm-header">
+      <h3 class="crm-title">
+        <i class="fas fa-handshake"></i>
+        Công cụ Quản lý Mối quan hệ
+      </h3>
+    </div>
+    
+    <div class="crm-tools-grid">
+      <!-- Communication Center -->
+      <div class="crm-tool communication-center">
+        <div class="tool-header">
+          <h4 class="tool-title">
+            <i class="fas fa-comments"></i>
+            Trung tâm Liên lạc
+          </h4>
+        </div>
+        <div class="tool-content">
+          <div class="communication-actions">
+            <button class="comm-btn email" onclick="sendBulkEmail()">
+              <i class="fas fa-envelope"></i>
+              <span>Gửi Email hàng loạt</span>
+            </button>
+            <button class="comm-btn sms" onclick="sendBulkSMS()">
+              <i class="fas fa-sms"></i>
+              <span>Gửi SMS thông báo</span>
+            </button>
+            <button class="comm-btn newsletter" onclick="createNewsletter()">
+              <i class="fas fa-newspaper"></i>
+              <span>Tạo Newsletter</span>
+            </button>
+          </div>
+          <div class="communication-stats">
+            <div class="stat-item">
+              <span class="stat-label">Email gần đây:</span>
+              <span class="stat-value" id="recent-emails">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Tỷ lệ mở:</span>
+              <span class="stat-value" id="email-open-rate">0%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customer Support -->
+      <div class="crm-tool customer-support">
+        <div class="tool-header">
+          <h4 class="tool-title">
+            <i class="fas fa-headset"></i>
+            Hỗ trợ Khách hàng
+          </h4>
+        </div>
+        <div class="tool-content">
+          <div class="support-metrics">
+            <div class="support-item">
+              <div class="support-icon pending">
+                <i class="fas fa-clock"></i>
+              </div>
+              <div class="support-info">
+                <span class="support-number" id="pending-tickets">0</span>
+                <span class="support-label">Tickets chờ xử lý</span>
+              </div>
+            </div>
+            <div class="support-item">
+              <div class="support-icon resolved">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <div class="support-info">
+                <span class="support-number" id="resolved-tickets">0</span>
+                <span class="support-label">Đã giải quyết</span>
+              </div>
+            </div>
+          </div>
+          <div class="support-actions">
+            <button class="support-btn" onclick="viewPendingTickets()">
+              <i class="fas fa-list"></i>
+              Xem tickets chờ
+            </button>
+            <button class="support-btn" onclick="createNewTicket()">
+              <i class="fas fa-plus"></i>
+              Tạo ticket mới
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loyalty Program -->
+      <div class="crm-tool loyalty-program">
+        <div class="tool-header">
+          <h4 class="tool-title">
+            <i class="fas fa-gift"></i>
+            Chương trình Khách hàng thân thiết
+          </h4>
+        </div>
+        <div class="tool-content">
+          <div class="loyalty-overview">
+            <div class="loyalty-stat">
+              <span class="loyalty-number" id="loyalty-members">0</span>
+              <span class="loyalty-label">Thành viên thân thiết</span>
+            </div>
+            <div class="loyalty-stat">
+              <span class="loyalty-number" id="points-distributed">0</span>
+              <span class="loyalty-label">Điểm đã phát</span>
+            </div>
+          </div>
+          <div class="loyalty-actions">
+            <button class="loyalty-btn" onclick="manageLoyaltyProgram()">
+              <i class="fas fa-cog"></i>
+              Quản lý chương trình
+            </button>
+            <button class="loyalty-btn" onclick="distributeRewards()">
+              <i class="fas fa-award"></i>
+              Phân phát thưởng
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analytics & Reports -->
+      <div class="crm-tool analytics-reports">
+        <div class="tool-header">
+          <h4 class="tool-title">
+            <i class="fas fa-chart-pie"></i>
+            Phân tích & Báo cáo
+          </h4>
+        </div>
+        <div class="tool-content">
+          <div class="analytics-quick-stats">
+            <div class="quick-stat">
+              <span class="quick-stat-value" id="customer-satisfaction">0%</span>
+              <span class="quick-stat-label">Hài lòng</span>
+            </div>
+            <div class="quick-stat">
+              <span class="quick-stat-value" id="retention-rate">0%</span>
+              <span class="quick-stat-label">Retention</span>
+            </div>
+            <div class="quick-stat">
+              <span class="quick-stat-value" id="churn-rate">0%</span>
+              <span class="quick-stat-label">Churn Rate</span>
+            </div>
+          </div>
+          <div class="analytics-actions">
+            <button class="analytics-btn" onclick="generateCustomerReport()">
+              <i class="fas fa-file-alt"></i>
+              Tạo báo cáo
+            </button>
+            <button class="analytics-btn" onclick="scheduleReport()">
+              <i class="fas fa-calendar-alt"></i>
+              Lập lịch báo cáo
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

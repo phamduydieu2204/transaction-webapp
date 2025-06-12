@@ -12,7 +12,7 @@ import { showError, refreshCurrentReport, exportCurrentReport } from './core/rep
 import { loadOverviewReport } from './overview/overviewReport.js';
 import { loadRevenueAnalysis } from './revenue/revenueAnalysis.js';
 import { loadExpenseAnalysis } from './expense/expenseAnalysis.js';
-import { loadCustomerReport } from './customer/customerReport.js';
+import { loadCustomerManagement } from './customer/customerManagement.js';
 import { loadRenewalReport } from './renewal/renewalReport.js';
 import { loadEmployeeReport } from './employee/employeeReport.js';
 import { loadFinanceReport } from './finance/financeReport.js';
@@ -124,7 +124,12 @@ async function loadReport(reportType) {
         await loadExpenseAnalysis(expenseOptions);
         break;
       case 'customer':
-        await loadCustomerReport();
+        // Pass current date range and period
+        const customerOptions = {
+          dateRange: window.globalFilters?.dateRange || null,
+          period: window.globalFilters?.period || 'this_month'
+        };
+        await loadCustomerManagement(customerOptions);
         break;
       case 'software':
         await loadSoftwareReport();
