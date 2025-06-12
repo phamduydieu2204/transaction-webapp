@@ -3565,7 +3565,6 @@ window.calculateProductAnalytics = calculateProductAnalytics;
 window.calculateNormalizedCustomerAnalytics = calculateNormalizedCustomerAnalytics;
 window.calculateNormalizedProductAnalytics = calculateNormalizedProductAnalytics;
 window.updateStatusBreakdownWithRefund = updateStatusBreakdownWithRefund;
-window.updateChartPeriod = updateChartPeriod;
 window.calculateRevenueByStatus = calculateRevenueByStatus;
 window.exportStatusData = exportStatusData;
 window.calculateDetailedStatusBreakdown = calculateDetailedStatusBreakdown;
