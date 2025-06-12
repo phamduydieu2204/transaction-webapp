@@ -185,56 +185,133 @@ canvas {
   text-align: center;
 }
 
-/* Modern Status Distribution Chart Layout */
-.status-chart-content {
-  height: 500px; /* Fixed height for proper layout */
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 32px;
-  align-items: stretch;
+/* Status Details Section */
+.status-details-section {
+  margin: 24px 0;
 }
 
-.status-chart-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: 16px;
+.status-detail-content {
   padding: 20px;
-  border: 1px solid #e2e8f0;
-}
-
-.status-chart-wrapper canvas {
-  width: 280px !important;
-  height: 280px !important;
-  max-width: none !important;
-  max-height: none !important;
-  display: block !important;
-}
-
-.status-detail-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
+}
+
+.status-detail-table-container {
   background: #f8fafc;
   border-radius: 12px;
   padding: 20px;
   border: 1px solid #e2e8f0;
+  overflow-x: auto;
 }
 
-.detail-title {
+.status-detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.status-detail-table th {
+  background: #1e293b;
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #334155;
+}
+
+.status-detail-table th:first-child {
+  border-radius: 8px 0 0 0;
+}
+
+.status-detail-table th:last-child {
+  border-radius: 0 8px 0 0;
+}
+
+.status-detail-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  background: white;
+}
+
+.status-detail-table tr:hover td {
+  background: #f1f5f9;
+}
+
+.status-detail-table .loading-row {
+  text-align: center;
+  padding: 40px;
+  color: #64748b;
+  font-style: italic;
+}
+
+/* Status Highlights */
+.status-highlights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.highlight-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s ease;
+}
+
+.highlight-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -8px rgba(0, 0, 0, 0.15);
+}
+
+.highlight-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: white;
+}
+
+.refund-highlight .highlight-icon {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.success-highlight .highlight-icon {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.net-highlight .highlight-icon {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.highlight-content {
+  flex: 1;
+}
+
+.highlight-title {
   font-size: 16px;
   font-weight: 600;
   color: #1e293b;
-  margin: 0 0 16px 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  margin-bottom: 4px;
 }
 
-.detail-title i {
-  color: #3b82f6;
+.highlight-desc {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.highlight-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
 }
 
 /* Line chart specific styles */
@@ -287,19 +364,9 @@ canvas {
 
 /* Modern Responsive Design */
 @media (max-width: 1024px) {
-  .status-chart-content {
+  .status-highlights {
     grid-template-columns: 1fr;
-    height: auto;
-    gap: 24px;
-  }
-  
-  .status-chart-wrapper {
-    height: 320px;
-  }
-  
-  .status-chart-wrapper canvas {
-    width: 250px !important;
-    height: 250px !important;
+    gap: 16px;
   }
 }
 
@@ -313,23 +380,41 @@ canvas {
     height: 300px;
   }
   
-  .status-chart-content {
-    height: auto;
+  .status-detail-content {
+    padding: 16px;
     gap: 20px;
   }
   
-  .status-chart-wrapper {
-    height: 280px;
+  .status-detail-table-container {
     padding: 16px;
   }
   
-  .status-chart-wrapper canvas {
-    width: 220px !important;
-    height: 220px !important;
+  .status-detail-table {
+    font-size: 12px;
   }
   
-  .status-detail-wrapper {
+  .status-detail-table th,
+  .status-detail-table td {
+    padding: 8px 12px;
+  }
+  
+  .highlight-card {
     padding: 16px;
+    gap: 12px;
+  }
+  
+  .highlight-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+  
+  .highlight-title {
+    font-size: 14px;
+  }
+  
+  .highlight-value {
+    font-size: 16px;
   }
   
   .trend-chart {

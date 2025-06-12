@@ -75,89 +75,14 @@
     </div>
   </div>
 
-  <!-- Transaction Status Summary -->
-  <div class="status-summary-grid">
-    <div class="status-card">
-      <h4>Phân bố trạng thái giao dịch</h4>
-      <div class="status-breakdown">
-        <div class="status-item completed">
-          <div class="status-info">
-            <span class="status-label">Đã hoàn tất</span>
-            <span class="status-count" id="completed-count">0</span>
-          </div>
-          <div class="status-bar">
-            <div class="status-fill" id="completed-bar" style="width: 0%"></div>
-          </div>
-          <div class="status-percentage" id="completed-percentage">0%</div>
-        </div>
-        
-        <div class="status-item paid">
-          <div class="status-info">
-            <span class="status-label">Đã thanh toán</span>
-            <span class="status-count" id="paid-count">0</span>
-          </div>
-          <div class="status-bar">
-            <div class="status-fill" id="paid-bar" style="width: 0%"></div>
-          </div>
-          <div class="status-percentage" id="paid-percentage">0%</div>
-        </div>
-        
-        <div class="status-item refund">
-          <div class="status-info">
-            <span class="status-label">Hoàn tiền</span>
-            <span class="status-count" id="refund-count">0</span>
-          </div>
-          <div class="status-bar">
-            <div class="status-fill" id="refund-bar" style="width: 0%"></div>
-          </div>
-          <div class="status-percentage" id="refund-percentage">0%</div>
-        </div>
-      </div>
-    </div>
 
-    <div class="status-card">
-      <h4>Tỷ lệ chuyển đổi</h4>
-      <div class="conversion-metrics">
-        <div class="conversion-item">
-          <div class="conversion-label">Tỷ lệ thanh toán</div>
-          <div class="conversion-value" id="payment-rate">0%</div>
-          <div class="conversion-desc">Chậhang → Thanh toán</div>
-        </div>
-        <div class="conversion-item">
-          <div class="conversion-label">Tỷ lệ hoàn tất</div>
-          <div class="conversion-value" id="completion-rate">0%</div>
-          <div class="conversion-desc">Đã TT → Hoàn tất</div>
-        </div>
-        <div class="conversion-item">
-          <div class="conversion-label">Tỷ lệ thành công</div>
-          <div class="conversion-value" id="success-rate">0%</div>
-          <div class="conversion-desc">Chậhang → Hoàn tất</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Charts Row -->
-  <div class="charts-row">
-    <!-- Revenue by Status Chart -->
+  <!-- Status Details Section -->
+  <div class="status-details-section">
     <div class="chart-container">
       <div class="chart-header">
         <h3 class="chart-title">
-          <i class="fas fa-chart-line"></i> 
-          Xu hướng doanh thu theo trạng thái
-        </h3>
-      </div>
-      <div class="chart-content">
-        <canvas id="revenue-status-chart"></canvas>
-      </div>
-    </div>
-
-    <!-- Transaction Status Distribution -->
-    <div class="chart-container">
-      <div class="chart-header">
-        <h3 class="chart-title">
-          <i class="fas fa-chart-pie"></i> 
-          Phân bố trạng thái giao dịch
+          <i class="fas fa-table"></i> 
+          Chi tiết theo trạng thái
         </h3>
         <div class="chart-actions">
           <button class="chart-btn" onclick="exportStatusData()">
@@ -165,69 +90,60 @@
           </button>
         </div>
       </div>
-      <div class="chart-content status-chart-content">
-        <div class="status-chart-wrapper">
-          <canvas id="status-distribution-chart"></canvas>
+      <div class="status-detail-content">
+        <div class="status-detail-table-container">
+          <table class="status-detail-table">
+            <thead>
+              <tr>
+                <th>Trạng thái</th>
+                <th>Số lượng</th>
+                <th>Tổng tiền</th>
+                <th>Tỷ lệ</th>
+                <th>Trung bình</th>
+              </tr>
+            </thead>
+            <tbody id="status-detail-tbody">
+              <tr>
+                <td colspan="5" class="loading-row">
+                  <i class="fas fa-spinner fa-spin"></i> Đang tải...
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <div class="status-detail-wrapper">
-          <h4 class="detail-title">
-            <i class="fas fa-table"></i> 
-            Chi tiết theo trạng thái
-          </h4>
-          <div class="status-detail-table-container">
-            <table class="status-detail-table">
-              <thead>
-                <tr>
-                  <th>Trạng thái</th>
-                  <th>Số lượng</th>
-                  <th>Tổng tiền</th>
-                  <th>Tỷ lệ</th>
-                  <th>Trung bình</th>
-                </tr>
-              </thead>
-              <tbody id="status-detail-tbody">
-                <tr>
-                  <td colspan="5" class="loading-row">
-                    <i class="fas fa-spinner fa-spin"></i> Đang tải...
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+        
+        <!-- Status Highlights -->
+        <div class="status-highlights">
+          <div class="highlight-card refund-highlight">
+            <div class="highlight-icon">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="highlight-content">
+              <div class="highlight-title">Cảnh báo Hoàn tiền</div>
+              <div class="highlight-desc">Giao dịch hoàn tiền hiển thị số âm</div>
+              <div class="highlight-value" id="refund-impact">-0 ₫</div>
+            </div>
           </div>
           
-          <!-- Status Highlights -->
-          <div class="status-highlights">
-            <div class="highlight-card refund-highlight">
-              <div class="highlight-icon">
-                <i class="fas fa-exclamation-triangle"></i>
-              </div>
-              <div class="highlight-content">
-                <div class="highlight-title">Cảnh báo Hoàn tiền</div>
-                <div class="highlight-desc">Giao dịch hoàn tiền hiển thị số âm</div>
-                <div class="highlight-value" id="refund-impact">-0 ₫</div>
-              </div>
+          <div class="highlight-card success-highlight">
+            <div class="highlight-icon">
+              <i class="fas fa-check-circle"></i>
             </div>
-            
-            <div class="highlight-card success-highlight">
-              <div class="highlight-icon">
-                <i class="fas fa-check-circle"></i>
-              </div>
-              <div class="highlight-content">
-                <div class="highlight-title">Tỷ lệ thành công</div>
-                <div class="highlight-desc">Giao dịch hoàn tất thành công</div>
-                <div class="highlight-value" id="success-rate-display">0%</div>
-              </div>
+            <div class="highlight-content">
+              <div class="highlight-title">Tỷ lệ thành công</div>
+              <div class="highlight-desc">Giao dịch hoàn tất thành công</div>
+              <div class="highlight-value" id="success-rate-display">0%</div>
             </div>
-            
-            <div class="highlight-card net-highlight">
-              <div class="highlight-icon">
-                <i class="fas fa-calculator"></i>
-              </div>
-              <div class="highlight-content">
-                <div class="highlight-title">Doanh thu ròng</div>
-                <div class="highlight-desc">Sau khi trừ hoàn tiền</div>
-                <div class="highlight-value" id="net-revenue">0 ₫</div>
-              </div>
+          </div>
+          
+          <div class="highlight-card net-highlight">
+            <div class="highlight-icon">
+              <i class="fas fa-calculator"></i>
+            </div>
+            <div class="highlight-content">
+              <div class="highlight-title">Doanh thu ròng</div>
+              <div class="highlight-desc">Sau khi trừ hoàn tiền</div>
+              <div class="highlight-value" id="net-revenue">0 ₫</div>
             </div>
           </div>
         </div>
