@@ -5,7 +5,7 @@
 /* Chart containers */
 .chart-container {
   position: relative;
-  height: 300px;
+  height: 400px; /* Increased for better visibility of negative values */
   margin: 20px 0;
 }
 
@@ -139,6 +139,31 @@ canvas {
   text-align: center;
 }
 
+/* Status distribution chart specific sizing */
+.status-chart-content {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.status-chart-wrapper {
+  flex: 0 0 320px; /* Fixed width for pie chart */
+  height: 320px; /* Fixed height to prevent overflow */
+  position: relative;
+}
+
+.status-chart-wrapper canvas {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: 300px !important;
+  height: 300px !important;
+}
+
+.status-detail-wrapper {
+  flex: 1;
+  min-width: 0; /* Allow shrinking */
+}
+
 /* Line chart specific styles */
 .line-chart-container {
   padding: 20px;
@@ -190,7 +215,24 @@ canvas {
 /* Responsive charts */
 @media (max-width: 768px) {
   .chart-container {
-    height: 250px;
+    height: 350px; /* Increased for mobile too */
+  }
+  
+  .status-chart-content {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .status-chart-wrapper {
+    flex: none;
+    width: 100%;
+    height: 280px;
+    margin: 0 auto;
+  }
+  
+  .status-chart-wrapper canvas {
+    width: 250px !important;
+    height: 250px !important;
   }
   
   .trend-chart {
