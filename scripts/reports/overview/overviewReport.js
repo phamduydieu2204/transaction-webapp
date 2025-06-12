@@ -870,9 +870,17 @@ function renderRevenueStatusChart(transactions) {
         {
           label: 'Hoàn tiền',
           data: chartData.refunded || chartData.unpaid,
-          backgroundColor: '#e74c3c',
+          backgroundColor: function(context) {
+            const value = context.parsed.y;
+            // Use different shades for negative values
+            return value < 0 ? '#c0392b' : '#e74c3c';
+          },
           borderColor: '#c0392b',
-          borderWidth: 1,
+          borderWidth: function(context) {
+            const value = context.parsed.y;
+            // Thicker border for negative values to highlight
+            return value < 0 ? 3 : 1;
+          },
           order: 3
         }
       ]
@@ -880,6 +888,14 @@ function renderRevenueStatusChart(transactions) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      layout: {
+        padding: {
+          top: 20,
+          bottom: 20,
+          left: 10,
+          right: 10
+        }
+      },
       interaction: {
         mode: 'index',
         intersect: false
@@ -931,7 +947,7 @@ function renderRevenueStatusChart(transactions) {
       },
       scales: {
         x: {
-          stacked: true,
+          stacked: false, // Changed to false to show individual bars
           grid: {
             display: false
           },
@@ -942,8 +958,9 @@ function renderRevenueStatusChart(transactions) {
           }
         },
         y: {
-          stacked: true,
-          beginAtZero: true,
+          stacked: false, // Changed to false to show individual values
+          beginAtZero: false, // Allow negative values to show properly
+          grace: '10%', // Add 10% padding above and below
           grid: {
             color: 'rgba(0, 0, 0, 0.1)',
             drawBorder: false
@@ -954,6 +971,19 @@ function renderRevenueStatusChart(transactions) {
             },
             font: {
               size: 11
+            },
+            maxTicksLimit: 8 // Limit ticks for better readability
+          },
+          // Auto-scale based on data range
+          afterDataLimits: function(scale) {
+            const range = scale.max - scale.min;
+            const padding = Math.max(range * 0.1, 100000); // At least 100k padding
+            scale.max += padding;
+            scale.min -= padding;
+            
+            // Ensure refunds (negative values) are properly visible
+            if (scale.min > -100000 && scale.max > 0) {
+              scale.min = Math.min(scale.min, -Math.abs(scale.max) * 0.2);
             }
           }
         }
@@ -1002,8 +1032,16 @@ function renderStatusDistributionChart(transactions) {
           '#c0392b'  // Darker red
         ],
         borderWidth: function(context) {
-          // Make refund border thicker to highlight
-          return context.dataIndex === 2 ? 4 : 2;
+          // Make all borders thicker for better visibility
+          const data = context.parsed || context.chart.data.datasets[0].data[context.dataIndex];
+          const total = context.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+          const percentage = total > 0 ? (data / total) * 100 : 0;
+          
+          // Thicker borders for small segments (< 5%) and refunds
+          if (percentage < 5 || context.dataIndex === 2) {
+            return 4;
+          }
+          return 2;
         },
         hoverBackgroundColor: [
           '#2ecc71',
@@ -1011,14 +1049,30 @@ function renderStatusDistributionChart(transactions) {
           '#ec7063'
         ],
         hoverBorderWidth: function(context) {
-          return context.dataIndex === 2 ? 6 : 3;
+          const data = context.chart.data.datasets[0].data[context.dataIndex];
+          const total = context.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+          const percentage = total > 0 ? (data / total) * 100 : 0;
+          
+          // Thicker hover borders for small segments and refunds
+          if (percentage < 5 || context.dataIndex === 2) {
+            return 6;
+          }
+          return 3;
         }
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: '50%', // Slightly smaller cutout for better visibility
+      cutout: '40%', // Reduced cutout for better visibility of small segments
+      layout: {
+        padding: {
+          top: 20,
+          bottom: 20,
+          left: 20,
+          right: 20
+        }
+      },
       plugins: {
         legend: {
           display: false // Hide default legend, we'll use custom table
@@ -1071,6 +1125,17 @@ function renderStatusDistributionChart(transactions) {
         animateScale: true,
         animateRotate: true,
         duration: 1200
+      },
+      // Ensure small segments are always visible
+      circumference: Math.PI * 2,
+      rotation: 0,
+      // Custom plugin to ensure minimum angle for segments
+      onHover: function(event, activeElements) {
+        if (activeElements.length > 0) {
+          event.native.target.style.cursor = 'pointer';
+        } else {
+          event.native.target.style.cursor = 'default';
+        }
       },
       elements: {
         arc: {
