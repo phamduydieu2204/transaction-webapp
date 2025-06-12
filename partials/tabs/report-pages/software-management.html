@@ -1,0 +1,566 @@
+<!-- Software Account Management Report Template -->
+<div class="software-management-container">
+  <!-- Header Section -->
+  <div class="report-header">
+    <div class="header-content">
+      <div class="header-info">
+        <h2 class="report-title">
+          <i class="fas fa-laptop-code"></i>
+          Quản lý Tài khoản Phần mềm
+        </h2>
+        <p class="report-subtitle">Theo dõi license, utilization và renewal management</p>
+      </div>
+      <div class="header-actions">
+        <button class="header-btn" onclick="refreshSoftwareManagement()">
+          <i class="fas fa-sync-alt"></i> Làm mới
+        </button>
+        <button class="header-btn" onclick="exportSoftwareReport()">
+          <i class="fas fa-download"></i> Xuất báo cáo
+        </button>
+        <button class="header-btn primary" onclick="openAddSoftwareModal()">
+          <i class="fas fa-plus"></i> Thêm phần mềm
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Software KPI Cards -->
+  <div class="software-kpi-grid">
+    <div class="kpi-card total-software">
+      <div class="kpi-icon">
+        <i class="fas fa-desktop"></i>
+      </div>
+      <div class="kpi-content">
+        <h3 class="kpi-label">Tổng Phần mềm</h3>
+        <p class="kpi-value" id="total-software-value">0</p>
+        <span class="kpi-change" id="total-software-change">+0</span>
+      </div>
+    </div>
+
+    <div class="kpi-card active-licenses">
+      <div class="kpi-icon">
+        <i class="fas fa-key"></i>
+      </div>
+      <div class="kpi-content">
+        <h3 class="kpi-label">License Hoạt động</h3>
+        <p class="kpi-value" id="active-licenses-value">0</p>
+        <span class="kpi-change" id="active-licenses-change">+0%</span>
+      </div>
+    </div>
+
+    <div class="kpi-card utilization-rate">
+      <div class="kpi-icon">
+        <i class="fas fa-chart-pie"></i>
+      </div>
+      <div class="kpi-content">
+        <h3 class="kpi-label">Tỷ lệ Sử dụng</h3>
+        <p class="kpi-value" id="utilization-rate-value">0%</p>
+        <span class="kpi-period" id="utilization-period">tổng utilization</span>
+      </div>
+    </div>
+
+    <div class="kpi-card renewal-cost">
+      <div class="kpi-icon">
+        <i class="fas fa-money-bill-wave"></i>
+      </div>
+      <div class="kpi-content">
+        <h3 class="kpi-label">Chi phí Gia hạn</h3>
+        <p class="kpi-value" id="renewal-cost-value">0 ₫</p>
+        <span class="kpi-detail" id="renewal-cost-detail">30 ngày tới</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- License Status Overview -->
+  <div class="license-status-overview">
+    <div class="status-header">
+      <h3 class="status-title">
+        <i class="fas fa-clipboard-list"></i>
+        Tổng quan Trạng thái License
+      </h3>
+      <div class="status-controls">
+        <div class="view-toggle">
+          <button class="toggle-btn active" data-view="status">Theo trạng thái</button>
+          <button class="toggle-btn" data-view="expiry">Theo hạn sử dụng</button>
+          <button class="toggle-btn" data-view="utilization">Theo sử dụng</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="status-grid">
+      <div class="status-card active-status">
+        <div class="status-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="status-info">
+          <h4 class="status-name">Đang hoạt động</h4>
+          <p class="status-count" id="active-status-count">0</p>
+          <span class="status-percentage" id="active-status-percentage">0%</span>
+        </div>
+        <div class="status-chart">
+          <canvas id="active-status-chart" width="60" height="60"></canvas>
+        </div>
+      </div>
+
+      <div class="status-card expiring-status">
+        <div class="status-icon">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="status-info">
+          <h4 class="status-name">Sắp hết hạn</h4>
+          <p class="status-count" id="expiring-status-count">0</p>
+          <span class="status-detail" id="expiring-status-detail">trong 30 ngày</span>
+        </div>
+        <div class="status-chart">
+          <canvas id="expiring-status-chart" width="60" height="60"></canvas>
+        </div>
+      </div>
+
+      <div class="status-card expired-status">
+        <div class="status-icon">
+          <i class="fas fa-times-circle"></i>
+        </div>
+        <div class="status-info">
+          <h4 class="status-name">Đã hết hạn</h4>
+          <p class="status-count" id="expired-status-count">0</p>
+          <span class="status-priority" id="expired-status-priority">Cần xử lý</span>
+        </div>
+        <div class="status-chart">
+          <canvas id="expired-status-chart" width="60" height="60"></canvas>
+        </div>
+      </div>
+
+      <div class="status-card unused-status">
+        <div class="status-icon">
+          <i class="fas fa-pause-circle"></i>
+        </div>
+        <div class="status-info">
+          <h4 class="status-name">Chưa sử dụng</h4>
+          <p class="status-count" id="unused-status-count">0</p>
+          <span class="status-suggestion" id="unused-status-suggestion">Tối ưu hóa</span>
+        </div>
+        <div class="status-chart">
+          <canvas id="unused-status-chart" width="60" height="60"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Software Analytics Charts -->
+  <div class="software-analytics-grid">
+    <!-- Software Usage Trends -->
+    <div class="chart-container software-usage-trends">
+      <div class="chart-header">
+        <h3 class="chart-title">
+          <i class="fas fa-chart-area"></i>
+          Xu hướng Sử dụng Phần mềm
+        </h3>
+        <div class="chart-controls">
+          <div class="metric-selector">
+            <button class="metric-btn active" data-metric="users">Người dùng</button>
+            <button class="metric-btn" data-metric="revenue">Doanh thu</button>
+            <button class="metric-btn" data-metric="licenses">Licenses</button>
+          </div>
+        </div>
+      </div>
+      <div class="chart-content">
+        <canvas id="software-usage-trends-chart" width="400" height="250"></canvas>
+      </div>
+    </div>
+
+    <!-- License Utilization -->
+    <div class="chart-container license-utilization">
+      <div class="chart-header">
+        <h3 class="chart-title">
+          <i class="fas fa-tachometer-alt"></i>
+          Hiệu suất Sử dụng License
+        </h3>
+        <div class="chart-controls">
+          <div class="utilization-filters">
+            <button class="filter-btn active" data-filter="all">Tất cả</button>
+            <button class="filter-btn" data-filter="high">Cao (>80%)</button>
+            <button class="filter-btn" data-filter="medium">TB (50-80%)</button>
+            <button class="filter-btn" data-filter="low">Thấp (<50%)</button>
+          </div>
+        </div>
+      </div>
+      <div class="chart-content">
+        <canvas id="license-utilization-chart" width="400" height="250"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Software Data Tables -->
+  <div class="software-tables">
+    <!-- Active Software Table -->
+    <div class="table-container active-software-table">
+      <div class="table-header">
+        <h3 class="table-title">
+          <i class="fas fa-list"></i>
+          Danh sách Phần mềm & License
+        </h3>
+        <div class="table-controls">
+          <div class="search-box">
+            <input type="text" placeholder="Tìm kiếm phần mềm..." id="software-search" onkeyup="filterSoftware()">
+            <i class="fas fa-search"></i>
+          </div>
+          <div class="filter-group">
+            <select id="software-category-filter" onchange="filterByCategory()">
+              <option value="all">Tất cả danh mục</option>
+              <option value="productivity">Productivity</option>
+              <option value="design">Design</option>
+              <option value="development">Development</option>
+              <option value="security">Security</option>
+              <option value="communication">Communication</option>
+            </select>
+            <select id="software-status-filter" onchange="filterByLicenseStatus()">
+              <option value="all">Tất cả trạng thái</option>
+              <option value="active">Đang hoạt động</option>
+              <option value="expiring">Sắp hết hạn</option>
+              <option value="expired">Đã hết hạn</option>
+              <option value="unused">Chưa sử dụng</option>
+            </select>
+          </div>
+          <button class="table-btn" onclick="exportSoftwareData()">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
+      </div>
+      <div class="table-content">
+        <table class="software-table" id="active-software-data-table">
+          <thead>
+            <tr>
+              <th class="select-col">
+                <input type="checkbox" id="select-all-software" onchange="toggleSelectAllSoftware()">
+              </th>
+              <th class="software-col">Phần mềm</th>
+              <th class="category-col">Danh mục</th>
+              <th class="licenses-col">Licenses</th>
+              <th class="users-col">Người dùng</th>
+              <th class="utilization-col">Sử dụng</th>
+              <th class="expiry-col">Hết hạn</th>
+              <th class="cost-col">Chi phí/tháng</th>
+              <th class="status-col">Trạng thái</th>
+              <th class="action-col">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="active-software-tbody">
+            <tr>
+              <td colspan="10" class="loading-row">
+                <i class="fas fa-spinner fa-spin"></i> Đang tải...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-pagination">
+        <div class="pagination-info">
+          Hiển thị <span id="software-showing">0</span> trong tổng số <span id="software-total">0</span> phần mềm
+        </div>
+        <div class="pagination-controls">
+          <button class="pagination-btn" onclick="previousSoftwarePage()">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <div class="pagination-numbers" id="software-pagination-numbers"></div>
+          <button class="pagination-btn" onclick="nextSoftwarePage()">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- License Alerts Table -->
+    <div class="table-container license-alerts-table">
+      <div class="table-header">
+        <h3 class="table-title">
+          <i class="fas fa-bell"></i>
+          Cảnh báo & Khuyến nghị
+        </h3>
+        <div class="table-controls">
+          <div class="alert-filters">
+            <button class="alert-filter-btn active" data-filter="all">Tất cả</button>
+            <button class="alert-filter-btn" data-filter="critical">Nghiêm trọng</button>
+            <button class="alert-filter-btn" data-filter="warning">Cảnh báo</button>
+            <button class="alert-filter-btn" data-filter="info">Thông tin</button>
+          </div>
+          <button class="table-btn" onclick="markAllAlertsRead()">
+            <i class="fas fa-check"></i> Đánh dấu đã đọc
+          </button>
+        </div>
+      </div>
+      <div class="table-content">
+        <table class="alerts-table" id="license-alerts-data-table">
+          <thead>
+            <tr>
+              <th class="priority-col">Ưu tiên</th>
+              <th class="software-col">Phần mềm</th>
+              <th class="alert-col">Cảnh báo</th>
+              <th class="date-col">Ngày</th>
+              <th class="action-col">Hành động</th>
+            </tr>
+          </thead>
+          <tbody id="license-alerts-tbody">
+            <tr>
+              <td colspan="5" class="loading-row">
+                <i class="fas fa-spinner fa-spin"></i> Đang tải...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- License Management Tools -->
+  <div class="license-management-tools">
+    <div class="tools-header">
+      <h3 class="tools-title">
+        <i class="fas fa-tools"></i>
+        Công cụ Quản lý License
+      </h3>
+    </div>
+    
+    <div class="tools-grid">
+      <!-- Renewal Management -->
+      <div class="tool-card renewal-management">
+        <div class="tool-header">
+          <h4 class="tool-title">
+            <i class="fas fa-calendar-alt"></i>
+            Quản lý Gia hạn
+          </h4>
+        </div>
+        <div class="tool-content">
+          <div class="renewal-stats">
+            <div class="renewal-item">
+              <span class="renewal-label">Gia hạn trong 30 ngày:</span>
+              <span class="renewal-value" id="renewals-30days">0</span>
+            </div>
+            <div class="renewal-item">
+              <span class="renewal-label">Chi phí dự kiến:</span>
+              <span class="renewal-value" id="expected-renewal-cost">0 ₫</span>
+            </div>
+            <div class="renewal-item">
+              <span class="renewal-label">Đã lên lịch:</span>
+              <span class="renewal-value" id="scheduled-renewals">0</span>
+            </div>
+          </div>
+          <div class="renewal-actions">
+            <button class="tool-btn primary" onclick="scheduleRenewals()">
+              <i class="fas fa-calendar-plus"></i>
+              Lập lịch gia hạn
+            </button>
+            <button class="tool-btn" onclick="viewRenewalCalendar()">
+              <i class="fas fa-calendar"></i>
+              Xem lịch gia hạn
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- License Optimization -->
+      <div class="tool-card license-optimization">
+        <div class="tool-header">
+          <h4 class="tool-title">
+            <i class="fas fa-chart-line"></i>
+            Tối ưu hóa License
+          </h4>
+        </div>
+        <div class="tool-content">
+          <div class="optimization-insights">
+            <div class="insight-item">
+              <div class="insight-icon savings">
+                <i class="fas fa-piggy-bank"></i>
+              </div>
+              <div class="insight-info">
+                <span class="insight-title">Tiết kiệm tiềm năng</span>
+                <span class="insight-value" id="potential-savings">0 ₫</span>
+              </div>
+            </div>
+            <div class="insight-item">
+              <div class="insight-icon unused">
+                <i class="fas fa-exclamation-circle"></i>
+              </div>
+              <div class="insight-info">
+                <span class="insight-title">License không sử dụng</span>
+                <span class="insight-value" id="unused-licenses">0</span>
+              </div>
+            </div>
+            <div class="insight-item">
+              <div class="insight-icon overused">
+                <i class="fas fa-arrow-up"></i>
+              </div>
+              <div class="insight-info">
+                <span class="insight-title">Cần mở rộng</span>
+                <span class="insight-value" id="expansion-needed">0</span>
+              </div>
+            </div>
+          </div>
+          <div class="optimization-actions">
+            <button class="tool-btn" onclick="generateOptimizationReport()">
+              <i class="fas fa-file-alt"></i>
+              Tạo báo cáo tối ưu
+            </button>
+            <button class="tool-btn" onclick="applyOptimization()">
+              <i class="fas fa-magic"></i>
+              Áp dụng tối ưu hóa
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Usage Analytics -->
+      <div class="tool-card usage-analytics">
+        <div class="tool-header">
+          <h4 class="tool-title">
+            <i class="fas fa-analytics"></i>
+            Phân tích Sử dụng
+          </h4>
+        </div>
+        <div class="tool-content">
+          <div class="usage-metrics">
+            <div class="usage-metric">
+              <span class="metric-label">Thời gian sử dụng TB:</span>
+              <span class="metric-value" id="avg-usage-time">0h</span>
+            </div>
+            <div class="usage-metric">
+              <span class="metric-label">Người dùng hoạt động:</span>
+              <span class="metric-value" id="active-users-count">0</span>
+            </div>
+            <div class="usage-metric">
+              <span class="metric-label">Peak usage time:</span>
+              <span class="metric-value" id="peak-usage-time">N/A</span>
+            </div>
+          </div>
+          <div class="usage-actions">
+            <button class="tool-btn" onclick="generateUsageReport()">
+              <i class="fas fa-chart-bar"></i>
+              Báo cáo sử dụng
+            </button>
+            <button class="tool-btn" onclick="exportUsageData()">
+              <i class="fas fa-download"></i>
+              Xuất dữ liệu
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compliance & Security -->
+      <div class="tool-card compliance-security">
+        <div class="tool-header">
+          <h4 class="tool-title">
+            <i class="fas fa-shield-alt"></i>
+            Compliance & Bảo mật
+          </h4>
+        </div>
+        <div class="tool-content">
+          <div class="compliance-status">
+            <div class="compliance-item">
+              <span class="compliance-label">Tuân thủ license:</span>
+              <span class="compliance-status-badge compliant">
+                <i class="fas fa-check"></i> Đạt
+              </span>
+            </div>
+            <div class="compliance-item">
+              <span class="compliance-label">Bảo mật cập nhật:</span>
+              <span class="compliance-status-badge warning">
+                <i class="fas fa-exclamation-triangle"></i> Cần kiểm tra
+              </span>
+            </div>
+            <div class="compliance-item">
+              <span class="compliance-label">Backup licenses:</span>
+              <span class="compliance-status-badge compliant">
+                <i class="fas fa-check"></i> Đầy đủ
+              </span>
+            </div>
+          </div>
+          <div class="compliance-actions">
+            <button class="tool-btn" onclick="runComplianceCheck()">
+              <i class="fas fa-search"></i>
+              Kiểm tra tuân thủ
+            </button>
+            <button class="tool-btn" onclick="updateSecurityStatus()">
+              <i class="fas fa-sync"></i>
+              Cập nhật bảo mật
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Software Performance Dashboard -->
+  <div class="software-performance-dashboard">
+    <div class="dashboard-header">
+      <h3 class="dashboard-title">
+        <i class="fas fa-tachometer-alt"></i>
+        Dashboard Hiệu suất Phần mềm
+      </h3>
+      <div class="dashboard-controls">
+        <div class="time-range-selector">
+          <button class="time-btn active" data-range="7d">7 ngày</button>
+          <button class="time-btn" data-range="30d">30 ngày</button>
+          <button class="time-btn" data-range="90d">90 ngày</button>
+          <button class="time-btn" data-range="1y">1 năm</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="performance-metrics-grid">
+      <div class="performance-metric roi">
+        <div class="metric-header">
+          <h4 class="metric-title">ROI Phần mềm</h4>
+          <span class="metric-trend positive">
+            <i class="fas fa-arrow-up"></i> +12%
+          </span>
+        </div>
+        <div class="metric-value" id="software-roi">245%</div>
+        <div class="metric-description">Lợi nhuận trên đầu tư software</div>
+        <div class="metric-chart">
+          <canvas id="roi-trend-chart" width="200" height="60"></canvas>
+        </div>
+      </div>
+
+      <div class="performance-metric productivity">
+        <div class="metric-header">
+          <h4 class="metric-title">Năng suất</h4>
+          <span class="metric-trend positive">
+            <i class="fas fa-arrow-up"></i> +8%
+          </span>
+        </div>
+        <div class="metric-value" id="productivity-score">87%</div>
+        <div class="metric-description">Điểm số năng suất trung bình</div>
+        <div class="metric-chart">
+          <canvas id="productivity-trend-chart" width="200" height="60"></canvas>
+        </div>
+      </div>
+
+      <div class="performance-metric cost-efficiency">
+        <div class="metric-header">
+          <h4 class="metric-title">Hiệu quả Chi phí</h4>
+          <span class="metric-trend positive">
+            <i class="fas fa-arrow-up"></i> +15%
+          </span>
+        </div>
+        <div class="metric-value" id="cost-efficiency">92%</div>
+        <div class="metric-description">Tỷ lệ chi phí/giá trị nhận được</div>
+        <div class="metric-chart">
+          <canvas id="cost-efficiency-trend-chart" width="200" height="60"></canvas>
+        </div>
+      </div>
+
+      <div class="performance-metric user-satisfaction">
+        <div class="metric-header">
+          <h4 class="metric-title">Hài lòng Người dùng</h4>
+          <span class="metric-trend neutral">
+            <i class="fas fa-minus"></i> 0%
+          </span>
+        </div>
+        <div class="metric-value" id="user-satisfaction">4.2/5</div>
+        <div class="metric-description">Điểm đánh giá trung bình</div>
+        <div class="metric-chart">
+          <canvas id="satisfaction-trend-chart" width="200" height="60"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

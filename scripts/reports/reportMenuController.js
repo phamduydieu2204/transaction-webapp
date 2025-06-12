@@ -13,6 +13,7 @@ import { loadOverviewReport } from './overview/overviewReport.js';
 import { loadRevenueAnalysis } from './revenue/revenueAnalysis.js';
 import { loadExpenseAnalysis } from './expense/expenseAnalysis.js';
 import { loadCustomerManagement } from './customer/customerManagement.js';
+import { loadSoftwareManagement } from './software/softwareManagement.js';
 import { loadRenewalReport } from './renewal/renewalReport.js';
 import { loadEmployeeReport } from './employee/employeeReport.js';
 import { loadFinanceReport } from './finance/financeReport.js';
@@ -132,7 +133,12 @@ async function loadReport(reportType) {
         await loadCustomerManagement(customerOptions);
         break;
       case 'software':
-        await loadSoftwareReport();
+        // Pass current date range and period
+        const softwareOptions = {
+          dateRange: window.globalFilters?.dateRange || null,
+          period: window.globalFilters?.period || 'this_month'
+        };
+        await loadSoftwareManagement(softwareOptions);
         break;
       case 'employee':
         await loadEmployeeReport();
@@ -155,22 +161,6 @@ async function loadReport(reportType) {
 }
 
 
-/**
- * Load software report (placeholder for now)
- */
-async function loadSoftwareReport() {
-  console.log('💻 Loading software report');
-  // Software report functionality will be implemented in separate module
-  const container = document.getElementById('report-software');
-  if (container) {
-    container.innerHTML = `
-      <div class="report-placeholder">
-        <h3>📊 Báo cáo Phần mềm</h3>
-        <p>Báo cáo phần mềm đang được phát triển...</p>
-      </div>
-    `;
-  }
-}
 
 // Make functions available globally for backward compatibility
 window.initReportMenu = initReportMenu;
