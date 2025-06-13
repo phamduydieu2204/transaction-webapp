@@ -146,29 +146,37 @@ async function updateRevenueKPIs(transactions, period) {
 function calculateRevenueMetrics(transactions) {
   let totalRevenue = 0;
   let highestTransaction = { amount: 0, customer: '', product: '' };
+  let validTransactionCount = 0;
   
   transactions.forEach(rawTransaction => {
     const t = normalizeTransaction(rawTransaction);
     if (!t) return;
     
-    const amount = t.revenue || 0;
-    totalRevenue += amount;
+    // Chỉ tính doanh thu từ giao dịch "đã hoàn tất" và "đã thanh toán"
+    // Loại bỏ "chưa thanh toán", "hoàn tiền", "đã hủy"
+    const status = (t.transactionType || t.loaiGiaoDich || '').toLowerCase().trim();
     
-    if (amount > highestTransaction.amount) {
-      highestTransaction = {
-        amount: amount,
-        customer: t.customerName || 'N/A',
-        product: t.softwareName || 'N/A'
-      };
+    if (status === 'đã hoàn tất' || status === 'đã thanh toán') {
+      const amount = t.revenue || 0;
+      totalRevenue += amount;
+      validTransactionCount++;
+      
+      if (amount > highestTransaction.amount) {
+        highestTransaction = {
+          amount: amount,
+          customer: t.customerName || 'N/A',
+          product: t.softwareName || 'N/A'
+        };
+      }
     }
   });
   
-  const avgTransactionValue = transactions.length > 0 ? totalRevenue / transactions.length : 0;
+  const avgTransactionValue = validTransactionCount > 0 ? totalRevenue / validTransactionCount : 0;
   
   return {
     totalRevenue,
     avgTransactionValue,
-    transactionCount: transactions.length,
+    transactionCount: validTransactionCount,
     highestTransaction
   };
 }
@@ -543,11 +551,20 @@ function filterDataByDateRange(data, dateRange) {
 
 // Additional helper functions for data processing
 function prepareTrendData(transactions, period) {
+  // Lọc giao dịch theo trạng thái hợp lệ
+  const validTransactions = transactions.filter(rawTransaction => {
+    const t = normalizeTransaction(rawTransaction);
+    if (!t) return false;
+    
+    const status = (t.transactionType || t.loaiGiaoDich || '').toLowerCase().trim();
+    return status === 'đã hoàn tất' || status === 'đã thanh toán';
+  });
+  
   // Implementation for trend data preparation
-  // This would create time-series data based on the period
+  // This would create time-series data based on the period using only valid transactions
   return {
     labels: ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'],
-    values: [100000, 150000, 120000, 180000] // Placeholder data
+    values: [100000, 150000, 120000, 180000] // Placeholder data - should be calculated from validTransactions
   };
 }
 
@@ -558,13 +575,18 @@ function calculateRevenueByCategory(transactions) {
     const t = normalizeTransaction(rawTransaction);
     if (!t) return;
     
-    const category = t.softwareName || 'Khác';
-    const revenue = t.revenue || 0;
+    // Chỉ tính doanh thu từ giao dịch "đã hoàn tất" và "đã thanh toán"
+    const status = (t.transactionType || t.loaiGiaoDich || '').toLowerCase().trim();
     
-    if (!categories[category]) {
-      categories[category] = 0;
+    if (status === 'đã hoàn tất' || status === 'đã thanh toán') {
+      const category = t.softwareName || 'Khác';
+      const revenue = t.revenue || 0;
+      
+      if (!categories[category]) {
+        categories[category] = 0;
+      }
+      categories[category] += revenue;
     }
-    categories[category] += revenue;
   });
   
   return {
@@ -580,20 +602,25 @@ function calculateCustomerRevenue(transactions) {
     const t = normalizeTransaction(rawTransaction);
     if (!t) return;
     
-    const customerName = t.customerName || 'Không xác định';
-    const revenue = t.revenue || 0;
+    // Chỉ tính doanh thu từ giao dịch "đã hoàn tất" và "đã thanh toán"
+    const status = (t.transactionType || t.loaiGiaoDich || '').toLowerCase().trim();
     
-    if (!customers[customerName]) {
-      customers[customerName] = {
-        name: customerName,
-        email: t.customerEmail || '',
-        revenue: 0,
-        transactionCount: 0
-      };
+    if (status === 'đã hoàn tất' || status === 'đã thanh toán') {
+      const customerName = t.customerName || 'Không xác định';
+      const revenue = t.revenue || 0;
+      
+      if (!customers[customerName]) {
+        customers[customerName] = {
+          name: customerName,
+          email: t.customerEmail || '',
+          revenue: 0,
+          transactionCount: 0
+        };
+      }
+      
+      customers[customerName].revenue += revenue;
+      customers[customerName].transactionCount++;
     }
-    
-    customers[customerName].revenue += revenue;
-    customers[customerName].transactionCount++;
   });
   
   return Object.values(customers).map(customer => ({
@@ -609,20 +636,25 @@ function calculateProductRevenue(transactions) {
     const t = normalizeTransaction(rawTransaction);
     if (!t) return;
     
-    const productName = t.softwareName || 'Không xác định';
-    const revenue = t.revenue || 0;
+    // Chỉ tính doanh thu từ giao dịch "đã hoàn tất" và "đã thanh toán"
+    const status = (t.transactionType || t.loaiGiaoDich || '').toLowerCase().trim();
     
-    if (!products[productName]) {
-      products[productName] = {
-        name: productName,
-        category: 'Software', // Could be enhanced with actual categories
-        revenue: 0,
-        quantity: 0
-      };
+    if (status === 'đã hoàn tất' || status === 'đã thanh toán') {
+      const productName = t.softwareName || 'Không xác định';
+      const revenue = t.revenue || 0;
+      
+      if (!products[productName]) {
+        products[productName] = {
+          name: productName,
+          category: 'Software', // Could be enhanced with actual categories
+          revenue: 0,
+          quantity: 0
+        };
+      }
+      
+      products[productName].revenue += revenue;
+      products[productName].quantity++;
     }
-    
-    products[productName].revenue += revenue;
-    products[productName].quantity++;
   });
   
   return Object.values(products).map(product => ({
@@ -670,8 +702,17 @@ function generateRevenueInsights(transactions) {
 }
 
 function getPreviousPeriodTransactions(transactions, period) {
-  // Placeholder - would implement actual previous period calculation
-  return transactions.slice(0, Math.floor(transactions.length / 2));
+  // Lọc chỉ giao dịch hợp lệ trước khi tính kỳ trước
+  const validTransactions = transactions.filter(rawTransaction => {
+    const t = normalizeTransaction(rawTransaction);
+    if (!t) return false;
+    
+    const status = (t.transactionType || t.loaiGiaoDich || '').toLowerCase().trim();
+    return status === 'đã hoàn tất' || status === 'đã thanh toán';
+  });
+  
+  // Placeholder - would implement actual previous period calculation using valid transactions
+  return validTransactions.slice(0, Math.floor(validTransactions.length / 2));
 }
 
 function loadChartJS() {
