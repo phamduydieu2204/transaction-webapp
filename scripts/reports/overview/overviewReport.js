@@ -4338,11 +4338,15 @@ function calculateUpdatedBusinessMetrics(transactions, expenses, dateRange) {
     : 0;
   
   // Calculate previous period for growth comparison
+  // For gross revenue, compare with same period of previous cycle (cùng kỳ chu kỳ trước)
   if (dateRange && dateRange.start && dateRange.end) {
-    const previousPeriodRange = calculatePreviousPeriodRange(dateRange);
-    const previousTransactions = filterDataByDateRange(transactions, previousPeriodRange);
+    const samePeriodPreviousCycleRange = calculateSamePeriodPreviousCycle(dateRange);
+    const samePeriodTransactions = filterDataByDateRange(transactions, samePeriodPreviousCycleRange);
     
-    previousTransactions.forEach(rawTransaction => {
+    console.log('📊 Same period previous cycle range:', samePeriodPreviousCycleRange);
+    console.log(`📊 Same period transactions found: ${samePeriodTransactions.length}`);
+    
+    samePeriodTransactions.forEach(rawTransaction => {
       const transaction = normalizeTransaction(rawTransaction);
       if (!transaction) return;
       
@@ -4365,6 +4369,12 @@ function calculateUpdatedBusinessMetrics(transactions, expenses, dateRange) {
     });
     
     metrics.previousPeriod.grossRevenue -= metrics.previousPeriod.totalRefunds;
+    
+    console.log('📊 Previous same period metrics:', {
+      grossRevenue: metrics.previousPeriod.grossRevenue,
+      totalRefunds: metrics.previousPeriod.totalRefunds,
+      effectiveTransactions: metrics.previousPeriod.effectiveTransactions
+    });
   }
   
   // Calculate growth rates
@@ -4389,7 +4399,45 @@ function calculateUpdatedBusinessMetrics(transactions, expenses, dateRange) {
 }
 
 /**
- * Calculate previous period date range for comparison
+ * Calculate same period of previous cycle for comparison
+ * Example: If current period is 2025/06/01 to 2025/06/13, 
+ * previous cycle same period would be 2025/05/01 to 2025/05/13
+ */
+function calculateSamePeriodPreviousCycle(currentRange) {
+  const startDate = new Date(currentRange.start);
+  const endDate = new Date(currentRange.end);
+  
+  console.log('📅 Current period:', { start: currentRange.start, end: currentRange.end });
+  
+  // Calculate previous cycle by going back 1 month
+  const prevStartDate = new Date(startDate);
+  const prevEndDate = new Date(endDate);
+  
+  // Go back 1 month for both start and end dates
+  prevStartDate.setMonth(prevStartDate.getMonth() - 1);
+  prevEndDate.setMonth(prevEndDate.getMonth() - 1);
+  
+  // Handle edge cases for month boundaries
+  // If original date was 31st but previous month only has 30 days, adjust
+  if (prevStartDate.getDate() !== startDate.getDate()) {
+    prevStartDate.setDate(0); // Set to last day of previous month
+  }
+  if (prevEndDate.getDate() !== endDate.getDate()) {
+    prevEndDate.setDate(0); // Set to last day of previous month
+  }
+  
+  const result = {
+    start: prevStartDate.toISOString().split('T')[0],
+    end: prevEndDate.toISOString().split('T')[0]
+  };
+  
+  console.log('📅 Same period previous cycle:', result);
+  
+  return result;
+}
+
+/**
+ * Calculate previous period date range for comparison (legacy function kept for compatibility)
  */
 function calculatePreviousPeriodRange(currentRange) {
   const startDate = new Date(currentRange.start);
