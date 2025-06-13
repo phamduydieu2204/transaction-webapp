@@ -1,75 +1,100 @@
 /**
- * Debug script for Employee Report
+ * Debug Employee Report
+ * Test function để kiểm tra employee report có hoạt động không
  */
 
-// Check if all required modules are available
-console.log('🔍 Checking Employee Report Dependencies...');
-
-// Check for Chart.js
-if (typeof Chart !== 'undefined') {
-    console.log('✅ Chart.js is loaded');
-} else {
-    console.log('❌ Chart.js is NOT loaded');
-}
-
-// Check for global data
-if (window.currentTransactionData) {
-    console.log('✅ Transaction data available:', window.currentTransactionData.length, 'records');
-} else {
-    console.log('❌ Transaction data NOT available');
-}
-
-if (window.currentExpenseData) {
-    console.log('✅ Expense data available:', window.currentExpenseData.length, 'records');
-} else {
-    console.log('❌ Expense data NOT available');
-}
-
-// Check for report container
-const container = document.getElementById('report-employee');
-if (container) {
-    console.log('✅ Employee report container found');
-} else {
-    console.log('❌ Employee report container NOT found');
-}
-
-// Try to load the report manually
-async function debugLoadEmployeeReport() {
-    try {
-        console.log('🚀 Attempting to load employee report...');
-        
-        // Import the module
-        const { loadEmployeeReport } = await import('./reports/employee/employeeReport.js');
-        
-        // Load the report
-        await loadEmployeeReport();
-        
-        console.log('✅ Employee report loaded successfully!');
-        
-    } catch (error) {
-        console.error('❌ Failed to load employee report:', error);
-        console.error('Stack trace:', error.stack);
-    }
-}
-
-// Add debug button
-const debugBtn = document.createElement('button');
-debugBtn.textContent = 'Debug Load Employee Report';
-debugBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 9999; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;';
-debugBtn.onclick = debugLoadEmployeeReport;
-document.body.appendChild(debugBtn);
-
-console.log('💡 Debug button added. Click it to manually load the employee report.');
-
-// Export for console debugging
-window.debugEmployeeReport = {
-    loadReport: debugLoadEmployeeReport,
-    checkDependencies: () => {
-        return {
-            chartJs: typeof Chart !== 'undefined',
-            transactionData: !!window.currentTransactionData,
-            expenseData: !!window.currentExpenseData,
-            container: !!document.getElementById('report-employee')
-        };
+window.debugEmployeeReport = function() {
+    console.log('🔍 Debugging Employee Report...');
+    
+    console.log('Available functions:', {
+        loadEmployeeReport: typeof window.loadEmployeeReport,
+        initEmployeeReport: typeof window.initEmployeeReport,
+        cleanupEmployeeReport: typeof window.cleanupEmployeeReport
+    });
+    
+    console.log('Container check:', {
+        reportEmployee: !!document.getElementById('report-employee'),
+        reportPagesContainer: !!document.getElementById('report-pages-container')
+    });
+    
+    console.log('Menu items:', {
+        employeeMenuItem: !!document.querySelector('[data-report="employee"]'),
+        menuItems: document.querySelectorAll('.menu-item').length
+    });
+    
+    console.log('Global data:', {
+        transactionData: window.currentTransactionData ? window.currentTransactionData.length : 'undefined',
+        expenseData: window.currentExpenseData ? window.currentExpenseData.length : 'undefined',
+        transactionList: window.transactionList ? window.transactionList.length : 'undefined',
+        expenseList: window.expenseList ? window.expenseList.length : 'undefined'
+    });
+    
+    // Try to manually trigger employee report
+    console.log('🧪 Testing manual employee report load...');
+    if (window.loadEmployeeReport) {
+        window.loadEmployeeReport();
+    } else {
+        console.error('❌ loadEmployeeReport function not available');
     }
 };
+
+window.testEmployeeReportTemplate = async function() {
+    console.log('🧪 Testing employee report template load...');
+    
+    try {
+        const response = await fetch('./partials/tabs/report-pages/employee-report.html');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const html = await response.text();
+        console.log('✅ Template loaded successfully, length:', html.length);
+        console.log('Template preview:', html.substring(0, 200) + '...');
+        
+        return html;
+    } catch (error) {
+        console.error('❌ Template load failed:', error);
+        return null;
+    }
+};
+
+window.forceEmployeeReport = function() {
+    console.log('🔧 Force loading employee report...');
+    
+    // Hide all report pages
+    const reportPages = document.querySelectorAll('.report-page');
+    reportPages.forEach(page => page.classList.remove('active'));
+    
+    // Show employee report page
+    const employeePage = document.getElementById('report-employee');
+    if (employeePage) {
+        employeePage.classList.add('active');
+        console.log('✅ Employee page shown');
+        
+        // Force load template
+        window.testEmployeeReportTemplate().then(html => {
+            if (html) {
+                employeePage.innerHTML = html;
+                console.log('✅ Template injected directly');
+            }
+        });
+        
+    } else {
+        console.error('❌ Employee page not found');
+    }
+    
+    // Update menu
+    const menuItems = document.querySelectorAll('.menu-item');
+    menuItems.forEach(item => item.classList.remove('active'));
+    
+    const employeeMenuItem = document.querySelector('[data-report="employee"]');
+    if (employeeMenuItem) {
+        employeeMenuItem.classList.add('active');
+        console.log('✅ Employee menu item activated');
+    }
+};
+
+console.log('🔧 Employee report debug functions loaded:');
+console.log('- debugEmployeeReport()');
+console.log('- testEmployeeReportTemplate()');
+console.log('- forceEmployeeReport()');

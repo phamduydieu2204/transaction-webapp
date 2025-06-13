@@ -16,6 +16,7 @@ import { initializeSessionValidation, validateSessionImmediate } from './core/se
 import { authManager } from './core/authManager.js';
 import './debugAuth.js'; // Debug functions
 import './debugEmployeeBadge.js'; // Debug employee badge
+import './debug-employee-report.js'; // Debug employee report
 
 // Import essential utilities (use unified modal system)
 import { showProcessingModal, showResultModal, closeProcessingModal } from './modalUnified.js';
@@ -27,6 +28,11 @@ import './detailModalUnified.js';
 import { initExpenseTab } from './initExpenseTab.js';
 import { initTransactionTab } from './initTransactionTab.js';
 import { initStatisticsTab } from './initStatisticsTab.js';
+
+// Import employee report modules
+import './reports/employee/employeeReport.js';
+import './reports/employee/employeeReportLoader.js';
+import './reports/employee/employeeReportCore.js';
 
 // Import performance optimizers
 import './core/requestOptimizer.js';

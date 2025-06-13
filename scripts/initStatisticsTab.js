@@ -169,13 +169,25 @@ function loadReportByType(reportType) {
       showReportPlaceholder(reportType, '💸 Phân tích chi phí');
       break;
     case 'customer':
-      showReportPlaceholder(reportType, '👥 Quản lý khách hàng');
+      if (window.loadCustomerManagement) {
+        window.loadCustomerManagement();
+      } else {
+        showReportPlaceholder(reportType, '👥 Quản lý khách hàng');
+      }
       break;
     case 'software':
-      showReportPlaceholder(reportType, '💻 Tài khoản phần mềm');
+      if (window.loadSoftwareManagement) {
+        window.loadSoftwareManagement();
+      } else {
+        showReportPlaceholder(reportType, '💻 Tài khoản phần mềm');
+      }
       break;
     case 'employee':
-      showReportPlaceholder(reportType, '👔 Báo cáo nhân viên');
+      if (window.loadEmployeeReport) {
+        window.loadEmployeeReport();
+      } else {
+        showReportPlaceholder(reportType, '👔 Báo cáo nhân viên');
+      }
       break;
     case 'finance':
       showReportPlaceholder(reportType, '🏦 Quản lý tài chính');
