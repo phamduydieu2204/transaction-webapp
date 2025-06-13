@@ -601,10 +601,14 @@ async function updateKPICards(kpis) {
   console.log('✨ UPDATED updateKPICards - Using new business metrics structure');
   console.log('📊 New KPIs data structure:', kpis);
   
+  // Check if we have the new metrics structure (with grossRevenue, pendingCollection, etc.)
+  const hasNewMetrics = kpis.grossRevenue !== undefined && kpis.statusBreakdown !== undefined;
+  console.log('🔍 Has new metrics structure:', hasNewMetrics);
+  
   // Check if we're using the new template with status-based elements
   const newTemplate = document.getElementById('completed-revenue') !== null;
   
-  if (newTemplate) {
+  if (newTemplate && hasNewMetrics) {
     // New template - Use updated business metrics structure
     console.log('🆕 Using new template with updated business metrics structure');
     
@@ -655,18 +659,64 @@ async function updateKPICards(kpis) {
     // Update status breakdown with new data
     updateStatusBreakdownWithNewMetrics(kpis);
     
+  } else if (newTemplate && !hasNewMetrics) {
+    // New template but old metrics structure - use legacy mapping
+    console.log('⚠️ Using new template but old metrics structure - legacy mapping');
+    updateKPICard('completed', {
+      value: kpis.financial?.totalRevenue || 0,
+      growth: 0,
+      elementId: 'completed-revenue',
+      changeId: 'completed-change'
+    });
+    
+    updateKPICard('pendingCollection', {
+      value: kpis.financial?.totalRevenue || 0, 
+      growth: 0,
+      elementId: 'paid-revenue', 
+      changeId: 'paid-change'
+    });
+    
+    updateKPICard('pendingPayment', {
+      value: 0,
+      growth: 0,
+      elementId: 'unpaid-revenue',
+      changeId: 'unpaid-change'
+    });
+    
+    updateKPICard('totalRefunds', {
+      value: 0,
+      growth: 0,
+      elementId: 'refund-revenue',
+      changeId: 'refund-change'
+    });
+    
+    updateKPICard('refundRate', {
+      value: 0,
+      growth: 0,
+      elementId: 'refund-rate',
+      changeId: 'refund-rate-change',
+      isPercentage: true
+    });
+    
+    updateKPICard('effectiveTransactions', {
+      value: kpis.revenue?.totalTransactions || 0,
+      growth: 0,
+      elementId: 'total-transactions',
+      changeId: 'transaction-change'
+    });
+    
   } else {
     // Old template fallback - convert new metrics to old structure
     console.log('⚠️ Using old template - converting new metrics to old structure');
     updateKPICard('revenue', {
-      value: kpis.grossRevenue || 0,
+      value: kpis.grossRevenue || kpis.financial?.totalRevenue || 0,
       growth: kpis.growthRates?.grossRevenue || 0,
       elementId: 'total-revenue',
       changeId: 'revenue-change'
     });
     
     updateKPICard('transaction', {
-      value: kpis.effectiveTransactions || 0,
+      value: kpis.effectiveTransactions || kpis.revenue?.totalTransactions || 0,
       growth: kpis.growthRates?.effectiveTransactions || 0,
       elementId: 'total-transactions',
       changeId: 'transaction-change'
