@@ -197,7 +197,11 @@ function loadReportByType(reportType) {
       }
       break;
     case 'cashflow-accrual':
-      showReportPlaceholder(reportType, '⚖️ Cash Flow vs Phân bổ');
+      if (window.loadCashFlowAccrualReport) {
+        window.loadCashFlowAccrualReport();
+      } else {
+        showReportPlaceholder(reportType, '⚖️ Cash Flow vs Phân bổ');
+      }
       break;
     default:
       console.warn('Unknown report type:', reportType);

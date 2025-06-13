@@ -39,6 +39,11 @@ import './reports/finance/financialReport.js';
 import './reports/finance/financialLoader.js';
 import './reports/finance/financialCore.js';
 
+// Import cash flow vs accrual modules
+import './reports/cashflow-accrual/cashFlowAccrualReport.js';
+import './reports/cashflow-accrual/cashFlowAccrualLoader.js';
+import './reports/cashflow-accrual/cashFlowAccrualCore.js';
+
 // Import performance optimizers
 import './core/requestOptimizer.js';
 import './core/domOptimizer.js';
@@ -437,6 +442,83 @@ window.forceFinancialManagement = function() {
     if (financeMenuItem) {
         financeMenuItem.classList.add('active');
         console.log('✅ Finance menu item activated');
+    }
+};
+
+// Cash Flow vs Accrual debug functions (inline for immediate availability)
+window.debugCashFlowAccrual = function() {
+    console.log('🔍 Debugging Cash Flow vs Accrual...');
+    
+    const results = {
+        functions: {
+            loadCashFlowAccrualReport: typeof window.loadCashFlowAccrualReport,
+            initCashFlowAccrualReport: typeof window.initCashFlowAccrualReport,
+            cleanupCashFlowAccrualReport: typeof window.cleanupCashFlowAccrualReport
+        },
+        containers: {
+            reportCashflowAccrual: !!document.getElementById('report-cashflow-accrual'),
+            reportPagesContainer: !!document.getElementById('report-pages-container')
+        },
+        menuItems: {
+            cashflowAccrualMenuItem: !!document.querySelector('[data-report="cashflow-accrual"]'),
+            menuItemsCount: document.querySelectorAll('.menu-item').length
+        },
+        currentPage: {
+            currentActiveReport: document.querySelector('.report-page.active')?.id,
+            currentActiveMenu: document.querySelector('.menu-item.active')?.dataset?.report
+        }
+    };
+    
+    console.table(results.functions);
+    console.table(results.containers);
+    console.table(results.menuItems);
+    console.table(results.currentPage);
+    
+    // Test loading function
+    if (typeof window.loadCashFlowAccrualReport === 'function') {
+        console.log('✅ Testing loadCashFlowAccrualReport...');
+        window.loadCashFlowAccrualReport();
+    } else {
+        console.error('❌ loadCashFlowAccrualReport function not available');
+    }
+    
+    return results;
+};
+
+window.forceCashFlowAccrual = function() {
+    console.log('🔧 Force loading cash flow vs accrual...');
+    
+    // Hide all report pages
+    const reportPages = document.querySelectorAll('.report-page');
+    reportPages.forEach(page => page.classList.remove('active'));
+    console.log('Hidden report pages:', reportPages.length);
+    
+    // Show cash flow accrual report page
+    const cashflowPage = document.getElementById('report-cashflow-accrual');
+    if (cashflowPage) {
+        cashflowPage.classList.add('active');
+        console.log('✅ Cash flow accrual page shown');
+        
+        // Force load cash flow accrual
+        if (typeof window.loadCashFlowAccrualReport === 'function') {
+            window.loadCashFlowAccrualReport();
+            console.log('✅ Cash flow accrual forced');
+        } else {
+            console.error('❌ loadCashFlowAccrualReport not available');
+        }
+        
+    } else {
+        console.error('❌ Cash flow accrual page not found');
+    }
+    
+    // Update menu
+    const menuItems = document.querySelectorAll('.menu-item');
+    menuItems.forEach(item => item.classList.remove('active'));
+    
+    const cashflowMenuItem = document.querySelector('[data-report="cashflow-accrual"]');
+    if (cashflowMenuItem) {
+        cashflowMenuItem.classList.add('active');
+        console.log('✅ Cash flow accrual menu item activated');
     }
 };
 
