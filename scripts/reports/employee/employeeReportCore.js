@@ -4,6 +4,8 @@
 import { formatDate } from '../../formatDate.js';
 import { formatDateTime } from '../../formatDateTime.js';
 import { formatCurrency } from '../../statistics/formatters.js';
+import { EmployeeDataProcessor } from './employeeDataProcessor.js';
+import { EmployeeCharts } from './employeeCharts.js';
 
 export class EmployeeReportCore {
     constructor() {
@@ -16,6 +18,17 @@ export class EmployeeReportCore {
         this.isInitialized = false;
         this.charts = {};
         this.kpiTargets = new Map(); // Lưu KPI targets cho nhân viên
+        
+        // Initialize new modules
+        this.dataProcessor = new EmployeeDataProcessor();
+        this.chartManager = new EmployeeCharts();
+        this.processedData = {
+            employees: [],
+            departments: [],
+            kpis: {},
+            topPerformers: [],
+            alerts: []
+        };
     }
 
     // Khởi tạo module
@@ -187,7 +200,22 @@ export class EmployeeReportCore {
         });
     }
 
-    // Xử lý và tính toán dữ liệu nhân viên
+    // Method mới để xử lý tất cả dữ liệu sử dụng EmployeeDataProcessor
+    processAllData(transactions = [], expenses = []) {
+        console.log('🔄 Processing all employee data...');
+        
+        // Use the new data processor
+        this.processedData = this.dataProcessor.processEmployeeData(transactions, expenses);
+        
+        // Update local references
+        this.employees = this.processedData.employees;
+        this.filteredEmployees = [...this.employees];
+        
+        console.log('✅ All employee data processed:', this.processedData);
+        return this.processedData;
+    }
+
+    // Xử lý và tính toán dữ liệu nhân viên (legacy method - keep for compatibility)
     processEmployeeData() {
         console.log('🔄 Processing employee data...');
         

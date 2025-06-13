@@ -4,6 +4,7 @@
  */
 
 import { EmployeeReportCore } from './employeeReportCore.js';
+import { EmployeeExport } from './employeeExport.js';
 
 class EmployeeReportLoader {
     constructor() {
@@ -13,6 +14,7 @@ class EmployeeReportLoader {
             transactions: [],
             expenses: []
         };
+        this.exportManager = new EmployeeExport();
     }
 
     /**
@@ -247,14 +249,20 @@ class EmployeeReportLoader {
     }
 
     /**
-     * Render charts
+     * Render charts using the chart manager
      */
     renderCharts(data) {
-        // Performance chart
-        this.renderPerformanceChart(data.chartData.performance);
-        
-        // Revenue chart
-        this.renderRevenueChart(data.chartData.revenue);
+        if (!this.employeeCore || !this.employeeCore.chartManager) {
+            console.warn('Chart manager not available');
+            return;
+        }
+
+        // Use the chart manager to render all charts
+        this.employeeCore.chartManager.renderPerformanceChart(data.employees);
+        this.employeeCore.chartManager.renderRevenueTrendChart(data.employees);
+        this.employeeCore.chartManager.renderDepartmentChart(data.departments);
+        this.employeeCore.chartManager.renderCommissionRevenueChart(data.employees);
+        this.employeeCore.chartManager.renderPerformanceDistribution(data.employees);
     }
 
     /**
@@ -533,9 +541,21 @@ class EmployeeReportLoader {
         document.querySelectorAll('.employee-chart-btn').forEach(btn => {
             btn.classList.remove('active');
         });
-        document.querySelector(`[data-period="${period}"]`).classList.add('active');
+        const periodBtn = document.querySelector(`[data-period="${period}"]`);
+        if (periodBtn) {
+            periodBtn.classList.add('active');
+        }
 
-        // Reload charts with new period
+        // Update charts with new period using chart manager
+        if (this.employeeCore && this.employeeCore.chartManager) {
+            const processedData = this.employeeCore.processedData;
+            this.employeeCore.chartManager.updateChartPeriod(
+                period, 
+                processedData.employees, 
+                processedData.departments
+            );
+        }
+
         console.log('[Employee Report] Chart period changed:', period);
     }
 
@@ -578,7 +598,15 @@ class EmployeeReportLoader {
      */
     exportData() {
         console.log('[Employee Report] Exporting data...');
-        // Implementation would export employee data to Excel/CSV
+        
+        if (!this.employeeCore || !this.employeeCore.processedData) {
+            console.warn('No employee data available for export');
+            alert('Không có dữ liệu để xuất. Vui lòng tải lại báo cáo.');
+            return;
+        }
+
+        const { employees, departments } = this.employeeCore.processedData;
+        this.exportManager.showExportModal(employees, departments);
     }
 
     /**
@@ -773,7 +801,12 @@ class EmployeeReportLoader {
      * Cleanup method
      */
     cleanup() {
-        // Destroy charts
+        // Cleanup chart manager
+        if (this.employeeCore && this.employeeCore.chartManager) {
+            this.employeeCore.chartManager.cleanup();
+        }
+
+        // Destroy legacy charts
         if (window.employeePerformanceChart) {
             window.employeePerformanceChart.destroy();
             window.employeePerformanceChart = null;
