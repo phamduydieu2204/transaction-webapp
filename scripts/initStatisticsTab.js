@@ -190,7 +190,11 @@ function loadReportByType(reportType) {
       }
       break;
     case 'finance':
-      showReportPlaceholder(reportType, '🏦 Quản lý tài chính');
+      if (window.loadFinancialManagement) {
+        window.loadFinancialManagement();
+      } else {
+        showReportPlaceholder(reportType, '🏦 Quản lý tài chính');
+      }
       break;
     case 'cashflow-accrual':
       showReportPlaceholder(reportType, '⚖️ Cash Flow vs Phân bổ');

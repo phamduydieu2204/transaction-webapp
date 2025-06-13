@@ -34,6 +34,11 @@ import './reports/employee/employeeReport.js';
 import './reports/employee/employeeReportLoader.js';
 import './reports/employee/employeeReportCore.js';
 
+// Import financial management modules
+import './reports/finance/financialReport.js';
+import './reports/finance/financialLoader.js';
+import './reports/finance/financialCore.js';
+
 // Import performance optimizers
 import './core/requestOptimizer.js';
 import './core/domOptimizer.js';

@@ -1,0 +1,428 @@
+<!-- Financial Management Report -->
+<div class="financial-management-container">
+    <!-- Header Section -->
+    <div class="financial-header">
+        <div class="header-content">
+            <h1 class="financial-title">🏦 Quản lý tài chính</h1>
+            <p class="financial-subtitle">Theo dõi và phân tích tình hình tài chính doanh nghiệp</p>
+        </div>
+        <div class="financial-quick-actions">
+            <button class="action-btn" data-action="refresh">
+                <i class="fas fa-sync-alt"></i> Làm mới
+            </button>
+            <button class="action-btn" data-action="export">
+                <i class="fas fa-download"></i> Xuất báo cáo
+            </button>
+            <button class="action-btn" data-action="settings">
+                <i class="fas fa-cog"></i> Cài đặt
+            </button>
+        </div>
+    </div>
+
+    <!-- Financial KPI Dashboard -->
+    <div class="financial-kpi-dashboard">
+        <!-- KPI Cards will be rendered here -->
+    </div>
+
+    <!-- Financial Overview Charts -->
+    <div class="financial-overview-section">
+        <div class="section-header">
+            <h3>📊 Tổng quan tài chính</h3>
+            <div class="chart-controls">
+                <select id="financialPeriodSelect" class="period-select">
+                    <option value="week">Tuần này</option>
+                    <option value="month" selected>Tháng này</option>
+                    <option value="quarter">Quý này</option>
+                    <option value="year">Năm này</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="card-header">
+                    <h4>💰 Dòng tiền</h4>
+                    <div class="chart-actions">
+                        <button class="chart-btn" data-period="month">Tháng</button>
+                        <button class="chart-btn active" data-period="quarter">Quý</button>
+                        <button class="chart-btn" data-period="year">Năm</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="cashFlowChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="card-header">
+                    <h4>📈 Lãi/Lỗ</h4>
+                </div>
+                <div class="chart-container">
+                    <canvas id="profitLossChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="card-header">
+                    <h4>🎯 Ngân sách vs Thực tế</h4>
+                </div>
+                <div class="chart-container">
+                    <canvas id="budgetVsActualChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="card-header">
+                    <h4>🏛️ Tài khoản ngân hàng</h4>
+                </div>
+                <div class="chart-container">
+                    <canvas id="accountBalanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profit & Loss Statement -->
+    <div class="profit-loss-section">
+        <div class="section-header">
+            <h3>📋 Báo cáo Lãi/Lỗ</h3>
+            <div class="statement-controls">
+                <input type="date" id="plStartDate" class="date-input">
+                <span>đến</span>
+                <input type="date" id="plEndDate" class="date-input">
+                <button class="btn btn-primary" id="generatePLStatement">Tạo báo cáo</button>
+            </div>
+        </div>
+        
+        <div class="profit-loss-table-container">
+            <table class="profit-loss-table">
+                <thead>
+                    <tr>
+                        <th>Khoản mục</th>
+                        <th>Tháng này</th>
+                        <th>Tháng trước</th>
+                        <th>Thay đổi</th>
+                        <th>% Thay đổi</th>
+                    </tr>
+                </thead>
+                <tbody id="profitLossTableBody">
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Financial Health Indicators -->
+    <div class="financial-health-section">
+        <div class="section-header">
+            <h3>🔍 Chỉ số sức khỏe tài chính</h3>
+        </div>
+        
+        <div class="health-indicators-grid">
+            <div class="indicator-card">
+                <div class="indicator-header">
+                    <span class="indicator-title">Tỷ lệ thanh khoản</span>
+                    <span class="indicator-icon">💧</span>
+                </div>
+                <div class="indicator-value" id="liquidityRatio">2.5</div>
+                <div class="indicator-status healthy">Tốt</div>
+                <div class="indicator-description">Khả năng thanh toán ngắn hạn</div>
+            </div>
+
+            <div class="indicator-card">
+                <div class="indicator-header">
+                    <span class="indicator-title">Tỷ suất lợi nhuận</span>
+                    <span class="indicator-icon">📊</span>
+                </div>
+                <div class="indicator-value" id="profitMargin">18.5%</div>
+                <div class="indicator-status good">Khá tốt</div>
+                <div class="indicator-description">Lợi nhuận trên doanh thu</div>
+            </div>
+
+            <div class="indicator-card">
+                <div class="indicator-header">
+                    <span class="indicator-title">Vòng quay tiền mặt</span>
+                    <span class="indicator-icon">🔄</span>
+                </div>
+                <div class="indicator-value" id="cashCycle">45 ngày</div>
+                <div class="indicator-status warning">Cần chú ý</div>
+                <div class="indicator-description">Thời gian thu hồi tiền</div>
+            </div>
+
+            <div class="indicator-card">
+                <div class="indicator-header">
+                    <span class="indicator-title">Runway</span>
+                    <span class="indicator-icon">🛤️</span>
+                </div>
+                <div class="indicator-value" id="cashRunway">12 tháng</div>
+                <div class="indicator-status healthy">An toàn</div>
+                <div class="indicator-description">Thời gian hoạt động với tiền hiện tại</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Management -->
+    <div class="account-management-section">
+        <div class="section-header">
+            <h3>🏦 Quản lý tài khoản</h3>
+            <button class="btn btn-success" id="addAccountBtn">
+                <i class="fas fa-plus"></i> Thêm tài khoản
+            </button>
+        </div>
+        
+        <div class="accounts-grid">
+            <div class="account-card" data-account="main">
+                <div class="account-header">
+                    <div class="account-info">
+                        <h4 class="account-name">Tài khoản chính</h4>
+                        <p class="account-number">**** 1234</p>
+                    </div>
+                    <div class="account-type">Vietcombank</div>
+                </div>
+                <div class="account-balance">
+                    <span class="balance-label">Số dư hiện tại</span>
+                    <span class="balance-amount">125,500,000 ₫</span>
+                </div>
+                <div class="account-actions">
+                    <button class="btn-link">Xem chi tiết</button>
+                    <button class="btn-link">Lịch sử</button>
+                </div>
+            </div>
+
+            <div class="account-card" data-account="backup">
+                <div class="account-header">
+                    <div class="account-info">
+                        <h4 class="account-name">Tài khoản dự phòng</h4>
+                        <p class="account-number">**** 5678</p>
+                    </div>
+                    <div class="account-type">Techcombank</div>
+                </div>
+                <div class="account-balance">
+                    <span class="balance-label">Số dư hiện tại</span>
+                    <span class="balance-amount">45,750,000 ₫</span>
+                </div>
+                <div class="account-actions">
+                    <button class="btn-link">Xem chi tiết</button>
+                    <button class="btn-link">Lịch sử</button>
+                </div>
+            </div>
+
+            <div class="account-card" data-account="operational">
+                <div class="account-header">
+                    <div class="account-info">
+                        <h4 class="account-name">Tài khoản vận hành</h4>
+                        <p class="account-number">**** 9012</p>
+                    </div>
+                    <div class="account-type">BIDV</div>
+                </div>
+                <div class="account-balance">
+                    <span class="balance-label">Số dư hiện tại</span>
+                    <span class="balance-amount">12,300,000 ₫</span>
+                </div>
+                <div class="account-actions">
+                    <button class="btn-link">Xem chi tiết</button>
+                    <button class="btn-link">Lịch sử</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Budget Planning -->
+    <div class="budget-planning-section">
+        <div class="section-header">
+            <h3>📋 Kế hoạch ngân sách</h3>
+            <button class="btn btn-primary" id="createBudgetBtn">
+                <i class="fas fa-plus"></i> Tạo ngân sách mới
+            </button>
+        </div>
+        
+        <div class="budget-overview">
+            <div class="budget-summary-cards">
+                <div class="budget-card">
+                    <div class="budget-header">
+                        <h4>Ngân sách tháng này</h4>
+                        <span class="budget-period">Tháng 6/2025</span>
+                    </div>
+                    <div class="budget-progress">
+                        <div class="progress-info">
+                            <span>Đã sử dụng: 45,600,000 ₫</span>
+                            <span>Còn lại: 24,400,000 ₫</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 65%"></div>
+                        </div>
+                        <div class="progress-percentage">65% đã sử dụng</div>
+                    </div>
+                </div>
+
+                <div class="budget-card">
+                    <div class="budget-header">
+                        <h4>Dự báo chi phí</h4>
+                        <span class="budget-period">30 ngày tới</span>
+                    </div>
+                    <div class="forecast-items">
+                        <div class="forecast-item">
+                            <span class="item-name">Chi phí nhân sự</span>
+                            <span class="item-amount">25,000,000 ₫</span>
+                        </div>
+                        <div class="forecast-item">
+                            <span class="item-name">Phần mềm & Tools</span>
+                            <span class="item-amount">8,500,000 ₫</span>
+                        </div>
+                        <div class="forecast-item">
+                            <span class="item-name">Marketing</span>
+                            <span class="item-amount">12,000,000 ₫</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Financial Alerts -->
+    <div class="financial-alerts-section">
+        <div class="section-header">
+            <h3>🚨 Cảnh báo tài chính</h3>
+            <span class="alerts-count">3</span>
+        </div>
+        
+        <div class="alerts-list">
+            <div class="alert-item warning">
+                <div class="alert-icon">⚠️</div>
+                <div class="alert-content">
+                    <h4>Ngân sách sắp vượt mức</h4>
+                    <p>Chi phí marketing tháng này đã đạt 85% ngân sách dự kiến</p>
+                    <span class="alert-time">2 giờ trước</span>
+                </div>
+                <button class="alert-action">Xem chi tiết</button>
+            </div>
+
+            <div class="alert-item info">
+                <div class="alert-icon">💡</div>
+                <div class="alert-content">
+                    <h4>Cơ hội tiết kiệm</h4>
+                    <p>Có thể tiết kiệm 15% chi phí phần mềm bằng cách đàm phán gói năm</p>
+                    <span class="alert-time">1 ngày trước</span>
+                </div>
+                <button class="alert-action">Tìm hiểu</button>
+            </div>
+
+            <div class="alert-item success">
+                <div class="alert-icon">✅</div>
+                <div class="alert-content">
+                    <h4>Mục tiêu đạt được</h4>
+                    <p>Doanh thu tháng này đã vượt 110% kế hoạch đề ra</p>
+                    <span class="alert-time">3 ngày trước</span>
+                </div>
+                <button class="alert-action">Xem báo cáo</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Financial Modals -->
+<div id="addAccountModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Thêm tài khoản mới</h3>
+            <button class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="addAccountForm">
+                <div class="form-group">
+                    <label>Tên tài khoản</label>
+                    <input type="text" id="accountName" required>
+                </div>
+                <div class="form-group">
+                    <label>Ngân hàng</label>
+                    <select id="bankName" required>
+                        <option value="">Chọn ngân hàng</option>
+                        <option value="vietcombank">Vietcombank</option>
+                        <option value="techcombank">Techcombank</option>
+                        <option value="bidv">BIDV</option>
+                        <option value="agribank">Agribank</option>
+                        <option value="sacombank">Sacombank</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Số tài khoản</label>
+                    <input type="text" id="accountNumber" required>
+                </div>
+                <div class="form-group">
+                    <label>Số dư ban đầu</label>
+                    <input type="number" id="initialBalance" required>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" id="saveAccountBtn">Lưu tài khoản</button>
+            <button class="btn btn-secondary" id="cancelAccountBtn">Hủy</button>
+        </div>
+    </div>
+</div>
+
+<div id="createBudgetModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Tạo ngân sách mới</h3>
+            <button class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="createBudgetForm">
+                <div class="form-group">
+                    <label>Tên ngân sách</label>
+                    <input type="text" id="budgetName" required>
+                </div>
+                <div class="form-group">
+                    <label>Kỳ ngân sách</label>
+                    <select id="budgetPeriod" required>
+                        <option value="monthly">Hàng tháng</option>
+                        <option value="quarterly">Hàng quý</option>
+                        <option value="yearly">Hàng năm</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tổng ngân sách</label>
+                    <input type="number" id="totalBudget" required>
+                </div>
+                <div class="form-group">
+                    <label>Phân bổ ngân sách</label>
+                    <div class="budget-allocation">
+                        <div class="allocation-item">
+                            <label>Nhân sự (%)</label>
+                            <input type="number" max="100" value="60">
+                        </div>
+                        <div class="allocation-item">
+                            <label>Marketing (%)</label>
+                            <input type="number" max="100" value="20">
+                        </div>
+                        <div class="allocation-item">
+                            <label>Công cụ (%)</label>
+                            <input type="number" max="100" value="15">
+                        </div>
+                        <div class="allocation-item">
+                            <label>Khác (%)</label>
+                            <input type="number" max="100" value="5">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" id="saveBudgetBtn">Tạo ngân sách</button>
+            <button class="btn btn-secondary" id="cancelBudgetBtn">Hủy</button>
+        </div>
+    </div>
+</div>
+
+<!-- Load Chart.js if not already loaded -->
+<script>
+    if (typeof Chart === 'undefined') {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        script.onload = function() {
+            console.log('📊 Chart.js loaded for financial management');
+        };
+        document.head.appendChild(script);
+    }
+</script>
