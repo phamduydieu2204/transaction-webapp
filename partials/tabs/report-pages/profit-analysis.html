@@ -1,0 +1,313 @@
+<!-- Profit Analysis Report Template -->
+<div class="profit-analysis-container">
+    <!-- Header Section -->
+    <div class="report-header">
+        <div class="header-content">
+            <h2 class="report-title">
+                <i class="fas fa-chart-pie"></i>
+                Phân tích Lợi nhuận Chi tiết
+            </h2>
+            <p class="report-subtitle">Phân tích tổng thể về lợi nhuận, chi phí và hiệu quả kinh doanh</p>
+        </div>
+        <div class="header-actions">
+            <button class="header-btn" onclick="refreshProfitAnalysis()">
+                <i class="fas fa-sync-alt"></i> Làm mới
+            </button>
+            <button class="header-btn" onclick="exportProfitReport()">
+                <i class="fas fa-download"></i> Xuất báo cáo
+            </button>
+        </div>
+    </div>
+
+    <!-- Profit KPI Cards -->
+    <div class="profit-kpi-grid">
+        <div class="kpi-card gross-profit">
+            <div class="kpi-icon">
+                <i class="fas fa-trending-up"></i>
+            </div>
+            <div class="kpi-content">
+                <h3 class="kpi-label">Lợi nhuận Gộp</h3>
+                <p class="kpi-value" id="gross-profit-value">0 ₫</p>
+                <span class="kpi-change" id="gross-profit-change">+0%</span>
+            </div>
+        </div>
+
+        <div class="kpi-card net-profit">
+            <div class="kpi-icon">
+                <i class="fas fa-coins"></i>
+            </div>
+            <div class="kpi-content">
+                <h3 class="kpi-label">Lợi nhuận Ròng</h3>
+                <p class="kpi-value" id="net-profit-value">0 ₫</p>
+                <span class="kpi-change" id="net-profit-change">+0%</span>
+            </div>
+        </div>
+
+        <div class="kpi-card profit-margin">
+            <div class="kpi-icon">
+                <i class="fas fa-percentage"></i>
+            </div>
+            <div class="kpi-content">
+                <h3 class="kpi-label">Tỷ suất Lợi nhuận</h3>
+                <p class="kpi-value" id="profit-margin-kpi">0%</p>
+                <span class="kpi-period" id="profit-margin-status">so với kỳ trước</span>
+            </div>
+        </div>
+
+        <div class="kpi-card efficiency">
+            <div class="kpi-icon">
+                <i class="fas fa-chart-bar"></i>
+            </div>
+            <div class="kpi-content">
+                <h3 class="kpi-label">Hiệu quả Kinh doanh</h3>
+                <p class="kpi-value" id="business-efficiency">Tốt</p>
+                <span class="kpi-detail" id="efficiency-detail">Dựa trên tỷ lệ chi phí</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profit Analysis Table -->
+    <div class="profit-analysis-section">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-table"></i>
+                Bảng Phân tích Lợi nhuận
+            </h3>
+            <div class="section-subtitle">
+                Chi tiết tính toán lợi nhuận và tỷ suất lợi nhuận
+            </div>
+        </div>
+        
+        <div class="profit-table-container">
+            <table class="profit-analysis-table">
+                <thead>
+                    <tr>
+                        <th class="metric-col">
+                            <span class="metric-title">Chỉ số</span>
+                        </th>
+                        <th class="value-col">
+                            <span class="value-title">Giá trị (₫)</span>
+                        </th>
+                        <th class="percentage-col">
+                            <span class="percentage-title">% Doanh thu</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="revenue-row">
+                        <td class="metric-name">
+                            <i class="fas fa-dollar-sign metric-icon positive"></i>
+                            <span class="metric-label custom-tooltip" data-metric="revenue">Doanh thu</span>
+                        </td>
+                        <td class="metric-value positive" id="profit-revenue">0 ₫</td>
+                        <td class="metric-percentage" id="profit-revenue-percent">100.0%</td>
+                    </tr>
+                    
+                    <tr class="refunds-row">
+                        <td class="metric-name">
+                            <i class="fas fa-undo-alt metric-icon negative"></i>
+                            <span class="metric-label custom-tooltip" data-metric="refunds">Tổng hoàn tiền</span>
+                        </td>
+                        <td class="metric-value negative" id="profit-refunds">0 ₫</td>
+                        <td class="metric-percentage negative" id="profit-refunds-percent">0.0%</td>
+                    </tr>
+                    
+                    <tr class="allocated-cost-row">
+                        <td class="metric-name">
+                            <i class="fas fa-chart-line metric-icon cost"></i>
+                            <span class="metric-label custom-tooltip" data-metric="allocated-cost">Chi phí phân bổ</span>
+                        </td>
+                        <td class="metric-value cost" id="profit-allocated-cost">0 ₫</td>
+                        <td class="metric-percentage cost" id="profit-allocated-cost-percent">0.0%</td>
+                    </tr>
+                    
+                    <tr class="direct-cost-row">
+                        <td class="metric-name">
+                            <i class="fas fa-receipt metric-icon cost"></i>
+                            <span class="metric-label custom-tooltip" data-metric="direct-cost">Chi phí không phân bổ</span>
+                        </td>
+                        <td class="metric-value cost" id="profit-direct-cost">0 ₫</td>
+                        <td class="metric-percentage cost" id="profit-direct-cost-percent">0.0%</td>
+                    </tr>
+                    
+                    <tr class="gross-profit-row">
+                        <td class="metric-name">
+                            <i class="fas fa-trending-up metric-icon profit"></i>
+                            <span class="metric-label custom-tooltip" data-metric="gross-profit">Lợi nhuận gộp</span>
+                        </td>
+                        <td class="metric-value profit" id="profit-gross">0 ₫</td>
+                        <td class="metric-percentage profit" id="profit-gross-percent">0.0%</td>
+                    </tr>
+                    
+                    <tr class="net-profit-row">
+                        <td class="metric-name">
+                            <i class="fas fa-coins metric-icon profit"></i>
+                            <span class="metric-label custom-tooltip" data-metric="net-profit">Lợi nhuận ròng</span>
+                        </td>
+                        <td class="metric-value profit" id="profit-net">0 ₫</td>
+                        <td class="metric-percentage profit" id="profit-net-percent">0.0%</td>
+                    </tr>
+                    
+                    <tr class="profit-margin-row highlight">
+                        <td class="metric-name">
+                            <i class="fas fa-percentage metric-icon highlight"></i>
+                            <span class="metric-label custom-tooltip" data-metric="profit-margin">Tỷ suất lợi nhuận</span>
+                        </td>
+                        <td class="metric-value highlight" id="profit-margin-value">0.0%</td>
+                        <td class="metric-percentage highlight" id="profit-margin-percent">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Profit Analysis Summary -->
+        <div class="profit-summary">
+            <div class="summary-cards">
+                <div class="summary-card revenue-summary">
+                    <div class="summary-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="summary-content">
+                        <h4 class="summary-title">Hiệu quả Doanh thu</h4>
+                        <p class="summary-value" id="revenue-efficiency">Tốt</p>
+                        <span class="summary-desc">Đánh giá dựa trên tỷ lệ hoàn tiền</span>
+                    </div>
+                </div>
+                
+                <div class="summary-card cost-summary">
+                    <div class="summary-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <div class="summary-content">
+                        <h4 class="summary-title">Kiểm soát Chi phí</h4>
+                        <p class="summary-value" id="cost-control">Khá tốt</p>
+                        <span class="summary-desc">Tỷ lệ chi phí so với doanh thu</span>
+                    </div>
+                </div>
+                
+                <div class="summary-card profitability-summary">
+                    <div class="summary-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="summary-content">
+                        <h4 class="summary-title">Mức sinh lời</h4>
+                        <p class="summary-value" id="profitability-level">Cao</p>
+                        <span class="summary-desc">Đánh giá tỷ suất lợi nhuận</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-grid">
+        <!-- Profit Trend Chart -->
+        <div class="chart-container profit-trend-chart">
+            <div class="chart-header">
+                <h3 class="chart-title">
+                    <i class="fas fa-line-chart"></i>
+                    Xu hướng Lợi nhuận
+                </h3>
+                <div class="chart-controls">
+                    <div class="period-selector">
+                        <button class="period-btn active" data-period="7days">7 ngày</button>
+                        <button class="period-btn" data-period="30days">30 ngày</button>
+                        <button class="period-btn" data-period="90days">90 ngày</button>
+                        <button class="period-btn" data-period="year">Năm</button>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-content">
+                <canvas id="profit-trend-chart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Profit Breakdown Chart -->
+        <div class="chart-container profit-breakdown-chart">
+            <div class="chart-header">
+                <h3 class="chart-title">
+                    <i class="fas fa-pie-chart"></i>
+                    Cơ cấu Lợi nhuận
+                </h3>
+                <div class="chart-controls">
+                    <button class="toggle-btn" onclick="toggleChartView('profit', 'pie')">
+                        <i class="fas fa-chart-pie"></i>
+                    </button>
+                    <button class="toggle-btn" onclick="toggleChartView('profit', 'bar')">
+                        <i class="fas fa-chart-bar"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="chart-content">
+                <canvas id="profit-breakdown-chart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profit Insights -->
+    <div class="profit-insights">
+        <div class="insights-header">
+            <h3 class="insights-title">
+                <i class="fas fa-lightbulb"></i>
+                Thông tin Chi tiết về Lợi nhuận
+            </h3>
+        </div>
+        <div class="insights-grid">
+            <div class="insight-card highest-margin">
+                <div class="insight-icon">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div class="insight-content">
+                    <h4 class="insight-title">Biên lợi nhuận Cao nhất</h4>
+                    <p class="insight-value" id="highest-margin-value">N/A</p>
+                    <span class="insight-desc" id="highest-margin-desc">Sản phẩm/Dịch vụ có lợi nhuận tốt nhất</span>
+                </div>
+            </div>
+
+            <div class="insight-card cost-efficiency">
+                <div class="insight-icon">
+                    <i class="fas fa-target"></i>
+                </div>
+                <div class="insight-content">
+                    <h4 class="insight-title">Hiệu quả Chi phí</h4>
+                    <p class="insight-value" id="cost-efficiency-value">N/A</p>
+                    <span class="insight-desc" id="cost-efficiency-desc">Tỷ lệ chi phí trên doanh thu</span>
+                </div>
+            </div>
+
+            <div class="insight-card growth-potential">
+                <div class="insight-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <div class="insight-content">
+                    <h4 class="insight-title">Tiềm năng Tăng trưởng</h4>
+                    <p class="insight-value" id="growth-potential-value">N/A</p>
+                    <span class="insight-desc" id="growth-potential-desc">Dự báo khả năng mở rộng</span>
+                </div>
+            </div>
+
+            <div class="insight-card improvement-area">
+                <div class="insight-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <div class="insight-content">
+                    <h4 class="insight-title">Khu vực Cải thiện</h4>
+                    <p class="insight-value" id="improvement-area-value">N/A</p>
+                    <span class="insight-desc" id="improvement-area-desc">Khuyến nghị tối ưu hóa</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Tooltip -->
+    <div id="profit-tooltip" class="profit-custom-tooltip">
+        <div class="tooltip-header">
+            <i class="tooltip-icon"></i>
+            <span class="tooltip-title"></span>
+        </div>
+        <div class="tooltip-content">
+            <div class="tooltip-formula"></div>
+            <div class="tooltip-description"></div>
+        </div>
+    </div>
+</div>

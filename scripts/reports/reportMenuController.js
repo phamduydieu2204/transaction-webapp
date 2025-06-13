@@ -12,6 +12,7 @@ import { showError, refreshCurrentReport, exportCurrentReport } from './core/rep
 import { loadOverviewReport } from './overview/overviewReport.js';
 import { loadRevenueAnalysis } from './revenue/revenueAnalysis.js';
 import { loadExpenseAnalysis } from './expense/expenseAnalysis.js';
+import { loadProfitAnalysis } from './profit/profitAnalysis.js';
 import { loadCustomerManagement } from './customer/customerManagement.js';
 import { loadSoftwareManagement } from './software/softwareManagement.js';
 import { loadRenewalReport } from './renewal/renewalReport.js';
@@ -123,6 +124,14 @@ async function loadReport(reportType) {
           period: window.globalFilters?.period || 'this_month'
         };
         await loadExpenseAnalysis(expenseOptions);
+        break;
+      case 'profit':
+        // Pass current date range and period
+        const profitOptions = {
+          dateRange: window.globalFilters?.dateRange || null,
+          period: window.globalFilters?.period || 'this_month'
+        };
+        await loadProfitAnalysis(profitOptions);
         break;
       case 'customer':
         // Pass current date range and period

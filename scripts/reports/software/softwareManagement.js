@@ -4,6 +4,10 @@
  */
 
 import { softwareManagement } from './softwareManagementCore.js';
+import { formatRevenue, formatCurrency } from '../../formatDate.js';
+import { getFromStorage } from '../../core/stateManager.js';
+import { normalizeDate } from '../../statisticsCore.js';
+import { normalizeTransaction } from '../../core/dataMapping.js';
 
 // Software management instance
 let softwareManagementInstance = null;
@@ -223,6 +227,7 @@ function createInlineSoftwareTemplate() {
         </script>
     `;
 }
+
 
 /**
  * Refresh software management data
