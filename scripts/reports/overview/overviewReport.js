@@ -103,7 +103,7 @@ export async function loadOverviewReport(options = {}) {
       loadTopProducts(filteredTransactions),
       loadTopCustomers(filteredTransactions),
       loadCharts(filteredTransactions, filteredExpenses),
-      updateDataTables(filteredTransactions, filteredExpenses),
+      // updateDataTables(filteredTransactions, filteredExpenses), // Removed - status details section removed
       loadPendingTransactions(filteredTransactions)
     ]);
     
@@ -3404,7 +3404,9 @@ function updatePendingAlerts(categories) {
 
 /**
  * Export status data to CSV
+ * COMMENTED OUT: Function removed along with Status Details section
  */
+/*
 function exportStatusData() {
   console.log('💾 Exporting status data...');
   
@@ -3454,6 +3456,7 @@ function exportStatusData() {
     alert('Lỗi xuất dữ liệu. Vui lòng thử lại.');
   }
 }
+*/
 
 /**
  * Action functions for pending transactions
@@ -3927,7 +3930,7 @@ window.calculateNormalizedCustomerAnalytics = calculateNormalizedCustomerAnalyti
 window.calculateNormalizedProductAnalytics = calculateNormalizedProductAnalytics;
 window.updateStatusBreakdownWithRefund = updateStatusBreakdownWithRefund;
 window.calculateRevenueByStatus = calculateRevenueByStatus;
-window.exportStatusData = exportStatusData;
+// window.exportStatusData = exportStatusData; // COMMENTED OUT: Function removed along with Status Details section
 window.calculateDetailedStatusBreakdown = calculateDetailedStatusBreakdown;
 window.loadPendingTransactions = loadPendingTransactions;
 window.categorizePendingTransactions = categorizePendingTransactions;
