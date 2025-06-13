@@ -362,6 +362,84 @@ window.forceEmployeeReport = function() {
         console.log('✅ Employee menu item activated');
     }
 };
+
+// Financial Management debug functions (inline for immediate availability)
+window.debugFinancialManagement = function() {
+    console.log('🔍 Debugging Financial Management...');
+    
+    const results = {
+        functions: {
+            loadFinancialManagement: typeof window.loadFinancialManagement,
+            initFinancialManagement: typeof window.initFinancialManagement,
+            cleanupFinancialManagement: typeof window.cleanupFinancialManagement
+        },
+        containers: {
+            reportFinance: !!document.getElementById('report-finance'),
+            reportPagesContainer: !!document.getElementById('report-pages-container')
+        },
+        menuItems: {
+            financeMenuItem: !!document.querySelector('[data-report="finance"]'),
+            menuItemsCount: document.querySelectorAll('.menu-item').length
+        },
+        currentPage: {
+            currentActiveReport: document.querySelector('.report-page.active')?.id,
+            currentActiveMenu: document.querySelector('.menu-item.active')?.dataset?.report
+        }
+    };
+    
+    console.table(results.functions);
+    console.table(results.containers);
+    console.table(results.menuItems);
+    console.table(results.currentPage);
+    
+    // Test loading function
+    if (typeof window.loadFinancialManagement === 'function') {
+        console.log('✅ Testing loadFinancialManagement...');
+        window.loadFinancialManagement();
+    } else {
+        console.error('❌ loadFinancialManagement function not available');
+    }
+    
+    return results;
+};
+
+window.forceFinancialManagement = function() {
+    console.log('🔧 Force loading financial management...');
+    
+    // Hide all report pages
+    const reportPages = document.querySelectorAll('.report-page');
+    reportPages.forEach(page => page.classList.remove('active'));
+    console.log('Hidden report pages:', reportPages.length);
+    
+    // Show financial report page
+    const financePage = document.getElementById('report-finance');
+    if (financePage) {
+        financePage.classList.add('active');
+        console.log('✅ Finance page shown');
+        
+        // Force load financial management
+        if (typeof window.loadFinancialManagement === 'function') {
+            window.loadFinancialManagement();
+            console.log('✅ Financial management forced');
+        } else {
+            console.error('❌ loadFinancialManagement not available');
+        }
+        
+    } else {
+        console.error('❌ Finance page not found');
+    }
+    
+    // Update menu
+    const menuItems = document.querySelectorAll('.menu-item');
+    menuItems.forEach(item => item.classList.remove('active'));
+    
+    const financeMenuItem = document.querySelector('[data-report="finance"]');
+    if (financeMenuItem) {
+        financeMenuItem.classList.add('active');
+        console.log('✅ Finance menu item activated');
+    }
+};
+
 // Make close function available globally
 window.closeProcessingModalUnified = closeProcessingModal;
 window.updatePackageList = updatePackageList;

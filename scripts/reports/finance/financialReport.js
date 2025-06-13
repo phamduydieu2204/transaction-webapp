@@ -48,17 +48,18 @@ async function loadFinancialTemplate() {
     try {
         const response = await fetch('./partials/tabs/report-pages/financial-management.html');
         if (!response.ok) {
+            console.warn('⚠️ Financial template not found, using fallback');
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
         const html = await response.text();
         container.innerHTML = html;
         
-        console.log('📄 Financial management template loaded');
+        console.log('📄 Financial management template loaded from file');
         
     } catch (error) {
-        console.error('❌ Error loading financial template:', error);
-        // Fallback template
+        console.log('📄 Using fallback financial template');
+        // Always use fallback template for now
         container.innerHTML = `
             <div class="financial-management-container">
                 <div class="page-header">
@@ -67,15 +68,18 @@ async function loadFinancialTemplate() {
                         <button class="btn-refresh" id="refresh-financial-data">
                             <i class="fas fa-sync-alt"></i> Làm mới
                         </button>
+                        <button class="export-financial-btn" data-format="csv">
+                            <i class="fas fa-download"></i> Xuất CSV
+                        </button>
                     </div>
                 </div>
                 
                 <div class="financial-loading" style="display: none;">
-                    <div class="loading-spinner">Đang tải dữ liệu tài chính...</div>
+                    <div class="loading-spinner">🔄 Đang tải dữ liệu tài chính...</div>
                 </div>
                 
                 <div class="financial-error" style="display: none;">
-                    <div class="error-message">Không thể tải dữ liệu tài chính</div>
+                    <div class="error-message">❌ Không thể tải dữ liệu tài chính</div>
                 </div>
                 
                 <div class="financial-content">
@@ -89,20 +93,28 @@ async function loadFinancialTemplate() {
                         <h3>📊 Biểu đồ tài chính</h3>
                         <div class="charts-grid">
                             <div class="chart-container">
-                                <h4>Dòng tiền</h4>
-                                <canvas id="cashFlowChart"></canvas>
+                                <h4>💰 Dòng tiền</h4>
+                                <canvas id="cashFlowChart" width="400" height="200"></canvas>
                             </div>
                             <div class="chart-container">
-                                <h4>Lãi lỗ</h4>
-                                <canvas id="profitLossChart"></canvas>
+                                <h4>📈 Lãi lỗ</h4>
+                                <canvas id="profitLossChart" width="400" height="200"></canvas>
                             </div>
                             <div class="chart-container">
-                                <h4>Ngân sách vs Thực tế</h4>
-                                <canvas id="budgetChart"></canvas>
+                                <h4>📊 Ngân sách vs Thực tế</h4>
+                                <canvas id="budgetChart" width="400" height="200"></canvas>
                             </div>
                             <div class="chart-container">
-                                <h4>Số dư tài khoản</h4>
-                                <canvas id="accountBalanceChart"></canvas>
+                                <h4>💳 Số dư tài khoản</h4>
+                                <canvas id="accountBalanceChart" width="400" height="200"></canvas>
+                            </div>
+                            <div class="chart-container">
+                                <h4>🏷️ Chi phí theo danh mục</h4>
+                                <canvas id="expenseCategoryChart" width="400" height="200"></canvas>
+                            </div>
+                            <div class="chart-container">
+                                <h4>📈 Xu hướng doanh thu</h4>
+                                <canvas id="revenueTrendChart" width="400" height="200"></canvas>
                             </div>
                         </div>
                     </div>
@@ -133,7 +145,6 @@ async function loadFinancialTemplate() {
                 </div>
             </div>
         `;
-        throw error;
     }
 }
 
