@@ -204,6 +204,47 @@
   color: #6b7280; /* text-gray-500 */
   margin: 0;
   line-height: 1.25;
+  cursor: help;
+  position: relative;
+}
+
+/* Tooltip enhancement for KPI titles */
+.kpi-metric-title[title]:hover {
+  color: #4b5563; /* darker gray on hover */
+}
+
+.kpi-metric-title[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  background: rgba(31, 41, 55, 0.95);
+  color: white;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  border-radius: 6px;
+  white-space: normal;
+  max-width: 250px;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+}
+
+.kpi-metric-title[title]:hover::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 4px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid rgba(31, 41, 55, 0.95);
+  z-index: 1001;
 }
 
 /* Large prominent value */

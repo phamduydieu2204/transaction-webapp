@@ -4345,9 +4345,9 @@ function calculateUpdatedBusinessMetrics(transactions, expenses, dateRange) {
     cancelled: metrics.statusBreakdown.cancelled
   });
   
-  // Doanh thu gộp = Tổng tiền "đã hoàn tất" - Tổng tiền "hoàn tiền"
-  metrics.grossRevenue = metrics.statusBreakdown.completed.amount - Math.abs(metrics.totalRefunds);
-  console.log(`💰 Gross Revenue Calculation: ${metrics.statusBreakdown.completed.amount} - ${Math.abs(metrics.totalRefunds)} = ${metrics.grossRevenue}`);
+  // Doanh thu gộp = Tổng tiền "đã hoàn tất" + Tổng tiền "đã thanh toán" - Tổng tiền "hoàn tiền"
+  metrics.grossRevenue = metrics.statusBreakdown.completed.amount + metrics.statusBreakdown.paid.amount - Math.abs(metrics.totalRefunds);
+  console.log(`💰 Gross Revenue Calculation: ${metrics.statusBreakdown.completed.amount} + ${metrics.statusBreakdown.paid.amount} - ${Math.abs(metrics.totalRefunds)} = ${metrics.grossRevenue}`);
   
   // Tỷ lệ hoàn tiền = Số giao dịch "hoàn tiền" / Tổng giao dịch có hiệu lực
   // Giao dịch có hiệu lực = "đã hoàn tất" + "đã thanh toán" + "chưa thanh toán"
@@ -4380,10 +4380,13 @@ function calculateUpdatedBusinessMetrics(transactions, expenses, dateRange) {
           metrics.previousPeriod.grossRevenue += amount;
           metrics.previousPeriod.effectiveTransactions++;
           break;
+        case 'đã thanh toán':
+          metrics.previousPeriod.grossRevenue += amount;
+          metrics.previousPeriod.effectiveTransactions++;
+          break;
         case 'hoàn tiền':
           metrics.previousPeriod.totalRefunds += amount;
           break;
-        case 'đã thanh toán':
         case 'chưa thanh toán':
           metrics.previousPeriod.effectiveTransactions++;
           break;
