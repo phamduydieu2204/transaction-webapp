@@ -765,10 +765,23 @@ function updateKPICard(type, data) {
     const arrow = isPositive ? 'fa-arrow-up' : 'fa-arrow-down';
     const sign = data.growth >= 0 ? '+' : '';
     
-    changeElement.innerHTML = `
-      <i class="fas ${arrow}"></i> ${sign}${data.growth.toFixed(1)}%
-    `;
-    changeElement.className = `kpi-change ${isPositive ? 'positive' : 'negative'}`;
+    // Check if we're using the new template with kpi-box-change class
+    const isNewTemplate = changeElement.classList.contains('kpi-box-change') || 
+                         changeElement.parentElement?.classList.contains('kpi-box');
+    
+    if (isNewTemplate) {
+      changeElement.innerHTML = `
+        <i class="fas ${arrow}"></i>
+        <span>${sign}${data.growth.toFixed(1)}%</span>
+      `;
+      changeElement.className = `kpi-box-change ${isPositive ? 'positive' : 'negative'}`;
+    } else {
+      // Legacy template support
+      changeElement.innerHTML = `
+        <i class="fas ${arrow}"></i> ${sign}${data.growth.toFixed(1)}%
+      `;
+      changeElement.className = `kpi-change ${isPositive ? 'positive' : 'negative'}`;
+    }
   }
 }
 
