@@ -613,6 +613,13 @@ async function updateKPICards(kpis) {
     console.log('🆕 Using new template with updated business metrics structure');
     
     // Map updated business metrics to KPI cards
+    console.log('🎯 Updating Gross Revenue KPI Card:', {
+      value: kpis.grossRevenue || 0,
+      growth: kpis.growthRates?.grossRevenue || 0,
+      hasGrowthRates: !!kpis.growthRates,
+      growthRates: kpis.growthRates
+    });
+    
     updateKPICard('grossRevenue', {
       value: kpis.grossRevenue || 0,
       growth: kpis.growthRates?.grossRevenue || 0,
@@ -771,8 +778,23 @@ function updateKPICard(type, data) {
     const isBoxTemplate = changeElement.classList.contains('kpi-box-change') || 
                          changeElement.parentElement?.classList.contains('kpi-box');
     
+    console.log(`🔍 Template Detection for ${type} (${data.changeId}):`, {
+      changeElementClasses: Array.from(changeElement.classList),
+      parentClasses: changeElement.parentElement ? Array.from(changeElement.parentElement.classList) : [],
+      isMetricTemplate: isMetricTemplate,
+      isBoxTemplate: isBoxTemplate
+    });
+    
     if (isMetricTemplate) {
       // New metric template (6-box grid)
+      console.log(`🎯 Applying NEW METRIC template for ${type}:`, {
+        growth: data.growth,
+        isPositive: isPositive,
+        arrow: arrow,
+        sign: sign,
+        elementId: data.elementId
+      });
+      
       changeElement.innerHTML = `
         <i class="fas ${arrow}"></i>
         <span>${sign}${data.growth.toFixed(1)}%</span>
@@ -4385,6 +4407,11 @@ function calculateUpdatedBusinessMetrics(transactions, expenses, dateRange) {
     totalRefunds: calculateGrowthRate(metrics.totalRefunds, metrics.previousPeriod.totalRefunds),
     effectiveTransactions: calculateGrowthRate(metrics.effectiveTransactions, metrics.previousPeriod.effectiveTransactions)
   };
+  
+  console.log('📈 DOANH THU GỘP - Growth Rate Calculation:');
+  console.log(`  Current Gross Revenue: ${metrics.grossRevenue}`);
+  console.log(`  Previous Period Gross Revenue: ${metrics.previousPeriod.grossRevenue}`);
+  console.log(`  Growth Rate: ${metrics.growthRates.grossRevenue.toFixed(2)}%`);
   
   console.log('📈 Final metrics calculated:');
   console.log('  💰 Doanh thu gộp:', formatCurrency(metrics.grossRevenue));
