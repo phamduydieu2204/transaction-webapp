@@ -30,6 +30,7 @@
 /* Page specific styles */
 @import url('pages/login.css');
 @import url('pages/dashboard.css');
+@import url('pages/employee-report.css');
 
 /* Utility classes */
 @import url('utilities/helpers.css');

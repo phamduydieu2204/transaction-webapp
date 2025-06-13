@@ -5,7 +5,7 @@ import { formatDate } from '../../formatDate.js';
 import { formatDateTime } from '../../formatDateTime.js';
 import { formatCurrency } from '../../statistics/formatters.js';
 
-export class EmployeeReport {
+export class EmployeeReportCore {
     constructor() {
         this.employees = [];
         this.transactions = [];
@@ -65,64 +65,126 @@ export class EmployeeReport {
 
     // Trích xuất dữ liệu từ sheet GiaoDich
     extractTransactionData() {
-        // Giả định dữ liệu sheet GiaoDich được lưu trong window.currentTransactionData
-        const rawData = window.currentTransactionData || [];
+        const rawData = this.transactions || [];
         
-        return rawData.map((row, index) => ({
-            id: index + 1,
-            maGiaoDich: row[0] || '',           // A: Mã giao dịch
-            ngayGiaoDich: row[1] || '',         // B: Ngày giao dịch
-            loaiGiaoDich: row[2] || '',         // C: Loại giao dịch
-            tenKhachHang: row[3] || '',         // D: Tên khách hàng
-            email: row[4] || '',                // E: Email
-            lienHe: row[5] || '',               // F: Liên hệ
-            soThangDangKy: parseInt(row[6]) || 0, // G: Số tháng đăng ký
-            ngayBatDau: row[7] || '',           // H: Ngày bắt đầu
-            ngayKetThuc: row[8] || '',          // I: Ngày kết thúc
-            soThietBi: parseInt(row[9]) || 0,   // J: Số thiết bị
-            tenPhanMem: row[10] || '',          // K: Tên phần mềm
-            goiPhanMem: row[11] || '',          // L: Gói phần mềm
-            tenTaiKhoan: row[12] || '',         // M: Tên tài khoản
-            idSheetTaiKhoan: row[13] || '',     // N: ID Sheet Tài khoản
-            capNhatCookie: row[14] || '',       // O: Cập nhật Cookie
-            thongTinDonHang: row[15] || '',     // P: Thông tin đơn hàng
-            doanhThu: parseFloat(row[16]) || 0, // Q: Doanh thu
-            hoaHong: parseFloat(row[17]) || 0,  // R: Hoa hồng
-            ghiChu: row[18] || '',              // S: Ghi chú
-            tenChuan: row[19] || '',            // T: Tên chuẩn
-            tenNhanVien: row[20] || '',         // U: Tên nhân viên
-            maNhanVien: row[21] || ''           // V: Mã nhân viên
-        }));
+        // Handle both array and object formats
+        return rawData.map((row, index) => {
+            // If data is already in object format
+            if (typeof row === 'object' && !Array.isArray(row)) {
+                return {
+                    id: index + 1,
+                    maGiaoDich: row.maGiaoDich || row.transactionCode || '',
+                    ngayGiaoDich: row.ngayGiaoDich || row.date || '',
+                    loaiGiaoDich: row.loaiGiaoDich || row.type || '',
+                    tenKhachHang: row.tenKhachHang || row.customerName || '',
+                    email: row.email || '',
+                    lienHe: row.lienHe || row.contact || '',
+                    soThangDangKy: parseInt(row.soThangDangKy || row.months || 0),
+                    ngayBatDau: row.ngayBatDau || row.startDate || '',
+                    ngayKetThuc: row.ngayKetThuc || row.endDate || '',
+                    soThietBi: parseInt(row.soThietBi || row.devices || 0),
+                    tenPhanMem: row.tenPhanMem || row.software || '',
+                    goiPhanMem: row.goiPhanMem || row.package || '',
+                    tenTaiKhoan: row.tenTaiKhoan || row.accountName || '',
+                    idSheetTaiKhoan: row.idSheetTaiKhoan || row.sheetId || '',
+                    capNhatCookie: row.capNhatCookie || row.updateCookie || '',
+                    thongTinDonHang: row.thongTinDonHang || row.orderInfo || '',
+                    doanhThu: parseFloat(row.doanhThu || row.revenue || 0),
+                    hoaHong: parseFloat(row.hoaHong || row.commission || 0),
+                    ghiChu: row.ghiChu || row.note || '',
+                    tenChuan: row.tenChuan || row.standardName || '',
+                    tenNhanVien: row.tenNhanVien || row.employeeName || '',
+                    maNhanVien: row.maNhanVien || row.employeeCode || ''
+                };
+            }
+            
+            // If data is in array format
+            return {
+                id: index + 1,
+                maGiaoDich: row[0] || '',           // A: Mã giao dịch
+                ngayGiaoDich: row[1] || '',         // B: Ngày giao dịch
+                loaiGiaoDich: row[2] || '',         // C: Loại giao dịch
+                tenKhachHang: row[3] || '',         // D: Tên khách hàng
+                email: row[4] || '',                // E: Email
+                lienHe: row[5] || '',               // F: Liên hệ
+                soThangDangKy: parseInt(row[6]) || 0, // G: Số tháng đăng ký
+                ngayBatDau: row[7] || '',           // H: Ngày bắt đầu
+                ngayKetThuc: row[8] || '',          // I: Ngày kết thúc
+                soThietBi: parseInt(row[9]) || 0,   // J: Số thiết bị
+                tenPhanMem: row[10] || '',          // K: Tên phần mềm
+                goiPhanMem: row[11] || '',          // L: Gói phần mềm
+                tenTaiKhoan: row[12] || '',         // M: Tên tài khoản
+                idSheetTaiKhoan: row[13] || '',     // N: ID Sheet Tài khoản
+                capNhatCookie: row[14] || '',       // O: Cập nhật Cookie
+                thongTinDonHang: row[15] || '',     // P: Thông tin đơn hàng
+                doanhThu: parseFloat(row[16]) || 0, // Q: Doanh thu
+                hoaHong: parseFloat(row[17]) || 0,  // R: Hoa hồng
+                ghiChu: row[18] || '',              // S: Ghi chú
+                tenChuan: row[19] || '',            // T: Tên chuẩn
+                tenNhanVien: row[20] || '',         // U: Tên nhân viên
+                maNhanVien: row[21] || ''           // V: Mã nhân viên
+            };
+        });
     }
 
     // Trích xuất dữ liệu từ sheet ChiPhi
     extractExpenseData() {
-        // Giả định dữ liệu sheet ChiPhi được lưu trong window.currentExpenseData
-        const rawData = window.currentExpenseData || [];
+        const rawData = this.expenses || [];
         
-        return rawData.map((row, index) => ({
-            id: index + 1,
-            maChiPhi: row[0] || '',             // A: Mã chi phí
-            ngayChi: row[1] || '',              // B: Ngày chi
-            loaiKeToan: row[2] || '',           // C: Loại kế toán
-            phanBo: row[3] || '',               // D: Phân bổ
-            loaiKhoanChi: row[4] || '',         // E: Loại khoản chi
-            danhMucChung: row[5] || '',         // F: Danh mục chung
-            tenSanPham: row[6] || '',           // G: Tên sản phẩm/Dịch vụ
-            phienBan: row[7] || '',             // H: Phiên bản/Gói dịch vụ
-            soTien: parseFloat(row[8]) || 0,    // I: Số tiền
-            donViTienTe: row[9] || '',          // J: Đơn vị tiền tệ
-            nganHang: row[10] || '',            // K: Ngân hàng/Ví
-            thongTinThe: row[11] || '',         // L: Thông tin thẻ/Tài khoản
-            phuongThucChi: row[12] || '',       // M: Phương thức chi
-            ngayTaiTuc: row[13] || '',          // N: Ngày tái tục
-            nguoiNhan: row[14] || '',           // O: Người nhận hoặc nhà cung cấp
-            trangThai: row[15] || '',           // P: Trạng thái
-            ghiChu: row[16] || '',              // Q: Ghi chú
-            tenChuan: row[17] || '',            // R: Tên chuẩn
-            tenNhanVien: row[18] || '',         // S: Tên nhân viên
-            maNhanVien: row[19] || ''           // T: Mã nhân viên
-        }));
+        // Handle both array and object formats
+        return rawData.map((row, index) => {
+            // If data is already in object format
+            if (typeof row === 'object' && !Array.isArray(row)) {
+                return {
+                    id: index + 1,
+                    maChiPhi: row.maChiPhi || row.expenseCode || '',
+                    ngayChi: row.ngayChi || row.date || '',
+                    loaiKeToan: row.loaiKeToan || row.accountingType || '',
+                    phanBo: row.phanBo || row.allocation || '',
+                    loaiKhoanChi: row.loaiKhoanChi || row.expenseType || '',
+                    danhMucChung: row.danhMucChung || row.category || '',
+                    tenSanPham: row.tenSanPham || row.productName || '',
+                    phienBan: row.phienBan || row.version || '',
+                    soTien: parseFloat(row.soTien || row.amount || 0),
+                    donViTienTe: row.donViTienTe || row.currency || 'VND',
+                    nganHang: row.nganHang || row.bank || '',
+                    thongTinThe: row.thongTinThe || row.cardInfo || '',
+                    phuongThucChi: row.phuongThucChi || row.paymentMethod || '',
+                    ngayTaiTuc: row.ngayTaiTuc || row.renewalDate || '',
+                    nguoiNhan: row.nguoiNhan || row.recipient || '',
+                    trangThai: row.trangThai || row.status || '',
+                    ghiChu: row.ghiChu || row.note || '',
+                    tenChuan: row.tenChuan || row.standardName || '',
+                    tenNhanVien: row.tenNhanVien || row.employeeName || '',
+                    maNhanVien: row.maNhanVien || row.employeeCode || ''
+                };
+            }
+            
+            // If data is in array format
+            return {
+                id: index + 1,
+                maChiPhi: row[0] || '',             // A: Mã chi phí
+                ngayChi: row[1] || '',              // B: Ngày chi
+                loaiKeToan: row[2] || '',           // C: Loại kế toán
+                phanBo: row[3] || '',               // D: Phân bổ
+                loaiKhoanChi: row[4] || '',         // E: Loại khoản chi
+                danhMucChung: row[5] || '',         // F: Danh mục chung
+                tenSanPham: row[6] || '',           // G: Tên sản phẩm/Dịch vụ
+                phienBan: row[7] || '',             // H: Phiên bản/Gói dịch vụ
+                soTien: parseFloat(row[8]) || 0,    // I: Số tiền
+                donViTienTe: row[9] || '',          // J: Đơn vị tiền tệ
+                nganHang: row[10] || '',            // K: Ngân hàng/Ví
+                thongTinThe: row[11] || '',         // L: Thông tin thẻ/Tài khoản
+                phuongThucChi: row[12] || '',       // M: Phương thức chi
+                ngayTaiTuc: row[13] || '',          // N: Ngày tái tục
+                nguoiNhan: row[14] || '',           // O: Người nhận hoặc nhà cung cấp
+                trangThai: row[15] || '',           // P: Trạng thái
+                ghiChu: row[16] || '',              // Q: Ghi chú
+                tenChuan: row[17] || '',            // R: Tên chuẩn
+                tenNhanVien: row[18] || '',         // S: Tên nhân viên
+                maNhanVien: row[19] || ''           // T: Mã nhân viên
+            };
+        });
     }
 
     // Xử lý và tính toán dữ liệu nhân viên
@@ -1460,4 +1522,4 @@ export class EmployeeReport {
 }
 
 // Export instance for global use
-export const employeeReport = new EmployeeReport();
+export const employeeReport = new EmployeeReportCore();

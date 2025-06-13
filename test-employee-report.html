@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Employee Report</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Employee Report</h1>
+        
+        <!-- Employee Report Container -->
+        <div id="report-employee" class="report-page active">
+            <!-- Content will be loaded here -->
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the employee report module
+        import { loadEmployeeReport } from './scripts/reports/employee/employeeReport.js';
+        
+        // Mock data for testing
+        window.currentTransactionData = [
+            ['GD001', '2024-01-15', 'Mới', 'Công ty ABC', 'abc@example.com', '0901234567', 12, '2024-01-15', '2025-01-15', 5, 'Software A', 'Premium', 'account1', 'sheet123', 'yes', 'Order info', 50000000, 5000000, 'Note', 'Standard', 'Nguyễn Văn A', 'NV001'],
+            ['GD002', '2024-01-20', 'Mới', 'Công ty XYZ', 'xyz@example.com', '0907654321', 6, '2024-01-20', '2024-07-20', 3, 'Software B', 'Basic', 'account2', 'sheet456', 'yes', 'Order info', 20000000, 2000000, 'Note', 'Standard', 'Trần Thị B', 'NV002'],
+            ['GD003', '2024-02-01', 'Gia hạn', 'Công ty DEF', 'def@example.com', '0912345678', 12, '2024-02-01', '2025-02-01', 10, 'Software A', 'Enterprise', 'account3', 'sheet789', 'yes', 'Order info', 100000000, 10000000, 'Note', 'Standard', 'Nguyễn Văn A', 'NV001'],
+            ['GD004', '2024-02-10', 'Mới', 'Công ty GHI', 'ghi@example.com', '0923456789', 3, '2024-02-10', '2024-05-10', 2, 'Software C', 'Starter', 'account4', 'sheet012', 'yes', 'Order info', 10000000, 1000000, 'Note', 'Standard', 'Lê Văn C', 'NV003'],
+            ['GD005', '2024-02-15', 'Mới', 'Công ty JKL', 'jkl@example.com', '0934567890', 6, '2024-02-15', '2024-08-15', 5, 'Software B', 'Professional', 'account5', 'sheet345', 'yes', 'Order info', 30000000, 3000000, 'Note', 'Standard', 'Trần Thị B', 'NV002']
+        ];
+        
+        window.currentExpenseData = [
+            ['CP001', '2024-01-10', 'Tiền mặt', 'Không', 'Chi phí vận hành', 'Marketing', 'Google Ads', '', 5000000, 'VND', 'Bank A', '***1234', 'Chuyển khoản', '', 'Google', 'Đã thanh toán', 'Quảng cáo tháng 1', 'Google Ads', 'Nguyễn Văn A', 'NV001'],
+            ['CP002', '2024-01-15', 'Phân bổ', '3 tháng', 'Chi phí cố định', 'Văn phòng', 'Thuê văn phòng', '', 15000000, 'VND', 'Bank B', '***5678', 'Chuyển khoản', '', 'Chủ nhà', 'Đã thanh toán', 'Tiền thuê Q1', 'Office Rent', 'Trần Thị B', 'NV002'],
+            ['CP003', '2024-02-05', 'Tiền mặt', 'Không', 'Chi phí vận hành', 'Nhân sự', 'Đào tạo', '', 3000000, 'VND', 'Cash', '', 'Tiền mặt', '', 'Training Center', 'Đã thanh toán', 'Khóa đào tạo', 'Training', 'Lê Văn C', 'NV003']
+        ];
+        
+        // Load the report
+        console.log('Loading employee report...');
+        loadEmployeeReport().then(() => {
+            console.log('Employee report loaded successfully');
+        }).catch(error => {
+            console.error('Failed to load employee report:', error);
+        });
+    </script>
+</body>
+</html>
