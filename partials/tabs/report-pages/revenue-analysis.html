@@ -68,6 +68,149 @@
     </div>
   </div>
 
+  <!-- Profit Analysis Table -->
+  <div class="profit-analysis-section">
+    <div class="section-header">
+      <h3 class="section-title">
+        <i class="fas fa-chart-pie"></i>
+        Phân tích Lợi nhuận
+      </h3>
+      <div class="section-subtitle">
+        Chi tiết tính toán lợi nhuận và tỷ suất lợi nhuận
+      </div>
+    </div>
+    
+    <div class="profit-table-container">
+      <table class="profit-analysis-table">
+        <thead>
+          <tr>
+            <th class="metric-col">
+              <span class="metric-title" title="Các chỉ số tài chính được tính toán từ doanh thu và chi phí trong kỳ">Chỉ số</span>
+            </th>
+            <th class="value-col">
+              <span class="value-title" title="Giá trị tính toán theo công thức cho từng chỉ số">Giá trị (₫)</span>
+            </th>
+            <th class="percentage-col">
+              <span class="percentage-title" title="Tỷ lệ phần trăm so với doanh thu">% Doanh thu</span>
+            </th>
+            <th class="formula-col">
+              <span class="formula-title" title="Công thức tính toán cho từng chỉ số">Công thức</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="revenue-row">
+            <td class="metric-name">
+              <i class="fas fa-dollar-sign metric-icon positive"></i>
+              <span class="metric-label" title="Tổng doanh thu đã hoàn tất + đã thanh toán - hoàn tiền trong kỳ">Doanh thu</span>
+            </td>
+            <td class="metric-value positive" id="profit-revenue">0 ₫</td>
+            <td class="metric-percentage" id="profit-revenue-percent">100.0%</td>
+            <td class="metric-formula">Đã hoàn tất + Đã thanh toán - Hoàn tiền</td>
+          </tr>
+          
+          <tr class="refunds-row">
+            <td class="metric-name">
+              <i class="fas fa-undo-alt metric-icon negative"></i>
+              <span class="metric-label" title="Tổng số tiền đã hoàn trả cho khách hàng trong kỳ (hiển thị số âm)">Tổng hoàn tiền</span>
+            </td>
+            <td class="metric-value negative" id="profit-refunds">0 ₫</td>
+            <td class="metric-percentage negative" id="profit-refunds-percent">0.0%</td>
+            <td class="metric-formula">-(Tổng giao dịch hoàn tiền)</td>
+          </tr>
+          
+          <tr class="allocated-cost-row">
+            <td class="metric-name">
+              <i class="fas fa-chart-line metric-icon cost"></i>
+              <span class="metric-label" title="Chi phí được phân bổ theo thời gian trong kỳ đang chọn">Chi phí phân bổ</span>
+            </td>
+            <td class="metric-value cost" id="profit-allocated-cost">0 ₫</td>
+            <td class="metric-percentage cost" id="profit-allocated-cost-percent">0.0%</td>
+            <td class="metric-formula">Chi phí có 'Phân bổ' = Có</td>
+          </tr>
+          
+          <tr class="direct-cost-row">
+            <td class="metric-name">
+              <i class="fas fa-receipt metric-icon cost"></i>
+              <span class="metric-label" title="Chi phí không phân bổ, phát sinh trực tiếp trong kỳ đang chọn">Chi phí không phân bổ</span>
+            </td>
+            <td class="metric-value cost" id="profit-direct-cost">0 ₫</td>
+            <td class="metric-percentage cost" id="profit-direct-cost-percent">0.0%</td>
+            <td class="metric-formula">Chi phí có 'Phân bổ' = Không</td>
+          </tr>
+          
+          <tr class="gross-profit-row">
+            <td class="metric-name">
+              <i class="fas fa-trending-up metric-icon profit"></i>
+              <span class="metric-label" title="Lợi nhuận gộp = Doanh thu - Chi phí phân bổ">Lợi nhuận gộp</span>
+            </td>
+            <td class="metric-value profit" id="profit-gross">0 ₫</td>
+            <td class="metric-percentage profit" id="profit-gross-percent">0.0%</td>
+            <td class="metric-formula">Doanh thu - Chi phí phân bổ</td>
+          </tr>
+          
+          <tr class="net-profit-row">
+            <td class="metric-name">
+              <i class="fas fa-coins metric-icon profit"></i>
+              <span class="metric-label" title="Lợi nhuận ròng = Lợi nhuận gộp - Chi phí không phân bổ">Lợi nhuận ròng</span>
+            </td>
+            <td class="metric-value profit" id="profit-net">0 ₫</td>
+            <td class="metric-percentage profit" id="profit-net-percent">0.0%</td>
+            <td class="metric-formula">Lợi nhuận gộp - Chi phí không phân bổ</td>
+          </tr>
+          
+          <tr class="profit-margin-row highlight">
+            <td class="metric-name">
+              <i class="fas fa-percentage metric-icon highlight"></i>
+              <span class="metric-label" title="Tỷ suất lợi nhuận = Lợi nhuận ròng / Doanh thu * 100">Tỷ suất lợi nhuận</span>
+            </td>
+            <td class="metric-value highlight" id="profit-margin-value">0.0%</td>
+            <td class="metric-percentage highlight" id="profit-margin-percent">-</td>
+            <td class="metric-formula">Lợi nhuận ròng / Doanh thu × 100</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Profit Analysis Summary -->
+    <div class="profit-summary">
+      <div class="summary-cards">
+        <div class="summary-card revenue-summary">
+          <div class="summary-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="summary-content">
+            <h4 class="summary-title">Hiệu quả Doanh thu</h4>
+            <p class="summary-value" id="revenue-efficiency">Tốt</p>
+            <span class="summary-desc">Đánh giá dựa trên tỷ lệ hoàn tiền</span>
+          </div>
+        </div>
+        
+        <div class="summary-card cost-summary">
+          <div class="summary-icon">
+            <i class="fas fa-calculator"></i>
+          </div>
+          <div class="summary-content">
+            <h4 class="summary-title">Kiểm soát Chi phí</h4>
+            <p class="summary-value" id="cost-control">Khá tốt</p>
+            <span class="summary-desc">Tỷ lệ chi phí so với doanh thu</span>
+          </div>
+        </div>
+        
+        <div class="summary-card profitability-summary">
+          <div class="summary-icon">
+            <i class="fas fa-trophy"></i>
+          </div>
+          <div class="summary-content">
+            <h4 class="summary-title">Mức sinh lời</h4>
+            <p class="summary-value" id="profitability-level">Cao</p>
+            <span class="summary-desc">Đánh giá tỷ suất lợi nhuận</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Charts Section -->
   <div class="charts-grid">
     <!-- Revenue Trend Chart -->

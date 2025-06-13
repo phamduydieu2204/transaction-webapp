@@ -54,6 +54,7 @@ export async function loadRevenueAnalysis(options = {}) {
     // Load all components
     await Promise.all([
       updateRevenueKPIs(filteredTransactions, period),
+      updateProfitAnalysis(filteredTransactions, expenses, dateRange),
       renderRevenueTrendChart(filteredTransactions, period),
       renderRevenueCategoryChart(filteredTransactions),
       loadTopCustomersByRevenue(filteredTransactions),
@@ -786,4 +787,224 @@ function refreshCustomerTable(view) {
 function refreshProductTable(sort) {
   console.log(`🔄 Refreshing product table for sort: ${sort}`);
   // Implementation for table refresh
+}
+
+/**
+ * Update profit analysis table
+ */
+async function updateProfitAnalysis(transactions, expenses, dateRange) {
+  console.log('💰 Updating profit analysis');
+  
+  try {
+    // Calculate revenue metrics
+    const revenueMetrics = calculateRevenueMetrics(transactions);
+    
+    // Filter expenses by date range
+    const filteredExpenses = filterExpensesByDateRange(expenses, dateRange);
+    
+    // Calculate expense metrics
+    const expenseMetrics = calculateExpenseMetrics(filteredExpenses);
+    
+    // Calculate profit metrics
+    const profitMetrics = calculateProfitMetrics(revenueMetrics, expenseMetrics);
+    
+    // Update all table values
+    updateProfitTableValues(profitMetrics);
+    
+    // Update summary cards
+    updateProfitSummaryCards(profitMetrics);
+    
+    console.log('💰 Profit analysis updated:', profitMetrics);
+    
+  } catch (error) {
+    console.error('❌ Error updating profit analysis:', error);
+  }
+}
+
+/**
+ * Calculate expense metrics from filtered expenses
+ */
+function calculateExpenseMetrics(expenses) {
+  let allocatedCosts = 0;
+  let directCosts = 0;
+  
+  expenses.forEach(rawExpense => {
+    const expense = normalizeExpense(rawExpense);
+    if (!expense) return;
+    
+    const amount = expense.amount || 0;
+    const isAllocated = (expense.allocation || expense.phanBo || '').toLowerCase().trim() === 'có';
+    
+    if (isAllocated) {
+      allocatedCosts += amount;
+    } else {
+      directCosts += amount;
+    }
+  });
+  
+  return {
+    allocatedCosts,
+    directCosts,
+    totalCosts: allocatedCosts + directCosts
+  };
+}
+
+/**
+ * Calculate profit metrics
+ */
+function calculateProfitMetrics(revenueMetrics, expenseMetrics) {
+  const revenue = revenueMetrics.totalRevenue;
+  const refunds = revenueMetrics.refundAmount;
+  const allocatedCosts = expenseMetrics.allocatedCosts;
+  const directCosts = expenseMetrics.directCosts;
+  
+  // Gross profit = Revenue - Allocated costs
+  const grossProfit = revenue - allocatedCosts;
+  
+  // Net profit = Gross profit - Direct costs
+  const netProfit = grossProfit - directCosts;
+  
+  // Profit margin = Net profit / Revenue * 100
+  const profitMargin = revenue > 0 ? (netProfit / revenue) * 100 : 0;
+  
+  return {
+    revenue,
+    refunds: -Math.abs(refunds), // Display as negative
+    allocatedCosts,
+    directCosts,
+    grossProfit,
+    netProfit,
+    profitMargin,
+    
+    // Percentages relative to revenue
+    refundsPercent: revenue > 0 ? (refunds / revenue) * 100 : 0,
+    allocatedCostsPercent: revenue > 0 ? (allocatedCosts / revenue) * 100 : 0,
+    directCostsPercent: revenue > 0 ? (directCosts / revenue) * 100 : 0,
+    grossProfitPercent: revenue > 0 ? (grossProfit / revenue) * 100 : 0,
+    netProfitPercent: revenue > 0 ? (netProfit / revenue) * 100 : 0
+  };
+}
+
+/**
+ * Update profit analysis table values
+ */
+function updateProfitTableValues(metrics) {
+  // Revenue row
+  updateElementText('profit-revenue', formatRevenue(metrics.revenue));
+  updateElementText('profit-revenue-percent', '100.0%');
+  
+  // Refunds row (displayed as negative)
+  updateElementText('profit-refunds', formatRevenue(metrics.refunds));
+  updateElementText('profit-refunds-percent', `${metrics.refundsPercent.toFixed(1)}%`);
+  
+  // Allocated costs row
+  updateElementText('profit-allocated-cost', formatRevenue(metrics.allocatedCosts));
+  updateElementText('profit-allocated-cost-percent', `${metrics.allocatedCostsPercent.toFixed(1)}%`);
+  
+  // Direct costs row
+  updateElementText('profit-direct-cost', formatRevenue(metrics.directCosts));
+  updateElementText('profit-direct-cost-percent', `${metrics.directCostsPercent.toFixed(1)}%`);
+  
+  // Gross profit row
+  updateElementText('profit-gross', formatRevenue(metrics.grossProfit));
+  updateElementText('profit-gross-percent', `${metrics.grossProfitPercent.toFixed(1)}%`);
+  
+  // Net profit row
+  updateElementText('profit-net', formatRevenue(metrics.netProfit));
+  updateElementText('profit-net-percent', `${metrics.netProfitPercent.toFixed(1)}%`);
+  
+  // Profit margin row
+  updateElementText('profit-margin-value', `${metrics.profitMargin.toFixed(1)}%`);
+  updateElementText('profit-margin-percent', '-');
+}
+
+/**
+ * Update profit summary cards
+ */
+function updateProfitSummaryCards(metrics) {
+  // Revenue efficiency based on refund rate
+  const refundRate = Math.abs(metrics.refundsPercent);
+  let revenueEfficiency = 'Xuất sắc';
+  if (refundRate > 10) revenueEfficiency = 'Cần cải thiện';
+  else if (refundRate > 5) revenueEfficiency = 'Khá tốt';
+  else if (refundRate > 2) revenueEfficiency = 'Tốt';
+  
+  updateElementText('revenue-efficiency', revenueEfficiency);
+  
+  // Cost control based on total cost percentage
+  const totalCostPercent = metrics.allocatedCostsPercent + metrics.directCostsPercent;
+  let costControl = 'Xuất sắc';
+  if (totalCostPercent > 80) costControl = 'Cần kiểm soát';
+  else if (totalCostPercent > 60) costControl = 'Khá tốt';
+  else if (totalCostPercent > 40) costControl = 'Tốt';
+  
+  updateElementText('cost-control', costControl);
+  
+  // Profitability level based on profit margin
+  let profitabilityLevel = 'Thấp';
+  if (metrics.profitMargin > 30) profitabilityLevel = 'Rất cao';
+  else if (metrics.profitMargin > 20) profitabilityLevel = 'Cao';
+  else if (metrics.profitMargin > 10) profitabilityLevel = 'Trung bình';
+  else if (metrics.profitMargin > 0) profitabilityLevel = 'Thấp';
+  else profitabilityLevel = 'Thua lỗ';
+  
+  updateElementText('profitability-level', profitabilityLevel);
+}
+
+/**
+ * Filter expenses by date range
+ */
+function filterExpensesByDateRange(expenses, dateRange) {
+  if (!dateRange || !dateRange.start || !dateRange.end) return expenses;
+  
+  return expenses.filter(expense => {
+    const expenseDate = normalizeDate(getExpenseField(expense, 'expenseDate'));
+    if (!expenseDate) return false;
+    
+    return expenseDate >= dateRange.start && expenseDate <= dateRange.end;
+  });
+}
+
+/**
+ * Normalize expense data
+ */
+function normalizeExpense(rawExpense) {
+  if (!rawExpense) return null;
+  
+  return {
+    amount: parseFloat(rawExpense.soTien || rawExpense.amount || 0),
+    allocation: rawExpense.phanBo || rawExpense.allocation || '',
+    date: rawExpense.ngayChi || rawExpense.date || '',
+    category: rawExpense.danhMucChung || rawExpense.category || ''
+  };
+}
+
+/**
+ * Get expense field value
+ */
+function getExpenseField(expense, fieldType) {
+  if (!expense) return '';
+  
+  switch (fieldType) {
+    case 'expenseDate':
+      return expense.ngayChi || expense.date || expense.expenseDate || '';
+    case 'amount':
+      return expense.soTien || expense.amount || 0;
+    case 'allocation':
+      return expense.phanBo || expense.allocation || '';
+    default:
+      return '';
+  }
+}
+
+/**
+ * Helper function to update element text content
+ */
+function updateElementText(elementId, text) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.textContent = text;
+  } else {
+    console.warn(`❌ Element not found: ${elementId}`);
+  }
 }
