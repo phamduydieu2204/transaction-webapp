@@ -4126,11 +4126,18 @@ function exportSoftwareData() {
  */
 function calculateUpdatedBusinessMetrics(transactions, expenses, dateRange) {
   console.log('🧮 Calculating updated business metrics with new logic...');
+  console.log('📊 Input data:', {
+    transactionsCount: transactions.length,
+    expensesCount: expenses.length,
+    dateRange: dateRange
+  });
   
   // Filter transactions by date range if provided
   let filteredTransactions = transactions;
   if (dateRange && dateRange.start && dateRange.end) {
+    console.log('🔍 Filtering by date range:', dateRange);
     filteredTransactions = filterDataByDateRange(transactions, dateRange);
+    console.log(`📊 Filtered transactions: ${transactions.length} → ${filteredTransactions.length}`);
   }
   
   // Initialize metrics
@@ -4165,15 +4172,27 @@ function calculateUpdatedBusinessMetrics(transactions, expenses, dateRange) {
   console.log(`📊 Processing ${filteredTransactions.length} transactions...`);
   
   // Process each transaction
-  filteredTransactions.forEach(rawTransaction => {
+  filteredTransactions.forEach((rawTransaction, index) => {
     const transaction = normalizeTransaction(rawTransaction);
-    if (!transaction) return;
+    if (!transaction) {
+      console.log(`⚠️ Transaction ${index} failed normalization:`, rawTransaction);
+      return;
+    }
     
     // Get transaction amount and status from column C (loaiGiaoDich)
     const amount = parseFloat(transaction.amount || transaction.doanhThu || transaction.revenue || 0);
     const status = (transaction.loaiGiaoDich || transaction.transactionType || '').toLowerCase().trim();
     
-    console.log(`💳 Processing transaction: ${status} - ${amount}`);
+    // Debug first few transactions
+    if (index < 5) {
+      console.log(`💳 Transaction ${index}:`, {
+        rawAmount: transaction.amount || transaction.doanhThu || transaction.revenue,
+        parsedAmount: amount,
+        rawStatus: transaction.loaiGiaoDich || transaction.transactionType,
+        normalizedStatus: status,
+        rawTransaction: rawTransaction
+      });
+    }
     
     metrics.totalTransactions++;
     
@@ -4220,9 +4239,17 @@ function calculateUpdatedBusinessMetrics(transactions, expenses, dateRange) {
   });
   
   // Calculate derived metrics
+  console.log('📊 Raw status breakdown before calculations:', {
+    completed: metrics.statusBreakdown.completed,
+    paid: metrics.statusBreakdown.paid,
+    unpaid: metrics.statusBreakdown.unpaid,
+    refunded: metrics.statusBreakdown.refunded,
+    cancelled: metrics.statusBreakdown.cancelled
+  });
   
   // Doanh thu gộp = Tổng tiền "đã hoàn tất" - Tổng tiền "hoàn tiền"
-  metrics.grossRevenue = metrics.statusBreakdown.completed.amount - metrics.totalRefunds;
+  metrics.grossRevenue = metrics.statusBreakdown.completed.amount - Math.abs(metrics.totalRefunds);
+  console.log(`💰 Gross Revenue Calculation: ${metrics.statusBreakdown.completed.amount} - ${Math.abs(metrics.totalRefunds)} = ${metrics.grossRevenue}`);
   
   // Tỷ lệ hoàn tiền = Số giao dịch "hoàn tiền" / Tổng giao dịch có hiệu lực
   // Giao dịch có hiệu lực = "đã hoàn tất" + "đã thanh toán" + "chưa thanh toán"
