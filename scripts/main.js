@@ -278,6 +278,85 @@ window.logout = logout;
 window.showProcessingModal = showProcessingModal;
 window.closeProcessingModal = closeProcessingModal; 
 window.showResultModal = showResultModal;
+
+// Employee report debug functions (inline for immediate availability)
+window.debugEmployeeReport = function() {
+    console.log('🔍 Debugging Employee Report...');
+    
+    const results = {
+        functions: {
+            loadEmployeeReport: typeof window.loadEmployeeReport,
+            initEmployeeReport: typeof window.initEmployeeReport,
+            cleanupEmployeeReport: typeof window.cleanupEmployeeReport
+        },
+        containers: {
+            reportEmployee: !!document.getElementById('report-employee'),
+            reportPagesContainer: !!document.getElementById('report-pages-container')
+        },
+        menuItems: {
+            employeeMenuItem: !!document.querySelector('[data-report="employee"]'),
+            menuItemsCount: document.querySelectorAll('.menu-item').length
+        },
+        globalData: {
+            transactionData: window.currentTransactionData ? window.currentTransactionData.length : 'undefined',
+            expenseData: window.currentExpenseData ? window.currentExpenseData.length : 'undefined',
+            transactionList: window.transactionList ? window.transactionList.length : 'undefined',
+            expenseList: window.expenseList ? window.expenseList.length : 'undefined'
+        }
+    };
+    
+    console.log('Debug results:', results);
+    
+    // Try to manually trigger employee report
+    console.log('🧪 Testing manual employee report load...');
+    if (window.loadEmployeeReport) {
+        window.loadEmployeeReport();
+    } else {
+        console.error('❌ loadEmployeeReport function not available');
+    }
+    
+    return results;
+};
+
+window.forceEmployeeReport = function() {
+    console.log('🔧 Force loading employee report...');
+    
+    // Hide all report pages
+    const reportPages = document.querySelectorAll('.report-page');
+    reportPages.forEach(page => page.classList.remove('active'));
+    console.log('Hidden report pages:', reportPages.length);
+    
+    // Show employee report page
+    const employeePage = document.getElementById('report-employee');
+    if (employeePage) {
+        employeePage.classList.add('active');
+        console.log('✅ Employee page shown');
+        
+        // Force load template
+        fetch('./partials/tabs/report-pages/employee-report.html')
+            .then(response => response.text())
+            .then(html => {
+                employeePage.innerHTML = html;
+                console.log('✅ Template injected directly');
+            })
+            .catch(error => {
+                console.error('❌ Template load failed:', error);
+            });
+        
+    } else {
+        console.error('❌ Employee page not found');
+    }
+    
+    // Update menu
+    const menuItems = document.querySelectorAll('.menu-item');
+    menuItems.forEach(item => item.classList.remove('active'));
+    
+    const employeeMenuItem = document.querySelector('[data-report="employee"]');
+    if (employeeMenuItem) {
+        employeeMenuItem.classList.add('active');
+        console.log('✅ Employee menu item activated');
+    }
+};
 // Make close function available globally
 window.closeProcessingModalUnified = closeProcessingModal;
 window.updatePackageList = updatePackageList;
