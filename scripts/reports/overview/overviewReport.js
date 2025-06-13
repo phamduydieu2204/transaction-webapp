@@ -79,14 +79,14 @@ export async function loadOverviewReport(options = {}) {
     // Update period display
     updatePeriodDisplay(period);
     
-    // Calculate KPIs with date range or period - USING NEW FUNCTION
-    // Use consolidated business metrics calculation from statisticsCore.js
-    const kpis = calculateBusinessMetrics(transactions, expenses, dateRange);
-    console.log('💰 Calculated KPIs:');
-    console.log('  - Revenue:', kpis.revenue);
-    console.log('  - Expense:', kpis.expense);
-    console.log('  - Profit:', kpis.profit);
-    console.log('  - Transactions:', kpis.transactions);
+    // Calculate KPIs with new business logic
+    const kpis = calculateUpdatedBusinessMetrics(transactions, expenses, dateRange);
+    console.log('💰 Calculated Updated KPIs:');
+    console.log('  - Doanh thu gộp:', kpis.grossRevenue);
+    console.log('  - Tiền đang chờ thu:', kpis.pendingCollection);
+    console.log('  - Tiền đang chờ chi:', kpis.pendingPayment);
+    console.log('  - Tổng tiền hoàn trả:', kpis.totalRefunds);
+    console.log('  - Tỷ lệ hoàn tiền:', kpis.refundRate);
     
     // Filter data for charts and tables
     const filteredTransactions = filterDataByDateRange(transactions, dateRange);
@@ -598,75 +598,76 @@ function calculateOverviewKPIs(transactions, expenses, dateRange, period = 'this
  * Update KPI cards with calculated data
  */
 async function updateKPICards(kpis) {
-  console.log('✨ UPDATED updateKPICards - Using consolidated business metrics');
-  console.log('📊 KPIs data structure:', kpis);
+  console.log('✨ UPDATED updateKPICards - Using new business metrics structure');
+  console.log('📊 New KPIs data structure:', kpis);
   
   // Check if we're using the new template with status-based elements
   const newTemplate = document.getElementById('completed-revenue') !== null;
   
   if (newTemplate) {
-    // New template - Use business metrics structure
-    console.log('🆕 Using new template with business metrics structure');
+    // New template - Use updated business metrics structure
+    console.log('🆕 Using new template with updated business metrics structure');
     
-    // Map business metrics to KPI cards
-    updateKPICard('completed', {
-      value: kpis.financial.totalRevenue || 0,
-      growth: 0, // Growth calculation can be added later
+    // Map updated business metrics to KPI cards
+    updateKPICard('grossRevenue', {
+      value: kpis.grossRevenue || 0,
+      growth: kpis.growthRates?.grossRevenue || 0,
       elementId: 'completed-revenue',
       changeId: 'completed-change'
     });
     
-    updateKPICard('paid', {
-      value: kpis.financial.totalRevenue || 0, // All revenue assumed paid for now
-      growth: 0,
+    updateKPICard('pendingCollection', {
+      value: kpis.pendingCollection || 0,
+      growth: kpis.growthRates?.pendingCollection || 0,
       elementId: 'paid-revenue', 
       changeId: 'paid-change'
     });
     
-    updateKPICard('refund', {
-      value: 0, // Refund can be calculated separately if needed
-      growth: 0,
+    updateKPICard('pendingPayment', {
+      value: kpis.pendingPayment || 0,
+      growth: kpis.growthRates?.pendingPayment || 0,
+      elementId: 'unpaid-revenue',
+      changeId: 'unpaid-change'
+    });
+    
+    updateKPICard('totalRefunds', {
+      value: kpis.totalRefunds || 0,
+      growth: kpis.growthRates?.totalRefunds || 0,
       elementId: 'refund-revenue',
       changeId: 'refund-change'
     });
     
-    updateKPICard('transaction', {
-      value: kpis.revenue.totalTransactions || 0,
-      growth: 0,
+    updateKPICard('refundRate', {
+      value: kpis.refundRate || 0,
+      growth: 0, // Rate growth calculation can be added later
+      elementId: 'refund-rate',
+      changeId: 'refund-rate-change',
+      isPercentage: true
+    });
+    
+    updateKPICard('effectiveTransactions', {
+      value: kpis.effectiveTransactions || 0,
+      growth: kpis.growthRates?.effectiveTransactions || 0,
       elementId: 'total-transactions',
       changeId: 'transaction-change'
     });
     
-    // Update status breakdown using simplified data
-    updateStatusBreakdownWithRefund(kpis);
+    // Update status breakdown with new data
+    updateStatusBreakdownWithNewMetrics(kpis);
     
   } else {
-    // Old template fallback - Use business metrics structure
-    console.log('⚠️ Using old template with business metrics');
+    // Old template fallback - convert new metrics to old structure
+    console.log('⚠️ Using old template - converting new metrics to old structure');
     updateKPICard('revenue', {
-      value: kpis.financial.totalRevenue || 0,
-      growth: 0,
+      value: kpis.grossRevenue || 0,
+      growth: kpis.growthRates?.grossRevenue || 0,
       elementId: 'total-revenue',
       changeId: 'revenue-change'
     });
     
-    updateKPICard('expense', {
-      value: kpis.expense?.current || 0,
-      growth: kpis.expense?.growth || 0,
-      elementId: 'total-expenses',
-      changeId: 'expense-change'
-    });
-    
-    updateKPICard('profit', {
-      value: kpis.profit?.current || 0,
-      growth: kpis.profit?.growth || 0,
-      elementId: 'total-profit',
-      changeId: 'profit-change'
-    });
-    
     updateKPICard('transaction', {
-      value: kpis.transactions.current,
-      growth: kpis.transactions.growth,
+      value: kpis.effectiveTransactions || 0,
+      growth: kpis.growthRates?.effectiveTransactions || 0,
       elementId: 'total-transactions',
       changeId: 'transaction-change'
     });
@@ -694,11 +695,17 @@ function updateKPICard(type, data) {
   console.log(`  - Element ID: ${data.elementId}`);
   console.log(`  - Raw value: ${data.value}`);
   console.log(`  - Growth: ${data.growth}%`);
+  console.log(`  - Is percentage: ${data.isPercentage}`);
   
   if (valueElement) {
-    if (type === 'transaction') {
+    if (data.isPercentage) {
+      // For percentage values like refund rate
+      valueElement.textContent = data.value.toFixed(2) + '%';
+    } else if (type.includes('transaction') || type === 'effectiveTransactions') {
+      // For transaction counts
       valueElement.textContent = data.value.toLocaleString();
     } else {
+      // For currency values
       valueElement.textContent = formatRevenue(data.value);
     }
   }
@@ -716,28 +723,104 @@ function updateKPICard(type, data) {
 }
 
 /**
- * Update status breakdown display
+ * Update status breakdown display with new metrics
  */
-function updateStatusBreakdown(kpis) {
-  const total = kpis.transactions.current;
+function updateStatusBreakdownWithNewMetrics(kpis) {
+  console.log('📊 Updating status breakdown with new metrics structure');
+  
+  const total = kpis.effectiveTransactions; // Use effective transactions (excluding cancelled)
   
   // Update counts
-  document.getElementById('completed-count').textContent = kpis.completed.count;
-  document.getElementById('paid-count').textContent = kpis.paid.count;
-  document.getElementById('unpaid-count').textContent = kpis.unpaid.count;
+  const completedElement = document.getElementById('completed-count');
+  const paidElement = document.getElementById('paid-count');
+  const unpaidElement = document.getElementById('unpaid-count');
+  const refundedElement = document.getElementById('refunded-count');
+  
+  if (completedElement) completedElement.textContent = kpis.statusBreakdown.completed.count;
+  if (paidElement) paidElement.textContent = kpis.statusBreakdown.paid.count;
+  if (unpaidElement) unpaidElement.textContent = kpis.statusBreakdown.unpaid.count;
+  if (refundedElement) refundedElement.textContent = kpis.statusBreakdown.refunded.count;
   
   // Update percentages and bars
-  const completedPercent = total > 0 ? (kpis.completed.count / total * 100) : 0;
-  const paidPercent = total > 0 ? (kpis.paid.count / total * 100) : 0;
-  const unpaidPercent = total > 0 ? (kpis.unpaid.count / total * 100) : 0;
+  const completedPercent = total > 0 ? (kpis.statusBreakdown.completed.count / total * 100) : 0;
+  const paidPercent = total > 0 ? (kpis.statusBreakdown.paid.count / total * 100) : 0;
+  const unpaidPercent = total > 0 ? (kpis.statusBreakdown.unpaid.count / total * 100) : 0;
+  const refundedPercent = kpis.totalTransactions > 0 ? (kpis.statusBreakdown.refunded.count / kpis.totalTransactions * 100) : 0;
   
-  document.getElementById('completed-percentage').textContent = completedPercent.toFixed(1) + '%';
-  document.getElementById('paid-percentage').textContent = paidPercent.toFixed(1) + '%';
-  document.getElementById('unpaid-percentage').textContent = unpaidPercent.toFixed(1) + '%';
+  // Update percentage displays
+  const completedPercentElement = document.getElementById('completed-percentage');
+  const paidPercentElement = document.getElementById('paid-percentage');
+  const unpaidPercentElement = document.getElementById('unpaid-percentage');
+  const refundedPercentElement = document.getElementById('refunded-percentage');
   
-  document.getElementById('completed-bar').style.width = completedPercent + '%';
-  document.getElementById('paid-bar').style.width = paidPercent + '%';
-  document.getElementById('unpaid-bar').style.width = unpaidPercent + '%';
+  if (completedPercentElement) completedPercentElement.textContent = completedPercent.toFixed(1) + '%';
+  if (paidPercentElement) paidPercentElement.textContent = paidPercent.toFixed(1) + '%';
+  if (unpaidPercentElement) unpaidPercentElement.textContent = unpaidPercent.toFixed(1) + '%';
+  if (refundedPercentElement) refundedPercentElement.textContent = refundedPercent.toFixed(1) + '%';
+  
+  // Update progress bars
+  const completedBar = document.getElementById('completed-bar');
+  const paidBar = document.getElementById('paid-bar');
+  const unpaidBar = document.getElementById('unpaid-bar');
+  const refundedBar = document.getElementById('refunded-bar');
+  
+  if (completedBar) completedBar.style.width = completedPercent + '%';
+  if (paidBar) paidBar.style.width = paidPercent + '%';
+  if (unpaidBar) unpaidBar.style.width = unpaidPercent + '%';
+  if (refundedBar) refundedBar.style.width = refundedPercent + '%';
+  
+  console.log('📊 Status breakdown updated:', {
+    completed: `${kpis.statusBreakdown.completed.count} (${completedPercent.toFixed(1)}%)`,
+    paid: `${kpis.statusBreakdown.paid.count} (${paidPercent.toFixed(1)}%)`,
+    unpaid: `${kpis.statusBreakdown.unpaid.count} (${unpaidPercent.toFixed(1)}%)`,
+    refunded: `${kpis.statusBreakdown.refunded.count} (${refundedPercent.toFixed(1)}%)`
+  });
+}
+
+/**
+ * Update status breakdown display (legacy function for compatibility)
+ */
+function updateStatusBreakdown(kpis) {
+  // Check if we have new metrics structure
+  if (kpis.statusBreakdown) {
+    updateStatusBreakdownWithNewMetrics(kpis);
+    return;
+  }
+  
+  // Legacy fallback
+  const total = kpis.transactions?.current || 0;
+  
+  // Update counts
+  const completedElement = document.getElementById('completed-count');
+  const paidElement = document.getElementById('paid-count');
+  const unpaidElement = document.getElementById('unpaid-count');
+  
+  if (completedElement && kpis.completed) completedElement.textContent = kpis.completed.count;
+  if (paidElement && kpis.paid) paidElement.textContent = kpis.paid.count;
+  if (unpaidElement && kpis.unpaid) unpaidElement.textContent = kpis.unpaid.count;
+  
+  // Update percentages and bars
+  if (kpis.completed && kpis.paid && kpis.unpaid) {
+    const completedPercent = total > 0 ? (kpis.completed.count / total * 100) : 0;
+    const paidPercent = total > 0 ? (kpis.paid.count / total * 100) : 0;
+    const unpaidPercent = total > 0 ? (kpis.unpaid.count / total * 100) : 0;
+    
+    const completedPercentElement = document.getElementById('completed-percentage');
+    const paidPercentElement = document.getElementById('paid-percentage');
+    const unpaidPercentElement = document.getElementById('unpaid-percentage');
+    
+    if (completedPercentElement) completedPercentElement.textContent = completedPercent.toFixed(1) + '%';
+    if (paidPercentElement) paidPercentElement.textContent = paidPercent.toFixed(1) + '%';
+    if (unpaidPercentElement) unpaidPercentElement.textContent = unpaidPercent.toFixed(1) + '%';
+    
+    const completedBar = document.getElementById('completed-bar');
+    const paidBar = document.getElementById('paid-bar');
+    const unpaidBar = document.getElementById('unpaid-bar');
+    
+    if (completedBar) completedBar.style.width = completedPercent + '%';
+    if (paidBar) paidBar.style.width = paidPercent + '%';
+    if (unpaidBar) unpaidBar.style.width = unpaidPercent + '%';
+  }
 }
 
 /**
@@ -4032,4 +4115,203 @@ function exportSoftwareData() {
     console.error('❌ Error exporting software data:', error);
     alert('Lỗi xuất dữ liệu sản phẩm. Vui lòng thử lại.');
   }
+}
+
+/**
+ * Calculate updated business metrics according to new requirements
+ * @param {Array} transactions - Raw transaction data
+ * @param {Array} expenses - Raw expense data  
+ * @param {Object} dateRange - Date range filter
+ * @returns {Object} Updated business metrics
+ */
+function calculateUpdatedBusinessMetrics(transactions, expenses, dateRange) {
+  console.log('🧮 Calculating updated business metrics with new logic...');
+  
+  // Filter transactions by date range if provided
+  let filteredTransactions = transactions;
+  if (dateRange && dateRange.start && dateRange.end) {
+    filteredTransactions = filterDataByDateRange(transactions, dateRange);
+  }
+  
+  // Initialize metrics
+  const metrics = {
+    grossRevenue: 0,           // Doanh thu gộp = "đã hoàn tất" - "hoàn tiền"
+    pendingCollection: 0,      // Tiền đang chờ thu = "chưa thanh toán"
+    pendingPayment: 0,         // Tiền đang chờ chi = "đã thanh toán" 
+    totalRefunds: 0,           // Tổng tiền hoàn trả = "hoàn tiền"
+    refundRate: 0,             // Tỷ lệ hoàn tiền = số GD "hoàn tiền" / (tổng GD có hiệu lực)
+    
+    // Breakdown by status for detailed analysis
+    statusBreakdown: {
+      completed: { count: 0, amount: 0 },      // đã hoàn tất
+      paid: { count: 0, amount: 0 },           // đã thanh toán
+      unpaid: { count: 0, amount: 0 },         // chưa thanh toán
+      refunded: { count: 0, amount: 0 },       // hoàn tiền
+      cancelled: { count: 0, amount: 0 }       // đã hủy
+    },
+    
+    // Transaction counts
+    totalTransactions: 0,
+    effectiveTransactions: 0,   // Không bao gồm "đã hủy"
+    
+    // Previous period comparison (for growth calculations)
+    previousPeriod: {
+      grossRevenue: 0,
+      totalRefunds: 0,
+      effectiveTransactions: 0
+    }
+  };
+  
+  console.log(`📊 Processing ${filteredTransactions.length} transactions...`);
+  
+  // Process each transaction
+  filteredTransactions.forEach(rawTransaction => {
+    const transaction = normalizeTransaction(rawTransaction);
+    if (!transaction) return;
+    
+    // Get transaction amount and status from column C (loaiGiaoDich)
+    const amount = parseFloat(transaction.amount || transaction.doanhThu || transaction.revenue || 0);
+    const status = (transaction.loaiGiaoDich || transaction.transactionType || '').toLowerCase().trim();
+    
+    console.log(`💳 Processing transaction: ${status} - ${amount}`);
+    
+    metrics.totalTransactions++;
+    
+    // Categorize by transaction status (column C in GiaoDich sheet)
+    switch (status) {
+      case 'đã hoàn tất':
+        metrics.statusBreakdown.completed.count++;
+        metrics.statusBreakdown.completed.amount += amount;
+        metrics.effectiveTransactions++;
+        break;
+        
+      case 'đã thanh toán':
+        metrics.statusBreakdown.paid.count++;
+        metrics.statusBreakdown.paid.amount += amount;
+        metrics.pendingPayment += amount;  // Tiền đang chờ chi
+        metrics.effectiveTransactions++;
+        break;
+        
+      case 'chưa thanh toán':
+        metrics.statusBreakdown.unpaid.count++;
+        metrics.statusBreakdown.unpaid.amount += amount;
+        metrics.pendingCollection += amount;  // Tiền đang chờ thu
+        metrics.effectiveTransactions++;
+        break;
+        
+      case 'hoàn tiền':
+        metrics.statusBreakdown.refunded.count++;
+        metrics.statusBreakdown.refunded.amount += amount;
+        metrics.totalRefunds += amount;  // Tổng tiền hoàn trả
+        break;
+        
+      case 'đã hủy':
+        metrics.statusBreakdown.cancelled.count++;
+        metrics.statusBreakdown.cancelled.amount += amount;
+        // Không tính vào effectiveTransactions
+        break;
+        
+      default:
+        console.warn(`⚠️ Unknown transaction status: "${status}"`);
+        // Treat unknown status as effective transaction
+        metrics.effectiveTransactions++;
+        break;
+    }
+  });
+  
+  // Calculate derived metrics
+  
+  // Doanh thu gộp = Tổng tiền "đã hoàn tất" - Tổng tiền "hoàn tiền"
+  metrics.grossRevenue = metrics.statusBreakdown.completed.amount - metrics.totalRefunds;
+  
+  // Tỷ lệ hoàn tiền = Số giao dịch "hoàn tiền" / Tổng giao dịch có hiệu lực
+  // Giao dịch có hiệu lực = "đã hoàn tất" + "đã thanh toán" + "chưa thanh toán"
+  const validTransactionsForRefundRate = metrics.statusBreakdown.completed.count + 
+                                        metrics.statusBreakdown.paid.count + 
+                                        metrics.statusBreakdown.unpaid.count;
+  
+  metrics.refundRate = validTransactionsForRefundRate > 0 
+    ? (metrics.statusBreakdown.refunded.count / validTransactionsForRefundRate * 100)
+    : 0;
+  
+  // Calculate previous period for growth comparison
+  if (dateRange && dateRange.start && dateRange.end) {
+    const previousPeriodRange = calculatePreviousPeriodRange(dateRange);
+    const previousTransactions = filterDataByDateRange(transactions, previousPeriodRange);
+    
+    previousTransactions.forEach(rawTransaction => {
+      const transaction = normalizeTransaction(rawTransaction);
+      if (!transaction) return;
+      
+      const amount = parseFloat(transaction.amount || transaction.doanhThu || transaction.revenue || 0);
+      const status = (transaction.loaiGiaoDich || transaction.transactionType || '').toLowerCase().trim();
+      
+      switch (status) {
+        case 'đã hoàn tất':
+          metrics.previousPeriod.grossRevenue += amount;
+          metrics.previousPeriod.effectiveTransactions++;
+          break;
+        case 'hoàn tiền':
+          metrics.previousPeriod.totalRefunds += amount;
+          break;
+        case 'đã thanh toán':
+        case 'chưa thanh toán':
+          metrics.previousPeriod.effectiveTransactions++;
+          break;
+      }
+    });
+    
+    metrics.previousPeriod.grossRevenue -= metrics.previousPeriod.totalRefunds;
+  }
+  
+  // Calculate growth rates
+  metrics.growthRates = {
+    grossRevenue: calculateGrowthRate(metrics.grossRevenue, metrics.previousPeriod.grossRevenue),
+    pendingCollection: 0, // Growth for pending amounts might not be meaningful
+    pendingPayment: 0,
+    totalRefunds: calculateGrowthRate(metrics.totalRefunds, metrics.previousPeriod.totalRefunds),
+    effectiveTransactions: calculateGrowthRate(metrics.effectiveTransactions, metrics.previousPeriod.effectiveTransactions)
+  };
+  
+  console.log('📈 Final metrics calculated:');
+  console.log('  💰 Doanh thu gộp:', formatCurrency(metrics.grossRevenue));
+  console.log('  ⏳ Tiền đang chờ thu:', formatCurrency(metrics.pendingCollection));
+  console.log('  💸 Tiền đang chờ chi:', formatCurrency(metrics.pendingPayment));
+  console.log('  🔄 Tổng tiền hoàn trả:', formatCurrency(metrics.totalRefunds));
+  console.log('  📊 Tỷ lệ hoàn tiền:', `${metrics.refundRate.toFixed(2)}%`);
+  console.log('  📋 Status breakdown:', metrics.statusBreakdown);
+  console.log('  📈 Growth rates:', metrics.growthRates);
+  
+  return metrics;
+}
+
+/**
+ * Calculate previous period date range for comparison
+ */
+function calculatePreviousPeriodRange(currentRange) {
+  const startDate = new Date(currentRange.start);
+  const endDate = new Date(currentRange.end);
+  
+  // Calculate period length in days
+  const periodLength = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+  
+  // Calculate previous period
+  const prevEndDate = new Date(startDate);
+  prevEndDate.setDate(prevEndDate.getDate() - 1);
+  
+  const prevStartDate = new Date(prevEndDate);
+  prevStartDate.setDate(prevStartDate.getDate() - periodLength + 1);
+  
+  return {
+    start: prevStartDate.toISOString().split('T')[0],
+    end: prevEndDate.toISOString().split('T')[0]
+  };
+}
+
+/**
+ * Calculate growth rate between current and previous values
+ */
+function calculateGrowthRate(current, previous) {
+  if (previous === 0) return current > 0 ? 100 : 0;
+  return ((current - previous) / previous) * 100;
 }
