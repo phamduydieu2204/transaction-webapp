@@ -65,6 +65,9 @@ export async function loadRevenueAnalysis(options = {}) {
     // Setup event handlers
     setupRevenueAnalysisHandlers();
     
+    // Setup custom profit tooltips
+    setupProfitTooltips();
+    
     console.log('✅ Revenue analysis loaded successfully');
     
   } catch (error) {
@@ -1007,4 +1010,153 @@ function updateElementText(elementId, text) {
   } else {
     console.warn(`❌ Element not found: ${elementId}`);
   }
+}
+
+/**
+ * Setup custom profit tooltips
+ */
+function setupProfitTooltips() {
+  const tooltipElements = document.querySelectorAll('.custom-tooltip[data-metric]');
+  const tooltip = document.getElementById('profit-tooltip');
+  
+  if (!tooltip) {
+    console.warn('❌ Profit tooltip container not found');
+    return;
+  }
+  
+  // Tooltip data configuration
+  const tooltipData = {
+    'revenue': {
+      title: 'Doanh thu',
+      icon: 'fas fa-dollar-sign',
+      iconColor: '#16a34a',
+      iconBg: '#dcfce7',
+      formula: 'Doanh thu = Đã hoàn tất + Đã thanh toán - Hoàn tiền',
+      description: 'Tổng số tiền thực tế đã thu được từ khách hàng trong kỳ, sau khi trừ đi các khoản hoàn tiền. Đây là chỉ số quan trọng nhất để đánh giá hiệu quả kinh doanh.'
+    },
+    'refunds': {
+      title: 'Tổng hoàn tiền',
+      icon: 'fas fa-undo-alt',
+      iconColor: '#dc2626',
+      iconBg: '#fee2e2',
+      formula: 'Tổng hoàn tiền = -(Tổng giao dịch có trạng thái "hoàn tiền")',
+      description: 'Tổng số tiền đã hoàn trả lại cho khách hàng trong kỳ. Hiển thị dưới dạng số âm để thể hiện đây là khoản tiền bị mất. Tỷ lệ hoàn tiền cao có thể báo hiệu vấn đề về chất lượng sản phẩm hoặc dịch vụ.'
+    },
+    'allocated-cost': {
+      title: 'Chi phí phân bổ',
+      icon: 'fas fa-chart-line',
+      iconColor: '#d97706',
+      iconBg: '#fef3c7',
+      formula: 'Chi phí phân bổ = Tổng chi phí có cột "Phân bổ" = "Có"',
+      description: 'Chi phí được phân bổ theo thời gian, thường là những khoản chi dài hạn như thuê văn phòng, lương nhân viên, phần mềm... Được chia đều cho các tháng trong chu kỳ sử dụng.'
+    },
+    'direct-cost': {
+      title: 'Chi phí không phân bổ',
+      icon: 'fas fa-receipt',
+      iconColor: '#d97706',
+      iconBg: '#fef3c7',
+      formula: 'Chi phí không phân bổ = Tổng chi phí có cột "Phân bổ" = "Không"',
+      description: 'Chi phí phát sinh trực tiếp trong kỳ, không cần phân bổ như chi phí marketing, mua nguyên vật liệu, chi phí vận hành... Thường là những khoản chi một lần hoặc theo từng dự án cụ thể.'
+    },
+    'gross-profit': {
+      title: 'Lợi nhuận gộp',
+      icon: 'fas fa-trending-up',
+      iconColor: '#2563eb',
+      iconBg: '#dbeafe',
+      formula: 'Lợi nhuận gộp = Doanh thu - Chi phí phân bổ',
+      description: 'Lợi nhuận sau khi trừ đi chi phí cơ bản, thường dùng để đánh giá hiệu quả hoạt động cốt lõi của doanh nghiệp. Chỉ số này giúp đánh giá khả năng sinh lời từ hoạt động kinh doanh chính.'
+    },
+    'net-profit': {
+      title: 'Lợi nhuận ròng',
+      icon: 'fas fa-coins',
+      iconColor: '#2563eb',
+      iconBg: '#dbeafe',
+      formula: 'Lợi nhuận ròng = Lợi nhuận gộp - Chi phí không phân bổ',
+      description: 'Lợi nhuận cuối cùng sau khi trừ tất cả các loại chi phí. Đây là chỉ số quan trọng nhất để đánh giá hiệu quả tổng thể và khả năng sinh lời thực sự của doanh nghiệp trong kỳ.'
+    },
+    'profit-margin': {
+      title: 'Tỷ suất lợi nhuận',
+      icon: 'fas fa-percentage',
+      iconColor: '#7c3aed',
+      iconBg: '#f3e8ff',
+      formula: 'Tỷ suất lợi nhuận = (Lợi nhuận ròng ÷ Doanh thu) × 100',
+      description: 'Tỷ lệ phần trăm lợi nhuận ròng so với doanh thu, cho biết hiệu quả sử dụng vốn. Tỷ suất cao cho thấy doanh nghiệp hoạt động hiệu quả và có khả năng kiểm soát chi phí tốt.'
+    }
+  };
+  
+  tooltipElements.forEach(element => {
+    const metricType = element.getAttribute('data-metric');
+    const data = tooltipData[metricType];
+    
+    if (!data) return;
+    
+    // Add event listeners
+    element.addEventListener('mouseenter', (e) => {
+      showCustomTooltip(e, data, tooltip);
+    });
+    
+    element.addEventListener('mouseleave', () => {
+      hideCustomTooltip(tooltip);
+    });
+    
+    element.addEventListener('mousemove', (e) => {
+      updateTooltipPosition(e, tooltip);
+    });
+  });
+}
+
+/**
+ * Show custom tooltip
+ */
+function showCustomTooltip(event, data, tooltip) {
+  // Update tooltip content
+  const icon = tooltip.querySelector('.tooltip-icon');
+  const title = tooltip.querySelector('.tooltip-title');
+  const formula = tooltip.querySelector('.tooltip-formula');
+  const description = tooltip.querySelector('.tooltip-description');
+  
+  // Set icon
+  icon.className = `tooltip-icon ${data.icon}`;
+  icon.style.backgroundColor = data.iconBg;
+  icon.style.color = data.iconColor;
+  
+  // Set content
+  title.textContent = data.title;
+  formula.textContent = data.formula;
+  description.textContent = data.description;
+  
+  // Position and show tooltip
+  updateTooltipPosition(event, tooltip);
+  tooltip.classList.add('show');
+}
+
+/**
+ * Hide custom tooltip
+ */
+function hideCustomTooltip(tooltip) {
+  tooltip.classList.remove('show');
+}
+
+/**
+ * Update tooltip position
+ */
+function updateTooltipPosition(event, tooltip) {
+  const rect = tooltip.getBoundingClientRect();
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  
+  let left = event.pageX + 15;
+  let top = event.pageY - rect.height - 15;
+  
+  // Adjust position if tooltip goes outside viewport
+  if (left + rect.width > viewportWidth) {
+    left = event.pageX - rect.width - 15;
+  }
+  
+  if (top < window.pageYOffset) {
+    top = event.pageY + 15;
+  }
+  
+  tooltip.style.left = `${left}px`;
+  tooltip.style.top = `${top}px`;
 }

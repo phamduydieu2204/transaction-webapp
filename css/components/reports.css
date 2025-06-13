@@ -417,46 +417,93 @@
   color: #7c3aed;
 }
 
-.profit-analysis-table .metric-label[title] {
-  cursor: help;
-  position: relative;
-}
 
-.profit-analysis-table .metric-label[title]:hover {
-  color: #1e40af;
-}
-
-/* Tooltip for metric labels */
-.profit-analysis-table .metric-label[title]:hover::after {
-  content: attr(title);
+/* Custom Tooltip Styles */
+.profit-custom-tooltip {
   position: absolute;
-  bottom: 100%;
-  left: 0;
-  margin-bottom: 8px;
-  padding: 8px 12px;
-  background: rgba(31, 41, 55, 0.95);
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   color: white;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.4;
-  border-radius: 6px;
-  white-space: normal;
-  max-width: 250px;
-  z-index: 1000;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  pointer-events: none;
+  padding: 0;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  z-index: 10000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 320px;
+  min-width: 280px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
 }
 
-.profit-analysis-table .metric-label[title]:hover::before {
-  content: '';
-  position: absolute;
-  bottom: 100%;
-  left: 20px;
-  margin-bottom: 4px;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: 6px solid rgba(31, 41, 55, 0.95);
-  z-index: 1001;
+.profit-custom-tooltip.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.profit-custom-tooltip .tooltip-header {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 16px 20px;
+  border-radius: 12px 12px 0 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profit-custom-tooltip .tooltip-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.profit-custom-tooltip .tooltip-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: #f8fafc;
+}
+
+.profit-custom-tooltip .tooltip-content {
+  padding: 16px 20px;
+}
+
+.profit-custom-tooltip .tooltip-formula {
+  font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #e2e8f0;
+  margin-bottom: 12px;
+  border-left: 3px solid #3b82f6;
+}
+
+.profit-custom-tooltip .tooltip-description {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #cbd5e1;
+}
+
+/* Custom tooltip hover styles */
+.profit-analysis-table .metric-label.custom-tooltip {
+  cursor: pointer;
+  position: relative;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.profit-analysis-table .metric-label.custom-tooltip:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #1e40af;
+  transform: translateX(2px);
 }
 
 /* Value styling */
@@ -505,32 +552,18 @@
   font-weight: 600;
 }
 
-/* Formula styling */
-.profit-analysis-table .metric-formula {
-  font-family: 'Monaco', 'Consolas', monospace;
-  font-size: 0.8rem;
-  color: #6b7280;
-  background-color: #f8fafc;
-  padding: 4px 8px;
-  border-radius: 4px;
-  border: 1px solid #e5e7eb;
-}
 
 /* Column widths */
 .profit-analysis-table .metric-col {
-  width: 25%;
+  width: 50%;
 }
 
 .profit-analysis-table .value-col {
-  width: 20%;
+  width: 30%;
 }
 
 .profit-analysis-table .percentage-col {
-  width: 15%;
-}
-
-.profit-analysis-table .formula-col {
-  width: 40%;
+  width: 20%;
 }
 
 /* Profit Summary Cards */
