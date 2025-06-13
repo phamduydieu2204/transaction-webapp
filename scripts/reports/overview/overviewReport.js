@@ -765,11 +765,21 @@ function updateKPICard(type, data) {
     const arrow = isPositive ? 'fa-arrow-up' : 'fa-arrow-down';
     const sign = data.growth >= 0 ? '+' : '';
     
-    // Check if we're using the new template with kpi-box-change class
-    const isNewTemplate = changeElement.classList.contains('kpi-box-change') || 
+    // Check which template we're using based on class names
+    const isMetricTemplate = changeElement.classList.contains('kpi-metric-change') || 
+                            changeElement.parentElement?.classList.contains('kpi-metric-box');
+    const isBoxTemplate = changeElement.classList.contains('kpi-box-change') || 
                          changeElement.parentElement?.classList.contains('kpi-box');
     
-    if (isNewTemplate) {
+    if (isMetricTemplate) {
+      // New metric template (6-box grid)
+      changeElement.innerHTML = `
+        <i class="fas ${arrow}"></i>
+        <span>${sign}${data.growth.toFixed(1)}%</span>
+      `;
+      changeElement.className = `kpi-metric-change ${isPositive ? 'positive' : 'negative'}`;
+    } else if (isBoxTemplate) {
+      // Previous box template
       changeElement.innerHTML = `
         <i class="fas ${arrow}"></i>
         <span>${sign}${data.growth.toFixed(1)}%</span>

@@ -12,108 +12,108 @@
     </div>
   </div>
 
-  <!-- Modern KPI Dashboard -->
-  <div class="kpi-dashboard-modern">
-    <div class="row g-3">
+  <!-- Dashboard Tổng quan chỉ số - 6 boxes in 1 row -->
+  <div class="kpi-metrics-dashboard">
+    <div class="kpi-grid-6">
       <!-- Doanh thu gộp -->
-      <div class="col-lg-2 col-md-4 col-sm-6">
-        <div class="kpi-box" data-metric="revenue">
-          <div class="kpi-box-icon revenue-icon">
+      <div class="kpi-metric-box">
+        <div class="kpi-metric-header">
+          <div class="kpi-metric-icon kpi-icon-revenue">
             <i class="fas fa-chart-line"></i>
           </div>
-          <div class="kpi-box-content">
-            <h6 class="kpi-box-title">Doanh thu gộp</h6>
-            <div class="kpi-box-value" id="completed-revenue">0 ₫</div>
-            <div class="kpi-box-change" id="completed-change">
-              <i class="fas fa-arrow-up"></i>
-              <span>+0%</span>
-            </div>
+          <div class="kpi-metric-change" id="completed-change">
+            <i class="fas fa-arrow-up"></i>
+            <span>+0%</span>
           </div>
+        </div>
+        <div class="kpi-metric-content">
+          <div class="kpi-metric-title">Doanh thu gộp</div>
+          <div class="kpi-metric-value" id="completed-revenue">0 ₫</div>
         </div>
       </div>
 
       <!-- Tiền đang chờ thu -->
-      <div class="col-lg-2 col-md-4 col-sm-6">
-        <div class="kpi-box" data-metric="pending-collection">
-          <div class="kpi-box-icon pending-icon">
+      <div class="kpi-metric-box">
+        <div class="kpi-metric-header">
+          <div class="kpi-metric-icon kpi-icon-pending">
             <i class="fas fa-hourglass-half"></i>
           </div>
-          <div class="kpi-box-content">
-            <h6 class="kpi-box-title">Tiền đang chờ thu</h6>
-            <div class="kpi-box-value" id="paid-revenue">0 ₫</div>
-            <div class="kpi-box-change" id="paid-change">
-              <i class="fas fa-arrow-up"></i>
-              <span>+0%</span>
-            </div>
+          <div class="kpi-metric-change" id="paid-change">
+            <i class="fas fa-arrow-up"></i>
+            <span>+0%</span>
           </div>
+        </div>
+        <div class="kpi-metric-content">
+          <div class="kpi-metric-title">Tiền đang chờ thu</div>
+          <div class="kpi-metric-value" id="paid-revenue">0 ₫</div>
         </div>
       </div>
 
-      <!-- Chờ giao hàng (đổi từ Tiền đang chờ chi) -->
-      <div class="col-lg-2 col-md-4 col-sm-6">
-        <div class="kpi-box" data-metric="pending-delivery">
-          <div class="kpi-box-icon delivery-icon">
+      <!-- Chờ giao hàng -->
+      <div class="kpi-metric-box">
+        <div class="kpi-metric-header">
+          <div class="kpi-metric-icon kpi-icon-delivery">
             <i class="fas fa-truck"></i>
           </div>
-          <div class="kpi-box-content">
-            <h6 class="kpi-box-title">Chờ giao hàng</h6>
-            <div class="kpi-box-value" id="unpaid-revenue">0 ₫</div>
-            <div class="kpi-box-change" id="unpaid-change">
-              <i class="fas fa-arrow-up"></i>
-              <span>+0%</span>
-            </div>
+          <div class="kpi-metric-change" id="unpaid-change">
+            <i class="fas fa-arrow-up"></i>
+            <span>+0%</span>
           </div>
+        </div>
+        <div class="kpi-metric-content">
+          <div class="kpi-metric-title">Chờ giao hàng</div>
+          <div class="kpi-metric-value" id="unpaid-revenue">0 ₫</div>
         </div>
       </div>
 
       <!-- Tổng tiền hoàn trả -->
-      <div class="col-lg-2 col-md-4 col-sm-6">
-        <div class="kpi-box" data-metric="refunds">
-          <div class="kpi-box-icon refund-icon">
+      <div class="kpi-metric-box">
+        <div class="kpi-metric-header">
+          <div class="kpi-metric-icon kpi-icon-refund">
             <i class="fas fa-undo-alt"></i>
           </div>
-          <div class="kpi-box-content">
-            <h6 class="kpi-box-title">Tổng tiền hoàn trả</h6>
-            <div class="kpi-box-value" id="refund-revenue">0 ₫</div>
-            <div class="kpi-box-change" id="refund-change">
-              <i class="fas fa-arrow-up"></i>
-              <span>+0%</span>
-            </div>
+          <div class="kpi-metric-change" id="refund-change">
+            <i class="fas fa-arrow-up"></i>
+            <span>+0%</span>
           </div>
+        </div>
+        <div class="kpi-metric-content">
+          <div class="kpi-metric-title">Tổng tiền hoàn trả</div>
+          <div class="kpi-metric-value" id="refund-revenue">0 ₫</div>
         </div>
       </div>
 
       <!-- Tỷ lệ hoàn tiền -->
-      <div class="col-lg-2 col-md-4 col-sm-6">
-        <div class="kpi-box" data-metric="refund-rate">
-          <div class="kpi-box-icon rate-icon">
+      <div class="kpi-metric-box">
+        <div class="kpi-metric-header">
+          <div class="kpi-metric-icon kpi-icon-rate">
             <i class="fas fa-percentage"></i>
           </div>
-          <div class="kpi-box-content">
-            <h6 class="kpi-box-title">Tỷ lệ hoàn tiền</h6>
-            <div class="kpi-box-value" id="refund-rate">0.00%</div>
-            <div class="kpi-box-change" id="refund-rate-change">
-              <i class="fas fa-arrow-up"></i>
-              <span>+0%</span>
-            </div>
+          <div class="kpi-metric-change" id="refund-rate-change">
+            <i class="fas fa-arrow-up"></i>
+            <span>+0%</span>
           </div>
+        </div>
+        <div class="kpi-metric-content">
+          <div class="kpi-metric-title">Tỷ lệ hoàn tiền</div>
+          <div class="kpi-metric-value" id="refund-rate">0.00%</div>
         </div>
       </div>
 
       <!-- Giao dịch có hiệu lực -->
-      <div class="col-lg-2 col-md-4 col-sm-6">
-        <div class="kpi-box" data-metric="transactions">
-          <div class="kpi-box-icon transaction-icon">
+      <div class="kpi-metric-box">
+        <div class="kpi-metric-header">
+          <div class="kpi-metric-icon kpi-icon-transaction">
             <i class="fas fa-handshake"></i>
           </div>
-          <div class="kpi-box-content">
-            <h6 class="kpi-box-title">Giao dịch có hiệu lực</h6>
-            <div class="kpi-box-value" id="total-transactions">0</div>
-            <div class="kpi-box-change" id="transaction-change">
-              <i class="fas fa-arrow-up"></i>
-              <span>+0%</span>
-            </div>
+          <div class="kpi-metric-change" id="transaction-change">
+            <i class="fas fa-arrow-up"></i>
+            <span>+0%</span>
           </div>
+        </div>
+        <div class="kpi-metric-content">
+          <div class="kpi-metric-title">Giao dịch có hiệu lực</div>
+          <div class="kpi-metric-value" id="total-transactions">0</div>
         </div>
       </div>
     </div>
