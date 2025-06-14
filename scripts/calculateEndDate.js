@@ -79,6 +79,11 @@ export function initializeDateCalculations() {
       calculateEndDate(startDateInput, durationInput, endDateInput);
     });
     
+    // Update end date when user types in start date manually
+    startDateInput.addEventListener('input', () => {
+      calculateEndDate(startDateInput, durationInput, endDateInput);
+    });
+    
     // Update end date when duration changes
     durationInput.addEventListener('change', () => {
       calculateEndDate(startDateInput, durationInput, endDateInput);

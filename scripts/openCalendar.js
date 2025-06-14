@@ -5,10 +5,19 @@ export function openCalendar(inputId, calculateEndDate, startDateInput, duration
     // Lấy giá trị hiện tại của input (nếu có)
     const currentValue = document.getElementById(inputId).value;
     
+    // Kiểm tra xem đã có instance flatpickr chưa
+    const existingInstance = document.getElementById(inputId)._flatpickr;
+    if (existingInstance) {
+      existingInstance.open();
+      return;
+    }
+    
     const fp = flatpickr(`#${inputId}`, {
       dateFormat: "Y/m/d",
       defaultDate: currentValue || null, // Giữ giá trị hiện tại nếu có
       inline: false,
+      allowInput: true, // Cho phép nhập thủ công
+      clickOpens: false, // Không mở calendar khi click vào input
       // Thêm class để highlight ngày hôm nay
       onDayCreate: function(dObj, dStr, fp, dayElem) {
         // Kiểm tra nếu là ngày hôm nay
