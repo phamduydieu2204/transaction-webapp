@@ -23,7 +23,7 @@ export async function handleUpdateCookie(index, transactionList) {
   newCookieEl.value = "";
   window.currentCookieTransaction = transaction;
 
-  // Lấy cookie hiện tại
+  // Lấy cookie hiện tại và tên file
   try {
     const { BACKEND_URL } = getConstants();
     showProcessingModal("Đang tải cookie...");
@@ -31,12 +31,23 @@ export async function handleUpdateCookie(index, transactionList) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        action: "getCookie",
+        action: "getCookieAndFileName",
         accountSheetId: transaction.accountSheetId
       })
     });
     const result = await response.json();
+    
+    // Cập nhật cookie content
     currentCookieEl.value = result.cookie || "(Không có dữ liệu)";
+    
+    // Cập nhật label với tên file
+    const currentCookieLabel = document.getElementById("currentCookieLabel");
+    if (currentCookieLabel && result.fileName) {
+      currentCookieLabel.textContent = result.fileName + ":";
+    } else {
+      currentCookieLabel.textContent = "Cookie hiện tại:";
+    }
+    
     closeProcessingModal();
     modal.style.display = "block";
   } catch (err) {
@@ -121,10 +132,11 @@ export async function confirmUpdateCookie() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        action: "updateCookie",
+        action: "updateCookieAndRename",
         transactionId: transaction.transactionId,
         accountSheetId: transaction.accountSheetId,
         newCookie: newCookie,
+        accountName: transaction.accountName,
         type: "confirm"
       })
     });
