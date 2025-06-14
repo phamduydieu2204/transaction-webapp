@@ -6,6 +6,35 @@
  */
 
 export const TRANSACTION_TYPES = {
+  // All possible transaction types in the correct order
+  ALL_TYPES: [
+    {
+      value: "Đã hoàn tất",
+      label: "Đã hoàn tất", 
+      tooltip: "Giao dịch đã được thanh toán và đã giao hàng cho khách"
+    },
+    {
+      value: "Đã thanh toán", 
+      label: "Đã thanh toán",
+      tooltip: "Khách hàng đã thực hiện thanh toán nhưng bên bán chưa giao hàng"
+    },
+    {
+      value: "Chưa thanh toán",
+      label: "Chưa thanh toán",
+      tooltip: "Bên bán đã giao hàng nhưng khách hàng chưa thực hiện chuyển khoản"
+    },
+    {
+      value: "Hoàn tiền",
+      label: "Hoàn tiền",
+      tooltip: "Giao dịch đã hoàn tất nhưng khách hàng không hài lòng và mong muốn được hoàn tiền"
+    },
+    {
+      value: "Hủy giao dịch", 
+      label: "Hủy giao dịch",
+      tooltip: "Giao dịch không hoàn tất do khách hàng không chuyển tiền hoặc bên bán không thể giao hàng"
+    }
+  ],
+  
   // Default states for new transactions
   DEFAULT: [
     {
@@ -25,18 +54,13 @@ export const TRANSACTION_TYPES = {
     }
   ],
   
-  // Additional states when editing
-  EDIT_STATES: {
-    REFUND: {
-      value: "Hoàn tiền",
-      label: "Hoàn tiền",
-      tooltip: "Giao dịch đã hoàn tất nhưng khách hàng không hài lòng và mong muốn được hoàn tiền"
-    },
-    CANCEL: {
-      value: "Hủy giao dịch", 
-      label: "Hủy giao dịch",
-      tooltip: "Giao dịch không hoàn tất do khách hàng không chuyển tiền hoặc bên bán không thể giao hàng"
-    }
+  // Edit rules based on original transaction status
+  EDIT_RULES: {
+    "Đã hoàn tất": ["Đã hoàn tất", "Hoàn tiền"],
+    "Chưa thanh toán": ["Đã hoàn tất", "Chưa thanh toán", "Hủy giao dịch"],
+    "Đã thanh toán": ["Đã hoàn tất", "Đã thanh toán", "Hủy giao dịch"],
+    "Hoàn tiền": ["Hoàn tiền"],
+    "Hủy giao dịch": ["Hủy giao dịch"]
   }
 };
 
@@ -80,29 +104,31 @@ export function updateTransactionTypeForEdit(originalStatus, currentValue = '') 
     currentValue
   });
   
-  // Start with default options
-  initTransactionTypeDropdown();
-  
-  // Add appropriate additional option based on original status
-  let additionalOption = null;
-  
-  if (originalStatus === "Đã hoàn tất") {
-    // Add refund option
-    additionalOption = TRANSACTION_TYPES.EDIT_STATES.REFUND;
-  } else if (originalStatus === "Chưa thanh toán" || originalStatus === "Đã thanh toán") {
-    // Add cancel option
-    additionalOption = TRANSACTION_TYPES.EDIT_STATES.CANCEL;
+  // Clear existing options except the placeholder
+  while (select.children.length > 1) {
+    select.removeChild(select.lastChild);
   }
   
-  if (additionalOption) {
-    const option = document.createElement('option');
-    option.value = additionalOption.value;
-    option.textContent = additionalOption.label;
-    option.title = additionalOption.tooltip;
-    select.appendChild(option);
-    
-    console.log(`✅ Added additional option: ${additionalOption.label}`);
+  // Get allowed options based on original status
+  const allowedOptions = TRANSACTION_TYPES.EDIT_RULES[originalStatus] || [];
+  
+  if (allowedOptions.length === 0) {
+    console.warn(`⚠️ No edit rules found for status: ${originalStatus}`);
+    return;
   }
+  
+  // Add options in the correct order based on ALL_TYPES sequence
+  TRANSACTION_TYPES.ALL_TYPES.forEach(type => {
+    if (allowedOptions.includes(type.value)) {
+      const option = document.createElement('option');
+      option.value = type.value;
+      option.textContent = type.label;
+      option.title = type.tooltip;
+      select.appendChild(option);
+    }
+  });
+  
+  console.log(`✅ Added ${allowedOptions.length} options for ${originalStatus}:`, allowedOptions);
   
   // Set current value if provided
   if (currentValue && select.querySelector(`option[value="${currentValue}"]`)) {
