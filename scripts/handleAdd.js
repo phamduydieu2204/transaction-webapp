@@ -22,6 +22,13 @@ function getTodayFormatted() {
 export async function handleAdd(userInfo, currentEditTransactionId, loadTransactions, handleReset, updatePackageList, showProcessingModal, showResultModal) {
   console.log("🔍 handleAdd được gọi");
   
+  // Kiểm tra nếu người dùng đang cố thêm giao dịch hoàn tiền trực tiếp
+  const transactionTypeElement = document.getElementById("transactionType");
+  if (transactionTypeElement && (transactionTypeElement.value === "Hoàn tiền" || transactionTypeElement.value === "Hoàn Tiền")) {
+    showResultModal("Bạn không thể thêm 1 giao dịch Hoàn tiền. Hãy chọn Cập Nhật", false);
+    return;
+  }
+  
   // Kiểm tra nếu đang trong tiến trình sửa thì hiển thị modal ngay tức thì
   if (window.currentEditTransactionId !== null) {
     console.log("Đang trong tiến trình sửa, mở modal lựa chọn thêm/cập nhật...");
