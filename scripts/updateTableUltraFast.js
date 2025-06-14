@@ -247,9 +247,20 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       </div>
     `;
 
+    // Create transaction ID cell with copy order button
+    const transactionIdCell = `
+      <div class="transaction-id-cell">
+        <div style="font-weight: bold; margin-bottom: 4px;">${transaction.transactionId}</div>
+        <button class="copy-order-btn" data-transaction='${JSON.stringify(transaction).replace(/'/g, "&apos;")}' title="Copy thông tin đơn hàng" style="display: flex; align-items: center; padding: 2px 6px; font-size: 11px; border: 1px solid #007bff; background: #e7f3ff; color: #007bff; cursor: pointer; border-radius: 3px; white-space: nowrap;">
+          <span style="margin-right: 2px;">📋</span>
+          <span>Copy đơn hàng</span>
+        </button>
+      </div>
+    `;
+
     return `
       <tr class="${isExpired ? 'expired-row' : ''}" data-index="${dataIndex}">
-        <td>${transaction.transactionId}</td>
+        <td>${transactionIdCell}</td>
         <td>${formatDate(transaction.transactionDate)}</td>
         <td>${transaction.transactionType}</td>
         <td>${customerInfoCell}</td>
@@ -320,6 +331,21 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
           e.target.textContent = '✓';
           setTimeout(() => e.target.textContent = '📋', 800);
         }
+        
+        // Handle copy order button clicks
+        if (e.target.matches('.copy-order-btn') || e.target.closest('.copy-order-btn')) {
+          const button = e.target.matches('.copy-order-btn') ? e.target : e.target.closest('.copy-order-btn');
+          const transactionData = button.dataset.transaction;
+          
+          if (transactionData) {
+            try {
+              const transaction = JSON.parse(transactionData.replace(/&apos;/g, "'"));
+              copyOrderInfo(transaction, button);
+            } catch (error) {
+              console.error('Error parsing transaction data:', error);
+            }
+          }
+        }
       });
     });
   }
@@ -353,6 +379,70 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       window.totalRevenue = fullRevenue;
     }, 100);
   }
+}
+
+/**
+ * Copy order information to clipboard
+ */
+function copyOrderInfo(transaction, button) {
+  const formatDate = (dateStr) => {
+    if (!dateStr) return 'Không có';
+    // Convert YYYY/MM/DD to DD/MM/YYYY
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return dateStr;
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('vi-VN').format(amount || 0) + ' VNĐ';
+  };
+
+  const orderInfo = `👤 Tên khách hàng: ${transaction.customerName || 'Không có'}
+📧 Email: ${transaction.customerEmail || 'Không có'}
+🔧 Dịch vụ: ${transaction.softwareName || ''} - ${transaction.softwarePackage || ''} - ${transaction.accountName || ''}
+📅 Số tháng: ${transaction.duration || 0} tháng
+🗓️ Chu kỳ: ${formatDate(transaction.startDate)} - ${formatDate(transaction.endDate)}
+💰 Doanh thu: ${formatCurrency(transaction.revenue)}
+📞 Liên hệ: ${transaction.customerPhone || 'Không có'}
+📝 Ghi chú: ${transaction.note || 'Không có'}
+🆔 Mã giao dịch: ${transaction.transactionId || 'Không có'}`;
+
+  // Copy to clipboard
+  navigator.clipboard.writeText(orderInfo).then(() => {
+    // Show success feedback
+    const originalContent = button.innerHTML;
+    button.innerHTML = '<span style="margin-right: 2px;">✅</span><span>Đã copy!</span>';
+    button.style.background = '#d4edda';
+    button.style.color = '#155724';
+    button.style.borderColor = '#c3e6cb';
+    
+    // Reset after 2 seconds
+    setTimeout(() => {
+      button.innerHTML = originalContent;
+      button.style.background = '#e7f3ff';
+      button.style.color = '#007bff';
+      button.style.borderColor = '#007bff';
+    }, 2000);
+  }).catch((err) => {
+    console.error('Failed to copy order info:', err);
+    
+    // Show error feedback
+    const originalContent = button.innerHTML;
+    button.innerHTML = '<span style="margin-right: 2px;">❌</span><span>Lỗi copy!</span>';
+    button.style.background = '#f8d7da';
+    button.style.color = '#721c24';
+    button.style.borderColor = '#f5c6cb';
+    
+    // Reset after 2 seconds
+    setTimeout(() => {
+      button.innerHTML = originalContent;
+      button.style.background = '#e7f3ff';
+      button.style.color = '#007bff';
+      button.style.borderColor = '#007bff';
+    }, 2000);
+  });
 }
 
 /**
