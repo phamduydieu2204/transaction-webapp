@@ -37,7 +37,7 @@ export async function handleUpdateCookie(index, transactionList) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        action: "getCookieAndFileName",
+        action: "getCookieWithCredentials",
         accountSheetId: transaction.accountSheetId
       })
     });
@@ -47,6 +47,12 @@ export async function handleUpdateCookie(index, transactionList) {
     
     // Cập nhật cookie content
     currentCookieEl.value = result.cookie || "(Không có dữ liệu)";
+    
+    // Cập nhật username và password
+    const usernameEl = document.getElementById("currentUsername");
+    const passwordEl = document.getElementById("currentPassword");
+    if (usernameEl) usernameEl.value = result.username || "";
+    if (passwordEl) passwordEl.value = result.password || "";
     
     // Cập nhật label với tên file
     const currentCookieLabel = document.getElementById("currentCookieLabel");
@@ -243,5 +249,45 @@ function enableInteraction() {
   } else {
     console.error('❌ formOverlay not found');
   }
+}
+
+export function copyUsername() {
+  console.log('👤 copyUsername called');
+  
+  const val = document.getElementById("currentUsername").value;
+  console.log('👤 Username value:', val);
+  
+  if (!val) {
+    showResultModal("⚠️ Không có tên đăng nhập để sao chép!", false);
+    return;
+  }
+  
+  navigator.clipboard.writeText(val).then(() => {
+    console.log('✅ Username copied successfully');
+    showResultModal("✅ Đã sao chép tên đăng nhập!", true);
+  }).catch((err) => {
+    console.error('❌ Copy failed:', err);
+    showResultModal("❌ Không thể sao chép tên đăng nhập!", false);
+  });
+}
+
+export function copyPassword() {
+  console.log('🔑 copyPassword called');
+  
+  const val = document.getElementById("currentPassword").value;
+  console.log('🔑 Password value:', val ? '***' : '(empty)');
+  
+  if (!val) {
+    showResultModal("⚠️ Không có mật khẩu để sao chép!", false);
+    return;
+  }
+  
+  navigator.clipboard.writeText(val).then(() => {
+    console.log('✅ Password copied successfully');
+    showResultModal("✅ Đã sao chép mật khẩu!", true);
+  }).catch((err) => {
+    console.error('❌ Copy failed:', err);
+    showResultModal("❌ Không thể sao chép mật khẩu!", false);
+  });
 }
   

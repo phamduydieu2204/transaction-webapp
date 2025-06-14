@@ -99,6 +99,8 @@ import {
   confirmUpdateCookie,
   cancelUpdateCookie,
   copyCurrentCookie,
+  copyUsername,
+  copyPassword,
   closeUpdateCookieModal
 } from './handleUpdateCookie.js';
 import { checkSheetAccess } from './checkSheetAccess.js';
@@ -600,6 +602,8 @@ window.confirmChangePassword = confirmChangePassword;
 window.confirmUpdateCookie = confirmUpdateCookie;
 window.cancelUpdateCookie = cancelUpdateCookie;
 window.copyCurrentCookie = copyCurrentCookie;
+window.copyUsername = copyUsername;
+window.copyPassword = copyPassword;
 window.closeUpdateCookieModal = closeUpdateCookieModal;
 window.editExpenseRow = editExpenseRow;
 window.handleDeleteExpense = handleDeleteExpense;

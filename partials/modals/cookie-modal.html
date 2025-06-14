@@ -5,6 +5,25 @@
     <h2>Cập nhật Cookie</h2>
 
     <label for="currentCookie" id="currentCookieLabel">Cookie hiện tại:</label>
+    
+    <!-- Thêm phần hiển thị username và password -->
+    <div class="credentials-row" style="display: flex; gap: 10px; margin-bottom: 10px;">
+      <div style="flex: 1;">
+        <label style="font-size: 12px; color: #666;">Tên đăng nhập:</label>
+        <div style="display: flex; align-items: center; gap: 5px;">
+          <input type="text" id="currentUsername" readonly style="flex: 1; height: 30px; margin: 0;" />
+          <button onclick="copyUsername()" style="padding: 5px 10px; height: 30px;">📋</button>
+        </div>
+      </div>
+      <div style="flex: 1;">
+        <label style="font-size: 12px; color: #666;">Mật khẩu:</label>
+        <div style="display: flex; align-items: center; gap: 5px;">
+          <input type="text" id="currentPassword" readonly style="flex: 1; height: 30px; margin: 0;" />
+          <button onclick="copyPassword()" style="padding: 5px 10px; height: 30px;">📋</button>
+        </div>
+      </div>
+    </div>
+    
     <textarea id="currentCookie" readonly rows="6"></textarea>
     <div class="cookie-actions">
       <button onclick="copyCurrentCookie()">📋 Copy Cookie</button>
