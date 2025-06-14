@@ -69,8 +69,9 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
   const rowsHtml = paginatedItems.map((transaction, index) => {
     // For search results, use the local index in the search results
     // For normal view, use globalIndex for pagination
-    // Always find the actual index in the current transaction list to handle sorting changes
-    const actualIndex = transactionList.findIndex(t => t.transactionId === transaction.transactionId);
+    // Always find the actual index in the global list to handle sorting changes and new transactions
+    const globalList = window.transactionList || transactionList;
+    const actualIndex = globalList.findIndex(t => t.transactionId === transaction.transactionId);
     const dataIndex = actualIndex !== -1 ? actualIndex : (window.isSearching ? index : startIndex + index);
     
     // Debug log cho giao dịch hoàn tiền
@@ -299,9 +300,11 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
           console.log(`📌 Action select changed - action: ${action}, data-index: ${index}`);
           console.log(`   - window.isSearching: ${window.isSearching}`);
           
-          // Use current active list
-          const currentList = window.isSearching ? window.transactionList : transactionList;
+          // Always use the global window.transactionList which is updated after refund
+          const currentList = window.transactionList || transactionList;
           console.log(`   - Using list with length: ${currentList.length}`);
+          console.log(`   - window.transactionList.length: ${window.transactionList ? window.transactionList.length : 'undefined'}`);
+          console.log(`   - transactionList (closure).length: ${transactionList.length}`);
           
           if (action && index >= 0) {
             handleTableAction(action, index, currentList);
