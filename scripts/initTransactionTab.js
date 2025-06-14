@@ -6,6 +6,7 @@
 import { initializeDateCalculations } from './calculateEndDate.js';
 import { updatePackageList } from './updatePackageList.js';
 import { updateAccountList } from './updateAccountList.js';
+import { initTransactionTypeDropdown } from './transactionTypeManager.js';
 
 /**
  * Setup software dropdown event handlers for cascading selection
@@ -85,6 +86,9 @@ export async function initTransactionTab() {
   try {
     // Initialize date calculations and defaults
     initializeDateCalculations();
+    
+    // Initialize transaction type dropdown with all options
+    initTransactionTypeDropdown();
     
     // Initialize software data if needed
     await initializeSoftwareData();
