@@ -73,6 +73,16 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     const actualIndex = transactionList.findIndex(t => t.transactionId === transaction.transactionId);
     const dataIndex = actualIndex !== -1 ? actualIndex : (window.isSearching ? index : startIndex + index);
     
+    // Debug log cho giao dịch hoàn tiền
+    if (transaction.transactionType === "Hoàn tiền" || transaction.transactionType === "Hoàn Tiền") {
+      console.log(`🔍 DEBUG Hoàn tiền - ID: ${transaction.transactionId}`);
+      console.log(`   - index trong page: ${index}`);
+      console.log(`   - startIndex: ${startIndex}`);
+      console.log(`   - actualIndex tìm được: ${actualIndex}`);
+      console.log(`   - dataIndex sẽ dùng: ${dataIndex}`);
+      console.log(`   - transactionList.length: ${transactionList.length}`);
+    }
+    
     
     const endDate = parseDate(transaction.endDate);
     const isExpired = endDate < today;
@@ -286,8 +296,12 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
           const action = e.target.value;
           const index = parseInt(e.target.dataset.index);
           
+          console.log(`📌 Action select changed - action: ${action}, data-index: ${index}`);
+          console.log(`   - window.isSearching: ${window.isSearching}`);
+          
           // Use current active list
           const currentList = window.isSearching ? window.transactionList : transactionList;
+          console.log(`   - Using list with length: ${currentList.length}`);
           
           if (action && index >= 0) {
             handleTableAction(action, index, currentList);
@@ -342,12 +356,20 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
  * Handle table actions efficiently
  */
 function handleTableAction(action, index, transactionList) {
+  console.log(`🎯 handleTableAction called - action: ${action}, index: ${index}`);
+  console.log(`   - transactionList.length: ${transactionList.length}`);
   
   // Get the actual transaction object
   const transaction = transactionList[index];
   
   if (!transaction) {
+    console.error(`❌ Không tìm thấy transaction tại index ${index}`);
     return;
+  }
+  
+  console.log(`   - Transaction found: ${transaction.transactionId} - ${transaction.transactionType}`);
+  if (transaction.transactionType === "Hoàn tiền" || transaction.transactionType === "Hoàn Tiền") {
+    console.log(`   🔍 Đây là giao dịch hoàn tiền!`);
   }
   
   switch(action) {
