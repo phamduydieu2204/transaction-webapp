@@ -37,7 +37,7 @@ export async function handleUpdateCookie(index, transactionList) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        action: "getCookieWithCredentials",
+        action: "getCookieAndFileName",
         accountSheetId: transaction.accountSheetId
       })
     });
@@ -48,18 +48,49 @@ export async function handleUpdateCookie(index, transactionList) {
     // Cập nhật cookie content
     currentCookieEl.value = result.cookie || "(Không có dữ liệu)";
     
-    // Cập nhật username và password
-    const usernameEl = document.getElementById("currentUsername");
-    const passwordEl = document.getElementById("currentPassword");
-    if (usernameEl) usernameEl.value = result.username || "";
-    if (passwordEl) passwordEl.value = result.password || "";
-    
     // Cập nhật label với tên file
     const currentCookieLabel = document.getElementById("currentCookieLabel");
     if (currentCookieLabel && result.fileName) {
       currentCookieLabel.textContent = result.fileName + ":";
     } else {
       currentCookieLabel.textContent = "Cookie hiện tại:";
+    }
+    
+    // Lấy thông tin username và password từ API
+    try {
+      const accountResponse = await fetch(BACKEND_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "getAccountInfoBySoftware",
+          softwareName: transaction.softwareName,
+          softwarePackage: transaction.softwarePackage,
+          accountName: transaction.accountName
+        })
+      });
+      const accountResult = await accountResponse.json();
+      
+      console.log('🔐 Account info result:', accountResult);
+      
+      // Cập nhật username và password
+      const usernameEl = document.getElementById("currentUsername");
+      const passwordEl = document.getElementById("currentPassword");
+      
+      if (accountResult.status === "success") {
+        if (usernameEl) usernameEl.value = accountResult.username || "";
+        if (passwordEl) passwordEl.value = accountResult.password || "";
+      } else {
+        // Fallback: hiển thị accountName nếu không lấy được username
+        if (usernameEl) usernameEl.value = transaction.accountName || "";
+        if (passwordEl) passwordEl.value = "";
+      }
+    } catch (accountErr) {
+      console.error('🔐 Error loading account info:', accountErr);
+      // Fallback values
+      const usernameEl = document.getElementById("currentUsername");
+      const passwordEl = document.getElementById("currentPassword");
+      if (usernameEl) usernameEl.value = transaction.accountName || "";
+      if (passwordEl) passwordEl.value = "";
     }
     
     closeProcessingModal();
