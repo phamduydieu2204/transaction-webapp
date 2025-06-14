@@ -69,7 +69,9 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
   const rowsHtml = paginatedItems.map((transaction, index) => {
     // For search results, use the local index in the search results
     // For normal view, use globalIndex for pagination
-    const dataIndex = window.isSearching ? index : startIndex + index;
+    // Always find the actual index in the current transaction list to handle sorting changes
+    const actualIndex = transactionList.findIndex(t => t.transactionId === transaction.transactionId);
+    const dataIndex = actualIndex !== -1 ? actualIndex : (window.isSearching ? index : startIndex + index);
     
     
     const endDate = parseDate(transaction.endDate);
