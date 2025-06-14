@@ -8,6 +8,8 @@ export function openCalendar(inputId, calculateEndDate, startDateInput, duration
     // Kiểm tra xem đã có instance flatpickr chưa
     const existingInstance = document.getElementById(inputId)._flatpickr;
     if (existingInstance) {
+      // Luôn jump đến tháng hiện tại khi mở lại
+      existingInstance.jumpToDate(today);
       existingInstance.open();
       return;
     }
@@ -18,6 +20,7 @@ export function openCalendar(inputId, calculateEndDate, startDateInput, duration
       inline: false,
       allowInput: true, // Cho phép nhập thủ công
       clickOpens: false, // Không mở calendar khi click vào input
+      disableMobile: true, // Tắt mobile mode để giữ được input thủ công
       // Thêm class để highlight ngày hôm nay
       onDayCreate: function(dObj, dStr, fp, dayElem) {
         // Kiểm tra nếu là ngày hôm nay
@@ -43,13 +46,18 @@ export function openCalendar(inputId, calculateEndDate, startDateInput, duration
           }
         }
       },
-      onReady: function(dateObj, dateStr, instance) {
-        // Đảm bảo calendar hiển thị tháng hiện tại khi mở
-        if (!currentValue) {
-          instance.jumpToDate(today);
-        }
+      onOpen: function(selectedDates, dateStr, instance) {
+        // Luôn hiển thị tháng hiện tại khi mở calendar
+        instance.jumpToDate(today);
+      },
+      onClose: function(selectedDates, dateStr, instance) {
+        // Đảm bảo input vẫn có thể nhập thủ công sau khi đóng calendar
+        const input = document.getElementById(inputId);
+        input.removeAttribute('readonly');
       }
     });
     
+    // Mở calendar và jump đến tháng hiện tại
+    fp.jumpToDate(today);
     fp.open();
   }
