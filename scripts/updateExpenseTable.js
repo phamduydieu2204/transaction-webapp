@@ -321,7 +321,7 @@ function createExpenseRow(expense, index) {
     <td>${renewDate}</td>
     <td>${supplier}</td>
     <td>${status}</td>
-    <td>${note}</td>
+    <td>${note.replace(/\n/g, "<br>")}</td>
     <td>
       <select class="action-select" data-expense='${JSON.stringify(expense).replace(/'/g, "&apos;")}' onchange="handleExpenseAction(this, this.dataset.expense)">
         <option value="">-- Chọn --</option>

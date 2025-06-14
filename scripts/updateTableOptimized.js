@@ -133,7 +133,7 @@ export function updateTableOptimized(transactionList, currentPage, itemsPerPage,
         <td>${transaction.deviceCount}</td>
         <td>${softwareInfo}</td>
         <td>${transaction.revenue}</td>
-        <td>${transaction.note || ""}</td>
+        <td>${(transaction.note || "").replace(/\n/g, "<br>")}</td>
         <td>${infoCell}</td>
         <td>
           <select class="action-select" data-index="${globalIndex}">
