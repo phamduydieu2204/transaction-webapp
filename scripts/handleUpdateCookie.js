@@ -27,6 +27,12 @@ export async function handleUpdateCookie(index, transactionList) {
   try {
     const { BACKEND_URL } = getConstants();
     showProcessingModal("Đang tải cookie...");
+    
+    console.log('🍪 Request data:', {
+      action: "getCookieAndFileName",
+      accountSheetId: transaction.accountSheetId
+    });
+    
     const response = await fetch(BACKEND_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -36,6 +42,8 @@ export async function handleUpdateCookie(index, transactionList) {
       })
     });
     const result = await response.json();
+    
+    console.log('🍪 Response result:', result);
     
     // Cập nhật cookie content
     currentCookieEl.value = result.cookie || "(Không có dữ liệu)";
@@ -51,6 +59,7 @@ export async function handleUpdateCookie(index, transactionList) {
     closeProcessingModal();
     modal.style.display = "block";
   } catch (err) {
+    console.error('🍪 Error loading cookie:', err);
     closeProcessingModal();
     showResultModal("Không thể tải cookie: " + err.message, false);
   }
@@ -136,6 +145,8 @@ export async function confirmUpdateCookie() {
         transactionId: transaction.transactionId,
         accountSheetId: transaction.accountSheetId,
         newCookie: newCookie,
+        softwareName: transaction.softwareName,
+        softwarePackage: transaction.softwarePackage,
         accountName: transaction.accountName,
         type: "confirm"
       })
