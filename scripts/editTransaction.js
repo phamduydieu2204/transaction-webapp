@@ -72,36 +72,7 @@ console.log("🔎 typeof fetchSoftwareList =", typeof fetchSoftwareList);
   // Setup transaction type dropdown for edit mode
   updateTransactionTypeForEdit(transactionTypeValue, transactionTypeValue);
   
-  // Thêm cảnh báo cho các thay đổi trạng thái quan trọng
-  if (transactionTypeSelect) {
-    transactionTypeSelect.addEventListener("change", function() {
-      const newValue = this.value;
-      const originalValue = transaction.transactionType;
-      
-      // Cảnh báo khi chuyển sang Hoàn tiền
-      if (originalValue !== "Hoàn tiền" && newValue === "Hoàn tiền") {
-        alert("⚠️ Lưu ý: Khi chuyển sang 'Hoàn tiền':\n\n" +
-              "1. Hệ thống sẽ tự động tạo giao dịch hoàn tiền MỚI\n" +
-              "2. Giao dịch gốc vẫn giữ trạng thái ban đầu với doanh thu gốc\n" +
-              "3. Nhập số tiền hoàn lại vào ô Doanh thu (VD: hoàn 11 VNĐ thì nhập 11)\n" +
-              "4. Hệ thống sẽ tự động chuyển thành số âm (-11)\n\n" +
-              "💡 Ví dụ: Giao dịch gốc 1122 VNĐ, hoàn lại 11 VNĐ:\n" +
-              "- Giao dịch gốc: +1122 VNĐ\n" +
-              "- Giao dịch hoàn tiền: -11 VNĐ\n" +
-              "- Tổng thực thu: 1111 VNĐ");
-      }
-      
-      // Cảnh báo khi chuyển sang Hủy giao dịch
-      if (originalValue !== "Hủy giao dịch" && newValue === "Hủy giao dịch") {
-        alert("⚠️ Lưu ý: Khi chuyển sang 'Hủy giao dịch':\n\n" +
-              "1. Giao dịch sẽ được đánh dấu là đã hủy\n" +
-              "2. Doanh thu sẽ được đặt về 0\n" +
-              "3. Quyền truy cập file sẽ bị thu hồi\n" +
-              "4. Không thể hoàn tác sau khi lưu\n\n" +
-              "💡 Hãy chắc chắn trước khi thực hiện thao tác này!");
-      }
-    });
-  }
+  // Loại bỏ cảnh báo theo yêu cầu của user
 
   // Gắn sự kiện 'change' cho dropdown tài khoản để cập nhật biến toàn cục tương ứng
   accountNameSelect.addEventListener('change', () => {
