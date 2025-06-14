@@ -22,10 +22,14 @@ function getTodayFormatted() {
 export async function handleAdd(userInfo, currentEditTransactionId, loadTransactions, handleReset, updatePackageList, showProcessingModal, showResultModal) {
   console.log("🔍 handleAdd được gọi");
   
-  // Kiểm tra nếu người dùng đang cố thêm giao dịch hoàn tiền trực tiếp
+  // Kiểm tra nếu người dùng đang cố thêm giao dịch hoàn tiền hoặc hủy giao dịch trực tiếp
   const transactionTypeElement = document.getElementById("transactionType");
   if (transactionTypeElement && (transactionTypeElement.value === "Hoàn tiền" || transactionTypeElement.value === "Hoàn Tiền")) {
     showResultModal("Bạn không thể thêm 1 giao dịch Hoàn tiền. Hãy chọn Cập Nhật", false);
+    return;
+  }
+  if (transactionTypeElement && transactionTypeElement.value === "Hủy giao dịch") {
+    showResultModal("Bạn không thể thêm 1 giao dịch Hủy giao dịch. Hãy chọn Cập Nhật", false);
     return;
   }
   

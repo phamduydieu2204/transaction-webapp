@@ -35,12 +35,12 @@ export const TRANSACTION_TYPES = {
     }
   ],
   
-  // Default states for new transactions
+  // Default states for new transactions (includes all types for search purposes)
   DEFAULT: [
     {
-      value: "Chưa thanh toán",
-      label: "Chưa thanh toán",
-      tooltip: "Bên bán đã giao hàng nhưng khách hàng chưa thực hiện chuyển khoản"
+      value: "Đã hoàn tất",
+      label: "Đã hoàn tất", 
+      tooltip: "Giao dịch đã được thanh toán và đã giao hàng cho khách"
     },
     {
       value: "Đã thanh toán", 
@@ -48,9 +48,19 @@ export const TRANSACTION_TYPES = {
       tooltip: "Khách hàng đã thực hiện thanh toán nhưng bên bán chưa giao hàng"
     },
     {
-      value: "Đã hoàn tất",
-      label: "Đã hoàn tất", 
-      tooltip: "Giao dịch đã được thanh toán và đã giao hàng cho khách"
+      value: "Chưa thanh toán",
+      label: "Chưa thanh toán",
+      tooltip: "Bên bán đã giao hàng nhưng khách hàng chưa thực hiện chuyển khoản"
+    },
+    {
+      value: "Hoàn tiền",
+      label: "Hoàn tiền",
+      tooltip: "Giao dịch đã hoàn tất nhưng khách hàng không hài lòng và mong muốn được hoàn tiền"
+    },
+    {
+      value: "Hủy giao dịch", 
+      label: "Hủy giao dịch",
+      tooltip: "Giao dịch không hoàn tất do khách hàng không chuyển tiền hoặc bên bán không thể giao hàng"
     }
   ],
   
