@@ -224,30 +224,65 @@ function calculateExpenseMetrics(expenses, dateRange) {
         // Chi phí phân bổ: Loại kế toán = "OPEX" hoặc "COGS", Phân bổ = "Có", Ngày tái tục >= Ngày bắt đầu chu kỳ
         else if (allocation === 'có' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
             if (rangeStart && rangeEnd && renewalDate >= rangeStart && !isNaN(expenseDate.getTime()) && !isNaN(renewalDate.getTime())) {
-                // Tính chi phí phân bổ theo công thức
+                
+                // Tính số ngày từ ngày chi đến ngày tái tục
                 const totalDays = Math.ceil((renewalDate - expenseDate) / (1000 * 60 * 60 * 24));
-                const dailyCost = amount / totalDays;
                 
-                // Tính số ngày còn hiệu lực trong chu kỳ báo cáo
-                const effectiveStartDate = new Date(Math.max(expenseDate.getTime(), rangeStart.getTime()));
-                const effectiveEndDate = new Date(Math.min(renewalDate.getTime(), rangeEnd.getTime()));
-                const effectiveDays = Math.ceil((effectiveEndDate - effectiveStartDate) / (1000 * 60 * 60 * 24)) + 1;
+                // Tính số ngày trong chu kỳ báo cáo (từ đầu đến cuối tháng)
+                const periodDays = Math.ceil((rangeEnd - rangeStart) / (1000 * 60 * 60 * 24)) + 1;
                 
-                // Chi phí phân bổ = số ngày hiệu lực × chi phí mỗi ngày
-                const allocatedAmount = Math.max(0, effectiveDays * dailyCost);
+                let allocatedAmount = 0;
+                
+                // Nếu ngày tái tục < ngày cuối chu kỳ
+                if (renewalDate < rangeEnd) {
+                    // Số ngày từ đầu chu kỳ đến ngày tái tục
+                    const daysToRenewal = Math.ceil((renewalDate - rangeStart) / (1000 * 60 * 60 * 24)) + 1;
+                    
+                    // Ngày hiện tại (giả sử là ngày cuối chu kỳ để tính đầy đủ)
+                    const today = new Date();
+                    const daysToToday = Math.ceil((today - rangeStart) / (1000 * 60 * 60 * 24)) + 1;
+                    
+                    // Lấy Min(ngày tái tục - đầu chu kỳ, ngày hiện tại - đầu chu kỳ)
+                    const effectiveDays = Math.min(daysToRenewal, daysToToday);
+                    
+                    // Công thức: số tiền * effectiveDays / totalDays
+                    allocatedAmount = amount * effectiveDays / totalDays;
+                    
+                    console.log(`📊 Renewal < End Date calculation:`, {
+                        renewalDate: renewalDate.toISOString().split('T')[0],
+                        rangeEnd: rangeEnd.toISOString().split('T')[0],
+                        daysToRenewal: daysToRenewal,
+                        daysToToday: daysToToday,
+                        effectiveDays: effectiveDays,
+                        formula: `${amount} * ${effectiveDays} / ${totalDays} = ${allocatedAmount.toFixed(2)}`
+                    });
+                } 
+                // Nếu ngày tái tục >= ngày cuối chu kỳ
+                else {
+                    // Công thức: số tiền * periodDays / totalDays
+                    allocatedAmount = amount * periodDays / totalDays;
+                    
+                    console.log(`📊 Renewal >= End Date calculation:`, {
+                        renewalDate: renewalDate.toISOString().split('T')[0],
+                        rangeEnd: rangeEnd.toISOString().split('T')[0],
+                        periodDays: periodDays,
+                        formula: `${amount} * ${periodDays} / ${totalDays} = ${allocatedAmount.toFixed(2)}`
+                    });
+                }
+                
                 allocatedCosts += allocatedAmount;
                 
-                console.log(`📊 Allocated cost calculation:`, {
+                console.log(`📊 Final allocated cost summary:`, {
                     expenseId: expense.expenseId || 'N/A',
                     product: expense.product || 'N/A',
                     amount: amount,
                     expenseDate: expenseDate.toISOString().split('T')[0],
                     renewalDate: renewalDate.toISOString().split('T')[0],
+                    rangeStart: rangeStart.toISOString().split('T')[0],
+                    rangeEnd: rangeEnd.toISOString().split('T')[0],
                     totalDays: totalDays,
-                    dailyCost: dailyCost.toFixed(2),
-                    effectiveStartDate: effectiveStartDate.toISOString().split('T')[0],
-                    effectiveEndDate: effectiveEndDate.toISOString().split('T')[0],
-                    effectiveDays: effectiveDays,
+                    periodDays: periodDays,
+                    isRenewalBeforeEnd: renewalDate < rangeEnd,
                     allocatedAmount: allocatedAmount.toFixed(2)
                 });
             }
