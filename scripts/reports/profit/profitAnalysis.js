@@ -50,8 +50,10 @@ export async function loadProfitAnalysis(options = {}) {
         
         // Load all components
         await Promise.all([
+            updateProfitOverviewGrid(filteredTransactions, filteredExpenses, period),
             updateProfitKPIs(filteredTransactions, filteredExpenses, period),
             loadProfitAnalysisData(filteredTransactions, filteredExpenses, dateRange),
+            loadSoftwareProfitAnalysis(filteredTransactions, filteredExpenses, dateRange),
             renderProfitTrendChart(filteredTransactions, filteredExpenses, period),
             renderProfitBreakdownChart(filteredTransactions, filteredExpenses),
             updateProfitInsights(filteredTransactions, filteredExpenses)
@@ -797,6 +799,398 @@ window.exportProfitReport = function() {
 
 window.toggleChartView = function(chartType, viewType) {
     console.log(`🔄 Toggling ${chartType} chart to ${viewType} view`);
+};
+
+/**
+ * Update the profit overview grid (6 KPI cards)
+ */
+async function updateProfitOverviewGrid(transactions, expenses, period) {
+    console.log('💰 Updating profit overview grid');
+    
+    // Calculate current period metrics
+    const revenueMetrics = calculateRevenueMetrics(transactions);
+    const expenseMetrics = calculateExpenseMetrics(expenses);
+    const profitMetrics = calculateProfitMetrics(revenueMetrics, expenseMetrics);
+    
+    // Calculate previous period for comparison
+    const previousTransactions = getPreviousPeriodTransactions(transactions, period);
+    const previousExpenses = getPreviousPeriodExpenses(expenses, period);
+    const previousRevenueMetrics = calculateRevenueMetrics(previousTransactions);
+    const previousExpenseMetrics = calculateExpenseMetrics(previousExpenses);
+    const previousProfitMetrics = calculateProfitMetrics(previousRevenueMetrics, previousExpenseMetrics);
+    
+    // Update overview grid values
+    updateOverviewCard('overview-revenue', formatRevenue(profitMetrics.revenue), 
+        calculatePercentageChange(previousProfitMetrics.revenue, profitMetrics.revenue));
+    
+    updateOverviewCard('overview-refunds', formatRevenue(Math.abs(profitMetrics.refunds)), 
+        calculatePercentageChange(Math.abs(previousProfitMetrics.refunds), Math.abs(profitMetrics.refunds)), true);
+    
+    updateOverviewCard('overview-allocated-cost', formatRevenue(profitMetrics.allocatedCosts), 
+        calculatePercentageChange(previousProfitMetrics.allocatedCosts, profitMetrics.allocatedCosts));
+    
+    updateOverviewCard('overview-direct-cost', formatRevenue(profitMetrics.directCosts), 
+        calculatePercentageChange(previousProfitMetrics.directCosts, profitMetrics.directCosts));
+    
+    updateOverviewCard('overview-gross-profit', formatRevenue(profitMetrics.grossProfit), 
+        calculatePercentageChange(previousProfitMetrics.grossProfit, profitMetrics.grossProfit));
+    
+    updateOverviewCard('overview-net-profit', formatRevenue(profitMetrics.netProfit), 
+        calculatePercentageChange(previousProfitMetrics.netProfit, profitMetrics.netProfit));
+    
+    // Update profit margin with status
+    updateKPIElement('overview-profit-margin', `${profitMetrics.profitMargin.toFixed(1)}%`);
+    
+    let marginStatus = 'Ổn định';
+    if (profitMetrics.profitMargin > 30) marginStatus = 'Rất tốt';
+    else if (profitMetrics.profitMargin > 20) marginStatus = 'Tốt';
+    else if (profitMetrics.profitMargin > 10) marginStatus = 'Trung bình';
+    else if (profitMetrics.profitMargin <= 0) marginStatus = 'Cần cải thiện';
+    
+    updateKPIElement('overview-margin-status', marginStatus);
+    
+    console.log('💰 Profit overview grid updated');
+}
+
+/**
+ * Load software profit analysis table
+ */
+async function loadSoftwareProfitAnalysis(transactions, expenses, dateRange) {
+    console.log('💻 Loading software profit analysis');
+    
+    try {
+        // Get software profit data
+        const softwareProfitData = await calculateSoftwareProfitMetrics(transactions, expenses, dateRange);
+        
+        // Update table
+        updateSoftwareProfitTable(softwareProfitData);
+        
+        // Update summary
+        updateSoftwareProfitSummary(softwareProfitData);
+        
+        console.log('💻 Software profit analysis loaded:', softwareProfitData.length, 'software items');
+        
+    } catch (error) {
+        console.error('❌ Error loading software profit analysis:', error);
+    }
+}
+
+/**
+ * Calculate profit metrics for each software
+ */
+async function calculateSoftwareProfitMetrics(transactions, expenses, dateRange) {
+    console.log('🔢 Calculating software profit metrics');
+    
+    // Get unique software names from expenses (Tên chuẩn column - column R)
+    const softwareNames = getSoftwareNamesFromExpenses(expenses, dateRange);
+    console.log('📋 Found software names:', softwareNames);
+    
+    const softwareProfitData = [];
+    
+    for (const softwareName of softwareNames) {
+        // Calculate revenue for this software from transactions
+        const softwareRevenue = calculateSoftwareRevenue(transactions, softwareName);
+        
+        // Calculate refunds for this software
+        const softwareRefunds = calculateSoftwareRefunds(transactions, softwareName);
+        
+        // Calculate allocated costs for this software
+        const allocatedCosts = calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange);
+        
+        // Calculate gross profit = revenue - allocated costs
+        const grossProfit = softwareRevenue.netRevenue - allocatedCosts;
+        
+        // Calculate profit margin = (gross profit / net revenue) * 100
+        const profitMargin = softwareRevenue.netRevenue > 0 ? (grossProfit / softwareRevenue.netRevenue) * 100 : 0;
+        
+        softwareProfitData.push({
+            softwareName,
+            totalRevenue: softwareRevenue.netRevenue,
+            grossRevenue: softwareRevenue.grossRevenue,
+            refunds: softwareRefunds,
+            allocatedCosts,
+            grossProfit,
+            profitMargin
+        });
+    }
+    
+    // Sort by gross profit descending
+    softwareProfitData.sort((a, b) => b.grossProfit - a.grossProfit);
+    
+    return softwareProfitData;
+}
+
+/**
+ * Get unique software names from expenses that meet criteria
+ */
+function getSoftwareNamesFromExpenses(expenses, dateRange) {
+    const softwareNames = new Set();
+    
+    expenses.forEach(expense => {
+        const expenseDate = normalizeDate(expense.ngayChi || expense.date || '');
+        const expenseType = (expense.loaiKhoanChi || expense.expenseType || '').trim();
+        const softwareName = (expense.tenChuan || expense.standardName || '').trim();
+        const allocation = (expense.phanBo || expense.allocation || '').toLowerCase().trim();
+        const renewalDate = normalizeDate(expense.ngayTaiTuc || expense.renewalDate || '');
+        
+        // Check criteria: "Kinh doanh phần mềm" expense type
+        if (expenseType === 'Kinh doanh phần mềm' && softwareName) {
+            // Check if expense date is in selected period OR (allocation = "Có" AND renewal date > period start)
+            const isInPeriod = dateRange && expenseDate >= dateRange.start && expenseDate <= dateRange.end;
+            const isAllocatedAndActiveInPeriod = allocation === 'có' && dateRange && renewalDate > dateRange.start;
+            
+            if (isInPeriod || isAllocatedAndActiveInPeriod) {
+                softwareNames.add(softwareName);
+            }
+        }
+    });
+    
+    return Array.from(softwareNames).sort();
+}
+
+/**
+ * Calculate revenue for a specific software
+ */
+function calculateSoftwareRevenue(transactions, softwareName) {
+    let grossRevenue = 0;
+    let refunds = 0;
+    
+    transactions.forEach(transaction => {
+        const transactionSoftware = transaction.tenPhanMem || transaction.softwareName || '';
+        const status = (transaction.loaiGiaoDich || transaction.transactionType || '').toLowerCase().trim();
+        const amount = parseFloat(transaction.doanhThu || transaction.revenue || 0);
+        
+        if (transactionSoftware === softwareName) {
+            if (status === 'đã hoàn tất' || status === 'đã thanh toán') {
+                grossRevenue += amount;
+            } else if (status === 'hoàn tiền') {
+                refunds += Math.abs(amount);
+            }
+        }
+    });
+    
+    return {
+        grossRevenue,
+        refunds,
+        netRevenue: grossRevenue - refunds
+    };
+}
+
+/**
+ * Calculate refunds for a specific software
+ */
+function calculateSoftwareRefunds(transactions, softwareName) {
+    let refunds = 0;
+    
+    transactions.forEach(transaction => {
+        const transactionSoftware = transaction.tenPhanMem || transaction.softwareName || '';
+        const status = (transaction.loaiGiaoDich || transaction.transactionType || '').toLowerCase().trim();
+        const amount = parseFloat(transaction.doanhThu || transaction.revenue || 0);
+        
+        if (transactionSoftware === softwareName && status === 'hoàn tiền') {
+            refunds += Math.abs(amount);
+        }
+    });
+    
+    return refunds;
+}
+
+/**
+ * Calculate allocated costs for a specific software
+ */
+function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
+    let totalAllocatedCosts = 0;
+    
+    expenses.forEach(expense => {
+        const expenseSoftware = (expense.tenChuan || expense.standardName || '').trim();
+        const expenseType = (expense.loaiKhoanChi || expense.expenseType || '').trim();
+        
+        if (expenseSoftware === softwareName && expenseType === 'Kinh doanh phần mềm') {
+            const expenseDate = normalizeDate(expense.ngayChi || expense.date || '');
+            const allocation = (expense.phanBo || expense.allocation || '').toLowerCase().trim();
+            const amount = parseFloat(expense.soTien || expense.amount || 0);
+            const renewalDate = normalizeDate(expense.ngayTaiTuc || expense.renewalDate || '');
+            
+            // Check if expense date is in selected period
+            const isInPeriod = dateRange && expenseDate >= dateRange.start && expenseDate <= dateRange.end;
+            
+            if (isInPeriod) {
+                if (allocation === 'không') {
+                    // Direct cost - add full amount
+                    totalAllocatedCosts += amount;
+                } else if (allocation === 'có') {
+                    // Allocated cost - check if renewal date > period start
+                    if (renewalDate > dateRange.start) {
+                        // Calculate allocated portion
+                        const totalDays = Math.ceil((renewalDate - expenseDate) / (1000 * 60 * 60 * 24));
+                        const periodDays = Math.ceil((dateRange.end - dateRange.start) / (1000 * 60 * 60 * 24)) + 1;
+                        const allocatedAmount = (amount / totalDays) * periodDays;
+                        totalAllocatedCosts += allocatedAmount;
+                    }
+                }
+            } else if (allocation === 'có' && renewalDate > dateRange.start) {
+                // Expense outside period but allocated and still active
+                const totalDays = Math.ceil((renewalDate - expenseDate) / (1000 * 60 * 60 * 24));
+                const periodDays = Math.ceil((dateRange.end - dateRange.start) / (1000 * 60 * 60 * 24)) + 1;
+                const allocatedAmount = (amount / totalDays) * periodDays;
+                totalAllocatedCosts += allocatedAmount;
+            }
+        }
+    });
+    
+    return totalAllocatedCosts;
+}
+
+/**
+ * Update software profit table
+ */
+function updateSoftwareProfitTable(softwareProfitData) {
+    const tableBody = document.getElementById('software-profit-table-body');
+    if (!tableBody) return;
+    
+    if (softwareProfitData.length === 0) {
+        tableBody.innerHTML = `
+            <tr class="no-data-row">
+                <td colspan="6" class="no-data-cell">
+                    <div class="no-data-message">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Không có dữ liệu phần mềm trong kỳ được chọn</span>
+                    </div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    const rows = softwareProfitData.map(item => {
+        const profitClass = item.grossProfit >= 0 ? 'positive' : 'negative';
+        const marginClass = item.profitMargin >= 20 ? 'high' : item.profitMargin >= 10 ? 'medium' : 'low';
+        
+        return `
+            <tr class="software-row" data-software="${item.softwareName}">
+                <td class="software-name">
+                    <div class="software-info">
+                        <span class="software-title">${item.softwareName}</span>
+                    </div>
+                </td>
+                <td class="revenue-value">
+                    <span class="value-amount">${formatRevenue(item.totalRevenue)}</span>
+                    <div class="value-breakdown">
+                        <small>Gộp: ${formatRevenue(item.grossRevenue)}</small>
+                    </div>
+                </td>
+                <td class="refund-value">
+                    <span class="value-amount negative">${formatRevenue(item.refunds)}</span>
+                </td>
+                <td class="cost-value">
+                    <span class="value-amount">${formatRevenue(item.allocatedCosts)}</span>
+                </td>
+                <td class="profit-value ${profitClass}">
+                    <span class="value-amount">${formatRevenue(item.grossProfit)}</span>
+                </td>
+                <td class="margin-value ${marginClass}">
+                    <span class="margin-percent">${item.profitMargin.toFixed(1)}%</span>
+                    <div class="margin-indicator">
+                        <div class="indicator-bar">
+                            <div class="indicator-fill" style="width: ${Math.min(100, Math.max(0, item.profitMargin))}%"></div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+    
+    tableBody.innerHTML = rows;
+    
+    // Setup table interaction
+    setupSoftwareProfitTableHandlers();
+}
+
+/**
+ * Update software profit summary
+ */
+function updateSoftwareProfitSummary(softwareProfitData) {
+    const totalCount = softwareProfitData.length;
+    const totalRevenue = softwareProfitData.reduce((sum, item) => sum + item.totalRevenue, 0);
+    const totalCosts = softwareProfitData.reduce((sum, item) => sum + item.allocatedCosts, 0);
+    const totalProfit = softwareProfitData.reduce((sum, item) => sum + item.grossProfit, 0);
+    const averageMargin = totalCount > 0 ? 
+        softwareProfitData.reduce((sum, item) => sum + item.profitMargin, 0) / totalCount : 0;
+    
+    updateKPIElement('total-software-count', totalCount.toString());
+    updateKPIElement('total-software-revenue', formatRevenue(totalRevenue));
+    updateKPIElement('total-software-cost', formatRevenue(totalCosts));
+    updateKPIElement('total-software-profit', formatRevenue(totalProfit));
+    updateKPIElement('average-profit-margin', `${averageMargin.toFixed(1)}%`);
+}
+
+/**
+ * Setup software profit table handlers
+ */
+function setupSoftwareProfitTableHandlers() {
+    // Search functionality
+    const searchInput = document.getElementById('software-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            filterSoftwareProfitTable(e.target.value);
+        });
+    }
+    
+    // Sort functionality
+    const sortIcons = document.querySelectorAll('.software-profit-table .sort-icon');
+    sortIcons.forEach(icon => {
+        icon.addEventListener('click', (e) => {
+            const sortBy = e.target.dataset.sort;
+            sortSoftwareProfitTable(sortBy);
+        });
+    });
+}
+
+/**
+ * Filter software profit table
+ */
+function filterSoftwareProfitTable(searchTerm) {
+    const rows = document.querySelectorAll('.software-row');
+    const term = searchTerm.toLowerCase().trim();
+    
+    rows.forEach(row => {
+        const softwareName = row.dataset.software.toLowerCase();
+        const isVisible = !term || softwareName.includes(term);
+        row.style.display = isVisible ? '' : 'none';
+    });
+}
+
+/**
+ * Sort software profit table
+ */
+function sortSoftwareProfitTable(sortBy) {
+    console.log(`🔄 Sorting software profit table by: ${sortBy}`);
+    // Implementation for table sorting
+}
+
+/**
+ * Helper function to update overview cards
+ */
+function updateOverviewCard(valueId, value, change, isNegative = false) {
+    updateKPIElement(valueId, value);
+    
+    const changeId = valueId + '-change';
+    const changeElement = document.getElementById(changeId);
+    if (changeElement && typeof change === 'number') {
+        const isPositive = isNegative ? change <= 0 : change >= 0;
+        changeElement.textContent = `${isPositive ? '+' : ''}${change.toFixed(1)}%`;
+        changeElement.className = `card-change ${isPositive ? 'positive' : 'negative'}`;
+    }
+}
+
+// Global functions for template usage
+window.refreshSoftwareProfitData = function() {
+    loadProfitAnalysis();
+};
+
+window.exportSoftwareProfitReport = function() {
+    console.log('📊 Exporting software profit report...');
+    // Implementation for export functionality
 };
 
 // Make functions available globally

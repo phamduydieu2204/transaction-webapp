@@ -19,6 +19,188 @@
         </div>
     </div>
 
+    <!-- Profit Overview Grid - 6 KPI Metrics -->
+    <div class="profit-overview-grid">
+        <div class="profit-overview-card revenue-card">
+            <div class="card-icon">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="card-content">
+                <h3 class="card-label">Doanh thu</h3>
+                <p class="card-value" id="overview-revenue">0 ₫</p>
+                <span class="card-change" id="overview-revenue-change">+0%</span>
+            </div>
+        </div>
+
+        <div class="profit-overview-card refund-card">
+            <div class="card-icon">
+                <i class="fas fa-undo-alt"></i>
+            </div>
+            <div class="card-content">
+                <h3 class="card-label">Tổng hoàn tiền</h3>
+                <p class="card-value" id="overview-refunds">0 ₫</p>
+                <span class="card-change negative" id="overview-refunds-change">+0%</span>
+            </div>
+        </div>
+
+        <div class="profit-overview-card allocated-cost-card">
+            <div class="card-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="card-content">
+                <h3 class="card-label">Chi phí phân bổ</h3>
+                <p class="card-value" id="overview-allocated-cost">0 ₫</p>
+                <span class="card-change" id="overview-allocated-cost-change">+0%</span>
+            </div>
+        </div>
+
+        <div class="profit-overview-card direct-cost-card">
+            <div class="card-icon">
+                <i class="fas fa-receipt"></i>
+            </div>
+            <div class="card-content">
+                <h3 class="card-label">Chi phí không phân bổ</h3>
+                <p class="card-value" id="overview-direct-cost">0 ₫</p>
+                <span class="card-change" id="overview-direct-cost-change">+0%</span>
+            </div>
+        </div>
+
+        <div class="profit-overview-card gross-profit-card">
+            <div class="card-icon">
+                <i class="fas fa-trending-up"></i>
+            </div>
+            <div class="card-content">
+                <h3 class="card-label">Lợi nhuận gộp</h3>
+                <p class="card-value" id="overview-gross-profit">0 ₫</p>
+                <span class="card-change" id="overview-gross-profit-change">+0%</span>
+            </div>
+        </div>
+
+        <div class="profit-overview-card net-profit-card">
+            <div class="card-icon">
+                <i class="fas fa-coins"></i>
+            </div>
+            <div class="card-content">
+                <h3 class="card-label">Lợi nhuận ròng</h3>
+                <p class="card-value" id="overview-net-profit">0 ₫</p>
+                <span class="card-change" id="overview-net-profit-change">+0%</span>
+            </div>
+        </div>
+
+        <div class="profit-overview-card margin-card">
+            <div class="card-icon">
+                <i class="fas fa-percentage"></i>
+            </div>
+            <div class="card-content">
+                <h3 class="card-label">Tỷ suất lợi nhuận</h3>
+                <p class="card-value" id="overview-profit-margin">0%</p>
+                <span class="card-status" id="overview-margin-status">Ổn định</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Software Profit Analysis Table -->
+    <div class="software-profit-analysis-section">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-laptop-code"></i>
+                Bảng Phân tích Lợi nhuận theo Phần mềm
+            </h3>
+            <div class="section-subtitle">
+                Chi tiết phân tích lợi nhuận và tỷ suất cho từng phần mềm kinh doanh
+            </div>
+        </div>
+        
+        <div class="software-profit-table-container">
+            <div class="table-controls">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="software-search" placeholder="Tìm kiếm phần mềm...">
+                </div>
+                <div class="table-actions">
+                    <button class="action-btn" onclick="exportSoftwareProfitReport()">
+                        <i class="fas fa-download"></i> Xuất Excel
+                    </button>
+                    <button class="action-btn" onclick="refreshSoftwareProfitData()">
+                        <i class="fas fa-sync-alt"></i> Làm mới
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-wrapper">
+                <table class="software-profit-table">
+                    <thead>
+                        <tr>
+                            <th class="software-name-col">
+                                <span class="col-title">Tên phần mềm</span>
+                                <i class="fas fa-sort sort-icon" data-sort="software"></i>
+                            </th>
+                            <th class="revenue-col">
+                                <span class="col-title">Tổng doanh thu</span>
+                                <i class="fas fa-sort sort-icon" data-sort="revenue"></i>
+                                <div class="col-subtitle">(Đã hoàn tất + Đã thanh toán - Hoàn tiền)</div>
+                            </th>
+                            <th class="refund-col">
+                                <span class="col-title">Tổng tiền hoàn</span>
+                                <i class="fas fa-sort sort-icon" data-sort="refund"></i>
+                            </th>
+                            <th class="allocated-cost-col">
+                                <span class="col-title">Chi phí phân bổ phần mềm</span>
+                                <i class="fas fa-sort sort-icon" data-sort="cost"></i>
+                            </th>
+                            <th class="gross-profit-col">
+                                <span class="col-title">Lợi nhuận gộp</span>
+                                <i class="fas fa-sort sort-icon" data-sort="profit"></i>
+                                <div class="col-subtitle">(Doanh thu - Chi phí phân bổ)</div>
+                            </th>
+                            <th class="profit-margin-col">
+                                <span class="col-title">Tỷ suất lợi nhuận</span>
+                                <i class="fas fa-sort sort-icon" data-sort="margin"></i>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="software-profit-table-body">
+                        <!-- Data will be populated by JavaScript -->
+                        <tr class="loading-row">
+                            <td colspan="6" class="loading-cell">
+                                <div class="loading-spinner">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <span>Đang tải dữ liệu phần mềm...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Table Summary -->
+            <div class="table-summary">
+                <div class="summary-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Tổng số phần mềm:</span>
+                        <span class="stat-value" id="total-software-count">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Tổng doanh thu:</span>
+                        <span class="stat-value" id="total-software-revenue">0 ₫</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Tổng chi phí phân bổ:</span>
+                        <span class="stat-value" id="total-software-cost">0 ₫</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Tổng lợi nhuận gộp:</span>
+                        <span class="stat-value" id="total-software-profit">0 ₫</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Tỷ suất trung bình:</span>
+                        <span class="stat-value" id="average-profit-margin">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Profit KPI Cards -->
     <div class="profit-kpi-grid">
         <div class="kpi-card gross-profit">
