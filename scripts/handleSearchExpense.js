@@ -53,6 +53,7 @@ export async function handleSearchExpense() {
   if (expenseRecurring && expenseRecurring !== "") conditions.expenseRecurring = expenseRecurring;
   
   const expenseRenewDate = getValue("expenseRenewDate");
+  // Backend expect tên trường là expenseRenewDate nhưng trả về là renewDate
   if (expenseRenewDate && expenseRenewDate !== "yyyy/mm/dd") conditions.expenseRenewDate = expenseRenewDate;
   
   const expenseSupplier = getValue("expenseSupplier");
