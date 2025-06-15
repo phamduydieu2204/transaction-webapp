@@ -44,19 +44,27 @@ export async function loadProfitAnalysis(options = {}) {
         const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
         const period = options.period || window.globalFilters?.period || 'this_month';
         
-        // Filter data by date range
+        // Filter transactions by date range, but keep ALL expenses for allocation calculation
         const filteredTransactions = filterDataByDateRange(transactions, dateRange);
-        const filteredExpenses = filterExpensesByDateRange(expenses, dateRange);
+        // For expenses: keep all data, let calculateExpenseMetrics handle the filtering logic
+        const allExpenses = expenses;
+        
+        console.log('📊 Profit analysis data filtering:', {
+            originalTransactions: transactions.length,
+            filteredTransactions: filteredTransactions.length,
+            allExpensesKept: allExpenses.length,
+            dateRange: dateRange
+        });
         
         // Load all components
         await Promise.all([
-            updateProfitOverviewGrid(filteredTransactions, filteredExpenses, period, dateRange),
-            updateProfitKPIs(filteredTransactions, filteredExpenses, period, dateRange),
-            loadProfitAnalysisData(filteredTransactions, filteredExpenses, dateRange),
-            loadSoftwareProfitAnalysis(filteredTransactions, filteredExpenses, dateRange),
-            renderProfitTrendChart(filteredTransactions, filteredExpenses, period),
-            renderProfitBreakdownChart(filteredTransactions, filteredExpenses, dateRange),
-            updateProfitInsights(filteredTransactions, filteredExpenses)
+            updateProfitOverviewGrid(filteredTransactions, allExpenses, period, dateRange),
+            updateProfitKPIs(filteredTransactions, allExpenses, period, dateRange),
+            loadProfitAnalysisData(filteredTransactions, allExpenses, dateRange),
+            loadSoftwareProfitAnalysis(filteredTransactions, allExpenses, dateRange),
+            renderProfitTrendChart(filteredTransactions, allExpenses, period),
+            renderProfitBreakdownChart(filteredTransactions, allExpenses, dateRange),
+            updateProfitInsights(filteredTransactions, allExpenses)
         ]);
         
         // Setup tooltips and event handlers
@@ -217,11 +225,15 @@ function calculateExpenseMetrics(expenses, dateRange) {
         const rangeStart = dateRange ? new Date(dateRange.start) : null;
         const rangeEnd = dateRange ? new Date(dateRange.end) : null;
         
-        // Chi phí không phân bổ: Phân bổ = "Không" và Loại kế toán = "COGS" hoặc "OPEX"
+        // Chi phí không phân bổ: Phân bổ = "Không" và Loại kế toán = "COGS" hoặc "OPEX" và Ngày chi trong chu kỳ
         if (allocation === 'không' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
-            directCosts += amount;
+            // Chỉ tính chi phí không phân bổ nếu ngày chi nằm trong chu kỳ
+            if (rangeStart && rangeEnd && expenseDate >= rangeStart && expenseDate <= rangeEnd) {
+                directCosts += amount;
+            }
         } 
         // Chi phí phân bổ: Loại kế toán = "OPEX" hoặc "COGS", Phân bổ = "Có", Ngày tái tục >= Ngày bắt đầu chu kỳ
+        // KHÔNG cần quan tâm ngày chi có nằm trong chu kỳ hay không
         else if (allocation === 'có' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
             if (rangeStart && rangeEnd && renewalDate >= rangeStart && !isNaN(expenseDate.getTime()) && !isNaN(renewalDate.getTime())) {
                 
@@ -290,9 +302,10 @@ function calculateExpenseMetrics(expenses, dateRange) {
     });
     
     console.log(`💰 Expense metrics calculated:`, {
-        allocatedCosts: allocatedCosts,
-        directCosts: directCosts,
-        totalExpenses: expenses.length
+        allocatedCosts: allocatedCosts.toFixed(2),
+        directCosts: directCosts.toFixed(2),
+        totalExpensesProcessed: expenses.length,
+        dateRange: dateRange ? `${dateRange.start} to ${dateRange.end}` : 'No date range'
     });
     
     return {
