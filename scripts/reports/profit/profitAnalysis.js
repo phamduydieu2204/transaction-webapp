@@ -208,11 +208,15 @@ function calculateExpenseMetrics(expenses) {
         if (!expense) return;
         
         const amount = expense.amount || 0;
-        const isAllocated = (expense.allocation || expense.phanBo || '').toLowerCase().trim() === 'có';
+        const allocation = (expense.allocation || expense.phanBo || '').toLowerCase().trim();
+        const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
         
-        if (isAllocated) {
+        // Chi phí phân bổ: Phân bổ = "Có"
+        if (allocation === 'có') {
             allocatedCosts += amount;
-        } else {
+        } 
+        // Chi phí không phân bổ: Phân bổ = "Không" và Loại kế toán = "COGS" hoặc "OPEX"
+        else if (allocation === 'không' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
             directCosts += amount;
         }
     });
@@ -679,6 +683,7 @@ function normalizeExpense(rawExpense) {
     return {
         amount: parseFloat(rawExpense.soTien || rawExpense.amount || 0),
         allocation: rawExpense.phanBo || rawExpense.allocation || '',
+        accountingType: rawExpense.loaiKeToan || rawExpense.accountingType || '',
         date: rawExpense.ngayChi || rawExpense.date || '',
         category: rawExpense.danhMucChung || rawExpense.category || ''
     };
@@ -1008,6 +1013,7 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
         if (expenseSoftware === softwareName && expenseType === 'Kinh doanh phần mềm') {
             const expenseDate = normalizeDate(expense.ngayChi || expense.date || '');
             const allocation = (expense.phanBo || expense.allocation || '').toLowerCase().trim();
+            const accountingType = (expense.loaiKeToan || expense.accountingType || '').trim();
             const amount = parseFloat(expense.soTien || expense.amount || 0);
             const renewalDate = normalizeDate(expense.ngayTaiTuc || expense.renewalDate || '');
             
@@ -1015,8 +1021,8 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
             const isInPeriod = dateRange && expenseDate >= dateRange.start && expenseDate <= dateRange.end;
             
             if (isInPeriod) {
-                if (allocation === 'không') {
-                    // Direct cost - add full amount
+                if (allocation === 'không' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
+                    // Direct cost - add full amount only if accounting type is COGS or OPEX
                     totalAllocatedCosts += amount;
                 } else if (allocation === 'có') {
                     // Allocated cost - check if renewal date > period start
