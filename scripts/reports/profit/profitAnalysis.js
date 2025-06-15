@@ -208,7 +208,7 @@ function calculateExpenseMetrics(expenses) {
         if (!expense) return;
         
         const amount = expense.amount || 0;
-        const allocation = (expense.allocation || expense.phanBo || '').toLowerCase().trim();
+        const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
         const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
         
         // Chi phí phân bổ: Phân bổ = "Có"
@@ -682,8 +682,9 @@ function normalizeExpense(rawExpense) {
     
     return {
         amount: parseFloat(rawExpense.soTien || rawExpense.amount || 0),
-        allocation: rawExpense.phanBo || rawExpense.allocation || '',
-        accountingType: rawExpense.loaiKeToan || rawExpense.accountingType || '',
+        allocation: rawExpense.periodicAllocation || rawExpense.phanBo || rawExpense.allocation || '',
+        accountingType: rawExpense.accountingType || rawExpense.loaiKeToan || '',
+        periodicAllocation: rawExpense.periodicAllocation || rawExpense.phanBo || '',
         date: rawExpense.ngayChi || rawExpense.date || '',
         category: rawExpense.danhMucChung || rawExpense.category || ''
     };
@@ -933,9 +934,9 @@ function getSoftwareNamesFromExpenses(expenses, dateRange) {
     
     expenses.forEach(expense => {
         const expenseDate = normalizeDate(expense.ngayChi || expense.date || '');
-        const expenseType = (expense.loaiKhoanChi || expense.expenseType || '').trim();
-        const softwareName = (expense.tenChuan || expense.standardName || '').trim();
-        const allocation = (expense.phanBo || expense.allocation || '').toLowerCase().trim();
+        const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
+        const softwareName = (expense.product || expense.tenChuan || expense.standardName || '').trim();
+        const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
         const renewalDate = normalizeDate(expense.ngayTaiTuc || expense.renewalDate || '');
         
         // Check criteria: "Kinh doanh phần mềm" expense type
@@ -1007,13 +1008,13 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
     let totalAllocatedCosts = 0;
     
     expenses.forEach(expense => {
-        const expenseSoftware = (expense.tenChuan || expense.standardName || '').trim();
-        const expenseType = (expense.loaiKhoanChi || expense.expenseType || '').trim();
+        const expenseSoftware = (expense.product || expense.tenChuan || expense.standardName || '').trim();
+        const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
         
         if (expenseSoftware === softwareName && expenseType === 'Kinh doanh phần mềm') {
             const expenseDate = normalizeDate(expense.ngayChi || expense.date || '');
-            const allocation = (expense.phanBo || expense.allocation || '').toLowerCase().trim();
-            const accountingType = (expense.loaiKeToan || expense.accountingType || '').trim();
+            const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
+            const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
             const amount = parseFloat(expense.soTien || expense.amount || 0);
             const renewalDate = normalizeDate(expense.ngayTaiTuc || expense.renewalDate || '');
             
