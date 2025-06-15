@@ -210,8 +210,12 @@ function calculateExpenseMetrics(expenses, dateRange) {
         const amount = expense.amount || 0;
         const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
         const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
-        const expenseDate = normalizeDate(expense.date || '');
-        const renewalDate = normalizeDate(expense.renewDate || expense.ngayTaiTuc || '');
+        const expenseDate = new Date(expense.date || '');
+        const renewalDate = new Date(expense.renewDate || expense.ngayTaiTuc || '');
+        
+        // Convert dateRange strings to Date objects
+        const rangeStart = dateRange ? new Date(dateRange.start) : null;
+        const rangeEnd = dateRange ? new Date(dateRange.end) : null;
         
         // Chi phí không phân bổ: Phân bổ = "Không" và Loại kế toán = "COGS" hoặc "OPEX"
         if (allocation === 'không' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
@@ -219,14 +223,14 @@ function calculateExpenseMetrics(expenses, dateRange) {
         } 
         // Chi phí phân bổ: Loại kế toán = "OPEX" hoặc "COGS", Phân bổ = "Có", Ngày tái tục >= Ngày bắt đầu chu kỳ
         else if (allocation === 'có' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
-            if (dateRange && renewalDate >= dateRange.start && expenseDate && renewalDate) {
+            if (rangeStart && rangeEnd && renewalDate >= rangeStart && !isNaN(expenseDate.getTime()) && !isNaN(renewalDate.getTime())) {
                 // Tính chi phí phân bổ theo công thức
                 const totalDays = Math.ceil((renewalDate - expenseDate) / (1000 * 60 * 60 * 24));
                 const dailyCost = amount / totalDays;
                 
                 // Tính số ngày còn hiệu lực trong chu kỳ báo cáo
-                const effectiveStartDate = Math.max(expenseDate, dateRange.start);
-                const effectiveEndDate = Math.min(renewalDate, dateRange.end);
+                const effectiveStartDate = new Date(Math.max(expenseDate.getTime(), rangeStart.getTime()));
+                const effectiveEndDate = new Date(Math.min(renewalDate.getTime(), rangeEnd.getTime()));
                 const effectiveDays = Math.ceil((effectiveEndDate - effectiveStartDate) / (1000 * 60 * 60 * 24)) + 1;
                 
                 // Chi phí phân bổ = số ngày hiệu lực × chi phí mỗi ngày
@@ -234,15 +238,17 @@ function calculateExpenseMetrics(expenses, dateRange) {
                 allocatedCosts += allocatedAmount;
                 
                 console.log(`📊 Allocated cost calculation:`, {
+                    expenseId: expense.expenseId || 'N/A',
+                    product: expense.product || 'N/A',
                     amount: amount,
                     expenseDate: expenseDate.toISOString().split('T')[0],
                     renewalDate: renewalDate.toISOString().split('T')[0],
                     totalDays: totalDays,
-                    dailyCost: dailyCost,
+                    dailyCost: dailyCost.toFixed(2),
                     effectiveStartDate: effectiveStartDate.toISOString().split('T')[0],
                     effectiveEndDate: effectiveEndDate.toISOString().split('T')[0],
                     effectiveDays: effectiveDays,
-                    allocatedAmount: allocatedAmount
+                    allocatedAmount: allocatedAmount.toFixed(2)
                 });
             }
         }
@@ -714,11 +720,14 @@ function normalizeExpense(rawExpense) {
     if (!rawExpense) return null;
     
     return {
+        expenseId: rawExpense.expenseId || rawExpense.maChiPhi || '',
         amount: parseFloat(rawExpense.soTien || rawExpense.amount || 0),
         allocation: rawExpense.periodicAllocation || rawExpense.phanBo || rawExpense.allocation || '',
         accountingType: rawExpense.accountingType || rawExpense.loaiKeToan || '',
         periodicAllocation: rawExpense.periodicAllocation || rawExpense.phanBo || '',
+        product: rawExpense.product || rawExpense.tenSanPham || '',
         date: rawExpense.ngayChi || rawExpense.date || '',
+        renewDate: rawExpense.renewDate || rawExpense.ngayTaiTuc || '',
         category: rawExpense.danhMucChung || rawExpense.category || ''
     };
 }
