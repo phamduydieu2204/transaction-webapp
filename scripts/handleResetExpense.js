@@ -2,15 +2,16 @@ import { showProcessingModal } from './showProcessingModal.js';
 import { closeProcessingModal } from './closeProcessingModal.js';
 import { showResultModal } from './showResultModal.js';
 import { initExpenseDropdowns } from './initExpenseDropdowns.js';
+import { getConstants } from './constants.js';
 
-export function handleResetExpense() {
-  showProcessingModal("Đang làm mới form...");
+export async function handleResetExpense() {
+  showProcessingModal("Đang làm mới form và tải lại dữ liệu...");
   
   try {
-    // Reset form
+    // Reset form về trạng thái ban đầu
     document.getElementById("expenseForm").reset();
     
-    // Set default values
+    // Set default values giống như khi tải trang
     document.getElementById("expenseDate").value = window.todayFormatted || "";
     document.getElementById("expenseRecorder").value = window.userInfo?.tenNhanVien || "";
     
@@ -28,10 +29,81 @@ export function handleResetExpense() {
       expenseIdField.value = "";
     }
     
+    // Reset search state
+    window.isExpenseSearching = false;
+    window.currentExpensePage = 1;
+    
+    // Reload all expenses như khi tải trang ban đầu
+    await loadAllExpenses();
+    
     closeProcessingModal();
-    showResultModal("Form đã được làm mới!", true);
+    showResultModal("Form và dữ liệu đã được làm mới!", true);
   } catch (err) {
     closeProcessingModal();
-    showResultModal(`Lỗi khi làm mới form: ${err.message}`, false);
+    showResultModal(`Lỗi khi làm mới: ${err.message}`, false);
+  }
+}
+
+/**
+ * Load all expenses like when page first loads
+ */
+async function loadAllExpenses() {
+  const { BACKEND_URL } = getConstants();
+  
+  if (!window.userInfo) {
+    console.warn('⚠️ No user info found');
+    return;
+  }
+  
+  const data = {
+    action: 'searchExpenses',
+    maNhanVien: window.userInfo.maNhanVien,
+    conditions: {} // Empty conditions to get all expenses
+  };
+  
+  try {
+    console.log('🔄 Reloading all expenses...');
+    
+    const response = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    if (result.status === 'success') {
+      // Store expenses globally
+      window.expenseList = result.data || [];
+      window.currentExpensePage = 1;
+      window.isExpenseSearching = false;
+      
+      console.log(`✅ Reloaded ${window.expenseList.length} expenses`);
+      
+      // Update table immediately
+      if (typeof window.updateExpenseTable === 'function') {
+        window.updateExpenseTable();
+      }
+      
+      // Update stats if available
+      if (typeof window.renderExpenseStats === 'function') {
+        window.renderExpenseStats();
+      }
+      
+    } else {
+      console.error('❌ Error loading expenses:', result.message);
+      window.expenseList = [];
+    }
+    
+  } catch (error) {
+    console.error('❌ Error loading expenses:', error);
+    window.expenseList = [];
+    throw error;
   }
 }
