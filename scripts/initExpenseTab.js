@@ -10,6 +10,39 @@ import { renderExpenseStats } from './renderExpenseStats.js';
 import { updateExpenseTable } from './updateExpenseTable.js';
 
 /**
+ * Set default values for expense form
+ */
+function setDefaultExpenseValues() {
+  // Set default date
+  const expenseDateEl = document.getElementById("expenseDate");
+  if (expenseDateEl) {
+    expenseDateEl.value = window.todayFormatted || "";
+  }
+  
+  // Set default dropdown values
+  const currencyEl = document.getElementById("expenseCurrency");
+  if (currencyEl) {
+    currencyEl.value = "VND";
+  }
+  
+  const recurringEl = document.getElementById("expenseRecurring");
+  if (recurringEl) {
+    recurringEl.value = "Chi một lần";
+  }
+  
+  const statusEl = document.getElementById("expenseStatus");
+  if (statusEl) {
+    statusEl.value = "Đã thanh toán";
+  }
+  
+  // Set default recorder
+  const recorderEl = document.getElementById("expenseRecorder");
+  if (recorderEl) {
+    recorderEl.value = window.userInfo?.tenNhanVien || "";
+  }
+}
+
+/**
  * Initialize expense tab data
  */
 export async function initExpenseTab() {
@@ -20,6 +53,9 @@ export async function initExpenseTab() {
     try {
       // Show loading modal
       showProcessingModal('Đang tải dữ liệu chi phí...');
+      
+      // Set default values for form
+      setDefaultExpenseValues();
       
       // Load expense data
       await loadExpenses();

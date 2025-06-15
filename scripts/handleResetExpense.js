@@ -14,6 +14,11 @@ export function handleResetExpense() {
     document.getElementById("expenseDate").value = window.todayFormatted || "";
     document.getElementById("expenseRecorder").value = window.userInfo?.tenNhanVien || "";
     
+    // Set default dropdown values
+    document.getElementById("expenseCurrency").value = "VND";
+    document.getElementById("expenseRecurring").value = "Chi một lần";
+    document.getElementById("expenseStatus").value = "Đã thanh toán";
+    
     // Re-initialize dropdowns
     initExpenseDropdowns();
     

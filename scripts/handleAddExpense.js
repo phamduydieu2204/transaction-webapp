@@ -51,8 +51,13 @@ export async function handleAddExpense() {
     if (result.status === "success") {
       showResultModal(`Chi phí đã được lưu! Mã chi phí: ${result.chiPhiId}`, true);
       document.getElementById("expenseForm").reset();
+      
+      // Set default values after reset
       document.getElementById("expenseDate").value = window.todayFormatted;
       document.getElementById("expenseRecorder").value = window.userInfo?.tenNhanVien || "";
+      document.getElementById("expenseCurrency").value = "VND";
+      document.getElementById("expenseRecurring").value = "Chi một lần";
+      document.getElementById("expenseStatus").value = "Đã thanh toán";
       
       // ✅ Clear cache để đảm bảo lấy data mới nhất
       cacheManager.clearExpenseCaches();

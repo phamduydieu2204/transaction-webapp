@@ -81,7 +81,8 @@
         <div class="form-field">
           <label>Tiền tệ</label>
           <select id="expenseCurrency">
-            <option value="VND">VND</option>
+            <option value="">-- Chọn loại tiền tệ --</option>
+            <option value="VND" selected>VND</option>
             <option value="USD">USD</option>
             <option value="NGN">NGN</option>
           </select>
@@ -115,7 +116,8 @@
         <div class="form-field">
           <label>Phương thức chi</label>
           <select id="expenseRecurring" onchange="handleRecurringChange()">
-            <option value="Chi một lần">Chi một lần</option>
+            <option value="">-- Chọn phương thức chi --</option>
+            <option value="Chi một lần" selected>Chi một lần</option>
             <option value="Hàng tháng">Định kỳ hàng tháng</option>
             <option value="Hàng quý">Định kỳ hàng quý</option>
             <option value="Hàng năm">Định kỳ hàng năm</option>
@@ -135,9 +137,10 @@
         <div class="form-field">
           <label>Trạng thái</label>
           <select id="expenseStatus">
-            <option>Đã thanh toán</option>
-            <option>Chưa thanh toán</option>
-            <option>Đã hủy</option>
+            <option value="">-- Chọn trạng thái --</option>
+            <option value="Đã thanh toán" selected>Đã thanh toán</option>
+            <option value="Chưa thanh toán">Chưa thanh toán</option>
+            <option value="Đã hủy">Đã hủy</option>
           </select>
           <div class="error-message" id="expenseStatus-error">Vui lòng chọn trạng thái</div>
         </div>

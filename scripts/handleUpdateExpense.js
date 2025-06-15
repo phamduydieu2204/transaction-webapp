@@ -97,7 +97,13 @@ export async function handleUpdateExpense() {
     if (result.status === "success") {
       showResultModal("Đã cập nhật chi phí thành công!", true);
       document.getElementById("expenseForm").reset();
+      
+      // Set default values after reset
       document.getElementById("expenseDate").value = window.todayFormatted;
+      document.getElementById("expenseRecorder").value = window.userInfo?.tenNhanVien || "";
+      document.getElementById("expenseCurrency").value = "VND";
+      document.getElementById("expenseRecurring").value = "Chi một lần";
+      document.getElementById("expenseStatus").value = "Đã thanh toán";
       
       // ✅ Clear cache và reload expense data
       cacheManager.clearExpenseCaches();
