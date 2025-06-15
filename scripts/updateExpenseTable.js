@@ -254,8 +254,8 @@ function createExpenseRow(expense, index) {
   }
   
   // Format dates
-  const formattedDate = formatDate(expense.date || expense.ngay);
-  const formattedRenewDate = formatDate(expense.renewDate);
+  const formattedDate = formatDate(expense.date || expense.ngay || expense.expenseDate);
+  const formattedRenewDate = formatDate(expense.renewDate || expense.expenseRenewDate || expense.ngayTaiTuc);
   
   // 1. Mã chi phí
   const expenseId = expense.expenseId || expense.id || `EXP${index + 1}`;
@@ -339,13 +339,14 @@ function createExpenseRow(expense, index) {
   }
   
   // Kiểm tra ngày tái tục đã hết hạn
-  if (expense.renewDate) {
+  const renewDateValue = expense.renewDate || expense.expenseRenewDate || expense.ngayTaiTuc;
+  if (renewDateValue) {
     const today = new Date();
     const parseDate = (str) => {
       const [y, m, d] = (str || '').split('/').map(Number);
       return new Date(y, m - 1, d);
     };
-    const renewDateObj = parseDate(expense.renewDate);
+    const renewDateObj = parseDate(renewDateValue);
     if (renewDateObj < today) {
       tr.classList.add('expired-row');
     }
