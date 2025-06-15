@@ -39,7 +39,8 @@ export async function handleSearchExpense() {
   if (expenseAmount && expenseAmount !== "0") conditions.expenseAmount = expenseAmount;
   
   const expenseCurrency = getValue("expenseCurrency");
-  if (expenseCurrency) conditions.expenseCurrency = expenseCurrency;
+  // Chỉ thêm nếu không phải giá trị mặc định tìm kiếm
+  if (expenseCurrency && expenseCurrency !== "") conditions.expenseCurrency = expenseCurrency;
   
   const expenseBank = getValue("expenseBank");
   if (expenseBank) conditions.expenseBank = expenseBank;
@@ -48,7 +49,8 @@ export async function handleSearchExpense() {
   if (expenseCard) conditions.expenseCard = expenseCard;
   
   const expenseRecurring = getValue("expenseRecurring");
-  if (expenseRecurring) conditions.expenseRecurring = expenseRecurring;
+  // Chỉ thêm nếu không phải giá trị mặc định tìm kiếm
+  if (expenseRecurring && expenseRecurring !== "") conditions.expenseRecurring = expenseRecurring;
   
   const expenseRenewDate = getValue("expenseRenewDate");
   if (expenseRenewDate && expenseRenewDate !== "yyyy/mm/dd") conditions.expenseRenewDate = expenseRenewDate;
@@ -57,10 +59,18 @@ export async function handleSearchExpense() {
   if (expenseSupplier) conditions.expenseSupplier = expenseSupplier;
   
   const expenseStatus = getValue("expenseStatus");
-  if (expenseStatus) conditions.expenseStatus = expenseStatus;
+  // Chỉ thêm nếu không phải giá trị mặc định tìm kiếm
+  if (expenseStatus && expenseStatus !== "") conditions.expenseStatus = expenseStatus;
   
   const expenseNote = getValue("expenseNote");
   if (expenseNote) conditions.expenseNote = expenseNote;
+
+  // Kiểm tra nếu không có điều kiện nào được nhập
+  const hasConditions = Object.keys(conditions).length > 0;
+  
+  if (!hasConditions) {
+    console.log("📋 Không có điều kiện tìm kiếm - sẽ lấy tất cả chi phí");
+  }
 
   const data = {
     action: "searchExpenses",
@@ -69,8 +79,6 @@ export async function handleSearchExpense() {
   };
 
   console.log("📤 Tìm kiếm chi phí với điều kiện:", JSON.stringify(data, null, 2));
-
-  showProcessingModal("Đang tìm kiếm chi phí...");
 
   try {
     const res = await fetch(BACKEND_URL, {
@@ -85,12 +93,22 @@ export async function handleSearchExpense() {
     if (result.status === "success") {
       window.expenseList = result.data || [];
       window.currentExpensePage = 1;
-      window.isExpenseSearching = true;
+      window.isExpenseSearching = hasConditions; // Chỉ đánh dấu là đang tìm kiếm nếu có điều kiện
       
-      // Gọi renderExpenseStats để hiển thị kết quả tìm kiếm
+      // Cập nhật table ngay lập tức
+      if (typeof window.updateExpenseTable === 'function') {
+        window.updateExpenseTable();
+      }
+      
+      // Gọi renderExpenseStats để hiển thị kết quả
       renderExpenseStats();
       
-      showResultModal(`Tìm kiếm thành công! Tìm thấy ${result.data.length} chi phí.`, true);
+      // Thông báo khác nhau tùy theo có điều kiện tìm kiếm hay không
+      if (hasConditions) {
+        showResultModal(`Tìm kiếm thành công! Tìm thấy ${result.data.length} chi phí phù hợp.`, true);
+      } else {
+        showResultModal(`Đã tải ${result.data.length} chi phí.`, true);
+      }
     } else {
       showResultModal(result.message || "Không thể tìm kiếm chi phí!", false);
     }
