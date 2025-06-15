@@ -50,12 +50,12 @@ export async function loadProfitAnalysis(options = {}) {
         
         // Load all components
         await Promise.all([
-            updateProfitOverviewGrid(filteredTransactions, filteredExpenses, period),
-            updateProfitKPIs(filteredTransactions, filteredExpenses, period),
+            updateProfitOverviewGrid(filteredTransactions, filteredExpenses, period, dateRange),
+            updateProfitKPIs(filteredTransactions, filteredExpenses, period, dateRange),
             loadProfitAnalysisData(filteredTransactions, filteredExpenses, dateRange),
             loadSoftwareProfitAnalysis(filteredTransactions, filteredExpenses, dateRange),
             renderProfitTrendChart(filteredTransactions, filteredExpenses, period),
-            renderProfitBreakdownChart(filteredTransactions, filteredExpenses),
+            renderProfitBreakdownChart(filteredTransactions, filteredExpenses, dateRange),
             updateProfitInsights(filteredTransactions, filteredExpenses)
         ]);
         
@@ -99,19 +99,19 @@ async function loadProfitAnalysisHTML() {
 /**
  * Update profit KPI cards
  */
-async function updateProfitKPIs(transactions, expenses, period) {
+async function updateProfitKPIs(transactions, expenses, period, dateRange) {
     console.log('💰 Updating profit KPIs');
     
     // Calculate current period metrics
     const revenueMetrics = calculateRevenueMetrics(transactions);
-    const expenseMetrics = calculateExpenseMetrics(expenses);
+    const expenseMetrics = calculateExpenseMetrics(expenses, dateRange);
     const profitMetrics = calculateProfitMetrics(revenueMetrics, expenseMetrics);
     
     // Calculate previous period for comparison
     const previousTransactions = getPreviousPeriodTransactions(transactions, period);
     const previousExpenses = getPreviousPeriodExpenses(expenses, period);
     const previousRevenueMetrics = calculateRevenueMetrics(previousTransactions);
-    const previousExpenseMetrics = calculateExpenseMetrics(previousExpenses);
+    const previousExpenseMetrics = calculateExpenseMetrics(previousExpenses, dateRange);
     const previousProfitMetrics = calculateProfitMetrics(previousRevenueMetrics, previousExpenseMetrics);
     
     // Update KPI values
@@ -149,7 +149,7 @@ async function loadProfitAnalysisData(transactions, expenses, dateRange) {
     try {
         // Calculate metrics
         const revenueMetrics = calculateRevenueMetrics(transactions);
-        const expenseMetrics = calculateExpenseMetrics(expenses);
+        const expenseMetrics = calculateExpenseMetrics(expenses, dateRange);
         const profitMetrics = calculateProfitMetrics(revenueMetrics, expenseMetrics);
         
         // Update table
@@ -197,9 +197,9 @@ function calculateRevenueMetrics(transactions) {
 }
 
 /**
- * Calculate expense metrics from filtered expenses
+ * Calculate expense metrics from filtered expenses with proper allocation logic
  */
-function calculateExpenseMetrics(expenses) {
+function calculateExpenseMetrics(expenses, dateRange) {
     let allocatedCosts = 0;
     let directCosts = 0;
     
@@ -210,15 +210,48 @@ function calculateExpenseMetrics(expenses) {
         const amount = expense.amount || 0;
         const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
         const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
+        const expenseDate = normalizeDate(expense.date || '');
+        const renewalDate = normalizeDate(expense.renewDate || expense.ngayTaiTuc || '');
         
-        // Chi phí phân bổ: Phân bổ = "Có"
-        if (allocation === 'có') {
-            allocatedCosts += amount;
-        } 
         // Chi phí không phân bổ: Phân bổ = "Không" và Loại kế toán = "COGS" hoặc "OPEX"
-        else if (allocation === 'không' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
+        if (allocation === 'không' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
             directCosts += amount;
+        } 
+        // Chi phí phân bổ: Loại kế toán = "OPEX" hoặc "COGS", Phân bổ = "Có", Ngày tái tục >= Ngày bắt đầu chu kỳ
+        else if (allocation === 'có' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
+            if (dateRange && renewalDate >= dateRange.start && expenseDate && renewalDate) {
+                // Tính chi phí phân bổ theo công thức
+                const totalDays = Math.ceil((renewalDate - expenseDate) / (1000 * 60 * 60 * 24));
+                const dailyCost = amount / totalDays;
+                
+                // Tính số ngày còn hiệu lực trong chu kỳ báo cáo
+                const effectiveStartDate = Math.max(expenseDate, dateRange.start);
+                const effectiveEndDate = Math.min(renewalDate, dateRange.end);
+                const effectiveDays = Math.ceil((effectiveEndDate - effectiveStartDate) / (1000 * 60 * 60 * 24)) + 1;
+                
+                // Chi phí phân bổ = số ngày hiệu lực × chi phí mỗi ngày
+                const allocatedAmount = Math.max(0, effectiveDays * dailyCost);
+                allocatedCosts += allocatedAmount;
+                
+                console.log(`📊 Allocated cost calculation:`, {
+                    amount: amount,
+                    expenseDate: expenseDate.toISOString().split('T')[0],
+                    renewalDate: renewalDate.toISOString().split('T')[0],
+                    totalDays: totalDays,
+                    dailyCost: dailyCost,
+                    effectiveStartDate: effectiveStartDate.toISOString().split('T')[0],
+                    effectiveEndDate: effectiveEndDate.toISOString().split('T')[0],
+                    effectiveDays: effectiveDays,
+                    allocatedAmount: allocatedAmount
+                });
+            }
         }
+    });
+    
+    console.log(`💰 Expense metrics calculated:`, {
+        allocatedCosts: allocatedCosts,
+        directCosts: directCosts,
+        totalExpenses: expenses.length
     });
     
     return {
@@ -396,7 +429,7 @@ async function renderProfitTrendChart(transactions, expenses, period) {
 /**
  * Render profit breakdown chart
  */
-async function renderProfitBreakdownChart(transactions, expenses) {
+async function renderProfitBreakdownChart(transactions, expenses, dateRange) {
     console.log('🍰 Rendering profit breakdown chart');
     
     const canvas = document.getElementById('profit-breakdown-chart');
@@ -411,7 +444,7 @@ async function renderProfitBreakdownChart(transactions, expenses) {
     
     // Calculate breakdown data
     const revenueMetrics = calculateRevenueMetrics(transactions);
-    const expenseMetrics = calculateExpenseMetrics(expenses);
+    const expenseMetrics = calculateExpenseMetrics(expenses, dateRange);
     
     // Destroy existing chart
     if (window.profitBreakdownChart) {
@@ -810,19 +843,19 @@ window.toggleChartView = function(chartType, viewType) {
 /**
  * Update the profit overview grid (6 KPI cards)
  */
-async function updateProfitOverviewGrid(transactions, expenses, period) {
+async function updateProfitOverviewGrid(transactions, expenses, period, dateRange) {
     console.log('💰 Updating profit overview grid');
     
     // Calculate current period metrics
     const revenueMetrics = calculateRevenueMetrics(transactions);
-    const expenseMetrics = calculateExpenseMetrics(expenses);
+    const expenseMetrics = calculateExpenseMetrics(expenses, dateRange);
     const profitMetrics = calculateProfitMetrics(revenueMetrics, expenseMetrics);
     
     // Calculate previous period for comparison
     const previousTransactions = getPreviousPeriodTransactions(transactions, period);
     const previousExpenses = getPreviousPeriodExpenses(expenses, period);
     const previousRevenueMetrics = calculateRevenueMetrics(previousTransactions);
-    const previousExpenseMetrics = calculateExpenseMetrics(previousExpenses);
+    const previousExpenseMetrics = calculateExpenseMetrics(previousExpenses, dateRange);
     const previousProfitMetrics = calculateProfitMetrics(previousRevenueMetrics, previousExpenseMetrics);
     
     // Update overview grid values
