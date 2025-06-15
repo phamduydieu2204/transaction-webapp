@@ -117,13 +117,18 @@ export async function loadInitialData() {
     await softwareDataPromise;
     console.log('✅ Software data loaded');
     
-    // Phase 2: Tab-specific data (lazy loading)
+    // Phase 2: Tab-specific data (parallel loading for statistics)
     console.log('🚀 Phase 2: Loading tab-specific data...');
     
-    // Only load transaction data initially (most common tab)
-    // Other tab data will be loaded when user switches to them
-    await loadTransactionDataOptimized();
-    console.log('✅ Transaction data loaded');
+    // Load both transaction and expense data in parallel
+    // This ensures statistics tab has data available immediately
+    const dataPromises = [
+      loadTransactionDataOptimized(),
+      loadExpenseData()
+    ];
+    
+    await Promise.all(dataPromises);
+    console.log('✅ Transaction and expense data loaded');
     
     // Phase 3: Initialize minimal features
     console.log('🚀 Phase 3: Initializing minimal features...');
@@ -217,6 +222,55 @@ async function loadTransactionDataOptimized() {
  */
 async function loadTransactionData() {
   return await loadTransactionDataOptimized();
+}
+
+/**
+ * Load expense data for statistics and reports
+ */
+async function loadExpenseData() {
+  console.log('📊 Loading expense data...');
+  
+  try {
+    const { BACKEND_URL } = getConstants();
+    
+    if (!window.userInfo || !window.userInfo.maNhanVien) {
+      console.warn('⚠️ No user info available to load expenses');
+      window.expenseList = [];
+      return;
+    }
+    
+    const data = {
+      action: 'searchExpenses',
+      maNhanVien: window.userInfo.maNhanVien,
+      conditions: {} // Empty conditions to get all expenses
+    };
+    
+    const response = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    if (result.status === 'success') {
+      window.expenseList = result.data || [];
+      console.log(`✅ Loaded ${window.expenseList.length} expenses`);
+    } else {
+      console.error('❌ Error loading expenses:', result.message);
+      window.expenseList = [];
+    }
+    
+  } catch (error) {
+    console.error('❌ Failed to load expense data:', error);
+    window.expenseList = [];
+  }
 }
 
 /**

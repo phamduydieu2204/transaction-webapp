@@ -59,6 +59,7 @@ export async function ultraFastInit(userInfo) {
     window.currentPage = 1;
     window.itemsPerPage = 15; // Ultra-small
     window.transactionList = [];
+    window.expenseList = [];
 
     // Step 1.5: Load critical modal functions immediately
     await loadCriticalFunctions();
@@ -117,10 +118,34 @@ function scheduleBackgroundLoading() {
     }
   }, 1000);
 
-  // Load expense features in background
+  // Load expense data in background
   setTimeout(async () => {
     try {
-      console.log('🔄 Background: Loading expense features...');
+      console.log('🔄 Background: Loading expense data...');
+      const { getConstants } = await import('../constants.js');
+      const { BACKEND_URL } = getConstants();
+      
+      if (window.userInfo && window.userInfo.maNhanVien) {
+        const data = {
+          action: 'searchExpenses',
+          maNhanVien: window.userInfo.maNhanVien,
+          conditions: {}
+        };
+        
+        const response = await fetch(BACKEND_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        if (result.status === 'success') {
+          window.expenseList = result.data || [];
+          console.log(`✅ Background: Loaded ${window.expenseList.length} expenses`);
+        }
+      }
+      
+      // Then load expense features
       const { initExpenseDropdowns } = await import('../initExpenseDropdowns.js');
       await initExpenseDropdowns();
       console.log('✅ Background: Expense features loaded');

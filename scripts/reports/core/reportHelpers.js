@@ -31,14 +31,51 @@ export async function ensureDataIsLoaded() {
   
   // Also ensure expense data is loaded
   if (!window.expenseList || window.expenseList.length === 0) {
-    console.log('🔄 No expense data found, trying to load from statistics...');
-    // Try to get expense data from statistics module
-    if (window.loadStatisticsData && typeof window.loadStatisticsData === 'function') {
-      try {
-        await window.loadStatisticsData();
-      } catch (error) {
-        console.warn('⚠️ Failed to load expense data:', error);
+    console.log('🔄 No expense data found, loading from API...');
+    
+    // Try to load expense data directly from API
+    try {
+      const { getConstants } = await import('../../constants.js');
+      const { BACKEND_URL } = getConstants();
+      
+      if (window.userInfo && window.userInfo.maNhanVien) {
+        const data = {
+          action: 'searchExpenses',
+          maNhanVien: window.userInfo.maNhanVien,
+          conditions: {} // Empty conditions to get all expenses
+        };
+        
+        console.log('🔄 Fetching expense data from API...');
+        
+        const response = await fetch(BACKEND_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+          // Store expenses globally - API returns data not expenses
+          window.expenseList = result.data || [];
+          console.log(`✅ Loaded ${window.expenseList.length} expenses from API`);
+        } else {
+          console.error('❌ Error loading expenses:', result.message);
+          window.expenseList = [];
+        }
+      } else {
+        console.warn('⚠️ No user info available to load expenses');
+        window.expenseList = [];
       }
+    } catch (error) {
+      console.error('❌ Failed to load expense data:', error);
+      window.expenseList = [];
     }
   }
   
