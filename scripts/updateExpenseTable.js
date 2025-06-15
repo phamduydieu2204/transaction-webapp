@@ -251,6 +251,12 @@ function createExpenseRow(expense, index) {
   if (index === 0) {
     console.log('🔍 DEBUG: Sample expense data structure:', expense);
     console.log('🔍 Available keys:', Object.keys(expense));
+    // Debug ngày tái tục
+    console.log('📅 DEBUG: Renew date fields:', {
+      renewDate: expense.renewDate,
+      expenseRenewDate: expense.expenseRenewDate,
+      ngayTaiTuc: expense.ngayTaiTuc
+    });
   }
   
   // Format dates
