@@ -1142,48 +1142,68 @@ function calculateSoftwareRefunds(transactions, softwareName) {
  * Calculate allocated costs for a specific software
  */
 function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
-    let totalAllocatedCosts = 0;
+    let allocatedCosts = 0;
+    let directCosts = 0;
     
     expenses.forEach(expense => {
         // Cột R trong sheet ChiPhi = tenChuan
         const expenseSoftware = (expense.tenChuan || expense.standardName || '').trim();
         const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
         
+        // Only process if this expense belongs to the current software
         if (expenseSoftware === softwareName && expenseType === 'Kinh doanh phần mềm') {
-            const expenseDate = normalizeDate(expense.ngayChi || expense.date || '');
+            const amount = expense.amount || 0;
             const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
             const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
-            const amount = parseFloat(expense.soTien || expense.amount || 0);
-            const renewalDate = normalizeDate(expense.ngayTaiTuc || expense.renewalDate || '');
+            const expenseDate = new Date(expense.date || '');
+            const renewalDate = new Date(expense.renewDate || expense.ngayTaiTuc || '');
             
-            // Check if expense date is in selected period
-            const isInPeriod = dateRange && expenseDate >= dateRange.start && expenseDate <= dateRange.end;
+            // Convert dateRange strings to Date objects
+            const rangeStart = dateRange ? new Date(dateRange.start) : null;
+            const rangeEnd = dateRange ? new Date(dateRange.end) : null;
             
-            if (isInPeriod) {
-                if (allocation === 'không' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
-                    // Direct cost - add full amount only if accounting type is COGS or OPEX
-                    totalAllocatedCosts += amount;
-                } else if (allocation === 'có') {
-                    // Allocated cost - check if renewal date > period start
-                    if (renewalDate > dateRange.start) {
-                        // Calculate allocated portion
-                        const totalDays = Math.ceil((renewalDate - expenseDate) / (1000 * 60 * 60 * 24));
-                        const periodDays = Math.ceil((dateRange.end - dateRange.start) / (1000 * 60 * 60 * 24)) + 1;
-                        const allocatedAmount = (amount / totalDays) * periodDays;
-                        totalAllocatedCosts += allocatedAmount;
-                    }
+            // Apply SAME LOGIC as overview-allocated-cost but filtered by software name
+            
+            // Chi phí không phân bổ: Phân bổ = "Không" và Loại kế toán = "COGS" hoặc "OPEX" và Ngày chi trong chu kỳ
+            if (allocation === 'không' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
+                if (rangeStart && rangeEnd && expenseDate >= rangeStart && expenseDate <= rangeEnd) {
+                    directCosts += amount;
                 }
-            } else if (allocation === 'có' && renewalDate > dateRange.start) {
-                // Expense outside period but allocated and still active
-                const totalDays = Math.ceil((renewalDate - expenseDate) / (1000 * 60 * 60 * 24));
-                const periodDays = Math.ceil((dateRange.end - dateRange.start) / (1000 * 60 * 60 * 24)) + 1;
-                const allocatedAmount = (amount / totalDays) * periodDays;
-                totalAllocatedCosts += allocatedAmount;
+            }
+            // Chi phí phân bổ: Loại kế toán = "OPEX" hoặc "COGS", Phân bổ = "Có", Ngày tái tục >= Ngày bắt đầu chu kỳ
+            else if (allocation === 'có' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
+                if (rangeStart && rangeEnd && renewalDate >= rangeStart && !isNaN(expenseDate.getTime()) && !isNaN(renewalDate.getTime())) {
+                    
+                    // Tính số ngày từ ngày chi đến ngày tái tục
+                    const totalDays = Math.ceil((renewalDate - expenseDate) / (1000 * 60 * 60 * 24));
+                    
+                    // Tính số ngày trong chu kỳ báo cáo
+                    const periodDays = Math.ceil((rangeEnd - rangeStart) / (1000 * 60 * 60 * 24)) + 1;
+                    
+                    let allocatedAmount = 0;
+                    
+                    // Nếu ngày tái tục < ngày cuối chu kỳ
+                    if (renewalDate < rangeEnd) {
+                        const daysToRenewal = Math.ceil((renewalDate - rangeStart) / (1000 * 60 * 60 * 24)) + 1;
+                        const today = new Date();
+                        const daysToToday = Math.ceil((today - rangeStart) / (1000 * 60 * 60 * 24)) + 1;
+                        const effectiveDays = Math.min(daysToRenewal, daysToToday);
+                        
+                        allocatedAmount = amount * effectiveDays / totalDays;
+                    } 
+                    // Nếu ngày tái tục >= ngày cuối chu kỳ
+                    else {
+                        allocatedAmount = amount * periodDays / totalDays;
+                    }
+                    
+                    allocatedCosts += allocatedAmount;
+                }
             }
         }
     });
     
-    return totalAllocatedCosts;
+    // Return only allocated costs (matching the column name in the table)
+    return allocatedCosts;
 }
 
 /**
