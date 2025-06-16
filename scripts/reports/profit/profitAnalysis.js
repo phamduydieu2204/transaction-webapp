@@ -1152,8 +1152,8 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
     });
     
     expenses.forEach(expense => {
-        // Cột R trong sheet ChiPhi = tenChuan
-        const expenseSoftware = (expense.tenChuan || expense.standardName || '').trim();
+        // Sử dụng field product vì tenChuan không tồn tại trong data
+        const expenseSoftware = (expense.product || expense.tenChuan || expense.standardName || '').trim();
         const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
         
         // Debug: Log all expenses to understand the data structure
@@ -1174,10 +1174,10 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
             console.log(`✅ Processing expense for ${softwareName}:`, expense);
             
             const amount = expense.amount || 0;
-            const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
-            const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
+            const allocation = (expense.periodicAllocation || '').toLowerCase().trim();
+            const accountingType = (expense.accountingType || '').trim();
             const expenseDate = new Date(expense.date || '');
-            const renewalDate = new Date(expense.renewDate || expense.ngayTaiTuc || '');
+            const renewalDate = new Date(expense.renewDate || '');
             
             // Convert dateRange strings to Date objects
             const rangeStart = dateRange ? new Date(dateRange.start) : null;
