@@ -977,9 +977,8 @@ async function loadSoftwareProfitAnalysis(transactions, expenses, dateRange) {
 async function calculateSoftwareProfitMetrics(transactions, expenses, dateRange) {
     console.log('🔢 Calculating software profit metrics');
     
-    // Get unique software names from expenses (Tên chuẩn column - column R)
-    const softwareNames = getSoftwareNamesFromExpenses(expenses, dateRange);
-    console.log('📋 Found software names:', softwareNames);
+    // Get unique software names from all sources (revenue + direct costs + allocated costs)
+    const softwareNames = getSoftwareNamesFromAllSources(transactions, expenses, dateRange);
     
     const softwareProfitData = [];
     
@@ -1017,31 +1016,76 @@ async function calculateSoftwareProfitMetrics(transactions, expenses, dateRange)
 }
 
 /**
- * Get unique software names from expenses that meet criteria
+ * Get unique software names from transactions and expenses
  */
-function getSoftwareNamesFromExpenses(expenses, dateRange) {
+function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
     const softwareNames = new Set();
     
+    console.log('🔍 Getting software names from all sources...');
+    
+    // 1. Phần mềm có doanh thu trong chu kỳ báo cáo
+    let revenueCount = 0;
+    transactions.forEach(transaction => {
+        const softwareName = (transaction.tenPhanMem || transaction.softwareName || '').trim();
+        const standardName = (transaction.tenChuan || transaction.standardName || '').trim();
+        const finalSoftwareName = standardName || softwareName;
+        
+        if (finalSoftwareName) {
+            softwareNames.add(finalSoftwareName);
+            revenueCount++;
+        }
+    });
+    console.log(`📊 Found ${revenueCount} software with revenue in period`);
+    
+    // 2. Phần mềm có chi phí không phân bổ trong chu kỳ báo cáo
+    let directCostCount = 0;
     expenses.forEach(expense => {
-        const expenseDate = normalizeDate(expense.ngayChi || expense.date || '');
+        const expenseDate = new Date(expense.date || '');
         const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
         const softwareName = (expense.product || expense.tenChuan || expense.standardName || '').trim();
         const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
-        const renewalDate = normalizeDate(expense.ngayTaiTuc || expense.renewalDate || '');
+        const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
         
-        // Check criteria: "Kinh doanh phần mềm" expense type
-        if (expenseType === 'Kinh doanh phần mềm' && softwareName) {
-            // Check if expense date is in selected period OR (allocation = "Có" AND renewal date > period start)
-            const isInPeriod = dateRange && expenseDate >= dateRange.start && expenseDate <= dateRange.end;
-            const isAllocatedAndActiveInPeriod = allocation === 'có' && dateRange && renewalDate > dateRange.start;
-            
-            if (isInPeriod || isAllocatedAndActiveInPeriod) {
+        const rangeStart = dateRange ? new Date(dateRange.start) : null;
+        const rangeEnd = dateRange ? new Date(dateRange.end) : null;
+        
+        // Chi phí không phân bổ: Phân bổ = "Không", COGS/OPEX, Ngày chi trong chu kỳ
+        if (expenseType === 'Kinh doanh phần mềm' && softwareName && 
+            allocation === 'không' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
+            if (rangeStart && rangeEnd && expenseDate >= rangeStart && expenseDate <= rangeEnd) {
                 softwareNames.add(softwareName);
+                directCostCount++;
             }
         }
     });
+    console.log(`📊 Found ${directCostCount} software with direct costs in period`);
     
-    return Array.from(softwareNames).sort();
+    // 3. Phần mềm có chi phí phân bổ (ngày tái tục >= ngày đầu chu kỳ)
+    let allocatedCostCount = 0;
+    expenses.forEach(expense => {
+        const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
+        const softwareName = (expense.product || expense.tenChuan || expense.standardName || '').trim();
+        const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
+        const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
+        const renewalDate = new Date(expense.renewDate || expense.ngayTaiTuc || '');
+        
+        const rangeStart = dateRange ? new Date(dateRange.start) : null;
+        
+        // Chi phí phân bổ: Phân bổ = "Có", COGS/OPEX, Ngày tái tục >= ngày đầu chu kỳ
+        if (expenseType === 'Kinh doanh phần mềm' && softwareName &&
+            allocation === 'có' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
+            if (rangeStart && renewalDate >= rangeStart && !isNaN(renewalDate.getTime())) {
+                softwareNames.add(softwareName);
+                allocatedCostCount++;
+            }
+        }
+    });
+    console.log(`📊 Found ${allocatedCostCount} software with allocated costs`);
+    
+    const finalList = Array.from(softwareNames).sort();
+    console.log(`📋 Total unique software names: ${finalList.length}`, finalList);
+    
+    return finalList;
 }
 
 /**
@@ -1053,10 +1097,12 @@ function calculateSoftwareRevenue(transactions, softwareName) {
     
     transactions.forEach(transaction => {
         const transactionSoftware = transaction.tenPhanMem || transaction.softwareName || '';
+        const standardName = transaction.tenChuan || transaction.standardName || '';
+        const finalSoftwareName = standardName || transactionSoftware;
         const status = (transaction.loaiGiaoDich || transaction.transactionType || '').toLowerCase().trim();
         const amount = parseFloat(transaction.doanhThu || transaction.revenue || 0);
         
-        if (transactionSoftware === softwareName) {
+        if (finalSoftwareName === softwareName) {
             if (status === 'đã hoàn tất' || status === 'đã thanh toán') {
                 grossRevenue += amount;
             } else if (status === 'hoàn tiền') {
@@ -1080,10 +1126,12 @@ function calculateSoftwareRefunds(transactions, softwareName) {
     
     transactions.forEach(transaction => {
         const transactionSoftware = transaction.tenPhanMem || transaction.softwareName || '';
+        const standardName = transaction.tenChuan || transaction.standardName || '';
+        const finalSoftwareName = standardName || transactionSoftware;
         const status = (transaction.loaiGiaoDich || transaction.transactionType || '').toLowerCase().trim();
         const amount = parseFloat(transaction.doanhThu || transaction.revenue || 0);
         
-        if (transactionSoftware === softwareName && status === 'hoàn tiền') {
+        if (finalSoftwareName === softwareName && status === 'hoàn tiền') {
             refunds += Math.abs(amount);
         }
     });
