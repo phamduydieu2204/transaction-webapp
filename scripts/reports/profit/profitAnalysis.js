@@ -1145,13 +1145,34 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
     let allocatedCosts = 0;
     let directCosts = 0;
     
+    console.log(`🔍 DEBUG SOFTWARE ALLOCATED COSTS:`, {
+        softwareName: softwareName,
+        totalExpenses: expenses.length,
+        dateRange: dateRange
+    });
+    
     expenses.forEach(expense => {
         // Cột R trong sheet ChiPhi = tenChuan
         const expenseSoftware = (expense.tenChuan || expense.standardName || '').trim();
         const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
         
+        // Debug: Log all expenses to understand the data structure
+        if (expenseSoftware) {
+            console.log(`💡 Expense data:`, {
+                expenseSoftware: expenseSoftware,
+                targetSoftware: softwareName,
+                matches: expenseSoftware === softwareName,
+                expenseType: expenseType,
+                amount: expense.amount || 0,
+                allocation: expense.periodicAllocation || expense.phanBo || expense.allocation || '',
+                accountingType: expense.accountingType || expense.loaiKeToan || ''
+            });
+        }
+        
         // Only process if this expense belongs to the current software
         if (expenseSoftware === softwareName && expenseType === 'Kinh doanh phần mềm') {
+            console.log(`✅ Processing expense for ${softwareName}:`, expense);
+            
             const amount = expense.amount || 0;
             const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
             const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
@@ -1200,6 +1221,12 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
                 }
             }
         }
+    });
+    
+    console.log(`💰 SOFTWARE ALLOCATED COSTS RESULT for ${softwareName}:`, {
+        allocatedCosts: allocatedCosts,
+        directCosts: directCosts,
+        totalProcessed: expenses.length
     });
     
     // Return only allocated costs (matching the column name in the table)
