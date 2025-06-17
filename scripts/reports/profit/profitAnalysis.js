@@ -1036,13 +1036,14 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
     });
     console.log(`📊 Found ${revenueCount} software with revenue in period from GiaoDich`);
     
-    // 2. Phần mềm có chi phí không phân bổ trong chu kỳ báo cáo (từ sheet ChiPhi cột R - Tên chuẩn)
+    // 2. Phần mềm có chi phí không phân bổ trong chu kỳ báo cáo (từ sheet ChiPhi)
+    // Chi phí dùng field `product` (cột "Tên sản phẩm/Dịch vụ" trong sheet ChiPhi)
     let directCostCount = 0;
     expenses.forEach(expense => {
         const expenseDate = new Date(expense.date || '');
         const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
-        // Cột R trong sheet ChiPhi = tenChuan
-        const standardName = (expense.tenChuan || expense.standardName || '').trim();
+        // Chi phí dùng field product hoặc tenSanPham
+        const productName = (expense.product || expense.tenSanPham || expense.standardName || '').trim();
         const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
         const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
         
@@ -1050,22 +1051,23 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
         const rangeEnd = dateRange ? new Date(dateRange.end) : null;
         
         // Chi phí không phân bổ: Phân bổ = "Không", COGS/OPEX, Ngày chi trong chu kỳ
-        if (expenseType === 'Kinh doanh phần mềm' && standardName && 
+        if (expenseType === 'Kinh doanh phần mềm' && productName && 
             allocation === 'không' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
             if (rangeStart && rangeEnd && expenseDate >= rangeStart && expenseDate <= rangeEnd) {
-                softwareNames.add(standardName);
+                softwareNames.add(productName);
                 directCostCount++;
             }
         }
     });
     console.log(`📊 Found ${directCostCount} software with direct costs in period from ChiPhi`);
     
-    // 3. Phần mềm có chi phí phân bổ (ngày tái tục >= ngày đầu chu kỳ) (từ sheet ChiPhi cột R - Tên chuẩn)
+    // 3. Phần mềm có chi phí phân bổ (ngày tái tục >= ngày đầu chu kỳ) (từ sheet ChiPhi)
+    // Chi phí dùng field `product` (cột "Tên sản phẩm/Dịch vụ" trong sheet ChiPhi)
     let allocatedCostCount = 0;
     expenses.forEach(expense => {
         const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
-        // Cột R trong sheet ChiPhi = tenChuan
-        const standardName = (expense.tenChuan || expense.standardName || '').trim();
+        // Chi phí dùng field product hoặc tenSanPham
+        const productName = (expense.product || expense.tenSanPham || expense.standardName || '').trim();
         const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
         const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
         const renewalDate = new Date(expense.renewDate || expense.ngayTaiTuc || '');
@@ -1073,10 +1075,10 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
         const rangeStart = dateRange ? new Date(dateRange.start) : null;
         
         // Chi phí phân bổ: Phân bổ = "Có", COGS/OPEX, Ngày tái tục >= ngày đầu chu kỳ
-        if (expenseType === 'Kinh doanh phần mềm' && standardName &&
+        if (expenseType === 'Kinh doanh phần mềm' && productName &&
             allocation === 'có' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
             if (rangeStart && renewalDate >= rangeStart && !isNaN(renewalDate.getTime())) {
-                softwareNames.add(standardName);
+                softwareNames.add(productName);
                 allocatedCostCount++;
             }
         }
@@ -1145,39 +1147,88 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
     let allocatedCosts = 0;
     let directCosts = 0;
     
-    console.log(`🔍 DEBUG SOFTWARE ALLOCATED COSTS:`, {
+    console.log(`🔍 DEBUG SOFTWARE ALLOCATED COSTS - START:`, {
         softwareName: softwareName,
         totalExpenses: expenses.length,
-        dateRange: dateRange
+        dateRange: dateRange,
+        dateRangeFormatted: dateRange ? `${dateRange.start} to ${dateRange.end}` : 'No date range'
     });
     
-    expenses.forEach(expense => {
-        // Sử dụng field product vì tenChuan không tồn tại trong data
-        const expenseSoftware = (expense.product || expense.tenChuan || expense.standardName || '').trim();
+    // Log sample expense data to understand structure
+    if (expenses.length > 0) {
+        console.log(`📋 Sample expense data (first 3 items):`, expenses.slice(0, 3));
+        
+        // Log all possible field names from first expense
+        if (expenses[0]) {
+            console.log(`📊 Available fields in expense object:`, Object.keys(expenses[0]));
+            console.log(`📊 Field values that might contain software name:`, {
+                product: expenses[0].product,
+                tenChuan: expenses[0].tenChuan,
+                standardName: expenses[0].standardName,
+                tenSanPham: expenses[0].tenSanPham,
+                moTa: expenses[0].moTa,
+                description: expenses[0].description
+            });
+        }
+    }
+    
+    let processedCount = 0;
+    let matchedCount = 0;
+    
+    expenses.forEach((expense, index) => {
+        // Log full expense object for first few items
+        if (index < 5) {
+            console.log(`📦 Expense #${index + 1} full data:`, expense);
+        }
+        
+        // Get software name from expense - use same order as getSoftwareNamesFromAllSources
+        // Giao dịch dùng field `tenChuan` (cột T trong sheet GiaoDich)
+        // Chi phí dùng field `product` (cột "Tên sản phẩm/Dịch vụ" trong sheet ChiPhi)
+        const expenseSoftware = (expense.product || expense.tenSanPham || expense.standardName || '').trim();
         const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
         
-        // Debug: Log all expenses to understand the data structure
+        // Debug: Log mapping results
         if (expenseSoftware) {
-            console.log(`💡 Expense data:`, {
-                expenseSoftware: expenseSoftware,
+            console.log(`🔤 Name mapping for expense #${index + 1}:`, {
+                rawProduct: expense.product,
+                rawTenChuan: expense.tenChuan,
+                rawStandardName: expense.standardName,
+                rawTenSanPham: expense.tenSanPham,
+                mappedName: expenseSoftware,
                 targetSoftware: softwareName,
                 matches: expenseSoftware === softwareName,
                 expenseType: expenseType,
-                amount: expense.amount || 0,
-                allocation: expense.periodicAllocation || expense.phanBo || expense.allocation || '',
-                accountingType: expense.accountingType || expense.loaiKeToan || ''
+                isBusinessSoftware: expenseType === 'Kinh doanh phần mềm'
             });
         }
         
         // Only process if this expense belongs to the current software
         if (expenseSoftware === softwareName && expenseType === 'Kinh doanh phần mềm') {
-            console.log(`✅ Processing expense for ${softwareName}:`, expense);
+            matchedCount++;
+            console.log(`✅ MATCHED expense #${index + 1} for ${softwareName}:`, {
+                expenseId: expense.expenseId || expense.maChiPhi || 'N/A',
+                description: expense.description || expense.moTa || 'N/A',
+                amount: expense.amount || expense.soTien || 0,
+                allocation: expense.periodicAllocation || expense.phanBo || expense.allocation || '',
+                accountingType: expense.accountingType || expense.loaiKeToan || '',
+                date: expense.date || expense.ngayChi || '',
+                renewDate: expense.renewDate || expense.ngayTaiTuc || ''
+            });
             
-            const amount = expense.amount || 0;
-            const allocation = (expense.periodicAllocation || '').toLowerCase().trim();
-            const accountingType = (expense.accountingType || '').trim();
-            const expenseDate = new Date(expense.date || '');
-            const renewalDate = new Date(expense.renewDate || '');
+            const amount = parseFloat(expense.amount || expense.soTien || 0);
+            const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
+            const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
+            const expenseDate = new Date(expense.date || expense.ngayChi || '');
+            const renewalDate = new Date(expense.renewDate || expense.ngayTaiTuc || '');
+            
+            console.log(`🔢 Processing allocation for matched expense:`, {
+                amount: amount,
+                allocation: allocation,
+                accountingType: accountingType,
+                expenseDate: expenseDate.toISOString().split('T')[0],
+                renewalDate: renewalDate.toISOString().split('T')[0],
+                isValidDates: !isNaN(expenseDate.getTime()) && !isNaN(renewalDate.getTime())
+            });
             
             // Convert dateRange strings to Date objects
             const rangeStart = dateRange ? new Date(dateRange.start) : null;
@@ -1189,10 +1240,18 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
             if (allocation === 'không' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
                 if (rangeStart && rangeEnd && expenseDate >= rangeStart && expenseDate <= rangeEnd) {
                     directCosts += amount;
+                    console.log(`💸 Added to direct costs: ${amount} (total direct: ${directCosts})`);
                 }
             }
             // Chi phí phân bổ: Loại kế toán = "OPEX" hoặc "COGS", Phân bổ = "Có", Ngày tái tục >= Ngày bắt đầu chu kỳ
             else if (allocation === 'có' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
+                console.log(`🔍 Checking allocated cost conditions:`, {
+                    hasDateRange: rangeStart && rangeEnd,
+                    renewalAfterStart: renewalDate >= rangeStart,
+                    validDates: !isNaN(expenseDate.getTime()) && !isNaN(renewalDate.getTime()),
+                    conditionsMet: rangeStart && rangeEnd && renewalDate >= rangeStart && !isNaN(expenseDate.getTime()) && !isNaN(renewalDate.getTime())
+                });
+                
                 if (rangeStart && rangeEnd && renewalDate >= rangeStart && !isNaN(expenseDate.getTime()) && !isNaN(renewalDate.getTime())) {
                     
                     // Tính số ngày từ ngày chi đến ngày tái tục
@@ -1211,22 +1270,44 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
                         const effectiveDays = Math.min(daysToRenewal, daysToToday);
                         
                         allocatedAmount = amount * effectiveDays / totalDays;
+                        
+                        console.log(`📊 Allocated calculation (renewal < end):`, {
+                            amount: amount,
+                            effectiveDays: effectiveDays,
+                            totalDays: totalDays,
+                            formula: `${amount} * ${effectiveDays} / ${totalDays}`,
+                            result: allocatedAmount
+                        });
                     } 
                     // Nếu ngày tái tục >= ngày cuối chu kỳ
                     else {
                         allocatedAmount = amount * periodDays / totalDays;
+                        
+                        console.log(`📊 Allocated calculation (renewal >= end):`, {
+                            amount: amount,
+                            periodDays: periodDays,
+                            totalDays: totalDays,
+                            formula: `${amount} * ${periodDays} / ${totalDays}`,
+                            result: allocatedAmount
+                        });
                     }
                     
                     allocatedCosts += allocatedAmount;
+                    console.log(`💰 Added to allocated costs: ${allocatedAmount} (total allocated: ${allocatedCosts})`);
                 }
             }
         }
+        
+        processedCount++;
     });
     
-    console.log(`💰 SOFTWARE ALLOCATED COSTS RESULT for ${softwareName}:`, {
+    console.log(`💰 SOFTWARE ALLOCATED COSTS FINAL RESULT for ${softwareName}:`, {
         allocatedCosts: allocatedCosts,
         directCosts: directCosts,
-        totalProcessed: expenses.length
+        totalExpenses: expenses.length,
+        processedExpenses: processedCount,
+        matchedExpenses: matchedCount,
+        dateRange: dateRange ? `${dateRange.start} to ${dateRange.end}` : 'No date range'
     });
     
     // Return only allocated costs (matching the column name in the table)
