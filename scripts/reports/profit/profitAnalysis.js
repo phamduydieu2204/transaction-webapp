@@ -261,8 +261,8 @@ function calculateExpenseMetrics(expenses, dateRange) {
                     allocatedAmount = amount * effectiveDays / totalDays;
                     
                     console.log(`📊 Renewal < End Date calculation:`, {
-                        renewalDate: renewalDate.toISOString().split('T')[0],
-                        rangeEnd: rangeEnd.toISOString().split('T')[0],
+                        renewalDate: !isNaN(renewalDate.getTime()) ? renewalDate.toISOString().split('T')[0] : 'Invalid Date',
+                        rangeEnd: rangeEnd && !isNaN(rangeEnd.getTime()) ? rangeEnd.toISOString().split('T')[0] : 'Invalid Date',
                         daysToRenewal: daysToRenewal,
                         daysToToday: daysToToday,
                         effectiveDays: effectiveDays,
@@ -275,8 +275,8 @@ function calculateExpenseMetrics(expenses, dateRange) {
                     allocatedAmount = amount * periodDays / totalDays;
                     
                     console.log(`📊 Renewal >= End Date calculation:`, {
-                        renewalDate: renewalDate.toISOString().split('T')[0],
-                        rangeEnd: rangeEnd.toISOString().split('T')[0],
+                        renewalDate: !isNaN(renewalDate.getTime()) ? renewalDate.toISOString().split('T')[0] : 'Invalid Date',
+                        rangeEnd: rangeEnd && !isNaN(rangeEnd.getTime()) ? rangeEnd.toISOString().split('T')[0] : 'Invalid Date',
                         periodDays: periodDays,
                         formula: `${amount} * ${periodDays} / ${totalDays} = ${allocatedAmount.toFixed(2)}`
                     });
@@ -288,10 +288,10 @@ function calculateExpenseMetrics(expenses, dateRange) {
                     expenseId: expense.expenseId || 'N/A',
                     product: expense.product || 'N/A',
                     amount: amount,
-                    expenseDate: expenseDate.toISOString().split('T')[0],
-                    renewalDate: renewalDate.toISOString().split('T')[0],
-                    rangeStart: rangeStart.toISOString().split('T')[0],
-                    rangeEnd: rangeEnd.toISOString().split('T')[0],
+                    expenseDate: !isNaN(expenseDate.getTime()) ? expenseDate.toISOString().split('T')[0] : 'Invalid Date',
+                    renewalDate: !isNaN(renewalDate.getTime()) ? renewalDate.toISOString().split('T')[0] : 'Invalid Date',
+                    rangeStart: rangeStart && !isNaN(rangeStart.getTime()) ? rangeStart.toISOString().split('T')[0] : 'Invalid Date',
+                    rangeEnd: rangeEnd && !isNaN(rangeEnd.getTime()) ? rangeEnd.toISOString().split('T')[0] : 'Invalid Date',
                     totalDays: totalDays,
                     periodDays: periodDays,
                     isRenewalBeforeEnd: renewalDate < rangeEnd,
@@ -1220,14 +1220,15 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
             const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
             const expenseDate = new Date(expense.date || expense.ngayChi || '');
             const renewalDate = new Date(expense.renewDate || expense.ngayTaiTuc || '');
+            const isValidDates = !isNaN(expenseDate.getTime()) && !isNaN(renewalDate.getTime());
             
             console.log(`🔢 Processing allocation for matched expense:`, {
                 amount: amount,
                 allocation: allocation,
                 accountingType: accountingType,
-                expenseDate: expenseDate.toISOString().split('T')[0],
-                renewalDate: renewalDate.toISOString().split('T')[0],
-                isValidDates: !isNaN(expenseDate.getTime()) && !isNaN(renewalDate.getTime())
+                expenseDate: isValidDates ? expenseDate.toISOString().split('T')[0] : 'Invalid Date',
+                renewalDate: isValidDates ? renewalDate.toISOString().split('T')[0] : 'Invalid Date',
+                isValidDates: isValidDates
             });
             
             // Convert dateRange strings to Date objects
