@@ -992,8 +992,14 @@ async function calculateSoftwareProfitMetrics(transactions, expenses, dateRange)
         // Calculate allocated costs for this software
         const allocatedCosts = calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange);
         
-        // Calculate gross profit = revenue - allocated costs
-        const grossProfit = softwareRevenue.netRevenue - allocatedCosts;
+        // Calculate direct costs for this software  
+        const directCosts = calculateSoftwareDirectCosts(expenses, softwareName, dateRange);
+        
+        // Calculate total costs = allocated costs + direct costs
+        const totalCosts = allocatedCosts + directCosts;
+        
+        // Calculate gross profit = revenue - total costs
+        const grossProfit = softwareRevenue.netRevenue - totalCosts;
         
         // Calculate profit margin = (gross profit / net revenue) * 100
         const profitMargin = softwareRevenue.netRevenue > 0 ? (grossProfit / softwareRevenue.netRevenue) * 100 : 0;
@@ -1003,7 +1009,9 @@ async function calculateSoftwareProfitMetrics(transactions, expenses, dateRange)
             totalRevenue: softwareRevenue.netRevenue,
             grossRevenue: softwareRevenue.grossRevenue,
             refunds: softwareRefunds,
+            directCosts,
             allocatedCosts,
+            totalCosts,
             grossProfit,
             profitMargin
         });
@@ -1316,6 +1324,79 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
 }
 
 /**
+ * Calculate direct costs for a specific software (không phân bổ)
+ */
+function calculateSoftwareDirectCosts(expenses, softwareName, dateRange) {
+    console.log(`🔍 DEBUG SOFTWARE DIRECT COSTS - START:`, {
+        softwareName: softwareName,
+        totalExpenses: expenses.length,
+        dateRange: dateRange ? `${dateRange.start} to ${dateRange.end}` : 'No date range'
+    });
+    
+    let directCosts = 0;
+    let processedCount = 0;
+    let matchedCount = 0;
+    
+    // Convert dateRange strings to Date objects
+    const rangeStart = dateRange ? new Date(dateRange.start) : null;
+    const rangeEnd = dateRange ? new Date(dateRange.end) : null;
+    
+    expenses.forEach((expense, index) => {
+        // Get software name from expense - use same logic as other functions
+        const expenseSoftware = (expense.product || expense.tenSanPham || expense.standardName || '').trim();
+        
+        // Only process expenses that match this software
+        if (expenseSoftware !== softwareName) {
+            return;
+        }
+        
+        matchedCount++;
+        
+        const amount = parseFloat(expense.amount || expense.soTien || 0);
+        const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
+        const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
+        const expenseDate = new Date(expense.date || expense.ngayChi || '');
+        const isValidExpenseDate = !isNaN(expenseDate.getTime());
+        
+        console.log(`🔢 Processing direct cost for matched expense:`, {
+            amount: amount,
+            allocation: allocation,
+            accountingType: accountingType,
+            expenseDate: isValidExpenseDate ? expenseDate.toISOString().split('T')[0] : 'Invalid Date',
+            isValidExpenseDate: isValidExpenseDate
+        });
+        
+        // Chi phí không phân bổ: Phân bổ = "Không" và Loại kế toán = "COGS" hoặc "OPEX" và Ngày chi trong chu kỳ
+        if (allocation === 'không' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
+            // Chỉ tính chi phí không phân bổ nếu ngày chi nằm trong chu kỳ
+            if (rangeStart && rangeEnd && isValidExpenseDate && expenseDate >= rangeStart && expenseDate <= rangeEnd) {
+                directCosts += amount;
+                
+                console.log(`💰 Added direct cost:`, {
+                    amount: amount,
+                    expenseDate: expenseDate.toISOString().split('T')[0],
+                    rangeStart: rangeStart.toISOString().split('T')[0],
+                    rangeEnd: rangeEnd.toISOString().split('T')[0],
+                    runningTotal: directCosts
+                });
+            }
+        }
+        
+        processedCount++;
+    });
+    
+    console.log(`💰 SOFTWARE DIRECT COSTS FINAL RESULT for ${softwareName}:`, {
+        directCosts: directCosts,
+        totalExpenses: expenses.length,
+        processedExpenses: processedCount,
+        matchedExpenses: matchedCount,
+        dateRange: dateRange ? `${dateRange.start} to ${dateRange.end}` : 'No date range'
+    });
+    
+    return directCosts;
+}
+
+/**
  * Update software profit table
  */
 function updateSoftwareProfitTable(softwareProfitData) {
@@ -1325,7 +1406,7 @@ function updateSoftwareProfitTable(softwareProfitData) {
     if (softwareProfitData.length === 0) {
         tableBody.innerHTML = `
             <tr class="no-data-row">
-                <td colspan="6" class="no-data-cell">
+                <td colspan="7" class="no-data-cell">
                     <div class="no-data-message">
                         <i class="fas fa-info-circle"></i>
                         <span>Không có dữ liệu phần mềm trong kỳ được chọn</span>
@@ -1355,6 +1436,9 @@ function updateSoftwareProfitTable(softwareProfitData) {
                 </td>
                 <td class="refund-value">
                     <span class="value-amount negative">${formatRevenue(item.refunds)}</span>
+                </td>
+                <td class="direct-cost-value">
+                    <span class="value-amount">${formatRevenue(item.directCosts)}</span>
                 </td>
                 <td class="cost-value">
                     <span class="value-amount">${formatRevenue(item.allocatedCosts)}</span>
@@ -1386,14 +1470,17 @@ function updateSoftwareProfitTable(softwareProfitData) {
 function updateSoftwareProfitSummary(softwareProfitData) {
     const totalCount = softwareProfitData.length;
     const totalRevenue = softwareProfitData.reduce((sum, item) => sum + item.totalRevenue, 0);
-    const totalCosts = softwareProfitData.reduce((sum, item) => sum + item.allocatedCosts, 0);
+    const totalDirectCosts = softwareProfitData.reduce((sum, item) => sum + item.directCosts, 0);
+    const totalAllocatedCosts = softwareProfitData.reduce((sum, item) => sum + item.allocatedCosts, 0);
+    const totalCosts = softwareProfitData.reduce((sum, item) => sum + item.totalCosts, 0);
     const totalProfit = softwareProfitData.reduce((sum, item) => sum + item.grossProfit, 0);
     const averageMargin = totalCount > 0 ? 
         softwareProfitData.reduce((sum, item) => sum + item.profitMargin, 0) / totalCount : 0;
     
     updateKPIElement('total-software-count', totalCount.toString());
     updateKPIElement('total-software-revenue', formatRevenue(totalRevenue));
-    updateKPIElement('total-software-cost', formatRevenue(totalCosts));
+    updateKPIElement('total-software-direct-cost', formatRevenue(totalDirectCosts));
+    updateKPIElement('total-software-cost', formatRevenue(totalAllocatedCosts));
     updateKPIElement('total-software-profit', formatRevenue(totalProfit));
     updateKPIElement('average-profit-margin', `${averageMargin.toFixed(1)}%`);
 }

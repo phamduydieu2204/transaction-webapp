@@ -144,6 +144,10 @@
                                 <span class="col-title">Tổng tiền hoàn</span>
                                 <i class="fas fa-sort sort-icon" data-sort="refund"></i>
                             </th>
+                            <th class="direct-cost-col">
+                                <span class="col-title">Chi phí không phân bổ</span>
+                                <i class="fas fa-sort sort-icon" data-sort="direct-cost"></i>
+                            </th>
                             <th class="allocated-cost-col">
                                 <span class="col-title">Chi phí phân bổ phần mềm</span>
                                 <i class="fas fa-sort sort-icon" data-sort="cost"></i>
@@ -151,7 +155,7 @@
                             <th class="gross-profit-col">
                                 <span class="col-title">Lợi nhuận gộp</span>
                                 <i class="fas fa-sort sort-icon" data-sort="profit"></i>
-                                <div class="col-subtitle">(Doanh thu - Chi phí phân bổ)</div>
+                                <div class="col-subtitle">(Doanh thu - Tổng chi phí)</div>
                             </th>
                             <th class="profit-margin-col">
                                 <span class="col-title">Tỷ suất lợi nhuận</span>
@@ -162,7 +166,7 @@
                     <tbody id="software-profit-table-body">
                         <!-- Data will be populated by JavaScript -->
                         <tr class="loading-row">
-                            <td colspan="6" class="loading-cell">
+                            <td colspan="7" class="loading-cell">
                                 <div class="loading-spinner">
                                     <i class="fas fa-spinner fa-spin"></i>
                                     <span>Đang tải dữ liệu phần mềm...</span>
@@ -183,6 +187,10 @@
                     <div class="stat-item">
                         <span class="stat-label">Tổng doanh thu:</span>
                         <span class="stat-value" id="total-software-revenue">0 ₫</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Tổng chi phí không phân bổ:</span>
+                        <span class="stat-value" id="total-software-direct-cost">0 ₫</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">Tổng chi phí phân bổ:</span>
