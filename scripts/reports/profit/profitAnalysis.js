@@ -1024,6 +1024,20 @@ async function calculateSoftwareProfitMetrics(transactions, expenses, dateRange)
 }
 
 /**
+ * Check if expense product is related to software name
+ * e.g., "ChatGPT" (expense) should match "ChatGPT Plus Private" (software)
+ */
+function isExpenseRelatedToSoftware(expenseProduct, softwareName) {
+    if (!expenseProduct || !softwareName) return false;
+    
+    const expenseProductLower = expenseProduct.toLowerCase().trim();
+    const softwareNameLower = softwareName.toLowerCase().trim();
+    
+    return softwareNameLower.includes(expenseProductLower) || 
+           expenseProductLower.includes(softwareNameLower);
+}
+
+/**
  * Get unique software names from transactions and expenses
  */
 function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
@@ -1050,8 +1064,8 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
     expenses.forEach(expense => {
         const expenseDate = new Date(expense.date || '');
         const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
-        // Chi phí dùng field tenChuan (cột R - Tên chuẩn trong sheet ChiPhi)
-        const standardName = (expense.tenChuan || expense.standardName || '').trim();
+        // Chi phí dùng field product (cột "Tên sản phẩm/Dịch vụ" - thực tế có trong data)
+        const productName = (expense.product || expense.tenSanPham || '').trim();
         const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
         const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
         
@@ -1059,10 +1073,10 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
         const rangeEnd = dateRange ? new Date(dateRange.end) : null;
         
         // Chi phí không phân bổ: Phân bổ = "Không", COGS/OPEX, Ngày chi trong chu kỳ
-        if (expenseType === 'Kinh doanh phần mềm' && standardName && 
+        if (expenseType === 'Kinh doanh phần mềm' && productName && 
             allocation === 'không' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
             if (rangeStart && rangeEnd && expenseDate >= rangeStart && expenseDate <= rangeEnd) {
-                softwareNames.add(standardName);
+                softwareNames.add(productName);
                 directCostCount++;
             }
         }
@@ -1074,8 +1088,8 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
     let allocatedCostCount = 0;
     expenses.forEach(expense => {
         const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
-        // Chi phí dùng field tenChuan (cột R - Tên chuẩn trong sheet ChiPhi)
-        const standardName = (expense.tenChuan || expense.standardName || '').trim();
+        // Chi phí dùng field product (cột "Tên sản phẩm/Dịch vụ" - thực tế có trong data)
+        const productName = (expense.product || expense.tenSanPham || '').trim();
         const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
         const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
         const renewalDate = new Date(expense.renewDate || expense.ngayTaiTuc || '');
@@ -1083,10 +1097,10 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
         const rangeStart = dateRange ? new Date(dateRange.start) : null;
         
         // Chi phí phân bổ: Phân bổ = "Có", COGS/OPEX, Ngày tái tục >= ngày đầu chu kỳ
-        if (expenseType === 'Kinh doanh phần mềm' && standardName &&
+        if (expenseType === 'Kinh doanh phần mềm' && productName &&
             allocation === 'có' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
             if (rangeStart && renewalDate >= rangeStart && !isNaN(renewalDate.getTime())) {
-                softwareNames.add(standardName);
+                softwareNames.add(productName);
                 allocatedCostCount++;
             }
         }
@@ -1191,8 +1205,8 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
         
         // Get software name from expense - use same order as getSoftwareNamesFromAllSources
         // Giao dịch dùng field `tenChuan` (cột T trong sheet GiaoDich)
-        // Chi phí cũng dùng field `tenChuan` (cột R trong sheet ChiPhi) để mapping đúng
-        const expenseSoftware = (expense.tenChuan || expense.standardName || '').trim();
+        // Chi phí dùng field `product` (cột "Tên sản phẩm/Dịch vụ" thực tế có trong data)
+        const expenseSoftware = (expense.product || expense.tenSanPham || '').trim();
         const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
         
         // Debug: Log mapping results
@@ -1211,7 +1225,7 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
         }
         
         // Only process if this expense belongs to the current software
-        if (expenseSoftware === softwareName && expenseType === 'Kinh doanh phần mềm') {
+        if (isExpenseRelatedToSoftware(expenseSoftware, softwareName) && expenseType === 'Kinh doanh phần mềm') {
             matchedCount++;
             console.log(`✅ MATCHED expense #${index + 1} for ${softwareName}:`, {
                 expenseId: expense.expenseId || expense.maChiPhi || 'N/A',
@@ -1342,11 +1356,11 @@ function calculateSoftwareDirectCosts(expenses, softwareName, dateRange) {
     const rangeEnd = dateRange ? new Date(dateRange.end) : null;
     
     expenses.forEach((expense, index) => {
-        // Get software name from expense - use tenChuan (cột R - Tên chuẩn trong sheet ChiPhi)
-        const expenseSoftware = (expense.tenChuan || expense.standardName || '').trim();
+        // Get software name from expense - use product (cột "Tên sản phẩm/Dịch vụ" thực tế có trong data)
+        const expenseSoftware = (expense.product || expense.tenSanPham || '').trim();
         
-        // Only process expenses that match this software
-        if (expenseSoftware !== softwareName) {
+        // Smart matching: Check if expense product is related to software name
+        if (!isExpenseRelatedToSoftware(expenseSoftware, softwareName)) {
             return;
         }
         
@@ -1359,11 +1373,17 @@ function calculateSoftwareDirectCosts(expenses, softwareName, dateRange) {
         const isValidExpenseDate = !isNaN(expenseDate.getTime());
         
         console.log(`🔢 Processing direct cost for matched expense:`, {
+            expenseId: expense.expenseId || 'N/A',
+            expenseSoftware: expenseSoftware,
+            softwareName: softwareName,
             amount: amount,
             allocation: allocation,
             accountingType: accountingType,
             expenseDate: isValidExpenseDate ? expenseDate.toISOString().split('T')[0] : 'Invalid Date',
-            isValidExpenseDate: isValidExpenseDate
+            isValidExpenseDate: isValidExpenseDate,
+            rangeStart: rangeStart ? rangeStart.toISOString().split('T')[0] : 'No start',
+            rangeEnd: rangeEnd ? rangeEnd.toISOString().split('T')[0] : 'No end',
+            expenseInRange: rangeStart && rangeEnd && isValidExpenseDate && expenseDate >= rangeStart && expenseDate <= rangeEnd
         });
         
         // Chi phí không phân bổ: Phân bổ = "Không" và Loại kế toán = "COGS" hoặc "OPEX" và Ngày chi trong chu kỳ
