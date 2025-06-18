@@ -1087,8 +1087,10 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
     
     expenses.forEach((expense, index) => {
         const expenseDate = new Date(expense.date || expense.ngayChi || '');
-        const standardName = (expense.tenChuan || expense.standardName || '').trim();
+        // Nếu không có tenChuan, sử dụng product field
+        const standardName = (expense.tenChuan || expense.standardName || expense.product || expense.tenSanPham || '').trim();
         const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
+        const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
         
         // Kiểm tra chi phí nằm trong chu kỳ báo cáo
         const rangeStart = dateRange ? new Date(dateRange.start) : null;
@@ -1099,15 +1101,18 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
         if (index < 3) {
             console.log(`💰 Chi phí #${index + 1}:`, {
                 standardName: standardName,
+                product: expense.product,
                 expenseDate: !isNaN(expenseDate.getTime()) ? expenseDate.toISOString().split('T')[0] : 'Invalid Date',
                 accountingType: accountingType,
+                expenseType: expenseType,
                 isInDateRange: isInDateRange,
                 isRelevantExpense: isRelevantExpense,
-                willInclude: isRelevantExpense && isInDateRange
+                willInclude: isRelevantExpense && isInDateRange && expenseType === 'Kinh doanh phần mềm'
             });
         }
         
-        if (isRelevantExpense && isInDateRange) {
+        // Thêm điều kiện: CHỈ lấy chi phí kinh doanh phần mềm
+        if (isRelevantExpense && isInDateRange && expenseType === 'Kinh doanh phần mềm') {
             softwareNames.add(standardName);
             directCostNames.add(standardName);
             directCostSource++;
@@ -1123,9 +1128,11 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
     
     expenses.forEach((expense, index) => {
         const renewalDate = new Date(expense.renewDate || expense.ngayTaiTuc || '');
-        const standardName = (expense.tenChuan || expense.standardName || '').trim();
+        // Nếu không có tenChuan, sử dụng product field
+        const standardName = (expense.tenChuan || expense.standardName || expense.product || expense.tenSanPham || '').trim();
         const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
         const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
+        const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
         
         // Kiểm tra chi phí phân bổ: Ngày tái tục >= ngày bắt đầu chu kỳ, Phân bổ = "Có", COGS/OPEX
         const rangeStart = dateRange ? new Date(dateRange.start) : null;
@@ -1136,9 +1143,11 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
         if (index < 3) {
             console.log(`📈 Chi phí phân bổ #${index + 1}:`, {
                 standardName: standardName,
+                product: expense.product,
                 renewalDate: !isNaN(renewalDate.getTime()) ? renewalDate.toISOString().split('T')[0] : 'Invalid Date',
                 allocation: allocation,
                 accountingType: accountingType,
+                expenseType: expenseType,
                 isRenewalAfterStart: isRenewalAfterStart,
                 isAllocated: isAllocated,
                 isRelevantExpense: isRelevantExpense,
@@ -1146,7 +1155,8 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
             });
         }
         
-        if (isRelevantExpense && isAllocated && isRenewalAfterStart) {
+        // Thêm điều kiện: CHỈ lấy chi phí kinh doanh phần mềm, không lấy chi phí lương nhân viên
+        if (isRelevantExpense && isAllocated && isRenewalAfterStart && expenseType === 'Kinh doanh phần mềm') {
             softwareNames.add(standardName);
             allocatedCostNames.add(standardName);
             allocatedCostSource++;
