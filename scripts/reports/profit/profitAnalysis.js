@@ -1024,6 +1024,47 @@ async function calculateSoftwareProfitMetrics(transactions, expenses, dateRange)
 }
 
 /**
+ * Create mapping table between transaction.tenChuan and expense.product
+ * Since tenChuan field doesn't exist in expense data, we need smart mapping
+ */
+function createSoftwareMapping() {
+    return {
+        // Transaction tenChuan -> Expense product mapping
+        'ChatGPT Plus Private': 'ChatGPT',
+        'ChatGPT Plus Share': 'ChatGPT', 
+        'ChatGPT Team Private': 'ChatGPT',
+        'Grok AI Share': 'Grok AI',
+        'Helium10 Diamon': 'Helium10',
+        'Helium10 Platinum': 'Helium10',
+        'Netflix Private': 'NetFlix',
+        'Netflix Share': 'NetFlix',
+        'YouTube Premium': 'Youtube',
+        'Claude AI Private': 'Claude AI',
+        'Midjourney Private': 'Midjourney',
+        'Canva Pro': 'Canva',
+        'VOC AI': 'VOC AI',
+        'SurfShark VPN': 'SurfShark',
+        'Minimax AI': 'Minimax'
+    };
+}
+
+/**
+ * Get expense product name that matches transaction standard name
+ */
+function getExpenseProductForSoftware(standardName) {
+    const mapping = createSoftwareMapping();
+    return mapping[standardName] || standardName;
+}
+
+/**
+ * Check if expense product relates to transaction standard name
+ */
+function doesExpenseMatchSoftware(expenseProduct, transactionStandardName) {
+    const expectedProduct = getExpenseProductForSoftware(transactionStandardName);
+    return expenseProduct === expectedProduct;
+}
+
+/**
  * Get unique software names from transactions and expenses
  */
 function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
@@ -1045,13 +1086,13 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
     console.log(`📊 Found ${revenueCount} software with revenue in period from GiaoDich`);
     
     // 2. Phần mềm có chi phí không phân bổ trong chu kỳ báo cáo (từ sheet ChiPhi)
-    // Chi phí sử dụng cột R - Tên chuẩn để mapping với GiaoDich
+    // Chi phí sử dụng product field, cần reverse mapping để tìm tenChuan tương ứng
     let directCostCount = 0;
     expenses.forEach(expense => {
         const expenseDate = new Date(expense.date || '');
         const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
-        // Chi phí dùng field tenChuan (cột R - Tên chuẩn trong sheet ChiPhi)
-        const standardName = (expense.tenChuan || expense.standardName || '').trim();
+        // Chi phí dùng field product (cột "Tên sản phẩm/Dịch vụ" thực tế có trong data)
+        const productName = (expense.product || expense.tenSanPham || '').trim();
         const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
         const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
         
@@ -1059,23 +1100,29 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
         const rangeEnd = dateRange ? new Date(dateRange.end) : null;
         
         // Chi phí không phân bổ: Phân bổ = "Không", COGS/OPEX, Ngày chi trong chu kỳ
-        if (expenseType === 'Kinh doanh phần mềm' && standardName && 
+        if (expenseType === 'Kinh doanh phần mềm' && productName && 
             allocation === 'không' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
             if (rangeStart && rangeEnd && expenseDate >= rangeStart && expenseDate <= rangeEnd) {
-                softwareNames.add(standardName);
-                directCostCount++;
+                // Find transaction standardName(s) that map to this expense product
+                const mapping = createSoftwareMapping();
+                for (const [standardName, expenseProduct] of Object.entries(mapping)) {
+                    if (expenseProduct === productName) {
+                        softwareNames.add(standardName);
+                        directCostCount++;
+                    }
+                }
             }
         }
     });
     console.log(`📊 Found ${directCostCount} software with direct costs in period from ChiPhi`);
     
     // 3. Phần mềm có chi phí phân bổ (ngày tái tục >= ngày đầu chu kỳ) (từ sheet ChiPhi)
-    // Chi phí sử dụng cột R - Tên chuẩn để mapping với GiaoDich
+    // Chi phí sử dụng product field, cần reverse mapping để tìm tenChuan tương ứng
     let allocatedCostCount = 0;
     expenses.forEach(expense => {
         const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
-        // Chi phí dùng field tenChuan (cột R - Tên chuẩn trong sheet ChiPhi)
-        const standardName = (expense.tenChuan || expense.standardName || '').trim();
+        // Chi phí dùng field product (cột "Tên sản phẩm/Dịch vụ" thực tế có trong data)
+        const productName = (expense.product || expense.tenSanPham || '').trim();
         const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
         const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
         const renewalDate = new Date(expense.renewDate || expense.ngayTaiTuc || '');
@@ -1083,11 +1130,17 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
         const rangeStart = dateRange ? new Date(dateRange.start) : null;
         
         // Chi phí phân bổ: Phân bổ = "Có", COGS/OPEX, Ngày tái tục >= ngày đầu chu kỳ
-        if (expenseType === 'Kinh doanh phần mềm' && standardName &&
+        if (expenseType === 'Kinh doanh phần mềm' && productName &&
             allocation === 'có' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
             if (rangeStart && renewalDate >= rangeStart && !isNaN(renewalDate.getTime())) {
-                softwareNames.add(standardName);
-                allocatedCostCount++;
+                // Find transaction standardName(s) that map to this expense product
+                const mapping = createSoftwareMapping();
+                for (const [standardName, expenseProduct] of Object.entries(mapping)) {
+                    if (expenseProduct === productName) {
+                        softwareNames.add(standardName);
+                        allocatedCostCount++;
+                    }
+                }
             }
         }
     });
@@ -1191,27 +1244,28 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
         
         // Get software name from expense - use same order as getSoftwareNamesFromAllSources
         // Giao dịch dùng field `tenChuan` (cột T trong sheet GiaoDich)
-        // Chi phí dùng field `tenChuan` (cột R - Tên chuẩn trong sheet ChiPhi)
-        const expenseSoftware = (expense.tenChuan || expense.standardName || '').trim();
+        // Chi phí dùng field `product` (cột "Tên sản phẩm/Dịch vụ" thực tế có trong data)
+        const expenseProduct = (expense.product || expense.tenSanPham || '').trim();
         const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
         
         // Debug: Log mapping results
-        if (expenseSoftware) {
+        if (expenseProduct) {
+            const expectedProduct = getExpenseProductForSoftware(softwareName);
+            const matches = doesExpenseMatchSoftware(expenseProduct, softwareName);
             console.log(`🔤 Name mapping for expense #${index + 1}:`, {
-                rawTenChuan: expense.tenChuan,
-                rawStandardName: expense.standardName,
                 rawProduct: expense.product,
                 rawTenSanPham: expense.tenSanPham,
-                mappedName: expenseSoftware,
+                expenseProduct: expenseProduct,
                 targetSoftware: softwareName,
-                matches: expenseSoftware === softwareName,
+                expectedProduct: expectedProduct,
+                matches: matches,
                 expenseType: expenseType,
                 isBusinessSoftware: expenseType === 'Kinh doanh phần mềm'
             });
         }
         
-        // Only process if this expense belongs to the current software (exact match by tenChuan)
-        if (expenseSoftware === softwareName && expenseType === 'Kinh doanh phần mềm') {
+        // Only process if this expense belongs to the current software (mapping match)
+        if (doesExpenseMatchSoftware(expenseProduct, softwareName) && expenseType === 'Kinh doanh phần mềm') {
             matchedCount++;
             console.log(`✅ MATCHED expense #${index + 1} for ${softwareName}:`, {
                 expenseId: expense.expenseId || expense.maChiPhi || 'N/A',
@@ -1342,11 +1396,11 @@ function calculateSoftwareDirectCosts(expenses, softwareName, dateRange) {
     const rangeEnd = dateRange ? new Date(dateRange.end) : null;
     
     expenses.forEach((expense, index) => {
-        // Get software name from expense - use tenChuan (cột R - Tên chuẩn trong sheet ChiPhi)
-        const expenseSoftware = (expense.tenChuan || expense.standardName || '').trim();
+        // Get software name from expense - use product field and check mapping
+        const expenseProduct = (expense.product || expense.tenSanPham || '').trim();
         
-        // Exact matching by standardized name
-        if (expenseSoftware !== softwareName) {
+        // Check if this expense product matches the target software using mapping
+        if (!doesExpenseMatchSoftware(expenseProduct, softwareName)) {
             return;
         }
         
@@ -1358,13 +1412,13 @@ function calculateSoftwareDirectCosts(expenses, softwareName, dateRange) {
         const expenseDate = new Date(expense.date || expense.ngayChi || '');
         const isValidExpenseDate = !isNaN(expenseDate.getTime());
         
-        console.log(`🔢 Processing direct cost for matched expense (tenChuan):`, {
+        console.log(`🔢 Processing direct cost for matched expense (mapping):`, {
             expenseId: expense.expenseId || 'N/A',
-            rawTenChuan: expense.tenChuan,
             rawProduct: expense.product,
-            expenseSoftware: expenseSoftware,
+            expenseProduct: expenseProduct,
             softwareName: softwareName,
-            exactMatch: expenseSoftware === softwareName,
+            expectedProduct: getExpenseProductForSoftware(softwareName),
+            mappingMatch: doesExpenseMatchSoftware(expenseProduct, softwareName),
             amount: amount,
             allocation: allocation,
             accountingType: accountingType,
