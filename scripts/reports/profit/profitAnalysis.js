@@ -1032,75 +1032,139 @@ function doesExpenseMatchSoftware(expenseTenChuan, targetSoftwareName) {
 }
 
 /**
- * Get unique software names from transactions and expenses using tenChuan field only
+ * BƯỚC 1: Liệt kê danh sách tên chuẩn duy nhất từ 3 nguồn
+ * 1. Tên chuẩn trong sheet GiaoDich có doanh thu nằm trong chu kỳ báo cáo
+ * 2. Tên chuẩn có chi phí nằm trong chu kỳ báo cáo (sheet ChiPhi)  
+ * 3. Tên chuẩn có chi phí phân bổ (Ngày tái tục >= ngày bắt đầu chu kỳ, Phân bổ = "Có", COGS/OPEX)
  */
 function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
     const softwareNames = new Set();
     
-    console.log('🔍 Getting software names from all sources using tenChuan field...');
+    console.log('🔍 BƯỚC 1: Liệt kê danh sách tên chuẩn duy nhất từ 3 nguồn...');
+    console.log('📅 Chu kỳ báo cáo:', dateRange ? `${dateRange.start} đến ${dateRange.end}` : 'Không xác định');
     
-    // 1. Phần mềm có doanh thu trong chu kỳ báo cáo (từ sheet GiaoDich cột T - Tên chuẩn)
-    let revenueCount = 0;
-    transactions.forEach(transaction => {
-        // Cột T trong sheet GiaoDich = tenChuan
+    // Nguồn 1: Tên chuẩn trong sheet GiaoDich có doanh thu nằm trong chu kỳ báo cáo
+    let revenueSource = 0;
+    const revenueNames = new Set();
+    
+    transactions.forEach((transaction, index) => {
+        const transactionDate = new Date(transaction.ngayGiaoDich || transaction.date || transaction.transactionDate || '');
         const standardName = (transaction.tenChuan || transaction.standardName || '').trim();
+        const status = (transaction.loaiGiaoDich || transaction.transactionType || '').toLowerCase().trim();
+        const amount = parseFloat(transaction.doanhThu || transaction.revenue || 0);
         
-        if (standardName) {
-            softwareNames.add(standardName);
-            revenueCount++;
-        }
-    });
-    console.log(`📊 Found ${revenueCount} software with revenue in period from GiaoDich.tenChuan`);
-    
-    // 2. Phần mềm có chi phí không phân bổ trong chu kỳ báo cáo (từ sheet ChiPhi cột T - Tên chuẩn)
-    let directCostCount = 0;
-    expenses.forEach(expense => {
-        const expenseDate = new Date(expense.date || '');
-        const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
-        // Chi phí cũng dùng field tenChuan (cột T trong sheet ChiPhi)
-        const standardName = (expense.tenChuan || expense.standardName || '').trim();
-        const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
-        const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
-        
+        // Kiểm tra giao dịch có doanh thu trong chu kỳ
         const rangeStart = dateRange ? new Date(dateRange.start) : null;
         const rangeEnd = dateRange ? new Date(dateRange.end) : null;
+        const isInDateRange = rangeStart && rangeEnd && transactionDate >= rangeStart && transactionDate <= rangeEnd;
+        const hasRevenue = (status === 'đã hoàn tất' || status === 'đã thanh toán') && amount > 0;
         
-        // Chi phí không phân bổ: Phân bổ = "Không", COGS/OPEX, Ngày chi trong chu kỳ
-        if (expenseType === 'Kinh doanh phần mềm' && standardName && 
-            allocation === 'không' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
-            if (rangeStart && rangeEnd && expenseDate >= rangeStart && expenseDate <= rangeEnd) {
-                softwareNames.add(standardName);
-                directCostCount++;
-            }
+        if (index < 3) {
+            console.log(`📊 Giao dịch #${index + 1}:`, {
+                standardName: standardName,
+                transactionDate: !isNaN(transactionDate.getTime()) ? transactionDate.toISOString().split('T')[0] : 'Invalid Date',
+                status: status,
+                amount: amount,
+                isInDateRange: isInDateRange,
+                hasRevenue: hasRevenue,
+                willInclude: standardName && hasRevenue && isInDateRange
+            });
+        }
+        
+        if (standardName && hasRevenue && isInDateRange) {
+            softwareNames.add(standardName);
+            revenueNames.add(standardName);
+            revenueSource++;
         }
     });
-    console.log(`📊 Found ${directCostCount} software with direct costs in period from ChiPhi.tenChuan`);
     
-    // 3. Phần mềm có chi phí phân bổ (ngày tái tục >= ngày đầu chu kỳ) (từ sheet ChiPhi cột T - Tên chuẩn)
-    let allocatedCostCount = 0;
-    expenses.forEach(expense => {
-        const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
-        // Chi phí cũng dùng field tenChuan (cột T trong sheet ChiPhi)
+    console.log(`✅ Nguồn 1 - GiaoDich có doanh thu: ${revenueSource} records, ${revenueNames.size} tên chuẩn unique`);
+    console.log(`📋 Danh sách từ GiaoDich:`, Array.from(revenueNames).sort());
+    
+    // Nguồn 2: Tên chuẩn có chi phí nằm trong chu kỳ báo cáo (sheet ChiPhi)
+    let directCostSource = 0;
+    const directCostNames = new Set();
+    
+    expenses.forEach((expense, index) => {
+        const expenseDate = new Date(expense.date || expense.ngayChi || '');
+        const standardName = (expense.tenChuan || expense.standardName || '').trim();
+        const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
+        
+        // Kiểm tra chi phí nằm trong chu kỳ báo cáo
+        const rangeStart = dateRange ? new Date(dateRange.start) : null;
+        const rangeEnd = dateRange ? new Date(dateRange.end) : null;
+        const isInDateRange = rangeStart && rangeEnd && expenseDate >= rangeStart && expenseDate <= rangeEnd;
+        const isRelevantExpense = standardName && (accountingType === 'COGS' || accountingType === 'OPEX');
+        
+        if (index < 3) {
+            console.log(`💰 Chi phí #${index + 1}:`, {
+                standardName: standardName,
+                expenseDate: !isNaN(expenseDate.getTime()) ? expenseDate.toISOString().split('T')[0] : 'Invalid Date',
+                accountingType: accountingType,
+                isInDateRange: isInDateRange,
+                isRelevantExpense: isRelevantExpense,
+                willInclude: isRelevantExpense && isInDateRange
+            });
+        }
+        
+        if (isRelevantExpense && isInDateRange) {
+            softwareNames.add(standardName);
+            directCostNames.add(standardName);
+            directCostSource++;
+        }
+    });
+    
+    console.log(`✅ Nguồn 2 - ChiPhi trong chu kỳ: ${directCostSource} records, ${directCostNames.size} tên chuẩn unique`);
+    console.log(`📋 Danh sách từ ChiPhi:`, Array.from(directCostNames).sort());
+    
+    // Nguồn 3: Tên chuẩn có chi phí phân bổ (Ngày tái tục >= ngày bắt đầu chu kỳ, Phân bổ = "Có", COGS/OPEX)
+    let allocatedCostSource = 0;
+    const allocatedCostNames = new Set();
+    
+    expenses.forEach((expense, index) => {
+        const renewalDate = new Date(expense.renewDate || expense.ngayTaiTuc || '');
         const standardName = (expense.tenChuan || expense.standardName || '').trim();
         const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
         const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
-        const renewalDate = new Date(expense.renewDate || expense.ngayTaiTuc || '');
         
+        // Kiểm tra chi phí phân bổ: Ngày tái tục >= ngày bắt đầu chu kỳ, Phân bổ = "Có", COGS/OPEX
         const rangeStart = dateRange ? new Date(dateRange.start) : null;
+        const isRenewalAfterStart = rangeStart && renewalDate >= rangeStart && !isNaN(renewalDate.getTime());
+        const isAllocated = allocation === 'có';
+        const isRelevantExpense = standardName && (accountingType === 'COGS' || accountingType === 'OPEX');
         
-        // Chi phí phân bổ: Phân bổ = "Có", COGS/OPEX, Ngày tái tục >= ngày đầu chu kỳ
-        if (expenseType === 'Kinh doanh phần mềm' && standardName &&
-            allocation === 'có' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
-            if (rangeStart && renewalDate >= rangeStart && !isNaN(renewalDate.getTime())) {
-                softwareNames.add(standardName);
-                allocatedCostCount++;
-            }
+        if (index < 3) {
+            console.log(`📈 Chi phí phân bổ #${index + 1}:`, {
+                standardName: standardName,
+                renewalDate: !isNaN(renewalDate.getTime()) ? renewalDate.toISOString().split('T')[0] : 'Invalid Date',
+                allocation: allocation,
+                accountingType: accountingType,
+                isRenewalAfterStart: isRenewalAfterStart,
+                isAllocated: isAllocated,
+                isRelevantExpense: isRelevantExpense,
+                willInclude: isRelevantExpense && isAllocated && isRenewalAfterStart
+            });
+        }
+        
+        if (isRelevantExpense && isAllocated && isRenewalAfterStart) {
+            softwareNames.add(standardName);
+            allocatedCostNames.add(standardName);
+            allocatedCostSource++;
         }
     });
-    console.log(`📊 Found ${allocatedCostCount} software with allocated costs from ChiPhi.tenChuan`);
     
+    console.log(`✅ Nguồn 3 - Chi phí phân bổ: ${allocatedCostSource} records, ${allocatedCostNames.size} tên chuẩn unique`);
+    console.log(`📋 Danh sách từ Chi phí phân bổ:`, Array.from(allocatedCostNames).sort());
+    
+    // Tổng hợp kết quả
     const finalList = Array.from(softwareNames).sort();
-    console.log(`📋 Total unique software names using tenChuan only: ${finalList.length}`, finalList);
+    console.log(`\n🎯 KẾT QUẢ BƯỚC 1 - Danh sách tên chuẩn duy nhất:`);
+    console.log(`📊 Tổng số tên chuẩn unique: ${finalList.length}`);
+    console.log(`📋 Danh sách cuối cùng:`, finalList);
+    console.log(`📈 Thống kê nguồn dữ liệu:`);
+    console.log(`   - Từ GiaoDich có doanh thu: ${revenueNames.size} tên chuẩn`);
+    console.log(`   - Từ ChiPhi trong chu kỳ: ${directCostNames.size} tên chuẩn`);
+    console.log(`   - Từ Chi phí phân bổ: ${allocatedCostNames.size} tên chuẩn`);
     
     return finalList;
 }
