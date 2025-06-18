@@ -79,18 +79,18 @@ export async function loadOverviewReport(options = {}) {
     // Update period display
     updatePeriodDisplay(period);
     
-    // Calculate KPIs with new business logic
-    const kpis = calculateUpdatedBusinessMetrics(transactions, expenses, dateRange);
+    // Filter data by date range FIRST
+    const filteredTransactions = filterDataByDateRange(transactions, dateRange);
+    const filteredExpenses = filterDataByDateRange(expenses, dateRange);
+    
+    // Calculate KPIs with filtered data (and pass unfiltered data for comparison)
+    const kpis = calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses, dateRange, transactions);
     console.log('💰 Calculated Updated KPIs:');
     console.log('  - Doanh thu gộp:', kpis.grossRevenue);
     console.log('  - Tiền đang chờ thu:', kpis.pendingCollection);
     console.log('  - Tiền đang chờ chi:', kpis.pendingPayment);
     console.log('  - Tổng tiền hoàn trả:', kpis.totalRefunds);
     console.log('  - Tỷ lệ hoàn tiền:', kpis.refundRate);
-    
-    // Filter data for charts and tables
-    const filteredTransactions = filterDataByDateRange(transactions, dateRange);
-    const filteredExpenses = filterDataByDateRange(expenses, dateRange);
     
     // Update all components
     console.log('🚀 Loading overview components...');
@@ -4222,7 +4222,7 @@ function exportSoftwareData() {
  * @param {Object} dateRange - Date range filter
  * @returns {Object} Updated business metrics
  */
-function calculateUpdatedBusinessMetrics(transactions, expenses, dateRange) {
+function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses, dateRange, allTransactions) {
   console.log('🧮 Calculating updated business metrics with new logic...');
   console.log('📊 Input data:', {
     transactionsCount: transactions.length,
@@ -4230,13 +4230,9 @@ function calculateUpdatedBusinessMetrics(transactions, expenses, dateRange) {
     dateRange: dateRange
   });
   
-  // Filter transactions by date range if provided
-  let filteredTransactions = transactions;
-  if (dateRange && dateRange.start && dateRange.end) {
-    console.log('🔍 Filtering by date range:', dateRange);
-    filteredTransactions = filterDataByDateRange(transactions, dateRange);
-    console.log(`📊 Filtered transactions: ${transactions.length} → ${filteredTransactions.length}`);
-  }
+  // Use pre-filtered transactions for current period metrics
+  console.log(`📊 Working with ${filteredTransactions.length} pre-filtered transactions`);
+  console.log(`📊 Total unfiltered transactions available: ${allTransactions ? allTransactions.length : 0}`);
   
   // Initialize metrics
   const metrics = {
@@ -4363,7 +4359,7 @@ function calculateUpdatedBusinessMetrics(transactions, expenses, dateRange) {
   // For gross revenue, compare with same period of previous cycle (cùng kỳ chu kỳ trước)
   if (dateRange && dateRange.start && dateRange.end) {
     const samePeriodPreviousCycleRange = calculateSamePeriodPreviousCycle(dateRange);
-    const samePeriodTransactions = filterDataByDateRange(transactions, samePeriodPreviousCycleRange);
+    const samePeriodTransactions = filterDataByDateRange(allTransactions, samePeriodPreviousCycleRange);
     
     console.log('📊 Same period previous cycle range:', samePeriodPreviousCycleRange);
     console.log(`📊 Same period transactions found: ${samePeriodTransactions.length}`);
