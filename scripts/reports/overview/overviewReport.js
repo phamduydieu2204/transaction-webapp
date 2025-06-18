@@ -4225,8 +4225,8 @@ function exportSoftwareData() {
 function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses, dateRange, allTransactions) {
   console.log('🧮 Calculating updated business metrics with new logic...');
   console.log('📊 Input data:', {
-    transactionsCount: transactions.length,
-    expensesCount: expenses.length,
+    transactionsCount: filteredTransactions.length,
+    expensesCount: filteredExpenses.length,
     dateRange: dateRange
   });
   
