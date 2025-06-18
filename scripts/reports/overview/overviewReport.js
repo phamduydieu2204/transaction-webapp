@@ -4357,9 +4357,10 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
   
   // Calculate previous period for growth comparison
   // For gross revenue, compare with same period of previous cycle (cùng kỳ chu kỳ trước)
-  if (dateRange && dateRange.start && dateRange.end) {
+  if (dateRange && dateRange.start && dateRange.end && allTransactions) {
     const samePeriodPreviousCycleRange = calculateSamePeriodPreviousCycle(dateRange);
-    const samePeriodTransactions = filterDataByDateRange(allTransactions, samePeriodPreviousCycleRange);
+    // Use allTransactions to get data from previous period
+    const samePeriodTransactions = filterDataByDateRange(allTransactions || [], samePeriodPreviousCycleRange);
     
     console.log('📊 Same period previous cycle range:', samePeriodPreviousCycleRange);
     console.log(`📊 Same period transactions found: ${samePeriodTransactions.length}`);
