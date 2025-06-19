@@ -1549,6 +1549,27 @@ function calculateSoftwareDirectCosts(expenses, softwareName, dateRange) {
 }
 
 /**
+ * Format currency with zero handling
+ */
+function formatCurrencyForTable(amount) {
+    if (amount === 0 || amount === null || amount === undefined) {
+        return '<span class="zero-value">-</span>';
+    }
+    return formatRevenue(amount);
+}
+
+/**
+ * Get profit status class and label
+ */
+function getProfitStatus(profitMargin) {
+    if (profitMargin >= 30) return { class: 'excellent', label: 'Xuất sắc' };
+    if (profitMargin >= 20) return { class: 'high', label: 'Cao' };
+    if (profitMargin >= 10) return { class: 'medium', label: 'Trung bình' };
+    if (profitMargin >= 0) return { class: 'low', label: 'Thấp' };
+    return { class: 'negative', label: 'Thua lỗ' };
+}
+
+/**
  * Update software profit table
  */
 function updateSoftwareProfitTable(softwareProfitData) {
@@ -1569,40 +1590,73 @@ function updateSoftwareProfitTable(softwareProfitData) {
         return;
     }
     
-    const rows = softwareProfitData.map(item => {
+    const rows = softwareProfitData.map((item, index) => {
         const profitClass = item.grossProfit >= 0 ? 'positive' : 'negative';
-        const marginClass = item.profitMargin >= 20 ? 'high' : item.profitMargin >= 10 ? 'medium' : 'low';
+        const profitStatus = getProfitStatus(item.profitMargin);
+        const hasRevenue = item.totalRevenue > 0;
+        const hasRefunds = item.refunds > 0;
+        const hasDirectCosts = item.directCosts > 0;
+        const hasAllocatedCosts = item.allocatedCosts > 0;
         
         return `
-            <tr class="software-row" data-software="${item.softwareName}">
-                <td class="software-name">
+            <tr class="software-row ${hasRevenue ? 'has-revenue' : 'no-revenue'}" data-software="${item.softwareName}">
+                <td class="software-name-cell">
                     <div class="software-info">
-                        <span class="software-title">${item.softwareName}</span>
+                        <div class="software-rank">${index + 1}</div>
+                        <div class="software-details">
+                            <span class="software-title">${item.softwareName}</span>
+                            <div class="software-status ${profitStatus.class}">
+                                <i class="fas fa-circle status-indicator"></i>
+                                <span class="status-text">${profitStatus.label}</span>
+                            </div>
+                        </div>
                     </div>
                 </td>
-                <td class="revenue-value">
-                    <span class="value-amount">${formatRevenue(item.totalRevenue)}</span>
-                    <div class="value-breakdown">
-                        <small>Gộp: ${formatRevenue(item.grossRevenue)}</small>
+                <td class="revenue-cell ${hasRevenue ? 'has-value' : 'empty-value'}">
+                    <div class="value-container">
+                        <span class="primary-value">${formatCurrencyForTable(item.totalRevenue)}</span>
+                        ${item.grossRevenue !== item.totalRevenue ? `
+                            <div class="value-breakdown">
+                                <small class="breakdown-label">Gộp: ${formatCurrencyForTable(item.grossRevenue)}</small>
+                            </div>
+                        ` : ''}
                     </div>
                 </td>
-                <td class="refund-value">
-                    <span class="value-amount negative">${formatRevenue(item.refunds)}</span>
+                <td class="refund-cell ${hasRefunds ? 'has-value negative' : 'empty-value'}">
+                    <div class="value-container">
+                        <span class="primary-value">${formatCurrencyForTable(item.refunds)}</span>
+                    </div>
                 </td>
-                <td class="direct-cost-value">
-                    <span class="value-amount">${formatRevenue(item.directCosts)}</span>
+                <td class="direct-cost-cell ${hasDirectCosts ? 'has-value cost' : 'empty-value'}">
+                    <div class="value-container">
+                        <span class="primary-value">${formatCurrencyForTable(item.directCosts)}</span>
+                    </div>
                 </td>
-                <td class="cost-value">
-                    <span class="value-amount">${formatRevenue(item.allocatedCosts)}</span>
+                <td class="allocated-cost-cell ${hasAllocatedCosts ? 'has-value cost' : 'empty-value'}">
+                    <div class="value-container">
+                        <span class="primary-value">${formatCurrencyForTable(item.allocatedCosts)}</span>
+                    </div>
                 </td>
-                <td class="profit-value ${profitClass}">
-                    <span class="value-amount">${formatRevenue(item.grossProfit)}</span>
+                <td class="profit-cell ${profitClass}">
+                    <div class="value-container">
+                        <span class="primary-value profit-amount">${formatCurrencyForTable(item.grossProfit)}</span>
+                        ${item.grossProfit !== 0 ? `
+                            <div class="profit-indicator">
+                                <i class="fas ${item.grossProfit >= 0 ? 'fa-arrow-up' : 'fa-arrow-down'}"></i>
+                            </div>
+                        ` : ''}
+                    </div>
                 </td>
-                <td class="margin-value ${marginClass}">
-                    <span class="margin-percent">${item.profitMargin.toFixed(1)}%</span>
-                    <div class="margin-indicator">
-                        <div class="indicator-bar">
-                            <div class="indicator-fill" style="width: ${Math.min(100, Math.max(0, item.profitMargin))}%"></div>
+                <td class="margin-cell ${profitStatus.class}">
+                    <div class="margin-container">
+                        <span class="margin-percent">${item.profitMargin.toFixed(1)}%</span>
+                        <div class="margin-bar">
+                            <div class="margin-fill ${profitStatus.class}" 
+                                 style="width: ${Math.min(100, Math.max(0, Math.abs(item.profitMargin)))}%">
+                            </div>
+                        </div>
+                        <div class="margin-status ${profitStatus.class}">
+                            ${profitStatus.label}
                         </div>
                     </div>
                 </td>
@@ -1629,12 +1683,17 @@ function updateSoftwareProfitSummary(softwareProfitData) {
     const averageMargin = totalCount > 0 ? 
         softwareProfitData.reduce((sum, item) => sum + item.profitMargin, 0) / totalCount : 0;
     
+    // Helper function to format summary values
+    const formatSummaryValue = (amount) => {
+        return amount === 0 ? '-' : formatRevenue(amount);
+    };
+    
     updateKPIElement('total-software-count', totalCount.toString());
-    updateKPIElement('total-software-revenue', formatRevenue(totalRevenue));
-    updateKPIElement('total-software-direct-cost', formatRevenue(totalDirectCosts));
-    updateKPIElement('total-software-cost', formatRevenue(totalAllocatedCosts));
-    updateKPIElement('total-software-profit', formatRevenue(totalProfit));
-    updateKPIElement('average-profit-margin', `${averageMargin.toFixed(1)}%`);
+    updateKPIElement('total-software-revenue', formatSummaryValue(totalRevenue));
+    updateKPIElement('total-software-direct-cost', formatSummaryValue(totalDirectCosts));
+    updateKPIElement('total-software-cost', formatSummaryValue(totalAllocatedCosts));
+    updateKPIElement('total-software-profit', formatSummaryValue(totalProfit));
+    updateKPIElement('average-profit-margin', averageMargin === 0 ? '-' : `${averageMargin.toFixed(1)}%`);
 }
 
 /**
