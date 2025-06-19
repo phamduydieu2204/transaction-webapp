@@ -1109,12 +1109,12 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
                 expenseType: expenseType,
                 isInDateRange: isInDateRange,
                 isRelevantExpense: isRelevantExpense,
-                willInclude: isRelevantExpense && isInDateRange && expenseType === 'Kinh doanh phần mềm'
+                willInclude: isRelevantExpense && isInDateRange
             });
         }
         
-        // Thêm điều kiện: CHỈ lấy chi phí kinh doanh phần mềm
-        if (isRelevantExpense && isInDateRange && expenseType === 'Kinh doanh phần mềm') {
+        // Chỉ cần điều kiện: loại kế toán COGS/OPEX và ngày chi trong chu kỳ
+        if (isRelevantExpense && isInDateRange) {
             softwareNames.add(standardName);
             directCostNames.add(standardName);
             directCostSource++;
@@ -1157,8 +1157,8 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
             });
         }
         
-        // Thêm điều kiện: CHỈ lấy chi phí kinh doanh phần mềm, không lấy chi phí lương nhân viên
-        if (isRelevantExpense && isAllocated && isRenewalAfterStart && expenseType === 'Kinh doanh phần mềm') {
+        // Chỉ cần điều kiện: loại kế toán COGS/OPEX, phân bổ = Có, ngày tái tục >= đầu chu kỳ
+        if (isRelevantExpense && isAllocated && isRenewalAfterStart) {
             softwareNames.add(standardName);
             allocatedCostNames.add(standardName);
             allocatedCostSource++;
@@ -1287,7 +1287,7 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
         }
         
         // Only process if this expense belongs to the current software (direct tenChuan match)
-        if (doesExpenseMatchSoftware(expenseTenChuan, softwareName) && expenseType === 'Kinh doanh phần mềm') {
+        if (doesExpenseMatchSoftware(expenseTenChuan, softwareName)) {
             matchedCount++;
             console.log(`✅ MATCHED expense #${index + 1} for ${softwareName}:`, {
                 expenseId: expense.expenseId || expense.maChiPhi || 'N/A',
