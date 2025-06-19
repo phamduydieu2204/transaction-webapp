@@ -1089,8 +1089,8 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
     
     expenses.forEach((expense, index) => {
         const expenseDate = new Date(expense.date || expense.ngayChi || '');
-        // Nếu không có tenChuan, sử dụng product field
-        const standardName = (expense.tenChuan || expense.standardName || expense.product || expense.tenSanPham || '').trim();
+        // CHỈ sử dụng tenChuan field, KHÔNG fallback sang product
+        const standardName = (expense.tenChuan || expense.standardName || '').trim();
         const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
         const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
         
@@ -1103,7 +1103,8 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
         if (index < 3) {
             console.log(`💰 Chi phí #${index + 1}:`, {
                 standardName: standardName,
-                product: expense.product,
+                rawTenChuan: expense.tenChuan,
+                rawProduct: expense.product,
                 expenseDate: !isNaN(expenseDate.getTime()) ? expenseDate.toISOString().split('T')[0] : 'Invalid Date',
                 accountingType: accountingType,
                 expenseType: expenseType,
@@ -1130,8 +1131,8 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
     
     expenses.forEach((expense, index) => {
         const renewalDate = new Date(expense.renewDate || expense.ngayTaiTuc || '');
-        // Nếu không có tenChuan, sử dụng product field
-        const standardName = (expense.tenChuan || expense.standardName || expense.product || expense.tenSanPham || '').trim();
+        // CHỈ sử dụng tenChuan field, KHÔNG fallback sang product
+        const standardName = (expense.tenChuan || expense.standardName || '').trim();
         const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
         const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
         const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
@@ -1145,7 +1146,8 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
         if (index < 3) {
             console.log(`📈 Chi phí phân bổ #${index + 1}:`, {
                 standardName: standardName,
-                product: expense.product,
+                rawTenChuan: expense.tenChuan,
+                rawProduct: expense.product,
                 renewalDate: !isNaN(renewalDate.getTime()) ? renewalDate.toISOString().split('T')[0] : 'Invalid Date',
                 allocation: allocation,
                 accountingType: accountingType,
