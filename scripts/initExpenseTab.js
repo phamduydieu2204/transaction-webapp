@@ -58,16 +58,26 @@ export async function initExpenseTab() {
       console.log('🔍 Expense quick search initialized');
     }
     
-    // Only load data if not already loaded
-    if (!window.expenseList || window.expenseList.length === 0) {
-      console.log('💰 Loading expense data for the first time...');
-      await loadExpensesInBackground();
-    } else {
-      console.log('✅ Using cached expense data');
+    // Debug: Check current expense list state
+    console.log('🔍 DEBUG: Checking expense list state:', {
+      exists: !!window.expenseList,
+      length: window.expenseList?.length || 0,
+      type: typeof window.expenseList,
+      expenseTabInitialized: window.expenseTabInitialized
+    });
+    
+    // Check if we already have data and don't need to reload
+    if (window.expenseTabInitialized && window.expenseList && window.expenseList.length > 0) {
+      console.log(`✅ Using cached expense data (${window.expenseList.length} expenses) - no reload needed`);
       // Update table with existing data
       updateExpenseTable();
       // Render expense statistics
       renderExpenseStats();
+    } else {
+      console.log('💰 Loading expense data...');
+      await loadExpensesInBackground();
+      // Mark as initialized
+      window.expenseTabInitialized = true;
     }
     
     console.log('✅ Expense tab initialized');
@@ -145,6 +155,9 @@ async function loadExpenses() {
     
     await loadExpensesInBackground();
     
+    // Mark as initialized
+    window.expenseTabInitialized = true;
+    
   } catch (error) {
     console.error('❌ Error loading expenses:', error);
   } finally {
@@ -152,6 +165,16 @@ async function loadExpenses() {
   }
 }
 
+/**
+ * Reset expense tab state (for logout or forced refresh)
+ */
+function resetExpenseTabState() {
+  window.expenseTabInitialized = false;
+  window.expenseList = [];
+  console.log('🔄 Expense tab state reset');
+}
+
 // Make functions globally available
 window.initExpenseTab = initExpenseTab;
 window.loadExpenses = loadExpenses; // For refresh/search operations that need modal
+window.resetExpenseTabState = resetExpenseTabState; // For logout or forced refresh
