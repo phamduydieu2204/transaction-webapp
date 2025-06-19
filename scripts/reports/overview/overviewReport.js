@@ -104,7 +104,7 @@ export async function loadOverviewReport(options = {}) {
       loadTopCustomers(filteredTransactions),
       loadCharts(filteredTransactions, filteredExpenses),
       // updateDataTables(filteredTransactions, filteredExpenses), // Removed - status details section removed
-      loadPendingTransactions(filteredTransactions)
+      loadPendingTransactions(filteredTransactions, dateRange)
     ]);
     
     // PERFORMANCE: Initialize lazy loading for non-critical elements
@@ -3170,8 +3170,9 @@ function updateElementStyle(elementId, property, value) {
 /**
  * Load and display pending transactions that need action
  * @param {Array} transactions - Filtered transactions for current period
+ * @param {Object} dateRange - Date range filter {start, end}
  */
-async function loadPendingTransactions(transactions = []) {
+async function loadPendingTransactions(transactions = [], dateRange = null) {
   try {
     console.log('📋 Loading pending transactions...');
     
@@ -3188,7 +3189,7 @@ async function loadPendingTransactions(transactions = []) {
     
     // Load pending tables
     await Promise.all([
-      loadNeedsDeliveryTable(pendingCategories.needsDelivery),
+      loadNeedsDeliveryTable(pendingCategories.needsDelivery, dateRange),
       loadNeedsPaymentTable(pendingCategories.needsPayment)
     ]);
     
@@ -3305,8 +3306,9 @@ function updatePendingSummary(categories) {
 /**
  * Load needs delivery table
  * @param {Array} needsDelivery - Transactions that need delivery
+ * @param {Object} dateRange - Date range filter {start, end}
  */
-async function loadNeedsDeliveryTable(needsDelivery) {
+async function loadNeedsDeliveryTable(needsDelivery, dateRange = null) {
   const tbody = document.getElementById('needs-delivery-tbody');
   if (!tbody) return;
   
@@ -3324,7 +3326,15 @@ async function loadNeedsDeliveryTable(needsDelivery) {
   
   tbody.innerHTML = needsDelivery.map(rawTransaction => {
     const transaction = normalizeTransaction(rawTransaction);
-    const orderDate = transaction.transactionDate ? new Date(transaction.transactionDate) : new Date();
+    
+    // Use cycle start date instead of transaction date
+    let displayDate = new Date();
+    if (dateRange && dateRange.start) {
+      displayDate = new Date(dateRange.start);
+    } else if (transaction.transactionDate) {
+      displayDate = new Date(transaction.transactionDate);
+    }
+    
     const customer = transaction.customerName || 'Không xác định';
     const product = transaction.softwareName || 'N/A';
     const amount = transaction.revenue || 0;
@@ -3334,8 +3344,9 @@ async function loadNeedsDeliveryTable(needsDelivery) {
     return `
       <tr class="pending-row ${isUrgent ? 'urgent-row' : ''}" data-transaction-id="${transaction.id || ''}">
         <td class="date-cell">
-          ${orderDate.toLocaleDateString('vi-VN')}
+          ${displayDate.toLocaleDateString('vi-VN')}
           ${isUrgent ? '<span class="urgent-badge">🔥 Gấp</span>' : ''}
+          <div class="date-note">Bắt đầu chu kỳ</div>
         </td>
         <td class="customer-cell">${customer}</td>
         <td class="product-cell">${product}</td>
@@ -3510,16 +3521,20 @@ function markAsDelivered(transactionId) {
   console.log('🚚 Marking as delivered:', transactionId);
   // Implementation would update transaction status
   alert(`Gả lập: Đánh dấu giao dịch ${transactionId} đã giao hàng`);
-  // Reload pending transactions
-  loadPendingTransactions();
+  // Reload pending transactions with current date range
+  const dateRange = window.globalFilters?.dateRange || null;
+  const transactions = window.transactionList || [];
+  loadPendingTransactions(transactions, dateRange);
 }
 
 function markAsPaid(transactionId) {
   console.log('💰 Marking as paid:', transactionId);
   // Implementation would update payment status
   alert(`Gả lập: Đánh dấu giao dịch ${transactionId} đã thanh toán`);
-  // Reload pending transactions
-  loadPendingTransactions();
+  // Reload pending transactions with current date range
+  const dateRange = window.globalFilters?.dateRange || null;
+  const transactions = window.transactionList || [];
+  loadPendingTransactions(transactions, dateRange);
 }
 
 function sendPaymentReminder(transactionId) {
@@ -3542,7 +3557,10 @@ function markAllAsDelivered() {
     return;
   }
   alert(`Gả lập: Đánh dấu ${checkedRows.length} giao dịch đã giao hàng`);
-  loadPendingTransactions();
+  // Reload pending transactions with current date range
+  const dateRange = window.globalFilters?.dateRange || null;
+  const transactions = window.transactionList || [];
+  loadPendingTransactions(transactions, dateRange);
 }
 
 function markAllAsPaid() {
@@ -3553,7 +3571,10 @@ function markAllAsPaid() {
     return;
   }
   alert(`Gả lập: Đánh dấu ${checkedRows.length} giao dịch đã thanh toán`);
-  loadPendingTransactions();
+  // Reload pending transactions with current date range
+  const dateRange = window.globalFilters?.dateRange || null;
+  const transactions = window.transactionList || [];
+  loadPendingTransactions(transactions, dateRange);
 }
 
 function sendPaymentReminders() {

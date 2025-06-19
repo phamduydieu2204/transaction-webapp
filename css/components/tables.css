@@ -11,6 +11,15 @@ table {
   table-layout: auto; /* Allow table to expand naturally */
 }
 
+/* Date note styling for pending tables */
+.date-note {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 400;
+  margin-top: 2px;
+  font-style: italic;
+}
+
 /* Desktop optimization */
 @media (min-width: 1200px) {
   table {
