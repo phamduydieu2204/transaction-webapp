@@ -3348,8 +3348,51 @@ async function loadNeedsDeliveryTable(needsDelivery, dateRange = null) {
     const customer = transaction.customerName || 'Không xác định';
     const product = transaction.softwareName || 'N/A';
     const amount = transaction.revenue || 0;
-    const waitingTime = rawTransaction.waitingDays;
-    const isUrgent = rawTransaction.isUrgent;
+    
+    // Calculate waiting time from current date to start date (column H)
+    let waitingTime = 0;
+    let waitingText = '';
+    let isUrgent = false;
+    let waitingClass = '';
+    
+    if (transaction.startDate) {
+      const startDate = new Date(transaction.startDate);
+      const currentDate = new Date();
+      
+      // Set time to start of day for accurate day calculation
+      startDate.setHours(0, 0, 0, 0);
+      currentDate.setHours(0, 0, 0, 0);
+      
+      // Calculate difference in days
+      const timeDiff = startDate.getTime() - currentDate.getTime();
+      const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+      
+      if (daysDiff > 0) {
+        // Future start date
+        waitingTime = daysDiff;
+        waitingText = `${daysDiff} ngày nữa`;
+        isUrgent = daysDiff <= 3; // Urgent if starting within 3 days
+        waitingClass = daysDiff <= 3 ? 'urgent-waiting' : daysDiff <= 7 ? 'warning-waiting' : 'normal-waiting';
+      } else if (daysDiff === 0) {
+        // Today
+        waitingTime = 0;
+        waitingText = 'Hôm nay';
+        isUrgent = true;
+        waitingClass = 'urgent-waiting';
+      } else {
+        // Past start date (overdue)
+        waitingTime = Math.abs(daysDiff);
+        waitingText = `Quá ${Math.abs(daysDiff)} ngày`;
+        isUrgent = true;
+        waitingClass = 'overdue-waiting';
+      }
+    } else {
+      // Fallback if no start date
+      waitingTime = rawTransaction.waitingDays || 0;
+      waitingText = `${waitingTime} ngày`;
+      isUrgent = rawTransaction.isUrgent || false;
+      waitingClass = isUrgent ? 'urgent-waiting' : 'normal-waiting';
+    }
     
     return `
       <tr class="pending-row ${isUrgent ? 'urgent-row' : ''}" data-transaction-id="${transaction.id || ''}">
@@ -3361,8 +3404,8 @@ async function loadNeedsDeliveryTable(needsDelivery, dateRange = null) {
         <td class="customer-cell">${customer}</td>
         <td class="product-cell">${product}</td>
         <td class="amount-cell">${formatRevenue(amount)}</td>
-        <td class="waiting-cell ${isUrgent ? 'urgent-waiting' : ''}">
-          ${waitingTime} ngày
+        <td class="waiting-cell ${waitingClass}">
+          ${waitingText}
           ${isUrgent ? '<i class="fas fa-exclamation-triangle urgent-icon"></i>' : ''}
         </td>
         <td class="action-cell">
