@@ -3327,12 +3327,22 @@ async function loadNeedsDeliveryTable(needsDelivery, dateRange = null) {
   tbody.innerHTML = needsDelivery.map(rawTransaction => {
     const transaction = normalizeTransaction(rawTransaction);
     
-    // Use cycle start date instead of transaction date
+    // Use transaction start date (column H) instead of cycle start date
     let displayDate = new Date();
-    if (dateRange && dateRange.start) {
-      displayDate = new Date(dateRange.start);
+    let dateNote = '';
+    
+    if (transaction.startDate) {
+      // Use startDate from transaction (column H in GiaoDich sheet)
+      displayDate = new Date(transaction.startDate);
+      dateNote = 'Ngày bắt đầu gói';
     } else if (transaction.transactionDate) {
+      // Fallback to transaction date
       displayDate = new Date(transaction.transactionDate);
+      dateNote = 'Ngày giao dịch';
+    } else {
+      // Last fallback to current date
+      displayDate = new Date();
+      dateNote = 'Không xác định';
     }
     
     const customer = transaction.customerName || 'Không xác định';
@@ -3346,7 +3356,7 @@ async function loadNeedsDeliveryTable(needsDelivery, dateRange = null) {
         <td class="date-cell">
           ${displayDate.toLocaleDateString('vi-VN')}
           ${isUrgent ? '<span class="urgent-badge">🔥 Gấp</span>' : ''}
-          <div class="date-note">Bắt đầu chu kỳ</div>
+          <div class="date-note">${dateNote}</div>
         </td>
         <td class="customer-cell">${customer}</td>
         <td class="product-cell">${product}</td>
