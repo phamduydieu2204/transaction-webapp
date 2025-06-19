@@ -3256,9 +3256,14 @@ function categorizePendingTransactions(transactions) {
   });
   
   // Sort by priority and date
+  // Sort by start date (column H) from past to future
   needsDelivery.sort((a, b) => {
-    if (a.isUrgent !== b.isUrgent) return b.isUrgent - a.isUrgent;
-    return b.waitingDays - a.waitingDays;
+    // Get start dates
+    const dateA = a.startDate ? new Date(a.startDate) : new Date('9999-12-31'); // Put records without date at the end
+    const dateB = b.startDate ? new Date(b.startDate) : new Date('9999-12-31');
+    
+    // Sort from past to future (ascending)
+    return dateA.getTime() - dateB.getTime();
   });
   
   needsPayment.sort((a, b) => {
