@@ -247,17 +247,19 @@ function calculateExpenseMetrics(expenses, dateRange) {
                 
                 // Nếu ngày tái tục < ngày cuối chu kỳ
                 if (renewalDate < rangeEnd) {
+                    // Ngày hiện tại
+                    const today = new Date();
+                    
                     // Số ngày từ đầu chu kỳ đến ngày tái tục
                     const daysToRenewal = Math.ceil((renewalDate - rangeStart) / (1000 * 60 * 60 * 24)) + 1;
                     
-                    // Ngày hiện tại (giả sử là ngày cuối chu kỳ để tính đầy đủ)
-                    const today = new Date();
+                    // Số ngày từ đầu chu kỳ đến ngày hiện tại
                     const daysToToday = Math.ceil((today - rangeStart) / (1000 * 60 * 60 * 24)) + 1;
                     
-                    // Lấy Min(ngày tái tục - đầu chu kỳ, ngày hiện tại - đầu chu kỳ)
-                    const effectiveDays = Math.min(daysToRenewal, daysToToday);
+                    // Lấy Min(ngày hiện tại - đầu chu kỳ, ngày tái tục - đầu chu kỳ)
+                    const effectiveDays = Math.min(daysToToday, daysToRenewal);
                     
-                    // Công thức: số tiền * effectiveDays / totalDays
+                    // Công thức: số tiền * Min(ngày hiện tại - đầu chu kỳ, ngày tái tục - đầu chu kỳ) / (ngày tái tục - ngày chi)
                     allocatedAmount = amount * effectiveDays / totalDays;
                     
                     console.log(`📊 Renewal < End Date calculation:`, {
@@ -1347,11 +1349,19 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
                     
                     // Nếu ngày tái tục < ngày cuối chu kỳ
                     if (renewalDate < rangeEnd) {
-                        const daysToRenewal = Math.ceil((renewalDate - rangeStart) / (1000 * 60 * 60 * 24)) + 1;
+                        // Ngày hiện tại
                         const today = new Date();
-                        const daysToToday = Math.ceil((today - rangeStart) / (1000 * 60 * 60 * 24)) + 1;
-                        const effectiveDays = Math.min(daysToRenewal, daysToToday);
                         
+                        // Số ngày từ đầu chu kỳ đến ngày tái tục
+                        const daysToRenewal = Math.ceil((renewalDate - rangeStart) / (1000 * 60 * 60 * 24)) + 1;
+                        
+                        // Số ngày từ đầu chu kỳ đến ngày hiện tại
+                        const daysToToday = Math.ceil((today - rangeStart) / (1000 * 60 * 60 * 24)) + 1;
+                        
+                        // Lấy Min(ngày hiện tại - đầu chu kỳ, ngày tái tục - đầu chu kỳ)
+                        const effectiveDays = Math.min(daysToToday, daysToRenewal);
+                        
+                        // Công thức: số tiền * Min(ngày hiện tại - đầu chu kỳ, ngày tái tục - đầu chu kỳ) / (ngày tái tục - ngày chi)
                         allocatedAmount = amount * effectiveDays / totalDays;
                         
                         console.log(`📊 Allocated calculation (renewal < end):`, {
