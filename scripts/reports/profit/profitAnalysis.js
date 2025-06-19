@@ -779,7 +779,7 @@ function normalizeExpense(rawExpense) {
         date: rawExpense.ngayChi || rawExpense.date || '',
         renewDate: rawExpense.renewDate || rawExpense.ngayTaiTuc || '',
         category: rawExpense.danhMucChung || rawExpense.category || '',
-        tenChuan: rawExpense.tenChuan || rawExpense.standardName || '',
+        tenChuan: rawExpense.tenChuan || rawExpense.standardName || '',  // standardName is used in getExpenseStats
         type: rawExpense.type || rawExpense.loaiKhoanChi || rawExpense.expenseType || ''
     };
 }
@@ -1090,11 +1090,13 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
     const directCostNames = new Set();
     
     expenses.forEach((expense, index) => {
-        const expenseDate = new Date(expense.date || expense.ngayChi || '');
+        // First normalize the expense to ensure consistent field access
+        const normalizedExpense = normalizeExpense(expense);
+        const expenseDate = new Date(normalizedExpense.date || '');
         // CHỈ sử dụng tenChuan field, KHÔNG fallback sang product
-        const standardName = (expense.tenChuan || expense.standardName || '').trim();
-        const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
-        const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
+        const standardName = (normalizedExpense.tenChuan || '').trim();
+        const accountingType = (normalizedExpense.accountingType || '').trim();
+        const expenseType = (normalizedExpense.type || '').trim();
         
         // Kiểm tra chi phí nằm trong chu kỳ báo cáo
         const rangeStart = dateRange ? new Date(dateRange.start) : null;
@@ -1105,17 +1107,26 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
         if (index < 3) {
             console.log(`💰 Chi phí #${index + 1}:`, {
                 standardName: standardName,
+                rawExpenseFields: Object.keys(expense),
                 rawTenChuan: expense.tenChuan,
+                rawStandardName: expense.standardName,
                 rawProduct: expense.product,
+                normalizedTenChuan: normalizedExpense.tenChuan,
                 expenseDate: !isNaN(expenseDate.getTime()) ? expenseDate.toISOString().split('T')[0] : 'Invalid Date',
                 accountingType: accountingType,
                 expenseType: expenseType,
                 isInDateRange: isInDateRange,
                 isRelevantExpense: isRelevantExpense,
                 willInclude: isRelevantExpense && isInDateRange,
-                // Debug: Show all fields
-                allFields: Object.keys(expense),
-                sampleData: expense
+                // Debug: Show sample raw data
+                rawExpenseSample: {
+                    tenChuan: expense.tenChuan,
+                    standardName: expense.standardName,
+                    product: expense.product,
+                    tenSanPham: expense.tenSanPham,
+                    loaiKeToan: expense.loaiKeToan,
+                    accountingType: expense.accountingType
+                }
             });
         }
         
@@ -1135,22 +1146,27 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
     const allocatedCostNames = new Set();
     
     expenses.forEach((expense, index) => {
-        const renewalDate = new Date(expense.renewDate || expense.ngayTaiTuc || '');
+        // First normalize the expense to ensure consistent field access
+        const normalizedExpense = normalizeExpense(expense);
+        const renewalDate = new Date(normalizedExpense.renewDate || '');
         // CHỈ sử dụng tenChuan field, KHÔNG fallback sang product
-        const standardName = (expense.tenChuan || expense.standardName || '').trim();
-        const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
-        const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
-        const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
+        const standardName = (normalizedExpense.tenChuan || '').trim();
+        const allocation = (normalizedExpense.allocation || '').toLowerCase().trim();
+        const accountingType = (normalizedExpense.accountingType || '').trim();
+        const expenseType = (normalizedExpense.type || '').trim();
         
         // Debug: Check for "Vận hành văn phòng"
-        if (standardName && standardName.includes('văn phòng')) {
+        if (expense.product && expense.product.includes('văn phòng')) {
             console.log(`🏢 Found văn phòng expense #${index + 1}:`, {
+                rawProduct: expense.product,
+                normalizedTenChuan: normalizedExpense.tenChuan,
                 standardName: standardName,
                 allocation: allocation,
                 accountingType: accountingType,
                 expenseType: expenseType,
                 renewalDate: !isNaN(renewalDate.getTime()) ? renewalDate.toISOString().split('T')[0] : 'Invalid Date',
-                allData: expense
+                rawData: expense,
+                normalizedData: normalizedExpense
             });
         }
         
@@ -1163,8 +1179,11 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
         if (index < 3) {
             console.log(`📈 Chi phí phân bổ #${index + 1}:`, {
                 standardName: standardName,
+                rawExpenseFields: Object.keys(expense),
                 rawTenChuan: expense.tenChuan,
+                rawStandardName: expense.standardName,
                 rawProduct: expense.product,
+                normalizedTenChuan: normalizedExpense.tenChuan,
                 renewalDate: !isNaN(renewalDate.getTime()) ? renewalDate.toISOString().split('T')[0] : 'Invalid Date',
                 allocation: allocation,
                 accountingType: accountingType,
@@ -1173,9 +1192,19 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
                 isAllocated: isAllocated,
                 isRelevantExpense: isRelevantExpense,
                 willInclude: isRelevantExpense && isAllocated && isRenewalAfterStart,
-                // Debug: Show all fields
-                allFields: Object.keys(expense),
-                sampleData: expense
+                // Debug: Show sample raw data
+                rawExpenseSample: {
+                    tenChuan: expense.tenChuan,
+                    standardName: expense.standardName,
+                    product: expense.product,
+                    tenSanPham: expense.tenSanPham,
+                    loaiKeToan: expense.loaiKeToan,
+                    accountingType: expense.accountingType,
+                    phanBo: expense.phanBo,
+                    periodicAllocation: expense.periodicAllocation,
+                    ngayTaiTuc: expense.ngayTaiTuc,
+                    renewDate: expense.renewDate
+                }
             });
         }
         
@@ -1281,6 +1310,16 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
                 moTa: expenses[0].moTa,
                 description: expenses[0].description
             });
+            
+            // Check for "Vận hành văn phòng" in all expenses
+            const vanHanhExpenses = expenses.filter(exp => {
+                const product = (exp.product || exp.tenSanPham || '').toLowerCase();
+                const tenChuan = (exp.tenChuan || exp.standardName || '').toLowerCase();
+                const description = (exp.moTa || exp.description || '').toLowerCase();
+                return product.includes('văn phòng') || tenChuan.includes('văn phòng') || description.includes('văn phòng');
+            });
+            
+            console.log(`🏢 Found ${vanHanhExpenses.length} expenses with "văn phòng":`, vanHanhExpenses);
         }
     }
     
