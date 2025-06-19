@@ -778,7 +778,9 @@ function normalizeExpense(rawExpense) {
         product: rawExpense.product || rawExpense.tenSanPham || '',
         date: rawExpense.ngayChi || rawExpense.date || '',
         renewDate: rawExpense.renewDate || rawExpense.ngayTaiTuc || '',
-        category: rawExpense.danhMucChung || rawExpense.category || ''
+        category: rawExpense.danhMucChung || rawExpense.category || '',
+        tenChuan: rawExpense.tenChuan || rawExpense.standardName || '',
+        type: rawExpense.type || rawExpense.loaiKhoanChi || rawExpense.expenseType || ''
     };
 }
 
@@ -1110,7 +1112,10 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
                 expenseType: expenseType,
                 isInDateRange: isInDateRange,
                 isRelevantExpense: isRelevantExpense,
-                willInclude: isRelevantExpense && isInDateRange
+                willInclude: isRelevantExpense && isInDateRange,
+                // Debug: Show all fields
+                allFields: Object.keys(expense),
+                sampleData: expense
             });
         }
         
@@ -1137,6 +1142,18 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
         const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
         const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
         
+        // Debug: Check for "Vận hành văn phòng"
+        if (standardName && standardName.includes('văn phòng')) {
+            console.log(`🏢 Found văn phòng expense #${index + 1}:`, {
+                standardName: standardName,
+                allocation: allocation,
+                accountingType: accountingType,
+                expenseType: expenseType,
+                renewalDate: !isNaN(renewalDate.getTime()) ? renewalDate.toISOString().split('T')[0] : 'Invalid Date',
+                allData: expense
+            });
+        }
+        
         // Kiểm tra chi phí phân bổ: Ngày tái tục >= ngày bắt đầu chu kỳ, Phân bổ = "Có", COGS/OPEX
         const rangeStart = dateRange ? new Date(dateRange.start) : null;
         const isRenewalAfterStart = rangeStart && renewalDate >= rangeStart && !isNaN(renewalDate.getTime());
@@ -1155,7 +1172,10 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
                 isRenewalAfterStart: isRenewalAfterStart,
                 isAllocated: isAllocated,
                 isRelevantExpense: isRelevantExpense,
-                willInclude: isRelevantExpense && isAllocated && isRenewalAfterStart
+                willInclude: isRelevantExpense && isAllocated && isRenewalAfterStart,
+                // Debug: Show all fields
+                allFields: Object.keys(expense),
+                sampleData: expense
             });
         }
         
