@@ -8,9 +8,9 @@ export function handleChangePassword(index) {
   selectedTransactionIndex = index;
   selectedTransaction = window.transactionList[index];
 
-  // Lấy thông tin cũ từ sheet PhanMem
+  // Lấy thông tin cũ từ sheet PhanMem và tên file
   (async () => {
-    const { softwareName, softwarePackage, accountName } = selectedTransaction;
+    const { softwareName, softwarePackage, accountName, accountSheetId } = selectedTransaction;
     const accountInfo = await fetchAccountInfo(softwareName, softwarePackage, accountName);
 
     document.getElementById("oldLoginEmail").textContent = accountInfo.email || "(chưa có)";
@@ -21,6 +21,22 @@ export function handleChangePassword(index) {
     selectedTransaction.loginEmail = accountInfo.email;
     selectedTransaction.loginPassword = accountInfo.password;
     selectedTransaction.secret = accountInfo.secret;
+
+    // Lấy tên file hiện tại
+    if (accountSheetId) {
+      try {
+        const fileNameInfo = await fetchFileName(accountSheetId);
+        const fileNameLabel = document.getElementById("currentFileNameLabel");
+        if (fileNameInfo.fileName) {
+          fileNameLabel.textContent = fileNameInfo.fileName;
+        } else {
+          fileNameLabel.textContent = "Thông tin cũ";
+        }
+      } catch (error) {
+        console.error("Không thể lấy tên file:", error);
+        document.getElementById("currentFileNameLabel").textContent = "Thông tin cũ";
+      }
+    }
   })();
 
   // Reset các trường nhập mới
@@ -118,4 +134,73 @@ async function fetchAccountInfo(softwareName, softwarePackage, accountName) {
     console.error("Lỗi khi fetchAccountInfo:", error);
     return { email: "", password: "", secret: "" };
   }
+}
+
+// Hàm lấy tên file
+async function fetchFileName(accountSheetId) {
+  const { BACKEND_URL } = getConstants();
+
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "getCookieAndFileName",
+        accountSheetId: accountSheetId
+      })
+    });
+
+    const result = await response.json();
+    if (result.status === "success") {
+      return {
+        fileName: result.fileName || ""
+      };
+    } else {
+      console.warn("Không tìm thấy file:", result.message);
+      return { fileName: "" };
+    }
+  } catch (error) {
+    console.error("Lỗi khi fetchFileName:", error);
+    return { fileName: "" };
+  }
+}
+
+// Hàm copy cho các trường cũ
+export function copyOldLoginEmail() {
+  const val = document.getElementById("oldLoginEmail").textContent;
+  if (!val || val === "(chưa có)") {
+    alert("⚠️ Không có email để sao chép!");
+    return;
+  }
+  navigator.clipboard.writeText(val).then(() => {
+    alert("✅ Đã sao chép email đăng nhập!");
+  }).catch(() => {
+    alert("❌ Không thể sao chép email!");
+  });
+}
+
+export function copyOldPassword() {
+  const val = document.getElementById("oldPassword").textContent;
+  if (!val || val === "(chưa có)") {
+    alert("⚠️ Không có mật khẩu để sao chép!");
+    return;
+  }
+  navigator.clipboard.writeText(val).then(() => {
+    alert("✅ Đã sao chép mật khẩu!");
+  }).catch(() => {
+    alert("❌ Không thể sao chép mật khẩu!");
+  });
+}
+
+export function copyOldSecret() {
+  const val = document.getElementById("oldSecret").textContent;
+  if (!val || val === "(chưa có)") {
+    alert("⚠️ Không có secret để sao chép!");
+    return;
+  }
+  navigator.clipboard.writeText(val).then(() => {
+    alert("✅ Đã sao chép secret!");
+  }).catch(() => {
+    alert("❌ Không thể sao chép secret!");
+  });
 }
