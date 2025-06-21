@@ -166,7 +166,7 @@ async function fetchFileName(accountSheetId) {
 }
 
 // Hàm copy cho các trường cũ
-export function copyOldLoginEmail() {
+function copyOldLoginEmail() {
   const val = document.getElementById("oldLoginEmail").textContent;
   if (!val || val === "(chưa có)") {
     alert("⚠️ Không có email để sao chép!");
@@ -179,7 +179,7 @@ export function copyOldLoginEmail() {
   });
 }
 
-export function copyOldPassword() {
+function copyOldPassword() {
   const val = document.getElementById("oldPassword").textContent;
   if (!val || val === "(chưa có)") {
     alert("⚠️ Không có mật khẩu để sao chép!");
@@ -192,7 +192,7 @@ export function copyOldPassword() {
   });
 }
 
-export function copyOldSecret() {
+function copyOldSecret() {
   const val = document.getElementById("oldSecret").textContent;
   if (!val || val === "(chưa có)") {
     alert("⚠️ Không có secret để sao chép!");
@@ -204,3 +204,8 @@ export function copyOldSecret() {
     alert("❌ Không thể sao chép secret!");
   });
 }
+
+// Đăng ký các hàm vào global scope để có thể gọi từ HTML onclick
+window.copyOldLoginEmail = copyOldLoginEmail;
+window.copyOldPassword = copyOldPassword;
+window.copyOldSecret = copyOldSecret;
