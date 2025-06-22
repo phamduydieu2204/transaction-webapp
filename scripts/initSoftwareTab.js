@@ -118,6 +118,9 @@ function updateSoftwareTable() {
       highlightSearchTerms(software.accountName || '', searchTerms) : 
       escapeHtml(software.accountName || '');
     
+    // Build action dropdown based on fileType
+    const actionDropdown = buildSoftwareActionDropdown(software.fileType, startIndex + index);
+    
     // Get row background color based on date difference
     const rowBackgroundColor = getSoftwareRowColor(software.lastModified, software.passwordChangeDays);
     
@@ -140,12 +143,7 @@ function updateSoftwareTable() {
         <td style="text-align: center;">${lastModified}</td>
         <td style="text-align: center;">${renewalDate}</td>
         <td style="text-align: center;">
-          <select class="action-select" onchange="handleSoftwareAction(this, ${startIndex + index})">
-            <option value="">-- Chọn hành động --</option>
-            <option value="view">Xem chi tiết</option>
-            <option value="edit">Chỉnh sửa</option>
-            <option value="openSheet">Mở Google Sheet</option>
-          </select>
+          ${actionDropdown}
         </td>
       </tr>
     `;
@@ -1909,3 +1907,176 @@ function getSoftwareRowColor(lastModifiedDate, passwordChangeDays) {
   
   return ''; // Không tô màu khi còn trong thời hạn an toàn
 }
+
+// Build action dropdown based on fileType
+function buildSoftwareActionDropdown(fileType, index) {
+  let actionOptions = `<option value="">-- Chọn hành động --</option>`;
+  actionOptions += `<option value="view">Xem chi tiết</option>`;
+  actionOptions += `<option value="edit">Chỉnh sửa</option>`;
+  actionOptions += `<option value="openSheet">Mở Google Sheet</option>`;
+  
+  // Add specific actions based on fileType
+  if (fileType && fileType.toLowerCase() === 'sheet') {
+    actionOptions += `<option value="changePassword">Đổi MK</option>`;
+  } else if (fileType && fileType.toLowerCase() === 'docs') {
+    actionOptions += `<option value="updateCookie">Cookie</option>`;
+  }
+  
+  return `<select class="action-select" onchange="handleSoftwareAction(this, ${index})">${actionOptions}</select>`;
+}
+
+// Handle software action selection
+window.handleSoftwareAction = function(selectElement, index) {
+  const action = selectElement.value;
+  if (!action) return;
+  
+  console.log(`🎯 Software action: ${action} for index ${index}`);
+  
+  // Reset select to default
+  selectElement.value = '';
+  
+  switch (action) {
+    case 'view':
+      viewSoftwareItem(index);
+      break;
+    case 'edit':
+      editSoftwareItem(index);
+      break;
+    case 'openSheet':
+      openSoftwareSheet(index);
+      break;
+    case 'changePassword':
+      // Reuse function from transaction tab
+      if (typeof window.handleChangePassword === 'function') {
+        // Create a temporary transaction-like object for the software
+        const software = window.softwareList[index];
+        if (software) {
+          // Map software data to transaction format for compatibility
+          const tempTransaction = {
+            accountName: software.accountName,
+            accountSheetId: software.accountSheetId,
+            softwareName: software.softwareName,
+            softwarePackage: software.softwarePackage,
+            username: software.username,
+            password: software.password,
+            secret: software.secret
+          };
+          
+          // Temporarily set this as current transaction for the handler
+          const originalList = window.transactionList;
+          window.transactionList = [tempTransaction];
+          
+          window.handleChangePassword(0);
+          
+          // Restore original list after a short delay
+          setTimeout(() => {
+            window.transactionList = originalList;
+          }, 100);
+        }
+      } else {
+        console.error('❌ handleChangePassword function not found');
+        alert('❌ Chức năng đổi mật khẩu chưa sẵn sàng');
+      }
+      break;
+    case 'updateCookie':
+      // Reuse function from transaction tab
+      if (typeof window.handleUpdateCookie === 'function') {
+        // Create a temporary transaction-like object for the software
+        const software = window.softwareList[index];
+        if (software) {
+          // Map software data to transaction format for compatibility
+          const tempTransaction = {
+            accountName: software.accountName,
+            accountSheetId: software.accountSheetId,
+            softwareName: software.softwareName,
+            softwarePackage: software.softwarePackage,
+            username: software.username,
+            password: software.password,
+            cookie: software.cookie || '' // Add cookie field if available
+          };
+          
+          // Temporarily set this as current transaction for the handler
+          const originalList = window.transactionList;
+          window.transactionList = [tempTransaction];
+          
+          window.handleUpdateCookie(0);
+          
+          // Restore original list after a short delay
+          setTimeout(() => {
+            window.transactionList = originalList;
+          }, 100);
+        }
+      } else {
+        console.error('❌ handleUpdateCookie function not found');
+        alert('❌ Chức năng cập nhật cookie chưa sẵn sàng');
+      }
+      break;
+    default:
+      console.warn(`⚠️ Unknown action: ${action}`);
+  }
+};
+
+// View software item details
+function viewSoftwareItem(index) {
+  const software = window.softwareList[index];
+  if (!software) {
+    console.error('❌ Software not found at index:', index);
+    return;
+  }
+  
+  console.log('👁️ Viewing software:', software.softwareName);
+  
+  // Use existing modal system to show software details
+  if (typeof showResultModalModern === 'function') {
+    const details = `
+      <div style="text-align: left; line-height: 1.6;">
+        <h4>💻 ${software.softwareName} - ${software.softwarePackage}</h4>
+        <p><strong>Tài khoản:</strong> ${software.accountName}</p>
+        <p><strong>Giá bán:</strong> ${formatCurrency(software.price)}</p>
+        <p><strong>Tên đăng nhập:</strong> ${software.username || 'Chưa có'}</p>
+        <p><strong>Mật khẩu:</strong> ${software.password ? '***' : 'Chưa có'}</p>
+        <p><strong>Secret:</strong> ${software.secret ? '***' : 'Chưa có'}</p>
+        <p><strong>Ngày thay đổi:</strong> ${software.lastModified || 'Chưa có'}</p>
+        <p><strong>Ngày gia hạn:</strong> ${software.renewalDate || 'Chưa có'}</p>
+        <p><strong>Loại tệp:</strong> ${software.fileType || 'Chưa có'}</p>
+        <p><strong>Số ngày đổi MK:</strong> ${software.passwordChangeDays || 'Mặc định'}</p>
+        ${software.orderInfo ? `<p><strong>Thông tin đơn hàng:</strong><br>${software.orderInfo}</p>` : ''}
+      </div>
+    `;
+    showResultModalModern('Chi tiết phần mềm', details, 'info');
+  } else {
+    // Fallback to alert if modal not available
+    alert(`💻 ${software.softwareName}\n• Gói: ${software.softwarePackage}\n• Tài khoản: ${software.accountName}\n• Giá: ${formatCurrency(software.price)}`);
+  }
+}
+
+// Open Google Sheet for software
+function openSoftwareSheet(index) {
+  const software = window.softwareList[index];
+  if (!software) {
+    console.error('❌ Software not found at index:', index);
+    return;
+  }
+  
+  if (!software.accountSheetId) {
+    if (typeof showResultModalModern === 'function') {
+      showResultModalModern('Thông báo', 'Phần mềm này chưa có liên kết tới Google Sheet', 'warning');
+    } else {
+      alert('⚠️ Phần mềm này chưa có liên kết tới Google Sheet');
+    }
+    return;
+  }
+  
+  console.log('🔗 Opening Google Sheet for:', software.softwareName, 'ID:', software.accountSheetId);
+  
+  // Construct Google Sheets URL
+  const sheetUrl = `https://docs.google.com/spreadsheets/d/${software.accountSheetId}/edit`;
+  
+  // Open in new tab
+  window.open(sheetUrl, '_blank');
+  
+  // Show confirmation
+  if (typeof showResultModalModern === 'function') {
+    showResultModalModern('Thành công', `Đã mở Google Sheet cho ${software.softwareName}`, 'success');
+  }
+}}
