@@ -426,9 +426,9 @@ window.handleSoftwareReset = function() {
 
 function getSoftwareFormData() {
   return {
-    softwareName: document.getElementById('softwareName')?.value?.trim() || '',
-    softwarePackage: document.getElementById('softwarePackage')?.value?.trim() || '',
-    accountName: document.getElementById('accountName')?.value?.trim() || '',
+    softwareName: document.getElementById('softwareFormName')?.value?.trim() || '',
+    softwarePackage: document.getElementById('softwareFormPackage')?.value?.trim() || '',
+    accountName: document.getElementById('softwareFormAccount')?.value?.trim() || '',
     accountSheetId: document.getElementById('accountSheetId')?.value?.trim() || '',
     orderInfo: document.getElementById('orderInfo')?.value?.trim() || '',
     loginUsername: document.getElementById('loginUsername')?.value?.trim() || '',
@@ -446,16 +446,16 @@ function validateSoftwareForm(formData) {
   
   // Validate required fields
   const requiredFields = [
-    { field: 'softwareName', name: 'Tên phần mềm' },
-    { field: 'softwarePackage', name: 'Gói phần mềm' },
-    { field: 'accountName', name: 'Tên tài khoản' },
+    { field: 'softwareName', name: 'Tên phần mềm', elementId: 'softwareFormName' },
+    { field: 'softwarePackage', name: 'Gói phần mềm', elementId: 'softwareFormPackage' },
+    { field: 'accountName', name: 'Tên tài khoản', elementId: 'softwareFormAccount' },
     { field: 'loginUsername', name: 'Tên đăng nhập' },
     { field: 'loginPassword', name: 'Mật khẩu đăng nhập' }
   ];
   
-  requiredFields.forEach(({ field, name }) => {
+  requiredFields.forEach(({ field, name, elementId }) => {
     if (!formData[field]) {
-      showSoftwareFieldError(field, `${name} là bắt buộc`);
+      showSoftwareFieldError(elementId || field, `${name} là bắt buộc`);
       isValid = false;
     }
   });
@@ -499,9 +499,9 @@ function initSoftwareFormDropdowns() {
   console.log('🔧 Initializing software form dropdowns...');
   
   // Add event listeners for cascading dropdowns
-  const softwareNameInput = document.getElementById('softwareName');
-  const softwarePackageInput = document.getElementById('softwarePackage');
-  const accountNameInput = document.getElementById('accountName');
+  const softwareNameInput = document.getElementById('softwareFormName');
+  const softwarePackageInput = document.getElementById('softwareFormPackage');
+  const accountNameInput = document.getElementById('softwareFormAccount');
   
   if (softwareNameInput) {
     // Clear dependent fields when software name changes
@@ -594,7 +594,7 @@ function updateSoftwareNameDropdown() {
 
 function updateSoftwarePackageDropdown() {
   const datalist = document.getElementById('softwarePackageList');
-  const selectedSoftwareName = document.getElementById('softwareName')?.value?.trim();
+  const selectedSoftwareName = document.getElementById('softwareFormName')?.value?.trim();
   
   if (!datalist) return;
   
@@ -636,8 +636,8 @@ function updateSoftwarePackageDropdown() {
 
 function updateAccountNameDropdown() {
   const datalist = document.getElementById('accountNameList');
-  const selectedSoftwareName = document.getElementById('softwareName')?.value?.trim();
-  const selectedSoftwarePackage = document.getElementById('softwarePackage')?.value?.trim();
+  const selectedSoftwareName = document.getElementById('softwareFormName')?.value?.trim();
+  const selectedSoftwarePackage = document.getElementById('softwareFormPackage')?.value?.trim();
   
   if (!datalist) return;
   
@@ -694,9 +694,9 @@ function updateAccountNameDropdown() {
 }
 
 function autoFillFormFromSelection() {
-  const selectedSoftwareName = document.getElementById('softwareName')?.value?.trim();
-  const selectedSoftwarePackage = document.getElementById('softwarePackage')?.value?.trim();
-  const selectedAccountName = document.getElementById('accountName')?.value?.trim();
+  const selectedSoftwareName = document.getElementById('softwareFormName')?.value?.trim();
+  const selectedSoftwarePackage = document.getElementById('softwareFormPackage')?.value?.trim();
+  const selectedAccountName = document.getElementById('softwareFormAccount')?.value?.trim();
   
   if (!selectedSoftwareName || !selectedSoftwarePackage || !selectedAccountName) {
     return;
