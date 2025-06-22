@@ -9,6 +9,7 @@ import { getConstants } from './constants.js';
 window.softwareList = [];
 window.currentSoftwarePage = 1;
 window.softwareItemsPerPage = 10;
+window.currentEditSoftwareIndex = -1;
 
 export function initSoftwareTab() {
   console.log('💿 Initializing software tab...');
@@ -354,3 +355,135 @@ window.copyToClipboard = function(text) {
     alert('❌ Không thể sao chép dữ liệu!');
   });
 };
+
+// Software form handlers
+window.handleSoftwareAdd = function() {
+  console.log('🔄 Adding new software...');
+  
+  // Get form data
+  const formData = getSoftwareFormData();
+  
+  // Validate required fields
+  if (!validateSoftwareForm(formData)) {
+    return;
+  }
+  
+  // TODO: Implement add software API call
+  console.log('Software data to add:', formData);
+  alert('🚧 Chức năng thêm phần mềm đang được phát triển!');
+};
+
+window.handleSoftwareUpdate = function() {
+  console.log('🔄 Updating software...');
+  
+  // Get form data
+  const formData = getSoftwareFormData();
+  
+  // Validate required fields
+  if (!validateSoftwareForm(formData)) {
+    return;
+  }
+  
+  // TODO: Implement update software API call
+  console.log('Software data to update:', formData);
+  alert('🚧 Chức năng cập nhật phần mềm đang được phát triển!');
+};
+
+window.handleSoftwareSearch = function() {
+  console.log('🔍 Searching software...');
+  
+  // Get form data
+  const formData = getSoftwareFormData();
+  
+  // TODO: Implement search software logic
+  console.log('Software search criteria:', formData);
+  alert('🚧 Chức năng tìm kiếm phần mềm đang được phát triển!');
+};
+
+window.handleSoftwareReset = function() {
+  console.log('🔄 Resetting software form...');
+  
+  // Clear all form fields
+  const form = document.getElementById('softwareForm');
+  if (form) {
+    form.reset();
+  }
+  
+  // Clear any error messages
+  clearSoftwareFormErrors();
+  
+  // Reset any global editing state
+  window.currentEditSoftwareIndex = -1;
+  
+  console.log('✅ Software form reset complete');
+};
+
+function getSoftwareFormData() {
+  return {
+    softwareName: document.getElementById('softwareName')?.value?.trim() || '',
+    softwarePackage: document.getElementById('softwarePackage')?.value?.trim() || '',
+    accountName: document.getElementById('accountName')?.value?.trim() || '',
+    accountSheetId: document.getElementById('accountSheetId')?.value?.trim() || '',
+    orderInfo: document.getElementById('orderInfo')?.value?.trim() || '',
+    loginUsername: document.getElementById('loginUsername')?.value?.trim() || '',
+    loginPassword: document.getElementById('loginPassword')?.value?.trim() || '',
+    loginSecret: document.getElementById('loginSecret')?.value?.trim() || '',
+    standardName: document.getElementById('standardName')?.value?.trim() || ''
+  };
+}
+
+function validateSoftwareForm(formData) {
+  let isValid = true;
+  
+  // Clear previous errors
+  clearSoftwareFormErrors();
+  
+  // Validate required fields
+  const requiredFields = [
+    { field: 'softwareName', name: 'Tên phần mềm' },
+    { field: 'softwarePackage', name: 'Gói phần mềm' },
+    { field: 'accountName', name: 'Tên tài khoản' },
+    { field: 'loginUsername', name: 'Tên đăng nhập' },
+    { field: 'loginPassword', name: 'Mật khẩu đăng nhập' }
+  ];
+  
+  requiredFields.forEach(({ field, name }) => {
+    if (!formData[field]) {
+      showSoftwareFieldError(field, `${name} là bắt buộc`);
+      isValid = false;
+    }
+  });
+  
+  return isValid;
+}
+
+function showSoftwareFieldError(fieldId, message) {
+  const errorElement = document.getElementById(`${fieldId}-error`);
+  if (errorElement) {
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
+  }
+  
+  const fieldElement = document.getElementById(fieldId);
+  if (fieldElement) {
+    fieldElement.classList.add('error');
+  }
+}
+
+function clearSoftwareFormErrors() {
+  const errorElements = document.querySelectorAll('#softwareForm .error-message');
+  errorElements.forEach(element => {
+    element.textContent = '';
+    element.style.display = 'none';
+  });
+  
+  const fieldElements = document.querySelectorAll('#softwareForm .form-field');
+  fieldElements.forEach(element => {
+    element.classList.remove('error');
+  });
+  
+  const inputElements = document.querySelectorAll('#softwareForm input, #softwareForm textarea, #softwareForm select');
+  inputElements.forEach(element => {
+    element.classList.remove('error');
+  });
+}

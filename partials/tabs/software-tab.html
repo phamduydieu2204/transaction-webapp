@@ -1,9 +1,79 @@
 <!-- Tab Phần mềm -->
 <div id="tab-phan-mem" class="tab-content">
-  <div class="tab-header">
-    <h2>📱 Quản lý Phần mềm</h2>
-  </div>
+  <!-- Form Container -->
+  <div class="form-container">
+    <form id="softwareForm" onreset="handleSoftwareReset()">
+      <!-- Software Form Grid -->
+      <div class="transaction-form-grid">
+        
+        <!-- ✅ Dòng 1: Tên phần mềm, Gói phần mềm, Tên tài khoản, ID Sheet Tài khoản, Thông tin đơn hàng (spans 2 rows) -->
+        <div class="form-field">
+          <label class="required">Tên phần mềm <span class="required-asterisk">*</span></label>
+          <input type="text" id="softwareName" placeholder="Nhập tên phần mềm" required>
+          <div class="error-message" id="softwareName-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label class="required">Gói phần mềm <span class="required-asterisk">*</span></label>
+          <input type="text" id="softwarePackage" placeholder="Nhập gói phần mềm" required>
+          <div class="error-message" id="softwarePackage-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label class="required">Tên tài khoản <span class="required-asterisk">*</span></label>
+          <input type="text" id="accountName" placeholder="Nhập tên tài khoản" required>
+          <div class="error-message" id="accountName-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label>ID Sheet Tài khoản</label>
+          <input type="text" id="accountSheetId" placeholder="Nhập ID Google Sheet">
+          <div class="error-message" id="accountSheetId-error"></div>
+        </div>
+        
+        <!-- Thông tin đơn hàng - 1 cột, kéo dài từ dòng 1 đến dòng 2 -->
+        <div class="form-field note-field-tall">
+          <label>Thông tin đơn hàng</label>
+          <textarea id="orderInfo" placeholder="Nhập thông tin chi tiết về đơn hàng..."></textarea>
+          <div class="error-message" id="orderInfo-error"></div>
+        </div>
 
+        <!-- ✅ Dòng 2: Tên đăng nhập, Mật khẩu đăng nhập, Secret, Tên chuẩn -->
+        <div class="form-field">
+          <label class="required">Tên đăng nhập <span class="required-asterisk">*</span></label>
+          <input type="text" id="loginUsername" placeholder="Nhập tên đăng nhập" required>
+          <div class="error-message" id="loginUsername-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label class="required">Mật khẩu đăng nhập <span class="required-asterisk">*</span></label>
+          <input type="text" id="loginPassword" placeholder="Nhập mật khẩu" required>
+          <div class="error-message" id="loginPassword-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label>Secret</label>
+          <input type="text" id="loginSecret" placeholder="Nhập secret key (nếu có)">
+          <div class="error-message" id="loginSecret-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label>Tên chuẩn</label>
+          <input type="text" id="standardName" placeholder="Nhập tên chuẩn">
+          <div class="error-message" id="standardName-error"></div>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="button-row">
+        <button type="button" onclick="handleSoftwareAdd()">Thêm</button>
+        <button type="button" onclick="handleSoftwareUpdate()">Cập nhật</button>
+        <button type="button" onclick="handleSoftwareSearch()">Tìm kiếm</button>
+        <button type="reset">Làm mới</button>
+      </div>
+    </form>
+  </div>
+  
   <!-- Software List Section -->
   <div id="softwareSection" class="section">
     <div class="section-header">
