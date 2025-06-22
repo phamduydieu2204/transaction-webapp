@@ -513,6 +513,7 @@ function initSoftwareFormDropdowns() {
       // Update dropdowns
       updateSoftwarePackageDropdown();
       updateAccountNameDropdown();
+      updateOrderInfoDropdown();
       updateStandardNameDropdown();
     });
     
@@ -520,6 +521,7 @@ function initSoftwareFormDropdowns() {
       console.log('🔄 Software name confirmed:', softwareNameInput.value);
       updateSoftwarePackageDropdown();
       updateAccountNameDropdown();
+      updateOrderInfoDropdown();
       updateStandardNameDropdown();
     });
   }
@@ -532,26 +534,55 @@ function initSoftwareFormDropdowns() {
       if (accountNameInput) accountNameInput.value = '';
       // Update dropdowns
       updateAccountNameDropdown();
+      updateOrderInfoDropdown();
       updateStandardNameDropdown();
     });
     
     softwarePackageInput.addEventListener('change', () => {
       console.log('🔄 Software package confirmed:', softwarePackageInput.value);
       updateAccountNameDropdown();
+      updateOrderInfoDropdown();
+      updateStandardNameDropdown();
     });
   }
   
   if (accountNameInput) {
     accountNameInput.addEventListener('input', () => {
       console.log('🔄 Account name changed:', accountNameInput.value);
-      // Update standard name dropdown
+      // Update dependent dropdowns
+      updateOrderInfoDropdown();
       updateStandardNameDropdown();
     });
     
     accountNameInput.addEventListener('change', () => {
       console.log('🔄 Account name selected:', accountNameInput.value);
+      updateOrderInfoDropdown();
       updateStandardNameDropdown();
       autoFillFormFromSelection();
+    });
+  }
+  
+  // Add event listeners for order info field
+  const orderInfoInput = document.getElementById('orderInfo');
+  if (orderInfoInput) {
+    orderInfoInput.addEventListener('input', () => {
+      console.log('🔄 Order info changed (typing):', orderInfoInput.value);
+      // Don't auto-fill during typing to avoid interrupting user input
+    });
+    
+    orderInfoInput.addEventListener('change', () => {
+      console.log('🔄 Order info selected/entered:', orderInfoInput.value);
+      // Try to auto-fill if we have a complete selection or manual entry
+      autoFillFormFromSelection();
+    });
+    
+    // Also handle when user selects from datalist dropdown
+    orderInfoInput.addEventListener('blur', () => {
+      console.log('🔄 Order info field lost focus:', orderInfoInput.value);
+      // Auto-fill when user finishes entering/selecting value
+      if (orderInfoInput.value.trim()) {
+        autoFillFormFromSelection();
+      }
     });
   }
   
@@ -559,13 +590,23 @@ function initSoftwareFormDropdowns() {
   const standardNameInput = document.getElementById('standardName');
   if (standardNameInput) {
     standardNameInput.addEventListener('input', () => {
-      console.log('🔄 Standard name changed:', standardNameInput.value);
+      console.log('🔄 Standard name changed (typing):', standardNameInput.value);
+      // Don't auto-fill during typing to avoid interrupting user input
     });
     
     standardNameInput.addEventListener('change', () => {
-      console.log('🔄 Standard name selected:', standardNameInput.value);
-      // Try to auto-fill if we have a complete selection
+      console.log('🔄 Standard name selected/entered:', standardNameInput.value);
+      // Try to auto-fill if we have a complete selection or manual entry
       autoFillFormFromSelection();
+    });
+    
+    // Also handle when user selects from datalist dropdown
+    standardNameInput.addEventListener('blur', () => {
+      console.log('🔄 Standard name field lost focus:', standardNameInput.value);
+      // Auto-fill when user finishes entering/selecting value
+      if (standardNameInput.value.trim()) {
+        autoFillFormFromSelection();
+      }
     });
   }
   
@@ -576,6 +617,7 @@ function updateSoftwareFormDropdowns() {
   updateSoftwareNameDropdown();
   updateSoftwarePackageDropdown();
   updateAccountNameDropdown();
+  updateOrderInfoDropdown();
   updateStandardNameDropdown();
 }
 
@@ -718,6 +760,80 @@ function updateAccountNameDropdown() {
   console.log(`✅ Updated account name dropdown with ${uniqueAccounts.length} items`);
 }
 
+function updateOrderInfoDropdown() {
+  const datalist = document.getElementById('orderInfoList');
+  const selectedSoftwareName = document.getElementById('softwareFormName')?.value?.trim();
+  const selectedSoftwarePackage = document.getElementById('softwareFormPackage')?.value?.trim();
+  const selectedAccountName = document.getElementById('softwareFormAccount')?.value?.trim();
+  
+  if (!datalist) return;
+  
+  console.log(`🔍 Filtering order info for software: "${selectedSoftwareName}", package: "${selectedSoftwarePackage}", account: "${selectedAccountName}"`);
+  
+  let orderInfoList = [];
+  let filterDescription = '';
+  
+  if (selectedSoftwareName && selectedSoftwarePackage && selectedAccountName) {
+    // Filter by all three criteria
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName && 
+      item.softwarePackage === selectedSoftwarePackage &&
+      item.accountName === selectedAccountName
+    );
+    
+    filterDescription = `all three criteria`;
+    console.log(`📊 Found ${filteredItems.length} items matching all criteria`);
+    
+    orderInfoList = filteredItems
+      .map(item => item.orderInfo)
+      .filter(Boolean);
+  } else if (selectedSoftwareName && selectedSoftwarePackage) {
+    // Filter by software name and package
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName && 
+      item.softwarePackage === selectedSoftwarePackage
+    );
+    
+    filterDescription = `software "${selectedSoftwareName}" AND package "${selectedSoftwarePackage}"`;
+    console.log(`📊 Found ${filteredItems.length} items matching software and package`);
+    
+    orderInfoList = filteredItems
+      .map(item => item.orderInfo)
+      .filter(Boolean);
+  } else if (selectedSoftwareName) {
+    // Filter by software name only
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName
+    );
+    
+    filterDescription = `software "${selectedSoftwareName}" only`;
+    console.log(`📊 Found ${filteredItems.length} items matching software name only`);
+    
+    orderInfoList = filteredItems
+      .map(item => item.orderInfo)
+      .filter(Boolean);
+  } else {
+    // Show all order info if no filters
+    orderInfoList = window.softwareList.map(item => item.orderInfo).filter(Boolean);
+    filterDescription = 'no filter (showing all)';
+    console.log(`📊 Showing all order info (no filter)`);
+  }
+  
+  // Get unique order info and sort
+  const uniqueOrderInfo = [...new Set(orderInfoList)].sort();
+  
+  console.log(`📋 Available order info for ${filterDescription}:`, uniqueOrderInfo);
+  
+  datalist.innerHTML = '';
+  uniqueOrderInfo.forEach(info => {
+    const option = document.createElement('option');
+    option.value = info;
+    datalist.appendChild(option);
+  });
+  
+  console.log(`✅ Updated order info dropdown with ${uniqueOrderInfo.length} items`);
+}
+
 function updateStandardNameDropdown() {
   const datalist = document.getElementById('standardNameList');
   const selectedSoftwareName = document.getElementById('softwareFormName')?.value?.trim();
@@ -796,55 +912,93 @@ function autoFillFormFromSelection() {
   const selectedSoftwareName = document.getElementById('softwareFormName')?.value?.trim();
   const selectedSoftwarePackage = document.getElementById('softwareFormPackage')?.value?.trim();
   const selectedAccountName = document.getElementById('softwareFormAccount')?.value?.trim();
+  const selectedOrderInfo = document.getElementById('orderInfo')?.value?.trim();
+  const selectedStandardName = document.getElementById('standardName')?.value?.trim();
   
-  if (!selectedSoftwareName || !selectedSoftwarePackage || !selectedAccountName) {
-    return;
+  // Try to find an exact match first (all 5 key fields)
+  if (selectedSoftwareName && selectedSoftwarePackage && selectedAccountName && selectedOrderInfo && selectedStandardName) {
+    const exactMatch = window.softwareList.find(item => 
+      item.softwareName === selectedSoftwareName &&
+      item.softwarePackage === selectedSoftwarePackage &&
+      item.accountName === selectedAccountName &&
+      item.orderInfo === selectedOrderInfo &&
+      item.standardName === selectedStandardName
+    );
+    
+    if (exactMatch) {
+      console.log('🎯 Found exact match with standard name:', exactMatch);
+      fillFormFields(exactMatch);
+      return;
+    }
   }
   
-  // Find matching software entry
-  const matchingSoftware = window.softwareList.find(item => 
-    item.softwareName === selectedSoftwareName &&
-    item.softwarePackage === selectedSoftwarePackage &&
-    item.accountName === selectedAccountName
-  );
+  // If no exact match, try to find match by first 3 fields
+  if (selectedSoftwareName && selectedSoftwarePackage && selectedAccountName) {
+    const partialMatch = window.softwareList.find(item => 
+      item.softwareName === selectedSoftwareName &&
+      item.softwarePackage === selectedSoftwarePackage &&
+      item.accountName === selectedAccountName
+    );
+    
+    if (partialMatch) {
+      console.log('🔄 Found partial match (without standard name):', partialMatch);
+      fillFormFields(partialMatch, false); // Don't overwrite standard name if user typed it
+      return;
+    }
+  }
   
-  if (matchingSoftware) {
-    console.log('🔄 Auto-filling form from selection:', matchingSoftware);
-    
-    // Fill other form fields with existing data
-    const accountSheetIdField = document.getElementById('accountSheetId');
-    const loginUsernameField = document.getElementById('loginUsername');
-    const loginPasswordField = document.getElementById('loginPassword');
-    const loginSecretField = document.getElementById('loginSecret');
-    const standardNameField = document.getElementById('standardName');
-    
-    if (accountSheetIdField && matchingSoftware.accountSheetId) {
-      accountSheetIdField.value = matchingSoftware.accountSheetId;
+  console.log('ℹ️ No matching software found for auto-fill');
+}
+
+function fillFormFields(matchingSoftware, includeOptionalFields = true) {
+  console.log('🔄 Auto-filling form from selection:', matchingSoftware);
+  
+  // Fill other form fields with existing data
+  const accountSheetIdField = document.getElementById('accountSheetId');
+  const orderInfoField = document.getElementById('orderInfo');
+  const loginUsernameField = document.getElementById('loginUsername');
+  const loginPasswordField = document.getElementById('loginPassword');
+  const loginSecretField = document.getElementById('loginSecret');
+  const standardNameField = document.getElementById('standardName');
+  
+  if (accountSheetIdField && matchingSoftware.accountSheetId) {
+    accountSheetIdField.value = matchingSoftware.accountSheetId;
+  }
+  
+  // Only fill order info if requested and field is empty or matches
+  if (includeOptionalFields && orderInfoField && matchingSoftware.orderInfo) {
+    const currentOrderInfo = orderInfoField.value.trim();
+    if (!currentOrderInfo || currentOrderInfo === matchingSoftware.orderInfo) {
+      orderInfoField.value = matchingSoftware.orderInfo;
     }
-    
-    if (loginUsernameField && matchingSoftware.username) {
-      loginUsernameField.value = matchingSoftware.username;
-    }
-    
-    if (loginPasswordField && matchingSoftware.password) {
-      loginPasswordField.value = matchingSoftware.password;
-    }
-    
-    if (loginSecretField && matchingSoftware.secret) {
-      loginSecretField.value = matchingSoftware.secret;
-    }
-    
-    if (standardNameField && matchingSoftware.standardName) {
+  }
+  
+  if (loginUsernameField && matchingSoftware.username) {
+    loginUsernameField.value = matchingSoftware.username;
+  }
+  
+  if (loginPasswordField && matchingSoftware.password) {
+    loginPasswordField.value = matchingSoftware.password;
+  }
+  
+  if (loginSecretField && matchingSoftware.secret) {
+    loginSecretField.value = matchingSoftware.secret;
+  }
+  
+  // Only fill standard name if requested and field is empty or matches
+  if (includeOptionalFields && standardNameField && matchingSoftware.standardName) {
+    const currentStandardName = standardNameField.value.trim();
+    if (!currentStandardName || currentStandardName === matchingSoftware.standardName) {
       standardNameField.value = matchingSoftware.standardName;
     }
-    
-    // Set global edit index for update operations
-    const editIndex = window.softwareList.indexOf(matchingSoftware);
-    if (editIndex !== -1) {
-      window.currentEditSoftwareIndex = editIndex;
-      console.log(`📝 Set edit index to: ${editIndex}`);
-    }
-    
-    console.log('✅ Form auto-filled successfully');
   }
+  
+  // Set global edit index for update operations
+  const editIndex = window.softwareList.indexOf(matchingSoftware);
+  if (editIndex !== -1) {
+    window.currentEditSoftwareIndex = editIndex;
+    console.log(`📝 Set edit index to: ${editIndex}`);
+  }
+  
+  console.log('✅ Form auto-filled successfully');
 }
