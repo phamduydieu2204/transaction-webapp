@@ -93,18 +93,34 @@ function updateSoftwareTable() {
     return;
   }
   
+  // Get search terms for highlighting if in search mode
+  const searchTerms = window.isSoftwareSearching ? getCurrentSearchTerms() : [];
+  
   tbody.innerHTML = pageData.map((software, index) => {
     const actualIndex = startIndex + index + 1;
     const loginInfo = formatLoginInfo(software);
     const lastModified = formatDate(software.lastModified);
     const price = formatCurrency(software.price);
     
+    // Apply highlighting if searching
+    const softwareName = window.isSoftwareSearching ? 
+      highlightSearchTerms(software.softwareName || '', searchTerms) : 
+      escapeHtml(software.softwareName || '');
+    
+    const softwarePackage = window.isSoftwareSearching ? 
+      highlightSearchTerms(software.softwarePackage || '', searchTerms) : 
+      escapeHtml(software.softwarePackage || '');
+    
+    const accountName = window.isSoftwareSearching ? 
+      highlightSearchTerms(software.accountName || '', searchTerms) : 
+      escapeHtml(software.accountName || '');
+    
     return `
-      <tr>
+      <tr ${window.isSoftwareSearching ? 'style="background-color: #f8f9fa;"' : ''}>
         <td style="text-align: center;">${actualIndex}</td>
-        <td>${escapeHtml(software.softwareName || '')}</td>
-        <td>${escapeHtml(software.softwarePackage || '')}</td>
-        <td>${escapeHtml(software.accountName || '')}</td>
+        <td>${softwareName}</td>
+        <td>${softwarePackage}</td>
+        <td>${accountName}</td>
         <td style="text-align: right;">${price}</td>
         <td class="login-info-cell">${loginInfo}</td>
         <td style="text-align: center;">${lastModified}</td>
@@ -217,7 +233,16 @@ function escapeHtml(text) {
 function updateSoftwareTotalDisplay() {
   const totalDisplay = document.getElementById('softwareTotalDisplay');
   if (totalDisplay) {
-    totalDisplay.textContent = `Tổng: ${window.softwareList.length} phần mềm`;
+    if (window.isSoftwareSearching) {
+      totalDisplay.innerHTML = `
+        <span style="color: #007bff;">🔍 Kết quả tìm kiếm: ${window.softwareList.length} phần mềm</span>
+        <button onclick="clearSoftwareSearch()" style="margin-left: 10px; padding: 4px 8px; font-size: 12px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">
+          Xóa bộ lọc
+        </button>
+      `;
+    } else {
+      totalDisplay.textContent = `Tổng: ${window.softwareList.length} phần mềm`;
+    }
   }
 }
 
@@ -1421,3 +1446,175 @@ window.handleSoftwareUpdate = async function() {
     }
   }
 };
+
+// ========================================
+// SEARCH SOFTWARE FUNCTIONALITY
+// ========================================
+
+window.handleSoftwareSearch = async function() {
+  console.log('🔍 Searching software...');
+  
+  try {
+    // Get search conditions from form
+    const conditions = getSoftwareSearchConditions();
+    
+    // Check if at least one search condition is provided
+    if (Object.keys(conditions).length === 0) {
+      if (typeof showResultModalModern === 'function') {
+        showResultModalModern(
+          'Thiếu điều kiện tìm kiếm!', 
+          'Vui lòng nhập ít nhất một điều kiện tìm kiếm trong form.', 
+          'warning'
+        );
+      } else {
+        alert('⚠️ Vui lòng nhập ít nhất một điều kiện tìm kiếm');
+      }
+      return;
+    }
+    
+    // Show processing modal
+    if (typeof showProcessingModalModern === 'function') {
+      showProcessingModalModern('Đang tìm kiếm phần mềm...', 'Vui lòng đợi trong giây lát');
+    }
+    
+    // Call backend API
+    const { BACKEND_URL } = getConstants();
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "searchSoftware",
+        conditions: conditions
+      })
+    });
+    
+    const result = await response.json();
+    
+    // Close processing modal
+    if (typeof closeProcessingModalModern === 'function') {
+      closeProcessingModalModern();
+    }
+    
+    if (result.status === "success") {
+      // Set search mode and update software list
+      window.isSoftwareSearching = true;
+      window.softwareList = result.data || [];
+      window.currentSoftwarePage = 1;
+      
+      // Update display
+      updateSoftwareTable();
+      updateSoftwareTotalDisplay();
+      
+      // Show success message
+      const message = result.message || `Tìm thấy ${result.data.length} phần mềm phù hợp`;
+      if (typeof showResultModalModern === 'function') {
+        showResultModalModern('Tìm kiếm thành công!', message, 'success');
+      } else {
+        alert('✅ ' + message);
+      }
+      
+      console.log('✅ Software search completed:', result.data.length, 'results');
+      
+    } else {
+      // Show error message
+      console.error('❌ Error searching software:', result.message);
+      
+      if (typeof showResultModalModern === 'function') {
+        showResultModalModern('Lỗi!', result.message || 'Có lỗi xảy ra khi tìm kiếm phần mềm', 'error');
+      } else {
+        alert('❌ ' + (result.message || 'Có lỗi xảy ra khi tìm kiếm phần mềm'));
+      }
+    }
+    
+  } catch (error) {
+    console.error('❌ Error in handleSoftwareSearch:', error);
+    
+    // Close processing modal if it's open
+    if (typeof closeProcessingModalModern === 'function') {
+      closeProcessingModalModern();
+    }
+    
+    const errorMessage = 'Có lỗi xảy ra khi tìm kiếm phần mềm. Vui lòng thử lại.';
+    if (typeof showResultModalModern === 'function') {
+      showResultModalModern('Lỗi!', errorMessage, 'error');
+    } else {
+      alert('❌ ' + errorMessage);
+    }
+  }
+};
+
+function getSoftwareSearchConditions() {
+  const conditions = {};
+  
+  // Get form values
+  const getValue = (id) => document.getElementById(id)?.value?.trim() || '';
+  
+  const softwareName = getValue('softwareFormName');
+  const softwarePackage = getValue('softwareFormPackage');
+  const accountName = getValue('softwareFormAccount');
+  const price = getValue('price');
+  const accountSheetId = getValue('accountSheetId');
+  const orderInfo = getValue('orderInfo');
+  const loginUsername = getValue('loginUsername');
+  const standardName = getValue('standardName');
+  
+  // Add non-empty conditions
+  if (softwareName) conditions.softwareName = softwareName;
+  if (softwarePackage) conditions.softwarePackage = softwarePackage;
+  if (accountName) conditions.accountName = accountName;
+  if (price) conditions.price = price;
+  if (accountSheetId) conditions.accountSheetId = accountSheetId;
+  if (orderInfo) conditions.orderInfo = orderInfo;
+  if (loginUsername) conditions.username = loginUsername;
+  if (standardName) conditions.standardName = standardName;
+  
+  console.log('🔍 Search conditions:', conditions);
+  return conditions;
+}
+
+// Function to clear search and return to normal view
+window.clearSoftwareSearch = function() {
+  console.log('🔄 Clearing software search...');
+  
+  // Reset search state
+  window.isSoftwareSearching = false;
+  window.currentSoftwarePage = 1;
+  
+  // Reload all software data
+  loadSoftwareData();
+  
+  // Reset form
+  window.handleSoftwareReset();
+  
+  console.log('✅ Software search cleared');
+};
+
+// Function to highlight search terms in text
+function highlightSearchTerms(text, searchTerms) {
+  if (!text || !searchTerms || searchTerms.length === 0) {
+    return escapeHtml(text);
+  }
+  
+  let highlightedText = escapeHtml(text);
+  
+  // Create a case-insensitive regex for each search term
+  searchTerms.forEach(term => {
+    if (term && term.trim()) {
+      const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`(${escapedTerm})`, 'gi');
+      highlightedText = highlightedText.replace(regex, '<mark style="background-color: yellow; padding: 1px 2px;">$1</mark>');
+    }
+  });
+  
+  return highlightedText;
+}
+
+// Get current search terms for highlighting
+function getCurrentSearchTerms() {
+  if (!window.isSoftwareSearching) {
+    return [];
+  }
+  
+  const conditions = getSoftwareSearchConditions();
+  return Object.values(conditions).filter(term => term && term.trim());
+}
