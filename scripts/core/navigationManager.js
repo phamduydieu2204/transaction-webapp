@@ -30,6 +30,13 @@ const TAB_CONFIG = {
     preloadData: true,
     initFunction: 'initTransactionTab'
   },
+  'phan-mem': {
+    name: 'Phần mềm',
+    icon: '💿',
+    requiresAuth: true,
+    preloadData: true,
+    initFunction: 'initSoftwareTab'
+  },
   'chi-phi': {
     name: 'Chi phí',
     icon: '💸',

@@ -27,6 +27,7 @@ import './detailModalUnified.js';
 // Import tab initialization functions
 import { initExpenseTab } from './initExpenseTab.js';
 import { initTransactionTab } from './initTransactionTab.js';
+import { initSoftwareTab } from './initSoftwareTab.js';
 import { initStatisticsTab } from './initStatisticsTab.js';
 
 // Import employee report modules
@@ -617,6 +618,14 @@ window.editRow = (index) => {
 };
 window.deleteRow = (index) => {
   return deleteRow(index, window.deleteTransaction);
+};
+// Software tab function
+window.initSoftwareTab = () => {
+  if (typeof initSoftwareTab === 'function') {
+    return initSoftwareTab();
+  } else {
+    console.warn('⚠️ initSoftwareTab function not available');
+  }
 };
 window.closeModal = closeModal;
 window.confirmDelete = confirmDelete;

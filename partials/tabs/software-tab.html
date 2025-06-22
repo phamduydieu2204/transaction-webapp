@@ -1,0 +1,59 @@
+<!-- Tab Phần mềm -->
+<div id="tab-phan-mem" class="tab-content">
+  <div class="tab-header">
+    <h2>📱 Quản lý Phần mềm</h2>
+  </div>
+
+  <!-- Software List Section -->
+  <div id="softwareSection" class="section">
+    <div class="section-header">
+      <h3>📊 Danh sách phần mềm</h3>
+      <div class="header-controls">
+        <span id="softwareTotalDisplay" class="total-display">Tổng: 0 phần mềm</span>
+      </div>
+    </div>
+
+    <!-- Software Table -->
+    <div class="table-container" style="margin-top: 10px;">
+      <table id="softwareListTable" class="transaction-table">
+        <thead>
+          <tr>
+            <th style="width: 50px;">STT</th>
+            <th style="width: 200px;">Tên phần mềm</th>
+            <th style="width: 150px;">Gói phần mềm</th>
+            <th style="width: 150px;">Tên tài khoản</th>
+            <th style="width: 120px;">Giá bán</th>
+            <th style="width: 300px;">Thông tin đăng nhập</th>
+            <th style="width: 120px;">Ngày thay đổi</th>
+            <th style="width: 100px;">Hành động</th>
+          </tr>
+        </thead>
+        <tbody id="softwareTableBody">
+          <!-- Dữ liệu sẽ được thêm bằng JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-container">
+      <div class="pagination-info">
+        <span id="softwarePageInfo">Hiển thị 0-0 của 0 phần mềm</span>
+      </div>
+      <div class="pagination-controls">
+        <button id="softwarePrevBtn" class="pagination-btn" disabled>‹ Trước</button>
+        <span id="softwarePageNumbers" class="page-numbers"></span>
+        <button id="softwareNextBtn" class="pagination-btn" disabled>Tiếp ›</button>
+      </div>
+      <div class="pagination-settings">
+        <label for="softwareItemsPerPage">Hiển thị:</label>
+        <select id="softwareItemsPerPage" class="items-per-page">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+        <span>mục/trang</span>
+      </div>
+    </div>
+  </div>
+</div>

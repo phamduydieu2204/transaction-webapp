@@ -1,0 +1,130 @@
+/* Software Table Specific Styles */
+
+.login-info-cell {
+  min-width: 300px;
+  max-width: 300px;
+}
+
+.login-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  padding: 4px 8px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.login-item:last-child {
+  margin-bottom: 0;
+}
+
+.login-label {
+  font-weight: 500;
+  color: #495057;
+  min-width: 60px;
+  flex-shrink: 0;
+}
+
+.login-value {
+  font-family: 'Courier New', monospace;
+  background: #e9ecef;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  flex: 1;
+  word-break: break-all;
+}
+
+.password-mask,
+.secret-mask {
+  letter-spacing: 1px;
+  color: #6c757d;
+}
+
+.copy-small-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  padding: 2px 4px;
+  cursor: pointer;
+  font-size: 0.7rem;
+  transition: all 0.2s ease;
+  min-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copy-small-btn:hover {
+  background: #218838;
+  transform: scale(1.05);
+}
+
+.copy-small-btn:active {
+  transform: scale(0.95);
+}
+
+.no-data {
+  color: #6c757d;
+  font-style: italic;
+  text-align: center;
+  padding: 8px;
+}
+
+.action-select {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background: white;
+  font-size: 0.85rem;
+  color: #495057;
+}
+
+.action-select:focus {
+  outline: none;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Software table responsive adjustments */
+@media (max-width: 1200px) {
+  .login-info-cell {
+    min-width: 250px;
+    max-width: 250px;
+  }
+  
+  .login-item {
+    font-size: 0.8rem;
+  }
+  
+  .login-value {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-info-cell {
+    min-width: 200px;
+    max-width: 200px;
+  }
+  
+  .login-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .login-label {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .login-value {
+    width: 100%;
+  }
+}

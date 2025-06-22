@@ -28,6 +28,7 @@
 @import url('components/reports.css');
 @import url('components/software-profit-table.css'); /* Software profit table styling */
 @import url('components/password-modal.css'); /* Password modal styling */
+@import url('components/software-table.css'); /* Software table styling */
 
 /* Page specific styles */
 @import url('pages/login.css');

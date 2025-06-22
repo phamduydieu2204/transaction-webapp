@@ -77,6 +77,7 @@ export async function initializePartials() {
       { elementId: 'tab-navigation-container', partialPath: './partials/header/tab-navigation.html', priority: 1 },
       { elementId: 'transaction-tab-container', partialPath: './partials/tabs/transaction-tab.html', priority: 1 },
       // Secondary
+      { elementId: 'software-tab-container', partialPath: './partials/tabs/software-tab.html', priority: 2 },
       { elementId: 'expense-tab-container', partialPath: './partials/tabs/expense-tab.html', priority: 2 },
       { elementId: 'statistics-tab-container', partialPath: './partials/tabs/statistics-tab.html', priority: 2 },
       { elementId: 'reports-tab-container', partialPath: './partials/tabs/reports-tab.html', priority: 2 },
