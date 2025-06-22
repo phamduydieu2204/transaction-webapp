@@ -173,6 +173,11 @@ function formatDate(dateValue) {
   if (!dateValue) return '';
   
   try {
+    // If it's already in dd/mm/yyyy format, return as is
+    if (typeof dateValue === 'string' && /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateValue)) {
+      return dateValue;
+    }
+    
     const date = new Date(dateValue);
     if (isNaN(date.getTime())) return '';
     
