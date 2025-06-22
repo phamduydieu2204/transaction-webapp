@@ -46,12 +46,30 @@ export function handleChangePassword(index) {
     } else {
       fileNameLabel.textContent = "📁 Thông tin tài khoản";
     }
+
+    // Cập nhật links nếu có accountSheetId
+    if (accountSheetId) {
+      const fileLinksContainer = document.getElementById("fileLinksContainer");
+      const googleSheetLink = document.getElementById("googleSheetLink");
+      const googleDocsLink = document.getElementById("googleDocsLink");
+      
+      // Google Sheets link
+      googleSheetLink.href = `https://docs.google.com/spreadsheets/d/${accountSheetId}/edit`;
+      
+      // Google Docs link (cùng ID nhưng mở trong Docs viewer)
+      googleDocsLink.href = `https://docs.google.com/document/d/${accountSheetId}/edit`;
+      
+      // Hiển thị container links
+      fileLinksContainer.style.display = "flex";
+    }
   })();
 }
 
 // Đóng modal
 export function closeChangePasswordModal() {
   document.getElementById("changePasswordModal").style.display = "none";
+  // Reset file links
+  document.getElementById("fileLinksContainer").style.display = "none";
 }
 
 // Gửi yêu cầu cập nhật
