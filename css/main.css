@@ -428,10 +428,13 @@ table {
   grid-column: span 1 !important;
 }
 
-.transaction-form-grid .note-field-tall textarea {
+.transaction-form-grid .note-field-tall textarea,
+.transaction-form-grid .note-field-tall input[type="text"] {
   height: calc(100% - 40px) !important;
   min-height: 120px !important;
   resize: vertical !important;
+  word-wrap: break-word !important;
+  white-space: pre-wrap !important;
 }
 
 /* Ensure all form fields default to 1 column */

@@ -46,6 +46,13 @@ async function loadSoftwareData() {
       window.softwareList = result.data || [];
       console.log(`✅ Loaded ${window.softwareList.length} software items`);
       
+      // Debug: Log sample data to check orderInfo field
+      if (window.softwareList.length > 0) {
+        console.log('📋 Sample software data:', window.softwareList[0]);
+        const hasOrderInfo = window.softwareList.some(item => item.orderInfo);
+        console.log(`📋 Has orderInfo data: ${hasOrderInfo}`);
+      }
+      
       // Update display
       updateSoftwareTable();
       updateSoftwareTotalDisplay();
@@ -631,6 +638,10 @@ window.debugSoftwareDropdowns = function() {
   const uniqueNames = [...new Set(window.softwareList.map(item => item.softwareName))].filter(Boolean);
   console.log('Unique software names:', uniqueNames);
   
+  // Unique order info
+  const uniqueOrderInfo = [...new Set(window.softwareList.map(item => item.orderInfo))].filter(Boolean);
+  console.log('Unique order info:', uniqueOrderInfo);
+  
   // Test filtering for first software
   if (uniqueNames.length > 0) {
     const testSoftware = uniqueNames[0];
@@ -639,7 +650,20 @@ window.debugSoftwareDropdowns = function() {
       .map(item => item.softwarePackage)
       .filter(Boolean);
     console.log(`Packages for "${testSoftware}":`, [...new Set(packagesForSoftware)]);
+    
+    const orderInfoForSoftware = window.softwareList
+      .filter(item => item.softwareName === testSoftware)
+      .map(item => item.orderInfo)
+      .filter(Boolean);
+    console.log(`Order info for "${testSoftware}":`, [...new Set(orderInfoForSoftware)]);
   }
+};
+
+// Function để force refresh tất cả dropdowns - cho debugging
+window.forceRefreshDropdowns = function() {
+  console.log('🔄 Force refreshing all dropdowns...');
+  updateSoftwareFormDropdowns();
+  console.log('✅ All dropdowns refreshed');
 };
 
 function updateSoftwareNameDropdown() {
@@ -766,7 +790,15 @@ function updateOrderInfoDropdown() {
   const selectedSoftwarePackage = document.getElementById('softwareFormPackage')?.value?.trim();
   const selectedAccountName = document.getElementById('softwareFormAccount')?.value?.trim();
   
-  if (!datalist) return;
+  if (!datalist) {
+    console.warn('⚠️ orderInfoList datalist not found');
+    return;
+  }
+  
+  if (!window.softwareList || window.softwareList.length === 0) {
+    console.warn('⚠️ No software data available for order info dropdown');
+    return;
+  }
   
   console.log(`🔍 Filtering order info for software: "${selectedSoftwareName}", package: "${selectedSoftwarePackage}", account: "${selectedAccountName}"`);
   
