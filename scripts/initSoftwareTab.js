@@ -85,7 +85,7 @@ function updateSoftwareTable() {
   if (pageData.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="8" style="text-align: center; padding: 20px; color: #666;">
+        <td colspan="9" style="text-align: center; padding: 20px; color: #666;">
           Không có dữ liệu phần mềm
         </td>
       </tr>
@@ -100,6 +100,7 @@ function updateSoftwareTable() {
     const actualIndex = startIndex + index + 1;
     const loginInfo = formatLoginInfo(software);
     const lastModified = formatDate(software.lastModified);
+    const renewalDate = formatDate(software.renewalDate);
     const price = formatCurrency(software.price);
     
     // Apply highlighting if searching
@@ -135,6 +136,7 @@ function updateSoftwareTable() {
         <td style="text-align: right;">${price}</td>
         <td class="login-info-cell">${loginInfo}</td>
         <td style="text-align: center;">${lastModified}</td>
+        <td style="text-align: center;">${renewalDate}</td>
         <td style="text-align: center;">
           <select class="action-select" onchange="handleSoftwareAction(this, ${startIndex + index})">
             <option value="">-- Chọn hành động --</option>
@@ -417,7 +419,8 @@ function editSoftwareItem(software, index) {
     loginUsername: document.getElementById('loginUsername'),
     loginPassword: document.getElementById('loginPassword'),
     loginSecret: document.getElementById('loginSecret'),
-    standardName: document.getElementById('standardName')
+    standardName: document.getElementById('standardName'),
+    renewalDate: document.getElementById('renewalDate')
   };
   
   // Batch DOM updates to prevent layout thrashing
@@ -433,6 +436,20 @@ function editSoftwareItem(software, index) {
     if (formElements.loginPassword) formElements.loginPassword.value = software.password || '';
     if (formElements.loginSecret) formElements.loginSecret.value = software.secret || '';
     if (formElements.standardName) formElements.standardName.value = software.standardName || '';
+    
+    // Handle renewalDate - convert from dd/mm/yyyy to yyyy-mm-dd for input[type="date"]
+    if (formElements.renewalDate && software.renewalDate) {
+      const convertToInputDate = (vietnameseDate) => {
+        if (!vietnameseDate) return '';
+        const parts = vietnameseDate.split('/');
+        if (parts.length === 3) {
+          // Convert dd/mm/yyyy to yyyy-mm-dd
+          return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        }
+        return '';
+      };
+      formElements.renewalDate.value = convertToInputDate(software.renewalDate);
+    }
     
     // Update form dropdowns to match the selected values
     updateSoftwareFormDropdowns();
@@ -560,8 +577,29 @@ window.handleSoftwareAdd = async function() {
   }
 };
 
-window.handleSoftwareUpdate = function() {
+window.handleSoftwareUpdate = async function() {
   console.log('🔄 Updating software...');
+  
+  // Check if we're in edit mode
+  if (window.currentEditSoftwareIndex === -1) {
+    if (typeof showResultModalModern === 'function') {
+      showResultModalModern('Thông báo!', 'Vui lòng chọn một phần mềm để chỉnh sửa trước', 'warning');
+    } else {
+      alert('⚠️ Vui lòng chọn một phần mềm để chỉnh sửa trước');
+    }
+    return;
+  }
+  
+  // Get original software data
+  const originalSoftware = window.softwareList[window.currentEditSoftwareIndex];
+  if (!originalSoftware) {
+    if (typeof showResultModalModern === 'function') {
+      showResultModalModern('Lỗi!', 'Không tìm thấy dữ liệu phần mềm gốc', 'error');
+    } else {
+      alert('❌ Không tìm thấy dữ liệu phần mềm gốc');
+    }
+    return;
+  }
   
   // Get form data
   const formData = getSoftwareFormData();
@@ -571,20 +609,186 @@ window.handleSoftwareUpdate = function() {
     return;
   }
   
-  // TODO: Implement update software API call
-  console.log('Software data to update:', formData);
-  alert('🚧 Chức năng cập nhật phần mềm đang được phát triển!');
+  try {
+    // Show processing modal
+    if (typeof showProcessingModalModern === 'function') {
+      showProcessingModalModern('Đang cập nhật phần mềm...', 'Vui lòng đợi trong giây lát');
+    }
+    
+    // Prepare update data with original values for identification
+    const updateData = {
+      // Original values for identification
+      originalSoftwareName: originalSoftware.softwareName,
+      originalSoftwarePackage: originalSoftware.softwarePackage,
+      originalAccountName: originalSoftware.accountName,
+      
+      // New values for update
+      ...formData
+    };
+    
+    console.log('Software update data:', updateData);
+    
+    // Call backend API
+    const { BACKEND_URL } = getConstants();
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "updateSoftware",
+        ...updateData
+      })
+    });
+    
+    const result = await response.json();
+    
+    // Close processing modal
+    if (typeof closeProcessingModalModern === 'function') {
+      closeProcessingModalModern();
+    }
+    
+    if (result.status === "success") {
+      // Show success message
+      if (typeof showResultModalModern === 'function') {
+        showResultModalModern('Thành công!', result.message || 'Phần mềm đã được cập nhật thành công', 'success');
+      } else {
+        alert('✅ ' + (result.message || 'Phần mềm đã được cập nhật thành công'));
+      }
+      
+      // Reset form and editing state
+      window.handleSoftwareReset();
+      
+      // Reload software data to reflect changes
+      await loadSoftwareData();
+      
+      console.log('✅ Software updated successfully:', result.data);
+      
+    } else {
+      // Show error message
+      const errorMessage = result.message || 'Có lỗi xảy ra khi cập nhật phần mềm';
+      if (typeof showResultModalModern === 'function') {
+        showResultModalModern('Lỗi!', errorMessage, 'error');
+      } else {
+        alert('❌ ' + errorMessage);
+      }
+      console.error('❌ Error updating software:', result.message);
+    }
+    
+  } catch (error) {
+    // Close processing modal if still open
+    if (typeof closeProcessingModalModern === 'function') {
+      closeProcessingModalModern();
+    }
+    
+    const errorMessage = 'Lỗi kết nối: ' + error.message;
+    if (typeof showResultModalModern === 'function') {
+      showResultModalModern('Lỗi kết nối!', errorMessage, 'error');
+    } else {
+      alert('❌ ' + errorMessage);
+    }
+    console.error('❌ Network error updating software:', error);
+  }
 };
 
-window.handleSoftwareSearch = function() {
+window.handleSoftwareSearch = async function() {
   console.log('🔍 Searching software...');
   
   // Get form data
   const formData = getSoftwareFormData();
   
-  // TODO: Implement search software logic
-  console.log('Software search criteria:', formData);
-  alert('🚧 Chức năng tìm kiếm phần mềm đang được phát triển!');
+  // Check if at least one search field is filled
+  const hasSearchCriteria = Object.values(formData).some(value => value && value.trim() !== '');
+  
+  if (!hasSearchCriteria) {
+    if (typeof showResultModalModern === 'function') {
+      showResultModalModern('Thông báo!', 'Vui lòng nhập ít nhất một tiêu chí tìm kiếm', 'warning');
+    } else {
+      alert('⚠️ Vui lòng nhập ít nhất một tiêu chí tìm kiếm');
+    }
+    return;
+  }
+  
+  try {
+    // Show processing modal
+    if (typeof showProcessingModalModern === 'function') {
+      showProcessingModalModern('Đang tìm kiếm phần mềm...', 'Vui lòng đợi trong giây lát');
+    }
+    
+    // Prepare search conditions (only include non-empty fields)
+    const searchConditions = {};
+    Object.entries(formData).forEach(([key, value]) => {
+      if (value && value.trim() !== '') {
+        searchConditions[key] = value.trim();
+      }
+    });
+    
+    console.log('Software search conditions:', searchConditions);
+    
+    // Call backend API
+    const { BACKEND_URL } = getConstants();
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "searchSoftware",
+        conditions: searchConditions
+      })
+    });
+    
+    const result = await response.json();
+    
+    // Close processing modal
+    if (typeof closeProcessingModalModern === 'function') {
+      closeProcessingModalModern();
+    }
+    
+    if (result.status === "success") {
+      // Store search results and enable search mode
+      window.softwareList = result.data || [];
+      window.isSoftwareSearching = true;
+      window.softwareSearchTerms = Object.values(searchConditions);
+      
+      // Reset to first page
+      window.currentSoftwarePage = 1;
+      
+      // Update display
+      updateSoftwareTable();
+      updateSoftwareTotalDisplay();
+      
+      // Show success message
+      const message = result.message || `Tìm thấy ${result.data.length} phần mềm phù hợp`;
+      if (typeof showResultModalModern === 'function') {
+        showResultModalModern('Kết quả tìm kiếm!', message, 'success');
+      } else {
+        alert('✅ ' + message);
+      }
+      
+      console.log('✅ Software search completed:', result.data.length, 'results found');
+      
+    } else {
+      // Show error message
+      const errorMessage = result.message || 'Có lỗi xảy ra khi tìm kiếm phần mềm';
+      if (typeof showResultModalModern === 'function') {
+        showResultModalModern('Lỗi!', errorMessage, 'error');
+      } else {
+        alert('❌ ' + errorMessage);
+      }
+      console.error('❌ Error searching software:', result.message);
+    }
+    
+  } catch (error) {
+    // Close processing modal if still open
+    if (typeof closeProcessingModalModern === 'function') {
+      closeProcessingModalModern();
+    }
+    
+    const errorMessage = 'Lỗi kết nối: ' + error.message;
+    if (typeof showResultModalModern === 'function') {
+      showResultModalModern('Lỗi kết nối!', errorMessage, 'error');
+    } else {
+      alert('❌ ' + errorMessage);
+    }
+    console.error('❌ Network error searching software:', error);
+  }
 };
 
 window.handleSoftwareReset = function() {
@@ -602,6 +806,17 @@ window.handleSoftwareReset = function() {
   // Reset any global editing state
   window.currentEditSoftwareIndex = -1;
   
+  // Clear search mode if active
+  if (window.isSoftwareSearching) {
+    window.isSoftwareSearching = false;
+    window.softwareSearchTerms = [];
+    
+    // Reload original data
+    loadSoftwareData();
+    
+    console.log('🔄 Cleared search mode and reloaded original data');
+  }
+  
   console.log('✅ Software form reset complete');
 };
 
@@ -616,7 +831,8 @@ function getSoftwareFormData() {
     loginUsername: document.getElementById('loginUsername')?.value?.trim() || '',
     loginPassword: document.getElementById('loginPassword')?.value?.trim() || '',
     loginSecret: document.getElementById('loginSecret')?.value?.trim() || '',
-    standardName: document.getElementById('standardName')?.value?.trim() || ''
+    standardName: document.getElementById('standardName')?.value?.trim() || '',
+    renewalDate: document.getElementById('renewalDate')?.value?.trim() || ''
   };
 }
 

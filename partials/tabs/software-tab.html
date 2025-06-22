@@ -80,15 +80,20 @@
           <div class="error-message" id="standardName-error"></div>
         </div>
         
-        <!-- ✅ Dòng 3: ID Sheet Tài khoản -->
+        <!-- ✅ Dòng 3: ID Sheet Tài khoản, Ngày gia hạn -->
         <div class="form-field">
           <label>ID Sheet Tài khoản</label>
           <input type="text" id="accountSheetId" placeholder="Nhập ID Google Sheet">
           <div class="error-message" id="accountSheetId-error"></div>
         </div>
         
+        <div class="form-field">
+          <label>Ngày gia hạn</label>
+          <input type="date" id="renewalDate">
+          <div class="error-message" id="renewalDate-error"></div>
+        </div>
+        
         <!-- Empty fields for layout alignment -->
-        <div class="form-field-empty"></div>
         <div class="form-field-empty"></div>
         <div class="form-field-empty"></div>
       </div>
@@ -130,6 +135,7 @@
             <th>Giá bán</th>
             <th>Thông tin đăng nhập</th>
             <th>Ngày thay đổi</th>
+            <th>Ngày gia hạn</th>
             <th>Hành động</th>
           </tr>
         </thead>
