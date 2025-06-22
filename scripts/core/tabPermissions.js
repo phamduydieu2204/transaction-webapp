@@ -11,8 +11,9 @@ import { getStateProperty } from './stateManager.js';
  * Tab mapping from Vietnamese to internal IDs
  */
 const TAB_MAPPING = {
-  'tất cả': ['giao-dich', 'chi-phi', 'thong-ke', 'bao-cao', 'cai-dat'],
+  'tất cả': ['giao-dich', 'phan-mem', 'chi-phi', 'thong-ke', 'bao-cao', 'cai-dat'],
   'giao dịch': ['giao-dich'],
+  'phần mềm': ['phan-mem'],
   'chi phí': ['chi-phi'],
   'thống kê': ['thong-ke'],
   'báo cáo': ['bao-cao'],
@@ -184,6 +185,7 @@ export function validateTabAccess(requestedTab) {
 function showAccessDeniedMessage(deniedTab) {
   const tabNames = {
     'giao-dich': 'Nhập giao dịch',
+    'phan-mem': 'Phần mềm',
     'chi-phi': 'Nhập chi phí',
     'thong-ke': 'Thống kê',
     'bao-cao': 'Báo cáo',
