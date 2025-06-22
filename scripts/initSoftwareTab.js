@@ -17,6 +17,9 @@ export function initSoftwareTab() {
   // Initialize pagination controls
   initSoftwarePagination();
   
+  // Initialize form dropdowns
+  initSoftwareFormDropdowns();
+  
   // Load software data
   loadSoftwareData();
   
@@ -46,6 +49,9 @@ async function loadSoftwareData() {
       // Update display
       updateSoftwareTable();
       updateSoftwareTotalDisplay();
+      
+      // Update form dropdowns
+      updateSoftwareFormDropdowns();
     } else {
       console.error('❌ Error loading software data:', result.message);
       window.softwareList = [];
@@ -486,4 +492,198 @@ function clearSoftwareFormErrors() {
   inputElements.forEach(element => {
     element.classList.remove('error');
   });
+}
+
+// Dropdown management functions
+function initSoftwareFormDropdowns() {
+  console.log('🔧 Initializing software form dropdowns...');
+  
+  // Add event listeners for cascading dropdowns
+  const softwareNameInput = document.getElementById('softwareName');
+  const softwarePackageInput = document.getElementById('softwarePackage');
+  const accountNameInput = document.getElementById('accountName');
+  
+  if (softwareNameInput) {
+    softwareNameInput.addEventListener('input', () => {
+      updateSoftwarePackageDropdown();
+      updateAccountNameDropdown();
+    });
+    
+    softwareNameInput.addEventListener('change', () => {
+      updateSoftwarePackageDropdown();
+      updateAccountNameDropdown();
+    });
+  }
+  
+  if (softwarePackageInput) {
+    softwarePackageInput.addEventListener('input', () => {
+      updateAccountNameDropdown();
+    });
+    
+    softwarePackageInput.addEventListener('change', () => {
+      updateAccountNameDropdown();
+    });
+  }
+  
+  if (accountNameInput) {
+    accountNameInput.addEventListener('change', () => {
+      autoFillFormFromSelection();
+    });
+  }
+  
+  console.log('✅ Software form dropdowns initialized');
+}
+
+function updateSoftwareFormDropdowns() {
+  updateSoftwareNameDropdown();
+  updateSoftwarePackageDropdown();
+  updateAccountNameDropdown();
+}
+
+function updateSoftwareNameDropdown() {
+  const datalist = document.getElementById('softwareNameList');
+  if (!datalist) return;
+  
+  // Get unique software names from data
+  const uniqueNames = [...new Set(window.softwareList.map(item => item.softwareName))].filter(Boolean).sort();
+  
+  datalist.innerHTML = '';
+  uniqueNames.forEach(name => {
+    const option = document.createElement('option');
+    option.value = name;
+    datalist.appendChild(option);
+  });
+  
+  console.log(`✅ Updated software name dropdown with ${uniqueNames.length} items`);
+}
+
+function updateSoftwarePackageDropdown() {
+  const datalist = document.getElementById('softwarePackageList');
+  const selectedSoftwareName = document.getElementById('softwareName')?.value?.trim();
+  
+  if (!datalist) return;
+  
+  let packages = [];
+  
+  if (selectedSoftwareName) {
+    // Filter packages by selected software name
+    packages = window.softwareList
+      .filter(item => item.softwareName === selectedSoftwareName)
+      .map(item => item.softwarePackage)
+      .filter(Boolean);
+  } else {
+    // Show all packages if no software name selected
+    packages = window.softwareList.map(item => item.softwarePackage).filter(Boolean);
+  }
+  
+  // Get unique packages and sort
+  const uniquePackages = [...new Set(packages)].sort();
+  
+  datalist.innerHTML = '';
+  uniquePackages.forEach(pkg => {
+    const option = document.createElement('option');
+    option.value = pkg;
+    datalist.appendChild(option);
+  });
+  
+  console.log(`✅ Updated software package dropdown with ${uniquePackages.length} items`);
+}
+
+function updateAccountNameDropdown() {
+  const datalist = document.getElementById('accountNameList');
+  const selectedSoftwareName = document.getElementById('softwareName')?.value?.trim();
+  const selectedSoftwarePackage = document.getElementById('softwarePackage')?.value?.trim();
+  
+  if (!datalist) return;
+  
+  let accounts = [];
+  
+  if (selectedSoftwareName && selectedSoftwarePackage) {
+    // Filter accounts by both software name and package
+    accounts = window.softwareList
+      .filter(item => 
+        item.softwareName === selectedSoftwareName && 
+        item.softwarePackage === selectedSoftwarePackage
+      )
+      .map(item => item.accountName)
+      .filter(Boolean);
+  } else if (selectedSoftwareName) {
+    // Filter accounts by software name only
+    accounts = window.softwareList
+      .filter(item => item.softwareName === selectedSoftwareName)
+      .map(item => item.accountName)
+      .filter(Boolean);
+  } else {
+    // Show all accounts if no filters
+    accounts = window.softwareList.map(item => item.accountName).filter(Boolean);
+  }
+  
+  // Get unique accounts and sort
+  const uniqueAccounts = [...new Set(accounts)].sort();
+  
+  datalist.innerHTML = '';
+  uniqueAccounts.forEach(account => {
+    const option = document.createElement('option');
+    option.value = account;
+    datalist.appendChild(option);
+  });
+  
+  console.log(`✅ Updated account name dropdown with ${uniqueAccounts.length} items`);
+}
+
+function autoFillFormFromSelection() {
+  const selectedSoftwareName = document.getElementById('softwareName')?.value?.trim();
+  const selectedSoftwarePackage = document.getElementById('softwarePackage')?.value?.trim();
+  const selectedAccountName = document.getElementById('accountName')?.value?.trim();
+  
+  if (!selectedSoftwareName || !selectedSoftwarePackage || !selectedAccountName) {
+    return;
+  }
+  
+  // Find matching software entry
+  const matchingSoftware = window.softwareList.find(item => 
+    item.softwareName === selectedSoftwareName &&
+    item.softwarePackage === selectedSoftwarePackage &&
+    item.accountName === selectedAccountName
+  );
+  
+  if (matchingSoftware) {
+    console.log('🔄 Auto-filling form from selection:', matchingSoftware);
+    
+    // Fill other form fields with existing data
+    const accountSheetIdField = document.getElementById('accountSheetId');
+    const loginUsernameField = document.getElementById('loginUsername');
+    const loginPasswordField = document.getElementById('loginPassword');
+    const loginSecretField = document.getElementById('loginSecret');
+    const standardNameField = document.getElementById('standardName');
+    
+    if (accountSheetIdField && matchingSoftware.accountSheetId) {
+      accountSheetIdField.value = matchingSoftware.accountSheetId;
+    }
+    
+    if (loginUsernameField && matchingSoftware.username) {
+      loginUsernameField.value = matchingSoftware.username;
+    }
+    
+    if (loginPasswordField && matchingSoftware.password) {
+      loginPasswordField.value = matchingSoftware.password;
+    }
+    
+    if (loginSecretField && matchingSoftware.secret) {
+      loginSecretField.value = matchingSoftware.secret;
+    }
+    
+    if (standardNameField && matchingSoftware.standardName) {
+      standardNameField.value = matchingSoftware.standardName;
+    }
+    
+    // Set global edit index for update operations
+    const editIndex = window.softwareList.indexOf(matchingSoftware);
+    if (editIndex !== -1) {
+      window.currentEditSoftwareIndex = editIndex;
+      console.log(`📝 Set edit index to: ${editIndex}`);
+    }
+    
+    console.log('✅ Form auto-filled successfully');
+  }
 }

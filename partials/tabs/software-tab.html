@@ -9,19 +9,28 @@
         <!-- ✅ Dòng 1: Tên phần mềm, Gói phần mềm, Tên tài khoản, ID Sheet Tài khoản, Thông tin đơn hàng (spans 2 rows) -->
         <div class="form-field">
           <label class="required">Tên phần mềm <span class="required-asterisk">*</span></label>
-          <input type="text" id="softwareName" placeholder="Nhập tên phần mềm" required>
+          <input type="text" id="softwareName" list="softwareNameList" placeholder="Chọn hoặc nhập tên phần mềm" required autocomplete="off">
+          <datalist id="softwareNameList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
           <div class="error-message" id="softwareName-error"></div>
         </div>
         
         <div class="form-field">
           <label class="required">Gói phần mềm <span class="required-asterisk">*</span></label>
-          <input type="text" id="softwarePackage" placeholder="Nhập gói phần mềm" required>
+          <input type="text" id="softwarePackage" list="softwarePackageList" placeholder="Chọn hoặc nhập gói phần mềm" required autocomplete="off">
+          <datalist id="softwarePackageList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
           <div class="error-message" id="softwarePackage-error"></div>
         </div>
         
         <div class="form-field">
           <label class="required">Tên tài khoản <span class="required-asterisk">*</span></label>
-          <input type="text" id="accountName" placeholder="Nhập tên tài khoản" required>
+          <input type="text" id="accountName" list="accountNameList" placeholder="Chọn hoặc nhập tên tài khoản" required autocomplete="off">
+          <datalist id="accountNameList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
           <div class="error-message" id="accountName-error"></div>
         </div>
         
