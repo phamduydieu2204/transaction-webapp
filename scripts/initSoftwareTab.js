@@ -612,11 +612,8 @@ function initSoftwareFormDropdowns() {
       // Clear dependent fields
       if (softwarePackageInput) softwarePackageInput.value = '';
       if (accountNameInput) accountNameInput.value = '';
-      // Update dropdowns
-      updateSoftwarePackageDropdown();
-      updateAccountNameDropdown();
-      updateOrderInfoDropdown();
-      updateStandardNameDropdown();
+      // Use debounced update for input events
+      debouncedDropdownUpdate();
     });
     
     softwareNameInput.addEventListener('change', () => {
@@ -634,10 +631,8 @@ function initSoftwareFormDropdowns() {
       console.log('🔄 Software package changed:', softwarePackageInput.value);
       // Clear dependent fields
       if (accountNameInput) accountNameInput.value = '';
-      // Update dropdowns
-      updateAccountNameDropdown();
-      updateOrderInfoDropdown();
-      updateStandardNameDropdown();
+      // Use debounced update for input events
+      debouncedDropdownUpdate();
     });
     
     softwarePackageInput.addEventListener('change', () => {
@@ -651,9 +646,8 @@ function initSoftwareFormDropdowns() {
   if (accountNameInput) {
     accountNameInput.addEventListener('input', () => {
       console.log('🔄 Account name changed:', accountNameInput.value);
-      // Update dependent dropdowns
-      updateOrderInfoDropdown();
-      updateStandardNameDropdown();
+      // Use debounced update for input events
+      debouncedDropdownUpdate();
     });
     
     accountNameInput.addEventListener('change', () => {
@@ -753,6 +747,24 @@ window.debugSoftwareDropdowns = function() {
     console.log(`Order info for "${testSoftware}":`, [...new Set(orderInfoForSoftware)]);
   }
 };
+
+// Debounce function to prevent excessive updates
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+// Debounced dropdown update function
+const debouncedDropdownUpdate = debounce(() => {
+  updateSoftwareFormDropdowns();
+}, 150);
 
 // Function để force refresh tất cả dropdowns - cho debugging
 window.forceRefreshDropdowns = function() {
@@ -1104,52 +1116,63 @@ function autoFillFormFromSelection() {
 function fillFormFields(matchingSoftware, includeOptionalFields = true) {
   console.log('🔄 Auto-filling form from selection:', matchingSoftware);
   
-  // Fill other form fields with existing data
-  const accountSheetIdField = document.getElementById('accountSheetId');
-  const orderInfoField = document.getElementById('orderInfo');
-  const loginUsernameField = document.getElementById('loginUsername');
-  const loginPasswordField = document.getElementById('loginPassword');
-  const loginSecretField = document.getElementById('loginSecret');
-  const standardNameField = document.getElementById('standardName');
-  
-  if (accountSheetIdField && matchingSoftware.accountSheetId) {
-    accountSheetIdField.value = matchingSoftware.accountSheetId;
-  }
-  
-  // Only fill order info if requested and field is empty or matches
-  if (includeOptionalFields && orderInfoField && matchingSoftware.orderInfo) {
-    const currentOrderInfo = orderInfoField.value.trim();
-    if (!currentOrderInfo || currentOrderInfo === matchingSoftware.orderInfo) {
-      orderInfoField.value = matchingSoftware.orderInfo;
+  // Batch DOM operations to prevent layout thrashing
+  requestAnimationFrame(() => {
+    // Fill other form fields with existing data
+    const fields = {
+      accountSheetId: document.getElementById('accountSheetId'),
+      orderInfo: document.getElementById('orderInfo'),
+      loginUsername: document.getElementById('loginUsername'),
+      loginPassword: document.getElementById('loginPassword'),
+      loginSecret: document.getElementById('loginSecret'),
+      standardName: document.getElementById('standardName')
+    };
+    
+    // Batch all value assignments
+    const updates = [];
+    
+    if (fields.accountSheetId && matchingSoftware.accountSheetId) {
+      updates.push(() => fields.accountSheetId.value = matchingSoftware.accountSheetId);
     }
-  }
-  
-  if (loginUsernameField && matchingSoftware.username) {
-    loginUsernameField.value = matchingSoftware.username;
-  }
-  
-  if (loginPasswordField && matchingSoftware.password) {
-    loginPasswordField.value = matchingSoftware.password;
-  }
-  
-  if (loginSecretField && matchingSoftware.secret) {
-    loginSecretField.value = matchingSoftware.secret;
-  }
-  
-  // Only fill standard name if requested and field is empty or matches
-  if (includeOptionalFields && standardNameField && matchingSoftware.standardName) {
-    const currentStandardName = standardNameField.value.trim();
-    if (!currentStandardName || currentStandardName === matchingSoftware.standardName) {
-      standardNameField.value = matchingSoftware.standardName;
+    
+    // Only fill order info if requested and field is empty or matches
+    if (includeOptionalFields && fields.orderInfo && matchingSoftware.orderInfo) {
+      const currentOrderInfo = fields.orderInfo.value.trim();
+      if (!currentOrderInfo || currentOrderInfo === matchingSoftware.orderInfo) {
+        updates.push(() => fields.orderInfo.value = matchingSoftware.orderInfo);
+      }
     }
-  }
-  
-  // Set global edit index for update operations
-  const editIndex = window.softwareList.indexOf(matchingSoftware);
-  if (editIndex !== -1) {
-    window.currentEditSoftwareIndex = editIndex;
-    console.log(`📝 Set edit index to: ${editIndex}`);
-  }
-  
-  console.log('✅ Form auto-filled successfully');
+    
+    if (fields.loginUsername && matchingSoftware.username) {
+      updates.push(() => fields.loginUsername.value = matchingSoftware.username);
+    }
+    
+    if (fields.loginPassword && matchingSoftware.password) {
+      updates.push(() => fields.loginPassword.value = matchingSoftware.password);
+    }
+    
+    if (fields.loginSecret && matchingSoftware.secret) {
+      updates.push(() => fields.loginSecret.value = matchingSoftware.secret);
+    }
+    
+    // Only fill standard name if requested and field is empty or matches
+    if (includeOptionalFields && fields.standardName && matchingSoftware.standardName) {
+      const currentStandardName = fields.standardName.value.trim();
+      if (!currentStandardName || currentStandardName === matchingSoftware.standardName) {
+        updates.push(() => fields.standardName.value = matchingSoftware.standardName);
+      }
+    }
+    
+    // Execute all updates in one batch
+    updates.forEach(update => update());
+    
+    // Set global edit index for update operations
+    const editIndex = window.softwareList.indexOf(matchingSoftware);
+    if (editIndex !== -1) {
+      window.currentEditSoftwareIndex = editIndex;
+      console.log(`📝 Set edit index to: ${editIndex}`);
+    }
+    
+    console.log('✅ Form auto-filled successfully');
+  });
 }

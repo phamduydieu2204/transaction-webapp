@@ -321,6 +321,8 @@ table {
   background: #fff !important;
   border-radius: 8px !important;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+  min-height: 300px !important; /* Prevent sudden height changes */
+  will-change: auto !important; /* Optimize for animations */
 }
 
 /* Form field styling */
