@@ -370,20 +370,82 @@ window.copyToClipboard = function(text) {
 };
 
 // Software form handlers
-window.handleSoftwareAdd = function() {
+window.handleSoftwareAdd = async function() {
   console.log('🔄 Adding new software...');
   
-  // Get form data
-  const formData = getSoftwareFormData();
-  
-  // Validate required fields
-  if (!validateSoftwareForm(formData)) {
-    return;
+  try {
+    // Get form data
+    const formData = getSoftwareFormData();
+    
+    // Validate required fields
+    if (!validateSoftwareForm(formData)) {
+      return;
+    }
+    
+    // Show processing modal
+    if (typeof showProcessingModalModern === 'function') {
+      showProcessingModalModern('Đang thêm phần mềm...', 'Vui lòng đợi trong giây lát');
+    }
+    
+    // Call backend API
+    const { BACKEND_URL } = getConstants();
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "addSoftware",
+        ...formData
+      })
+    });
+    
+    const result = await response.json();
+    
+    // Close processing modal
+    if (typeof closeProcessingModalModern === 'function') {
+      closeProcessingModalModern();
+    }
+    
+    if (result.status === "success") {
+      // Show success message
+      if (typeof showResultModalModern === 'function') {
+        showResultModalModern('Thành công!', result.message || 'Phần mềm đã được thêm thành công', 'success');
+      } else {
+        alert('✅ ' + (result.message || 'Phần mềm đã được thêm thành công'));
+      }
+      
+      // Reset form
+      window.handleSoftwareReset();
+      
+      // Reload software data to reflect changes
+      await loadSoftwareData();
+      
+      console.log('✅ Software added successfully:', result.data);
+      
+    } else {
+      // Show error message
+      const errorMessage = result.message || 'Có lỗi xảy ra khi thêm phần mềm';
+      if (typeof showResultModalModern === 'function') {
+        showResultModalModern('Lỗi!', errorMessage, 'error');
+      } else {
+        alert('❌ ' + errorMessage);
+      }
+      console.error('❌ Error adding software:', result.message);
+    }
+    
+  } catch (error) {
+    // Close processing modal if still open
+    if (typeof closeProcessingModalModern === 'function') {
+      closeProcessingModalModern();
+    }
+    
+    const errorMessage = 'Lỗi kết nối: ' + error.message;
+    if (typeof showResultModalModern === 'function') {
+      showResultModalModern('Lỗi kết nối!', errorMessage, 'error');
+    } else {
+      alert('❌ ' + errorMessage);
+    }
+    console.error('❌ Network error adding software:', error);
   }
-  
-  // TODO: Implement add software API call
-  console.log('Software data to add:', formData);
-  alert('🚧 Chức năng thêm phần mềm đang được phát triển!');
 };
 
 window.handleSoftwareUpdate = function() {
@@ -447,6 +509,7 @@ function getSoftwareFormData() {
 
 function validateSoftwareForm(formData) {
   let isValid = true;
+  const errors = [];
   
   // Clear previous errors
   clearSoftwareFormErrors();
@@ -456,16 +519,43 @@ function validateSoftwareForm(formData) {
     { field: 'softwareName', name: 'Tên phần mềm', elementId: 'softwareFormName' },
     { field: 'softwarePackage', name: 'Gói phần mềm', elementId: 'softwareFormPackage' },
     { field: 'accountName', name: 'Tên tài khoản', elementId: 'softwareFormAccount' },
-    { field: 'loginUsername', name: 'Tên đăng nhập' },
-    { field: 'loginPassword', name: 'Mật khẩu đăng nhập' }
+    { field: 'loginUsername', name: 'Tên đăng nhập', elementId: 'loginUsername' },
+    { field: 'loginPassword', name: 'Mật khẩu đăng nhập', elementId: 'loginPassword' }
   ];
   
   requiredFields.forEach(({ field, name, elementId }) => {
-    if (!formData[field]) {
-      showSoftwareFieldError(elementId || field, `${name} là bắt buộc`);
+    if (!formData[field] || formData[field].trim() === '') {
+      const errorMsg = `${name} là bắt buộc`;
+      showSoftwareFieldError(elementId || field, errorMsg);
+      errors.push(errorMsg);
       isValid = false;
     }
   });
+  
+  // Validate data lengths
+  if (formData.softwareName && formData.softwareName.length > 100) {
+    showSoftwareFieldError('softwareFormName', 'Tên phần mềm không được vượt quá 100 ký tự');
+    errors.push('Tên phần mềm quá dài');
+    isValid = false;
+  }
+  
+  if (formData.loginPassword && formData.loginPassword.length < 4) {
+    showSoftwareFieldError('loginPassword', 'Mật khẩu phải có ít nhất 4 ký tự');
+    errors.push('Mật khẩu quá ngắn');
+    isValid = false;
+  }
+  
+  // Show summary error if validation fails
+  if (!isValid) {
+    console.warn('🔺 Form validation errors:', errors);
+    if (typeof showResultModalModern === 'function') {
+      showResultModalModern(
+        'Lỗi nhập liệu!', 
+        'Vui lòng kiểm tra các trường bắt buộc:\n• ' + errors.join('\n• '), 
+        'error'
+      );
+    }
+  }
   
   return isValid;
 }
