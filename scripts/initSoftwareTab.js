@@ -666,6 +666,26 @@ window.forceRefreshDropdowns = function() {
   console.log('✅ All dropdowns refreshed');
 };
 
+// Function để xử lý khi chọn từ order info dropdown
+window.selectOrderInfo = function(value) {
+  if (value) {
+    const orderInfoTextarea = document.getElementById('orderInfo');
+    if (orderInfoTextarea) {
+      orderInfoTextarea.value = value;
+      console.log('✅ Selected order info:', value);
+      
+      // Reset dropdown to default
+      const dropdown = document.getElementById('orderInfoDropdown');
+      if (dropdown) {
+        dropdown.value = '';
+      }
+      
+      // Trigger auto-fill if we have complete selection
+      autoFillFormFromSelection();
+    }
+  }
+};
+
 function updateSoftwareNameDropdown() {
   const datalist = document.getElementById('softwareNameList');
   if (!datalist) return;
@@ -785,13 +805,13 @@ function updateAccountNameDropdown() {
 }
 
 function updateOrderInfoDropdown() {
-  const datalist = document.getElementById('orderInfoList');
+  const dropdown = document.getElementById('orderInfoDropdown');
   const selectedSoftwareName = document.getElementById('softwareFormName')?.value?.trim();
   const selectedSoftwarePackage = document.getElementById('softwareFormPackage')?.value?.trim();
   const selectedAccountName = document.getElementById('softwareFormAccount')?.value?.trim();
   
-  if (!datalist) {
-    console.warn('⚠️ orderInfoList datalist not found');
+  if (!dropdown) {
+    console.warn('⚠️ orderInfoDropdown select not found');
     return;
   }
   
@@ -856,11 +876,15 @@ function updateOrderInfoDropdown() {
   
   console.log(`📋 Available order info for ${filterDescription}:`, uniqueOrderInfo);
   
-  datalist.innerHTML = '';
+  // Clear existing options (keep first option)
+  dropdown.innerHTML = '<option value="">-- Chọn từ danh sách có sẵn --</option>';
+  
   uniqueOrderInfo.forEach(info => {
     const option = document.createElement('option');
     option.value = info;
-    datalist.appendChild(option);
+    option.textContent = info.length > 50 ? info.substring(0, 50) + '...' : info;
+    option.title = info; // Full text in tooltip
+    dropdown.appendChild(option);
   });
   
   console.log(`✅ Updated order info dropdown with ${uniqueOrderInfo.length} items`);

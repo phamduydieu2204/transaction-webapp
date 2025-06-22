@@ -437,6 +437,57 @@ table {
   white-space: pre-wrap !important;
 }
 
+/* Order Info Container Layout */
+.order-info-container {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  height: calc(100% - 30px) !important;
+}
+
+.order-info-container textarea {
+  flex: 1 !important;
+  min-height: 80px !important;
+  resize: vertical !important;
+  border: 2px solid #e9ecef !important;
+  border-radius: 6px !important;
+  padding: 12px 14px !important;
+  font-size: 14px !important;
+  font-family: inherit !important;
+  transition: all 0.3s ease !important;
+  background-color: #fff !important;
+}
+
+.order-info-container textarea:focus {
+  outline: none !important;
+  border-color: #3498db !important;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1) !important;
+  background-color: #fafafa !important;
+}
+
+.order-info-dropdown {
+  padding: 8px 12px !important;
+  border: 2px solid #e9ecef !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  font-family: inherit !important;
+  background-color: #f8f9fa !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+}
+
+.order-info-dropdown:hover {
+  border-color: #3498db !important;
+  background-color: #e3f2fd !important;
+}
+
+.order-info-dropdown:focus {
+  outline: none !important;
+  border-color: #3498db !important;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1) !important;
+}
+
 /* Ensure all form fields default to 1 column */
 .transaction-form-grid .form-field {
   grid-column: span 1 !important;
