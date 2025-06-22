@@ -37,8 +37,9 @@ export function getTodayFormatted() {
 /**
  * Set default date values
  * @param {boolean} forceUpdate - If true, always update dates to today even if fields have values
+ * @param {boolean} recalculateEndDate - If true, recalculate end date. If false, preserve user-modified end date
  */
-export function setDefaultDates(forceUpdate = false) {
+export function setDefaultDates(forceUpdate = false, recalculateEndDate = true) {
   const today = getTodayFormatted();
   
   // Set transaction date - Always update if forceUpdate is true
@@ -53,11 +54,13 @@ export function setDefaultDates(forceUpdate = false) {
     startDateInput.value = today;
   }
   
-  // Update end date based on current values
-  const durationInput = document.getElementById('duration');
-  const endDateInput = document.getElementById('endDate');
-  if (startDateInput && durationInput && endDateInput) {
-    calculateEndDate(startDateInput, durationInput, endDateInput);
+  // Only recalculate end date if explicitly requested
+  if (recalculateEndDate) {
+    const durationInput = document.getElementById('duration');
+    const endDateInput = document.getElementById('endDate');
+    if (startDateInput && durationInput && endDateInput) {
+      calculateEndDate(startDateInput, durationInput, endDateInput);
+    }
   }
 }
 
@@ -65,8 +68,8 @@ export function setDefaultDates(forceUpdate = false) {
  * Initialize date calculations and event listeners
  */
 export function initializeDateCalculations() {
-  // Set default dates
-  setDefaultDates();
+  // Set default dates with recalculation enabled
+  setDefaultDates(false, true);
   
   // Add event listeners
   const startDateInput = document.getElementById('startDate');

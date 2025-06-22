@@ -56,10 +56,10 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
     return;
   }
   
-  // Always update to today's date for new transactions
+  // Update transaction and start date to today, but preserve user-modified end date
   const { setDefaultDates } = await import('./calculateEndDate.js');
-  setDefaultDates(true);
-  console.log("📅 Updated dates to today for new transaction");
+  setDefaultDates(true, false); // forceUpdate=true, recalculateEndDate=false
+  console.log("📅 Updated dates to today for new transaction (preserving end date)");
 
   if (!userInfo) {
     showResultModal("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.", false);
