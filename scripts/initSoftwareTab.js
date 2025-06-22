@@ -513,12 +513,14 @@ function initSoftwareFormDropdowns() {
       // Update dropdowns
       updateSoftwarePackageDropdown();
       updateAccountNameDropdown();
+      updateStandardNameDropdown();
     });
     
     softwareNameInput.addEventListener('change', () => {
       console.log('🔄 Software name confirmed:', softwareNameInput.value);
       updateSoftwarePackageDropdown();
       updateAccountNameDropdown();
+      updateStandardNameDropdown();
     });
   }
   
@@ -528,8 +530,9 @@ function initSoftwareFormDropdowns() {
       console.log('🔄 Software package changed:', softwarePackageInput.value);
       // Clear dependent fields
       if (accountNameInput) accountNameInput.value = '';
-      // Update dropdown
+      // Update dropdowns
       updateAccountNameDropdown();
+      updateStandardNameDropdown();
     });
     
     softwarePackageInput.addEventListener('change', () => {
@@ -539,8 +542,29 @@ function initSoftwareFormDropdowns() {
   }
   
   if (accountNameInput) {
+    accountNameInput.addEventListener('input', () => {
+      console.log('🔄 Account name changed:', accountNameInput.value);
+      // Update standard name dropdown
+      updateStandardNameDropdown();
+    });
+    
     accountNameInput.addEventListener('change', () => {
       console.log('🔄 Account name selected:', accountNameInput.value);
+      updateStandardNameDropdown();
+      autoFillFormFromSelection();
+    });
+  }
+  
+  // Add event listeners for standard name field
+  const standardNameInput = document.getElementById('standardName');
+  if (standardNameInput) {
+    standardNameInput.addEventListener('input', () => {
+      console.log('🔄 Standard name changed:', standardNameInput.value);
+    });
+    
+    standardNameInput.addEventListener('change', () => {
+      console.log('🔄 Standard name selected:', standardNameInput.value);
+      // Try to auto-fill if we have a complete selection
       autoFillFormFromSelection();
     });
   }
@@ -552,6 +576,7 @@ function updateSoftwareFormDropdowns() {
   updateSoftwareNameDropdown();
   updateSoftwarePackageDropdown();
   updateAccountNameDropdown();
+  updateStandardNameDropdown();
 }
 
 // Debug function để kiểm tra dữ liệu
@@ -691,6 +716,80 @@ function updateAccountNameDropdown() {
   });
   
   console.log(`✅ Updated account name dropdown with ${uniqueAccounts.length} items`);
+}
+
+function updateStandardNameDropdown() {
+  const datalist = document.getElementById('standardNameList');
+  const selectedSoftwareName = document.getElementById('softwareFormName')?.value?.trim();
+  const selectedSoftwarePackage = document.getElementById('softwareFormPackage')?.value?.trim();
+  const selectedAccountName = document.getElementById('softwareFormAccount')?.value?.trim();
+  
+  if (!datalist) return;
+  
+  console.log(`🔍 Filtering standard names for software: "${selectedSoftwareName}", package: "${selectedSoftwarePackage}", account: "${selectedAccountName}"`);
+  
+  let standardNames = [];
+  let filterDescription = '';
+  
+  if (selectedSoftwareName && selectedSoftwarePackage && selectedAccountName) {
+    // Filter by all three criteria
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName && 
+      item.softwarePackage === selectedSoftwarePackage &&
+      item.accountName === selectedAccountName
+    );
+    
+    filterDescription = `all three criteria`;
+    console.log(`📊 Found ${filteredItems.length} items matching all criteria`);
+    
+    standardNames = filteredItems
+      .map(item => item.standardName)
+      .filter(Boolean);
+  } else if (selectedSoftwareName && selectedSoftwarePackage) {
+    // Filter by software name and package
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName && 
+      item.softwarePackage === selectedSoftwarePackage
+    );
+    
+    filterDescription = `software "${selectedSoftwareName}" AND package "${selectedSoftwarePackage}"`;
+    console.log(`📊 Found ${filteredItems.length} items matching software and package`);
+    
+    standardNames = filteredItems
+      .map(item => item.standardName)
+      .filter(Boolean);
+  } else if (selectedSoftwareName) {
+    // Filter by software name only
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName
+    );
+    
+    filterDescription = `software "${selectedSoftwareName}" only`;
+    console.log(`📊 Found ${filteredItems.length} items matching software name only`);
+    
+    standardNames = filteredItems
+      .map(item => item.standardName)
+      .filter(Boolean);
+  } else {
+    // Show all standard names if no filters
+    standardNames = window.softwareList.map(item => item.standardName).filter(Boolean);
+    filterDescription = 'no filter (showing all)';
+    console.log(`📊 Showing all standard names (no filter)`);
+  }
+  
+  // Get unique standard names and sort
+  const uniqueStandardNames = [...new Set(standardNames)].sort();
+  
+  console.log(`📋 Available standard names for ${filterDescription}:`, uniqueStandardNames);
+  
+  datalist.innerHTML = '';
+  uniqueStandardNames.forEach(name => {
+    const option = document.createElement('option');
+    option.value = name;
+    datalist.appendChild(option);
+  });
+  
+  console.log(`✅ Updated standard name dropdown with ${uniqueStandardNames.length} items`);
 }
 
 function autoFillFormFromSelection() {

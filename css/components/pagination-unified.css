@@ -5,7 +5,8 @@
 /* Pagination container chung */
 .pagination,
 #pagination,
-#expensePagination {
+#expensePagination,
+#softwarePagination {
   display: flex;
   justify-content: flex-end; /* Căn phải */
   align-items: center;
@@ -20,7 +21,8 @@
 .pagination button,
 .pagination .pagination-btn,
 #pagination button,
-#expensePagination .pagination-btn {
+#expensePagination .pagination-btn,
+#softwarePagination button {
   min-width: 40px;
   height: 36px;
   padding: 8px 12px;
@@ -43,7 +45,8 @@
 .pagination button:hover:not(:disabled):not(.active),
 .pagination .pagination-btn:hover:not(:disabled):not(.active),
 #pagination button:hover:not(:disabled):not(.active),
-#expensePagination .pagination-btn:hover:not(:disabled):not(.active) {
+#expensePagination .pagination-btn:hover:not(:disabled):not(.active),
+#softwarePagination button:hover:not(:disabled):not(.active) {
   background-color: #f8f9fa;
   border-color: #3498db;
   color: #3498db;
@@ -55,7 +58,8 @@
 .pagination button.active,
 .pagination .pagination-btn.active,
 #pagination button.active,
-#expensePagination .pagination-btn.active {
+#expensePagination .pagination-btn.active,
+#softwarePagination button.active {
   background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
   border-color: #2980b9;
   color: #ffffff;
@@ -67,7 +71,8 @@
 .pagination button:disabled,
 .pagination .pagination-btn:disabled,
 #pagination button:disabled,
-#expensePagination .pagination-btn:disabled {
+#expensePagination .pagination-btn:disabled,
+#softwarePagination button:disabled {
   background-color: #f8f9fa;
   border-color: #e9ecef;
   color: #adb5bd;
@@ -120,7 +125,8 @@
 .pagination button:focus,
 .pagination .pagination-btn:focus,
 #pagination button:focus,
-#expensePagination .pagination-btn:focus {
+#expensePagination .pagination-btn:focus,
+#softwarePagination button:focus {
   outline: none;
   border-color: #3498db;
   box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
@@ -140,7 +146,8 @@
   .pagination button,
   .pagination .pagination-btn,
   #pagination button,
-  #expensePagination .pagination-btn {
+  #expensePagination .pagination-btn,
+  #softwarePagination button {
     min-width: 36px;
     height: 32px;
     padding: 6px 10px;
@@ -163,7 +170,8 @@
   .pagination button,
   .pagination .pagination-btn,
   #pagination button,
-  #expensePagination .pagination-btn {
+  #expensePagination .pagination-btn,
+  #softwarePagination button {
     min-width: 32px;
     height: 30px;
     padding: 4px 8px;
@@ -180,7 +188,8 @@
 .pagination button.active,
 .pagination .pagination-btn.active,
 #pagination button.active,
-#expensePagination .pagination-btn.active {
+#expensePagination .pagination-btn.active,
+#softwarePagination button.active {
   animation: pageChange 0.2s ease-out;
 }
 
@@ -188,7 +197,8 @@
 /* Page numbers */
 .pagination button:not(:first-child):not(:last-child):not(.active):not(.all-btn),
 #pagination button:not(:first-child):not(:last-child):not(.active),
-#expensePagination .pagination-btn:not(:first-child):not(:last-child):not(.active):not(.all-btn) {
+#expensePagination .pagination-btn:not(:first-child):not(:last-child):not(.active):not(.all-btn),
+#softwarePagination button:not(:first-child):not(:last-child):not(.active) {
   background-color: #ffffff;
   border-color: #dee2e6;
 }
@@ -197,7 +207,9 @@
 .pagination button:first-child,
 .pagination button:last-child,
 #pagination button:first-child,
-#pagination button:last-child {
+#pagination button:last-child,
+#softwarePagination button:first-child,
+#softwarePagination button:last-child {
   background-color: #f8f9fa;
   border-color: #ced4da;
   color: #495057;
@@ -206,7 +218,9 @@
 .pagination button:first-child:hover:not(:disabled),
 .pagination button:last-child:hover:not(:disabled),
 #pagination button:first-child:hover:not(:disabled),
-#pagination button:last-child:hover:not(:disabled) {
+#pagination button:last-child:hover:not(:disabled),
+#softwarePagination button:first-child:hover:not(:disabled),
+#softwarePagination button:last-child:hover:not(:disabled) {
   background-color: #e9ecef;
   border-color: #6c757d;
   color: #495057;

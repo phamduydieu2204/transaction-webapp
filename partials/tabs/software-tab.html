@@ -68,7 +68,10 @@
         
         <div class="form-field">
           <label>Tên chuẩn</label>
-          <input type="text" id="standardName" placeholder="Nhập tên chuẩn">
+          <input type="text" id="standardName" list="standardNameList" placeholder="Chọn hoặc nhập tên chuẩn" autocomplete="off">
+          <datalist id="standardNameList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
           <div class="error-message" id="standardName-error"></div>
         </div>
       </div>
