@@ -15,17 +15,17 @@
 
     <!-- Software Table -->
     <div class="table-container" style="margin-top: 10px;">
-      <table id="softwareListTable" class="transaction-table">
+      <table id="softwareListTable">
         <thead>
           <tr>
-            <th style="width: 50px;">STT</th>
-            <th style="width: 200px;">Tên phần mềm</th>
-            <th style="width: 150px;">Gói phần mềm</th>
-            <th style="width: 150px;">Tên tài khoản</th>
-            <th style="width: 120px;">Giá bán</th>
-            <th style="width: 300px;">Thông tin đăng nhập</th>
-            <th style="width: 120px;">Ngày thay đổi</th>
-            <th style="width: 100px;">Hành động</th>
+            <th>STT</th>
+            <th>Tên phần mềm</th>
+            <th>Gói phần mềm</th>
+            <th>Tên tài khoản</th>
+            <th>Giá bán</th>
+            <th>Thông tin đăng nhập</th>
+            <th>Ngày thay đổi</th>
+            <th>Hành động</th>
           </tr>
         </thead>
         <tbody id="softwareTableBody">
@@ -35,25 +35,6 @@
     </div>
 
     <!-- Pagination -->
-    <div class="pagination-container">
-      <div class="pagination-info">
-        <span id="softwarePageInfo">Hiển thị 0-0 của 0 phần mềm</span>
-      </div>
-      <div class="pagination-controls">
-        <button id="softwarePrevBtn" class="pagination-btn" disabled>‹ Trước</button>
-        <span id="softwarePageNumbers" class="page-numbers"></span>
-        <button id="softwareNextBtn" class="pagination-btn" disabled>Tiếp ›</button>
-      </div>
-      <div class="pagination-settings">
-        <label for="softwareItemsPerPage">Hiển thị:</label>
-        <select id="softwareItemsPerPage" class="items-per-page">
-          <option value="10">10</option>
-          <option value="25">25</option>
-          <option value="50">50</option>
-          <option value="100">100</option>
-        </select>
-        <span>mục/trang</span>
-      </div>
-    </div>
+    <div class="pagination" id="softwarePagination"></div>
   </div>
 </div>

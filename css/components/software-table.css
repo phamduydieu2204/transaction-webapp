@@ -1,5 +1,104 @@
-/* Software Table Specific Styles */
+/* Software Table Specific Styles - Mirror Transaction Table Styling */
 
+/* Apply same base styling as transaction table */
+#softwareListTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: auto;
+  background: transparent !important;
+  font-size: 14px;
+}
+
+/* Sticky header styling - same as transaction table */
+#softwareListTable thead {
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  top: 0; /* Stick to top of viewport */
+  z-index: 9999; /* Very high z-index to stay above everything */
+  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+#softwareListTable thead th {
+  background: transparent;
+  color: #ffffff;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.8px;
+  padding: 16px 12px;
+  border-bottom: 3px solid rgba(255,255,255,0.2);
+  border-right: 1px solid rgba(255,255,255,0.1);
+  position: relative;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+#softwareListTable thead th:last-child {
+  border-right: none;
+}
+
+/* Add hover effect for header cells */
+#softwareListTable thead th:hover {
+  background-color: rgba(255,255,255,0.1);
+  cursor: pointer;
+}
+
+/* Table body cells - same as transaction table */
+#softwareListTable td {
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  min-width: 100px;
+  max-width: 600px;
+  border: 1px solid #e9ecef;
+  padding: 12px;
+  text-align: left;
+  background-color: transparent;
+  color: #495057;
+  font-size: 14px;
+}
+
+/* Default row background */
+#softwareListTable tbody tr {
+  background-color: #ffffff;
+  transition: background-color 0.2s ease;
+}
+
+/* Alternating row colors - same as transaction table */
+#softwareListTable tbody tr:nth-child(even):not([style*="background-color"]) {
+  background-color: #f8f9fa;
+}
+
+/* Hover effect - same as transaction table */
+#softwareListTable tbody tr:hover:not([style*="background-color"]) {
+  background-color: #e3f2fd;
+  transition: background-color 0.2s ease;
+}
+
+/* First column styling - same as transaction table */
+#softwareListTable tbody td:first-child {
+  font-weight: 500;
+  color: #2c3e50;
+  text-align: center;
+}
+
+/* Desktop table optimization - same as transaction table */
+@media (min-width: 1200px) {
+  #softwareListTable {
+    font-size: 13px; /* Slightly smaller font to fit more content */
+  }
+  
+  #softwareListTable th,
+  #softwareListTable td {
+    padding: 6px 8px; /* Reduce vertical padding on large screens */
+    min-width: 120px; /* Wider minimum width */
+  }
+}
+
+/* Login info cell - specific to software table */
 .login-info-cell {
   min-width: 300px;
   max-width: 300px;
@@ -75,6 +174,44 @@
   padding: 8px;
 }
 
+/* Action buttons styling - same as transaction table */
+#softwareListTable .action-btn {
+  padding: 6px 12px;
+  margin: 0 2px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+#softwareListTable .view-btn {
+  background-color: #17a2b8;
+  color: white;
+}
+
+#softwareListTable .view-btn:hover {
+  background-color: #138496;
+}
+
+#softwareListTable .edit-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+#softwareListTable .edit-btn:hover {
+  background-color: #218838;
+}
+
+#softwareListTable .delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+#softwareListTable .delete-btn:hover {
+  background-color: #c82333;
+}
+
 .action-select {
   width: 100%;
   padding: 4px 8px;
@@ -91,7 +228,7 @@
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
-/* Software table responsive adjustments */
+/* Software table responsive adjustments - align with transaction table */
 @media (max-width: 1200px) {
   .login-info-cell {
     min-width: 250px;
@@ -108,6 +245,15 @@
 }
 
 @media (max-width: 768px) {
+  #softwareListTable {
+    font-size: 12px;
+  }
+  
+  #softwareListTable th,
+  #softwareListTable td {
+    padding: 6px;
+  }
+  
   .login-info-cell {
     min-width: 200px;
     max-width: 200px;

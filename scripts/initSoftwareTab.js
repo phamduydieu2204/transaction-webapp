@@ -64,9 +64,8 @@ function updateSoftwareTable() {
   const tbody = document.getElementById('softwareTableBody');
   if (!tbody) return;
   
-  const itemsPerPage = parseInt(document.getElementById('softwareItemsPerPage')?.value || 10);
-  const startIndex = (window.currentSoftwarePage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
+  const startIndex = (window.currentSoftwarePage - 1) * window.softwareItemsPerPage;
+  const endIndex = startIndex + window.softwareItemsPerPage;
   const pageData = window.softwareList.slice(startIndex, endIndex);
   
   if (pageData.length === 0) {
@@ -204,104 +203,115 @@ function updateSoftwareTotalDisplay() {
 }
 
 function initSoftwarePagination() {
-  // Items per page change handler
-  const itemsPerPageSelect = document.getElementById('softwareItemsPerPage');
-  if (itemsPerPageSelect) {
-    itemsPerPageSelect.addEventListener('change', () => {
-      window.currentSoftwarePage = 1;
+  // Software pagination functions - mirror transaction pagination pattern
+  window.softwareFirstPage = () => {
+    window.currentSoftwarePage = 1;
+    updateSoftwareTable();
+  };
+  
+  window.softwarePrevPage = () => {
+    if (window.currentSoftwarePage > 1) {
+      window.currentSoftwarePage--;
       updateSoftwareTable();
-    });
-  }
+    }
+  };
   
-  // Previous button
-  const prevBtn = document.getElementById('softwarePrevBtn');
-  if (prevBtn) {
-    prevBtn.addEventListener('click', () => {
-      if (window.currentSoftwarePage > 1) {
-        window.currentSoftwarePage--;
-        updateSoftwareTable();
-      }
-    });
-  }
+  window.softwareNextPage = () => {
+    const totalPages = Math.ceil(window.softwareList.length / window.softwareItemsPerPage);
+    if (window.currentSoftwarePage < totalPages) {
+      window.currentSoftwarePage++;
+      updateSoftwareTable();
+    }
+  };
   
-  // Next button
-  const nextBtn = document.getElementById('softwareNextBtn');
-  if (nextBtn) {
-    nextBtn.addEventListener('click', () => {
-      const itemsPerPage = parseInt(document.getElementById('softwareItemsPerPage')?.value || 10);
-      const totalPages = Math.ceil(window.softwareList.length / itemsPerPage);
-      
-      if (window.currentSoftwarePage < totalPages) {
-        window.currentSoftwarePage++;
-        updateSoftwareTable();
-      }
-    });
-  }
+  window.softwareLastPage = () => {
+    const totalPages = Math.ceil(window.softwareList.length / window.softwareItemsPerPage);
+    window.currentSoftwarePage = totalPages;
+    updateSoftwareTable();
+  };
+  
+  window.softwareGoToPage = (page) => {
+    const totalPages = Math.ceil(window.softwareList.length / window.softwareItemsPerPage);
+    if (page >= 1 && page <= totalPages) {
+      window.currentSoftwarePage = page;
+      updateSoftwareTable();
+    }
+  };
 }
 
 function updateSoftwarePagination() {
-  const itemsPerPage = parseInt(document.getElementById('softwareItemsPerPage')?.value || 10);
   const totalItems = window.softwareList.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const totalPages = Math.ceil(totalItems / window.softwareItemsPerPage);
+  const pagination = document.getElementById("softwarePagination");
   
-  // Update page info
-  const pageInfo = document.getElementById('softwarePageInfo');
-  if (pageInfo) {
-    const startIndex = (window.currentSoftwarePage - 1) * itemsPerPage + 1;
-    const endIndex = Math.min(window.currentSoftwarePage * itemsPerPage, totalItems);
-    pageInfo.textContent = `Hiển thị ${startIndex}-${endIndex} của ${totalItems} phần mềm`;
-  }
+  if (!pagination) return;
   
-  // Update buttons
-  const prevBtn = document.getElementById('softwarePrevBtn');
-  const nextBtn = document.getElementById('softwareNextBtn');
-  
-  if (prevBtn) {
-    prevBtn.disabled = window.currentSoftwarePage <= 1;
-  }
-  
-  if (nextBtn) {
-    nextBtn.disabled = window.currentSoftwarePage >= totalPages;
-  }
-  
-  // Update page numbers
-  const pageNumbers = document.getElementById('softwarePageNumbers');
-  if (pageNumbers) {
-    pageNumbers.innerHTML = generatePageNumbers(window.currentSoftwarePage, totalPages);
-  }
-}
+  pagination.innerHTML = "";
 
-function generatePageNumbers(currentPage, totalPages) {
-  if (totalPages <= 1) return '';
-  
-  let pages = [];
+  // First button
+  const firstButton = document.createElement("button");
+  firstButton.textContent = "«";
+  firstButton.onclick = window.softwareFirstPage;
+  firstButton.disabled = window.currentSoftwarePage === 1;
+  pagination.appendChild(firstButton);
+
+  // Previous button
+  const prevButton = document.createElement("button");
+  prevButton.textContent = "‹";
+  prevButton.onclick = window.softwarePrevPage;
+  prevButton.disabled = window.currentSoftwarePage === 1;
+  pagination.appendChild(prevButton);
+
   const maxVisiblePages = 5;
-  
-  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+  let startPage = Math.max(1, window.currentSoftwarePage - Math.floor(maxVisiblePages / 2));
   let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-  
+
   if (endPage - startPage + 1 < maxVisiblePages) {
     startPage = Math.max(1, endPage - maxVisiblePages + 1);
   }
-  
-  for (let i = startPage; i <= endPage; i++) {
-    const isActive = i === currentPage;
-    pages.push(`
-      <button class="page-number ${isActive ? 'active' : ''}" 
-              onclick="goToSoftwarePage(${i})"
-              ${isActive ? 'disabled' : ''}>
-        ${i}
-      </button>
-    `);
+
+  if (startPage > 1) {
+    const dots = document.createElement("span");
+    dots.textContent = "...";
+    dots.style.padding = "4px 8px";
+    pagination.appendChild(dots);
   }
-  
-  return pages.join('');
+
+  for (let i = startPage; i <= endPage; i++) {
+    const pageButton = document.createElement("button");
+    pageButton.textContent = i;
+    pageButton.onclick = () => window.softwareGoToPage(i);
+    if (i === window.currentSoftwarePage) {
+      pageButton.classList.add("active");
+    }
+    pagination.appendChild(pageButton);
+  }
+
+  if (endPage < totalPages) {
+    const dots = document.createElement("span");
+    dots.textContent = "...";
+    dots.style.padding = "4px 8px";
+    pagination.appendChild(dots);
+  }
+
+  // Next button
+  const nextButton = document.createElement("button");
+  nextButton.textContent = "›";
+  nextButton.onclick = window.softwareNextPage;
+  nextButton.disabled = window.currentSoftwarePage === totalPages;
+  pagination.appendChild(nextButton);
+
+  // Last button
+  const lastButton = document.createElement("button");
+  lastButton.textContent = "»";
+  lastButton.onclick = window.softwareLastPage;
+  lastButton.disabled = window.currentSoftwarePage === totalPages;
+  pagination.appendChild(lastButton);
 }
 
-// Global functions
+// Global functions - Legacy support
 window.goToSoftwarePage = function(page) {
-  window.currentSoftwarePage = page;
-  updateSoftwareTable();
+  window.softwareGoToPage(page);
 };
 
 window.handleSoftwareAction = function(selectElement, index) {
