@@ -46,21 +46,13 @@ async function loadSoftwareData() {
       window.softwareList = result.data || [];
       console.log(`✅ Loaded ${window.softwareList.length} software items`);
       
-      // Debug: Log sample data to check orderInfo field and passwordChangeDays
+      // Debug: Log sample data to check fields
       if (window.softwareList.length > 0) {
         console.log('📋 Sample software data:', window.softwareList[0]);
         const hasOrderInfo = window.softwareList.some(item => item.orderInfo);
         const hasPasswordChangeDays = window.softwareList.some(item => item.passwordChangeDays);
         console.log(`📋 Has orderInfo data: ${hasOrderInfo}`);
         console.log(`📋 Has passwordChangeDays data: ${hasPasswordChangeDays}`);
-        
-        // Log all passwordChangeDays values
-        const passwordDaysValues = window.softwareList.map(item => ({
-          name: item.softwareName,
-          lastModified: item.lastModified,
-          passwordChangeDays: item.passwordChangeDays
-        }));
-        console.log('📋 All passwordChangeDays values:', passwordDaysValues);
       }
       
       // Update display
@@ -125,9 +117,6 @@ function updateSoftwareTable() {
     const accountName = window.isSoftwareSearching ? 
       highlightSearchTerms(software.accountName || '', searchTerms) : 
       escapeHtml(software.accountName || '');
-    
-    // Debug: Log software data for color calculation
-    console.log(`🔍 Software ${actualIndex}: ${software.softwareName} - lastModified: ${software.lastModified}, passwordChangeDays: ${software.passwordChangeDays}`);
     
     // Get row background color based on date difference
     const rowBackgroundColor = getSoftwareRowColor(software.lastModified, software.passwordChangeDays);
@@ -1898,9 +1887,6 @@ function getSoftwareRowColor(lastModifiedDate, passwordChangeDays) {
   // Use passwordChangeDays from software item, fallback to default value if not available
   let passwordChangeThreshold = 30; // Default value
   
-  // Debug: Log the raw passwordChangeDays value
-  console.log(`🔍 DEBUG passwordChangeDays raw value:`, passwordChangeDays, `type: ${typeof passwordChangeDays}`);
-  
   if (passwordChangeDays !== null && passwordChangeDays !== undefined && passwordChangeDays !== '') {
     if (typeof passwordChangeDays === 'number') {
       passwordChangeThreshold = passwordChangeDays;
@@ -1912,19 +1898,13 @@ function getSoftwareRowColor(lastModifiedDate, passwordChangeDays) {
     }
   }
   
-  console.log(`📅 Date comparison: Today=${today.toDateString()}, LastModified=${lastModified.toDateString()}, Diff=${diffDays} days, PasswordChangeThreshold=${passwordChangeThreshold} (from: ${passwordChangeDays})`);
-  
   // Apply color rules according to user requirements:
   // Red: when diffDays > passwordChangeDays + 1
   // Yellow: when diffDays > passwordChangeDays
   if (diffDays > passwordChangeThreshold + 1) {
-    console.log(`🔴 RED COLOR: ${diffDays} > ${passwordChangeThreshold + 1}`);
     return 'background-color: #ffe6e6;'; // Màu đỏ nhạt khi quá hạn đổi mật khẩu > 1 ngày
   } else if (diffDays > passwordChangeThreshold) {
-    console.log(`🟡 YELLOW COLOR: ${diffDays} > ${passwordChangeThreshold}`);
     return 'background-color: #fff9e6;'; // Màu vàng nhạt khi quá hạn đổi mật khẩu
-  } else {
-    console.log(`⚪ WHITE COLOR: ${diffDays} <= ${passwordChangeThreshold}`);
   }
   
   return ''; // Không tô màu khi còn trong thời hạn an toàn
