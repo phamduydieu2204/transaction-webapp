@@ -8,11 +8,29 @@ export function handleChangePassword(index) {
   selectedTransactionIndex = index;
   selectedTransaction = window.transactionList[index];
 
+  // Reset các trường nhập mới
+  document.getElementById("newLoginEmail").value = "";
+  document.getElementById("newPassword").value = "";
+  document.getElementById("newSecret").value = "";
+
+  // Set placeholder cho tên file ngay lập tức
+  const fileNameLabel = document.getElementById("currentFileNameLabel");
+  fileNameLabel.textContent = "📁 Đang tải...";
+
+  // Hiện modal ngay lập tức
+  document.getElementById("changePasswordModal").style.display = "block";
+
   // Lấy thông tin cũ từ sheet PhanMem và tên file
   (async () => {
     const { softwareName, softwarePackage, accountName, accountSheetId } = selectedTransaction;
-    const accountInfo = await fetchAccountInfo(softwareName, softwarePackage, accountName);
+    
+    // Load song song cả 2 API calls để tăng tốc
+    const [accountInfo, fileNameInfo] = await Promise.all([
+      fetchAccountInfo(softwareName, softwarePackage, accountName),
+      accountSheetId ? fetchFileName(accountSheetId) : Promise.resolve({ fileName: "" })
+    ]);
 
+    // Cập nhật thông tin tài khoản
     document.getElementById("oldLoginEmail").textContent = accountInfo.email || "(chưa có)";
     document.getElementById("oldPassword").textContent = accountInfo.password || "(chưa có)";
     document.getElementById("oldSecret").textContent = accountInfo.secret || "(chưa có)";
@@ -22,30 +40,13 @@ export function handleChangePassword(index) {
     selectedTransaction.loginPassword = accountInfo.password;
     selectedTransaction.secret = accountInfo.secret;
 
-    // Lấy tên file hiện tại
-    if (accountSheetId) {
-      try {
-        const fileNameInfo = await fetchFileName(accountSheetId);
-        const fileNameLabel = document.getElementById("currentFileNameLabel");
-        if (fileNameInfo.fileName) {
-          fileNameLabel.textContent = fileNameInfo.fileName;
-        } else {
-          fileNameLabel.textContent = "Thông tin cũ";
-        }
-      } catch (error) {
-        console.error("Không thể lấy tên file:", error);
-        document.getElementById("currentFileNameLabel").textContent = "Thông tin cũ";
-      }
+    // Cập nhật tên file
+    if (fileNameInfo.fileName) {
+      fileNameLabel.textContent = fileNameInfo.fileName;
+    } else {
+      fileNameLabel.textContent = "📁 Thông tin tài khoản";
     }
   })();
-
-  // Reset các trường nhập mới
-  document.getElementById("newLoginEmail").value = "";
-  document.getElementById("newPassword").value = "";
-  document.getElementById("newSecret").value = "";
-
-  // Hiện modal
-  document.getElementById("changePasswordModal").style.display = "block";
 }
 
 // Đóng modal
