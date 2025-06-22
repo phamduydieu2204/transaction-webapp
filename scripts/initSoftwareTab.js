@@ -117,7 +117,7 @@ function updateSoftwareTable() {
       escapeHtml(software.accountName || '');
     
     // Get row background color based on date difference
-    const rowBackgroundColor = getSoftwareRowColor(software.lastModified);
+    const rowBackgroundColor = getSoftwareRowColor(software.lastModified, software.passwordChangeDays);
     
     // Combine search highlighting with date-based coloring
     let rowStyle = '';
@@ -1847,7 +1847,7 @@ function getCurrentSearchTerms() {
 }
 
 // Function to calculate days difference and get row background color
-function getSoftwareRowColor(lastModifiedDate) {
+function getSoftwareRowColor(lastModifiedDate, passwordChangeDays) {
   if (!lastModifiedDate) {
     return ''; // No color for empty dates
   }
@@ -1882,13 +1882,19 @@ function getSoftwareRowColor(lastModifiedDate) {
   const diffTime = today.getTime() - lastModified.getTime();
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
   
-  console.log(`📅 Date comparison: Today=${today.toDateString()}, LastModified=${lastModified.toDateString()}, Diff=${diffDays} days`);
+  // Use passwordChangeDays from software item, fallback to default value if not available
+  const passwordChangeThreshold = passwordChangeDays ? parseInt(passwordChangeDays, 10) : 30;
   
-  if (diffDays > 7) {
-    return 'background-color: #ffe6e6;'; // Màu đỏ nhạt cho > 7 ngày
-  } else if (diffDays > 5) {
-    return 'background-color: #fff9e6;'; // Màu vàng nhạt cho > 5 ngày
+  console.log(`📅 Date comparison: Today=${today.toDateString()}, LastModified=${lastModified.toDateString()}, Diff=${diffDays} days, PasswordChangeThreshold=${passwordChangeThreshold}`);
+  
+  // Apply color rules according to user requirements:
+  // Red: when diffDays > passwordChangeDays + 1
+  // Yellow: when diffDays > passwordChangeDays
+  if (diffDays > passwordChangeThreshold + 1) {
+    return 'background-color: #ffe6e6;'; // Màu đỏ nhạt khi quá hạn đổi mật khẩu > 1 ngày
+  } else if (diffDays > passwordChangeThreshold) {
+    return 'background-color: #fff9e6;'; // Màu vàng nhạt khi quá hạn đổi mật khẩu
   }
   
-  return ''; // Không tô màu cho <= 5 ngày
+  return ''; // Không tô màu khi còn trong thời hạn an toàn
 }
