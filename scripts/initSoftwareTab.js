@@ -609,19 +609,22 @@ function initSoftwareFormDropdowns() {
     // Clear dependent fields when software name changes
     softwareNameInput.addEventListener('input', () => {
       console.log('🔄 Software name changed:', softwareNameInput.value);
-      // Clear dependent fields
-      if (softwarePackageInput) softwarePackageInput.value = '';
-      if (accountNameInput) accountNameInput.value = '';
+      // Clear dependent fields only if they have values to avoid unnecessary DOM updates
+      if (softwarePackageInput && softwarePackageInput.value) softwarePackageInput.value = '';
+      if (accountNameInput && accountNameInput.value) accountNameInput.value = '';
       // Use debounced update for input events
       debouncedDropdownUpdate();
     });
     
     softwareNameInput.addEventListener('change', () => {
       console.log('🔄 Software name confirmed:', softwareNameInput.value);
-      updateSoftwarePackageDropdown();
-      updateAccountNameDropdown();
-      updateOrderInfoDropdown();
-      updateStandardNameDropdown();
+      // Batch these updates in a single requestAnimationFrame
+      requestAnimationFrame(() => {
+        updateSoftwarePackageDropdown();
+        updateAccountNameDropdown();
+        updateOrderInfoDropdown();
+        updateStandardNameDropdown();
+      });
     });
   }
   
@@ -629,17 +632,20 @@ function initSoftwareFormDropdowns() {
     // Clear dependent fields when package changes
     softwarePackageInput.addEventListener('input', () => {
       console.log('🔄 Software package changed:', softwarePackageInput.value);
-      // Clear dependent fields
-      if (accountNameInput) accountNameInput.value = '';
+      // Clear dependent fields only if they have values to avoid unnecessary DOM updates
+      if (accountNameInput && accountNameInput.value) accountNameInput.value = '';
       // Use debounced update for input events
       debouncedDropdownUpdate();
     });
     
     softwarePackageInput.addEventListener('change', () => {
       console.log('🔄 Software package confirmed:', softwarePackageInput.value);
-      updateAccountNameDropdown();
-      updateOrderInfoDropdown();
-      updateStandardNameDropdown();
+      // Batch these updates in a single requestAnimationFrame
+      requestAnimationFrame(() => {
+        updateAccountNameDropdown();
+        updateOrderInfoDropdown();
+        updateStandardNameDropdown();
+      });
     });
   }
   
@@ -652,9 +658,12 @@ function initSoftwareFormDropdowns() {
     
     accountNameInput.addEventListener('change', () => {
       console.log('🔄 Account name selected:', accountNameInput.value);
-      updateOrderInfoDropdown();
-      updateStandardNameDropdown();
-      autoFillFormFromSelection();
+      // Batch these updates in a single requestAnimationFrame
+      requestAnimationFrame(() => {
+        updateOrderInfoDropdown();
+        updateStandardNameDropdown();
+        autoFillFormFromSelection();
+      });
     });
   }
   
@@ -761,10 +770,20 @@ function debounce(func, wait) {
   };
 }
 
-// Debounced dropdown update function
+// Smart debounced dropdown update that only updates what's needed
 const debouncedDropdownUpdate = debounce(() => {
-  updateSoftwareFormDropdowns();
-}, 150);
+  // Use requestAnimationFrame to batch DOM updates
+  requestAnimationFrame(() => {
+    try {
+      updateSoftwarePackageDropdown();
+      updateAccountNameDropdown();
+      updateOrderInfoDropdown();
+      updateStandardNameDropdown();
+    } catch (error) {
+      console.error('Error in debounced dropdown update:', error);
+    }
+  });
+}, 100); // Reduced from 150ms to 100ms
 
 // Function để force refresh tất cả dropdowns - cho debugging
 window.forceRefreshDropdowns = function() {
@@ -842,14 +861,30 @@ function updateSoftwarePackageDropdown() {
   
   console.log(`📦 Available packages:`, uniquePackages);
   
-  datalist.innerHTML = '';
-  uniquePackages.forEach(pkg => {
-    const option = document.createElement('option');
-    option.value = pkg;
-    datalist.appendChild(option);
-  });
+  // Check if the content would be the same to avoid unnecessary DOM updates
+  const currentOptions = Array.from(datalist.children).map(option => option.value);
+  const isSame = currentOptions.length === uniquePackages.length && 
+                currentOptions.every((value, index) => value === uniquePackages[index]);
   
-  console.log(`✅ Updated software package dropdown with ${uniquePackages.length} items`);
+  if (!isSame) {
+    // Use DocumentFragment for efficient DOM manipulation
+    const fragment = document.createDocumentFragment();
+    uniquePackages.forEach(pkg => {
+      const option = document.createElement('option');
+      option.value = pkg;
+      fragment.appendChild(option);
+    });
+    
+    // Single DOM update
+    datalist.innerHTML = '';
+    datalist.appendChild(fragment);
+  }
+  
+  if (!isSame) {
+    console.log(`✅ Updated software package dropdown with ${uniquePackages.length} items`);
+  } else {
+    console.log(`⏭️ Software package dropdown unchanged (${uniquePackages.length} items)`);
+  }
 }
 
 function updateAccountNameDropdown() {
