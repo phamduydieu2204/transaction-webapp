@@ -504,29 +504,43 @@ function initSoftwareFormDropdowns() {
   const accountNameInput = document.getElementById('accountName');
   
   if (softwareNameInput) {
+    // Clear dependent fields when software name changes
     softwareNameInput.addEventListener('input', () => {
+      console.log('🔄 Software name changed:', softwareNameInput.value);
+      // Clear dependent fields
+      if (softwarePackageInput) softwarePackageInput.value = '';
+      if (accountNameInput) accountNameInput.value = '';
+      // Update dropdowns
       updateSoftwarePackageDropdown();
       updateAccountNameDropdown();
     });
     
     softwareNameInput.addEventListener('change', () => {
+      console.log('🔄 Software name confirmed:', softwareNameInput.value);
       updateSoftwarePackageDropdown();
       updateAccountNameDropdown();
     });
   }
   
   if (softwarePackageInput) {
+    // Clear dependent fields when package changes
     softwarePackageInput.addEventListener('input', () => {
+      console.log('🔄 Software package changed:', softwarePackageInput.value);
+      // Clear dependent fields
+      if (accountNameInput) accountNameInput.value = '';
+      // Update dropdown
       updateAccountNameDropdown();
     });
     
     softwarePackageInput.addEventListener('change', () => {
+      console.log('🔄 Software package confirmed:', softwarePackageInput.value);
       updateAccountNameDropdown();
     });
   }
   
   if (accountNameInput) {
     accountNameInput.addEventListener('change', () => {
+      console.log('🔄 Account name selected:', accountNameInput.value);
       autoFillFormFromSelection();
     });
   }
@@ -539,6 +553,27 @@ function updateSoftwareFormDropdowns() {
   updateSoftwarePackageDropdown();
   updateAccountNameDropdown();
 }
+
+// Debug function để kiểm tra dữ liệu
+window.debugSoftwareDropdowns = function() {
+  console.log('🔍 DEBUG: Software List Data');
+  console.log('Total items:', window.softwareList.length);
+  console.log('Sample data:', window.softwareList.slice(0, 3));
+  
+  // Unique software names
+  const uniqueNames = [...new Set(window.softwareList.map(item => item.softwareName))].filter(Boolean);
+  console.log('Unique software names:', uniqueNames);
+  
+  // Test filtering for first software
+  if (uniqueNames.length > 0) {
+    const testSoftware = uniqueNames[0];
+    const packagesForSoftware = window.softwareList
+      .filter(item => item.softwareName === testSoftware)
+      .map(item => item.softwarePackage)
+      .filter(Boolean);
+    console.log(`Packages for "${testSoftware}":`, [...new Set(packagesForSoftware)]);
+  }
+};
 
 function updateSoftwareNameDropdown() {
   const datalist = document.getElementById('softwareNameList');
@@ -563,21 +598,31 @@ function updateSoftwarePackageDropdown() {
   
   if (!datalist) return;
   
+  console.log(`🔍 Filtering packages for software: "${selectedSoftwareName}"`);
+  
   let packages = [];
   
   if (selectedSoftwareName) {
     // Filter packages by selected software name
-    packages = window.softwareList
-      .filter(item => item.softwareName === selectedSoftwareName)
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName
+    );
+    
+    console.log(`📊 Found ${filteredItems.length} items matching software name`);
+    
+    packages = filteredItems
       .map(item => item.softwarePackage)
       .filter(Boolean);
   } else {
     // Show all packages if no software name selected
     packages = window.softwareList.map(item => item.softwarePackage).filter(Boolean);
+    console.log(`📊 Showing all packages (no filter)`);
   }
   
   // Get unique packages and sort
   const uniquePackages = [...new Set(packages)].sort();
+  
+  console.log(`📦 Available packages:`, uniquePackages);
   
   datalist.innerHTML = '';
   uniquePackages.forEach(pkg => {
@@ -596,30 +641,47 @@ function updateAccountNameDropdown() {
   
   if (!datalist) return;
   
+  console.log(`🔍 Filtering accounts for software: "${selectedSoftwareName}", package: "${selectedSoftwarePackage}"`);
+  
   let accounts = [];
+  let filterDescription = '';
   
   if (selectedSoftwareName && selectedSoftwarePackage) {
     // Filter accounts by both software name and package
-    accounts = window.softwareList
-      .filter(item => 
-        item.softwareName === selectedSoftwareName && 
-        item.softwarePackage === selectedSoftwarePackage
-      )
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName && 
+      item.softwarePackage === selectedSoftwarePackage
+    );
+    
+    filterDescription = `software "${selectedSoftwareName}" AND package "${selectedSoftwarePackage}"`;
+    console.log(`📊 Found ${filteredItems.length} items matching both criteria`);
+    
+    accounts = filteredItems
       .map(item => item.accountName)
       .filter(Boolean);
   } else if (selectedSoftwareName) {
     // Filter accounts by software name only
-    accounts = window.softwareList
-      .filter(item => item.softwareName === selectedSoftwareName)
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName
+    );
+    
+    filterDescription = `software "${selectedSoftwareName}" only`;
+    console.log(`📊 Found ${filteredItems.length} items matching software name only`);
+    
+    accounts = filteredItems
       .map(item => item.accountName)
       .filter(Boolean);
   } else {
     // Show all accounts if no filters
     accounts = window.softwareList.map(item => item.accountName).filter(Boolean);
+    filterDescription = 'no filter (showing all)';
+    console.log(`📊 Showing all accounts (no filter)`);
   }
   
   // Get unique accounts and sort
   const uniqueAccounts = [...new Set(accounts)].sort();
+  
+  console.log(`🏢 Available accounts for ${filterDescription}:`, uniqueAccounts);
   
   datalist.innerHTML = '';
   uniqueAccounts.forEach(account => {
