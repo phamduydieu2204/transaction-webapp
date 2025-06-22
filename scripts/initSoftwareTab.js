@@ -115,8 +115,19 @@ function updateSoftwareTable() {
       highlightSearchTerms(software.accountName || '', searchTerms) : 
       escapeHtml(software.accountName || '');
     
+    // Get row background color based on date difference
+    const rowBackgroundColor = getSoftwareRowColor(software.lastModified);
+    
+    // Combine search highlighting with date-based coloring
+    let rowStyle = '';
+    if (window.isSoftwareSearching) {
+      rowStyle = 'style="background-color: #f8f9fa;"'; // Search mode takes priority
+    } else if (rowBackgroundColor) {
+      rowStyle = `style="${rowBackgroundColor}"`;
+    }
+    
     return `
-      <tr ${window.isSoftwareSearching ? 'style="background-color: #f8f9fa;"' : ''}>
+      <tr ${rowStyle}>
         <td style="text-align: center;">${actualIndex}</td>
         <td>${softwareName}</td>
         <td>${softwarePackage}</td>
@@ -1617,4 +1628,51 @@ function getCurrentSearchTerms() {
   
   const conditions = getSoftwareSearchConditions();
   return Object.values(conditions).filter(term => term && term.trim());
+}
+
+// Function to calculate days difference and get row background color
+function getSoftwareRowColor(lastModifiedDate) {
+  if (!lastModifiedDate) {
+    return ''; // No color for empty dates
+  }
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Reset time to midnight for accurate day comparison
+  
+  // Parse Vietnamese date format dd/mm/yyyy
+  const parseVietnameseDate = (dateStr) => {
+    if (!dateStr) return null;
+    
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+      // Convert dd/mm/yyyy to Date object
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+      const year = parseInt(parts[2], 10);
+      
+      const date = new Date(year, month, day);
+      date.setHours(0, 0, 0, 0); // Reset time
+      return date;
+    }
+    return null;
+  };
+  
+  const lastModified = parseVietnameseDate(lastModifiedDate);
+  if (!lastModified) {
+    return ''; // Invalid date format
+  }
+  
+  // Calculate days difference
+  const diffTime = today.getTime() - lastModified.getTime();
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  
+  console.log(`📅 Date comparison: Today=${today.toDateString()}, LastModified=${lastModified.toDateString()}, Diff=${diffDays} days`);
+  
+  if (diffDays > 7) {
+    return 'background-color: #ffe6e6;'; // Màu đỏ nhạt cho > 7 ngày
+  } else if (diffDays > 5) {
+    return 'background-color: #fff9e6;'; // Màu vàng nhạt cho > 5 ngày
+  }
+  
+  return ''; // Không tô màu cho <= 5 ngày
 }
