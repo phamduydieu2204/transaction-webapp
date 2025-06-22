@@ -2079,4 +2079,4 @@ function openSoftwareSheet(index) {
   if (typeof showResultModalModern === 'function') {
     showResultModalModern('Thành công', `Đã mở Google Sheet cho ${software.softwareName}`, 'success');
   }
-}}
+}
