@@ -6,7 +6,7 @@
       <!-- Software Form Grid -->
       <div class="transaction-form-grid">
         
-        <!-- ✅ Dòng 1: Tên phần mềm, Gói phần mềm, Tên tài khoản, ID Sheet Tài khoản, Thông tin đơn hàng (spans 2 rows) -->
+        <!-- ✅ Dòng 1: Tên phần mềm, Gói phần mềm, Tên tài khoản, Giá bán, Thông tin đơn hàng (spans 2 rows) -->
         <div class="form-field">
           <label class="required">Tên phần mềm <span class="required-asterisk">*</span></label>
           <input type="text" id="softwareFormName" list="softwareNameList" placeholder="Chọn hoặc nhập tên phần mềm" required autocomplete="off">
@@ -35,9 +35,9 @@
         </div>
         
         <div class="form-field">
-          <label>ID Sheet Tài khoản</label>
-          <input type="text" id="accountSheetId" placeholder="Nhập ID Google Sheet">
-          <div class="error-message" id="accountSheetId-error"></div>
+          <label>Giá bán</label>
+          <input type="text" id="price" placeholder="Nhập giá bán">
+          <div class="error-message" id="price-error"></div>
         </div>
         
         <!-- Thông tin đơn hàng - 1 cột, kéo dài từ dòng 1 đến dòng 2 -->
@@ -79,6 +79,18 @@
           </datalist>
           <div class="error-message" id="standardName-error"></div>
         </div>
+        
+        <!-- ✅ Dòng 3: ID Sheet Tài khoản -->
+        <div class="form-field">
+          <label>ID Sheet Tài khoản</label>
+          <input type="text" id="accountSheetId" placeholder="Nhập ID Google Sheet">
+          <div class="error-message" id="accountSheetId-error"></div>
+        </div>
+        
+        <!-- Empty fields for layout alignment -->
+        <div class="form-field-empty"></div>
+        <div class="form-field-empty"></div>
+        <div class="form-field-empty"></div>
       </div>
 
       <!-- Buttons -->

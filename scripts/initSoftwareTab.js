@@ -346,8 +346,8 @@ window.handleSoftwareAction = function(selectElement, index) {
       console.log('View software:', software);
       break;
     case 'edit':
-      // TODO: Implement edit
       console.log('Edit software:', software);
+      editSoftwareItem(software, index);
       break;
     case 'openSheet':
       if (software.accountSheetId) {
@@ -359,6 +359,77 @@ window.handleSoftwareAction = function(selectElement, index) {
   // Reset select
   selectElement.value = '';
 };
+
+// ========================================
+// EDIT SOFTWARE FUNCTIONALITY
+// ========================================
+
+function editSoftwareItem(software, index) {
+  console.log(`📝 Editing software at index ${index}:`, software);
+  
+  // Set the edit index
+  window.currentEditSoftwareIndex = index;
+  
+  // Fill form with software data
+  const formElements = {
+    softwareFormName: document.getElementById('softwareFormName'),
+    softwareFormPackage: document.getElementById('softwareFormPackage'),
+    softwareFormAccount: document.getElementById('softwareFormAccount'),
+    price: document.getElementById('price'),
+    accountSheetId: document.getElementById('accountSheetId'),
+    orderInfo: document.getElementById('orderInfo'),
+    loginUsername: document.getElementById('loginUsername'),
+    loginPassword: document.getElementById('loginPassword'),
+    loginSecret: document.getElementById('loginSecret'),
+    standardName: document.getElementById('standardName')
+  };
+  
+  // Batch DOM updates to prevent layout thrashing
+  requestAnimationFrame(() => {
+    // Fill form fields
+    if (formElements.softwareFormName) formElements.softwareFormName.value = software.softwareName || '';
+    if (formElements.softwareFormPackage) formElements.softwareFormPackage.value = software.softwarePackage || '';
+    if (formElements.softwareFormAccount) formElements.softwareFormAccount.value = software.accountName || '';
+    if (formElements.price) formElements.price.value = software.price || '';
+    if (formElements.accountSheetId) formElements.accountSheetId.value = software.accountSheetId || '';
+    if (formElements.orderInfo) formElements.orderInfo.value = software.orderInfo || '';
+    if (formElements.loginUsername) formElements.loginUsername.value = software.username || '';
+    if (formElements.loginPassword) formElements.loginPassword.value = software.password || '';
+    if (formElements.loginSecret) formElements.loginSecret.value = software.secret || '';
+    if (formElements.standardName) formElements.standardName.value = software.standardName || '';
+    
+    // Update form dropdowns to match the selected values
+    updateSoftwareFormDropdowns();
+    
+    // Scroll to form
+    const formContainer = document.querySelector('.form-container');
+    if (formContainer) {
+      formContainer.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    }
+    
+    // Show success message
+    if (typeof showResultModalModern === 'function') {
+      showResultModalModern(
+        'Đã tải dữ liệu!', 
+        `Dữ liệu phần mềm "${software.softwareName}" đã được tải vào form. Bạn có thể chỉnh sửa và nhấn "Cập nhật" để lưu thay đổi.`, 
+        'info'
+      );
+    }
+    
+    console.log(`✅ Software data loaded into form for editing`);
+  });
+  
+  // Reset the action select
+  setTimeout(() => {
+    const selectElement = document.querySelector(`select[onchange*="handleSoftwareAction(this, ${index})"]`);
+    if (selectElement) {
+      selectElement.value = '';
+    }
+  }, 100);
+}
 
 window.copyToClipboard = function(text) {
   if (!text) {
@@ -503,6 +574,7 @@ function getSoftwareFormData() {
     softwareName: document.getElementById('softwareFormName')?.value?.trim() || '',
     softwarePackage: document.getElementById('softwareFormPackage')?.value?.trim() || '',
     accountName: document.getElementById('softwareFormAccount')?.value?.trim() || '',
+    price: document.getElementById('price')?.value?.trim() || '',
     accountSheetId: document.getElementById('accountSheetId')?.value?.trim() || '',
     orderInfo: document.getElementById('orderInfo')?.value?.trim() || '',
     loginUsername: document.getElementById('loginUsername')?.value?.trim() || '',
@@ -1211,3 +1283,141 @@ function fillFormFields(matchingSoftware, includeOptionalFields = true) {
     console.log('✅ Form auto-filled successfully');
   });
 }
+
+// ========================================
+// UPDATE SOFTWARE FUNCTIONALITY
+// ========================================
+
+window.handleSoftwareUpdate = async function() {
+  console.log('🔄 Updating software...');
+  
+  try {
+    // Check if we have a software selected for editing
+    if (window.currentEditSoftwareIndex === -1 || !window.softwareList[window.currentEditSoftwareIndex]) {
+      if (typeof showResultModalModern === 'function') {
+        showResultModalModern(
+          'Chưa chọn phần mềm!', 
+          'Vui lòng chọn một phần mềm từ danh sách để cập nhật bằng cách nhấp vào dòng trong bảng.', 
+          'warning'
+        );
+      } else {
+        alert('⚠️ Vui lòng chọn một phần mềm từ danh sách để cập nhật');
+      }
+      return;
+    }
+    
+    // Get original software data
+    const originalSoftware = window.softwareList[window.currentEditSoftwareIndex];
+    
+    // Get current form data
+    const formData = getSoftwareFormData();
+    
+    // Validate required fields
+    if (!validateSoftwareForm(formData)) {
+      return;
+    }
+    
+    // Check if anything actually changed
+    const hasChanges = 
+      formData.softwareName !== originalSoftware.softwareName ||
+      formData.softwarePackage !== originalSoftware.softwarePackage ||
+      formData.accountName !== originalSoftware.accountName ||
+      formData.price !== originalSoftware.price ||
+      formData.accountSheetId !== originalSoftware.accountSheetId ||
+      formData.orderInfo !== originalSoftware.orderInfo ||
+      formData.loginUsername !== originalSoftware.username ||
+      formData.loginPassword !== originalSoftware.password ||
+      formData.loginSecret !== originalSoftware.secret ||
+      formData.standardName !== originalSoftware.standardName;
+    
+    if (!hasChanges) {
+      if (typeof showResultModalModern === 'function') {
+        showResultModalModern(
+          'Không có thay đổi!', 
+          'Không có thông tin nào được thay đổi. Vui lòng sửa đổi ít nhất một trường thông tin.', 
+          'info'
+        );
+      } else {
+        alert('ℹ️ Không có thông tin nào được thay đổi');
+      }
+      return;
+    }
+    
+    // Show processing modal
+    if (typeof showProcessingModalModern === 'function') {
+      showProcessingModalModern('Đang cập nhật phần mềm...', 'Vui lòng đợi trong giây lát');
+    }
+    
+    // Prepare update data with original identifiers
+    const updateData = {
+      // Original identifiers for finding the record
+      originalSoftwareName: originalSoftware.softwareName,
+      originalSoftwarePackage: originalSoftware.softwarePackage,
+      originalAccountName: originalSoftware.accountName,
+      
+      // New data to update
+      ...formData
+    };
+    
+    // Call backend API
+    const { BACKEND_URL } = getConstants();
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "updateSoftware",
+        ...updateData
+      })
+    });
+    
+    const result = await response.json();
+    
+    // Close processing modal
+    if (typeof closeProcessingModalModern === 'function') {
+      closeProcessingModalModern();
+    }
+    
+    if (result.status === "success") {
+      // Show success message
+      if (typeof showResultModalModern === 'function') {
+        showResultModalModern('Thành công!', result.message || 'Phần mềm đã được cập nhật thành công', 'success');
+      } else {
+        alert('✅ ' + (result.message || 'Phần mềm đã được cập nhật thành công'));
+      }
+      
+      // Reset form and edit state
+      window.handleSoftwareReset();
+      window.currentEditSoftwareIndex = -1;
+      
+      // Reload software data to reflect changes
+      await loadSoftwareData();
+      
+      console.log('✅ Software updated successfully:', result.data);
+      
+    } else {
+      // Show error message
+      console.error('❌ Error updating software:', result.message);
+      
+      if (typeof showResultModalModern === 'function') {
+        showResultModalModern('Lỗi!', result.message || 'Có lỗi xảy ra khi cập nhật phần mềm', 'error');
+      } else {
+        alert('❌ ' + (result.message || 'Có lỗi xảy ra khi cập nhật phần mềm'));
+      }
+    }
+    
+  } catch (error) {
+    console.error('❌ Error in handleSoftwareUpdate:', error);
+    
+    // Close processing modal if it's open
+    if (typeof closeProcessingModalModern === 'function') {
+      closeProcessingModalModern();
+    }
+    
+    const errorMessage = 'Có lỗi xảy ra khi cập nhật phần mềm. Vui lòng thử lại.';
+    if (typeof showResultModalModern === 'function') {
+      showResultModalModern('Lỗi!', errorMessage, 'error');
+    } else {
+      alert('❌ ' + errorMessage);
+    }
+  }
+};
