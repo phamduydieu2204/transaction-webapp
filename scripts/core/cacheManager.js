@@ -2,12 +2,19 @@
  * Cache Manager - Quản lý cache cho performance và real-time updates
  */
 
+class CacheManager {
+  constructor() {
+    this.caches = new Map();
+    this.ttl = 5 * 60 * 1000; // Default TTL: 5 minutes
   }
 
   /**
    * Set cache with optional TTL
    */
-
+  set(key, value, ttl = this.ttl) {
+    this.caches.set(key, {
+      value,
+      expires: Date.now() + ttl
     });
   }
 
@@ -64,6 +71,7 @@
     this.clear('transactions');
     this.clear('transaction-stats');
     
+    console.log('🧹 Transaction caches cleared');
   }
 
   /**
@@ -78,6 +86,7 @@
     this.clear('expenses');
     this.clear('expense-stats');
     
+    console.log('🧹 Expense caches cleared');
   }
 }
 

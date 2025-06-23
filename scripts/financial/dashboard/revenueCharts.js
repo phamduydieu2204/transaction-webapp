@@ -39,19 +39,92 @@ export function renderRevenueTrendChart(metrics, containerId = 'revenueTrendChar
     const date = new Date(year, monthNum - 1);
     return date.toLocaleDateString('vi-VN', { month: 'short', year: '2-digit' });
   });
+
+  const datasets = [
+    {
+      label: 'Doanh thu',
+      data: revenueData,
+      borderColor: CHART_COLORS.revenue,
+      backgroundColor: CHART_COLORS.revenue + '20',
+      fill: true,
+      tension: 0.4
     },
     {
+      label: 'Lợi nhuận',
+      data: profitData,
+      borderColor: CHART_COLORS.profit,
+      backgroundColor: CHART_COLORS.profit + '20',
+      fill: false,
+      tension: 0.4
     }
   ];
-  });
+
+  const config = createLineChartConfig(labels, datasets, {
+    plugins: {
+      title: {
+        display: true,
+        text: 'Xu hướng Doanh thu & Lợi nhuận (12 tháng gần nhất)',
         font: { size: 16, weight: 'bold' }
       },
+      legend: {
+        position: 'top'
       }
     },
-  }
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: function(value) {
+            return formatCurrencyForChart(value);
+          }
+        }
+      }
+    }
   });
+
+  // Create canvas if it doesn't exist
+  if (!document.getElementById(containerId + 'Canvas')) {
+    container.innerHTML = `<canvas id="${containerId}Canvas" style="max-height: 400px;"></canvas>`;
+  }
+
+  createOrUpdateChart(containerId + 'Canvas', config);
+}
+
+/**
+ * Render revenue by software breakdown chart
+ * @param {Object} metrics - Financial metrics data
+ * @param {string} containerId - Container element ID
+ */
+export function renderRevenueBySoftwareChart(metrics, containerId = 'revenueBySoftwareChart') {
+  const container = document.getElementById(containerId);
+  if (!container) {
+    console.warn(`Container #${containerId} not found for revenue by software chart`);
+    return;
+  }
+
+  const revenueByOrgSoftware = metrics.revenueByOrgSoftware || {};
+  const softwareData = Object.values(revenueByOrgSoftware)
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 10); // Top 10 software
+
+  if (softwareData.length === 0) {
+    container.innerHTML = '<div class="no-data">Không có dữ liệu doanh thu</div>';
+    return;
+  }
+
+  const labels = softwareData.map(item => item.name);
+  const data = softwareData.map(item => item.revenue);
+
+  const config = createPieChartConfig(labels, data, {
+    plugins: {
+      title: {
+        display: true,
+        text: 'Doanh thu theo Phần mềm (Top 10)',
         font: { size: 16, weight: 'bold' }
       },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
             const total = context.dataset.data.reduce((a, b) => a + b, 0);
             const percentage = ((context.parsed / total) * 100).toFixed(1);
             const software = softwareData[context.dataIndex];
@@ -67,6 +140,8 @@ export function renderRevenueTrendChart(metrics, containerId = 'revenueTrendChar
   });
 
   // Create canvas if it doesn't exist
+  if (!document.getElementById(containerId + 'Canvas')) {
+    container.innerHTML = `<canvas id="${containerId}Canvas" style="max-height: 400px;"></canvas>`;
   }
 
   createOrUpdateChart(containerId + 'Canvas', config);
@@ -96,16 +171,50 @@ export function renderMonthlyRevenueChart(metrics, containerId = 'monthlyRevenue
     const date = new Date(year, monthNum - 1);
     return date.toLocaleDateString('vi-VN', { month: 'long', year: 'numeric' });
   });
+
+  const datasets = [
+    {
+      label: 'Doanh thu',
+      data: revenueData,
+      backgroundColor: CHART_COLORS.revenue,
+      borderColor: CHART_COLORS.revenue,
+      borderWidth: 1
     },
     {
+      label: 'Chi phí',
+      data: expenseData,
+      backgroundColor: CHART_COLORS.expense,
+      borderColor: CHART_COLORS.expense,
+      borderWidth: 1
     }
   ];
+
+  const config = createBarChartConfig(labels, datasets, {
+    plugins: {
+      title: {
+        display: true,
+        text: 'So sánh Doanh thu vs Chi phí theo tháng',
         font: { size: 16, weight: 'bold' }
       },
+      legend: {
+        position: 'top'
       }
     },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: function(value) {
+            return formatCurrencyForChart(value);
+          }
+        }
+      }
+    }
   });
 
+  // Create canvas if it doesn't exist
+  if (!document.getElementById(containerId + 'Canvas')) {
+    container.innerHTML = `<canvas id="${containerId}Canvas" style="max-height: 400px;"></canvas>`;
   }
 
   createOrUpdateChart(containerId + 'Canvas', config);
@@ -143,19 +252,101 @@ export function renderRevenueGrowthChart(metrics, containerId = 'revenueGrowthCh
       labels.push(date.toLocaleDateString('vi-VN', { month: 'short', year: '2-digit' }));
     }
   }
+
+  if (growthRates.length === 0) {
+    container.innerHTML = '<div class="no-data">Không đủ dữ liệu để tính tăng trưởng</div>';
+    return;
+  }
+
+  // Color bars based on positive/negative growth
+  const backgroundColors = growthRates.map(rate => 
+    rate >= 0 ? CHART_COLORS.success : CHART_COLORS.danger
   );
+
+  const datasets = [{
+    label: 'Tăng trưởng (%)',
+    data: growthRates,
+    backgroundColor: backgroundColors,
+    borderColor: backgroundColors,
+    borderWidth: 1
   }];
-  });
+
+  const config = createBarChartConfig(labels, datasets, {
+    plugins: {
+      title: {
+        display: true,
+        text: 'Tỷ lệ Tăng trưởng Doanh thu theo tháng (%)',
         font: { size: 16, weight: 'bold' }
       },
+      legend: {
+        display: false
       },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
             const value = context.parsed.y.toFixed(1);
             return `Tăng trưởng: ${value}%`;
           }
         }
       }
     },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: function(value) {
+            return value + '%';
+          }
+        }
+      }
+    }
+  });
+
+  // Create canvas if it doesn't exist
+  if (!document.getElementById(containerId + 'Canvas')) {
+    container.innerHTML = `<canvas id="${containerId}Canvas" style="max-height: 400px;"></canvas>`;
   }
+
+  createOrUpdateChart(containerId + 'Canvas', config);
+}
+
+/**
+ * Render revenue analytics summary table
+ * @param {Object} metrics - Financial metrics data
+ * @param {string} containerId - Container element ID
+ */
+export function renderRevenueAnalyticsTable(metrics, containerId = 'revenueAnalyticsTable') {
+  const container = document.getElementById(containerId);
+  if (!container) {
+    console.warn(`Container #${containerId} not found for revenue analytics table`);
+    return;
+  }
+
+  const revenueByOrgSoftware = metrics.revenueByOrgSoftware || {};
+  const softwareData = Object.values(revenueByOrgSoftware)
+    .sort((a, b) => b.revenue - a.revenue);
+
+  let tableHTML = `
+    <div class="analytics-table">
+      <h4>📊 Phân tích Chi tiết Doanh thu</h4>
+      <table class="revenue-table">
+        <thead>
+          <tr>
+            <th>Phần mềm</th>
+            <th>Doanh thu</th>
+            <th>Giao dịch</th>
+            <th>Trung bình</th>
+            <th>% Tổng DT</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
+
+  const totalRevenue = metrics.totalRevenue || 0;
+
+  softwareData.forEach((software, index) => {
+    const percentage = totalRevenue > 0 ? ((software.revenue / totalRevenue) * 100).toFixed(1) : '0';
+    
     tableHTML += `
       <tr>
         <td class="software-name">${software.name}</td>

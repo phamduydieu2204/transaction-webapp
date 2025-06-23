@@ -60,16 +60,90 @@ export function handleChangePassword(index) {
       googleDocsLink.href = `https://docs.google.com/document/d/${accountSheetId}/edit`;
       
       // Hiển thị container links
+      fileLinksContainer.style.display = "flex";
+    }
+  })();
+}
+
+// Đóng modal
+export function closeChangePasswordModal() {
+  document.getElementById("changePasswordModal").style.display = "none";
+  // Reset file links
+  document.getElementById("fileLinksContainer").style.display = "none";
+}
+
+// Gửi yêu cầu cập nhật
+export async function confirmChangePassword() {
+  const newEmail = document.getElementById("newLoginEmail").value.trim();
+  const newPassword = document.getElementById("newPassword").value.trim();
+  const newSecret = document.getElementById("newSecret").value.trim();
+
+  const changes = {
+    softwareName: selectedTransaction.softwareName,
+    softwarePackage: selectedTransaction.softwarePackage,
+    accountName: selectedTransaction.accountName,
+    accountSheetId: selectedTransaction.accountSheetId,
+    transactionId: selectedTransaction.transactionId,
+
+    newEmail: newEmail || null,
+    newPassword: newPassword || null,
+    newSecret: newSecret || null,
+
+    oldEmail: selectedTransaction.loginEmail || "",
+    oldPassword: selectedTransaction.loginPassword || "",
+    oldSecret: selectedTransaction.secret || "",
+
+    editor: window.userInfo?.tenNhanVien || "Chưa xác định"
   };
+
+  const { BACKEND_URL } = getConstants();
+
+  try {
+    const res = await fetch(BACKEND_URL, {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-  });
+      body: JSON.stringify({
+        action: "updateAccountInfo",
         ...changes
       })
     });
+
+    const result = await res.json();
+    if (result.status === "success") {
+      alert("✅ Cập nhật tài khoản thành công!");
+      closeChangePasswordModal();
+      window.loadTransactions();
+    } else {
+      alert("❌ Thất bại: " + result.message);
     }
   } catch (err) {
     console.error("Lỗi cập nhật tài khoản:", err);
+    alert("❌ Lỗi kết nối máy chủ.");
+  }
+}
+
+// Hàm gọi backend lấy thông tin từ sheet PhanMem
+async function fetchAccountInfo(softwareName, softwarePackage, accountName) {
+  const { BACKEND_URL } = getConstants();
+
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "getAccountInfoBySoftware",
+        softwareName,
+        softwarePackage,
+        accountName
+      })
+    });
+
+    const result = await response.json();
+    if (result.status === "success") {
+      return {
+        email: result.username || "",
+        password: result.password || "",
+        secret: result.secret || ""
       };
     } else {
       console.warn("Không tìm thấy tài khoản:", result.message);
@@ -82,6 +156,23 @@ export function handleChangePassword(index) {
 }
 
 // Hàm lấy tên file
+async function fetchFileName(accountSheetId) {
+  const { BACKEND_URL } = getConstants();
+
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "getCookieAndFileName",
+        accountSheetId: accountSheetId
+      })
+    });
+
+    const result = await response.json();
+    if (result.status === "success") {
+      return {
+        fileName: result.fileName || ""
       };
     } else {
       console.warn("Không tìm thấy file:", result.message);

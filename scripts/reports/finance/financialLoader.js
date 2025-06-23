@@ -2,6 +2,21 @@
  * Financial Management Report Loader
  * Handles initialization and UI management for financial reporting
  */
+
+import { FinancialCore } from './financialCore.js';
+import { FinancialCharts } from './financialCharts.js';
+
+export class FinancialLoader {
+    constructor() {
+        this.core = null;
+        this.charts = null;
+        this.isInitialized = false;
+        this.currentPeriod = 'month';
+        this.selectedAccounts = [];
+        this.filters = {
+            dateRange: null,
+            accountTypes: [],
+            categories: []
         };
     }
 
@@ -10,6 +25,7 @@
      */
     async initialize() {
         try {
+            console.log('Initializing Financial Management...');
             
             this.core = new FinancialCore();
             this.charts = new FinancialCharts();
@@ -19,7 +35,9 @@
             this.renderDashboard();
             
             this.isInitialized = true;
-  } catch (error) {
+            console.log('✅ Financial Management initialized successfully');
+            
+        } catch (error) {
             console.error('❌ Failed to initialize Financial Management:', error);
             this.showError('Không thể khởi tạo module quản lý tài chính');
         }
@@ -34,7 +52,8 @@
             
             await this.core.loadData();
             console.log('Financial data loaded successfully');
-  } catch (error) {
+            
+        } catch (error) {
             console.error('Error loading financial data:', error);
             throw error;
         } finally {
@@ -103,7 +122,10 @@
             this.renderAccountsTable();
             this.renderProfitLossStatement();
             this.renderBudgetPlanning();
-  } catch (error) {
+            
+            console.log('✅ Financial dashboard rendered');
+            
+        } catch (error) {
             console.error('Error rendering financial dashboard:', error);
             this.showError('Không thể hiển thị dashboard tài chính');
         }
@@ -163,6 +185,54 @@
                 </div>
             </div>
         `;
+        
+        kpiContainer.innerHTML = kpiHTML;
+    }
+
+    /**
+     * Render financial charts
+     */
+    renderFinancialCharts() {
+        const cashFlowData = this.core.calculateCashFlow();
+        const profitLossData = this.core.calculateProfitLoss();
+        const budgetData = this.core.calculateBudgetComparison();
+        
+        // Render charts
+        this.charts.renderCashFlowChart(cashFlowData);
+        this.charts.renderProfitLossChart(profitLossData);
+        this.charts.renderBudgetChart(budgetData);
+        this.charts.renderAccountBalanceChart(this.core.getAccountBalances());
+        this.charts.renderExpenseCategoryChart(this.core.getExpensesByCategory());
+        this.charts.renderRevenueTrendChart(this.core.getRevenueTrend());
+    }
+
+    /**
+     * Render accounts table
+     */
+    renderAccountsTable() {
+        const tableContainer = document.querySelector('.accounts-table-container');
+        if (!tableContainer) return;
+
+        const accounts = this.core.getAccountBalances();
+        
+        let tableHTML = `
+            <table class="financial-table">
+                <thead>
+                    <tr>
+                        <th>Tài Khoản</th>
+                        <th>Loại</th>
+                        <th>Số Dư</th>
+                        <th>Thay Đổi</th>
+                        <th>Trạng Thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        accounts.forEach(account => {
+            const changeClass = account.change >= 0 ? 'positive' : 'negative';
+            const statusClass = account.balance >= 0 ? 'active' : 'warning';
+            
             tableHTML += `
                 <tr>
                     <td>${account.name}</td>
@@ -175,6 +245,81 @@
                 </tr>
             `;
         });
+        
+        tableHTML += '</tbody></table>';
+        tableContainer.innerHTML = tableHTML;
+    }
+
+    /**
+     * Render profit & loss statement
+     */
+    renderProfitLossStatement() {
+        const container = document.querySelector('.profit-loss-statement');
+        if (!container) return;
+
+        const pnl = this.core.calculateProfitLoss();
+        
+        const pnlHTML = `
+            <div class="pnl-section">
+                <h4>Doanh Thu</h4>
+                <div class="pnl-line">
+                    <span>Doanh thu bán hàng</span>
+                    <span>${this.formatCurrency(pnl.revenue.sales)}</span>
+                </div>
+                <div class="pnl-line">
+                    <span>Doanh thu dịch vụ</span>
+                    <span>${this.formatCurrency(pnl.revenue.services)}</span>
+                </div>
+                <div class="pnl-total">
+                    <span>Tổng Doanh Thu</span>
+                    <span>${this.formatCurrency(pnl.revenue.total)}</span>
+                </div>
+            </div>
+            
+            <div class="pnl-section">
+                <h4>Chi Phí</h4>
+                <div class="pnl-line">
+                    <span>Chi phí vận hành</span>
+                    <span>${this.formatCurrency(pnl.expenses.operating)}</span>
+                </div>
+                <div class="pnl-line">
+                    <span>Chi phí marketing</span>
+                    <span>${this.formatCurrency(pnl.expenses.marketing)}</span>
+                </div>
+                <div class="pnl-line">
+                    <span>Chi phí nhân sự</span>
+                    <span>${this.formatCurrency(pnl.expenses.personnel)}</span>
+                </div>
+                <div class="pnl-total">
+                    <span>Tổng Chi Phí</span>
+                    <span>${this.formatCurrency(pnl.expenses.total)}</span>
+                </div>
+            </div>
+            
+            <div class="pnl-section">
+                <div class="pnl-total profit">
+                    <span>Lợi Nhuận Ròng</span>
+                    <span>${this.formatCurrency(pnl.netProfit)}</span>
+                </div>
+            </div>
+        `;
+        
+        container.innerHTML = pnlHTML;
+    }
+
+    /**
+     * Render budget planning section
+     */
+    renderBudgetPlanning() {
+        const container = document.querySelector('.budget-planning-section');
+        if (!container) return;
+
+        const budget = this.core.calculateBudgetComparison();
+        
+        let budgetHTML = '<div class="budget-items">';
+        
+        budget.forEach(item => {
+            const varianceClass = item.variance >= 0 ? 'positive' : 'negative';
             const progressPercentage = Math.min((item.actual / item.budget) * 100, 100);
             
             budgetHTML += `
@@ -252,7 +397,8 @@
             }
             
             this.showSuccess(`Xuất dữ liệu ${format.toUpperCase()} thành công`);
-  } catch (error) {
+            
+        } catch (error) {
             console.error('Export error:', error);
             this.showError('Không thể xuất dữ liệu');
         }
@@ -264,6 +410,33 @@
     exportToCSV(data) {
         const csv = this.convertToCSV(data);
         const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `financial-report-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        
+        window.URL.revokeObjectURL(url);
+    }
+
+    /**
+     * Convert data to CSV format
+     */
+    convertToCSV(data) {
+        const headers = Object.keys(data[0] || {}).join(',');
+        const rows = data.map(row => Object.values(row).join(','));
+        return [headers, ...rows].join('\n');
+    }
+
+    /**
+     * Toggle chart visibility
+     */
+    toggleChartVisibility(chartId) {
+        const chartContainer = document.querySelector(`#${chartId}`);
+        if (chartContainer) {
+            chartContainer.style.display = 
+                chartContainer.style.display === 'none' ? 'block' : 'none';
         }
     }
 
@@ -276,16 +449,29 @@
             await this.loadData();
             this.renderDashboard();
             this.showSuccess('Đã cập nhật dữ liệu tài chính');
-  } catch (error) {
+        } catch (error) {
             console.error('Refresh error:', error);
-  });
+            this.showError('Không thể cập nhật dữ liệu');
+        }
+    }
 
+    /**
+     * Format currency
+     */
+    formatCurrency(amount) {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
         }).format(amount);
     }
 
     /**
      * Show loading state
      */
+    showLoading(show) {
+        const loader = document.querySelector('.financial-loading');
+        if (loader) {
+            loader.style.display = show ? 'block' : 'none';
         }
     }
 
@@ -297,6 +483,7 @@
         if (window.showResultModalModern) {
             window.showResultModalModern(message, 'success');
         } else {
+            console.log('✅', message);
         }
     }
 

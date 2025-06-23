@@ -41,3 +41,7 @@ swContent = swContent.replace(
   `const DYNAMIC_CACHE = 'transaction-app-dynamic-v${Date.now()}'`
 );
 fs.writeFileSync(swFile, swContent);
+
+console.log(`✅ Version updated to ${newVersion}`);
+console.log(`📅 Last update: ${versionData.lastUpdate}`);
+console.log(`🚀 Ready to deploy!`);

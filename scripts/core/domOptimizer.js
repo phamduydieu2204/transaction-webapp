@@ -38,6 +38,9 @@ class DOMBatcher {
     this.isProcessing = true;
     this.frameId = null;
     
+    // Use DocumentFragment for multiple insertions
+    const fragments = new Map();
+    
     // Group operations by type
     const reads = [];
     const writes = [];
@@ -74,42 +77,34 @@ class DOMBatcher {
   }
 }
 
-// Global DOM batcher instance
+// Global instance
 const domBatcher = new DOMBatcher();
 
 /**
- * Batch DOM read operations
+ * Batch DOM read operation
  */
 export function batchRead(fn) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     domBatcher.add({
       type: 'read',
       execute: () => {
-        try {
-          const result = fn();
-          resolve(result);
-        } catch (error) {
-          reject(error);
-        }
+        const result = fn();
+        resolve(result);
       }
     });
   });
 }
 
 /**
- * Batch DOM write operations
+ * Batch DOM write operation
  */
 export function batchWrite(fn) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     domBatcher.add({
       type: 'write',
       execute: () => {
-        try {
-          const result = fn();
-          resolve(result);
-        } catch (error) {
-          reject(error);
-        }
+        const result = fn();
+        resolve(result);
       }
     });
   });
@@ -213,27 +208,6 @@ export function optimizeFormInputs() {
   });
 }
 
-/**
- * Optimize scroll performance with throttling
- */
-export function optimizeScrollPerformance() {
-  let ticking = false;
-  
-  function updateScrollPosition() {
-    // Perform scroll-related updates here
-    ticking = false;
-  }
-  
-  function requestScrollUpdate() {
-    if (!ticking) {
-      requestAnimationFrame(updateScrollPosition);
-      ticking = true;
-    }
-  }
-  
-  window.addEventListener('scroll', requestScrollUpdate, { passive: true });
-}
-
 // Export utilities
 window.domOptimizer = {
   batchRead,
@@ -242,6 +216,5 @@ window.domOptimizer = {
   setupLazyLoading,
   debounce,
   throttle,
-  optimizeFormInputs,
-  optimizeScrollPerformance
+  optimizeFormInputs
 };

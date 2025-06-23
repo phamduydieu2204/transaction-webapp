@@ -40,6 +40,13 @@ export async function checkSheetAccess(transaction) {
 
     // Call backend to check access
     const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "checkSheetAccess",
+        sheetId: transaction.accountSheetId,
+        emails: emails
+      })
     });
 
     const result = await response.json();
@@ -173,6 +180,14 @@ async function grantAccess(email, sheetId, button) {
     const { BACKEND_URL } = getConstants();
     
     const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "grantSheetAccess",
+        sheetId: sheetId,
+        email: email,
+        role: "viewer" // Default to viewer permission
+      })
     });
 
     const result = await response.json();
@@ -214,6 +229,13 @@ async function revokeAccess(email, sheetId, button) {
     const { BACKEND_URL } = getConstants();
     
     const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "revokeSheetAccess",
+        sheetId: sheetId,
+        email: email
+      })
     });
 
     const result = await response.json();

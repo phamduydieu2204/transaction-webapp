@@ -33,7 +33,9 @@ export async function renderExpenseStats() {
     renderExpenseData(window.expenseList);
     return;
   }
-
+  
+  console.log("🔄 Bắt đầu load expense data bằng module mới...");
+  
   try {
     // ✅ Force refresh để lấy data mới nhất từ server
     const expenseData = await fetchExpenseData({ forceRefresh: true });
@@ -41,13 +43,29 @@ export async function renderExpenseStats() {
     window.expenseList = expenseData || [];
     window.isExpenseSearching = false;
     renderExpenseData(expenseData);
+    console.log("✅ Load expense data thành công:", expenseData.length, "chi phí");
     
   } catch (err) {
     console.error("❌ Lỗi khi thống kê chi phí:", err);
     // Fallback to old method if new module fails
-  });
+    console.log("🔄 Thử phương pháp cũ...");
+    await renderExpenseStatsLegacy();
+  }
+}
+
+// ✅ LEGACY METHOD FOR BACKWARD COMPATIBILITY
+async function renderExpenseStatsLegacy() {
+  const { BACKEND_URL } = getConstants();
+  
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    
+    const res = await fetch(BACKEND_URL, {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "getExpenseStats" }),
+      signal: controller.signal
     });
 
     clearTimeout(timeoutId);
@@ -62,6 +80,7 @@ export async function renderExpenseStats() {
       window.expenseList = result.data || [];
       window.isExpenseSearching = false;
       renderExpenseData(result.data);
+      console.log("✅ Legacy load expense data thành công:", result.data.length, "chi phí");
     } else {
       console.error("❌ Lỗi từ server:", result.message);
     }
@@ -73,21 +92,166 @@ export async function renderExpenseStats() {
     }
   }
 }
+
+function renderExpenseData(data) {
+  console.log("🔍 DEBUG: Dữ liệu chi phí nhận được:", data);
+  
+  // ✅ KIỂM TRA LẠI TAB HIỆN TẠI TRƯỚC KHI RENDER
+  const currentTab = document.querySelector(".tab-button.active");
+  const isChiPhiTab = currentTab && currentTab.dataset.tab === "tab-chi-phi";
+  const isThongKeTab = currentTab && currentTab.dataset.tab === "tab-thong-ke";
+  
+  // ✅ SỬ DỤNG MODULE MỚI ĐỂ TÍNH TỔNG CHI PHÍ
+  const today = new Date();
+  const todayFormatted = normalizeDate(today);
+
+  console.log("📌 BẮT ĐẦU TÍNH TỔNG CHI PHÍ VỚI MODULE MỚI");
+  console.log("🟢 Vai trò:", window.userInfo?.vaiTro);
+  console.log("🟢 isExpenseSearching:", window.isExpenseSearching);
+  console.log("🟢 todayFormatted:", todayFormatted);
+  console.log("🟢 Số lượng bản ghi chi phí:", data?.length);
+
+  // ✅ SỬ DỤNG FUNCTION MỚI ĐỂ TÍNH TỔNG
+  const totalExpenses = calculateTotalExpenses(data, {
+    isSearching: window.isExpenseSearching === true,
+    targetDate: window.isExpenseSearching ? null : todayFormatted,
+    currency: "VND"
   });
 
-  });
-  });
+  const totalExpense = totalExpenses.VND || 0;
+  console.log("✅ Tổng chi phí tính được:", totalExpense);
 
+  // ✅ Lưu tổng chi phí vào biến global và cập nhật hiển thị
+  window.totalExpense = totalExpense;
+
+  // Không cần cập nhật hiển thị totals nữa - đã xóa
+  console.log("✅ Đã lưu totalExpense:", totalExpense, "- Không hiển thị totals");
+
+  // ✅ CHỈ RENDER BẢNG NẾU ĐANG Ở TAB TƯƠNG ỨNG
+  if (isChiPhiTab) {
+    renderExpenseTable(data, normalizeDate);
+  }
+
+  if (isThongKeTab) {
+    renderExpenseSummaryModular(data);
+  }
+}
+
+// ✅ SỬ DỤNG MODULE MỚI ĐỂ RENDER BẢNG THỐNG KÊ
+function renderExpenseSummaryModular(data) {
+  try {
+    // Check if statistics tab is active before processing
+    const currentTab = document.querySelector(".tab-button.active");
+    const isThongKeTab = currentTab && currentTab.dataset.tab === "tab-thong-ke";
+    
+    if (!isThongKeTab) {
+      console.log("⏭️ Not on statistics tab, skipping modular summary");
+      return;
+    }
+
+    const summaryData = groupExpensesByMonth(data, {
+      currency: "VND",
+      sortBy: "month",
+      sortOrder: "desc"
     });
-  });
 
+    renderMonthlySummaryTable(summaryData, {
+      tableId: "monthlySummaryTable",
+      showGrowthRate: false
     });
 
     console.log("✅ Statistics summary rendered with new modules");
   } catch (error) {
     console.error("❌ Error rendering modular summary:", error);
     // Fallback to legacy method
+    renderExpenseSummary(data, normalizeDate);
+  }
+}
+
+// ✅ TÁCH RIÊNG HÀM RENDER BẢNG CHI PHÍ
+function renderExpenseTable(data, formatDate) {
+  const table1 = document.querySelector("#expenseListTable tbody");
+  
+  if (!table1) {
+    console.error("❌ Không tìm thấy table #expenseListTable tbody");
+    return;
+  }
+
+  // ✅ Cập nhật header theo yêu cầu mới
+  const tableHead = document.querySelector("#expenseListTable thead tr");
+  if (tableHead) {
+    tableHead.innerHTML = `
+      <th>Mã chi phí</th>
+      <th>Ngày chi</th>
+      <th>Loại kế toán</th>
+      <th>Phân bổ</th>
+      <th>Thông tin khoản chi</th>
+      <th>Số tiền</th>
+      <th>Chi tiết ngân hàng</th>
+      <th>Ngày tái tục</th>
+      <th>Người nhận/Nhà cung cấp</th>
+      <th>Ghi chú</th>
+      <th>Thao tác</th>
+    `;
+  }
+
+  const today = new Date();
+
+  // ✅ Sắp xếp chi phí mới nhất lên đầu (timestamp giảm dần)
+  const sortedData = [...(data || [])].sort((a, b) => {
+    const timestampA = (a.expenseId || "").replace(/[^0-9]/g, "");
+    const timestampB = (b.expenseId || "").replace(/[^0-9]/g, "");
+    return timestampB.localeCompare(timestampA);
+  });
+
+  // ✅ Logic phân trang
+  const itemsPerPage = window.itemsPerPage || 50;
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+  const currentPage = window.currentExpensePage || 1;
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedItems = sortedData.slice(startIndex, endIndex);
+
+  table1.innerHTML = "";
+
+  paginatedItems.forEach((e, index) => {
+    const globalIndex = startIndex + index;
+    const row = table1.insertRow();
+
+    // ✅ Thêm style cho dòng đã hết hạn tái tục
+    if (e.renewDate) {
+      const parseDate = (str) => {
+        const [y, m, d] = (str || "").split("/").map(Number);
+        return new Date(y, m - 1, d);
+      };
+      const renewDate = parseDate(e.renewDate);
+      if (renewDate < today) {
+        row.classList.add("expired-row");
+      }
+    }
+
+    // ✅ Thêm style màu vàng nhạt cho trạng thái "chưa thanh toán"
+    if (e.status && e.status.toLowerCase().includes("chưa thanh toán")) {
+      row.style.backgroundColor = "#fff9c4"; // Màu vàng nhạt
+    }
+
+    // ✅ CÁC CỘT THEO THỨ TỰ YÊU CẦU:
+    // 1. Mã chi phí
+    row.insertCell().textContent = e.expenseId || "";
+    
+    // 2. Ngày chi
+    row.insertCell().textContent = formatDate(e.date);
+    
+    // 3. Loại kế toán
+    row.insertCell().textContent = e.accountingType || "";
+    
+    // 4. Phân bổ (hiển thị với icon)
+    const allocationCell = row.insertCell();
+    if (e.periodicAllocation === "Có") {
+      allocationCell.innerHTML = '<span style="color: #28a745;">✓ Có</span>';
     } else {
+      allocationCell.innerHTML = '<span style="color: #6c757d;">✗ Không</span>';
     }
     
     // 5. Thông tin khoản chi (gộp 4 trường: type, category, product, package)
@@ -233,6 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Lazy load UI controller to avoid circular imports
   import('./statisticsUIController.js').then(module => {
     if (module.initializeStatisticsUI) {
+      console.log("🎮 Initializing statistics UI controller...");
       module.initializeStatisticsUI();
     }
   }).catch(error => {

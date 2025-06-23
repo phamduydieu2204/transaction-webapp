@@ -9,6 +9,35 @@
  * @param {number} amount - Revenue amount
  * @returns {string} Formatted revenue
  */
+export function formatRevenue(amount) {
+  if (typeof amount !== 'number' || isNaN(amount)) return '0 VND';
+  
+  return new Intl.NumberFormat('vi-VN').format(amount) + ' VND';
+}
+
+/**
+ * Format percentage value
+ * @param {number} value - Percentage value (0-100)
+ * @param {number} decimals - Number of decimal places
+ * @returns {string} Formatted percentage
+ */
+export function formatPercentage(value, decimals = 1) {
+  if (typeof value !== 'number' || isNaN(value)) return '0%';
+  
+  return value.toFixed(decimals) + '%';
+}
+
+/**
+ * Format large numbers with abbreviations (K, M, B)
+ * @param {number} num - Number to format
+ * @returns {string} Formatted number
+ */
+export function formatLargeNumber(num) {
+  if (typeof num !== 'number' || isNaN(num)) return '0';
+  
+  const absNum = Math.abs(num);
+  const sign = num < 0 ? '-' : '';
+  
   if (absNum >= 1e9) {
     return sign + (absNum / 1e9).toFixed(1) + 'B';
   } else if (absNum >= 1e6) {
@@ -37,8 +66,50 @@ export function formatDuration(days) {
     const remainingDays = days % 30;
     return `${months} tháng${remainingDays > 0 ? ` ${remainingDays} ngày` : ''}`;
   }
-  });
+  
+  return `${days} ngày`;
+}
 
+/**
+ * Format relative time (e.g., "2 ngày trước", "trong 5 ngày")
+ * @param {Date|string} date - Target date
+ * @returns {string} Formatted relative time
+ */
+export function formatRelativeTime(date) {
+  if (!date) return '';
+  
+  const targetDate = new Date(date);
+  const now = new Date();
+  const diffMs = targetDate.getTime() - now.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  
+  if (diffDays === 0) {
+    return 'Hôm nay';
+  } else if (diffDays === 1) {
+    return 'Ngày mai';
+  } else if (diffDays === -1) {
+    return 'Hôm qua';
+  } else if (diffDays > 0) {
+    return `Trong ${diffDays} ngày`;
+  } else {
+    return `${Math.abs(diffDays)} ngày trước`;
+  }
+}
+
+/**
+ * Format month-year for display
+ * @param {Date|string} date - Date object or string
+ * @returns {string} Formatted month-year
+ */
+export function formatMonthYear(date) {
+  if (!date) return '';
+  
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return '';
+  
+  return d.toLocaleDateString('vi-VN', {
+    month: 'long',
+    year: 'numeric'
   });
 }
 
@@ -139,12 +210,23 @@ export function formatDate(date, format = 'short') {
   
   switch (format) {
     case 'short':
-  });
-
+      return d.toLocaleDateString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
       });
     case 'long':
-  });
-
+      return d.toLocaleDateString('vi-VN', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
       });
+    case 'date-only':
+      return d.toLocaleDateString('vi-VN');
+    case 'datetime':
+      return d.toLocaleString('vi-VN');
+    default:
+      return d.toLocaleDateString('vi-VN');
   }
 }

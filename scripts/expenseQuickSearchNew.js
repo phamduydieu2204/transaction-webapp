@@ -94,6 +94,12 @@ export function initExpenseQuickSearchNew() {
       const { BACKEND_URL } = getConstants();
       
       const response = await fetch(BACKEND_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "searchExpenseCategories",
+          query: query
+        })
       });
 
       const result = await response.json();

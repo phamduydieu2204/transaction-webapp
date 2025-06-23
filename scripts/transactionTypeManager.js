@@ -81,6 +81,7 @@ export function initTransactionTypeDropdown() {
   const select = document.getElementById('transactionType');
   if (!select) return;
   
+  console.log('🔄 Initializing transaction type dropdown for new transaction');
   
   // Clear existing options except the placeholder
   while (select.children.length > 1) {
@@ -96,6 +97,7 @@ export function initTransactionTypeDropdown() {
     select.appendChild(option);
   });
   
+  console.log('✅ Transaction type dropdown initialized with default options');
 }
 
 /**
@@ -106,6 +108,11 @@ export function initTransactionTypeDropdown() {
 export function updateTransactionTypeForEdit(originalStatus, currentValue = '') {
   const select = document.getElementById('transactionType');
   if (!select) return;
+  
+  console.log('🔄 Updating transaction type dropdown for edit mode:', {
+    originalStatus,
+    currentValue
+  });
   
   // Clear existing options except the placeholder
   while (select.children.length > 1) {
@@ -131,10 +138,12 @@ export function updateTransactionTypeForEdit(originalStatus, currentValue = '') 
     }
   });
   
+  console.log(`✅ Added ${allowedOptions.length} options for ${originalStatus}:`, allowedOptions);
   
   // Set current value if provided
   if (currentValue && select.querySelector(`option[value="${currentValue}"]`)) {
     select.value = currentValue;
+    console.log(`✅ Set current value: ${currentValue}`);
   }
 }
 

@@ -8,40 +8,38 @@ const pendingRequests = new Map();
 const requestCache = new Map();
 
 /**
- * Deduplicate identical requests to prevent multiple calls
- * @param {string} key - Unique identifier for the request
- * @param {Function} requestFn - Function that makes the actual request
- * @param {Object} options - Options including cache duration
- * @returns {Promise} - Request result
+ * Deduplicate API requests
+ * @param {string} key - Unique key for the request
+ * @param {Function} requestFn - Function that returns a promise
+ * @param {Object} options - Cache options
+ * @returns {Promise} - Cached or new request promise
  */
 export async function deduplicateRequest(key, requestFn, options = {}) {
-  const { cacheDuration = 5 * 60 * 1000 } = options; // Default 5 minutes cache
-  
-  // Check if result is in cache
-  if (requestCache.has(key)) {
+  const {
+    cacheDuration = 5 * 60 * 1000, // 5 minutes default
+    forceRefresh = false
+  } = options;
+
+  // Check if request is already in flight
+  if (pendingRequests.has(key)) {
+    console.log(`🔄 Reusing in-flight request for: ${key}`);
+    return pendingRequests.get(key);
+  }
+
+  // Check cache if not forcing refresh
+  if (!forceRefresh && requestCache.has(key)) {
     const cached = requestCache.get(key);
-    const age = Date.now() - cached.timestamp;
-    
-    if (age < cacheDuration) {
-      console.log(`🚀 Cache hit for ${key}`);
-      return cached.data;
-    } else {
-      // Remove expired cache
-      requestCache.delete(key);
+    if (Date.now() - cached.timestamp < cacheDuration) {
+      console.log(`📦 Using cached response for: ${key}`);
+      return Promise.resolve(cached.data);
     }
   }
-  
-  // Check if request is already in progress
-  if (pendingRequests.has(key)) {
-    console.log(`⏳ Request pending for ${key}, waiting...`);
-    return await pendingRequests.get(key);
-  }
-  
-  // Make new request
-  console.log(`📡 Making new request for ${key}`);
+
+  // Create new request
+  console.log(`🚀 Making new request for: ${key}`);
   const requestPromise = requestFn()
     .then(data => {
-      // Cache the result
+      // Cache successful response
       requestCache.set(key, {
         data,
         timestamp: Date.now()
@@ -65,8 +63,10 @@ export async function deduplicateRequest(key, requestFn, options = {}) {
 export function clearRequestCache(key = null) {
   if (key) {
     requestCache.delete(key);
+    console.log(`🧹 Cleared cache for: ${key}`);
   } else {
     requestCache.clear();
+    console.log('🧹 Cleared all request cache');
   }
 }
 
@@ -119,6 +119,7 @@ export class RequestBatcher {
     const items = batch.map(b => b.item);
     
     try {
+      console.log(`🎯 Processing batch of ${items.length} requests`);
       const results = await this.batchProcessor(items);
       
       // Resolve individual promises
@@ -158,22 +159,10 @@ export function prefetchData(key, requestFn, options = {}) {
   }
 }
 
-/**
- * Get cache statistics
- */
-export function getCacheStats() {
-  return {
-    cacheSize: requestCache.size,
-    pendingRequests: pendingRequests.size,
-    cacheKeys: Array.from(requestCache.keys())
-  };
-}
-
 // Export for global access
 window.requestOptimizer = {
   deduplicateRequest,
   clearRequestCache,
   RequestBatcher,
-  prefetchData,
-  getCacheStats
+  prefetchData
 };

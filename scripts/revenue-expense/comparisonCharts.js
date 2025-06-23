@@ -4,15 +4,242 @@
  * Revenue vs expense comparisons and profit analysis
  * Handles comparative visualization and profitability metrics
  */
+
+import { formatCurrency } from '../statisticsCore.js';
+
+/**
+ * Generate profit area between revenue and expense lines
+ * @param {Array} data - Combined revenue/expense data
+ * @param {number} maxValue - Maximum value for scaling
+ * @returns {string} SVG path for profit area
+ */
+export function generateProfitArea(data, maxValue) {
+  if (!data || data.length === 0) return '';
+  
+  let path = 'M 0,400';
+  
+  // Top line (revenue)
+  data.forEach((item, index) => {
+    const x = data.length === 1 ? 500 : (1000 / (data.length - 1)) * index;
+    const revenueY = maxValue === 0 ? 400 : 400 - (item.revenue / maxValue) * 400;
+    
+    if (index === 0) {
+      path += ` L ${x},${revenueY}`;
+    } else {
+      path += ` L ${x},${revenueY}`;
+    }
+  });
+  
+  // Bottom line (expense)
+  for (let i = data.length - 1; i >= 0; i--) {
+    const x = data.length === 1 ? 500 : (1000 / (data.length - 1)) * i;
+    const expenseY = maxValue === 0 ? 400 : 400 - (data[i].expense / maxValue) * 400;
+    path += ` L ${x},${expenseY}`;
+  }
+  
+  path += ' Z';
+  
+  return `
+    <path
+      class="profit-area"
+      d="${path}"
+      fill="url(#profitGradient)"
+      opacity="0.3"
+    />
+  `;
+}
+
+/**
+ * Generate comparison chart with previous period
+ * @param {Array} currentData - Current period data
+ * @param {Array} previousData - Previous period data
+ * @param {number} maxValue - Maximum value for scaling
+ * @returns {string} SVG elements for comparison
+ */
+export function generatePeriodComparison(currentData, previousData, maxValue) {
+  if (!previousData || previousData.length === 0) return '';
+  
+  let comparisonSVG = '';
+  
+  // Previous period revenue line
+  const prevRevenuePoints = previousData.map((item, index) => {
+    const x = previousData.length === 1 ? 500 : (1000 / (previousData.length - 1)) * index;
+    const y = maxValue === 0 ? 400 : 400 - (item.revenue / maxValue) * 400;
+    return `${x},${y}`;
+  }).join(' ');
+  
+  comparisonSVG += `
+    <polyline
+      class="chart-line compare-revenue-line"
+      points="${prevRevenuePoints}"
+      fill="none"
+      stroke="#28a745"
+      stroke-width="2"
+      stroke-dasharray="8,4"
+      opacity="0.6"
+    />
+  `;
+  
+  // Previous period expense line
+  const prevExpensePoints = previousData.map((item, index) => {
+    const x = previousData.length === 1 ? 500 : (1000 / (previousData.length - 1)) * index;
+    const y = maxValue === 0 ? 400 : 400 - (item.expense / maxValue) * 400;
+    return `${x},${y}`;
+  }).join(' ');
+  
+  comparisonSVG += `
+    <polyline
+      class="chart-line compare-expense-line"
+      points="${prevExpensePoints}"
+      fill="none"
+      stroke="#dc3545"
+      stroke-width="2"
+      stroke-dasharray="8,4"
+      opacity="0.6"
+    />
+  `;
+  
+  return comparisonSVG;
+}
+
+/**
+ * Calculate profit analysis metrics
+ * @param {Array} data - Revenue/expense data
+ * @returns {Object} Profit analysis results
+ */
+export function analyzeProfitMetrics(data) {
+  if (!data || data.length === 0) {
+    return {
+      totalProfit: 0,
+      profitMargin: 0,
+      averageProfit: 0,
+      profitTrend: 'stable',
+      profitableMonths: 0,
+      unprofitableMonths: 0,
+      breakEvenMonths: 0,
+      bestMonth: null,
+      worstMonth: null
     };
   }
-  });
-
+  
+  const profits = data.map(item => ({
+    ...item,
+    profit: item.revenue - item.expense,
+    margin: item.revenue > 0 ? ((item.revenue - item.expense) / item.revenue) * 100 : 0
   }));
+  
+  const totalRevenue = data.reduce((sum, item) => sum + item.revenue, 0);
+  const totalExpense = data.reduce((sum, item) => sum + item.expense, 0);
+  const totalProfit = totalRevenue - totalExpense;
+  const profitMargin = totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
+  const averageProfit = profits.reduce((sum, item) => sum + item.profit, 0) / profits.length;
+  
+  // Count profitable/unprofitable months
+  const profitableMonths = profits.filter(item => item.profit > 0).length;
+  const unprofitableMonths = profits.filter(item => item.profit < 0).length;
+  const breakEvenMonths = profits.filter(item => item.profit === 0).length;
+  
+  // Find best and worst months
+  const bestMonth = profits.reduce((best, item) => 
+    item.profit > best.profit ? item : best
   );
+  const worstMonth = profits.reduce((worst, item) => 
+    item.profit < worst.profit ? item : worst
   );
   
   // Analyze profit trend
+  const midpoint = Math.floor(profits.length / 2);
+  const firstHalfProfit = profits.slice(0, midpoint).reduce((sum, item) => sum + item.profit, 0) / midpoint;
+  const secondHalfProfit = profits.slice(midpoint).reduce((sum, item) => sum + item.profit, 0) / (profits.length - midpoint);
+  
+  let profitTrend = 'stable';
+  if (secondHalfProfit > firstHalfProfit * 1.1) {
+    profitTrend = 'improving';
+  } else if (secondHalfProfit < firstHalfProfit * 0.9) {
+    profitTrend = 'declining';
+  }
+  
+  return {
+    totalProfit,
+    profitMargin,
+    averageProfit,
+    profitTrend,
+    profitableMonths,
+    unprofitableMonths,
+    breakEvenMonths,
+    bestMonth,
+    worstMonth,
+    firstHalfProfit,
+    secondHalfProfit,
+    profits
+  };
+}
+
+/**
+ * Generate profit bar chart overlay
+ * @param {Array} data - Revenue/expense data
+ * @param {number} maxValue - Maximum value for scaling
+ * @returns {string} SVG bars for profit visualization
+ */
+export function generateProfitBars(data, maxValue) {
+  if (!data || data.length === 0) return '';
+  
+  const barWidth = 1000 / data.length * 0.6; // 60% of available space
+  let bars = '';
+  
+  data.forEach((item, index) => {
+    const profit = item.revenue - item.expense;
+    const x = (1000 / data.length) * index + (1000 / data.length - barWidth) / 2;
+    const barHeight = Math.abs(profit) / maxValue * 400;
+    const y = profit >= 0 ? 400 - barHeight : 400;
+    
+    const colorClass = profit >= 0 ? 'profit-positive' : 'profit-negative';
+    const color = profit >= 0 ? '#28a745' : '#dc3545';
+    
+    bars += `
+      <rect
+        x="${x}"
+        y="${y}"
+        width="${barWidth}"
+        height="${barHeight}"
+        fill="${color}"
+        opacity="0.7"
+        class="profit-bar ${colorClass}"
+        data-period="${item.label}"
+        data-profit="${profit}"
+      />
+    `;
+  });
+  
+  return bars;
+}
+
+/**
+ * Generate comparison summary table
+ * @param {Array} currentData - Current period data
+ * @param {Array} previousData - Previous period data (optional)
+ * @returns {string} HTML table for comparison
+ */
+export function generateComparisonSummary(currentData, previousData = null) {
+  const currentMetrics = analyzeProfitMetrics(currentData);
+  const previousMetrics = previousData ? analyzeProfitMetrics(previousData) : null;
+  
+  const currentTotalRevenue = currentData.reduce((sum, item) => sum + item.revenue, 0);
+  const currentTotalExpense = currentData.reduce((sum, item) => sum + item.expense, 0);
+  
+  let comparisonRows = '';
+  
+  if (previousMetrics) {
+    const previousTotalRevenue = previousData.reduce((sum, item) => sum + item.revenue, 0);
+    const previousTotalExpense = previousData.reduce((sum, item) => sum + item.expense, 0);
+    
+    const revenueChange = previousTotalRevenue > 0 ? 
+      ((currentTotalRevenue - previousTotalRevenue) / previousTotalRevenue) * 100 : 0;
+    const expenseChange = previousTotalExpense > 0 ? 
+      ((currentTotalExpense - previousTotalExpense) / previousTotalExpense) * 100 : 0;
+    const profitChange = previousMetrics.totalProfit !== 0 ? 
+      ((currentMetrics.totalProfit - previousMetrics.totalProfit) / Math.abs(previousMetrics.totalProfit)) * 100 : 0;
+    
     comparisonRows = `
       <tr>
         <td>Thay đổi so với kỳ trước</td>
@@ -77,6 +304,11 @@
  * @param {Array} data - Revenue/expense data
  * @returns {string} HTML for profitability indicators
  */
+export function generateProfitabilityIndicators(data) {
+  const metrics = analyzeProfitMetrics(data);
+  
+  const profitabilityRatio = data.length > 0 ? (metrics.profitableMonths / data.length) * 100 : 0;
+  
   return `
     <div class="profitability-indicators">
       <div class="indicator-grid">
@@ -138,6 +370,11 @@
  * @param {Object} dataPoint - Data point
  * @returns {string} HTML for profit tooltip
  */
+export function generateProfitTooltip(dataPoint) {
+  const profit = dataPoint.revenue - dataPoint.expense;
+  const margin = dataPoint.revenue > 0 ? (profit / dataPoint.revenue) * 100 : 0;
+  const profitStatus = profit >= 0 ? 'Có lãi' : 'Thua lỗ';
+  
   return `
     <div class="tooltip-section profit-section">
       <div class="tooltip-title">

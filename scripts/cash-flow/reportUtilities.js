@@ -29,6 +29,7 @@ export function addReportInteractivity() {
   // Initialize charts if Chart.js is available
   if (typeof Chart !== 'undefined') {
     // Implementation would go here
+    console.log('📊 Charts would be initialized here');
   }
 }
 
@@ -278,6 +279,7 @@ export function addCashFlowVsAccrualStyles() {
  */
 export function exportReportToPDF(reportData, filename = 'cashflow-accrual-report.pdf') {
   // This would require a PDF library like jsPDF
+  console.log('📄 PDF export would be implemented here', { reportData, filename });
 }
 
 /**
@@ -285,6 +287,7 @@ export function exportReportToPDF(reportData, filename = 'cashflow-accrual-repor
  */
 export function exportReportToExcel(reportData, filename = 'cashflow-accrual-report.xlsx') {
   // This would require an Excel library like SheetJS
+  console.log('📊 Excel export would be implemented here', { reportData, filename });
 }
 
 /**

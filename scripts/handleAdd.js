@@ -20,6 +20,7 @@ function getTodayFormatted() {
 }
 
 export async function handleAdd(userInfo, currentEditTransactionId, loadTransactions, handleReset, updatePackageList, showProcessingModal, showResultModal) {
+  console.log("🔍 handleAdd được gọi");
   
   // Kiểm tra nếu người dùng đang cố thêm giao dịch hoàn tiền hoặc hủy giao dịch trực tiếp
   const transactionTypeElement = document.getElementById("transactionType");
@@ -58,6 +59,7 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
   // Update transaction and start date to today, but preserve user-modified end date
   const { setDefaultDates } = await import('./calculateEndDate.js');
   setDefaultDates(true, false); // forceUpdate=true, recalculateEndDate=false
+  console.log("📅 Updated dates to today for new transaction (preserving end date)");
 
   if (!userInfo) {
     showResultModal("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.", false);
@@ -139,6 +141,7 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
     originalTransactionId: transactionType === "Hoàn Tiền" ? currentEditTransactionId : null
   };
 
+  console.log("📤 Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
 
   try {
     const result = await apiRequestJson(data);

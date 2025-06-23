@@ -5,6 +5,7 @@
  * Coordinates between specialized chart modules
  */
 
+console.log('📦 revenueExpenseChart.js orchestrator loading...');
 
 // Import specialized chart modules
 import { 
@@ -47,11 +48,14 @@ import { formatCurrency } from './statistics/formatters.js';
  * @returns {Object} Data for chart
  */
 export function calculateChartData(transactionData, expenseData, dateRange = null) {
+  console.log('📢 calculateChartData called with:', {
     transactions: transactionData.length,
     expenses: expenseData.length,
-
+    dateRange
+  });
   
   const granularity = determineGranularity(dateRange);
+  console.log('📅 Granularity:', granularity);
   
   return aggregateDataByPeriod(transactionData, expenseData, dateRange, granularity);
 }
@@ -76,9 +80,11 @@ export function calculateLast12MonthsData(transactionData, expenseData) {
  * @param {string} containerId - Container element ID
  */
 export async function renderRevenueExpenseChart(transactionData, expenseData, containerId = 'revenueChart') {
+  console.log('🎯 renderRevenueExpenseChart orchestrator called with:', {
     containerId,
     transactionCount: transactionData.length,
     expenseCount: expenseData.length
+  });
   
   const container = document.getElementById(containerId);
   if (!container) {
@@ -92,11 +98,14 @@ export async function renderRevenueExpenseChart(transactionData, expenseData, co
   const theme = getChartTheme();
   const config = getResponsiveConfig();
   
+  console.log('📆 Calculating chart data...');
   const chartData = calculateChartData(transactionData, expenseData, dateRange);
+  console.log('📊 Chart data calculated:', chartData);
   
   // Calculate compare data if needed
   let compareData = null;
   if (compareMode !== 'none' && dateRange) {
+    console.log('🔄 Calculating compare data...');
     const compareRange = getCompareDateRange(compareMode, dateRange);
     
     try {
@@ -202,11 +211,13 @@ export async function renderRevenueExpenseChart(transactionData, expenseData, co
     </div>
   `;
   
+  console.log('🔨 Setting container HTML...');
   container.innerHTML = chartHTML;
   
   // Apply chart styles and interactivity
   applyChartStyles(containerId);
   addChartInteractivity(containerId);
+  console.log('✅ Chart rendered successfully with modular components');
 }
 
 // Helper functions for chart generation
@@ -405,4 +416,5 @@ window.calculateChartData = calculateChartData;
 window.calculateLast12MonthsData = calculateLast12MonthsData;
 window.renderRevenueExpenseChart = renderRevenueExpenseChart;
 window.addRevenueExpenseChartStyles = addRevenueExpenseChartStyles;
-
+
+console.log('✅ revenueExpenseChart.js module loaded successfully');

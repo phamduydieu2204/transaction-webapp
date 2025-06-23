@@ -11,6 +11,7 @@ import { normalizeDate } from '../statisticsCore.js';
  * Calculate comprehensive business metrics
  */
 export function calculateBusinessMetrics(transactionData, expenseData, dateRange) {
+  console.log("📊 Calculating business metrics for period:", dateRange);
   
   // Basic financial metrics
   const totalRevenue = calculateTotalRevenue(transactionData);
@@ -349,6 +350,15 @@ export function calculateGrowthMetrics(transactionData, expenseData, dateRange) 
     if (prevMonthTransactions.length > 0) {
       transactionGrowth = ((currentMonthTransactions.length - prevMonthTransactions.length) / prevMonthTransactions.length) * 100;
     }
+    
+    console.log('📊 Growth calculation:', {
+      currentMonthRevenue,
+      prevMonthRevenue,
+      revenueGrowth,
+      currentMonthTransactions: currentMonthTransactions.length,
+      prevMonthTransactions: prevMonthTransactions.length,
+      transactionGrowth
+    });
     
   } catch (error) {
     console.warn('⚠️ Error calculating growth metrics:', error);

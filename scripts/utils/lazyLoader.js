@@ -66,6 +66,7 @@ class LazyLoader {
    * Load chart component
    */
   async loadChart(chartContainer) {
+    console.log('⚡ Lazy loading chart:', chartContainer.id);
     
     // Add loading indicator
     chartContainer.classList.add('loading');
@@ -78,6 +79,7 @@ class LazyLoader {
       const canvas = chartContainer.querySelector('canvas');
       if (canvas) {
         // Initialize actual chart here
+        console.log('📊 Chart initialized:', canvas.id);
       }
     }
     
@@ -89,6 +91,7 @@ class LazyLoader {
    * Load table component
    */
   async loadTable(tableContainer) {
+    console.log('⚡ Lazy loading table:', tableContainer.id);
     
     // Add loading indicator
     tableContainer.classList.add('loading');
@@ -104,6 +107,7 @@ class LazyLoader {
    * Load generic lazy component
    */
   async loadGeneric(element) {
+    console.log('⚡ Lazy loading element:', element.className);
     
     element.classList.add('loading');
     
@@ -123,6 +127,7 @@ class LazyLoader {
       this.observer.observe(element);
     });
     
+    console.log(`👁️ Observing ${elements.length} lazy elements`);
   }
   
   /**
@@ -148,6 +153,7 @@ export function initOverviewLazyLoading() {
   lazyLoader.observe('[data-lazy="chart"]');
   lazyLoader.observe('[data-lazy="table"]');
   
+  console.log('✅ Lazy loading initialized for overview report');
 }
 
 /**
@@ -159,6 +165,7 @@ export function preloadCriticalElements() {
     element.classList.add('loaded');
   });
   
+  console.log(`⚡ Preloaded ${criticalElements.length} critical elements`);
 }
 
 /**

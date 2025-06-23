@@ -47,6 +47,7 @@ class PerformanceMonitor {
     
     this.measures.set(name, duration);
     
+    console.log(`✅ ${name}: ${duration.toFixed(2)}ms`);
     return duration;
   }
   
@@ -77,6 +78,7 @@ class PerformanceMonitor {
     const observer = new PerformanceObserver((list) => {
       list.getEntries().forEach((entry) => {
         if (entry.name === 'first-contentful-paint') {
+          console.log(`🎨 First Contentful Paint: ${entry.startTime.toFixed(2)}ms`);
         }
       });
     });
@@ -89,6 +91,7 @@ class PerformanceMonitor {
       const lcpObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
         const lastEntry = entries[entries.length - 1];
+        console.log(`🖼️ Largest Contentful Paint: ${lastEntry.startTime.toFixed(2)}ms`);
       });
       
       lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
@@ -103,6 +106,7 @@ class PerformanceMonitor {
           cumulativeLayoutShift += entry.value;
         }
       });
+      console.log(`📐 Cumulative Layout Shift: ${cumulativeLayoutShift.toFixed(4)}`);
     });
     
     clsObserver.observe({ entryTypes: ['layout-shift'] });
@@ -116,6 +120,7 @@ class PerformanceMonitor {
     const resourceObserver = new PerformanceObserver((list) => {
       list.getEntries().forEach((entry) => {
         if (entry.name.includes('.css') || entry.name.includes('.js') || entry.name.includes('.html')) {
+          console.log(`📦 Resource loaded: ${entry.name.split('/').pop()} (${entry.duration.toFixed(2)}ms)`);
         }
       });
     });
@@ -146,6 +151,7 @@ class TemplatePerformanceTester {
    * Test template loading performance
    */
   async testTemplateLoading() {
+    console.log('🧪 Testing template loading performance...');
     
     this.monitor.startTiming('template-total');
     this.monitor.startTiming('template-fetch');
@@ -153,6 +159,7 @@ class TemplatePerformanceTester {
     try {
       const response = await fetch('./partials/tabs/report-pages/overview-report.html', {
         cache: 'no-cache' // Force fresh fetch for accurate testing
+      });
       
       this.monitor.endTiming('template-fetch');
       this.monitor.startTiming('template-parse');
@@ -171,6 +178,7 @@ class TemplatePerformanceTester {
       
       this.results.templateLoading = this.monitor.getResults();
       
+      console.log('✅ Template loading test completed');
       
     } catch (error) {
       console.error('❌ Template loading test failed:', error);
@@ -181,6 +189,7 @@ class TemplatePerformanceTester {
    * Test CSS loading performance
    */
   async testCSSLoading() {
+    console.log('🧪 Testing CSS loading performance...');
     
     this.monitor.startTiming('css-critical');
     
@@ -216,12 +225,14 @@ class TemplatePerformanceTester {
     document.head.removeChild(link);
     
     this.results.cssLoading = this.monitor.getResults();
+    console.log('✅ CSS loading test completed');
   }
   
   /**
    * Test lazy loading performance
    */
   async testLazyLoading() {
+    console.log('🧪 Testing lazy loading performance...');
     
     this.monitor.startTiming('lazy-observer');
     
@@ -263,12 +274,14 @@ class TemplatePerformanceTester {
     testElements.forEach(element => document.body.removeChild(element));
     
     this.results.lazyLoading = this.monitor.getResults();
+    console.log(`✅ Lazy loading test completed (observed: ${observedCount})`);
   }
   
   /**
    * Run comprehensive performance test
    */
   async runFullTest() {
+    console.log('🚀 Starting comprehensive performance test...');
     
     // Start monitoring
     this.monitor.monitorWebVitals();
@@ -282,6 +295,7 @@ class TemplatePerformanceTester {
     // Generate report
     this.generateReport();
     
+    console.log('🏁 Performance test completed');
   }
   
   /**

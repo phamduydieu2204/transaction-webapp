@@ -47,12 +47,29 @@ export async function handleResetExpense() {
 /**
  * Load all expenses like when page first loads
  */
+async function loadAllExpenses() {
+  const { BACKEND_URL } = getConstants();
+  
+  if (!window.userInfo) {
+    console.warn('⚠️ No user info found');
+    return;
+  }
+  
+  const data = {
+    action: 'searchExpenses',
+    maNhanVien: window.userInfo.maNhanVien,
     conditions: {} // Empty conditions to get all expenses
   };
-  });
-
+  
+  try {
+    console.log('🔄 Reloading all expenses...');
+    
+    const response = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: {
         'Content-Type': 'application/json'
       },
+      body: JSON.stringify(data)
     });
     
     if (!response.ok) {
@@ -66,7 +83,9 @@ export async function handleResetExpense() {
       window.expenseList = result.data || [];
       window.currentExpensePage = 1;
       window.isExpenseSearching = false;
-
+      
+      console.log(`✅ Reloaded ${window.expenseList.length} expenses`);
+      
       // Update table immediately
       if (typeof window.updateExpenseTable === 'function') {
         window.updateExpenseTable();
@@ -81,6 +100,7 @@ export async function handleResetExpense() {
       console.error('❌ Error loading expenses:', result.message);
       window.expenseList = [];
     }
+    
   } catch (error) {
     console.error('❌ Error loading expenses:', error);
     window.expenseList = [];

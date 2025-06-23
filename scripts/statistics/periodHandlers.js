@@ -63,6 +63,7 @@ export function getDateRange(period, referenceDate = new Date()) {
       ranges.end = normalizeDate(today);
   }
 
+  console.log(`📅 Generated ${period} range:`, ranges);
   return ranges;
 }
 

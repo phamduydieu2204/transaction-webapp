@@ -7,7 +7,7 @@
 
 
 // Import core modules
-import { initializeApplication } from './core/appInitializer.js';
+import { initializeApp } from './core/appInitializer.js';
 import { initializeEventHandlers } from './core/eventManager.js';
 import { initializeStateManager, getState, updateState } from './core/stateManager.js';
 import { switchToTab, initializeTabSystem, switchToIntendedTab } from './core/navigationManager.js';
@@ -231,7 +231,7 @@ async function startApp() {
     }
     
     // Phase 2: Initialize core application
-    await initializeApplication();
+    await initializeApp();
     
     // Phase 3: Setup event handlers
     initializeEventHandlers();
@@ -321,6 +321,7 @@ window.debugEmployeeReport = function() {
     console.log('Debug results:', results);
     
     // Try to manually trigger employee report
+    console.log('🧪 Testing manual employee report load...');
     if (window.loadEmployeeReport) {
         window.loadEmployeeReport();
     } else {
@@ -331,6 +332,7 @@ window.debugEmployeeReport = function() {
 };
 
 window.forceEmployeeReport = function() {
+    console.log('🔧 Force loading employee report...');
     
     // Hide all report pages
     const reportPages = document.querySelectorAll('.report-page');
@@ -341,12 +343,14 @@ window.forceEmployeeReport = function() {
     const employeePage = document.getElementById('report-employee');
     if (employeePage) {
         employeePage.classList.add('active');
+        console.log('✅ Employee page shown');
         
         // Force load template
         fetch('./partials/tabs/report-pages/employee-report.html')
             .then(response => response.text())
             .then(html => {
                 employeePage.innerHTML = html;
+                console.log('✅ Template injected directly');
             })
             .catch(error => {
                 console.error('❌ Template load failed:', error);
@@ -363,6 +367,7 @@ window.forceEmployeeReport = function() {
     const employeeMenuItem = document.querySelector('[data-report="employee"]');
     if (employeeMenuItem) {
         employeeMenuItem.classList.add('active');
+        console.log('✅ Employee menu item activated');
     }
 };
 
@@ -397,6 +402,7 @@ window.debugFinancialManagement = function() {
     
     // Test loading function
     if (typeof window.loadFinancialManagement === 'function') {
+        console.log('✅ Testing loadFinancialManagement...');
         window.loadFinancialManagement();
     } else {
         console.error('❌ loadFinancialManagement function not available');
@@ -406,6 +412,7 @@ window.debugFinancialManagement = function() {
 };
 
 window.forceFinancialManagement = function() {
+    console.log('🔧 Force loading financial management...');
     
     // Hide all report pages
     const reportPages = document.querySelectorAll('.report-page');
@@ -416,10 +423,12 @@ window.forceFinancialManagement = function() {
     const financePage = document.getElementById('report-finance');
     if (financePage) {
         financePage.classList.add('active');
+        console.log('✅ Finance page shown');
         
         // Force load financial management
         if (typeof window.loadFinancialManagement === 'function') {
             window.loadFinancialManagement();
+            console.log('✅ Financial management forced');
         } else {
             console.error('❌ loadFinancialManagement not available');
         }
@@ -435,6 +444,7 @@ window.forceFinancialManagement = function() {
     const financeMenuItem = document.querySelector('[data-report="finance"]');
     if (financeMenuItem) {
         financeMenuItem.classList.add('active');
+        console.log('✅ Finance menu item activated');
     }
 };
 
@@ -469,6 +479,7 @@ window.debugCashFlowAccrual = function() {
     
     // Test loading function
     if (typeof window.loadCashFlowAccrualReport === 'function') {
+        console.log('✅ Testing loadCashFlowAccrualReport...');
         window.loadCashFlowAccrualReport();
     } else {
         console.error('❌ loadCashFlowAccrualReport function not available');
@@ -478,6 +489,7 @@ window.debugCashFlowAccrual = function() {
 };
 
 window.forceCashFlowAccrual = function() {
+    console.log('🔧 Force loading cash flow vs accrual...');
     
     // Hide all report pages
     const reportPages = document.querySelectorAll('.report-page');
@@ -488,10 +500,12 @@ window.forceCashFlowAccrual = function() {
     const cashflowPage = document.getElementById('report-cashflow-accrual');
     if (cashflowPage) {
         cashflowPage.classList.add('active');
+        console.log('✅ Cash flow accrual page shown');
         
         // Force load cash flow accrual
         if (typeof window.loadCashFlowAccrualReport === 'function') {
             window.loadCashFlowAccrualReport();
+            console.log('✅ Cash flow accrual forced');
         } else {
             console.error('❌ loadCashFlowAccrualReport not available');
         }
@@ -507,6 +521,7 @@ window.forceCashFlowAccrual = function() {
     const cashflowMenuItem = document.querySelector('[data-report="cashflow-accrual"]');
     if (cashflowMenuItem) {
         cashflowMenuItem.classList.add('active');
+        console.log('✅ Cash flow accrual menu item activated');
     }
 };
 

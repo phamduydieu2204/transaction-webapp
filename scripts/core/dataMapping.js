@@ -7,6 +7,8 @@
  * Transaction field mapping based on Google Sheets structure
  * Columns A-V: Mã giao dịch -> Mã nhân viên
  */
+export const TRANSACTION_FIELD_MAPPING = {
+  // Column A: Mã giao dịch
   transactionId: ['Mã giao dịch', 'maGiaoDich', 'id', 'transactionId'],
   
   // Column B: Ngày giao dịch
@@ -89,8 +91,7 @@ export function getTransactionField(transaction, fieldName) {
   // if (fieldName === 'customerName' || fieldName === 'email' || fieldName === 'softwareName') {
   //   console.log(`🔍 Looking for ${fieldName}:`, {
   //     possibleKeys,
-  //     availableKeys: Object.keys(transaction)
-  });
+  //     availableKeys: Object.keys(transaction),
   //     transaction: transaction
   //   });
   // }
@@ -160,8 +161,7 @@ export function normalizeTransaction(rawTransaction) {
   //   console.log('🔍 Normalized transaction:', {
   //     customerName: normalized.customerName,
   //     email: normalized.email,
-  //     revenue: normalized.revenue
-  });
+  //     revenue: normalized.revenue,
   //     originalData: rawTransaction
   //   });
   // }

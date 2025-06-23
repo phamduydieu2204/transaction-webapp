@@ -10,6 +10,7 @@ import { ensureDataIsLoaded, showError } from '../core/reportHelpers.js';
  * Load finance report
  */
 export async function loadFinanceReport() {
+  console.log('💼 Loading finance report');
   
   try {
     await ensureDataIsLoaded();

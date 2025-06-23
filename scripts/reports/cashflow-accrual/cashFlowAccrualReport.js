@@ -28,6 +28,7 @@ export async function loadCashFlowAccrualReport() {
         // Initialize the comparison
         await cashFlowAccrualLoader.initialize();
         
+        console.log('✅ Cash Flow vs Accrual Report loaded successfully');
         
     } catch (error) {
         console.error('❌ Error loading Cash Flow vs Accrual Report:', error);
@@ -54,6 +55,7 @@ async function loadCashFlowAccrualTemplate() {
         const html = await response.text();
         container.innerHTML = html;
         
+        console.log('📄 Cash flow vs accrual template loaded from file');
         
     } catch (error) {
         console.log('📄 Using fallback cash flow vs accrual template');
@@ -339,6 +341,7 @@ export function cleanupCashFlowAccrualReport() {
         cashFlowAccrualLoader.destroy();
         cashFlowAccrualLoader = null;
     }
+    console.log('🧹 Cash Flow vs Accrual Report cleaned up');
 }
 
 // Make functions available globally

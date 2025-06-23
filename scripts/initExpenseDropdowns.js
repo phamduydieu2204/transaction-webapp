@@ -1,9 +1,13 @@
 import { getConstants } from './constants.js';
-  });
+
+export async function initExpenseDropdowns() {
+  const { BACKEND_URL } = getConstants();
+  try {
+    const res = await fetch(BACKEND_URL, {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "getExpenseDropdownOptions" })
     });
-
     const result = await res.json();
     if (result.status !== "success") return;
 
@@ -117,6 +121,32 @@ import { getConstants } from './constants.js';
     console.error("Lỗi khi khởi tạo dropdown chi phí:", err);
   }
 }
+window.handleRecurringChange = () => {
+  const startDateStr = document.getElementById("expenseDate").value;
+  const method = document.getElementById("expenseRecurring").value;
+  const renewInput = document.getElementById("expenseRenewDate");
+
+  if (!startDateStr || !method) {
+    renewInput.value = "";
+    return;
+  }
+
+  const [yyyy, mm, dd] = startDateStr.split("/").map(Number);
+  const startDate = new Date(yyyy, mm - 1, dd);
+  let nextDate = new Date(startDate);
+
+  switch (method) {
+    case "Hàng tháng":
+      nextDate.setMonth(nextDate.getMonth() + 1);
+      break;
+    case "Hàng quý":
+      nextDate.setMonth(nextDate.getMonth() + 3);
+      break;
+    case "Hàng năm":
+      nextDate.setFullYear(nextDate.getFullYear() + 1);
+      break;
+    default:
+      renewInput.value = "";
       return;
   }
 

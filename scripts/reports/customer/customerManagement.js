@@ -3,6 +3,28 @@
  * 
  * Customer Management functionality - Quản lý khách hàng
  */
+
+import { ensureDataIsLoaded, showError } from '../core/reportHelpers.js';
+import { formatRevenue, formatCurrency, formatDate } from '../../formatDate.js';
+import { getFromStorage } from '../../core/stateManager.js';
+import { 
+  calculateBusinessMetrics,
+  normalizeDate
+} from '../../statisticsCore.js';
+import { 
+  getTransactionField, 
+  normalizeTransaction 
+} from '../../core/dataMapping.js';
+
+// Customer management state
+const customerState = {
+  currentPage: 1,
+  pageSize: 20,
+  totalCustomers: 0,
+  filteredCustomers: [],
+  selectedCustomers: [],
+  currentSegment: 'value',
+  currentInsight: 'recent'
 };
 
 /**
@@ -12,6 +34,7 @@
  * @param {string} options.period - Period name (e.g., 'this_month', 'last_month')
  */
 export async function loadCustomerManagement(options = {}) {
+  console.log('👥 Loading customer management with options:', options);
   
   try {
     // Load template
@@ -23,6 +46,11 @@ export async function loadCustomerManagement(options = {}) {
     // Get data
     const transactions = window.transactionList || getFromStorage('transactions') || [];
     const expenses = window.expenseList || getFromStorage('expenses') || [];
+    
+    console.log('👥 Customer management data:', {
+      transactions: transactions.length,
+      expenses: expenses.length
+    });
     
     // Get date range from options or global filters
     const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
@@ -47,6 +75,9 @@ export async function loadCustomerManagement(options = {}) {
     
     // Setup event handlers
     setupCustomerManagementHandlers();
+    
+    console.log('✅ Customer management loaded successfully');
+    
   } catch (error) {
     console.error('❌ Error loading customer management:', error);
     showError('Không thể tải quản lý khách hàng');
@@ -69,34 +100,216 @@ async function loadCustomerManagementHTML() {
     const html = await response.text();
     container.innerHTML = html;
     container.classList.add('active');
+    
+    console.log('✅ Customer management template loaded');
+    
   } catch (error) {
     console.error('❌ Could not load customer management template:', error);
-  });
+    throw error;
+  }
+}
+
+/**
+ * Process raw transaction data to extract customer information
+ */
+function processCustomerData(transactions) {
+  const customers = {};
+  const currentDate = new Date();
+  
+  transactions.forEach(rawTransaction => {
+    const t = normalizeTransaction(rawTransaction);
+    if (!t) return;
+    
+    const customerName = t.customerName || 'Không xác định';
+    const customerEmail = t.customerEmail || '';
+    const transactionDate = new Date(t.transactionDate || currentDate);
+    const revenue = t.revenue || 0;
+    
+    if (!customers[customerName]) {
+      customers[customerName] = {
+        name: customerName,
+        email: customerEmail,
+        firstTransactionDate: transactionDate,
+        lastTransactionDate: transactionDate,
+        totalRevenue: 0,
+        transactionCount: 0,
+        transactions: [],
+        status: 'new',
+        segment: 'regular',
+        ltv: 0
       };
     }
+    
+    const customer = customers[customerName];
+    customer.totalRevenue += revenue;
+    customer.transactionCount++;
+    customer.transactions.push(t);
+    
+    // Update dates
+    if (transactionDate < customer.firstTransactionDate) {
+      customer.firstTransactionDate = transactionDate;
+    }
+    if (transactionDate > customer.lastTransactionDate) {
+      customer.lastTransactionDate = transactionDate;
+    }
+    
+    // Calculate LTV
+    customer.ltv = customer.totalRevenue; // Simplified LTV calculation
+  });
+  
+  // Process customer analytics
+  const customerArray = Object.values(customers);
+  
+  // Determine customer status and segments
+  customerArray.forEach(customer => {
+    const daysSinceLastTransaction = Math.floor(
+      (currentDate - customer.lastTransactionDate) / (1000 * 60 * 60 * 24)
+    );
+    const daysSinceFirstTransaction = Math.floor(
+      (currentDate - customer.firstTransactionDate) / (1000 * 60 * 60 * 24)
+    );
+    
+    // Determine status
+    if (daysSinceFirstTransaction <= 30) {
+      customer.status = 'new';
+    } else if (daysSinceLastTransaction <= 90) {
+      customer.status = 'active';
+    } else {
+      customer.status = 'inactive';
+    }
+    
+    // Determine segment based on value and frequency
+    if (customer.totalRevenue >= 5000000 && customer.transactionCount >= 5) {
+      customer.segment = 'vip';
+    } else if (daysSinceLastTransaction > 180) {
+      customer.segment = 'at-risk';
+    } else if (daysSinceFirstTransaction <= 30) {
+      customer.segment = 'new';
+    } else {
+      customer.segment = 'regular';
+    }
+  });
+  
+  return {
+    customers: customerArray,
+    totalCustomers: customerArray.length,
+    activeCustomers: customerArray.filter(c => c.status === 'active').length,
+    newCustomers: customerArray.filter(c => c.status === 'new').length,
+    vipCustomers: customerArray.filter(c => c.segment === 'vip').length,
+    atRiskCustomers: customerArray.filter(c => c.segment === 'at-risk').length,
     totalRevenue: customerArray.reduce((sum, c) => sum + c.totalRevenue, 0),
+    averageLTV: customerArray.length > 0 ? 
+      customerArray.reduce((sum, c) => sum + c.ltv, 0) / customerArray.length : 0
   };
 }
 
 /**
  * Update customer KPI cards
  */
+async function updateCustomerKPIs(customerData, period) {
+  console.log('👥 Updating customer KPIs');
+  
+  // Calculate previous period for comparison
+  const previousData = calculatePreviousPeriodCustomers(customerData, period);
+  
+  // Update KPI values
+  updateKPIElement('total-customers-value', customerData.totalCustomers.toLocaleString());
+  updateKPIElement('active-customers-value', customerData.activeCustomers.toLocaleString());
+  updateKPIElement('new-customers-value', customerData.newCustomers.toLocaleString());
+  updateKPIElement('customer-ltv-value', formatRevenue(customerData.averageLTV));
+  
+  // Calculate and update changes
+  const totalChange = customerData.totalCustomers - (previousData.totalCustomers || 0);
+  const activePercentageChange = previousData.activeCustomers > 0 ? 
+    ((customerData.activeCustomers - previousData.activeCustomers) / previousData.activeCustomers) * 100 : 0;
+  
+  updateChangeElement('total-customers-change', totalChange, 'count');
+  updateChangeElement('active-customers-change', activePercentageChange, 'percentage');
+  
+  console.log('👥 Customer KPIs updated:', customerData);
+}
+
+/**
+ * Render customer acquisition chart
+ */
+async function renderCustomerAcquisitionChart(customerData, period) {
+  console.log('📈 Rendering customer acquisition chart');
+  
+  const canvas = document.getElementById('customer-acquisition-chart');
+  if (!canvas) return;
+  
+  // Ensure Chart.js is loaded
+  if (typeof Chart === 'undefined') {
+    await loadChartJS();
+  }
+  
+  const ctx = canvas.getContext('2d');
+  
+  // Prepare acquisition data
+  const acquisitionData = prepareAcquisitionData(customerData.customers, period);
+  
+  // Destroy existing chart
+  if (window.customerAcquisitionChart) {
+    window.customerAcquisitionChart.destroy();
+  }
+  
+  // Create new chart
+  window.customerAcquisitionChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: acquisitionData.labels,
+      datasets: [{
+        label: 'Khách hàng mới',
+        data: acquisitionData.values,
+        borderColor: '#3b82f6',
         backgroundColor: 'rgba(59, 130, 246, 0.1)',
-  });
+        borderWidth: 3,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 6,
+        pointHoverRadius: 8,
+        pointBackgroundColor: '#3b82f6',
+        pointBorderColor: '#ffffff',
+        pointBorderWidth: 2
       }]
     },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        intersect: false,
+        mode: 'index'
       },
+      plugins: {
+        legend: {
+          display: false
         },
+        tooltip: {
           backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: 'white',
+          bodyColor: 'white',
+          borderColor: '#3b82f6',
+          borderWidth: 1,
+          callbacks: {
+            label: function(context) {
               return `Khách hàng mới: ${context.parsed.y}`;
             }
           }
         }
       },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1
           },
+          grid: {
             color: 'rgba(0, 0, 0, 0.1)'
           }
         },
+        x: {
+          grid: {
+            display: false
           }
         }
       }
@@ -107,18 +320,65 @@ async function loadCustomerManagementHTML() {
 /**
  * Render customer lifecycle chart
  */
+async function renderCustomerLifecycleChart(customerData) {
+  console.log('🔄 Rendering customer lifecycle chart');
+  
+  const canvas = document.getElementById('customer-lifecycle-chart');
+  if (!canvas) return;
+  
+  // Ensure Chart.js is loaded
+  if (typeof Chart === 'undefined') {
+    await loadChartJS();
+  }
+  
+  const ctx = canvas.getContext('2d');
+  
+  // Calculate lifecycle distribution
+  const lifecycleData = calculateLifecycleDistribution(customerData.customers);
+  
+  // Destroy existing chart
+  if (window.customerLifecycleChart) {
+    window.customerLifecycleChart.destroy();
+  }
+  
+  // Create pie chart
+  window.customerLifecycleChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
       labels: ['Khách hàng mới', 'Hoạt động', 'Không hoạt động', 'VIP', 'Rủi ro'],
+      datasets: [{
+        data: [
+          lifecycleData.new,
+          lifecycleData.active,
+          lifecycleData.inactive,
+          lifecycleData.vip,
+          lifecycleData.atRisk
+        ],
+        backgroundColor: [
           '#10b981', // New - Green
           '#3b82f6', // Active - Blue
           '#6b7280', // Inactive - Gray
           '#f59e0b', // VIP - Gold
           '#ef4444'  // At Risk - Red
         ],
+        borderWidth: 2,
+        borderColor: '#ffffff'
       }]
     },
-  });
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            usePointStyle: true,
+            padding: 15
           }
         },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
               const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
               const percentage = ((context.parsed / total) * 100).toFixed(1);
               return `${context.label}: ${context.parsed} (${percentage}%)`;
@@ -134,6 +394,7 @@ async function loadCustomerManagementHTML() {
  * Update customer segmentation
  */
 async function updateCustomerSegmentation(customerData) {
+  console.log('🎯 Updating customer segmentation');
   
   const segments = calculateSegmentMetrics(customerData);
   
@@ -161,6 +422,7 @@ async function updateCustomerSegmentation(customerData) {
  * Load active customers table
  */
 async function loadActiveCustomersTable(customerData) {
+  console.log('📋 Loading active customers table');
   
   customerState.filteredCustomers = customerData.customers;
   customerState.totalCustomers = customerData.customers.length;
@@ -249,6 +511,7 @@ function renderCustomersTable() {
  * Load customer insights
  */
 async function loadCustomerInsights(customerData) {
+  console.log('💡 Loading customer insights');
   
   const insights = generateCustomerInsights(customerData, customerState.currentInsight);
   
@@ -296,6 +559,7 @@ async function loadCustomerInsights(customerData) {
  * Update CRM tools
  */
 async function updateCRMTools(customerData) {
+  console.log('🛠️ Updating CRM tools');
   
   // Update communication stats
   updateKPIElement('recent-emails', '12'); // Placeholder
@@ -412,8 +676,17 @@ function prepareAcquisitionData(customers, period) {
   
   return {
     labels: sortedPeriods.slice(-12), // Last 12 periods
+    values: sortedPeriods.slice(-12).map(period => acquisitionByPeriod[period] || 0)
   };
 }
+
+function calculateLifecycleDistribution(customers) {
+  const distribution = {
+    new: 0,
+    active: 0,
+    inactive: 0,
+    vip: 0,
+    atRisk: 0
   };
   
   customers.forEach(customer => {
@@ -442,16 +715,110 @@ function calculateSegmentMetrics(customerData) {
     atRisk: { customers: [], count: 0, percentage: 0, averageDaysSinceLastTransaction: 0 },
     new: { customers: [], count: 0, conversionRate: 0 }
   };
+  
+  customerData.customers.forEach(customer => {
+    if (customer.segment === 'vip') {
+      segments.vip.customers.push(customer);
+      segments.vip.revenue += customer.totalRevenue;
+    } else if (customer.segment === 'regular') {
+      segments.regular.customers.push(customer);
+      segments.regular.revenue += customer.totalRevenue;
+    } else if (customer.segment === 'at-risk') {
+      segments.atRisk.customers.push(customer);
+    } else if (customer.segment === 'new') {
+      segments.new.customers.push(customer);
+    }
   });
+  
+  // Calculate metrics
+  segments.vip.count = segments.vip.customers.length;
+  segments.vip.revenuePercentage = totalRevenue > 0 ? ((segments.vip.revenue / totalRevenue) * 100).toFixed(1) : 0;
+  segments.vip.averageLTV = segments.vip.count > 0 ? segments.vip.revenue / segments.vip.count : 0;
+  
+  segments.regular.count = segments.regular.customers.length;
+  segments.regular.revenuePercentage = totalRevenue > 0 ? ((segments.regular.revenue / totalRevenue) * 100).toFixed(1) : 0;
+  segments.regular.averageLTV = segments.regular.count > 0 ? segments.regular.revenue / segments.regular.count : 0;
+  
+  segments.atRisk.count = segments.atRisk.customers.length;
+  segments.atRisk.percentage = customerData.totalCustomers > 0 ? 
+    ((segments.atRisk.count / customerData.totalCustomers) * 100).toFixed(1) : 0;
+  
+  if (segments.atRisk.count > 0) {
+    const totalDays = segments.atRisk.customers.reduce((sum, customer) => {
+      return sum + Math.floor((new Date() - customer.lastTransactionDate) / (1000 * 60 * 60 * 24));
+    }, 0);
+    segments.atRisk.averageDaysSinceLastTransaction = Math.floor(totalDays / segments.atRisk.count);
+  }
+  
+  segments.new.count = segments.new.customers.length;
+  segments.new.conversionRate = 75; // Placeholder
+  
+  return segments;
+}
+
+function generateCustomerInsights(customerData, insightType) {
+  const insights = [];
+  
+  switch (insightType) {
+    case 'recent':
+      // Recent activities
+      const recentCustomers = customerData.customers
+        .filter(c => c.status === 'active')
+        .sort((a, b) => b.lastTransactionDate - a.lastTransactionDate)
+        .slice(0, 5);
+      
+      recentCustomers.forEach(customer => {
+        insights.push({
+          customerName: customer.name,
+          customerDetail: formatRevenue(customer.totalRevenue),
+          title: 'Hoạt động gần đây',
           description: `${customer.transactionCount} giao dịch trong kỳ`,
+          priority: 'medium',
+          action: 'followup',
+          actionLabel: 'Theo dõi',
+          customerId: customer.name
         });
       });
-  });
+      break;
+      
+    case 'churned':
+      // At-risk customers
+      const atRiskCustomers = customerData.customers
+        .filter(c => c.segment === 'at-risk')
+        .slice(0, 5);
+      
+      atRiskCustomers.forEach(customer => {
+        const daysSince = Math.floor((new Date() - customer.lastTransactionDate) / (1000 * 60 * 60 * 24));
+        insights.push({
+          customerName: customer.name,
           customerDetail: `${daysSince} ngày không hoạt động`,
+          title: 'Nguy cơ rời bỏ',
+          description: 'Cần chăm sóc để giữ chân khách hàng',
+          priority: 'high',
+          action: 'retention',
+          actionLabel: 'Chăm sóc',
+          customerId: customer.name
         });
       });
-  });
+      break;
+      
+    case 'opportunities':
+      // Upsell opportunities
+      const opportunities = customerData.customers
+        .filter(c => c.segment === 'regular' && c.transactionCount >= 3)
+        .sort((a, b) => b.totalRevenue - a.totalRevenue)
+        .slice(0, 5);
+      
+      opportunities.forEach(customer => {
+        insights.push({
+          customerName: customer.name,
           customerDetail: `${customer.transactionCount} giao dịch`,
+          title: 'Cơ hội bán thêm',
+          description: 'Khách hàng tiềm năng cho sản phẩm cao cấp',
+          priority: 'medium',
+          action: 'upsell',
+          actionLabel: 'Đề xuất',
+          customerId: customer.name
         });
       });
       break;
@@ -467,14 +834,36 @@ function getDatePeriodKey(date, period) {
   
   switch (period) {
     case 'weekly':
+      return `${year}-W${week}`;
+    case 'daily':
+      return date.toISOString().split('T')[0];
     default:
+      return `${year}-${month.toString().padStart(2, '0')}`;
+  }
+}
+
+function getStatusDisplayName(status) {
+  const statusMap = {
+    'new': 'Mới',
     'active': 'Hoạt động',
     'inactive': 'Không hoạt động'
   };
+  return statusMap[status] || status;
+}
+
+function getSegmentDisplayName(segment) {
+  const segmentMap = {
+    'vip': 'VIP',
     'regular': 'Thường',
     'at-risk': 'Rủi ro',
     'new': 'Mới'
   };
+  return segmentMap[segment] || segment;
+}
+
+function getPriorityDisplayName(priority) {
+  const priorityMap = {
+    'high': 'Cao',
     'medium': 'Trung bình',
     'low': 'Thấp'
   };
@@ -535,6 +924,7 @@ window.refreshCustomerManagement = function() {
 };
 
 window.exportCustomerReport = function() {
+  console.log('📊 Exporting customer report...');
 };
 
 window.openAddCustomerModal = function() {
@@ -542,19 +932,23 @@ window.openAddCustomerModal = function() {
 };
 
 window.exportCustomerData = function() {
+  console.log('📊 Exporting customer data...');
 };
 
 window.toggleCustomerLifecycleView = function(viewType) {
+  console.log(`🔄 Toggling lifecycle chart to ${viewType} view`);
 };
 
 window.filterCustomers = function() {
   const searchTerm = document.getElementById('customer-search').value.toLowerCase();
   // Implementation for customer filtering
+  console.log(`🔍 Filtering customers by: ${searchTerm}`);
 };
 
 window.filterByStatus = function() {
   const status = document.getElementById('customer-status-filter').value;
   // Implementation for status filtering
+  console.log(`🔍 Filtering customers by status: ${status}`);
 };
 
 window.toggleSelectAll = function() {
@@ -564,6 +958,7 @@ window.toggleSelectAll = function() {
 };
 
 window.viewCustomerDetails = function(customerId) {
+  console.log(`👁️ Viewing customer details: ${customerId}`);
 };
 
 window.editCustomer = function(customerId) {
@@ -571,9 +966,11 @@ window.editCustomer = function(customerId) {
 };
 
 window.messageCustomer = function(customerId) {
+  console.log(`💬 Messaging customer: ${customerId}`);
 };
 
 window.executeInsightAction = function(action, customerId) {
+  console.log(`🎯 Executing action ${action} for customer: ${customerId}`);
 };
 
 window.previousCustomerPage = function() {
@@ -601,37 +998,49 @@ window.goToCustomerPage = function(page) {
 
 // CRM Tools functions
 window.sendBulkEmail = function() {
+  console.log('📧 Sending bulk email...');
 };
 
 window.sendBulkSMS = function() {
+  console.log('📱 Sending bulk SMS...');
 };
 
 window.createNewsletter = function() {
+  console.log('📰 Creating newsletter...');
 };
 
 window.viewPendingTickets = function() {
+  console.log('🎫 Viewing pending tickets...');
 };
 
 window.createNewTicket = function() {
+  console.log('🆕 Creating new ticket...');
 };
 
 window.manageLoyaltyProgram = function() {
+  console.log('🎁 Managing loyalty program...');
 };
 
 window.distributeRewards = function() {
+  console.log('🏆 Distributing rewards...');
 };
 
 window.generateCustomerReport = function() {
+  console.log('📄 Generating customer report...');
 };
 
 window.scheduleReport = function() {
+  console.log('📅 Scheduling report...');
 };
 
 function refreshAcquisitionChart(view) {
+  console.log(`🔄 Refreshing acquisition chart for view: ${view}`);
 }
 
 function refreshSegmentation() {
+  console.log(`🔄 Refreshing segmentation for: ${customerState.currentSegment}`);
 }
 
 function refreshInsights() {
+  console.log(`🔄 Refreshing insights for: ${customerState.currentInsight}`);
 }

@@ -28,6 +28,7 @@ export function renderSimpleChart(data, options = {}) {
     return;
   }
 
+  console.log(`📈 Rendering ${chartType} chart:`, data.length, "data points");
 
   // Limit data for readability
   const chartData = data.slice(0, maxBars);
@@ -106,6 +107,7 @@ function renderBarChart(container, data, options) {
  */
 function renderLineChart(container, data, options) {
   // TODO: Implement line chart rendering
+  console.log("📊 Line chart rendering not yet implemented");
   renderBarChart(container, data, options); // Fallback to bar chart
 }
 
@@ -117,6 +119,7 @@ function renderLineChart(container, data, options) {
  */
 function renderPieChart(container, data, options) {
   // TODO: Implement pie chart rendering
+  console.log("📊 Pie chart rendering not yet implemented");
   renderBarChart(container, data, options); // Fallback to bar chart
 }
 

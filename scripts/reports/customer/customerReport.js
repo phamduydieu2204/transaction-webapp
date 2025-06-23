@@ -12,6 +12,7 @@ import { calculateCustomerLifetimeValue, calculateDaysBetween } from '../core/re
  * Load customer report
  */
 export async function loadCustomerReport() {
+  console.log('👥 Loading customer report');
   
   try {
     await ensureDataIsLoaded();
@@ -26,8 +27,87 @@ export async function loadCustomerReport() {
     console.log('✅ Customer report loaded');
   } catch (error) {
     console.error('❌ Error loading customer report:', error);
-  });
+    showError('Không thể tải báo cáo khách hàng');
+  }
+}
 
+/**
+ * Load customer overview statistics
+ */
+async function loadCustomerOverview() {
+  const container = document.getElementById('customerOverview');
+  if (!container) return;
+  
+  const transactions = window.transactionList || [];
+  
+  // Calculate customer metrics
+  const uniqueCustomers = new Set(transactions.map(t => t.customer)).size;
+  const totalRevenue = transactions.reduce((sum, t) => sum + (parseFloat(t.revenue) || 0), 0);
+  const avgRevenuePerCustomer = totalRevenue / (uniqueCustomers || 1);
+  const avgTransactionsPerCustomer = transactions.length / (uniqueCustomers || 1);
+  
+  // New customers this month
+  const thisMonth = new Date();
+  const startOfMonth = new Date(thisMonth.getFullYear(), thisMonth.getMonth(), 1);
+  const newCustomersThisMonth = new Set(
+    transactions
+      .filter(t => new Date(t.ngayTao) >= startOfMonth)
+      .map(t => t.customer)
+  ).size;
+  
+  const html = `
+    <div class="customer-overview-grid">
+      <div class="overview-metric">
+        <div class="metric-icon">👥</div>
+        <div class="metric-value">${uniqueCustomers.toLocaleString()}</div>
+        <div class="metric-label">Tổng khách hàng</div>
+      </div>
+      
+      <div class="overview-metric">
+        <div class="metric-icon">💰</div>
+        <div class="metric-value">${formatRevenue(avgRevenuePerCustomer)}</div>
+        <div class="metric-label">Doanh thu trung bình/KH</div>
+      </div>
+      
+      <div class="overview-metric">
+        <div class="metric-icon">📊</div>
+        <div class="metric-value">${avgTransactionsPerCustomer.toFixed(1)}</div>
+        <div class="metric-label">Giao dịch trung bình/KH</div>
+      </div>
+      
+      <div class="overview-metric">
+        <div class="metric-icon">🆕</div>
+        <div class="metric-value">${newCustomersThisMonth}</div>
+        <div class="metric-label">Khách hàng mới tháng này</div>
+      </div>
+    </div>
+  `;
+  
+  container.innerHTML = html;
+}
+
+/**
+ * Load top customers by revenue
+ */
+async function loadTopCustomers() {
+  const container = document.getElementById('topCustomersList');
+  if (!container) return;
+  
+  const transactions = window.transactionList || [];
+  const customerStats = {};
+  
+  // Calculate stats for each customer
+  transactions.forEach(transaction => {
+    const customer = transaction.customer || 'Không xác định';
+    const revenue = parseFloat(transaction.revenue) || 0;
+    
+    if (!customerStats[customer]) {
+      customerStats[customer] = {
+        name: customer,
+        revenue: 0,
+        transactionCount: 0,
+        firstTransaction: transaction.ngayTao,
+        lastTransaction: transaction.ngayTao
       };
     }
     
@@ -77,6 +157,46 @@ export async function loadCustomerReport() {
       </div>
     `;
   });
+  
+  html += `
+      </div>
+    </div>
+  `;
+  
+  container.innerHTML = html;
+}
+
+/**
+ * Load customer lifetime value analysis
+ */
+async function loadCustomerLifetimeValue() {
+  const container = document.getElementById('customerLifetimeValue');
+  if (!container) return;
+  
+  const transactions = window.transactionList || [];
+  const customerLTV = {};
+  
+  // Calculate LTV for each customer
+  transactions.forEach(transaction => {
+    const customer = transaction.customer || 'Không xác định';
+    if (!customerLTV[customer]) {
+      customerLTV[customer] = [];
+    }
+    customerLTV[customer].push(transaction);
+  });
+  
+  // Calculate LTV statistics
+  const ltvValues = Object.entries(customerLTV).map(([customer, customerTransactions]) => {
+    const ltv = calculateCustomerLifetimeValue(customerTransactions);
+    const daysSinceFirst = calculateDaysBetween(
+      customerTransactions[0].ngayTao,
+      new Date()
+    );
+    
+    return {
+      customer,
+      ltv,
+      transactionCount: customerTransactions.length,
       daysSinceFirst
     };
   });
@@ -148,6 +268,7 @@ async function loadCustomerActivity() {
     active: [], // Last 30 days
     recent: [], // 31-90 days
     inactive: [], // 91-365 days
+    dormant: [] // 365+ days
   };
   
   const customerLastActivity = {};

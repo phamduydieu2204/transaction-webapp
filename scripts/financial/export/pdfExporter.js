@@ -57,6 +57,7 @@ export function exportFinancialDashboardToPDF(metrics, transactionData, expenseD
     // Save PDF
     doc.save(filename);
     
+    console.log(`✅ Exported financial dashboard to PDF: ${filename}`);
     return true;
   } catch (error) {
     console.error('❌ Error exporting to PDF:', error);
@@ -78,8 +79,17 @@ function addPDFHeader(doc, yPosition) {
   doc.setFontSize(20);
   doc.setFont(undefined, 'bold');
   doc.text('BÁOCÁO TÀI CHÍNH TỔNG QUAN', 105, yPosition, { align: 'center' });
-  });
-
+  
+  yPosition += 10;
+  
+  // Date
+  doc.setFontSize(12);
+  doc.setFont(undefined, 'normal');
+  const currentDate = new Date().toLocaleDateString('vi-VN', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   });
   doc.text(`Ngày xuất: ${currentDate}`, 105, yPosition, { align: 'center' });
   
@@ -119,26 +129,133 @@ function addSummarySection(doc, metrics, yPosition) {
   
   yPosition = addTableToPDF(doc, summaryData, yPosition, {
     headerStyle: { fillColor: [66, 139, 202] },
+    alternateRowColors: true
   });
+  
+  return yPosition + 10;
+}
+
+/**
+ * Add revenue analysis section
+ * @param {Object} doc - jsPDF document
+ * @param {Object} metrics - Financial metrics
+ * @param {number} yPosition - Current Y position
+ * @returns {number} Updated Y position
+ */
+function addRevenueAnalysis(doc, metrics, yPosition) {
+  // Section title
+  doc.setFontSize(16);
+  doc.setFont(undefined, 'bold');
+  doc.text('💰 PHÂN TÍCH DOANH THU', 20, yPosition);
+  yPosition += 10;
+  
+  const revenueByOrgSoftware = metrics.revenueByOrgSoftware || {};
+  
+  if (Object.keys(revenueByOrgSoftware).length === 0) {
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'normal');
+    doc.text('Không có dữ liệu doanh thu', 20, yPosition);
+    return yPosition + 10;
+  }
+  
+  // Create revenue table
+  const revenueData = [['Phần mềm', 'Doanh thu', 'Giao dịch', '% Tổng']];
+  const totalRevenue = metrics.totalRevenue || 0;
+  
+  Object.values(revenueByOrgSoftware)
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 10) // Top 10
+    .forEach(software => {
+      const percentage = totalRevenue > 0 ? ((software.revenue / totalRevenue) * 100).toFixed(1) : '0';
+      revenueData.push([
+        software.name.length > 15 ? software.name.substring(0, 15) + '...' : software.name,
         formatCurrency(software.revenue),
-        software.transactionCount.toString()
-  });
+        software.transactionCount.toString(),
         `${percentage}%`
       ]);
     });
   
   yPosition = addTableToPDF(doc, revenueData, yPosition, {
     headerStyle: { fillColor: [40, 167, 69] },
+    alternateRowColors: true,
+    maxWidth: 170
   });
+  
+  return yPosition + 10;
+}
+
+/**
+ * Add expense analysis section
+ * @param {Object} doc - jsPDF document
+ * @param {Object} metrics - Financial metrics
+ * @param {number} yPosition - Current Y position
+ * @returns {number} Updated Y position
+ */
+function addExpenseAnalysis(doc, metrics, yPosition) {
+  // Section title
+  doc.setFontSize(16);
+  doc.setFont(undefined, 'bold');
+  doc.text('💸 PHÂN TÍCH CHI PHÍ', 20, yPosition);
+  yPosition += 10;
+  
+  const expensesByCategory = metrics.expensesByCategory || {};
+  
+  if (Object.keys(expensesByCategory).length === 0) {
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'normal');
+    doc.text('Không có dữ liệu chi phí', 20, yPosition);
+    return yPosition + 10;
+  }
+  
+  // Create expense table
+  const expenseData = [['Danh mục', 'Chi phí', 'Số lượng', '% Tổng']];
+  const totalExpenses = metrics.totalExpenses || 0;
+  
+  Object.values(expensesByCategory)
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, 10) // Top 10
+    .forEach(category => {
+      const percentage = totalExpenses > 0 ? ((category.amount / totalExpenses) * 100).toFixed(1) : '0';
+      expenseData.push([
+        category.name.length > 15 ? category.name.substring(0, 15) + '...' : category.name,
         formatCurrency(category.amount),
-        category.count.toString()
-  });
+        category.count.toString(),
         `${percentage}%`
       ]);
     });
   
   yPosition = addTableToPDF(doc, expenseData, yPosition, {
     headerStyle: { fillColor: [220, 53, 69] },
+    alternateRowColors: true,
+    maxWidth: 170
+  });
+  
+  return yPosition + 10;
+}
+
+/**
+ * Add performance metrics section
+ * @param {Object} doc - jsPDF document
+ * @param {Object} metrics - Financial metrics
+ * @param {number} yPosition - Current Y position
+ * @returns {number} Updated Y position
+ */
+function addPerformanceMetrics(doc, metrics, yPosition) {
+  // Section title
+  doc.setFontSize(16);
+  doc.setFont(undefined, 'bold');
+  doc.text('📈 CHỈ SỐ HIỆU SUẤT', 20, yPosition);
+  yPosition += 10;
+  
+  const { cashFlowMetrics = {}, growthMetrics = {} } = metrics;
+  
+  // Performance data
+  const performanceData = [
+    ['Chỉ số', 'Giá trị', 'Đánh giá'],
+    [
+      'Dòng tiền ròng (30 ngày)',
+      formatCurrency(cashFlowMetrics.netCashFlow || 0),
+      (cashFlowMetrics.netCashFlow || 0) >= 0 ? 'Tích cực' : 'Cần cải thiện'
     ],
     [
       'Tăng trưởng doanh thu',
@@ -147,6 +264,8 @@ function addSummarySection(doc, metrics, yPosition) {
     ],
     [
       'Burn Rate (ngày)',
+      formatCurrency(cashFlowMetrics.burnRate || 0),
+      (cashFlowMetrics.burnRate || 0) < 1000000 ? 'Hợp lý' : 'Cần kiểm soát'
     ],
     [
       'Runway',
@@ -157,6 +276,8 @@ function addSummarySection(doc, metrics, yPosition) {
   
   yPosition = addTableToPDF(doc, performanceData, yPosition, {
     headerStyle: { fillColor: [102, 16, 242] },
+    alternateRowColors: true
+  });
   
   // Add footer
   yPosition += 20;
@@ -178,6 +299,33 @@ function addSummarySection(doc, metrics, yPosition) {
 function addTableToPDF(doc, data, yPosition, options = {}) {
   const {
     headerStyle = { fillColor: [66, 139, 202] },
+    alternateRowColors = false,
+    maxWidth = 170,
+    cellPadding = 3
+  } = options;
+  
+  const startX = 20;
+  const colWidth = maxWidth / data[0].length;
+  const rowHeight = 8;
+  
+  data.forEach((row, rowIndex) => {
+    const isHeader = rowIndex === 0;
+    const currentY = yPosition + (rowIndex * rowHeight);
+    
+    // Set background color for header or alternating rows
+    if (isHeader && headerStyle.fillColor) {
+      doc.setFillColor(...headerStyle.fillColor);
+      doc.rect(startX, currentY - rowHeight + 2, maxWidth, rowHeight, 'F');
+    } else if (!isHeader && alternateRowColors && rowIndex % 2 === 0) {
+      doc.setFillColor(245, 245, 245);
+      doc.rect(startX, currentY - rowHeight + 2, maxWidth, rowHeight, 'F');
+    }
+    
+    // Set text style
+    doc.setFontSize(isHeader ? 11 : 10);
+    doc.setFont(undefined, isHeader ? 'bold' : 'normal');
+    doc.setTextColor(isHeader ? 255 : 0);
+    
     // Add cell text
     row.forEach((cell, colIndex) => {
       const cellX = startX + (colIndex * colWidth) + cellPadding;

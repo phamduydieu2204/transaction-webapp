@@ -76,6 +76,7 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     
     // Debug log cho giao dịch hoàn tiền
     if (transaction.transactionType === "Hoàn tiền" || transaction.transactionType === "Hoàn Tiền") {
+      console.log(`🔍 DEBUG Hoàn tiền - ID: ${transaction.transactionId}`);
       console.log(`   - index trong page: ${index}`);
       console.log(`   - startIndex: ${startIndex}`);
       console.log(`   - actualIndex tìm được: ${actualIndex}`);
@@ -306,6 +307,7 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
           const action = e.target.value;
           const index = parseInt(e.target.dataset.index);
           
+          console.log(`📌 Action select changed - action: ${action}, data-index: ${index}`);
           console.log(`   - window.isSearching: ${window.isSearching}`);
           
           // Always use the global window.transactionList which is updated after refund
@@ -446,6 +448,7 @@ function copyOrderInfo(transaction, button) {
  * Handle table actions efficiently
  */
 function handleTableAction(action, index, transactionList) {
+  console.log(`🎯 handleTableAction called - action: ${action}, index: ${index}`);
   console.log(`   - transactionList.length: ${transactionList.length}`);
   
   // Get the actual transaction object

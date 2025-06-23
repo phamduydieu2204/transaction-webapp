@@ -36,12 +36,45 @@ export function openAddOrUpdateModal() {
               </div>
             </div>
             <p style="text-align: center; margin-top: 16px;">
+              Bạn đang trong tiến trình sửa giao dịch.<br>
+              Vui lòng chọn hành động bạn muốn thực hiện:
+            </p>
           </div>
           
           <div class="modal-buttons">
             <button id="confirmAddNew" onclick="window.handleAddNewTransaction()" class="modal-btn modal-btn-success">
-  });
-
+              Thêm mới
+            </button>
+            <button id="confirmUpdate" onclick="window.handleUpdateTransactionFromModal()" class="modal-btn modal-btn-primary">
+              Cập nhật
+            </button>
+            <button id="confirmCancel" onclick="window.handleCancelModal()" class="modal-btn modal-btn-secondary">
+              Hủy bỏ
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Show the modal
+    const modal = document.getElementById('addOrUpdateModal');
+    if (modal) {
+      modal.style.display = 'block';
+    }
+  }
+  
+  export async function handleAddNewTransaction() {
+    console.log("🆕 handleAddNewTransaction called - clearing edit state");
+    window.currentEditTransactionId = null;
+    window.currentEditIndex = -1;
+    
+    // Update state if available
+    if (window.updateState) {
+      window.updateState({ 
+        currentEditTransactionId: null,
+        currentEditIndex: -1 
       });
     }
     
@@ -49,13 +82,15 @@ export function openAddOrUpdateModal() {
     
     // Don't reset the form - user wants to keep the data they entered
     // Just update the date to today and proceed with adding
+    console.log("🆕 Updating date to today and proceeding with add");
     try {
       const { setDefaultDates } = await import('./calculateEndDate.js');
       setDefaultDates(true); // Force update dates to today
-  } catch (error) {
+    } catch (error) {
       console.warn("Could not update dates:", error);
     }
     
+    console.log("🆕 Calling handleAdd() for new transaction with current form data");
     if (window.handleAdd) {
       window.handleAdd();
     } else {
@@ -64,11 +99,13 @@ export function openAddOrUpdateModal() {
   }
   
   export function handleUpdateTransactionFromModal() {
+    console.log("🔄 handleUpdateTransactionFromModal called");
     closeAddOrUpdateModal();
     window.handleUpdate(); // Gọi handleUpdate() luôn
   }
   
   export function handleCancelModal() {
+    console.log("❌ handleCancelModal called");
     closeAddOrUpdateModal();
   }
   
