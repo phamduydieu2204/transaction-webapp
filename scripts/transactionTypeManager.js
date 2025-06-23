@@ -107,9 +107,6 @@ export function updateTransactionTypeForEdit(originalStatus, currentValue = '') 
   const select = document.getElementById('transactionType');
   if (!select) return;
   
-    originalStatus,
-
-  
   // Clear existing options except the placeholder
   while (select.children.length > 1) {
     select.removeChild(select.lastChild);
