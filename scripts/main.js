@@ -1,112 +1,69 @@
 /**
- * main.js - Entry Point
+ * main.js - Entry Point (Optimized for Fast Loading)
  * 
- * Main entry point that orchestrates all application modules
- * Imports and initializes core application functionality
+ * Main entry point with lazy loading for better performance
+ * Only loads essential modules initially, others are loaded on-demand
  */
 
-
-// Import core modules
+// Import core modules (essential for startup)
 import { initializeApp } from './core/appInitializer.js';
 import { initializeEventHandlers } from './core/eventManager.js';
 import { initializeStateManager, getState, updateState } from './core/stateManager.js';
 import { switchToTab, initializeTabSystem, switchToIntendedTab } from './core/navigationManager.js';
-import { initializeTabPermissions } from './core/tabPermissions.js';
 import { initializeSessionValidation, validateSessionImmediate } from './core/sessionValidator.js';
 import { authManager } from './core/authManager.js';
-import './debugAuth.js'; // Debug functions
-import './debugEmployeeBadge.js'; // Debug employee badge
-import './debug-employee-report.js'; // Debug employee report
 
-// Import essential utilities (use unified modal system)
+// Import lazy loading system
+import { loadModule, preloadModule } from './core/lazyLoader.js';
+import { loadTabModules, startSmartPreloading } from './core/tabLoader.js';
+
+// Import performance monitoring
+import { trackModuleLoad, trackTabSwitch, generateReport } from './core/performanceMonitor.js';
+
+// Import essential utilities only
 import { showProcessingModal, showResultModal, closeProcessingModal } from './modalUnified.js';
-
-// Import unified detail modal for view functionality
-import './detailModalUnified.js';
-
-// Import tab initialization functions
-import { initExpenseTab } from './initExpenseTab.js';
-import { initTransactionTab } from './initTransactionTab.js';
-import { initSoftwareTab } from './initSoftwareTab.js';
-import { initStatisticsTab } from './initStatisticsTab.js';
-
-// Import employee report modules
-import './reports/employee/employeeReport.js';
-import './reports/employee/employeeReportLoader.js';
-import './reports/employee/employeeReportCore.js';
-
-// Import financial management modules
-import './reports/finance/financialReport.js';
-import './reports/finance/financialLoader.js';
-import './reports/finance/financialCore.js';
-
-// Import cash flow vs accrual modules
-import './reports/cashflow-accrual/cashFlowAccrualReport.js';
-import './reports/cashflow-accrual/cashFlowAccrualLoader.js';
-import './reports/cashflow-accrual/cashFlowAccrualCore.js';
-
-// Import performance optimizers
-import './core/requestOptimizer.js';
-import './core/domOptimizer.js';
-
-// Import legacy functions for backward compatibility
-import { logout } from './logout.js';
-import { openCalendar } from './openCalendar.js';
-import { calculateEndDate, initializeDateCalculations } from './calculateEndDate.js';
-import { updateCustomerInfo } from './updateCustomerInfo.js';
-import { handleReset } from './handleReset.js';
-import { loadTransactions, loadTransactionsOptimized } from './loadTransactions.js';
-import { handleAdd } from './handleAdd.js';
-import { handleUpdate } from './handleUpdate.js';
-import { handleSearch } from './handleSearch.js';
-import { viewTransaction } from './viewTransaction.js';
-
-// Make view functions available globally
-window.viewTransaction = viewTransaction;
-import { editTransaction } from './editTransaction.js';
-import { deleteTransaction } from './deleteTransaction.js';
-import { fetchSoftwareList } from './fetchSoftwareList.js';
-import { updatePackageList } from './updatePackageList.js';
-import { updateAccountList } from './updateAccountList.js';
-import { updateTable } from './updateTableUltraFast.js';
-import { formatDate } from './formatDate.js';
-import { copyToClipboard } from './copyToClipboard.js';
-import { closeModal } from './closeModal.js';
-import { firstPage, prevPage, nextPage, lastPage, goToPage } from './pagination.js';
-import { handleAddExpense } from './handleAddExpense.js';
-import { initExpenseDropdowns } from './initExpenseDropdowns.js';
-import { renderExpenseStats } from './renderExpenseStats.js';
-import { editExpenseRow } from './editExpenseRow.js';
-import { handleDeleteExpense } from './handleDeleteExpense.js';
-import { handleUpdateExpense } from './handleUpdateExpense.js';
-import { viewExpenseRow } from './viewExpenseRow.js';
-import { handleSearchExpense } from './handleSearchExpense.js';
-import { handleResetExpense } from './handleResetExpense.js';
-import { initTotalDisplay } from './updateTotalDisplay.js';
-import { initExpenseQuickSearch } from './expenseQuickSearch.js';
-import { initExpenseQuickSearchNew } from './expenseQuickSearchNew.js';
-import { handleChangePassword, closeChangePasswordModal, confirmChangePassword } from './handleChangePassword.js';
-import { formatDateTime } from './formatDateTime.js';
-import { openConfirmModal, closeConfirmModal, confirmDelete } from './confirmModal.js';
-import { 
-  openAddOrUpdateModal, 
-  closeAddOrUpdateModal, 
-  handleAddNewTransaction, 
-  handleUpdateTransactionFromModal, 
-  handleCancelModal 
-} from './handleAddOrUpdateModal.js';
-import {
-  handleUpdateCookie,
-  confirmUpdateCookie,
-  cancelUpdateCookie,
-  copyCurrentCookie,
-  copyUsername,
-  copyPassword,
-  closeUpdateCookieModal
-} from './handleUpdateCookie.js';
-import { checkSheetAccess } from './checkSheetAccess.js';
-import { editRow, deleteRow } from './legacy.js';
 import { getConstants } from './constants.js';
+
+// Cache for loaded modules to avoid re-importing
+const moduleCache = new Map();
+
+/**
+ * Lazy load a function and cache it
+ */
+async function lazyLoadFunction(functionName, modulePath, exportName = null) {
+  if (moduleCache.has(functionName)) {
+    return moduleCache.get(functionName);
+  }
+  
+  try {
+    const module = await loadModule(modulePath);
+    const fn = exportName ? module[exportName] : module[functionName] || module.default;
+    
+    if (typeof fn === 'function') {
+      moduleCache.set(functionName, fn);
+      return fn;
+    } else {
+      console.error(`❌ Function ${functionName} not found in ${modulePath}`);
+      return null;
+    }
+  } catch (error) {
+    console.error(`❌ Failed to load ${functionName} from ${modulePath}:`, error);
+    return null;
+  }
+}
+
+/**
+ * Create a lazy wrapper for a function
+ */
+function createLazyFunction(functionName, modulePath, exportName = null) {
+  return async (...args) => {
+    const fn = await lazyLoadFunction(functionName, modulePath, exportName);
+    if (fn) {
+      return fn(...args);
+    }
+    throw new Error(`Function ${functionName} could not be loaded`);
+  };
+}
 
 /**
  * Show login form when user is not authenticated
@@ -236,11 +193,41 @@ async function startApp() {
     // Phase 3: Setup event handlers
     initializeEventHandlers();
     
-    // Phase 4: Initialize navigation system
+    // Phase 4: Initialize navigation system and override tab switch function
     initializeTabSystem();
+    
+    // Override switchToTab to support lazy loading and performance tracking
+    const originalSwitchToTab = window.switchToTab;
+    window.switchToTab = async (tabName, options) => {
+      const tabTracker = trackTabSwitch(tabName);
+      try {
+        // Load tab modules before switching
+        console.log(`🔄 Loading modules for tab: ${tabName}`);
+        await loadTabModules(tabName);
+        
+        // Now switch to the tab
+        const result = await originalSwitchToTab(tabName, options);
+        tabTracker.end();
+        return result;
+      } catch (error) {
+        console.error(`❌ Error switching to tab ${tabName}:`, error);
+        tabTracker.end();
+        return false;
+      }
+    };
     
     // Phase 4.1: Switch to intended tab after authentication
     switchToIntendedTab();
+    
+    // Phase 4.2: Start smart preloading
+    setTimeout(() => {
+      startSmartPreloading();
+    }, 1000);
+    
+    // Phase 5: Generate performance report after initial load
+    setTimeout(() => {
+      generateReport();
+    }, 3000);
     
     
     // Phase 4.5: Initialize date defaults and calculations
@@ -286,8 +273,8 @@ async function startApp() {
   }
 }
 
-// Legacy global function exports for backward compatibility
-window.logout = logout;
+// Legacy global function exports with lazy loading for backward compatibility
+window.logout = createLazyFunction('logout', './logout.js');
 window.showProcessingModal = showProcessingModal;
 window.closeProcessingModal = closeProcessingModal; 
 window.showResultModal = showResultModal;
@@ -525,62 +512,85 @@ window.forceCashFlowAccrual = function() {
     }
 };
 
-// Make close function available globally
+// Lazy-loaded global functions for better performance
 window.closeProcessingModalUnified = closeProcessingModal;
-window.updatePackageList = updatePackageList;
-window.updateAccountList = updateAccountList;
-window.fetchSoftwareList = fetchSoftwareList;
-window.openCalendar = (inputId) =>
-  openCalendar(inputId, calculateEndDate, document.getElementById("startDate"), document.getElementById("duration"), document.getElementById("endDate"));
-window.updateCustomerInfo = () => {
-  const state = getState();
-  return updateCustomerInfo(state.transactions);
+window.updatePackageList = createLazyFunction('updatePackageList', './updatePackageList.js');
+window.updateAccountList = createLazyFunction('updateAccountList', './updateAccountList.js');
+window.fetchSoftwareList = createLazyFunction('fetchSoftwareList', './fetchSoftwareList.js');
+window.openCalendar = async (inputId) => {
+  const [openCalendarFn, calculateEndDateFn] = await Promise.all([
+    lazyLoadFunction('openCalendar', './openCalendar.js'),
+    lazyLoadFunction('calculateEndDate', './calculateEndDate.js')
+  ]);
+  return openCalendarFn(inputId, calculateEndDateFn, document.getElementById("startDate"), document.getElementById("duration"), document.getElementById("endDate"));
 };
-window.handleReset = () =>
-  handleReset(fetchSoftwareList, showProcessingModal, showResultModal, getState().todayFormatted, updatePackageList, updateAccountList);
-window.loadTransactions = () => {
+window.updateCustomerInfo = async () => {
+  const fn = await lazyLoadFunction('updateCustomerInfo', './updateCustomerInfo.js');
   const state = getState();
-  return loadTransactions(state.user, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction);
+  return fn(state.transactions);
 };
-window.loadTransactionsOptimized = (options = {}) => {
+window.handleReset = async () => {
+  const fn = await lazyLoadFunction('handleReset', './handleReset.js');
   const state = getState();
-  return loadTransactionsOptimized(state.user, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction, options);
+  return fn(window.fetchSoftwareList, showProcessingModal, showResultModal, state.todayFormatted, window.updatePackageList, window.updateAccountList);
 };
-window.handleAdd = () => {
+window.loadTransactions = async () => {
+  const [loadTransactionsFn, updateTableFn, formatDateFn, editTransactionFn, viewTransactionFn] = await Promise.all([
+    lazyLoadFunction('loadTransactions', './loadTransactions.js'),
+    lazyLoadFunction('updateTable', './updateTableUltraFast.js'),
+    lazyLoadFunction('formatDate', './formatDate.js'),
+    lazyLoadFunction('editTransaction', './editTransaction.js'),
+    lazyLoadFunction('viewTransaction', './viewTransaction.js')
+  ]);
   const state = getState();
-  return handleAdd(state.user, state.currentEditTransactionId, window.loadTransactions, window.handleReset, updatePackageList, showProcessingModal, showResultModal);
+  return loadTransactionsFn(state.user, updateTableFn, formatDateFn, editTransactionFn, window.deleteTransaction, viewTransactionFn);
 };
-window.handleUpdate = () => {
-  return handleUpdate();
-};
-window.handleSearch = () => {
+window.loadTransactionsOptimized = async (options = {}) => {
+  const fn = await lazyLoadFunction('loadTransactionsOptimized', './loadTransactions.js');
   const state = getState();
-  return handleSearch(state.user, state.transactions, showProcessingModal, showResultModal, updateTable, formatDate, editTransaction, window.deleteTransaction, viewTransaction);
+  return fn(state.user, window.updateTable, window.formatDate, window.editTransaction, window.deleteTransaction, window.viewTransaction, options);
 };
-window.viewTransaction = (indexOrTransaction, transactionList, formatDateFn) => {
+window.handleAdd = async () => {
+  const fn = await lazyLoadFunction('handleAdd', './handleAdd.js');
   const state = getState();
-  // Use passed parameters or defaults
+  return fn(state.user, state.currentEditTransactionId, window.loadTransactions, window.handleReset, window.updatePackageList, showProcessingModal, showResultModal);
+};
+window.handleUpdate = createLazyFunction('handleUpdate', './handleUpdate.js');
+window.handleSearch = async () => {
+  const [handleSearchFn, updateTableFn, formatDateFn, editTransactionFn, viewTransactionFn] = await Promise.all([
+    lazyLoadFunction('handleSearch', './handleSearch.js'),
+    lazyLoadFunction('updateTable', './updateTableUltraFast.js'),
+    lazyLoadFunction('formatDate', './formatDate.js'),
+    lazyLoadFunction('editTransaction', './editTransaction.js'),
+    lazyLoadFunction('viewTransaction', './viewTransaction.js')
+  ]);
+  const state = getState();
+  return handleSearchFn(state.user, state.transactions, showProcessingModal, showResultModal, updateTableFn, formatDateFn, editTransactionFn, window.deleteTransaction, viewTransactionFn);
+};
+window.viewTransaction = async (indexOrTransaction, transactionList, formatDateFn) => {
+  const viewTransactionFn = await lazyLoadFunction('viewTransaction', './viewTransaction.js');
+  const formatDateFn2 = formatDateFn || await lazyLoadFunction('formatDate', './formatDate.js');
+  const state = getState();
   const list = transactionList || state.transactions || window.transactionList;
-  const formatter = formatDateFn || formatDate;
-  return viewTransaction(indexOrTransaction, list, formatter);
+  return viewTransactionFn(indexOrTransaction, list, formatDateFn2);
 };
-window.editTransaction = (index) => {
+window.editTransaction = async (index) => {
+  const editTransactionFn = await lazyLoadFunction('editTransaction', './editTransaction.js');
   const state = getState();
-  // Use window.transactionList for consistency
   const transactionList = window.transactionList || state.transactions || [];
-  return editTransaction(index, transactionList, fetchSoftwareList, updatePackageList, updateAccountList);
+  return editTransactionFn(index, transactionList, window.fetchSoftwareList, window.updatePackageList, window.updateAccountList);
 };
-window.deleteTransaction = (index) => {
+window.deleteTransaction = async (index) => {
+  const deleteTransactionFn = await lazyLoadFunction('deleteTransaction', './deleteTransaction.js');
+  const openConfirmModalFn = await lazyLoadFunction('openConfirmModal', './confirmModal.js');
   const state = getState();
-  // Use window.transactionList instead of state.transactions for consistency
   const transactionList = window.transactionList || state.transactions || [];
   
-  // Prevent automatic calls during page load
   if (!transactionList || transactionList.length === 0) {
     return;
   }
   
-  return deleteTransaction(
+  return deleteTransactionFn(
     index,
     transactionList,
     state.user,
@@ -588,59 +598,63 @@ window.deleteTransaction = (index) => {
     window.handleReset,
     showProcessingModal,
     showResultModal,
-    openConfirmModal,
+    openConfirmModalFn,
     getConstants
   );
 };
-window.handleUpdateCookie = (index) => {
-  // Use window.transactionList for consistency with updateTable.js
-  return handleUpdateCookie(index, window.transactionList);
+window.handleUpdateCookie = async (index) => {
+  const fn = await lazyLoadFunction('handleUpdateCookie', './handleUpdateCookie.js');
+  return fn(index, window.transactionList);
 };
-window.handleChangePassword = handleChangePassword;
-window.handleAddExpense = handleAddExpense;
-window.closeChangePasswordModal = closeChangePasswordModal;
-window.confirmChangePassword = confirmChangePassword;
-window.confirmUpdateCookie = confirmUpdateCookie;
-window.cancelUpdateCookie = cancelUpdateCookie;
-window.copyCurrentCookie = copyCurrentCookie;
-window.copyUsername = copyUsername;
-window.copyPassword = copyPassword;
-window.closeUpdateCookieModal = closeUpdateCookieModal;
-window.editExpenseRow = editExpenseRow;
-window.handleDeleteExpense = handleDeleteExpense;
-window.handleUpdateExpense = handleUpdateExpense;
-window.viewExpenseRow = viewExpenseRow;
-window.handleSearchExpense = () => handleSearchExpense();
-window.handleResetExpense = handleResetExpense;
-window.editRow = (index) => {
+window.handleChangePassword = createLazyFunction('handleChangePassword', './handleChangePassword.js');
+window.handleAddExpense = createLazyFunction('handleAddExpense', './handleAddExpense.js');
+window.closeChangePasswordModal = createLazyFunction('closeChangePasswordModal', './handleChangePassword.js');
+window.confirmChangePassword = createLazyFunction('confirmChangePassword', './handleChangePassword.js');
+window.confirmUpdateCookie = createLazyFunction('confirmUpdateCookie', './handleUpdateCookie.js');
+window.cancelUpdateCookie = createLazyFunction('cancelUpdateCookie', './handleUpdateCookie.js');
+window.copyCurrentCookie = createLazyFunction('copyCurrentCookie', './handleUpdateCookie.js');
+window.copyUsername = createLazyFunction('copyUsername', './handleUpdateCookie.js');
+window.copyPassword = createLazyFunction('copyPassword', './handleUpdateCookie.js');
+window.closeUpdateCookieModal = createLazyFunction('closeUpdateCookieModal', './handleUpdateCookie.js');
+window.editExpenseRow = createLazyFunction('editExpenseRow', './editExpenseRow.js');
+window.handleDeleteExpense = createLazyFunction('handleDeleteExpense', './handleDeleteExpense.js');
+window.handleUpdateExpense = createLazyFunction('handleUpdateExpense', './handleUpdateExpense.js');
+window.viewExpenseRow = createLazyFunction('viewExpenseRow', './viewExpenseRow.js');
+window.handleSearchExpense = async () => {
+  const fn = await lazyLoadFunction('handleSearchExpense', './handleSearchExpense.js');
+  return fn();
+};
+window.handleResetExpense = createLazyFunction('handleResetExpense', './handleResetExpense.js');
+window.editRow = async (index) => {
+  const editRowFn = await lazyLoadFunction('editRow', './legacy.js');
   const state = getState();
-  return editRow(index, state.transactions);
+  return editRowFn(index, state.transactions);
 };
-window.deleteRow = (index) => {
-  return deleteRow(index, window.deleteTransaction);
+window.deleteRow = async (index) => {
+  const deleteRowFn = await lazyLoadFunction('deleteRow', './legacy.js');
+  return deleteRowFn(index, window.deleteTransaction);
 };
-// Software tab function
-window.initSoftwareTab = () => {
-  if (typeof initSoftwareTab === 'function') {
-    return initSoftwareTab();
-  } else {
-    console.warn('⚠️ initSoftwareTab function not available');
+window.initSoftwareTab = async () => {
+  try {
+    const initSoftwareTabFn = await lazyLoadFunction('initSoftwareTab', './initSoftwareTab.js');
+    return initSoftwareTabFn();
+  } catch (error) {
+    console.warn('⚠️ initSoftwareTab function not available:', error);
   }
 };
-window.closeModal = closeModal;
-window.confirmDelete = confirmDelete;
+window.closeModal = createLazyFunction('closeModal', './closeModal.js');
+window.confirmDelete = createLazyFunction('confirmDelete', './confirmModal.js');
 window.closeProcessingModal = closeProcessingModal;
-// Add/Update modal handlers
-window.openAddOrUpdateModal = openAddOrUpdateModal;
-window.closeAddOrUpdateModal = closeAddOrUpdateModal;
-window.handleAddNewTransaction = handleAddNewTransaction;
-window.handleUpdateTransactionFromModal = handleUpdateTransactionFromModal;
-window.handleCancelModal = handleCancelModal;
-window.firstPage = firstPage;
-window.prevPage = prevPage;
-window.nextPage = nextPage;
-window.lastPage = lastPage;
-window.goToPage = goToPage;
+window.openAddOrUpdateModal = createLazyFunction('openAddOrUpdateModal', './handleAddOrUpdateModal.js');
+window.closeAddOrUpdateModal = createLazyFunction('closeAddOrUpdateModal', './handleAddOrUpdateModal.js');
+window.handleAddNewTransaction = createLazyFunction('handleAddNewTransaction', './handleAddOrUpdateModal.js');
+window.handleUpdateTransactionFromModal = createLazyFunction('handleUpdateTransactionFromModal', './handleAddOrUpdateModal.js');
+window.handleCancelModal = createLazyFunction('handleCancelModal', './handleAddOrUpdateModal.js');
+window.firstPage = createLazyFunction('firstPage', './pagination.js');
+window.prevPage = createLazyFunction('prevPage', './pagination.js');
+window.nextPage = createLazyFunction('nextPage', './pagination.js');
+window.lastPage = createLazyFunction('lastPage', './pagination.js');
+window.goToPage = createLazyFunction('goToPage', './pagination.js');
 
 // Export state management for modules that need it
 window.getState = getState;

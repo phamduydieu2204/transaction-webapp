@@ -5,10 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quản lý giao dịch và chi phí</title>
   
-  <!-- CSS Files -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <!-- Local CSS will be loaded with version control -->
+  <!-- Critical CSS is inlined by cssOptimizer -->
+  <!-- External CSS will be loaded asynchronously -->
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <!-- Local CSS will be loaded asynchronously with version control -->
 </head>
 <body>
   <div class="container">
@@ -58,12 +59,27 @@
   <script>
     console.log('🔥 Index.html: Basic script loaded');
     
-    // Load CSS with version control
-    versionManager.loadCSS('css/main.css', 'main-css');
-    versionManager.loadCSS('css/full-width-override.css', 'override-css');
+    // Load CSS asynchronously for better performance
+    const loadCSSAsync = (href, id) => {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = href;
+      if (id) link.id = id;
+      link.media = 'print';
+      document.head.appendChild(link);
+      setTimeout(() => link.media = 'all', 0);
+    };
     
-    // Start auto-check for updates
-    versionManager.startAutoCheck();
+    // Load critical CSS first, then others asynchronously
+    loadCSSAsync('css/main.css', 'main-css');
+    setTimeout(() => {
+      loadCSSAsync('css/full-width-override.css', 'override-css');
+    }, 100);
+    
+    // Start auto-check for updates (delayed to not block initial render)
+    setTimeout(() => {
+      versionManager.startAutoCheck();
+    }, 1000);
   </script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script type="module">
