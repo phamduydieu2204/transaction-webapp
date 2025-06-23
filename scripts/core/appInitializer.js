@@ -64,11 +64,6 @@ export function loadUserInfo() {
     return false;
   }
 
-    name: window.userInfo.tenNhanVien,
-    id: window.userInfo.maNhanVien,
-    role: window.userInfo.vaiTro
-  });
-
   return true;
 }
 
