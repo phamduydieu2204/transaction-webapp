@@ -80,7 +80,6 @@ export async function renderRevenueExpenseChart(transactionData, expenseData, co
     containerId,
     transactionCount: transactionData.length,
     expenseCount: expenseData.length
-  });
   
   const container = document.getElementById(containerId);
   if (!container) {

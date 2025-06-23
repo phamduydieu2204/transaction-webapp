@@ -242,7 +242,6 @@ export class StatisticsViewController {
       beforeHide: config.beforeHide || null,
       afterHide: config.afterHide || null,
       responsive: config.responsive || true
-    });
   }
   
   /**
@@ -276,7 +275,6 @@ export class StatisticsViewController {
       deviceType,
       width,
       height: window.innerHeight
-    });
     
     // Handle mobile-specific view adjustments
     if (deviceType === 'mobile') {
@@ -329,7 +327,6 @@ export class StatisticsViewController {
       detail: data,
       bubbles: true,
       cancelable: true
-    });
     
     document.dispatchEvent(event);
   }
@@ -461,22 +458,18 @@ export function initializeViewControllers() {
   viewController.registerView('overview', {
     title: 'Tổng quan',
     icon: '📊'
-  });
   
   viewController.registerView('expenses', {
     title: 'Chi phí',
     icon: '💸'
-  });
   
   viewController.registerView('revenue', {
     title: 'Doanh thu',
     icon: '💰'
-  });
   
   viewController.registerView('reports', {
     title: 'Báo cáo',
     icon: '📈'
-  });
   
   // Setup navigation event listeners
   setupNavigationListeners();

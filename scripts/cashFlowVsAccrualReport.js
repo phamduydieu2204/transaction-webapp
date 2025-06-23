@@ -99,7 +99,6 @@ function initializeCharts(cashFlowData, accrualData) {
       type: 'line',
       data: cashFlowChartData,
       options: getChartOptions('Cash Flow')
-    });
   }
   
   // Initialize accrual chart
@@ -110,7 +109,6 @@ function initializeCharts(cashFlowData, accrualData) {
       type: 'line',
       data: accrualChartData,
       options: getChartOptions('Chi phí phân bổ')
-    });
   }
 }
 

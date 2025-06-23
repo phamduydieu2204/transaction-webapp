@@ -50,7 +50,6 @@ export async function ensureDataIsLoaded() {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify(data)
-        });
         
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -81,7 +80,6 @@ export async function ensureDataIsLoaded() {
   
     transactions: window.transactionList.length,
     expenses: window.expenseList.length
-  });
 }
 
 /**
@@ -94,7 +92,6 @@ export async function ensureSoftwareDataLoaded() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({})
-      });
       
       const result = await response.json();
       if (result.status === 'success') {

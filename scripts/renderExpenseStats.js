@@ -63,7 +63,6 @@ async function renderExpenseStatsLegacy() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "getExpenseStats" }),
       signal: controller.signal
-    });
 
     clearTimeout(timeoutId);
 
@@ -106,7 +105,6 @@ function renderExpenseData(data) {
     isSearching: window.isExpenseSearching === true,
     targetDate: window.isExpenseSearching ? null : todayFormatted,
     currency: "VND"
-  });
 
   const totalExpense = totalExpenses.VND || 0;
 
@@ -141,12 +139,10 @@ function renderExpenseSummaryModular(data) {
       currency: "VND",
       sortBy: "month",
       sortOrder: "desc"
-    });
 
     renderMonthlySummaryTable(summaryData, {
       tableId: "monthlySummaryTable",
       showGrowthRate: false
-    });
 
     console.log("✅ Statistics summary rendered with new modules");
   } catch (error) {

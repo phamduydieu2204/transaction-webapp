@@ -73,7 +73,6 @@ export class EmployeeDataProcessor {
                     renewalRate: 0,
                     renewals: 0,
                     newAcquisitions: 0
-                });
             }
             
             const employee = this.employees.get(key);
@@ -213,7 +212,6 @@ export class EmployeeDataProcessor {
                     avgPerformance: 0,
                     topPerformer: null,
                     customerCount: 0
-                });
             }
             
             const department = this.departments.get(dept);

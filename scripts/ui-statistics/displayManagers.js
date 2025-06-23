@@ -381,7 +381,6 @@ export class UIStateManager {
       visibility: element.style.visibility,
       opacity: element.style.opacity,
       classList: [...element.classList]
-    });
   }
   
   /**

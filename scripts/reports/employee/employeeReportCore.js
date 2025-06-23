@@ -64,7 +64,6 @@ export class EmployeeReportCore {
             
                 transactions: this.transactions.length,
                 expenses: this.expenses.length
-            });
             
         } catch (error) {
             console.error('❌ Error loading employee data:', error);
@@ -238,7 +237,6 @@ export class EmployeeReportCore {
                     monthlyRevenue: {},
                     monthlyTransactions: {},
                     rank: 0
-                });
             }
             
             const employee = employeeMap.get(employeeKey);

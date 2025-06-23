@@ -589,7 +589,6 @@ export function calculateAllocatedExpense(expense, dateRange) {
       allocation: expense.allocation,
       allocationValue: allocationValue,
       reason: 'allocation field not "Có"'
-    });
     return 0;
   }
   
@@ -609,7 +608,6 @@ export function calculateAllocatedExpense(expense, dateRange) {
     renewDateValue,
     parsedTransactionDate: transactionDate,
     parsedRenewalDate: renewalDate
-  });
   
   // Must have both dates for allocation
   if (!transactionDate || !renewalDate || renewalDate <= transactionDate) {
@@ -700,7 +698,6 @@ export function calculateAllocatedExpense(expense, dateRange) {
     validDaysInPeriod,
     calculation: `${dailyAmount.toFixed(2)} × ${validDaysInPeriod} days`,
     allocatedAmount: allocatedAmount.toFixed(2)
-  });
   
   return allocatedAmount;
 }
@@ -793,7 +790,6 @@ export function calculateMonthlyExpenseBreakdown(expenses, targetMonth = null) {
     totalActual: breakdown.totalActualExpense,
     allocatedCount: breakdown.allocatedDetails.length,
     actualCount: breakdown.actualDetails.length
-  });
   
   return breakdown;
 }
@@ -885,7 +881,6 @@ export function testAllocationLogic(testCases = null) {
       allocated: result.allocated,
       actual: result.actual,
       passed: result.overallPassed
-    });
   });
   
   const totalPassed = results.filter(r => r.overallPassed).length;
@@ -929,7 +924,6 @@ export function calculateActualExpense(expense, dateRange) {
       periodRange: `${dateRange.start} to ${dateRange.end}`,
       amount,
       included: true
-    });
     
     return amount;
   }
@@ -954,7 +948,6 @@ export function calculateROIByTenChuan(transactions, expenses, dateRange = null)
         product: expense.product || expense['Tên sản phẩm/Dịch vụ'],
         accountingType: accountingType,
         amount: expense.amount || expense['Số tiền']
-      });
       return false;
     }
     return true;
@@ -963,7 +956,6 @@ export function calculateROIByTenChuan(transactions, expenses, dateRange = null)
     original: expenses.length,
     filtered: filteredExpenses.length,
     excluded: expenses.length - filteredExpenses.length
-  });
   
   const transactionGroups = groupTransactionsByTenChuan(transactions);
   const expenseGroups = groupExpensesByTenChuan(filteredExpenses);
@@ -1012,7 +1004,6 @@ export function calculateROIByTenChuan(transactions, expenses, dateRange = null)
           allocatedAmount,
           currency,
           convertedVND: convertToVND(allocatedAmount, currency)
-        });
       } else {
         // No allocation - use actual amount if in period
         const actualAmount = calculateActualExpense(expense, dateRange);
@@ -1022,7 +1013,6 @@ export function calculateROIByTenChuan(transactions, expenses, dateRange = null)
             actualAmount,
             currency,
             convertedVND: convertToVND(actualAmount, currency)
-          });
         }
       }
       
@@ -1068,7 +1058,6 @@ export function calculateROIByTenChuan(transactions, expenses, dateRange = null)
       customerCount: transactionData.uniqueCustomers,
       transactionCount: transactionData.transactions.length,
       expenseCount: expenseData.expenses.length
-    });
   });
   
   // Sort by accounting ROI descending

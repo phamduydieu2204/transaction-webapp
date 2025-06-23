@@ -165,7 +165,6 @@ export async function loadTransactions(userInfo, updateTable, formatDate, editTr
       },
       body: JSON.stringify(data),
       signal: controller.signal
-    });
 
     clearTimeout(timeoutId);
 
@@ -193,12 +192,6 @@ export async function loadTransactions(userInfo, updateTable, formatDate, editTr
       const activeTabButton = document.querySelector(".tab-button.active");
       const isTransactionTabActive = (activeTab && activeTab.id === "tab-giao-dich") || 
                                    (activeTabButton && activeTabButton.dataset.tab === "tab-giao-dich");
-      
-        activeTabId: activeTab ? activeTab.id : "none",
-        activeTabButtonData: activeTabButton ? activeTabButton.dataset.tab : "none",
-        isTransactionTabActive,
-        willUpdateTable: isTransactionTabActive
-      });
       
       // ✅ ALWAYS UPDATE TABLE IF WE HAVE TRANSACTION DATA
       if (window.transactionList && window.transactionList.length >= 0) {

@@ -26,7 +26,6 @@ export async function renderOverviewTab(expenseData, transactionData, financialA
     renderFinancialOverview(financialAnalysis, {
       containerId: "financialOverview",
       showDetails: true
-    });
     
     // Render summary chart
     const { groupExpensesByMonth } = await import('../statisticsCore.js');
@@ -42,7 +41,6 @@ export async function renderOverviewTab(expenseData, transactionData, financialA
       title: "Chi Phí Theo Tháng",
       xLabel: "Tháng",
       yLabel: "Số Tiền (VND)"
-    });
     
     
   } catch (error) {
@@ -62,12 +60,10 @@ export async function renderExpensesTab(expenseData, uiState) {
       currency: uiState.currency,
       sortBy: uiState.sortBy,
       sortOrder: uiState.sortOrder
-    });
     
     renderMonthlySummaryTable(summaryData, {
       tableId: "monthlySummaryTable",
       showGrowthRate: uiState.showGrowthRate
-    });
     
     
   } catch (error) {
@@ -87,7 +83,6 @@ export async function renderRevenueTab(transactionData, uiState) {
       currency: uiState.currency,
       sortBy: uiState.sortBy,
       sortOrder: uiState.sortOrder
-    });
     
     // Convert to expense table format for compatibility
     const expenseFormatData = summaryData.map(item => ({
@@ -99,7 +94,6 @@ export async function renderRevenueTab(transactionData, uiState) {
     renderMonthlySummaryTable(expenseFormatData, {
       tableId: "monthlySummaryTable",
       showGrowthRate: uiState.showGrowthRate
-    });
     
     
   } catch (error) {
@@ -133,7 +127,6 @@ export async function renderEnhancedStatistics(expenseData, transactionData, fin
     renderBusinessOverviewDashboard(transactionData, expenseData, {
       containerId: "financialDashboard",
       dateRange: dateRange
-    });
     */
     
     // Refresh report menu components if active
@@ -160,7 +153,6 @@ export async function renderEnhancedStatistics(expenseData, transactionData, fin
       renderFinancialDashboard(transactionData, expenseData, {
         containerId: "financialDashboard",
         globalFilters: globalFilters
-      });
       console.log("✅ Fallback to old financial dashboard");
     } catch (fallbackError) {
       console.error("❌ Fallback failed:", fallbackError);
@@ -189,12 +181,10 @@ async function renderFilteredMonthlySummary(expenseData, globalFilters) {
       currency: uiState.currency,
       sortBy: uiState.sortBy,
       sortOrder: uiState.sortOrder
-    });
     
     renderMonthlySummaryTable(summaryData, {
       tableId: "monthlySummaryTable",
       showGrowthRate: false
-    });
     
     
   } catch (error) {
@@ -215,12 +205,10 @@ export async function renderDefaultTab(expenseData, financialAnalysis) {
       currency: uiState.currency,
       sortBy: uiState.sortBy,
       sortOrder: uiState.sortOrder
-    });
     
     renderMonthlySummaryTable(summaryData, {
       tableId: "monthlySummaryTable",
       showGrowthRate: false
-    });
     
     
   } catch (error) {
@@ -309,7 +297,6 @@ export function renderComparisonChart(currentData, previousData, config) {
       yLabel: 'Số tiền',
       colors: ['#3498db', '#95a5a6'],
       showLegend: true
-    });
     
     
   } catch (error) {
@@ -346,7 +333,6 @@ export function renderCategoryPieChart(data, config) {
       title,
       showLegend: true,
       responsive: true
-    });
     
     
   } catch (error) {
@@ -383,7 +369,6 @@ export function renderTrendChart(data, config) {
       yLabel: 'Giá trị',
       showLegend: false,
       responsive: true
-    });
     
     
   } catch (error) {

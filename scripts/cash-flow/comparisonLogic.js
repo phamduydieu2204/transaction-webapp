@@ -225,7 +225,6 @@ export function analyzeVariance(comparison) {
         variance,
         percentVariance,
         type: diff.difference > 0 ? 'cash_higher' : 'accrual_higher'
-      });
     }
   });
   

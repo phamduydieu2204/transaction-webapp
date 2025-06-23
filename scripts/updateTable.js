@@ -70,7 +70,6 @@ function handleTransactionActionByIndex(selectElement) {
     transaction,
     transactionId: transaction.transactionId,
     transactionListLength: window.transactionList ? window.transactionList.length : 0
-  });
   
   // Execute action based on selection
   switch (action) {
@@ -475,7 +474,6 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
         employeeCode: employeeCode,
         color: employeeColor,
         allKeys: Object.keys(transaction)
-      });
     }
     
     const infoCell = `

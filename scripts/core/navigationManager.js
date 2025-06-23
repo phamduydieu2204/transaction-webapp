@@ -333,7 +333,6 @@ function setupURLListener() {
       switchToTab(allowedTab, { 
         updateURL: allowedTab !== urlTab, // Update URL if redirected
         addToHistory: false 
-      });
     }
   });
 }

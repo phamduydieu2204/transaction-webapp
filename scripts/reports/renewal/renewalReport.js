@@ -135,7 +135,6 @@ async function loadExpiringSubscriptions() {
           ...transaction,
           daysUntilExpiry,
           isUrgent: daysUntilExpiry <= 30
-        });
       }
     }
   });

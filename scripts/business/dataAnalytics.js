@@ -350,14 +350,6 @@ export function calculateGrowthMetrics(transactionData, expenseData, dateRange) 
       transactionGrowth = ((currentMonthTransactions.length - prevMonthTransactions.length) / prevMonthTransactions.length) * 100;
     }
     
-      currentMonthRevenue,
-      prevMonthRevenue,
-      revenueGrowth,
-      currentMonthTransactions: currentMonthTransactions.length,
-      prevMonthTransactions: prevMonthTransactions.length,
-      transactionGrowth
-    });
-    
   } catch (error) {
     console.warn('⚠️ Error calculating growth metrics:', error);
   }

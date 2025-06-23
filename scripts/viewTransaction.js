@@ -129,14 +129,6 @@ export async function viewTransaction(indexOrTransaction, transactionList, forma
   try {
     const { BACKEND_URL } = getConstants();
     const res = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "getAccountInfoBySoftware",
-        softwareName: transaction.softwareName,
-        softwarePackage: transaction.softwarePackage,
-        accountName: transaction.accountName
-      })      
     });
     const result = await res.json();
     if (result.status === "success") {

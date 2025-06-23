@@ -164,7 +164,6 @@ async function refreshStatistics() {
       currentTab: currentTab ? currentTab.dataset.tab : "null",
       isThongKeTab: isThongKeTab,
       shouldRenderEnhanced: isThongKeTab
-    });
     
     if (!isThongKeTab) {
       console.log("⏭️ Not in statistics tab, skipping enhanced render");
@@ -180,7 +179,6 @@ async function refreshStatistics() {
       expenseCount: expenseData.length,
       transactionCount: transactionData.length,
       hasFinancialAnalysis: !!processedData.financialAnalysis
-    });
     
     // Render using modular chart renderer
     await renderEnhancedStatistics(

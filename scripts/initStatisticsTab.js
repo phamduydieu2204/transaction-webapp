@@ -18,7 +18,6 @@ export async function initStatisticsTab() {
       transactionList: window.transactionList ? window.transactionList.length : 0,
       expenseList: window.expenseList ? window.expenseList.length : 0,
       userInfo: !!window.userInfo
-    });
     
     // Load report pages HTML if not already loaded
     await loadReportPagesHTML();

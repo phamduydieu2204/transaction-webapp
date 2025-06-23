@@ -21,7 +21,6 @@ export async function deleteTransaction(
     transactionListType: typeof transactionList,
     transactionListLength: transactionList ? transactionList.length : 0,
     hasUserInfo: !!userInfo
-  });
 
   // Validation cơ bản trước
   if (!transactionList || !Array.isArray(transactionList)) {
@@ -106,7 +105,6 @@ export async function deleteTransaction(
         "Content-Type": "application/json"
       },
       body: JSON.stringify(data)
-    });
 
     const result = await response.json();
     console.log("Kết quả từ server:", result);

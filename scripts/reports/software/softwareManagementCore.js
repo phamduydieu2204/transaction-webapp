@@ -51,7 +51,6 @@ export class SoftwareManagement {
                 software: this.softwareAccounts.length,
                 transactions: this.transactions.length,
                 expenses: this.expenses.length
-            });
             
         } catch (error) {
             console.error('❌ Error loading data:', error);
@@ -168,7 +167,6 @@ export class SoftwareManagement {
                     status: 'active',
                     expiryDate: null,
                     alertLevel: 'normal'
-                });
             }
         });
 

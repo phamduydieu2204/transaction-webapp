@@ -14,7 +14,6 @@ export async function handleDeleteExpense(expenseId) {
         action: "deleteExpense",
         expenseId,
         maNhanVien: window.userInfo?.maNhanVien || ""
-      })
     });
 
     const result = await res.json();

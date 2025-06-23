@@ -246,7 +246,6 @@ function createExpenseRow(expense, index) {
       renewDate: expense.renewDate,
       expenseRenewDate: expense.expenseRenewDate,
       ngayTaiTuc: expense.ngayTaiTuc
-    });
   }
   
   // Format dates

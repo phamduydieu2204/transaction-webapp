@@ -128,7 +128,6 @@ const reportCache = {
     this.data.set(key, {
       value,
       timestamp: Date.now()
-    });
   },
   
   get(key) {

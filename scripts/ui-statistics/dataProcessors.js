@@ -51,7 +51,6 @@ export async function loadStatisticsData(uiState) {
     
       expenses: data.expenses.length,
       transactions: data.transactions.length
-    });
     
     // Store in global variables for compatibility
     window.expenseList = data.expenses;
@@ -108,12 +107,10 @@ export function processDataForUI(expenseData, transactionData, uiState) {
   const expenseTotals = calculateTotalExpenses(expenseData, {
     currency: uiState.currency,
     dateRange: dateRangeFilter
-  });
   
   const revenueTotals = calculateTotalRevenue(transactionData, {
     currency: uiState.currency,
     dateRange: dateRangeFilter
-  });
   
   // Calculate financial analysis
   const financialAnalysis = calculateFinancialAnalysis(revenueTotals, expenseTotals);
@@ -200,7 +197,6 @@ function prepareExpensesData(expenseData, uiState) {
     currency: uiState.currency,
     sortBy: uiState.sortBy,
     sortOrder: uiState.sortOrder
-  });
   
   return {
     summaryData,
@@ -216,7 +212,6 @@ function prepareRevenueData(transactionData, uiState) {
     currency: uiState.currency,
     sortBy: uiState.sortBy,
     sortOrder: uiState.sortOrder
-  });
   
   // Convert to expense table format for compatibility
   const expenseFormatData = summaryData.map(item => ({
@@ -245,7 +240,6 @@ export function prepareCombinedExportData(data, uiState) {
     currency: uiState.currency,
     sortBy: uiState.sortBy,
     sortOrder: uiState.sortOrder
-  });
   
   expenseSummary.forEach(item => {
     combined.push({
@@ -262,7 +256,6 @@ export function prepareCombinedExportData(data, uiState) {
     currency: uiState.currency,
     sortBy: uiState.sortBy,
     sortOrder: uiState.sortOrder
-  });
   
   revenueSummary.forEach(item => {
     combined.push({

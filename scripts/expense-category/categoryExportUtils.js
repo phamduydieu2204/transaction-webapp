@@ -25,7 +25,6 @@ export async function exportChartAsPNG(chartId, fileName = 'expense-category-cha
       const canvas = await html2canvas(chartContainer, {
         backgroundColor: '#ffffff',
         scale: 2
-      });
       
       const link = document.createElement('a');
       link.download = fileName;

@@ -29,7 +29,6 @@ async function loadOverviewHTML_Optimized() {
       signal: controller.signal,
       cache: 'force-cache', // Use browser cache
       priority: 'high' // High priority fetch
-    });
     
     clearTimeout(timeoutId);
     
@@ -101,7 +100,6 @@ class TemplateCache {
     const response = await fetch(url, {
       cache: 'force-cache',
       priority: 'high'
-    });
     
     if (!response.ok) {
       throw new Error(`Template fetch failed: ${response.status}`);

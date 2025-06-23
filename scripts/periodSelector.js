@@ -251,7 +251,6 @@ function refreshAllReports(dateRange) {
     window.refreshStatisticsWithFilters({
       ...window.globalFilters,
       dateRange: dateRange
-    });
   }
   
   // Refresh current report with new date range

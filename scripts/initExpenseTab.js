@@ -61,7 +61,6 @@ export async function initExpenseTab() {
       length: window.expenseList?.length || 0,
       type: typeof window.expenseList,
       expenseTabInitialized: window.expenseTabInitialized
-    });
     
     // Check if we already have data and don't need to reload
     if (window.expenseTabInitialized && window.expenseList && window.expenseList.length > 0) {
@@ -107,7 +106,6 @@ async function loadExpensesInBackground() {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(data)
-    });
     
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);

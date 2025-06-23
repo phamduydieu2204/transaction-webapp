@@ -15,7 +15,6 @@ export async function apiRequest(data) {
     },
     body: JSON.stringify(data)
   });
-}
 
 /**
  * Helper function to make API requests and parse JSON response

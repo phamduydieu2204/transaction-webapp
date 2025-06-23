@@ -249,7 +249,6 @@ export function calculateAllocatedExpense(expense, dateRange) {
       allocation: expense.allocation,
       allocationValue: allocationValue,
       reason: 'allocation field not "Có"'
-    });
     return 0;
   }
   
@@ -269,7 +268,6 @@ export function calculateAllocatedExpense(expense, dateRange) {
     renewDateValue,
     parsedTransactionDate: transactionDate,
     parsedRenewalDate: renewalDate
-  });
   
   // Must have both dates for allocation
   if (!transactionDate || !renewalDate || renewalDate <= transactionDate) {
@@ -360,7 +358,6 @@ export function calculateAllocatedExpense(expense, dateRange) {
     validDaysInPeriod,
     calculation: `${dailyAmount.toFixed(2)} × ${validDaysInPeriod} days`,
     allocatedAmount: allocatedAmount.toFixed(2)
-  });
   
   return allocatedAmount;
 }
@@ -401,7 +398,6 @@ export function calculateActualExpense(expense, dateRange) {
       periodRange: `${dateRange.start} to ${dateRange.end}`,
       amount,
       included: true
-    });
     
     return amount;
   }
@@ -497,7 +493,6 @@ export function calculateMonthlyExpenseBreakdown(expenses, targetMonth = null) {
     totalActual: breakdown.totalActualExpense,
     allocatedCount: breakdown.allocatedDetails.length,
     actualCount: breakdown.actualDetails.length
-  });
   
   return breakdown;
 }

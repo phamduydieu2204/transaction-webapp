@@ -28,7 +28,6 @@ export async function fetchExpenseData(options = {}) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "getExpenseStats" }),
       signal: controller.signal
-    });
 
     clearTimeout(timeoutId);
 
@@ -77,7 +76,6 @@ export async function fetchTransactionData(options = {}) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "getTransactionStats" }),
       signal: controller.signal
-    });
 
     clearTimeout(timeoutId);
 
@@ -126,7 +124,6 @@ export async function fetchExpenseOptions(options = {}) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "getExpenseDropdownOptions" }),
       signal: controller.signal
-    });
 
     clearTimeout(timeoutId);
 
@@ -181,7 +178,6 @@ export async function searchExpenses(filters, options = {}) {
         ...filters
       }),
       signal: controller.signal
-    });
 
     clearTimeout(timeoutId);
 
@@ -233,7 +229,6 @@ export async function searchTransactions(filters, options = {}) {
         ...filters
       }),
       signal: controller.signal
-    });
 
     clearTimeout(timeoutId);
 

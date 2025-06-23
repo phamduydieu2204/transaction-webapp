@@ -36,7 +36,6 @@ export async function loadProfitAnalysis(options = {}) {
         
             transactions: transactions.length,
             expenses: expenses.length
-        });
         
         // Get date range from options or global filters
         const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
@@ -51,7 +50,6 @@ export async function loadProfitAnalysis(options = {}) {
             filteredTransactions: filteredTransactions.length,
             allExpensesKept: allExpenses.length,
             dateRange: dateRange
-        });
         
         // Load all components
         await Promise.all([
@@ -259,7 +257,6 @@ function calculateExpenseMetrics(expenses, dateRange) {
                         daysToToday: daysToToday,
                         effectiveDays: effectiveDays,
                         formula: `${amount} * ${effectiveDays} / ${totalDays} = ${allocatedAmount.toFixed(2)}`
-                    });
                 } 
                 // Nếu ngày tái tục >= ngày cuối chu kỳ
                 else {
@@ -270,7 +267,6 @@ function calculateExpenseMetrics(expenses, dateRange) {
                         rangeEnd: rangeEnd && !isNaN(rangeEnd.getTime()) ? rangeEnd.toISOString().split('T')[0] : 'Invalid Date',
                         periodDays: periodDays,
                         formula: `${amount} * ${periodDays} / ${totalDays} = ${allocatedAmount.toFixed(2)}`
-                    });
                 }
                 
                 allocatedCosts += allocatedAmount;
@@ -286,7 +282,6 @@ function calculateExpenseMetrics(expenses, dateRange) {
                     periodDays: periodDays,
                     isRenewalBeforeEnd: renewalDate < rangeEnd,
                     allocatedAmount: allocatedAmount.toFixed(2)
-                });
             }
         }
     });
@@ -295,7 +290,6 @@ function calculateExpenseMetrics(expenses, dateRange) {
         directCosts: directCosts.toFixed(2),
         totalExpensesProcessed: expenses.length,
         dateRange: dateRange ? `${dateRange.start} to ${dateRange.end}` : 'No date range'
-    });
     
     return {
         allocatedCosts,
@@ -1045,7 +1039,6 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
                 isInDateRange: isInDateRange,
                 hasRevenue: hasRevenue,
                 willInclude: standardName && hasRevenue && isInDateRange
-            });
         }
         
         if (standardName && hasRevenue && isInDateRange) {
@@ -1134,7 +1127,6 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
                 renewalDate: !isNaN(renewalDate.getTime()) ? renewalDate.toISOString().split('T')[0] : 'Invalid Date',
                 rawData: expense,
                 normalizedData: normalizedExpense
-            });
         }
         
         // Kiểm tra chi phí phân bổ: Ngày tái tục >= ngày bắt đầu chu kỳ, Phân bổ = "Có", COGS/OPEX
@@ -1253,7 +1245,6 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
         totalExpenses: expenses.length,
         dateRange: dateRange,
         dateRangeFormatted: dateRange ? `${dateRange.start} to ${dateRange.end}` : 'No date range'
-    });
     
     // Log sample expense data to understand structure
     if (expenses.length > 0) {
@@ -1266,7 +1257,6 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
                 tenSanPham: expenses[0].tenSanPham,
                 moTa: expenses[0].moTa,
                 description: expenses[0].description
-            });
             
             // Check for "Vận hành văn phòng" in all expenses
             const vanHanhExpenses = expenses.filter(exp => {
@@ -1298,7 +1288,6 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
                 matches: expenseTenChuan === softwareName,
                 expenseType: expenseType,
                 isBusinessSoftware: expenseType === 'Kinh doanh phần mềm'
-            });
         }
         
         // Only process if this expense belongs to the current software (direct tenChuan match)
@@ -1311,7 +1300,6 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
                 accountingType: expense.accountingType || expense.loaiKeToan || '',
                 date: expense.date || expense.ngayChi || '',
                 renewDate: expense.renewDate || expense.ngayTaiTuc || ''
-            });
             
             const amount = parseFloat(expense.amount || expense.soTien || 0);
             const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
@@ -1326,7 +1314,6 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
                 expenseDate: isValidDates ? expenseDate.toISOString().split('T')[0] : 'Invalid Date',
                 renewalDate: isValidDates ? renewalDate.toISOString().split('T')[0] : 'Invalid Date',
                 isValidDates: isValidDates
-            });
             
             // Convert dateRange strings to Date objects
             const rangeStart = dateRange ? new Date(dateRange.start) : null;
@@ -1346,7 +1333,6 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
                     renewalAfterStart: renewalDate >= rangeStart,
                     validDates: !isNaN(expenseDate.getTime()) && !isNaN(renewalDate.getTime()),
                     conditionsMet: rangeStart && rangeEnd && renewalDate >= rangeStart && !isNaN(expenseDate.getTime()) && !isNaN(renewalDate.getTime())
-                });
                 
                 if (rangeStart && rangeEnd && renewalDate >= rangeStart && !isNaN(expenseDate.getTime()) && !isNaN(renewalDate.getTime())) {
                     
@@ -1380,7 +1366,6 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
                             totalDays: totalDays,
                             formula: `${amount} * ${effectiveDays} / ${totalDays}`,
                             result: allocatedAmount
-                        });
                     } 
                     // Nếu ngày tái tục >= ngày cuối chu kỳ
                     else {
@@ -1391,7 +1376,6 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
                             totalDays: totalDays,
                             formula: `${amount} * ${periodDays} / ${totalDays}`,
                             result: allocatedAmount
-                        });
                     }
                     
                     allocatedCosts += allocatedAmount;
@@ -1408,7 +1392,6 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
         processedExpenses: processedCount,
         matchedExpenses: matchedCount,
         dateRange: dateRange ? `${dateRange.start} to ${dateRange.end}` : 'No date range'
-    });
     
     // Return only allocated costs (matching the column name in the table)
     return allocatedCosts;
@@ -1421,7 +1404,6 @@ function calculateSoftwareDirectCosts(expenses, softwareName, dateRange) {
         softwareName: softwareName,
         totalExpenses: expenses.length,
         dateRange: dateRange ? `${dateRange.start} to ${dateRange.end}` : 'No date range'
-    });
     
     let directCosts = 0;
     let processedCount = 0;
@@ -1460,7 +1442,6 @@ function calculateSoftwareDirectCosts(expenses, softwareName, dateRange) {
             rangeStart: rangeStart ? rangeStart.toISOString().split('T')[0] : 'No start',
             rangeEnd: rangeEnd ? rangeEnd.toISOString().split('T')[0] : 'No end',
             expenseInRange: rangeStart && rangeEnd && isValidExpenseDate && expenseDate >= rangeStart && expenseDate <= rangeEnd
-        });
         
         // Chi phí không phân bổ: Phân bổ = "Không" và Loại kế toán = "COGS" hoặc "OPEX" và Ngày chi trong chu kỳ
         if (allocation === 'không' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
@@ -1473,7 +1454,6 @@ function calculateSoftwareDirectCosts(expenses, softwareName, dateRange) {
                     rangeStart: rangeStart.toISOString().split('T')[0],
                     rangeEnd: rangeEnd.toISOString().split('T')[0],
                     runningTotal: directCosts
-                });
             }
         }
         
@@ -1485,7 +1465,6 @@ function calculateSoftwareDirectCosts(expenses, softwareName, dateRange) {
         processedExpenses: processedCount,
         matchedExpenses: matchedCount,
         dateRange: dateRange ? `${dateRange.start} to ${dateRange.end}` : 'No date range'
-    });
     
     return directCosts;
 }

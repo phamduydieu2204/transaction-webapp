@@ -39,7 +39,6 @@ export async function loadExpenseAnalysis(options = {}) {
     
       transactions: transactions.length,
       expenses: expenses.length
-    });
     
     // Get date range from options or global filters
     const dateRange = options.dateRange || window.globalFilters?.dateRange || null;

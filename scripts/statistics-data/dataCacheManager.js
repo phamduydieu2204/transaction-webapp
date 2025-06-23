@@ -189,7 +189,6 @@ export function cacheSearchResults(query, results) {
     query: query,
     results: results,
     timestamp: Date.now()
-  });
   
   searchCache.lastFetch = Date.now();
 }

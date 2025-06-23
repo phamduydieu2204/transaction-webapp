@@ -128,7 +128,6 @@ function scheduleBackgroundLoading() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
-        });
         
         const result = await response.json();
         if (result.status === 'success') {

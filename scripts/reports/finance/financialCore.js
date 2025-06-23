@@ -49,7 +49,6 @@ export class FinancialCore {
             
                 transactions: this.transactions.length,
                 expenses: this.expenses.length
-            });
             
         } catch (error) {
             console.error('❌ Error loading financial data:', error);
@@ -184,7 +183,6 @@ export class FinancialCore {
                     profit: 0,
                     transactionCount: 0,
                     expenseCount: 0
-                });
             }
             
             const monthData = monthlyData.get(monthKey);
@@ -207,7 +205,6 @@ export class FinancialCore {
                     profit: 0,
                     transactionCount: 0,
                     expenseCount: 0
-                });
             }
             
             const monthData = monthlyData.get(monthKey);
@@ -242,7 +239,6 @@ export class FinancialCore {
                     profit: 0,
                     transactionCount: 0,
                     expenseCount: 0
-                });
             }
             
             const quarterData = quarterlyData.get(quarterKey);
@@ -273,7 +269,6 @@ export class FinancialCore {
                     profit: 0,
                     transactionCount: 0,
                     expenseCount: 0
-                });
             }
             
             const yearData = yearlyData.get(year);
@@ -302,7 +297,6 @@ export class FinancialCore {
                     revenue: 0,
                     count: 0,
                     customers: new Set()
-                });
             }
             
             const categoryData = categories.get(category);
@@ -336,7 +330,6 @@ export class FinancialCore {
                     count: 0,
                     recurring: 0,
                     oneTime: 0
-                });
             }
             
             const categoryData = categories.get(category);

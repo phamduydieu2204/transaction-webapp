@@ -30,11 +30,6 @@ async function loadSoftwareData() {
     
     
     const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "getSoftwareListFull" // We'll need to create this action
-      })
     });
     
     const result = await response.json();
@@ -711,12 +706,6 @@ window.handleSoftwareSearch = async function() {
     // Call backend API
     const { BACKEND_URL } = getConstants();
     const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "searchSoftware",
-        conditions: searchConditions
-      })
     });
     
     const result = await response.json();
@@ -1637,12 +1626,6 @@ window.handleSoftwareSearch = async function() {
     // Call backend API
     const { BACKEND_URL } = getConstants();
     const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "searchSoftware",
-        conditions: conditions
-      })
     });
     
     const result = await response.json();

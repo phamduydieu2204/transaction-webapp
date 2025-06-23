@@ -54,7 +54,6 @@ export async function loadOverviewReport(options = {}) {
     
       transactionList: window.transactionList ? window.transactionList.length : 0,
       expenseList: window.expenseList ? window.expenseList.length : 0
-    });
     
     // Get data from global variables (primary) or storage (fallback)
     const transactions = window.transactionList || getFromStorage('transactions') || [];
@@ -64,7 +63,6 @@ export async function loadOverviewReport(options = {}) {
       expenses: expenses.length,
       sampleTransaction: transactions[0] ? Object.keys(transactions[0]) : [],
       sampleExpense: expenses[0] ? Object.keys(expenses[0]) : []
-    });
     
     // Get date range from options or global filters
     const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
@@ -585,35 +583,30 @@ async function updateKPICards(kpis) {
       growth: kpis.growthRates?.grossRevenue || 0,
       hasGrowthRates: !!kpis.growthRates,
       growthRates: kpis.growthRates
-    });
     
     updateKPICard('grossRevenue', {
       value: kpis.grossRevenue || 0,
       growth: kpis.growthRates?.grossRevenue || 0,
       elementId: 'completed-revenue',
       changeId: 'completed-change'
-    });
     
     updateKPICard('pendingCollection', {
       value: kpis.pendingCollection || 0,
       growth: kpis.growthRates?.pendingCollection || 0,
       elementId: 'paid-revenue', 
       changeId: 'paid-change'
-    });
     
     updateKPICard('pendingPayment', {
       value: kpis.pendingPayment || 0,
       growth: kpis.growthRates?.pendingPayment || 0,
       elementId: 'unpaid-revenue',
       changeId: 'unpaid-change'
-    });
     
     updateKPICard('totalRefunds', {
       value: kpis.totalRefunds || 0,
       growth: kpis.growthRates?.totalRefunds || 0,
       elementId: 'refund-revenue',
       changeId: 'refund-change'
-    });
     
     updateKPICard('refundRate', {
       value: kpis.refundRate || 0,
@@ -621,14 +614,12 @@ async function updateKPICards(kpis) {
       elementId: 'refund-rate',
       changeId: 'refund-rate-change',
       isPercentage: true
-    });
     
     updateKPICard('effectiveTransactions', {
       value: kpis.effectiveTransactions || 0,
       growth: kpis.growthRates?.effectiveTransactions || 0,
       elementId: 'total-transactions',
       changeId: 'transaction-change'
-    });
     
     // Update status breakdown with new data
     updateStatusBreakdownWithNewMetrics(kpis);
@@ -640,28 +631,24 @@ async function updateKPICards(kpis) {
       growth: 0,
       elementId: 'completed-revenue',
       changeId: 'completed-change'
-    });
     
     updateKPICard('pendingCollection', {
       value: kpis.financial?.totalRevenue || 0, 
       growth: 0,
       elementId: 'paid-revenue', 
       changeId: 'paid-change'
-    });
     
     updateKPICard('pendingPayment', {
       value: 0,
       growth: 0,
       elementId: 'unpaid-revenue',
       changeId: 'unpaid-change'
-    });
     
     updateKPICard('totalRefunds', {
       value: 0,
       growth: 0,
       elementId: 'refund-revenue',
       changeId: 'refund-change'
-    });
     
     updateKPICard('refundRate', {
       value: 0,
@@ -669,14 +656,12 @@ async function updateKPICards(kpis) {
       elementId: 'refund-rate',
       changeId: 'refund-rate-change',
       isPercentage: true
-    });
     
     updateKPICard('effectiveTransactions', {
       value: kpis.revenue?.totalTransactions || 0,
       growth: 0,
       elementId: 'total-transactions',
       changeId: 'transaction-change'
-    });
     
   } else {
     // Old template fallback - convert new metrics to old structure
@@ -685,14 +670,12 @@ async function updateKPICards(kpis) {
       growth: kpis.growthRates?.grossRevenue || 0,
       elementId: 'total-revenue',
       changeId: 'revenue-change'
-    });
     
     updateKPICard('transaction', {
       value: kpis.effectiveTransactions || kpis.revenue?.totalTransactions || 0,
       growth: kpis.growthRates?.effectiveTransactions || 0,
       elementId: 'total-transactions',
       changeId: 'transaction-change'
-    });
   }
 }
 
@@ -744,7 +727,6 @@ function updateKPICard(type, data) {
       parentClasses: changeElement.parentElement ? Array.from(changeElement.parentElement.classList) : [],
       isMetricTemplate: isMetricTemplate,
       isBoxTemplate: isBoxTemplate
-    });
     
     if (isMetricTemplate) {
       // New metric template (6-box grid)
@@ -753,7 +735,6 @@ function updateKPICard(type, data) {
         arrow: arrow,
         sign: sign,
         elementId: data.elementId
-      });
       
       changeElement.innerHTML = `
         <i class="fas ${arrow}"></i>
@@ -827,7 +808,6 @@ function updateStatusBreakdownWithNewMetrics(kpis) {
     paid: `${kpis.statusBreakdown.paid.count} (${paidPercent.toFixed(1)}%)`,
     unpaid: `${kpis.statusBreakdown.unpaid.count} (${unpaidPercent.toFixed(1)}%)`,
     refunded: `${kpis.statusBreakdown.refunded.count} (${refundedPercent.toFixed(1)}%)`
-  });
 }
 
 /**
@@ -3177,7 +3157,6 @@ function categorizePendingTransactions(transactions) {
         waitingDays,
         isUrgent,
         priority: isUrgent ? 'high' : 'normal'
-      });
     }
     
     // Case 2: Chưa thanh toán (cần thu tiền)
@@ -3193,7 +3172,6 @@ function categorizePendingTransactions(transactions) {
         isOverdue,
         deliveryDate,
         priority: isOverdue ? 'high' : 'normal'
-      });
     }
   });
   
@@ -3711,7 +3689,6 @@ function calculateNormalizedCustomerAnalytics(transactions) {
                 averageOrderValue: 0,
                 refundCount: 0,
                 refundAmount: 0
-            });
         }
         
         const customer = customerMap.get(customerKey);
@@ -3790,7 +3767,6 @@ function calculateNormalizedProductAnalytics(transactions) {
                 totalMonths: 0,
                 refundCount: 0,
                 refundAmount: 0
-            });
         }
         
         const product = productMap.get(productName);
@@ -4231,7 +4207,6 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
     transactionsCount: filteredTransactions.length,
     expensesCount: filteredExpenses.length,
     dateRange: dateRange
-  });
   
   // Use pre-filtered transactions for current period metrics
   
@@ -4283,7 +4258,6 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
         rawStatus: transaction.loaiGiaoDich || transaction.transactionType,
         normalizedStatus: status,
         rawTransaction: rawTransaction
-      });
     }
     
     metrics.totalTransactions++;
@@ -4336,7 +4310,6 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
     unpaid: metrics.statusBreakdown.unpaid,
     refunded: metrics.statusBreakdown.refunded,
     cancelled: metrics.statusBreakdown.cancelled
-  });
   
   // Doanh thu gộp = Tổng tiền "đã hoàn tất" + Tổng tiền "đã thanh toán" - Tổng tiền "hoàn tiền"
   metrics.grossRevenue = metrics.statusBreakdown.completed.amount + metrics.statusBreakdown.paid.amount - metrics.totalRefunds;
@@ -4389,7 +4362,6 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
       grossRevenue: metrics.previousPeriod.grossRevenue,
       totalRefunds: metrics.previousPeriod.totalRefunds,
       effectiveTransactions: metrics.previousPeriod.effectiveTransactions
-    });
   }
   
   // Calculate growth rates

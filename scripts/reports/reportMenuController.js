@@ -38,7 +38,6 @@ export function initReportMenu() {
     topProducts: !!document.getElementById('topProducts'),
     topCustomers: !!document.getElementById('topCustomers'),
     summaryStats: !!document.getElementById('summaryStats')
-  });
   
   // Setup menu click handlers
   setupMenuHandlers();

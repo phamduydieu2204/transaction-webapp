@@ -161,12 +161,6 @@ async function fetchFileName(accountSheetId) {
 
   try {
     const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "getCookieAndFileName",
-        accountSheetId: accountSheetId
-      })
     });
 
     const result = await response.json();

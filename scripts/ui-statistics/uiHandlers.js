@@ -135,7 +135,6 @@ export function handleStatisticsTabActivation() {
     tabContent: tabContent ? "found" : "null",
     tabDisplay: tabContentStyle ? tabContentStyle.display : "unknown",
     windowExpenseList: window.expenseList ? window.expenseList.length : "null"
-  });
   
   // Import required functions
   return import('../statisticsUIController.js').then(module => {
@@ -151,7 +150,6 @@ export function handleStatisticsTabActivation() {
         tabDisplay: tabContentStyleAfter ? tabContentStyleAfter.display : "unknown",
         tableExists: document.querySelector("#monthlySummaryTable") ? "found" : "null",
         tbodyExists: document.querySelector("#monthlySummaryTable tbody") ? "found" : "null"
-      });
       
       // Check if we need to refresh data
       if (!window.expenseList || window.expenseList.length === 0) {

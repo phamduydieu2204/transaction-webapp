@@ -74,12 +74,6 @@ async function searchExpenseDescriptions(query) {
     resultsDiv.style.display = 'block';
     
     const response = await fetch(BACKEND_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'searchExpenseByDescription',
-        query: query
-      })
     });
     
     const result = await response.json();

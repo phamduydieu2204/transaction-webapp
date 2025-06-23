@@ -32,7 +32,6 @@ export class CashFlowAccrualCore {
             
                 transactions: this.transactionData.length,
                 expenses: this.expenseData.length
-            });
             
             // Process the data
             await this.processData();

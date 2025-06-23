@@ -27,15 +27,8 @@ export async function handleUpdateCookie(index, transactionList) {
     
       action: "getCookieAndFileName",
       accountSheetId: transaction.accountSheetId
-    });
     
     const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "getCookieAndFileName",
-        accountSheetId: transaction.accountSheetId
-      })
     });
     const result = await response.json();
     
@@ -54,14 +47,6 @@ export async function handleUpdateCookie(index, transactionList) {
     // Lấy thông tin username và password từ API
     try {
       const accountResponse = await fetch(BACKEND_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "getAccountInfoBySoftware",
-          softwareName: transaction.softwareName,
-          softwarePackage: transaction.softwarePackage,
-          accountName: transaction.accountName
-        })
       });
       const accountResult = await accountResponse.json();
       
@@ -156,18 +141,6 @@ export async function confirmUpdateCookie() {
     showProcessingModal("Đang cập nhật Cookie...");
     
     const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "updateCookieAndRename",
-        transactionId: transaction.transactionId,
-        accountSheetId: transaction.accountSheetId,
-        newCookie: newCookie,
-        softwareName: transaction.softwareName,
-        softwarePackage: transaction.softwarePackage,
-        accountName: transaction.accountName,
-        type: "confirm"
-      })
     });
     
     const result = await response.json();
@@ -208,13 +181,6 @@ export async function cancelUpdateCookie() {
 
     const { BACKEND_URL } = getConstants();
     await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "updateCookie",
-        transactionId: transaction.transactionId,
-        type: "cancel"
-      })
     });
     
   } catch (err) {

@@ -153,7 +153,6 @@ class TemplatePerformanceTester {
     try {
       const response = await fetch('./partials/tabs/report-pages/overview-report.html', {
         cache: 'no-cache' // Force fresh fetch for accurate testing
-      });
       
       this.monitor.endTiming('template-fetch');
       this.monitor.startTiming('template-parse');
