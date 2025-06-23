@@ -40,6 +40,7 @@ export async function deduplicateRequest(key, requestFn, options = {}) {
       requestCache.set(key, {
         data,
         timestamp: Date.now()
+      });
       return data;
     })
     .finally(() => {
