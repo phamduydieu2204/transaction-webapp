@@ -267,6 +267,7 @@ async function validateWithServer(user) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
+      });
       
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
