@@ -143,16 +143,14 @@ class LazyLoader {
 // Create global lazy loader instance
 const lazyLoader = new LazyLoader();
 
-// Export functions
-export const {
-  loadModule,
-  preloadModule,
-  loadModules,
-  isLoaded,
-  getLoadedModule,
-  clearCache,
-  getStats
-} = lazyLoader;
+// Export functions bound to the instance
+export const loadModule = (modulePath, cacheKey) => lazyLoader.loadModule(modulePath, cacheKey);
+export const preloadModule = (modulePath, cacheKey) => lazyLoader.preloadModule(modulePath, cacheKey);
+export const loadModules = (moduleConfigs) => lazyLoader.loadModules(moduleConfigs);
+export const isLoaded = (key) => lazyLoader.isLoaded(key);
+export const getLoadedModule = (key) => lazyLoader.getLoadedModule(key);
+export const clearCache = (key) => lazyLoader.clearCache(key);
+export const getStats = () => lazyLoader.getStats();
 
 // Make available globally for backward compatibility
 window.lazyLoader = lazyLoader;

@@ -296,17 +296,15 @@ class PerformanceMonitor {
 // Create global performance monitor instance
 const performanceMonitor = new PerformanceMonitor();
 
-// Export functions
-export const {
-  trackModuleLoad,
-  trackTabSwitch,
-  trackApiCall,
-  trackNavigation,
-  getMemoryUsage,
-  getCoreWebVitals,
-  generateReport,
-  getSnapshot
-} = performanceMonitor;
+// Export functions bound to the instance
+export const trackModuleLoad = (moduleName, startTime) => performanceMonitor.trackModuleLoad(moduleName, startTime);
+export const trackTabSwitch = (tabName, startTime) => performanceMonitor.trackTabSwitch(tabName, startTime);
+export const trackApiCall = (apiName, startTime) => performanceMonitor.trackApiCall(apiName, startTime);
+export const trackNavigation = (url) => performanceMonitor.trackNavigation(url);
+export const getMemoryUsage = () => performanceMonitor.getMemoryUsage();
+export const getCoreWebVitals = () => performanceMonitor.getCoreWebVitals();
+export const generateReport = () => performanceMonitor.generateReport();
+export const getSnapshot = () => performanceMonitor.getSnapshot();
 
 // Make available globally
 window.performanceMonitor = performanceMonitor;

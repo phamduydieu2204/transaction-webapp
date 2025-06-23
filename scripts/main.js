@@ -231,8 +231,13 @@ async function startApp() {
     
     
     // Phase 4.5: Initialize date defaults and calculations
-    setTimeout(() => {
-      initializeDateCalculations();
+    setTimeout(async () => {
+      try {
+        const { initializeDateCalculations } = await loadModule('./calculateEndDate.js');
+        initializeDateCalculations();
+      } catch (error) {
+        console.error('Failed to initialize date calculations:', error);
+      }
     }, 100); // Small delay to ensure DOM is ready
     
     // Phase 5: Apply ultra full-width layout override

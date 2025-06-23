@@ -482,16 +482,47 @@ function notifyTabSwitch(fromTab, toTab) {
 async function initializeTabIfNeeded(tabName) {
   const tabConfig = TAB_CONFIG[tabName];
   
-  if (tabConfig.initFunction && window[tabConfig.initFunction]) {
+  if (tabConfig.initFunction) {
     try {
-      const result = window[tabConfig.initFunction]();
-      
-      // Handle both sync and async functions
-      if (result && typeof result.then === 'function') {
-        await result;
+      // Check if function exists on window
+      if (window[tabConfig.initFunction]) {
+        const result = window[tabConfig.initFunction]();
+        
+        // Handle both sync and async functions
+        if (result && typeof result.then === 'function') {
+          await result;
+        }
+        
+        console.log(`✅ Tab ${tabName} initialized`);
+      } else {
+        // Try to load the module if not available
+        console.log(`⏳ Loading init function for tab ${tabName}...`);
+        const moduleMapping = {
+          'giao-dich': '../initTransactionTab.js',
+          'phan-mem': '../initSoftwareTab.js',
+          'chi-phi': '../initExpenseTab.js',
+          'thong-ke': '../initStatisticsTab.js',
+          'bao-cao': '../initReportTab.js',
+          'cai-dat': '../initSettingsTab.js'
+        };
+        
+        const modulePath = moduleMapping[tabName];
+        if (modulePath) {
+          try {
+            const module = await import(modulePath);
+            const initFunction = module[tabConfig.initFunction] || module.default;
+            
+            if (typeof initFunction === 'function') {
+              // Store on window for future use
+              window[tabConfig.initFunction] = initFunction;
+              await initFunction();
+              console.log(`✅ Tab ${tabName} initialized via lazy load`);
+            }
+          } catch (loadError) {
+            console.warn(`⚠️ Could not load init function for tab ${tabName}:`, loadError);
+          }
+        }
       }
-      
-      console.log(`✅ Tab ${tabName} initialized`);
     } catch (error) {
       console.error(`❌ Error initializing tab ${tabName}:`, error);
     }
