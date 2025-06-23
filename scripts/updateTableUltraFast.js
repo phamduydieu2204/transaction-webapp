@@ -251,9 +251,8 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     const transactionIdCell = `
       <div class="transaction-id-cell">
         <div style="font-weight: bold; margin-bottom: 4px;">${transaction.transactionId}</div>
-        <button class="copy-order-btn" data-transaction='${JSON.stringify(transaction).replace(/'/g, "&apos;")}' title="Copy thông tin đơn hàng" style="display: flex; align-items: center; padding: 2px 6px; font-size: 11px; border: 1px solid #007bff; background: #e7f3ff; color: #007bff; cursor: pointer; border-radius: 3px; white-space: nowrap;">
-          <span style="margin-right: 2px;">📋</span>
-          <span>Copy đơn hàng</span>
+        <button class="copy-order-btn" data-transaction='${JSON.stringify(transaction).replace(/'/g, "&apos;")}' title="Copy thông tin đơn hàng" style="display: flex; align-items: center; padding: 4px 8px; font-size: 14px; border: 1px solid #007bff; background: #e7f3ff; color: #007bff; cursor: pointer; border-radius: 3px; white-space: nowrap;">
+          📋
         </button>
       </div>
     `;

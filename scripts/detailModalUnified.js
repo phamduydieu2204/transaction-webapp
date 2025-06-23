@@ -109,7 +109,8 @@ export class DetailModal {
       if (field.showCopy && field.value) {
         const copyBtn = document.createElement('button');
         copyBtn.className = 'copy-btn';
-        copyBtn.textContent = 'Copy';
+        copyBtn.innerHTML = '📋'; // Copy icon
+        copyBtn.title = 'Sao chép'; // Tooltip
         copyBtn.onclick = () => this.copyValue(field.value, field.label);
         valueContainer.appendChild(copyBtn);
       }
@@ -192,7 +193,7 @@ export class DetailModal {
 
   async copyValue(value, label) {
     try {
-      await copyToClipboard(value);
+      await navigator.clipboard.writeText(value);
       this.showCopyFeedback(label);
     } catch (error) {
       console.error('Failed to copy:', error);
