@@ -13,7 +13,6 @@ export async function handleSearchExpense() {
   const isAdmin = window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin";
   
   if (!isAdmin) {
-    console.log("⚠️ Không phải admin - một số điều kiện tìm kiếm chi phí sẽ bị bỏ qua: ngày chi phí, sản phẩm, gói");
   }
 
   // Lấy các điều kiện tìm kiếm từ form
@@ -70,7 +69,6 @@ export async function handleSearchExpense() {
   const hasConditions = Object.keys(conditions).length > 0;
   
   if (!hasConditions) {
-    console.log("📋 Không có điều kiện tìm kiếm - sẽ lấy tất cả chi phí");
   }
 
   const data = {
@@ -79,7 +77,6 @@ export async function handleSearchExpense() {
     conditions: conditions
   };
 
-  console.log("📤 Tìm kiếm chi phí với điều kiện:", JSON.stringify(data, null, 2));
 
   try {
     const res = await fetch(BACKEND_URL, {

@@ -34,7 +34,6 @@ export function renderMonthlySummaryTable(summaryData, options = {}) {
 
   // Create tbody if it doesn't exist (fix for missing tbody issue)
   if (!tableBody && tableElement) {
-    console.log(`🔧 Creating missing tbody for table ${tableId}`);
     tableBody = document.createElement('tbody');
     tableElement.appendChild(tableBody);
   }
@@ -46,7 +45,6 @@ export function renderMonthlySummaryTable(summaryData, options = {}) {
     return;
   }
 
-  console.log("📊 Rendering monthly summary table:", summaryData.length, "entries");
 
   // Clear existing content
   tableBody.innerHTML = "";
@@ -64,7 +62,6 @@ export function renderMonthlySummaryTable(summaryData, options = {}) {
   });
 
   hideLoadingElements();
-  console.log("✅ Monthly summary table rendered successfully");
 }
 
 /**
@@ -162,7 +159,6 @@ function hideLoadingElements() {
     document.querySelector('[class*="spinner"]')
   ].filter(el => el !== null);
 
-  console.log("🔍 DEBUG loading elements after render:", {
     foundLoadingElements: loadingElements.length,
     loadingElements: loadingElements.map(el => ({
       tagName: el.tagName,
@@ -176,7 +172,6 @@ function hideLoadingElements() {
   // Hide any visible loading elements
   loadingElements.forEach(el => {
     if (window.getComputedStyle(el).display !== 'none') {
-      console.log(`🚫 Hiding loading element:`, el.className || el.id);
       el.style.display = 'none';
     }
   });

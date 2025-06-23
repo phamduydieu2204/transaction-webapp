@@ -62,7 +62,6 @@ async function loadAllExpenses() {
   };
   
   try {
-    console.log('🔄 Reloading all expenses...');
     
     const response = await fetch(BACKEND_URL, {
       method: 'POST',
@@ -84,7 +83,6 @@ async function loadAllExpenses() {
       window.currentExpensePage = 1;
       window.isExpenseSearching = false;
       
-      console.log(`✅ Reloaded ${window.expenseList.length} expenses`);
       
       // Update table immediately
       if (typeof window.updateExpenseTable === 'function') {

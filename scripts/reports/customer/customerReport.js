@@ -12,7 +12,6 @@ import { calculateCustomerLifetimeValue, calculateDaysBetween } from '../core/re
  * Load customer report
  */
 export async function loadCustomerReport() {
-  console.log('👥 Loading customer report');
   
   try {
     await ensureDataIsLoaded();

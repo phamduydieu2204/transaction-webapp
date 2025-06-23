@@ -25,7 +25,6 @@ import {
  * @param {string} options.period - Period name (e.g., 'this_month', 'last_month')
  */
 export async function loadExpenseAnalysis(options = {}) {
-  console.log('💸 Loading expense analysis with options:', options);
   
   try {
     // Load template
@@ -38,7 +37,6 @@ export async function loadExpenseAnalysis(options = {}) {
     const transactions = window.transactionList || getFromStorage('transactions') || [];
     const expenses = window.expenseList || getFromStorage('expenses') || [];
     
-    console.log('💸 Expense analysis data:', {
       transactions: transactions.length,
       expenses: expenses.length
     });
@@ -65,7 +63,6 @@ export async function loadExpenseAnalysis(options = {}) {
     // Setup event handlers
     setupExpenseAnalysisHandlers();
     
-    console.log('✅ Expense analysis loaded successfully');
     
   } catch (error) {
     console.error('❌ Error loading expense analysis:', error);
@@ -90,7 +87,6 @@ async function loadExpenseAnalysisHTML() {
     container.innerHTML = html;
     container.classList.add('active');
     
-    console.log('✅ Expense analysis template loaded');
     
   } catch (error) {
     console.error('❌ Could not load expense analysis template:', error);
@@ -102,7 +98,6 @@ async function loadExpenseAnalysisHTML() {
  * Update expense KPI cards
  */
 async function updateExpenseKPIs(expenses, transactions, period) {
-  console.log('💰 Updating expense KPIs');
   
   // Calculate current period metrics
   const currentMetrics = calculateExpenseMetrics(expenses);
@@ -141,7 +136,6 @@ async function updateExpenseKPIs(expenses, transactions, period) {
       `${currentMetrics.largestExpense.category || 'N/A'} - ${currentMetrics.largestExpense.description}`);
   }
   
-  console.log('💰 Expense KPIs updated:', currentMetrics);
 }
 
 /**
@@ -195,7 +189,6 @@ function calculateRevenueMetrics(transactions) {
  * Render expense trend chart
  */
 async function renderExpenseTrendChart(expenses, period) {
-  console.log('📈 Rendering expense trend chart');
   
   const canvas = document.getElementById('expense-trend-chart');
   if (!canvas) return;
@@ -285,7 +278,6 @@ async function renderExpenseTrendChart(expenses, period) {
  * Render expense category chart (pie/bar)
  */
 async function renderExpenseCategoryChart(expenses) {
-  console.log('🍰 Rendering expense category chart');
   
   const canvas = document.getElementById('expense-category-chart');
   if (!canvas) return;
@@ -349,7 +341,6 @@ async function renderExpenseCategoryChart(expenses) {
  * Render budget comparison chart
  */
 async function renderBudgetComparisonChart(expenses) {
-  console.log('📊 Rendering budget comparison chart');
   
   const canvas = document.getElementById('budget-comparison-chart');
   if (!canvas) return;
@@ -424,7 +415,6 @@ async function renderBudgetComparisonChart(expenses) {
  * Load top expense categories
  */
 async function loadTopExpenseCategories(expenses) {
-  console.log('📋 Loading top expense categories');
   
   const categoryExpenses = calculateCategoryExpenses(expenses);
   const topCategories = categoryExpenses
@@ -477,7 +467,6 @@ async function loadTopExpenseCategories(expenses) {
  * Load expense types (recurring vs one-time)
  */
 async function loadExpenseTypes(expenses) {
-  console.log('🔄 Loading expense types');
   
   const expenseTypes = analyzeExpenseTypes(expenses);
   
@@ -523,7 +512,6 @@ async function loadExpenseTypes(expenses) {
  * Update expense control dashboard
  */
 async function updateExpenseControlDashboard(expenses, transactions) {
-  console.log('🛡️ Updating expense control dashboard');
   
   // Update budget alerts
   const budgetAlerts = generateBudgetAlerts(expenses);
@@ -835,20 +823,16 @@ window.refreshExpenseAnalysis = function() {
 };
 
 window.exportExpenseReport = function() {
-  console.log('📊 Exporting expense report...');
   // Implementation for export functionality
 };
 
 window.exportCategoryExpenseData = function() {
-  console.log('📊 Exporting category expense data...');
 };
 
 window.exportExpenseTypesData = function() {
-  console.log('📊 Exporting expense types data...');
 };
 
 window.toggleExpenseChartView = function(chartType, viewType) {
-  console.log(`🔄 Toggling ${chartType} chart to ${viewType} view`);
 };
 
 window.editExpense = function(expenseId) {
@@ -856,21 +840,17 @@ window.editExpense = function(expenseId) {
 };
 
 function refreshExpenseChart(period) {
-  console.log(`🔄 Refreshing expense chart for period: ${period}`);
   // Implementation for chart refresh
 }
 
 function refreshBudgetChart(view) {
-  console.log(`🔄 Refreshing budget chart for view: ${view}`);
   // Implementation for budget chart refresh
 }
 
 function refreshExpenseTable(view) {
-  console.log(`🔄 Refreshing expense table for view: ${view}`);
   // Implementation for table refresh
 }
 
 function filterExpenseTypes(filter) {
-  console.log(`🔄 Filtering expense types: ${filter}`);
   // Implementation for expense type filtering
 }

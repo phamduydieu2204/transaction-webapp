@@ -29,7 +29,6 @@ export function calculateTotalExpenses(data, options = {}) {
 
   if (!Array.isArray(data)) return totals;
 
-  console.log("🧮 Calculating expenses:", {
     recordCount: data.length,
     isSearching,
     targetDate,
@@ -71,7 +70,6 @@ export function calculateTotalExpenses(data, options = {}) {
     totals[expenseCurrency] += amount;
   });
 
-  console.log("✅ Expense totals calculated:", totals);
   return totals;
 }
 
@@ -98,7 +96,6 @@ export function calculateTotalRevenue(data, options = {}) {
 
   if (!Array.isArray(data)) return totals;
 
-  console.log("🧮 Calculating revenue:", {
     recordCount: data.length,
     isSearching,
     targetDate,
@@ -146,7 +143,6 @@ export function calculateTotalRevenue(data, options = {}) {
     totals[transactionCurrency] += revenue;
   });
 
-  console.log("✅ Revenue totals calculated:", totals);
   return totals;
 }
 
@@ -186,7 +182,6 @@ export function calculateFinancialAnalysis(revenue, expenses) {
     overallMargin: totalRevenue > 0 ? ((totalRevenue - totalExpenses) / totalRevenue) * 100 : 0
   };
 
-  console.log("📈 Financial analysis completed:", analysis.summary);
   return analysis;
 }
 
@@ -231,7 +226,6 @@ export function calculateAllocatedExpense(expense, dateRange) {
   if ((expense.product && (expense.product.includes('Helium10') || expense.product.includes('Trả lương'))) || 
       (expense.description && (expense.description.includes('Helium10') || expense.description.includes('Trả lương'))) ||
       (expense['Tên sản phẩm/Dịch vụ'] && expense['Tên sản phẩm/Dịch vụ'].includes('Trả lương'))) {
-    console.log(`🔍 DEBUG - Salary/Helium10 expense object:`, {
       fullExpense: expense,
       keys: Object.keys(expense),
       periodicAllocation: expense.periodicAllocation,
@@ -250,7 +244,6 @@ export function calculateAllocatedExpense(expense, dateRange) {
   
   // If no allocation needed, return 0
   if (!allocationValue || (allocationValue !== 'Có' && allocationValue !== 'Có')) {
-    console.log(`❌ ${expense.product || expense.description || 'Unknown'} - No allocation:`, {
       periodicAllocation: expense.periodicAllocation,
       'Phân bổ': expense['Phân bổ'],
       allocation: expense.allocation,
@@ -268,7 +261,6 @@ export function calculateAllocatedExpense(expense, dateRange) {
   const transactionDate = dateValue ? new Date(normalizeDate(dateValue)) : null;
   const renewalDate = renewDateValue ? new Date(normalizeDate(renewDateValue)) : null;
   
-  console.log(`📅 Date parsing for ${expense.product || expense.description}:`, {
     originalDate: expense.date,
     'Ngày chi': expense['Ngày chi'],
     dateValue,
@@ -281,7 +273,6 @@ export function calculateAllocatedExpense(expense, dateRange) {
   
   // Must have both dates for allocation
   if (!transactionDate || !renewalDate || renewalDate <= transactionDate) {
-    console.log(`❌ ${expense.product || expense['Tên sản phẩm/Dịch vụ'] || expense.description} - Invalid dates:`, {
       transactionDate: dateValue,
       renewalDate: renewDateValue,
       parsedTransactionDate: transactionDate,
@@ -300,7 +291,6 @@ export function calculateAllocatedExpense(expense, dateRange) {
   const amountValue = expense.amount || expense['Số tiền'] || 0;
   const totalAmount = parseFloat(amountValue) || 0;
   
-  console.log(`💰 Amount parsing for ${expense.product || expense['Tên sản phẩm/Dịch vụ']}:`, {
     originalAmount: expense.amount,
     'Số tiền': expense['Số tiền'],
     amountValue,
@@ -333,7 +323,6 @@ export function calculateAllocatedExpense(expense, dateRange) {
   // Special handling for monthly salary payments
   if (expense.product && expense.product.includes('Trả lương') || 
       expense['Tên sản phẩm/Dịch vụ'] && expense['Tên sản phẩm/Dịch vụ'].includes('Trả lương')) {
-    console.log(`💵 Salary payment debug:`, {
       transactionDate: normalizeDate(transactionDate),
       renewalDate: normalizeDate(renewalDate),
       periodStart: normalizeDate(periodStart),
@@ -359,7 +348,6 @@ export function calculateAllocatedExpense(expense, dateRange) {
   // Return allocated amount for the overlapping period
   const allocatedAmount = dailyAmount * validDaysInPeriod;
   
-  console.log(`📊 Allocated expense calculation:`, {
     expense: expense.product || expense.description,
     totalAmount,
     transactionDate: normalizeDate(transactionDate),
@@ -408,7 +396,6 @@ export function calculateActualExpense(expense, dateRange) {
   if (expenseDate >= periodStart && expenseDate <= periodEnd) {
     const amount = parseFloat(expense.amount) || 0;
     
-    console.log(`💰 Actual expense calculation:`, {
       expense: expense.product || expense.description,
       expenseDate: normalizeDate(expenseDate),
       periodRange: `${dateRange.start} to ${dateRange.end}`,
@@ -506,7 +493,6 @@ export function calculateMonthlyExpenseBreakdown(expenses, targetMonth = null) {
     breakdown.totalActualExpense += convertToVND(currData.actual, currency);
   });
   
-  console.log(`📅 Monthly expense breakdown for ${breakdown.targetMonth}:`, {
     totalAllocated: breakdown.totalAllocatedExpense,
     totalActual: breakdown.totalActualExpense,
     allocatedCount: breakdown.allocatedDetails.length,

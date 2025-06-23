@@ -19,7 +19,6 @@ let softwareManagementInstance = null;
  * @param {string} options.period - Period filter
  */
 export async function loadSoftwareManagement(options = {}) {
-    console.log('💻 Loading software management report', options);
     
     try {
         // Get container
@@ -39,7 +38,6 @@ export async function loadSoftwareManagement(options = {}) {
         // Initialize with data
         await softwareManagementInstance.initialize();
         
-        console.log('✅ Software management report loaded successfully');
         
     } catch (error) {
         console.error('❌ Error loading software management report:', error);

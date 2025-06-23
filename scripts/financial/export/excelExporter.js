@@ -40,7 +40,6 @@ export function exportFinancialDashboardToExcel(metrics, transactionData, expens
     // Export file
     XLSX.writeFile(workbook, filename);
     
-    console.log(`✅ Exported financial dashboard to ${filename}`);
     return true;
   } catch (error) {
     console.error('❌ Error exporting to Excel:', error);

@@ -5,7 +5,6 @@
  * Handles data transformation, filtering, and preparation for UI
  */
 
-console.log('📦 dataProcessors.js module loading...');
 
 // Import required functions
 import { 
@@ -36,7 +35,6 @@ export async function loadStatisticsData(uiState) {
   renderLoadingState("monthlySummaryTable");
   
   try {
-    console.log("🔄 Loading statistics data...");
     
     // Get expense data and create combined data structure
     const expenseData = await fetchExpenseData({ forceRefresh: false });
@@ -51,7 +49,6 @@ export async function loadStatisticsData(uiState) {
       timestamp: Date.now()
     };
     
-    console.log("📊 Combined data prepared:", {
       expenses: data.expenses.length,
       transactions: data.transactions.length
     });
@@ -60,7 +57,6 @@ export async function loadStatisticsData(uiState) {
     window.expenseList = data.expenses;
     window.transactionList = data.transactions;
     
-    console.log("🎯 Data loading completed");
     
     // ✅ DEBUG: Check data loading completion
     const dataLoadState = {
@@ -71,8 +67,6 @@ export async function loadStatisticsData(uiState) {
       isLoadingFlag: uiState.isLoading
     };
     
-    console.log("🔍 DEBUG data loading state:", dataLoadState);
-    console.log("✅ Statistics data loaded successfully");
     
     return data;
     
@@ -289,7 +283,6 @@ export function prepareCombinedExportData(data, uiState) {
  * @returns {Object} - Fresh data
  */
 export async function forceRefreshData(uiState) {
-  console.log("🔄 Forcing data refresh...");
   
   try {
     const data = await getCombinedStatistics({ forceRefresh: true });
@@ -382,7 +375,6 @@ export function validateDataIntegrity(data) {
 function cleanupLoadingModals() {
   // Force close any processing modals
   if (typeof window.closeProcessingModal === 'function') {
-    console.log("🚫 Force closing any processing modals");
     window.closeProcessingModal();
   }
   
@@ -394,7 +386,6 @@ function cleanupLoadingModals() {
     document.querySelector('#loading-modal')
   ].filter(el => el !== null);
   
-  console.log("🔍 DEBUG modal elements:", {
     foundModals: modalElements.length,
     modals: modalElements.map(el => ({
       id: el.id,
@@ -407,7 +398,6 @@ function cleanupLoadingModals() {
   // Force hide any visible modals
   modalElements.forEach(el => {
     if (window.getComputedStyle(el).display !== 'none') {
-      console.log(`🚫 Force hiding modal:`, el.id || el.className);
       el.style.display = 'none';
     }
   });
@@ -417,5 +407,4 @@ function cleanupLoadingModals() {
 window.loadStatisticsData = loadStatisticsData;
 window.processDataForUI = processDataForUI;
 window.forceRefreshData = forceRefreshData;
-
-console.log('✅ dataProcessors.js module loaded successfully');
+

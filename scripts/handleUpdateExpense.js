@@ -11,7 +11,6 @@ import { renderExpenseStats } from './renderExpenseStats.js';
  */
 async function reloadExpenseData() {
   try {
-    console.log('🔄 Reloading expense data from server...');
     const { BACKEND_URL } = getConstants();
     
     const data = {
@@ -30,7 +29,6 @@ async function reloadExpenseData() {
     
     if (result.status === "success") {
       window.expenseList = result.data || [];
-      console.log(`✅ Reloaded ${result.data.length} expenses from server`);
       
       // Update table with fresh data
       if (typeof window.updateExpenseTable === 'function') {

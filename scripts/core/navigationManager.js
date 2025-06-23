@@ -91,7 +91,6 @@ const tabSwitchListeners = [];
  * Initialize navigation manager
  */
 export function initializeNavigation() {
-  console.log('🧭 Initializing navigation manager...');
 
   try {
     // Setup tab event handlers
@@ -106,7 +105,6 @@ export function initializeNavigation() {
     // Setup keyboard navigation
     setupKeyboardNavigation();
     
-    console.log('✅ Navigation manager initialized');
     return true;
   } catch (error) {
     console.error('❌ Error initializing navigation:', error);
@@ -129,7 +127,6 @@ function setupTabHandlers() {
     });
   });
   
-  console.log('✅ Tab handlers setup complete');
 }
 
 /**
@@ -144,7 +141,6 @@ export async function switchToTab(tabName, options = {}) {
     skipTransition = false
   } = options;
   
-  console.log(`🔄 Switching to tab: ${tabName}`);
   
   try {
     // Validate tab exists
@@ -164,7 +160,6 @@ export async function switchToTab(tabName, options = {}) {
       console.warn('⚠️ Access denied to tab:', tabName);
       const allowedTab = getDefaultAllowedTab();
       if (allowedTab !== tabName) {
-        console.log(`🔄 Redirecting to allowed tab: ${allowedTab}`);
         return switchToTab(allowedTab, options);
       }
       return false;
@@ -198,7 +193,6 @@ export async function switchToTab(tabName, options = {}) {
       // Initialize tab if needed
       await initializeTabIfNeeded(tabName);
       
-      console.log(`✅ Successfully switched to tab: ${tabName}`);
       return true;
     } else {
       // Revert state on failure
@@ -277,7 +271,6 @@ function loadInitialTab() {
   // Save intended tab from URL for later use (after auth)
   if (urlTab && TAB_CONFIG[urlTab]) {
     intendedTab = urlTab;
-    console.log(`💾 Intended tab from URL: ${intendedTab}`);
   }
   
   // Try to get tab from saved state
@@ -296,10 +289,8 @@ function loadInitialTab() {
     // User is logged in, validate permissions and switch to allowed tab
     const allowedTab = validateTabAccess(validTab);
     switchToTab(allowedTab, { updateURL: true, addToHistory: false, skipTransition: true });
-    console.log(`🎯 Initial tab loaded (authenticated): ${allowedTab}`);
   } else {
     // User not logged in, save intended tab and switch to default for now
-    console.log(`🔐 User not authenticated, saving intended tab: ${validTab}`);
     // Don't switch tab yet, will be handled after authentication
   }
 }
@@ -531,7 +522,6 @@ export function getAllTabs() {
  * Switch to intended tab after authentication
  */
 export function switchToIntendedTab() {
-  console.log('🎯 Switching to intended tab after authentication...');
   
   // Initialize tab permissions system
   initializeTabPermissions();
@@ -545,7 +535,6 @@ export function switchToIntendedTab() {
   const validTab = TAB_CONFIG[targetTab] ? targetTab : NAV_CONFIG.defaultTab;
   const allowedTab = validateTabAccess(validTab);
   
-  console.log(`🔄 Switching to tab after auth: ${allowedTab} (requested: ${validTab})`);
   
   // Switch to the allowed tab
   switchToTab(allowedTab, { updateURL: true, addToHistory: false, skipTransition: false });

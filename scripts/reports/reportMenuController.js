@@ -32,10 +32,8 @@ window.reportState = reportState;
  * Initialize report menu controller
  */
 export function initReportMenu() {
-  console.log('🎮 Initializing report menu controller');
   
   // Check if containers exist
-  console.log('🔍 Checking containers:', {
     revenueChart: !!document.getElementById('revenueChart'),
     topProducts: !!document.getElementById('topProducts'),
     topCustomers: !!document.getElementById('topCustomers'),
@@ -53,7 +51,6 @@ export function initReportMenu() {
   window.exportCurrentReport = exportCurrentReport;
   window.loadReport = loadReport;
   
-  console.log('✅ Report menu controller initialized');
 }
 
 /**
@@ -83,7 +80,6 @@ function setupMenuHandlers() {
 async function loadReport(reportType) {
   if (reportState.isLoading) return;
   
-  console.log(`📊 Loading report: ${reportType}`);
   
   reportState.currentReport = reportType;
   reportState.isLoading = true;

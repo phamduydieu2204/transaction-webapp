@@ -12,7 +12,6 @@ import { calculateDaysBetween, calculateRenewalRate } from '../core/reportCalcul
  * Load renewal report
  */
 export async function loadRenewalReport() {
-  console.log('🔄 Loading renewal report');
   
   try {
     await ensureDataIsLoaded();

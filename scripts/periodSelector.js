@@ -37,7 +37,6 @@ function closePeriodDropdown(event) {
  * Select report period
  */
 window.selectReportPeriod = function(period) {
-  console.log('📅 Selecting report period:', period);
   
   // Update selected period
   currentReportPeriod = period;
@@ -240,7 +239,6 @@ function formatDateForFilter(date) {
  * Refresh all reports with new date range
  */
 function refreshAllReports(dateRange) {
-  console.log('🔄 Refreshing all reports with date range:', dateRange);
   
   // Update filter panel if exists
   if (window.updatePeriodFilter) {
@@ -291,7 +289,6 @@ function showCustomDatePicker() {
  * Initialize period selector
  */
 export function initPeriodSelector() {
-  console.log('📅 Initializing period selector');
   
   // Set initial period from saved filters
   if (window.globalFilters && window.globalFilters.period) {

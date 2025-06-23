@@ -25,13 +25,11 @@ export class CashFlowAccrualCore {
      */
     async loadData() {
         try {
-            console.log('🔄 Loading cash flow vs accrual data...');
             
             // Get data from global variables
             this.transactionData = window.transactionList || [];
             this.expenseData = window.expenseList || [];
             
-            console.log('📊 Data loaded:', {
                 transactions: this.transactionData.length,
                 expenses: this.expenseData.length
             });
@@ -39,7 +37,6 @@ export class CashFlowAccrualCore {
             // Process the data
             await this.processData();
             
-            console.log('✅ Cash flow vs accrual data processing completed');
             
         } catch (error) {
             console.error('❌ Error loading cash flow vs accrual data:', error);

@@ -5,7 +5,6 @@
  * Coordinates between specialized UI modules
  */
 
-console.log('📦 statisticsUIController.js orchestrator loading...');
 
 // Import specialized UI modules
 import {
@@ -70,7 +69,6 @@ window.uiState = uiState;
  * Initializes the statistics UI controller using modular components
  */
 export function initializeStatisticsUI() {
-  console.log("🎮 Initializing statistics UI controller orchestrator");
   
   // Set flag to indicate UI controller is active
   window.statisticsUIControllerActive = true;
@@ -91,7 +89,6 @@ export function initializeStatisticsUI() {
   // Initialize report menu controller
   import('./reportMenuController.js').then(module => {
     if (module.initReportMenu) {
-      console.log("🎮 Initializing report menu...");
       module.initReportMenu();
     }
   }).catch(error => {
@@ -109,7 +106,6 @@ export function initializeStatisticsUI() {
   // Expose refresh function for global filters
   window.refreshStatisticsWithFilters = refreshStatisticsWithFilters;
   
-  console.log("✅ Statistics UI controller orchestrator initialized");
 }
 
 /**
@@ -117,7 +113,6 @@ export function initializeStatisticsUI() {
  * @param {string} format - Export format
  */
 async function handleDataExport(format) {
-  console.log("📤 Exporting data in format:", format);
   
   try {
     // Use modular data processor for export preparation
@@ -161,13 +156,11 @@ async function refreshStatistics() {
   if (uiState.isLoading) return;
   
   try {
-    console.log("🔄 Refreshing statistics display using orchestrator...");
     
     // Check if we're in statistics tab
     const currentTab = document.querySelector(".tab-button.active");
     const isThongKeTab = currentTab && currentTab.dataset.tab === "tab-thong-ke";
     
-    console.log("🔍 DEBUG refreshStatistics:", {
       currentTab: currentTab ? currentTab.dataset.tab : "null",
       isThongKeTab: isThongKeTab,
       shouldRenderEnhanced: isThongKeTab
@@ -184,7 +177,6 @@ async function refreshStatistics() {
     // Process data using modular processor
     const processedData = processDataForUI(expenseData, transactionData, uiState);
     
-    console.log("🎯 About to call renderEnhancedStatistics with processed data:", {
       expenseCount: expenseData.length,
       transactionCount: transactionData.length,
       hasFinancialAnalysis: !!processedData.financialAnalysis
@@ -202,7 +194,6 @@ async function refreshStatistics() {
     uiState.isLoading = false;
     uiState.lastError = null;
     
-    console.log("✅ Statistics refreshed successfully using orchestrator");
     
   } catch (error) {
     console.error("❌ Failed to refresh statistics:", error);
@@ -224,14 +215,12 @@ export function getUIState() {
  */
 export function updateUIState(newState) {
   Object.assign(uiState, newState);
-  console.log("🎮 UI state updated:", uiState);
 }
 
 /**
  * Forces refresh of statistics using modular data processor
  */
 export async function forceRefresh() {
-  console.log("🔄 Forcing statistics refresh using orchestrator...");
   
   try {
     const data = await forceRefreshData(uiState);
@@ -249,7 +238,6 @@ export async function forceRefresh() {
  * Resets UI to default state using modular UI handlers
  */
 export function resetUI() {
-  console.log("🔄 Resetting statistics UI using orchestrator...");
   
   uiState.currentTab = "overview";
   uiState.dateRange = "month";
@@ -272,7 +260,6 @@ export function resetUI() {
  * Refresh statistics với global filters using modular components
  */
 async function refreshStatisticsWithFilters(globalFilters) {
-  console.log("🔄 Refreshing statistics with global filters using orchestrator:", globalFilters);
   
   try {
     const expenseData = window.expenseList || [];
@@ -303,5 +290,4 @@ window.getUIState = getUIState;
 window.updateUIState = updateUIState;
 window.forceRefresh = forceRefresh;
 window.resetUI = resetUI;
-
-console.log('✅ statisticsUIController.js orchestrator loaded successfully');
+

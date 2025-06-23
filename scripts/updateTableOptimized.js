@@ -170,7 +170,6 @@ export function updateTableOptimized(transactionList, currentPage, itemsPerPage,
         const selected = e.target.value;
         const globalIndex = parseInt(e.target.dataset.index);
         
-        console.log(`🎯 Action selected: ${selected} for index: ${globalIndex}`);
         
         switch(selected) {
           case 'edit':
@@ -242,7 +241,6 @@ export function updateTableOptimized(transactionList, currentPage, itemsPerPage,
 
   // ✅ Save total revenue
   window.totalRevenue = totalRevenue;
-  console.log("✅ Total revenue calculated:", totalRevenue);
 }
 
 // Export as default updateTable

@@ -72,7 +72,6 @@ class UIBlocker {
     // Ngăn scroll
     document.body.style.overflow = 'hidden';
 
-    console.log('🔒 UI blocked');
   }
 
   /**
@@ -90,7 +89,6 @@ class UIBlocker {
     // Khôi phục scroll
     document.body.style.overflow = '';
 
-    console.log('🔓 UI unblocked');
   }
 
   /**

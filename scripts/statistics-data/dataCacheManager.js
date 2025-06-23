@@ -62,7 +62,6 @@ export function updateCache(cacheKey, data) {
     lastFetch: Date.now()
   };
   
-  console.log(`📦 Cache updated for ${cacheKey}:`, 
     Array.isArray(data) ? `${data.length} items` : 'data stored');
 }
 
@@ -77,7 +76,6 @@ export function getFromCache(cacheKey) {
     return null;
   }
   
-  console.log(`📦 Cache hit for ${cacheKey}`);
   return dataCache[cacheKey].data;
 }
 
@@ -96,7 +94,6 @@ export function clearCache(cacheKey = null) {
         dataCache[cacheKey].data.clear();
       }
       
-      console.log(`🗑️ Cache cleared for ${cacheKey}`);
     }
   } else {
     Object.keys(dataCache).forEach(key => {
@@ -108,7 +105,6 @@ export function clearCache(cacheKey = null) {
         dataCache[key].data = new Map();
       }
     });
-    console.log("🗑️ All caches cleared");
   }
 }
 
@@ -187,7 +183,6 @@ export function cacheSearchResults(query, results) {
     // Remove oldest entry
     const firstKey = searchCache.data.keys().next().value;
     searchCache.data.delete(firstKey);
-    console.log(`🗑️ Removed oldest search cache entry`);
   }
   
   searchCache.data.set(queryHash, {
@@ -197,7 +192,6 @@ export function cacheSearchResults(query, results) {
   });
   
   searchCache.lastFetch = Date.now();
-  console.log(`📦 Cached search results: ${results.length} items`);
 }
 
 /**
@@ -222,7 +216,6 @@ export function getCachedSearchResults(query) {
     return null;
   }
   
-  console.log(`📦 Search cache hit: ${cached.results.length} items`);
   return cached.results;
 }
 
@@ -234,7 +227,6 @@ export function getCachedSearchResults(query) {
 export function preloadCache(cacheKey, data) {
   if (dataCache[cacheKey]) {
     updateCache(cacheKey, data);
-    console.log(`🚀 Cache preloaded for ${cacheKey}`);
   }
 }
 
@@ -307,6 +299,5 @@ export function optimizeCache() {
     }
   });
   
-  console.log(`🧹 Cache optimized: ${removed} expired entries removed`);
   return removed;
 }

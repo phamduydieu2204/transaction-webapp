@@ -13,12 +13,10 @@ export async function loadPartial(elementId, partialPath, useCache = true) {
     const element = document.getElementById(elementId);
     if (element) {
       element.innerHTML = cachedHtml;
-      console.log(`📦 Used cached partial: ${partialPath}`);
     }
     return;
   }
 
-  console.log(`📄 Loading partial: ${partialPath} into #${elementId}`);
   try {
     const response = await fetch(partialPath);
     if (!response.ok) {
@@ -36,7 +34,6 @@ export async function loadPartial(elementId, partialPath, useCache = true) {
       // Use insertAdjacentHTML for better performance
       element.innerHTML = '';
       element.insertAdjacentHTML('afterbegin', html);
-      console.log(`✅ Inserted into #${elementId}`);
     } else {
       console.error(`❌ Element with id '${elementId}' not found`);
     }
@@ -64,11 +61,9 @@ export async function loadPartials(partials) {
  * Initialize all partials khi DOM loaded
  */
 export async function initializePartials() {
-  console.log('🚀 PartialLoader: Starting optimized partial loading...');
   
   try {
     // Preload all partials in parallel but inject only critical ones first
-    console.log('🚀 Preloading all partials in parallel...');
     
     // Define all partials
     const allPartials = [
@@ -109,17 +104,13 @@ export async function initializePartials() {
     // Start preloading all files
     const preloadStart = Date.now();
     Promise.all(preloadPromises).then(() => {
-      console.log(`✅ All partials preloaded in ${Date.now() - preloadStart}ms`);
     });
     
     // Phase 1: Inject critical components immediately
-    console.log('🚀 Phase 1: Injecting critical components...');
     const criticalPartials = allPartials.filter(p => p.priority === 1);
     await loadPartials(criticalPartials);
-    console.log('✅ Critical components injected');
     
     // Phase 2: Inject remaining components using cached data
-    console.log('🚀 Phase 2: Injecting remaining components from cache...');
     
     // Use requestIdleCallback for non-critical components
     const injectNonCritical = () => {
@@ -137,19 +128,15 @@ export async function initializePartials() {
       setTimeout(injectNonCritical, 10);
     }
     
-    console.log('✅ Non-critical component injection scheduled');
     
     // Phase 4: Optional components (lazy load)
-    console.log('🚀 Phase 4: Loading optional components...');
     setTimeout(async () => {
       const reportPagesContainer = document.getElementById('report-pages-container');
       if (reportPagesContainer) {
         await loadPartial('report-pages-container', './partials/tabs/report-pages.html');
-        console.log('✅ Report pages loaded');
       }
     }, 50); // Reduced delay
     
-    console.log('✅ All partials loading initiated');
     
   } catch (error) {
     console.error('❌ Error in partial loading:', error);

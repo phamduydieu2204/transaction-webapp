@@ -74,7 +74,6 @@ let autoSaveInterval = null;
  * Initialize state manager
  */
 export function initializeStateManager() {
-  console.log('🔄 Initializing state manager...');
   
   try {
     // Load saved state from localStorage
@@ -89,7 +88,6 @@ export function initializeStateManager() {
     // Make state globally available
     window.appState = appState;
     
-    console.log('✅ State manager initialized');
     return true;
   } catch (error) {
     console.error('❌ Error initializing state manager:', error);
@@ -290,9 +288,7 @@ function loadPersistedState() {
           }
         });
         
-        console.log('✅ State loaded from localStorage');
       } else {
-        console.log('⚠️ Saved state is too old, using default state');
       }
     }
     
@@ -303,7 +299,6 @@ function loadPersistedState() {
       appState.user = parsedCriticalState.user;
       appState.activeTab = parsedCriticalState.activeTab;
       
-      console.log('✅ Critical state loaded as fallback');
     }
     
   } catch (error) {
@@ -347,7 +342,6 @@ function setupStateValidation() {
     appState.itemsPerPage = 50;
   }
   
-  console.log('✅ State validation complete');
 }
 
 /**
@@ -398,7 +392,6 @@ export function resetState() {
   };
   
   updateState(defaultState, true);
-  console.log('🔄 State reset to defaults');
 }
 
 /**
@@ -422,7 +415,6 @@ export function getStateStats() {
  * Cleanup state manager
  */
 export function cleanupStateManager() {
-  console.log('🧹 Cleaning up state manager...');
   
   if (autoSaveInterval) {
     clearInterval(autoSaveInterval);
@@ -435,7 +427,6 @@ export function cleanupStateManager() {
   // Clear listeners
   stateListeners.clear();
   
-  console.log('✅ State manager cleanup complete');
 }
 
 /**

@@ -62,7 +62,6 @@ export function calculateTotalExpenses(data, options = {}) {
 
   if (!Array.isArray(data)) return totals;
 
-  console.log("🧮 Calculating expenses:", {
     recordCount: data.length,
     isSearching,
     targetDate,
@@ -104,7 +103,6 @@ export function calculateTotalExpenses(data, options = {}) {
     totals[expenseCurrency] += amount;
   });
 
-  console.log("✅ Expense totals calculated:", totals);
   return totals;
 }
 
@@ -131,7 +129,6 @@ export function calculateTotalRevenue(data, options = {}) {
 
   if (!Array.isArray(data)) return totals;
 
-  console.log("🧮 Calculating revenue:", {
     recordCount: data.length,
     isSearching,
     targetDate,
@@ -179,7 +176,6 @@ export function calculateTotalRevenue(data, options = {}) {
     totals[transactionCurrency] += revenue;
   });
 
-  console.log("✅ Revenue totals calculated:", totals);
   return totals;
 }
 
@@ -200,7 +196,6 @@ export function groupExpensesByMonth(data, options = {}) {
 
   if (!Array.isArray(data)) return summaryMap;
 
-  console.log("📊 Grouping expenses by month:", {
     recordCount: data.length,
     currency,
     sortBy,
@@ -247,7 +242,6 @@ export function groupExpensesByMonth(data, options = {}) {
     return sortOrder === "desc" ? -comparison : comparison;
   });
 
-  console.log("✅ Monthly grouping completed:", summaryArray.length, "entries");
   return summaryArray;
 }
 
@@ -268,7 +262,6 @@ export function groupRevenueByMonth(data, options = {}) {
 
   if (!Array.isArray(data)) return [];
 
-  console.log("📊 Grouping revenue by month:", {
     recordCount: data.length,
     currency,
     sortBy,
@@ -315,7 +308,6 @@ export function groupRevenueByMonth(data, options = {}) {
     return sortOrder === "desc" ? -comparison : comparison;
   });
 
-  console.log("✅ Revenue grouping completed:", summaryArray.length, "entries");
   return summaryArray;
 }
 
@@ -355,7 +347,6 @@ export function calculateFinancialAnalysis(revenue, expenses) {
     overallMargin: totalRevenue > 0 ? ((totalRevenue - totalExpenses) / totalRevenue) * 100 : 0
   };
 
-  console.log("📈 Financial analysis completed:", analysis.summary);
   return analysis;
 }
 
@@ -415,7 +406,6 @@ export function getDateRange(period, referenceDate = new Date()) {
       ranges.end = normalizeDate(today);
   }
 
-  console.log(`📅 Generated ${period} range:`, ranges);
   return ranges;
 }
 
@@ -576,7 +566,6 @@ export function calculateAllocatedExpense(expense, dateRange) {
   if ((expense.product && (expense.product.includes('Helium10') || expense.product.includes('Trả lương'))) || 
       (expense.description && (expense.description.includes('Helium10') || expense.description.includes('Trả lương'))) ||
       (expense['Tên sản phẩm/Dịch vụ'] && expense['Tên sản phẩm/Dịch vụ'].includes('Trả lương'))) {
-    console.log(`🔍 DEBUG - Salary/Helium10 expense object:`, {
       fullExpense: expense,
       keys: Object.keys(expense),
       periodicAllocation: expense.periodicAllocation,
@@ -595,7 +584,6 @@ export function calculateAllocatedExpense(expense, dateRange) {
   
   // If no allocation needed, return 0
   if (!allocationValue || (allocationValue !== 'Có' && allocationValue !== 'Có')) {
-    console.log(`❌ ${expense.product || expense.description || 'Unknown'} - No allocation:`, {
       periodicAllocation: expense.periodicAllocation,
       'Phân bổ': expense['Phân bổ'],
       allocation: expense.allocation,
@@ -613,7 +601,6 @@ export function calculateAllocatedExpense(expense, dateRange) {
   const transactionDate = dateValue ? new Date(normalizeDate(dateValue)) : null;
   const renewalDate = renewDateValue ? new Date(normalizeDate(renewDateValue)) : null;
   
-  console.log(`📅 Date parsing for ${expense.product || expense.description}:`, {
     originalDate: expense.date,
     'Ngày chi': expense['Ngày chi'],
     dateValue,
@@ -626,7 +613,6 @@ export function calculateAllocatedExpense(expense, dateRange) {
   
   // Must have both dates for allocation
   if (!transactionDate || !renewalDate || renewalDate <= transactionDate) {
-    console.log(`❌ ${expense.product || expense['Tên sản phẩm/Dịch vụ'] || expense.description} - Invalid dates:`, {
       transactionDate: dateValue,
       renewalDate: renewDateValue,
       parsedTransactionDate: transactionDate,
@@ -645,7 +631,6 @@ export function calculateAllocatedExpense(expense, dateRange) {
   const amountValue = expense.amount || expense['Số tiền'] || 0;
   const totalAmount = parseFloat(amountValue) || 0;
   
-  console.log(`💰 Amount parsing for ${expense.product || expense['Tên sản phẩm/Dịch vụ']}:`, {
     originalAmount: expense.amount,
     'Số tiền': expense['Số tiền'],
     amountValue,
@@ -678,7 +663,6 @@ export function calculateAllocatedExpense(expense, dateRange) {
   // Special handling for monthly salary payments
   if (expense.product && expense.product.includes('Trả lương') || 
       expense['Tên sản phẩm/Dịch vụ'] && expense['Tên sản phẩm/Dịch vụ'].includes('Trả lương')) {
-    console.log(`💵 Salary payment debug:`, {
       transactionDate: normalizeDate(transactionDate),
       renewalDate: normalizeDate(renewalDate),
       periodStart: normalizeDate(periodStart),
@@ -704,7 +688,6 @@ export function calculateAllocatedExpense(expense, dateRange) {
   // Return allocated amount for the overlapping period
   const allocatedAmount = dailyAmount * validDaysInPeriod;
   
-  console.log(`📊 Allocated expense calculation:`, {
     expense: expense.product || expense.description,
     totalAmount,
     transactionDate: normalizeDate(transactionDate),
@@ -806,7 +789,6 @@ export function calculateMonthlyExpenseBreakdown(expenses, targetMonth = null) {
     breakdown.totalActualExpense += convertToVND(currData.actual, currency);
   });
   
-  console.log(`📅 Monthly expense breakdown for ${breakdown.targetMonth}:`, {
     totalAllocated: breakdown.totalAllocatedExpense,
     totalActual: breakdown.totalActualExpense,
     allocatedCount: breakdown.allocatedDetails.length,
@@ -900,7 +882,6 @@ export function testAllocationLogic(testCases = null) {
     result.overallPassed = result.allocated.passed && result.actual.passed;
     results.push(result);
     
-    console.log(`🗺️ Test: ${test.name}`, {
       allocated: result.allocated,
       actual: result.actual,
       passed: result.overallPassed
@@ -908,7 +889,6 @@ export function testAllocationLogic(testCases = null) {
   });
   
   const totalPassed = results.filter(r => r.overallPassed).length;
-  console.log(`🏆 Test Results: ${totalPassed}/${results.length} tests passed`);
   
   return results;
 }
@@ -944,7 +924,6 @@ export function calculateActualExpense(expense, dateRange) {
   if (expenseDate >= periodStart && expenseDate <= periodEnd) {
     const amount = parseFloat(expense.amount) || 0;
     
-    console.log(`💰 Actual expense calculation:`, {
       expense: expense.product || expense.description,
       expenseDate: normalizeDate(expenseDate),
       periodRange: `${dateRange.start} to ${dateRange.end}`,
@@ -972,7 +951,6 @@ export function calculateROIByTenChuan(transactions, expenses, dateRange = null)
     const accountingType = expense.accountingType || expense['Loại kế toán'] || '';
     
     if (accountingType === 'Không liên quan') {
-      console.log(`🚫 Excluding expense from ROI:`, {
         product: expense.product || expense['Tên sản phẩm/Dịch vụ'],
         accountingType: accountingType,
         amount: expense.amount || expense['Số tiền']
@@ -982,7 +960,6 @@ export function calculateROIByTenChuan(transactions, expenses, dateRange = null)
     return true;
   });
   
-  console.log(`🛡️ Filtered expenses for ROI:`, {
     original: expenses.length,
     filtered: filteredExpenses.length,
     excluded: expenses.length - filteredExpenses.length
@@ -1031,7 +1008,6 @@ export function calculateROIByTenChuan(transactions, expenses, dateRange = null)
       if (allocatedAmount > 0) {
         // Has periodic allocation
         allocatedExpenseVND += convertToVND(allocatedAmount, currency);
-        console.log(`📊 ${tenChuan} - Allocated expense:`, {
           product: expense.product,
           allocatedAmount,
           currency,
@@ -1042,7 +1018,6 @@ export function calculateROIByTenChuan(transactions, expenses, dateRange = null)
         const actualAmount = calculateActualExpense(expense, dateRange);
         if (actualAmount > 0) {
           allocatedExpenseVND += convertToVND(actualAmount, currency);
-          console.log(`💰 ${tenChuan} - Non-allocated actual expense:`, {
             product: expense.product,
             actualAmount,
             currency,
@@ -1186,7 +1161,6 @@ export function calculateExpensesByCategory(expenseData) {
  * @returns {Object} - Comprehensive business metrics
  */
 export function calculateBusinessMetrics(transactionData, expenseData, dateRange = null) {
-  console.log("📊 Calculating business metrics for period:", dateRange);
   
   // Apply date range filtering if specified
   let filteredTransactions = transactionData;

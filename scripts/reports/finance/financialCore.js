@@ -23,7 +23,6 @@ export class FinancialCore {
         if (this.isInitialized) return;
         
         try {
-            console.log('💰 Initializing Financial Core...');
             
             await this.loadFinancialData();
             this.processFinancialData();
@@ -32,7 +31,6 @@ export class FinancialCore {
             this.generateFinancialHealth();
             
             this.isInitialized = true;
-            console.log('✅ Financial Core initialized successfully');
             
         } catch (error) {
             console.error('❌ Error initializing Financial Core:', error);
@@ -49,7 +47,6 @@ export class FinancialCore {
             this.transactions = this.extractTransactionData();
             this.expenses = this.extractExpenseData();
             
-            console.log('📊 Financial data loaded:', {
                 transactions: this.transactions.length,
                 expenses: this.expenses.length
             });
@@ -151,7 +148,6 @@ export class FinancialCore {
      * Process financial data for analysis
      */
     processFinancialData() {
-        console.log('🔄 Processing financial data...');
         
         // Process by time periods
         this.monthlyData = this.groupByMonth();
@@ -165,7 +161,6 @@ export class FinancialCore {
         // Calculate cash flow
         this.cashFlowData = this.calculateCashFlow();
         
-        console.log('✅ Financial data processed');
     }
 
     /**
@@ -388,7 +383,6 @@ export class FinancialCore {
      * Calculate financial metrics and KPIs
      */
     calculateFinancialMetrics() {
-        console.log('📊 Calculating financial metrics...');
         
         const totalRevenue = this.transactions.reduce((sum, t) => sum + t.revenue, 0);
         const totalExpenses = this.expenses.reduce((sum, e) => sum + e.amount, 0);
@@ -466,7 +460,6 @@ export class FinancialCore {
             customerAcquisitionCost: this.calculateCAC()
         };
         
-        console.log('✅ Financial metrics calculated:', this.financialMetrics);
     }
 
     /**
@@ -645,7 +638,6 @@ export class FinancialCore {
      * Generate mock data for testing
      */
     generateMockFinancialData() {
-        console.log('📝 Generating mock financial data...');
         
         // Mock transactions
         this.transactions = [
@@ -666,7 +658,6 @@ export class FinancialCore {
      * Export financial data
      */
     exportFinancialData(format = 'csv') {
-        console.log(`📊 Exporting financial data as ${format}...`);
         
         const data = {
             metrics: this.financialMetrics,

@@ -5,7 +5,6 @@
  * Handles loading states, notifications, modal management
  */
 
-console.log('📦 displayManagers.js module loading...');
 
 /**
  * Shows success message to user
@@ -23,7 +22,6 @@ export function showSuccessMessage(message) {
     }, 3000);
   }
   
-  console.log("✅ Success:", message);
 }
 
 /**
@@ -128,7 +126,6 @@ export class LoadingManager {
       this.loadingTimeouts.set(elementId, timeoutId);
     }
     
-    console.log(`🔄 Loading started for ${elementId}`);
   }
   
   /**
@@ -154,7 +151,6 @@ export class LoadingManager {
     element.classList.remove('loading');
     this.loadingElements.delete(elementId);
     
-    console.log(`✅ Loading ended for ${elementId}`);
   }
   
   /**
@@ -241,7 +237,6 @@ export class ModalManager {
       }
     }
     
-    console.log(`📱 Modal ${modalId} shown`);
   }
   
   /**
@@ -266,7 +261,6 @@ export class ModalManager {
     // Clean up keyboard handlers
     this.cleanupKeyboardHandlers(modalId);
     
-    console.log(`🚫 Modal ${modalId} hidden`);
   }
   
   /**
@@ -506,7 +500,6 @@ export const uiStateManager = new UIStateManager();
 export function cleanupDisplayManagers() {
   loadingManager.hideAllLoading();
   modalManager.hideAllModals();
-  console.log("🧹 Display managers cleaned up");
 }
 
 /**
@@ -603,5 +596,4 @@ window.showInfoMessage = showInfoMessage;
 window.loadingManager = loadingManager;
 window.modalManager = modalManager;
 window.uiStateManager = uiStateManager;
-
-console.log('✅ displayManagers.js module loaded successfully');
+

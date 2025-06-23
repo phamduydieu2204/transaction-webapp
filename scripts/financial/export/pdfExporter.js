@@ -57,7 +57,6 @@ export function exportFinancialDashboardToPDF(metrics, transactionData, expenseD
     // Save PDF
     doc.save(filename);
     
-    console.log(`✅ Exported financial dashboard to PDF: ${filename}`);
     return true;
   } catch (error) {
     console.error('❌ Error exporting to PDF:', error);

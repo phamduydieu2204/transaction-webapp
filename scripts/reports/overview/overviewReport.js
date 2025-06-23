@@ -31,7 +31,6 @@ import { initCSSOptimizations, optimizeFontLoading, addResourceHints } from '../
  * @param {string} options.period - Period name (e.g., 'this_month', 'last_month')
  */
 export async function loadOverviewReport(options = {}) {
-  console.log('📈 Loading overview report with options:', options);
   
   try {
     // PERFORMANCE: Initialize optimizations early
@@ -53,7 +52,6 @@ export async function loadOverviewReport(options = {}) {
     // Ensure data is loaded before proceeding
     await ensureDataIsLoaded();
     
-    console.log('🔍 Checking data availability:', {
       transactionList: window.transactionList ? window.transactionList.length : 0,
       expenseList: window.expenseList ? window.expenseList.length : 0
     });
@@ -62,7 +60,6 @@ export async function loadOverviewReport(options = {}) {
     const transactions = window.transactionList || getFromStorage('transactions') || [];
     const expenses = window.expenseList || getFromStorage('expenses') || [];
     
-    console.log('📊 Data found:', {
       transactions: transactions.length,
       expenses: expenses.length,
       sampleTransaction: transactions[0] ? Object.keys(transactions[0]) : [],
@@ -73,8 +70,6 @@ export async function loadOverviewReport(options = {}) {
     const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
     const period = options.period || window.globalFilters?.period || 'this_month';
     
-    console.log('📅 Using date range:', dateRange);
-    console.log('📅 Period:', period);
     
     // Update period display
     updatePeriodDisplay(period);
@@ -85,7 +80,6 @@ export async function loadOverviewReport(options = {}) {
     
     // Calculate KPIs with filtered data (and pass unfiltered data for comparison)
     const kpis = calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses, dateRange, transactions);
-    console.log('💰 Calculated Updated KPIs:');
     console.log('  - Doanh thu gộp:', kpis.grossRevenue);
     console.log('  - Tiền đang chờ thu:', kpis.pendingCollection);
     console.log('  - Tiền đang chờ chi:', kpis.pendingPayment);
@@ -93,7 +87,6 @@ export async function loadOverviewReport(options = {}) {
     console.log('  - Tỷ lệ hoàn tiền:', kpis.refundRate);
     
     // Update all components
-    console.log('🚀 Loading overview components...');
     
     // Wait a moment for DOM to be ready
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -110,8 +103,6 @@ export async function loadOverviewReport(options = {}) {
     // PERFORMANCE: Initialize lazy loading for non-critical elements
     initOverviewLazyLoading();
     
-    console.log('🔄 FORCE CACHE REFRESH - v2.0.1');
-    console.log('✅ Overview report loaded successfully with optimizations');
     
   } catch (error) {
     console.error('❌ Error loading overview report:', error);
@@ -134,29 +125,23 @@ async function loadOverviewHTML() {
     }
     
     const html = await response.text();
-    console.log('✅ Template HTML loaded, length:', html.length);
     
     // Find the overview report container and add content to it
     const overviewPage = document.getElementById('report-overview');
     if (overviewPage) {
-      console.log('📝 Applying template to existing container');
       overviewPage.innerHTML = html;
       overviewPage.classList.add('active');
-      console.log('✅ Template applied to existing container');
       
       // Verify template was applied
       setTimeout(() => {
         const hasCompleted = !!document.getElementById('completed-revenue');
         const hasChart = !!document.getElementById('revenue-status-chart');
-        console.log('🗖️ Template verification after apply:', { hasCompleted, hasChart });
       }, 10);
     } else {
       // Fallback: create the structure
       container.innerHTML = `<div id="report-overview" class="report-page active">${html}</div>`;
-      console.log('✅ Template applied to new container');
     }
     
-    console.log('📄 NEW Overview HTML template loaded successfully');
     
     // Verify new elements exist
     setTimeout(() => {
@@ -165,7 +150,6 @@ async function loadOverviewHTML() {
       const unpaidElement = document.getElementById('unpaid-revenue');
       const revenueStatusChart = document.getElementById('revenue-status-chart');
       const statusDistChart = document.getElementById('status-distribution-chart');
-      console.log('🔍 Template verification:', {
         'completed-revenue': !!completedElement,
         'paid-revenue': !!paidElement,
         'unpaid-revenue': !!unpaidElement,
@@ -175,7 +159,6 @@ async function loadOverviewHTML() {
       
       // Debug: check what's actually in the container
       const container = document.getElementById('report-overview');
-      console.log('📝 Container content preview:', container?.innerHTML?.substring(0, 200) + '...');
     }, 50);
     
   } catch (error) {
@@ -191,7 +174,6 @@ async function loadOverviewHTML() {
 function enhanceExistingStructure(container) {
   // Check if container already has the KPI structure
   if (container.querySelector('.kpi-grid')) {
-    console.log('📄 KPI structure already exists');
     return;
   }
   
@@ -318,7 +300,6 @@ function enhanceExistingStructure(container) {
   const existingContent = container.innerHTML;
   container.innerHTML = kpiHTML + existingContent;
   
-  console.log('📄 Overview structure enhanced with KPI cards');
 }
 
 /**
@@ -377,7 +358,6 @@ function calculateOverviewKPIs(transactions, expenses, dateRange, period = 'this
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
   
-  console.log('📅 🆕 NEW FIXED Date filtering setup:');
   console.log(`  - Period parameter: "${period}"`);
   console.log(`  - Period === 'all_time':`, period === 'all_time');
   console.log(`  - Using date range:`, dateRange);
@@ -388,26 +368,19 @@ function calculateOverviewKPIs(transactions, expenses, dateRange, period = 'this
   let filteredTransactions, filteredExpenses;
   
   // Check period FIRST
-  console.log('📅 📝 Checking period value...');
   if (period && period.toString() === 'all_time') {
     // No filtering for all time
-    console.log('📅 🔥 💯 🆕 ALL TIME BRANCH ACTIVATED - NO FILTERING!');
     filteredTransactions = transactions;
     filteredExpenses = expenses;
-    console.log('📅 💯 Result: transactions =', filteredTransactions.length, ', expenses =', filteredExpenses.length);
   } else if (dateRange && dateRange.start && dateRange.end) {
     // Use provided date range
-    console.log('📊 Using date range filtering');
     filteredTransactions = filterDataByDateRange(transactions, dateRange);
     filteredExpenses = filterDataByDateRange(expenses, dateRange);
     
-    console.log('📊 Filtered by date range:');
     console.log(`  - Transactions: ${transactions.length} → ${filteredTransactions.length}`);
     console.log(`  - Expenses: ${expenses.length} → ${filteredExpenses.length}`);
   } else {
     // Default to current month if no date range
-    console.log('📅 Using current month fallback for period:', period);
-    console.log('📅 ❌ CURRENT MONTH FALLBACK ACTIVATED');
     
     filteredTransactions = transactions.filter(rawTransaction => {
       const t = normalizeTransaction(rawTransaction);
@@ -462,7 +435,6 @@ function calculateOverviewKPIs(transactions, expenses, dateRange, period = 'this
   const totalRevenue = statusBreakdown.completed.revenue + statusBreakdown.paid.revenue + statusBreakdown.unpaid.revenue;
   const totalTransactions = filteredTransactions.length;
   
-  console.log('📊 Revenue calculation by status:');
   console.log('  - Completed:', statusBreakdown.completed);
   console.log('  - Paid:', statusBreakdown.paid);
   console.log('  - Unpaid:', statusBreakdown.unpaid);
@@ -480,7 +452,6 @@ function calculateOverviewKPIs(transactions, expenses, dateRange, period = 'this
     ? (statusBreakdown.completed.count / totalTransactions * 100)
     : 0;
   
-  console.log('📊 Revenue calculation by status:');
   console.log('  - Completed:', statusBreakdown.completed);
   console.log('  - Paid:', statusBreakdown.paid);
   console.log('  - Unpaid:', statusBreakdown.unpaid);
@@ -599,21 +570,17 @@ function calculateOverviewKPIs(transactions, expenses, dateRange, period = 'this
  */
 async function updateKPICards(kpis) {
   console.log('✨ UPDATED updateKPICards - Using new business metrics structure');
-  console.log('📊 New KPIs data structure:', kpis);
   
   // Check if we have the new metrics structure (with grossRevenue, pendingCollection, etc.)
   const hasNewMetrics = kpis.grossRevenue !== undefined && kpis.statusBreakdown !== undefined;
-  console.log('🔍 Has new metrics structure:', hasNewMetrics);
   
   // Check if we're using the new template with status-based elements
   const newTemplate = document.getElementById('completed-revenue') !== null;
   
   if (newTemplate && hasNewMetrics) {
     // New template - Use updated business metrics structure
-    console.log('🆕 Using new template with updated business metrics structure');
     
     // Map updated business metrics to KPI cards
-    console.log('🎯 Updating Gross Revenue KPI Card:', {
       value: kpis.grossRevenue || 0,
       growth: kpis.growthRates?.grossRevenue || 0,
       hasGrowthRates: !!kpis.growthRates,
@@ -668,7 +635,6 @@ async function updateKPICards(kpis) {
     
   } else if (newTemplate && !hasNewMetrics) {
     // New template but old metrics structure - use legacy mapping
-    console.log('⚠️ Using new template but old metrics structure - legacy mapping');
     updateKPICard('completed', {
       value: kpis.financial?.totalRevenue || 0,
       growth: 0,
@@ -714,7 +680,6 @@ async function updateKPICards(kpis) {
     
   } else {
     // Old template fallback - convert new metrics to old structure
-    console.log('⚠️ Using old template - converting new metrics to old structure');
     updateKPICard('revenue', {
       value: kpis.grossRevenue || kpis.financial?.totalRevenue || 0,
       growth: kpis.growthRates?.grossRevenue || 0,
@@ -738,8 +703,6 @@ function updateKPICard(type, data) {
   const valueElement = document.getElementById(data.elementId);
   const changeElement = document.getElementById(data.changeId);
   
-  console.log(`🔍 Looking for element: ${data.elementId}`);
-  console.log(`🔍 Element found:`, !!valueElement);
   
   if (!valueElement) {
     console.warn(`❌ KPI element not found: ${data.elementId}`);
@@ -748,7 +711,6 @@ function updateKPICard(type, data) {
     return;
   }
   
-  console.log(`💰 Updating KPI ${type}:`);
   console.log(`  - Element ID: ${data.elementId}`);
   console.log(`  - Raw value: ${data.value}`);
   console.log(`  - Growth: ${data.growth}%`);
@@ -778,7 +740,6 @@ function updateKPICard(type, data) {
     const isBoxTemplate = changeElement.classList.contains('kpi-box-change') || 
                          changeElement.parentElement?.classList.contains('kpi-box');
     
-    console.log(`🔍 Template Detection for ${type} (${data.changeId}):`, {
       changeElementClasses: Array.from(changeElement.classList),
       parentClasses: changeElement.parentElement ? Array.from(changeElement.parentElement.classList) : [],
       isMetricTemplate: isMetricTemplate,
@@ -787,7 +748,6 @@ function updateKPICard(type, data) {
     
     if (isMetricTemplate) {
       // New metric template (6-box grid)
-      console.log(`🎯 Applying NEW METRIC template for ${type}:`, {
         growth: data.growth,
         isPositive: isPositive,
         arrow: arrow,
@@ -821,7 +781,6 @@ function updateKPICard(type, data) {
  * Update status breakdown display with new metrics
  */
 function updateStatusBreakdownWithNewMetrics(kpis) {
-  console.log('📊 Updating status breakdown with new metrics structure');
   
   const total = kpis.effectiveTransactions; // Use effective transactions (excluding cancelled)
   
@@ -864,7 +823,6 @@ function updateStatusBreakdownWithNewMetrics(kpis) {
   if (unpaidBar) unpaidBar.style.width = unpaidPercent + '%';
   if (refundedBar) refundedBar.style.width = refundedPercent + '%';
   
-  console.log('📊 Status breakdown updated:', {
     completed: `${kpis.statusBreakdown.completed.count} (${completedPercent.toFixed(1)}%)`,
     paid: `${kpis.statusBreakdown.paid.count} (${paidPercent.toFixed(1)}%)`,
     unpaid: `${kpis.statusBreakdown.unpaid.count} (${unpaidPercent.toFixed(1)}%)`,
@@ -933,7 +891,6 @@ function updateConversionRates(conversion) {
 async function loadCharts(transactions, expenses) {
   try {
     // Since charts were removed, directly update the status detail table
-    console.log('📊 Updating status detail table (charts removed)');
     
     // Calculate detailed status breakdown with amounts
     const statusBreakdown = calculateDetailedStatusBreakdown(transactions);
@@ -941,7 +898,6 @@ async function loadCharts(transactions, expenses) {
     // Update the status detail table
     updateStatusDetailTable(statusBreakdown);
     
-    console.log('✅ Status detail table updated with breakdown:', statusBreakdown);
     
   } catch (error) {
     console.error('❌ Error updating status details:', error);
@@ -980,7 +936,6 @@ function renderRevenueStatusChart(transactions) {
   const currentPeriod = window.globalFilters?.period || 'this_month';
   const dateRange = window.globalFilters?.dateRange || null;
   
-  console.log('📈 Rendering revenue trend chart for period:', currentPeriod);
   
   // Prepare data based on current report cycle
   let chartData;
@@ -1492,7 +1447,6 @@ function renderStatusDistributionChart(transactions) {
   // Update the detailed status table
   updateStatusDetailTable(statusBreakdown);
   
-  console.log('🍰 Status distribution chart with details rendered:', statusBreakdown);
 }
 
 /**
@@ -1605,7 +1559,6 @@ function updateStatusDetailTable(statusBreakdown) {
   
   tableBody.innerHTML += totalRow;
   
-  console.log('📊 Status detail table updated with breakdown:', statusBreakdown);
 }
 
 /**
@@ -2071,10 +2024,8 @@ function updateDataTables(transactions, expenses) {
   
   if (hasNewTables) {
     // New template - tables are updated via loadTopCustomers and loadTopProducts
-    console.log('📊 Using new table template');
   } else if (hasOldTables) {
     // Old template
-    console.log('📊 Using old table template');
     updateTopCustomersTable(transactions);
     updateRecentTransactionsTable(transactions);
     updateTopExpensesTable(expenses);
@@ -2931,7 +2882,6 @@ function calculateOverviewKPIsNew(transactions, expenses, dateRange, period = 't
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
   
-  console.log('🆕 🔥 NEW FUNCTION - Date filtering setup:');
   console.log(`  - Period parameter: "${period}"`);
   console.log(`  - Period === 'all_time':`, period === 'all_time');
   console.log(`  - Total transactions to filter: ${transactions.length}`);
@@ -2941,12 +2891,9 @@ function calculateOverviewKPIsNew(transactions, expenses, dateRange, period = 't
   let filteredTransactions, filteredExpenses;
   
   if (period === 'all_time') {
-    console.log('🆕 💯 ALL TIME ACTIVATED - NO FILTERING!');
     filteredTransactions = transactions;
     filteredExpenses = expenses;
-    console.log('🆕 💯 RESULT: transactions =', filteredTransactions.length);
   } else {
-    console.log('🆕 Using current month filter for period:', period);
     filteredTransactions = transactions.filter(t => {
       const rawDate = t.transactionDate || t.ngayGiaoDich || t.date;
       const transactionDate = new Date(rawDate);
@@ -2998,7 +2945,6 @@ function calculateOverviewKPIsNew(transactions, expenses, dateRange, period = 't
   const totalRevenue = statusBreakdown.completed.revenue + statusBreakdown.paid.revenue + statusBreakdown.unpaid.revenue;
   const totalTransactions = filteredTransactions.length;
   
-  console.log('🆕 📊 NEW FUNCTION Revenue calculation:');
   console.log('  - Filtered transactions:', totalTransactions);
   console.log('  - Total revenue calculated:', totalRevenue);
   
@@ -3041,7 +2987,6 @@ function calculateOverviewKPIsNew(transactions, expenses, dateRange, period = 't
  * @param {Object} kpis - Business metrics from statisticsCore
  */
 function updateStatusBreakdownWithRefund(kpis) {
-  console.log('📊 Updating status breakdown with refund support');
   
   // Get current transactions for real status calculation
   const transactions = window.transactionList || [];
@@ -3104,7 +3049,6 @@ function updateStatusBreakdownWithRefund(kpis) {
     updateStatusHighlights(statusBreakdown, total);
   }
   
-  console.log('📊 Status breakdown updated:', statusBreakdown);
 }
 
 /**
@@ -3139,7 +3083,6 @@ function updateStatusHighlights(statusBreakdown, total) {
     netElement.className = netRevenue >= 0 ? 'highlight-value positive' : 'highlight-value negative';
   }
   
-  console.log('📈 Status highlights updated:', { refundImpact, successRate, netRevenue });
 }
 
 /**
@@ -3174,7 +3117,6 @@ function updateElementStyle(elementId, property, value) {
  */
 async function loadPendingTransactions(transactions = [], dateRange = null) {
   try {
-    console.log('📋 Loading pending transactions...');
     
     // Use provided transactions or fallback to global
     if (!transactions || transactions.length === 0) {
@@ -3522,7 +3464,6 @@ function updatePendingAlerts(categories) {
  */
 /*
 function exportStatusData() {
-  console.log('💾 Exporting status data...');
   
   try {
     const transactions = window.transactionList || [];
@@ -3576,7 +3517,6 @@ function exportStatusData() {
  * Action functions for pending transactions
  */
 function markAsDelivered(transactionId) {
-  console.log('🚚 Marking as delivered:', transactionId);
   // Implementation would update transaction status
   alert(`Gả lập: Đánh dấu giao dịch ${transactionId} đã giao hàng`);
   // Reload pending transactions with current date range
@@ -3586,7 +3526,6 @@ function markAsDelivered(transactionId) {
 }
 
 function markAsPaid(transactionId) {
-  console.log('💰 Marking as paid:', transactionId);
   // Implementation would update payment status
   alert(`Gả lập: Đánh dấu giao dịch ${transactionId} đã thanh toán`);
   // Reload pending transactions with current date range
@@ -3596,19 +3535,16 @@ function markAsPaid(transactionId) {
 }
 
 function sendPaymentReminder(transactionId) {
-  console.log('🔔 Sending payment reminder:', transactionId);
   // Implementation would send reminder
   alert(`Gả lập: Gửi nhắc nhở thanh toán cho giao dịch ${transactionId}`);
 }
 
 function viewTransactionDetails(transactionId) {
-  console.log('👁️ Viewing transaction details:', transactionId);
   // Implementation would show transaction detail modal
   alert(`Gả lập: Hiển thị chi tiết giao dịch ${transactionId}`);
 }
 
 function markAllAsDelivered() {
-  console.log('🚚 Marking all as delivered');
   const checkedRows = document.querySelectorAll('.needs-delivery-table input[type="checkbox"]:checked');
   if (checkedRows.length === 0) {
     alert('Vui lòng chọn ít nhất một giao dịch');
@@ -3622,7 +3558,6 @@ function markAllAsDelivered() {
 }
 
 function markAllAsPaid() {
-  console.log('💰 Marking all as paid');
   const checkedRows = document.querySelectorAll('.needs-payment-table input[type="checkbox"]:checked');
   if (checkedRows.length === 0) {
     alert('Vui lòng chọn ít nhất một giao dịch');
@@ -3636,18 +3571,15 @@ function markAllAsPaid() {
 }
 
 function sendPaymentReminders() {
-  console.log('🔔 Sending payment reminders');
   const overdueCount = document.getElementById('overdue-count')?.textContent || 0;
   alert(`Gả lập: Gửi nhắc nhở thanh toán cho ${overdueCount} giao dịch quá hạn`);
 }
 
 function showOverdueDetails() {
-  console.log('📄 Showing overdue details');
   alert('Gả lập: Hiển thị chi tiết các giao dịch quá hạn thanh toán');
 }
 
 function showUrgentDeliveries() {
-  console.log('🎆 Showing urgent deliveries');
   alert('Gả lập: Hiển thị danh sách giao hàng gấp');
 }
 
@@ -3944,7 +3876,6 @@ function calculateProductScore(product) {
  * Export functions for pending transactions
  */
 function exportNeedsDelivery() {
-  console.log('💾 Exporting needs delivery data...');
   
   try {
     const transactions = window.transactionList || [];
@@ -3994,7 +3925,6 @@ function exportNeedsDelivery() {
 }
 
 function exportNeedsPayment() {
-  console.log('💾 Exporting needs payment data...');
   
   try {
     const transactions = window.transactionList || [];
@@ -4085,7 +4015,6 @@ window.calculateProductScore = calculateProductScore;
  * @param {string} customerIdentifier - Customer email or name to view
  */
 function viewCustomerDetails(customerIdentifier) {
-  console.log('👥 Viewing customer details:', customerIdentifier);
   
   const transactions = window.transactionList || [];
   const customerTransactions = transactions.filter(rawTransaction => {
@@ -4124,7 +4053,6 @@ function viewCustomerDetails(customerIdentifier) {
  * @param {string} productName - Product name to view
  */
 function viewProductDetails(productName) {
-  console.log('📺 Viewing product details:', productName);
   
   const transactions = window.transactionList || [];
   const productTransactions = transactions.filter(rawTransaction => {
@@ -4162,7 +4090,6 @@ function viewProductDetails(productName) {
  * Export enhanced customer data to CSV
  */
 function exportCustomerData() {
-  console.log('💾 Exporting customer data...');
   
   try {
     const transactions = window.transactionList || [];
@@ -4224,7 +4151,6 @@ function exportCustomerData() {
  * Export enhanced software/product data to CSV
  */
 function exportSoftwareData() {
-  console.log('💾 Exporting software/product data...');
   
   try {
     const transactions = window.transactionList || [];
@@ -4302,16 +4228,12 @@ function exportSoftwareData() {
  * @returns {Object} Updated business metrics
  */
 function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses, dateRange, allTransactions) {
-  console.log('🧮 Calculating updated business metrics with new logic...');
-  console.log('📊 Input data:', {
     transactionsCount: filteredTransactions.length,
     expensesCount: filteredExpenses.length,
     dateRange: dateRange
   });
   
   // Use pre-filtered transactions for current period metrics
-  console.log(`📊 Working with ${filteredTransactions.length} pre-filtered transactions`);
-  console.log(`📊 Total unfiltered transactions available: ${allTransactions ? allTransactions.length : 0}`);
   
   // Initialize metrics
   const metrics = {
@@ -4342,13 +4264,11 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
     }
   };
   
-  console.log(`📊 Processing ${filteredTransactions.length} transactions...`);
   
   // Process each transaction
   filteredTransactions.forEach((rawTransaction, index) => {
     const transaction = normalizeTransaction(rawTransaction);
     if (!transaction) {
-      console.log(`⚠️ Transaction ${index} failed normalization:`, rawTransaction);
       return;
     }
     
@@ -4358,7 +4278,6 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
     
     // Debug first few transactions
     if (index < 5) {
-      console.log(`💳 Transaction ${index}:`, {
         rawAmount: transaction.amount || transaction.doanhThu || transaction.revenue,
         parsedAmount: amount,
         rawStatus: transaction.loaiGiaoDich || transaction.transactionType,
@@ -4412,7 +4331,6 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
   });
   
   // Calculate derived metrics
-  console.log('📊 Raw status breakdown before calculations:', {
     completed: metrics.statusBreakdown.completed,
     paid: metrics.statusBreakdown.paid,
     unpaid: metrics.statusBreakdown.unpaid,
@@ -4422,7 +4340,6 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
   
   // Doanh thu gộp = Tổng tiền "đã hoàn tất" + Tổng tiền "đã thanh toán" - Tổng tiền "hoàn tiền"
   metrics.grossRevenue = metrics.statusBreakdown.completed.amount + metrics.statusBreakdown.paid.amount - metrics.totalRefunds;
-  console.log(`💰 Gross Revenue Calculation: ${metrics.statusBreakdown.completed.amount} + ${metrics.statusBreakdown.paid.amount} - ${metrics.totalRefunds} = ${metrics.grossRevenue}`);
   
   // Tỷ lệ hoàn tiền = Số giao dịch "hoàn tiền" / Tổng giao dịch có hiệu lực
   // Giao dịch có hiệu lực = "đã hoàn tất" + "đã thanh toán" + "chưa thanh toán"
@@ -4441,8 +4358,6 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
     // Use allTransactions to get data from previous period
     const samePeriodTransactions = filterDataByDateRange(allTransactions || [], samePeriodPreviousCycleRange);
     
-    console.log('📊 Same period previous cycle range:', samePeriodPreviousCycleRange);
-    console.log(`📊 Same period transactions found: ${samePeriodTransactions.length}`);
     
     samePeriodTransactions.forEach(rawTransaction => {
       const transaction = normalizeTransaction(rawTransaction);
@@ -4471,7 +4386,6 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
     
     metrics.previousPeriod.grossRevenue -= metrics.previousPeriod.totalRefunds;
     
-    console.log('📊 Previous same period metrics:', {
       grossRevenue: metrics.previousPeriod.grossRevenue,
       totalRefunds: metrics.previousPeriod.totalRefunds,
       effectiveTransactions: metrics.previousPeriod.effectiveTransactions
@@ -4487,12 +4401,10 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
     effectiveTransactions: calculateGrowthRate(metrics.effectiveTransactions, metrics.previousPeriod.effectiveTransactions)
   };
   
-  console.log('📈 DOANH THU GỘP - Growth Rate Calculation:');
   console.log(`  Current Gross Revenue: ${metrics.grossRevenue}`);
   console.log(`  Previous Period Gross Revenue: ${metrics.previousPeriod.grossRevenue}`);
   console.log(`  Growth Rate: ${metrics.growthRates.grossRevenue.toFixed(2)}%`);
   
-  console.log('📈 Final metrics calculated:');
   console.log('  💰 Doanh thu gộp:', formatCurrency(metrics.grossRevenue));
   console.log('  ⏳ Tiền đang chờ thu:', formatCurrency(metrics.pendingCollection));
   console.log('  💸 Tiền đang chờ chi:', formatCurrency(metrics.pendingPayment));
@@ -4513,7 +4425,6 @@ function calculateSamePeriodPreviousCycle(currentRange) {
   const startDate = new Date(currentRange.start);
   const endDate = new Date(currentRange.end);
   
-  console.log('📅 Current period:', { start: currentRange.start, end: currentRange.end });
   
   // Calculate previous cycle by going back 1 month
   const prevStartDate = new Date(startDate);
@@ -4537,7 +4448,6 @@ function calculateSamePeriodPreviousCycle(currentRange) {
     end: prevEndDate.toISOString().split('T')[0]
   };
   
-  console.log('📅 Same period previous cycle:', result);
   
   return result;
 }

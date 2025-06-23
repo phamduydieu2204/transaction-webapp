@@ -17,12 +17,10 @@ window.handleDeleteExpense = handleDeleteExpense;
 window.updateExpenseTable = updateExpenseTable;
 
 // Force refresh on load to show new structure
-console.log('👁️ Loading unified detail modals for view functionality...');
 if (typeof window !== 'undefined') {
   // Schedule refresh after DOM is ready
   setTimeout(() => {
     if (window.expenseList && window.expenseList.length > 0) {
-      console.log('🎨 Refreshing expense table with transaction-style UI...');
       updateExpenseTable();
     }
   }, 100);
@@ -30,7 +28,6 @@ if (typeof window !== 'undefined') {
   // Also schedule a longer refresh to catch late-loading data
   setTimeout(() => {
     if (window.expenseList && window.expenseList.length > 0) {
-      console.log('🎨 Final refresh for expense table styling...');
       updateExpenseTable();
     }
     // FORCE: Remove any remaining scroll on containers
@@ -42,7 +39,6 @@ if (typeof window !== 'undefined') {
  * Force refresh expense table (useful after adding new expense)
  */
 export function refreshExpenseTable() {
-  console.log('🔄 Force refreshing expense table...');
   // Reset to first page to show newest expense
   window.currentExpensePage = 1;
   updateExpenseTable();
@@ -91,7 +87,6 @@ window.handleExpenseAction = handleExpenseAction;
  * Force remove internal scroll from expense table containers
  */
 function forceRemoveInternalScroll() {
-  console.log('🚫 FORCE: Removing internal scroll from expense containers...');
   
   // List of selectors that might have scroll
   const scrollSelectors = [
@@ -111,7 +106,6 @@ function forceRemoveInternalScroll() {
         el.style.overflowY = 'visible';
         el.style.maxHeight = 'none';
         el.style.height = 'auto';
-        console.log(`🚫 Removed scroll from: ${selector}`);
       }
     });
   });
@@ -238,7 +232,6 @@ export function updateExpenseTable() {
   // Update pagination - Sử dụng component chung như transaction table
   updateExpensePagination(totalPages, currentPage);
   
-  console.log(`📄 Displayed ${paginatedExpenses.length} expenses (page ${currentPage}/${totalPages}) with pagination`);
 }
 
 /**
@@ -249,10 +242,7 @@ function createExpenseRow(expense, index) {
   
   // Debug log để xem cấu trúc dữ liệu
   if (index === 0) {
-    console.log('🔍 DEBUG: Sample expense data structure:', expense);
-    console.log('🔍 Available keys:', Object.keys(expense));
     // Debug ngày tái tục
-    console.log('📅 DEBUG: Renew date fields:', {
       renewDate: expense.renewDate,
       expenseRenewDate: expense.expenseRenewDate,
       ngayTaiTuc: expense.ngayTaiTuc

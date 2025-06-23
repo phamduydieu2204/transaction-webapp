@@ -5,7 +5,6 @@
  * Handles all chart generation and data visualization components
  */
 
-console.log('📦 chartRenderers.js module loading...');
 
 // Import rendering utilities
 import { 
@@ -45,7 +44,6 @@ export async function renderOverviewTab(expenseData, transactionData, financialA
       yLabel: "Số Tiền (VND)"
     });
     
-    console.log("✅ Overview tab rendered");
     
   } catch (error) {
     console.error("❌ Error rendering overview tab:", error);
@@ -71,7 +69,6 @@ export async function renderExpensesTab(expenseData, uiState) {
       showGrowthRate: uiState.showGrowthRate
     });
     
-    console.log("✅ Expenses tab rendered");
     
   } catch (error) {
     console.error("❌ Error rendering expenses tab:", error);
@@ -104,7 +101,6 @@ export async function renderRevenueTab(transactionData, uiState) {
       showGrowthRate: uiState.showGrowthRate
     });
     
-    console.log("✅ Revenue tab rendered");
     
   } catch (error) {
     console.error("❌ Error rendering revenue tab:", error);
@@ -117,7 +113,6 @@ export async function renderRevenueTab(transactionData, uiState) {
  */
 export async function renderEnhancedStatistics(expenseData, transactionData, financialAnalysis, globalFilters = null) {
   try {
-    console.log("🎨 Rendering Enhanced Statistics with Business Overview Dashboard...");
     
     // Use saved filters if no filters provided
     if (!globalFilters && window.globalFilters) {
@@ -145,7 +140,6 @@ export async function renderEnhancedStatistics(expenseData, transactionData, fin
     if (window.refreshCurrentReport && document.querySelector('.report-page.active')) {
       window.refreshCurrentReport();
     }
-    console.log("✅ Business Overview Dashboard rendered");
     
     // 2. Render Export Controls
     renderExportControls({
@@ -153,12 +147,10 @@ export async function renderEnhancedStatistics(expenseData, transactionData, fin
       formats: ["csv", "json"],
       onExport: window.handleDataExport || (() => console.log("Export handler not found"))
     });
-    console.log("✅ Export controls rendered");
     
     // 3. Render Monthly Summary Table với filtered data
     await renderFilteredMonthlySummary(expenseData, globalFilters);
     
-    console.log("🎉 Enhanced Statistics rendering complete!");
     
   } catch (error) {
     console.error("❌ Error rendering enhanced statistics:", error);
@@ -204,7 +196,6 @@ async function renderFilteredMonthlySummary(expenseData, globalFilters) {
       showGrowthRate: false
     });
     
-    console.log("✅ Monthly summary table rendered");
     
   } catch (error) {
     console.error("❌ Error rendering monthly summary:", error);
@@ -231,7 +222,6 @@ export async function renderDefaultTab(expenseData, financialAnalysis) {
       showGrowthRate: false
     });
     
-    console.log("✅ Default tab rendered");
     
   } catch (error) {
     console.error("❌ Error rendering default tab:", error);
@@ -279,7 +269,6 @@ export function renderCustomChart(data, config) {
       responsive
     });
     
-    console.log(`✅ Custom chart rendered in ${containerId}`);
     
   } catch (error) {
     console.error(`❌ Error rendering custom chart in ${containerId}:`, error);
@@ -322,7 +311,6 @@ export function renderComparisonChart(currentData, previousData, config) {
       showLegend: true
     });
     
-    console.log(`✅ Comparison chart rendered in ${containerId}`);
     
   } catch (error) {
     console.error(`❌ Error rendering comparison chart:`, error);
@@ -360,7 +348,6 @@ export function renderCategoryPieChart(data, config) {
       responsive: true
     });
     
-    console.log(`✅ Category pie chart rendered in ${containerId}`);
     
   } catch (error) {
     console.error(`❌ Error rendering category pie chart:`, error);
@@ -398,7 +385,6 @@ export function renderTrendChart(data, config) {
       responsive: true
     });
     
-    console.log(`✅ Trend chart rendered in ${containerId}`);
     
   } catch (error) {
     console.error(`❌ Error rendering trend chart:`, error);
@@ -413,7 +399,6 @@ export function clearCharts(containerId) {
   const container = document.getElementById(containerId);
   if (container) {
     container.innerHTML = '';
-    console.log(`🧹 Charts cleared in ${containerId}`);
   }
 }
 
@@ -448,7 +433,6 @@ export async function refreshAllCharts(data, config = {}) {
       }
     }
     
-    console.log("✅ All charts refreshed");
     
   } catch (error) {
     console.error("❌ Error refreshing charts:", error);
@@ -461,5 +445,4 @@ window.renderOverviewTab = renderOverviewTab;
 window.renderExpensesTab = renderExpensesTab;
 window.renderRevenueTab = renderRevenueTab;
 window.renderDefaultTab = renderDefaultTab;
-
-console.log('✅ chartRenderers.js module loaded successfully');
+

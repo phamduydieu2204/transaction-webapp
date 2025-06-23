@@ -156,11 +156,9 @@ export async function getReportData(options) {
   const cached = reportCache.get(cacheKey);
   
   if (cached) {
-    console.log('📦 Using cached report data');
     return cached;
   }
   
-  console.log('🔄 Fetching fresh report data');
   const data = await fetchExpenseData(options);
   reportCache.set(cacheKey, data);
   

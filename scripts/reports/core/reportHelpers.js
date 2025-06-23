@@ -19,7 +19,6 @@ export async function ensureDataIsLoaded() {
   
   // If still no data after waiting, try to trigger load
   if (!window.transactionList || window.transactionList.length === 0) {
-    console.log('🔄 No transaction data found, triggering load...');
     if (window.loadTransactions) {
       try {
         await window.loadTransactions();
@@ -31,7 +30,6 @@ export async function ensureDataIsLoaded() {
   
   // Also ensure expense data is loaded
   if (!window.expenseList || window.expenseList.length === 0) {
-    console.log('🔄 No expense data found, loading from API...');
     
     // Try to load expense data directly from API
     try {
@@ -45,7 +43,6 @@ export async function ensureDataIsLoaded() {
           conditions: {} // Empty conditions to get all expenses
         };
         
-        console.log('🔄 Fetching expense data from API...');
         
         const response = await fetch(BACKEND_URL, {
           method: 'POST',
@@ -64,7 +61,6 @@ export async function ensureDataIsLoaded() {
         if (result.status === 'success') {
           // Store expenses globally - API returns data not expenses
           window.expenseList = result.data || [];
-          console.log(`✅ Loaded ${window.expenseList.length} expenses from API`);
         } else {
           console.error('❌ Error loading expenses:', result.message);
           window.expenseList = [];
@@ -83,7 +79,6 @@ export async function ensureDataIsLoaded() {
   if (!window.transactionList) window.transactionList = [];
   if (!window.expenseList) window.expenseList = [];
   
-  console.log('✅ Data ensured:', {
     transactions: window.transactionList.length,
     expenses: window.expenseList.length
   });
@@ -94,7 +89,6 @@ export async function ensureDataIsLoaded() {
  */
 export async function ensureSoftwareDataLoaded() {
   if (!window.softwareList || window.softwareList.length === 0) {
-    console.log('📦 Loading software list...');
     try {
       const response = await fetch(`${SERVER_CONFIG.BASE_URL}/${SERVER_CONFIG.ENDPOINTS.GET_SOFTWARE_LIST}`, {
         method: 'POST',
@@ -105,7 +99,6 @@ export async function ensureSoftwareDataLoaded() {
       const result = await response.json();
       if (result.status === 'success') {
         window.softwareList = result.softwareList || [];
-        console.log(`✅ Loaded ${window.softwareList.length} software items`);
       }
     } catch (error) {
       console.warn('⚠️ Failed to load software list:', error);
@@ -162,7 +155,6 @@ export function hideLoading() {
  */
 export function refreshCurrentReport() {
   const currentReport = window.reportState?.currentReport || 'overview';
-  console.log(`🔄 Refreshing current report: ${currentReport}`);
   
   if (window.loadReport) {
     window.loadReport(currentReport);
@@ -174,7 +166,6 @@ export function refreshCurrentReport() {
  */
 export function exportCurrentReport() {
   const currentReport = window.reportState?.currentReport || 'overview';
-  console.log(`📊 Exporting current report: ${currentReport}`);
   
   // Implementation depends on report type
   switch (currentReport) {

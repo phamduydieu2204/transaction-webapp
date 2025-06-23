@@ -150,7 +150,6 @@ export function groupExpensesByMonth(data, options = {}) {
 
   if (!Array.isArray(data)) return summaryMap;
 
-  console.log("📊 Grouping expenses by month:", {
     recordCount: data.length,
     currency,
     sortBy,
@@ -197,7 +196,6 @@ export function groupExpensesByMonth(data, options = {}) {
     return sortOrder === "desc" ? -comparison : comparison;
   });
 
-  console.log("✅ Monthly grouping completed:", summaryArray.length, "entries");
   return summaryArray;
 }
 
@@ -218,7 +216,6 @@ export function groupRevenueByMonth(data, options = {}) {
 
   if (!Array.isArray(data)) return [];
 
-  console.log("📊 Grouping revenue by month:", {
     recordCount: data.length,
     currency,
     sortBy,
@@ -265,7 +262,6 @@ export function groupRevenueByMonth(data, options = {}) {
     return sortOrder === "desc" ? -comparison : comparison;
   });
 
-  console.log("✅ Revenue grouping completed:", summaryArray.length, "entries");
   return summaryArray;
 }
 

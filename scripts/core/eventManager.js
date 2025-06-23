@@ -49,7 +49,6 @@ function addTrackedEventListener(element, event, handler, options = {}) {
  * Setup form event handlers
  */
 export function setupFormHandlers() {
-  console.log('🎯 Setting up form handlers...');
 
   // Transaction form handlers
   setupTransactionFormHandlers();
@@ -60,7 +59,6 @@ export function setupFormHandlers() {
   // Global form handlers
   setupGlobalFormHandlers();
   
-  console.log('✅ Form handlers setup complete');
 }
 
 /**
@@ -182,7 +180,6 @@ function setupGlobalFormHandlers() {
  * Setup pagination event handlers
  */
 export function setupPaginationHandlers() {
-  console.log('📄 Setting up pagination handlers...');
 
   // First page button
   const firstPageBtn = document.getElementById('firstPage');
@@ -221,7 +218,6 @@ export function setupPaginationHandlers() {
     });
   }
 
-  console.log('✅ Pagination handlers setup complete');
 }
 
 /**
@@ -276,14 +272,12 @@ export function setupKeyboardShortcuts() {
     }
   });
 
-  console.log('✅ Keyboard shortcuts setup complete');
 }
 
 /**
  * Setup modal event handlers
  */
 export function setupModalHandlers() {
-  console.log('🔔 Setting up modal handlers...');
 
   // Click outside modal to close
   addTrackedEventListener(document, 'click', function(e) {
@@ -310,14 +304,12 @@ export function setupModalHandlers() {
     });
   });
 
-  console.log('✅ Modal handlers setup complete');
 }
 
 /**
  * Setup responsive handlers
  */
 export function setupResponsiveHandlers() {
-  console.log('📱 Setting up responsive handlers...');
 
   // Window resize handler
   let resizeTimeout;
@@ -332,7 +324,6 @@ export function setupResponsiveHandlers() {
   // Initial responsive setup
   handleResponsiveLayout();
 
-  console.log('✅ Responsive handlers setup complete');
 }
 
 /**
@@ -367,7 +358,6 @@ function handleResponsiveLayout() {
  */
 export function setupPerformanceMonitoring() {
   if (window.DEBUG) {
-    console.log('📊 Setting up performance monitoring...');
 
     // Monitor long-running operations
     addTrackedEventListener(document, 'click', function(e) {
@@ -383,7 +373,6 @@ export function setupPerformanceMonitoring() {
       }, 0);
     });
 
-    console.log('✅ Performance monitoring setup complete');
   }
 }
 
@@ -391,7 +380,6 @@ export function setupPerformanceMonitoring() {
  * Initialize all event handlers
  */
 export function initializeEventHandlers() {
-  console.log('🎯 Initializing event handlers...');
 
   try {
     setupFormHandlers();
@@ -401,7 +389,6 @@ export function initializeEventHandlers() {
     setupResponsiveHandlers();
     setupPerformanceMonitoring();
     
-    console.log('✅ All event handlers initialized successfully');
     return true;
   } catch (error) {
     console.error('❌ Error initializing event handlers:', error);
@@ -413,7 +400,6 @@ export function initializeEventHandlers() {
  * Cleanup all event listeners
  */
 export function cleanupEventHandlers() {
-  console.log('🧹 Cleaning up event handlers...');
 
   eventListeners.forEach((listeners, key) => {
     listeners.forEach(({ element, event, handler, options }) => {
@@ -427,7 +413,6 @@ export function cleanupEventHandlers() {
 
   eventListeners.clear();
   
-  console.log('✅ Event handlers cleanup complete');
 }
 
 // Make functions globally available for backward compatibility

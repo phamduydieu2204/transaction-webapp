@@ -12,11 +12,9 @@ import { initPeriodSelector } from './periodSelector.js';
  * Initialize the statistics tab
  */
 export async function initStatisticsTab() {
-  console.log('📊 Initializing statistics tab...');
   
   try {
     // Check if we have transaction data
-    console.log('🔍 Checking data availability:', {
       transactionList: window.transactionList ? window.transactionList.length : 0,
       expenseList: window.expenseList ? window.expenseList.length : 0,
       userInfo: !!window.userInfo
@@ -34,14 +32,12 @@ export async function initStatisticsTab() {
     // Initialize report menu controller
     if (typeof initReportMenu === 'function') {
       await initReportMenu();
-      console.log('✅ Report menu initialized');
     } else {
       console.warn('⚠️ initReportMenu not available, loading overview directly');
       // Fallback: load overview report directly
       await loadOverviewReport();
     }
     
-    console.log('✅ Statistics tab initialized successfully');
     
   } catch (error) {
     console.error('❌ Error initializing statistics tab:', error);
@@ -61,7 +57,6 @@ async function loadReportPagesHTML() {
   
   // Check if already loaded
   if (container.querySelector('#report-overview')) {
-    console.log('📄 Report pages already loaded');
     return;
   }
   
@@ -116,7 +111,6 @@ function showStatisticsError(message) {
  * Initialize menu interactions
  */
 function initMenuInteractions() {
-  console.log('🎛️ Initializing menu interactions');
   
   // Setup menu item click handlers
   const menuItems = document.querySelectorAll('.menu-item');
@@ -135,7 +129,6 @@ function initMenuInteractions() {
     });
   });
   
-  console.log('✅ Menu interactions initialized');
 }
 
 /**
@@ -143,7 +136,6 @@ function initMenuInteractions() {
  * @param {string} reportType - Type of report to load
  */
 function loadReportByType(reportType) {
-  console.log('📊 Loading report type:', reportType);
   
   // Hide all report pages
   const reportPages = document.querySelectorAll('.report-page');

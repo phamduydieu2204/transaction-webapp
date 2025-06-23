@@ -24,7 +24,6 @@ export function renderFinancialOverview(financialData, options = {}) {
     return;
   }
 
-  console.log("💰 Rendering financial overview");
 
   const { summary, profit, profitMargin } = financialData;
 
@@ -55,7 +54,6 @@ export function renderFinancialOverview(financialData, options = {}) {
   // Add CSS styles if not already present
   addFinancialOverviewStyles();
 
-  console.log("✅ Financial overview rendered successfully");
 }
 
 /**

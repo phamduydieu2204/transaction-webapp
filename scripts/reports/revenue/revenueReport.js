@@ -12,7 +12,6 @@ import { calculateTotalRevenue, groupByTimePeriod, calculateGrowthRate } from '.
  * Load revenue report
  */
 export async function loadRevenueReport() {
-  console.log('💰 Loading revenue report');
   
   try {
     await ensureDataIsLoaded();

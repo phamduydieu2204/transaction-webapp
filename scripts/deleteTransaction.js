@@ -17,7 +17,6 @@ export async function deleteTransaction(
   openConfirmModal,
   getConstants
 ) {
-  console.log("🗑️ deleteTransaction được gọi với:", {
     index,
     transactionListType: typeof transactionList,
     transactionListLength: transactionList ? transactionList.length : 0,
@@ -51,7 +50,6 @@ export async function deleteTransaction(
     return;
   }
 
-  console.log("✅ Transaction found:", transaction.transactionId);
 
   const confirmMessage = `Bạn có chắc muốn xóa giao dịch ${transaction.transactionId}? ${
     transaction.accountSheetId && transaction.customerEmail
@@ -100,7 +98,6 @@ export async function deleteTransaction(
     duocXoaGiaoDichCuaAi: userInfo.duocXoaGiaoDichCuaAi || "chỉ bản thân"
   };
 
-  console.log("📤 Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
 
   try {
     const response = await fetch(BACKEND_URL, {

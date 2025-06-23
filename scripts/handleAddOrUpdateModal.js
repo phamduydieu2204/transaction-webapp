@@ -66,7 +66,6 @@ export function openAddOrUpdateModal() {
   }
   
   export async function handleAddNewTransaction() {
-    console.log("🆕 handleAddNewTransaction called - clearing edit state");
     window.currentEditTransactionId = null;
     window.currentEditIndex = -1;
     
@@ -82,7 +81,6 @@ export function openAddOrUpdateModal() {
     
     // Don't reset the form - user wants to keep the data they entered
     // Just update the date to today and proceed with adding
-    console.log("🆕 Updating date to today and proceeding with add");
     try {
       const { setDefaultDates } = await import('./calculateEndDate.js');
       setDefaultDates(true); // Force update dates to today
@@ -90,7 +88,6 @@ export function openAddOrUpdateModal() {
       console.warn("Could not update dates:", error);
     }
     
-    console.log("🆕 Calling handleAdd() for new transaction with current form data");
     if (window.handleAdd) {
       window.handleAdd();
     } else {
@@ -99,13 +96,11 @@ export function openAddOrUpdateModal() {
   }
   
   export function handleUpdateTransactionFromModal() {
-    console.log("🔄 handleUpdateTransactionFromModal called");
     closeAddOrUpdateModal();
     window.handleUpdate(); // Gọi handleUpdate() luôn
   }
   
   export function handleCancelModal() {
-    console.log("❌ handleCancelModal called");
     closeAddOrUpdateModal();
   }
   

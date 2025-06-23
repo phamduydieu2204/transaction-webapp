@@ -36,7 +36,6 @@ export class EmployeeReportCore {
         if (this.isInitialized) return;
         
         try {
-            console.log('🔧 Initializing Employee Report with actual sheet data...');
             
             this.setupEventListeners();
             await this.loadAllData();
@@ -50,7 +49,6 @@ export class EmployeeReportCore {
             this.renderRankingSection();
             
             this.isInitialized = true;
-            console.log('✅ Employee Report initialized successfully');
             
         } catch (error) {
             console.error('❌ Error initializing Employee Report:', error);
@@ -64,7 +62,6 @@ export class EmployeeReportCore {
             this.transactions = this.extractTransactionData();
             this.expenses = this.extractExpenseData();
             
-            console.log('📊 Employee data loaded:', {
                 transactions: this.transactions.length,
                 expenses: this.expenses.length
             });
@@ -202,7 +199,6 @@ export class EmployeeReportCore {
 
     // Method mới để xử lý tất cả dữ liệu sử dụng EmployeeDataProcessor
     processAllData(transactions = [], expenses = []) {
-        console.log('🔄 Processing all employee data...');
         
         // Use the new data processor
         this.processedData = this.dataProcessor.processEmployeeData(transactions, expenses);
@@ -211,13 +207,11 @@ export class EmployeeReportCore {
         this.employees = this.processedData.employees;
         this.filteredEmployees = [...this.employees];
         
-        console.log('✅ All employee data processed:', this.processedData);
         return this.processedData;
     }
 
     // Xử lý và tính toán dữ liệu nhân viên (legacy method - keep for compatibility)
     processEmployeeData() {
-        console.log('🔄 Processing employee data...');
         
         // Tạo map nhân viên
         const employeeMap = new Map();
@@ -300,12 +294,10 @@ export class EmployeeReportCore {
         
         this.filteredEmployees = [...this.employees];
         
-        console.log('✅ Employee data processing completed:', this.employees.length, 'employees');
     }
 
     // Tạo dữ liệu mẫu nếu không có dữ liệu thực
     generateMockData() {
-        console.log('🎭 Generating mock employee data for demonstration...');
         
         const mockEmployees = [
             { name: 'Nguyễn Văn An', code: 'NV001', dept: 'sales' },
@@ -1543,7 +1535,6 @@ export class EmployeeReportCore {
     }
 
     async refresh() {
-        console.log('🔄 Refreshing employee report data...');
         this.isInitialized = false;
         await this.initialize();
     }
