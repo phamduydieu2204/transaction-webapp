@@ -4,8 +4,10 @@ function debugLayout() {
     
     // Viewport dimensions
     console.log('📐 Viewport:', {
-  });
-
+        width: window.innerWidth,
+        height: window.innerHeight,
+        scrollX: window.scrollX,
+        scrollY: window.scrollY
     });
     
     // Container element analysis
@@ -15,9 +17,22 @@ function debugLayout() {
         const containerStyles = window.getComputedStyle(container);
         
         console.log('📦 Container:', {
+            boundingRect: {
+                width: containerRect.width,
+                height: containerRect.height,
+                left: containerRect.left,
+                right: containerRect.right,
+                top: containerRect.top,
+                bottom: containerRect.bottom
             },
-  });
-
+            computedStyles: {
+                width: containerStyles.width,
+                maxWidth: containerStyles.maxWidth,
+                margin: containerStyles.margin,
+                padding: containerStyles.padding,
+                boxSizing: containerStyles.boxSizing,
+                overflow: containerStyles.overflow,
+                position: containerStyles.position
             }
         });
     } else {
@@ -30,9 +45,15 @@ function debugLayout() {
     const bodyStyles = window.getComputedStyle(body);
     
     console.log('🏢 Body:', {
+        boundingRect: {
+            width: bodyRect.width,
+            height: bodyRect.height
         },
-  });
-
+        computedStyles: {
+            width: bodyStyles.width,
+            margin: bodyStyles.margin,
+            padding: bodyStyles.padding,
+            overflow: bodyStyles.overflow
         }
     });
     
@@ -42,9 +63,13 @@ function debugLayout() {
     const htmlStyles = window.getComputedStyle(html);
     
     console.log('🌐 HTML:', {
+        boundingRect: {
+            width: htmlRect.width,
+            height: htmlRect.height
         },
-  });
-
+        computedStyles: {
+            width: htmlStyles.width,
+            overflow: htmlStyles.overflow
         }
     });
     
@@ -60,8 +85,10 @@ function debugLayout() {
             
             console.log(`   Level ${level} - ${current.tagName}${current.className ? '.' + current.className : ''}:`, {
                 boundingRect: { width: rect.width, left: rect.left, right: rect.right },
-  });
-
+                computedStyles: {
+                    width: styles.width,
+                    maxWidth: styles.maxWidth,
+                    overflow: styles.overflow
                 }
             });
             

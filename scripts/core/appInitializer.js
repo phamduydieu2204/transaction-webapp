@@ -6,13 +6,63 @@
  */
 
 // Import core dependencies
-  } catch (e) {
-    console.error('❌ Error parsing user data:', e);
-    // Load both transaction and expense data in parallel
+import { fetchSoftwareList } from '../fetchSoftwareList.js';
+import { getConstants } from '../config/constants.js';
+
+/**
+ * Main application initialization function
+ */
+export async function initializeApplication() {
+  console.log('🚀 Starting application initialization...');
+  
+  try {
+    // Setup error handling first
+    setupErrorHandling();
+    
+    // Initialize constants and configuration
+    initializeConstants();
+    
+    // Load initial data in parallel
     // This ensures statistics tab has data available immediately
+    await loadInitialData();
+    
+    console.log('✅ Application initialized successfully');
+    return true;
+  } catch (error) {
+    console.error('❌ Application initialization failed:', error);
+    
+    // Show error message to user
+    if (window.showResultModal) {
+      window.showResultModal('Không thể khởi tạo ứng dụng. Vui lòng tải lại trang.', false);
+    } else {
+      alert('Không thể khởi tạo ứng dụng. Vui lòng tải lại trang.');
+    }
+    
+    return false;
+  }
+}
+
+/**
+ * Load initial data required for app startup
+ */
+async function loadInitialData() {
+  console.log('📦 Loading initial data...');
+  
+  try {
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    window.userInfo = userData;
+    
+    // Load both transaction and expense data in parallel
+    await Promise.all([
+      loadTransactionData(),
+      loadExpenseData(),
+      loadSoftwareData()
+    ]);
+    
+    // Initialize minimal features for immediate interaction
     await initializeMinimalFeatures();
     
-    console.log('✅ Initial data loaded successfully (optimized)');
+    console.log('✅ Initial data loaded successfully');
   } catch (error) {
     console.error('❌ Error loading initial data:', error);
     throw error;
@@ -43,22 +93,69 @@ async function loadSoftwareData() {
 /**
  * Load transaction data optimized for performance
  */
-  });
-
-      }
-    );
-
-    // Preload next page in background after UI settles
-      }
-    }, 2000);
-  } catch (error) {
-    console.error('❌ Failed to load transaction data:', error);
-      conditions: {} // Empty conditions to get all expenses
-    };
-  });
-
+async function loadTransactionData() {
+  try {
+    console.log('📊 Loading transaction data...');
+    
+    const response = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: {
         'Content-Type': 'application/json'
       },
+      body: JSON.stringify({
+        action: 'getTransactions',
+        page: 1,
+        pageSize: 50,
+        conditions: {}
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    if (result.status === 'success') {
+      window.transactionList = result.data || [];
+      console.log(`✅ Loaded ${window.transactionList.length} transactions`);
+      
+      // Preload next page in background after UI settles
+      setTimeout(async () => {
+        try {
+          await loadTransactionPage(2, 50);
+        } catch (error) {
+          console.warn('⚠️ Failed to preload next transaction page:', error);
+        }
+      }, 2000);
+    } else {
+      console.error('❌ Error loading transactions:', result.message);
+      window.transactionList = [];
+    }
+  } catch (error) {
+    console.error('❌ Failed to load transaction data:', error);
+    window.transactionList = [];
+  }
+}
+
+/**
+ * Load expense data optimized for performance
+ */
+async function loadExpenseData() {
+  try {
+    console.log('💰 Loading expense data...');
+    
+    const response = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        action: 'getExpenses',
+        page: 1,
+        pageSize: 50,
+        conditions: {} // Empty conditions to get all expenses
+      })
     });
     
     if (!response.ok) {
@@ -69,6 +166,7 @@ async function loadSoftwareData() {
     
     if (result.status === 'success') {
       window.expenseList = result.data || [];
+      console.log(`✅ Loaded ${window.expenseList.length} expenses`);
     } else {
       console.error('❌ Error loading expenses:', result.message);
       window.expenseList = [];
@@ -80,9 +178,44 @@ async function loadSoftwareData() {
 }
 
 /**
+ * Load specific page of transaction data
+ */
+async function loadTransactionPage(page, pageSize) {
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        action: 'getTransactions',
+        page: page,
+        pageSize: pageSize,
+        conditions: {}
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    if (result.status === 'success' && result.data && result.data.length > 0) {
+      // Append to existing data
+      window.transactionList = window.transactionList.concat(result.data);
+      console.log(`✅ Preloaded page ${page}: ${result.data.length} more transactions`);
+    }
+  } catch (error) {
+    console.warn(`⚠️ Failed to load transaction page ${page}:`, error);
+  }
+}
+
+/**
  * Initialize minimal features for immediate interaction
  */
 async function initializeMinimalFeatures() {
+  console.log('⚡ Initializing minimal features...');
   
   try {
     // Only initialize features needed for immediate interaction
@@ -117,6 +250,7 @@ async function initializeMinimalFeatures() {
  * Initialize heavy features in background
  */
 async function initializeHeavyFeatures() {
+  console.log('📊 Initializing heavy features...');
   
   try {
     // Initialize expense features (only when needed)
@@ -138,13 +272,19 @@ async function initializeExpenseFeatures() {
     await new Promise(resolve => setTimeout(resolve, 500));
     
     // Initialize expense dropdowns
-    await initExpenseDropdowns();
+    if (typeof window.initExpenseDropdowns === 'function') {
+      await window.initExpenseDropdowns();
+    }
     
     // Render expense statistics
-    renderExpenseStats();
+    if (typeof window.renderExpenseStats === 'function') {
+      window.renderExpenseStats();
+    }
     
     // Initialize expense quick search
-    initExpenseQuickSearch();
+    if (typeof window.initExpenseQuickSearch === 'function') {
+      window.initExpenseQuickSearch();
+    }
     
     console.log('✅ Expense features initialized');
   } catch (error) {
@@ -191,7 +331,6 @@ export function setupErrorHandling() {
       window.showResultModal('Đã xảy ra lỗi kết nối. Vui lòng kiểm tra mạng và thử lại.', false);
     }
   });
-
 }
 
 /**
@@ -208,30 +347,29 @@ export function initializeConstants() {
     console.log('✅ Constants initialized');
   } catch (error) {
     console.error('❌ Error initializing constants:', error);
-    };
-    
-    // Log performance information
-    await loadInitialData();
-    
-    return true;
-  } catch (error) {
-    console.error('❌ Application initialization failed:', error);
-    
-    // Show error message to user
-    if (window.showResultModal) {
-      window.showResultModal('Không thể khởi tạo ứng dụng. Vui lòng tải lại trang.', false);
-    } else {
-      alert('Không thể khởi tạo ứng dụng. Vui lòng tải lại trang.');
-    }
-    
-    return false;
+    // Continue with default values
   }
+}
+
+/**
+ * Placeholder functions for updatePackageList and updateAccountList
+ * These should be implemented based on your UI requirements
+ */
+function updatePackageList(packages) {
+  // Implementation depends on your UI structure
+  console.log('📦 Package list updated:', packages?.length || 0);
+}
+
+function updateAccountList(accounts) {
+  // Implementation depends on your UI structure
+  console.log('👤 Account list updated:', accounts?.length || 0);
 }
 
 /**
  * Cleanup function for page unload
  */
 export function cleanupApp() {
+  console.log('🧹 Cleaning up application...');
   
   // Clear any intervals or timeouts
   if (window.refreshInterval) {
@@ -247,6 +385,7 @@ export function cleanupApp() {
     console.warn('⚠️ Could not save last activity:', error);
   }
   
+  console.log('✅ Application cleanup completed');
 }
 
 // Setup cleanup on page unload
