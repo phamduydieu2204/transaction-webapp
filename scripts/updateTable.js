@@ -65,12 +65,6 @@ function handleTransactionActionByIndex(selectElement) {
     return;
   }
   
-    action,
-    globalIndex,
-    transaction,
-    transactionId: transaction.transactionId,
-    transactionListLength: window.transactionList ? window.transactionList.length : 0
-  
   // Execute action based on selection
   switch (action) {
     case 'view':
@@ -469,11 +463,7 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
     // Debug employee code
     if (index === 0) {
-        maNhanVien: transaction.maNhanVien,
-        tenNhanVien: transaction.tenNhanVien,
-        employeeCode: employeeCode,
-        color: employeeColor,
-        allKeys: Object.keys(transaction)
+      // Employee debug info logged elsewhere
     }
     
     const infoCell = `
