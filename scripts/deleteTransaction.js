@@ -100,6 +100,7 @@ export async function deleteTransaction(
         "Content-Type": "application/json"
       },
       body: JSON.stringify(data)
+    });
 
     const result = await response.json();
     console.log("Kết quả từ server:", result);
