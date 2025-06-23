@@ -153,8 +153,7 @@ export function groupExpensesByMonth(data, options = {}) {
     recordCount: data.length,
     currency,
     sortBy,
-    sortOrder
-  });
+
 
   data.forEach(expense => {
     // Only process specified currency
@@ -219,8 +218,7 @@ export function groupRevenueByMonth(data, options = {}) {
     recordCount: data.length,
     currency,
     sortBy,
-    sortOrder
-  });
+
 
   data.forEach(transaction => {
     // Only process specified currency

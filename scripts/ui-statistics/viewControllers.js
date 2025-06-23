@@ -78,8 +78,7 @@ export class StatisticsViewController {
       this.triggerViewEvent('viewSwitched', {
         from: previousView,
         to: viewName,
-        options
-      });
+
       
       
     } catch (error) {

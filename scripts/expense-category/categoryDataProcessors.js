@@ -169,8 +169,7 @@ export function calculateCategoryStats(categoryData) {
       allSubCategories.push({
         category,
         subCategory: subCat,
-        amount
-      });
+
     });
   });
   

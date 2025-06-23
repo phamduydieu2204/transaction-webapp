@@ -987,8 +987,7 @@ async function calculateSoftwareProfitMetrics(transactions, expenses, dateRange)
             allocatedCosts,
             totalCosts,
             grossProfit,
-            profitMargin
-        });
+
     }
     
     // Sort by gross profit descending

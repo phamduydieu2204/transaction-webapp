@@ -108,8 +108,7 @@ export function updateTransactionTypeForEdit(originalStatus, currentValue = '') 
   if (!select) return;
   
     originalStatus,
-    currentValue
-  });
+
   
   // Clear existing options except the placeholder
   while (select.children.length > 1) {

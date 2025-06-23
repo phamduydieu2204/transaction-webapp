@@ -254,8 +254,7 @@ export function renderCustomChart(data, config) {
       yLabel,
       colors,
       showLegend,
-      responsive
-    });
+
     
     
   } catch (error) {

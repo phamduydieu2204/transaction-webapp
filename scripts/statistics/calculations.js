@@ -32,8 +32,7 @@ export function calculateTotalExpenses(data, options = {}) {
     recordCount: data.length,
     isSearching,
     targetDate,
-    currency
-  });
+
 
   data.forEach(expense => {
     const expenseCurrency = expense.currency || "VND";
@@ -100,8 +99,7 @@ export function calculateTotalRevenue(data, options = {}) {
     isSearching,
     targetDate,
     currency,
-    userRole
-  });
+
 
   data.forEach(transaction => {
     const transactionCurrency = transaction.currency || "VND";
@@ -293,8 +291,7 @@ export function calculateAllocatedExpense(expense, dateRange) {
     'Số tiền': expense['Số tiền'],
     amountValue,
     totalAmount,
-    totalValidityDays
-  });
+
   const dailyAmount = totalAmount / totalValidityDays;
   
   // If no date range specified, return amount for current month

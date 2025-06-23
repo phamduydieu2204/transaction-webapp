@@ -49,8 +49,7 @@ import { formatCurrency } from './statistics/formatters.js';
 export function calculateChartData(transactionData, expenseData, dateRange = null) {
     transactions: transactionData.length,
     expenses: expenseData.length,
-    dateRange
-  });
+
   
   const granularity = determineGranularity(dateRange);
   

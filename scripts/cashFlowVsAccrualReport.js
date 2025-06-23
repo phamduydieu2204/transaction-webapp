@@ -30,8 +30,7 @@ export async function renderCashFlowVsAccrualReport(expenseData, options = {}) {
 
     expenses: expenseData.length,
     dateRange,
-    useCache
-  });
+
 
   try {
     // Fetch data if needed

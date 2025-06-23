@@ -49,10 +49,6 @@ export async function editTransaction(index, transactionList, fetchSoftwareList,
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 
-  softwareNameValue,
-  softwarePackageValue,
-  accountNameValue
-});
   // Đã loại bỏ showProcessingModal để tránh trùng lặp với uiBlocker
 
   // ✅ Cập nhật danh sách dropdown với các giá trị gốc cần giữ lại
