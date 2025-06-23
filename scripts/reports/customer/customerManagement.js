@@ -24,7 +24,6 @@ const customerState = {
   filteredCustomers: [],
   selectedCustomers: [],
   currentSegment: 'value',
-  currentInsight: 'recent'
 };
 
 /**
@@ -47,7 +46,6 @@ export async function loadCustomerManagement(options = {}) {
     const expenses = window.expenseList || getFromStorage('expenses') || [];
     
       transactions: transactions.length,
-      expenses: expenses.length
     
     // Get date range from options or global filters
     const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
@@ -131,7 +129,6 @@ function processCustomerData(transactions) {
         transactions: [],
         status: 'new',
         segment: 'regular',
-        ltv: 0
       };
     }
     
@@ -262,7 +259,6 @@ async function renderCustomerAcquisitionChart(customerData, period) {
         pointHoverRadius: 8,
         pointBackgroundColor: '#3b82f6',
         pointBorderColor: '#ffffff',
-        pointBorderWidth: 2
       }]
     },
     options: {
@@ -270,11 +266,9 @@ async function renderCustomerAcquisitionChart(customerData, period) {
       maintainAspectRatio: false,
       interaction: {
         intersect: false,
-        mode: 'index'
       },
       plugins: {
         legend: {
-          display: false
         },
         tooltip: {
           backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -293,7 +287,6 @@ async function renderCustomerAcquisitionChart(customerData, period) {
         y: {
           beginAtZero: true,
           ticks: {
-            stepSize: 1
           },
           grid: {
             color: 'rgba(0, 0, 0, 0.1)'
@@ -301,7 +294,6 @@ async function renderCustomerAcquisitionChart(customerData, period) {
         },
         x: {
           grid: {
-            display: false
           }
         }
       }
@@ -353,7 +345,6 @@ async function renderCustomerLifecycleChart(customerData) {
           '#ef4444'  // At Risk - Red
         ],
         borderWidth: 2,
-        borderColor: '#ffffff'
       }]
     },
     options: {
@@ -364,7 +355,6 @@ async function renderCustomerLifecycleChart(customerData) {
           position: 'right',
           labels: {
             usePointStyle: true,
-            padding: 15
           }
         },
         tooltip: {
@@ -663,7 +653,6 @@ function prepareAcquisitionData(customers, period) {
   
   return {
     labels: sortedPeriods.slice(-12), // Last 12 periods
-    values: sortedPeriods.slice(-12).map(period => acquisitionByPeriod[period] || 0)
   };
 }
 
@@ -673,7 +662,6 @@ function calculateLifecycleDistribution(customers) {
     active: 0,
     inactive: 0,
     vip: 0,
-    atRisk: 0
   };
   
   customers.forEach(customer => {
@@ -763,7 +751,6 @@ function generateCustomerInsights(customerData, insightType) {
           priority: 'medium',
           action: 'followup',
           actionLabel: 'Theo dõi',
-          customerId: customer.name
         });
       });
       break;
@@ -784,7 +771,6 @@ function generateCustomerInsights(customerData, insightType) {
           priority: 'high',
           action: 'retention',
           actionLabel: 'Chăm sóc',
-          customerId: customer.name
         });
       });
       break;
@@ -805,7 +791,6 @@ function generateCustomerInsights(customerData, insightType) {
           priority: 'medium',
           action: 'upsell',
           actionLabel: 'Đề xuất',
-          customerId: customer.name
         });
       });
       break;

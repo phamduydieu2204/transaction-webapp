@@ -16,7 +16,6 @@ export class CashFlowAccrualCore {
         this.filters = {
             categories: [],
             viewMode: 'both',
-            granularity: 'monthly'
         };
     }
 
@@ -31,7 +30,6 @@ export class CashFlowAccrualCore {
             this.expenseData = window.expenseList || [];
             
                 transactions: this.transactionData.length,
-                expenses: this.expenseData.length
             
             // Process the data
             await this.processData();
@@ -71,7 +69,6 @@ export class CashFlowAccrualCore {
             accrual: accrualView,
             comparison: comparison,
             insights: this.generateInsights(cashFlowView, accrualView, comparison),
-            recommendations: this.generateRecommendations(comparison)
         };
     }
 
@@ -82,7 +79,6 @@ export class CashFlowAccrualCore {
         const insights = {
             cashFlowInsights: [],
             accrualInsights: [],
-            comparisonInsights: []
         };
 
         // Cash Flow Insights
@@ -91,7 +87,6 @@ export class CashFlowAccrualCore {
             insights.cashFlowInsights.push({
                 type: 'info',
                 title: 'Tháng chi tiêu cao nhất',
-                message: `Tháng ${largestCashFlowMonth.month} có chi tiêu thực tế cao nhất: ${this.formatCurrency(largestCashFlowMonth.amount)}`
             });
         }
 
@@ -101,7 +96,6 @@ export class CashFlowAccrualCore {
             insights.cashFlowInsights.push({
                 type: 'warning',
                 title: 'Chi tiêu lớn',
-                message: `Có ${largePayments.length} tháng với chi tiêu lớn (>15% tổng chi tiêu)`
             });
         }
 
@@ -111,7 +105,6 @@ export class CashFlowAccrualCore {
             insights.accrualInsights.push({
                 type: 'info',
                 title: 'Danh mục phân bổ nhiều nhất',
-                message: `${mostAllocatedCategory.category}: ${this.formatCurrency(mostAllocatedCategory.amount)}`
             });
         }
 
@@ -121,13 +114,11 @@ export class CashFlowAccrualCore {
             insights.comparisonInsights.push({
                 type: 'warning',
                 title: 'Chênh lệch lớn',
-                message: `Chênh lệch ${totalDifferencePercent.toFixed(1)}% giữa cash flow và chi phí phân bổ`
             });
         } else if (totalDifferencePercent < 5) {
             insights.comparisonInsights.push({
                 type: 'success',
                 title: 'Cân bằng tốt',
-                message: `Chênh lệch chỉ ${totalDifferencePercent.toFixed(1)}% - quản lý tài chính hiệu quả`
             });
         }
 
@@ -141,7 +132,6 @@ export class CashFlowAccrualCore {
             insights.comparisonInsights.push({
                 type: 'info',
                 title: 'Biến động hàng tháng',
-                message: `Chênh lệch trung bình hàng tháng: ${this.formatCurrency(avgVariance)}`
             });
         }
 
@@ -160,14 +150,12 @@ export class CashFlowAccrualCore {
                 type: 'optimization',
                 title: 'Tối ưu timing thanh toán',
                 message: 'Cash flow cao hơn phân bổ - có thể điều chỉnh timing thanh toán để cân bằng dòng tiền',
-                priority: 'medium'
             });
         } else if (comparison.totalDifference < 0) {
             recommendations.push({
                 type: 'planning',
                 title: 'Lập kế hoạch thanh toán',
                 message: 'Chi phí phân bổ cao hơn cash flow - cần chuẩn bị thanh toán các khoản phân bổ',
-                priority: 'high'
             });
         }
 
@@ -179,7 +167,6 @@ export class CashFlowAccrualCore {
                 type: 'forecasting',
                 title: 'Dự báo theo mùa',
                 message: 'Phát hiện mẫu hình theo mùa - có thể dự báo và lập kế hoạch tài chính tốt hơn',
-                priority: 'medium'
             });
         }
 
@@ -190,7 +177,6 @@ export class CashFlowAccrualCore {
                 type: 'control',
                 title: 'Kiểm soát biến động',
                 message: 'Có nhiều tháng với chênh lệch lớn - cần xem xét chính sách phân bổ chi phí',
-                priority: 'high'
             });
         }
 
@@ -210,7 +196,6 @@ export class CashFlowAccrualCore {
             accrualTotal: accrual.total,
             difference: comparison.totalDifference,
             percentDifference: comparison.percentDifference,
-            status: this.getDifferenceStatus(comparison.percentDifference)
         };
     }
 
@@ -227,7 +212,6 @@ export class CashFlowAccrualCore {
             labels: months.map(month => this.formatMonthLabel(month)),
             cashFlowData: months.map(month => comparison.monthlyDifferences[month].cashFlow),
             accrualData: months.map(month => comparison.monthlyDifferences[month].accrual),
-            differenceData: months.map(month => comparison.monthlyDifferences[month].difference)
         };
     }
 
@@ -303,7 +287,6 @@ export class CashFlowAccrualCore {
                     accrual: data.accrual,
                     difference: data.difference,
                     percentDifference: percentDiff,
-                    status: this.getDifferenceStatus(percentDiff)
                 };
             });
     }
@@ -353,7 +336,6 @@ export class CashFlowAccrualCore {
                 description: expense.moTa || expense.description,
                 amount: parseFloat(expense.soTien) || parseFloat(expense.amount) || 0,
                 category: expense.danhMuc || expense.category,
-                allocationMethod: this.getAllocationMethod(expense)
             }));
     }
 
@@ -393,7 +375,6 @@ export class CashFlowAccrualCore {
                         avgMonthlyAmount: avgAmount,
                         frequency: monthlyAmounts.length,
                         variance: variance,
-                        type: 'recurring'
                     });
                 }
             }
@@ -414,7 +395,6 @@ export class CashFlowAccrualCore {
             category: categoryData,
             overview: this.getComparisonOverview(),
             insights: this.analysisData?.insights || {},
-            recommendations: this.analysisData?.recommendations || []
         };
     }
 
@@ -432,7 +412,6 @@ export class CashFlowAccrualCore {
     formatCurrency(amount) {
         return new Intl.NumberFormat('vi-VN', {
             style: 'currency',
-            currency: 'VND'
         }).format(amount);
     }
 

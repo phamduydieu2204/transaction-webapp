@@ -36,7 +36,6 @@ export function calculateExpenseByCategoryData(expenseData) {
     categoryData[category] = {
       total: 0,
       monthly: {},
-      subCategories: {}
     };
   });
   
@@ -51,7 +50,6 @@ export function calculateExpenseByCategoryData(expenseData) {
         acc[cat] = 0;
         return acc;
       }, {}),
-      total: 0
     };
   }
   
@@ -134,7 +132,6 @@ export function calculateCategoryStats(categoryData) {
     topCategory: null,
     topSubCategories: [],
     categoryPercentages: {},
-    monthlyTrend: []
   };
   
   // Calculate total expense
@@ -151,7 +148,6 @@ export function calculateCategoryStats(categoryData) {
   if (sortedCategories.length > 0) {
     stats.topCategory = {
       name: sortedCategories[0][0],
-      amount: sortedCategories[0][1].total
     };
   }
   
@@ -168,8 +164,6 @@ export function calculateCategoryStats(categoryData) {
     Object.entries(data.subCategories).forEach(([subCat, amount]) => {
       allSubCategories.push({
         category,
-        subCategory: subCat,
-
     });
   });
   
@@ -201,7 +195,6 @@ function calculateMonthlyTrend(monthlyData) {
       month: month.monthLabel,
       total: month.total,
       growth: growth,
-      isIncrease: growth > 0
     });
   });
   
@@ -263,8 +256,6 @@ function getPeriodKey(date, period) {
       const quarter = Math.floor(date.getMonth() / 3) + 1;
       return `${year}-Q${quarter}`;
     case 'monthly':
-    default:
-      return `${year}-${month}`;
   }
 }
 

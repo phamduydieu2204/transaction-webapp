@@ -27,7 +27,6 @@ export class EmployeeReportCore {
             departments: [],
             kpis: {},
             topPerformers: [],
-            alerts: []
         };
     }
 
@@ -63,8 +62,6 @@ export class EmployeeReportCore {
             this.expenses = this.extractExpenseData();
             
                 transactions: this.transactions.length,
-                expenses: this.expenses.length
-            
         } catch (error) {
             console.error('❌ Error loading employee data:', error);
             // Fallback to mock data if real data is not available
@@ -103,7 +100,6 @@ export class EmployeeReportCore {
                     ghiChu: row.ghiChu || row.note || '',
                     tenChuan: row.tenChuan || row.standardName || '',
                     tenNhanVien: row.tenNhanVien || row.employeeName || '',
-                    maNhanVien: row.maNhanVien || row.employeeCode || ''
                 };
             }
             
@@ -131,7 +127,6 @@ export class EmployeeReportCore {
                 ghiChu: row[18] || '',              // S: Ghi chú
                 tenChuan: row[19] || '',            // T: Tên chuẩn
                 tenNhanVien: row[20] || '',         // U: Tên nhân viên
-                maNhanVien: row[21] || ''           // V: Mã nhân viên
             };
         });
     }
@@ -165,7 +160,6 @@ export class EmployeeReportCore {
                     ghiChu: row.ghiChu || row.note || '',
                     tenChuan: row.tenChuan || row.standardName || '',
                     tenNhanVien: row.tenNhanVien || row.employeeName || '',
-                    maNhanVien: row.maNhanVien || row.employeeCode || ''
                 };
             }
             
@@ -191,7 +185,6 @@ export class EmployeeReportCore {
                 ghiChu: row[16] || '',              // Q: Ghi chú
                 tenChuan: row[17] || '',            // R: Tên chuẩn
                 tenNhanVien: row[18] || '',         // S: Tên nhân viên
-                maNhanVien: row[19] || ''           // T: Mã nhân viên
             };
         });
     }
@@ -236,7 +229,6 @@ export class EmployeeReportCore {
                     avgTransactionValue: 0,
                     monthlyRevenue: {},
                     monthlyTransactions: {},
-                    rank: 0
             }
             
             const employee = employeeMap.get(employeeKey);
@@ -322,7 +314,6 @@ export class EmployeeReportCore {
             lastActivity: this.getRandomDate(),
             rank: index + 1,
             monthlyRevenue: this.generateMonthlyData(),
-            monthlyTransactions: this.generateMonthlyTransactionData()
         }));
 
         // Tính toán và cập nhật các chỉ số
@@ -491,7 +482,6 @@ export class EmployeeReportCore {
                     count: 0,
                     revenue: 0,
                     commission: 0,
-                    avgPerformance: 0
                 };
             }
             departmentStats[dept].count++;
@@ -609,7 +599,6 @@ export class EmployeeReportCore {
                         '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1'
                     ],
                     borderRadius: 6,
-                    borderSkipped: false
                 }]
             },
             options: {
@@ -619,7 +608,6 @@ export class EmployeeReportCore {
                     legend: { display: false },
                     tooltip: {
                         callbacks: {
-                            label: (context) => `Doanh thu: ${formatCurrency(context.parsed.y)}`
                         }
                     }
                 },
@@ -627,12 +615,10 @@ export class EmployeeReportCore {
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            callback: (value) => formatCurrency(value)
                         }
                     },
                     x: {
                         ticks: {
-                            maxRotation: 45
                         }
                     }
                 }
@@ -664,14 +650,12 @@ export class EmployeeReportCore {
                         data: revenueData,
                         backgroundColor: '#10b981',
                         borderRadius: 4,
-                        yAxisID: 'y'
                     },
                     {
                         label: 'Hoa hồng',
                         data: commissionData,
                         backgroundColor: '#f59e0b',
                         borderRadius: 4,
-                        yAxisID: 'y1'
                     }
                 ]
             },
@@ -680,19 +664,16 @@ export class EmployeeReportCore {
                 maintainAspectRatio: false,
                 interaction: {
                     mode: 'index',
-                    intersect: false,
                 },
                 plugins: {
                     tooltip: {
                         callbacks: {
-                            label: (context) => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`
                         }
                     }
                 },
                 scales: {
                     x: {
                         ticks: {
-                            maxRotation: 45
                         }
                     },
                     y: {
@@ -700,7 +681,6 @@ export class EmployeeReportCore {
                         display: true,
                         position: 'left',
                         ticks: {
-                            callback: (value) => formatCurrency(value)
                         }
                     },
                     y1: {
@@ -708,10 +688,8 @@ export class EmployeeReportCore {
                         display: true,
                         position: 'right',
                         grid: {
-                            drawOnChartArea: false,
                         },
                         ticks: {
-                            callback: (value) => formatCurrency(value)
                         }
                     }
                 }
@@ -762,7 +740,6 @@ export class EmployeeReportCore {
                         backgroundColor: 'rgba(79, 70, 229, 0.1)',
                         fill: true,
                         tension: 0.4,
-                        yAxisID: 'y'
                     },
                     {
                         label: 'Số top performers',
@@ -770,7 +747,6 @@ export class EmployeeReportCore {
                         borderColor: '#10b981',
                         backgroundColor: '#10b981',
                         type: 'bar',
-                        yAxisID: 'y1'
                     }
                 ]
             },
@@ -796,7 +772,6 @@ export class EmployeeReportCore {
                         display: true,
                         position: 'left',
                         ticks: {
-                            callback: (value) => value + '%'
                         }
                     },
                     y1: {
@@ -804,10 +779,8 @@ export class EmployeeReportCore {
                         display: true,
                         position: 'right',
                         grid: {
-                            drawOnChartArea: false,
                         },
                         ticks: {
-                            stepSize: 1
                         }
                     }
                 }
@@ -839,7 +812,6 @@ export class EmployeeReportCore {
                     data: Object.values(distributionData),
                     backgroundColor: ['#10b981', '#f59e0b', '#6b7280', '#ef4444'],
                     borderWidth: 2,
-                    borderColor: '#ffffff'
                 }]
             },
             options: {
@@ -848,7 +820,6 @@ export class EmployeeReportCore {
                 plugins: {
                     legend: {
                         position: 'bottom',
-                        labels: { padding: 20 }
                     },
                     tooltip: {
                         callbacks: {
@@ -967,7 +938,6 @@ export class EmployeeReportCore {
                     totalRevenue: 0,
                     totalCommission: 0,
                     avgPerformance: 0,
-                    employees: []
                 };
             }
             deptStats[dept].count++;

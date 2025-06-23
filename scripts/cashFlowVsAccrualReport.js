@@ -71,7 +71,6 @@ export async function renderCashFlowVsAccrualReport(expenseData, options = {}) {
       cashFlow: cashFlowData,
       accrual: accrualData,
       comparison: comparison,
-      rendered: true
     };
     
   } catch (error) {
@@ -97,7 +96,6 @@ function initializeCharts(cashFlowData, accrualData) {
     new Chart(cashFlowCanvas, {
       type: 'line',
       data: cashFlowChartData,
-      options: getChartOptions('Cash Flow')
   }
   
   // Initialize accrual chart
@@ -107,7 +105,6 @@ function initializeCharts(cashFlowData, accrualData) {
     new Chart(accrualCanvas, {
       type: 'line',
       data: accrualChartData,
-      options: getChartOptions('Chi phí phân bổ')
   }
 }
 
@@ -123,7 +120,6 @@ function prepareCashFlowChartData(cashFlowData) {
       data: months.map(m => cashFlowData.byMonth[m]),
       borderColor: 'rgb(239, 68, 68)',
       backgroundColor: 'rgba(239, 68, 68, 0.1)',
-      tension: 0.3
     }]
   };
 }
@@ -140,7 +136,6 @@ function prepareAccrualChartData(accrualData) {
       data: months.map(m => accrualData.byMonth[m]),
       borderColor: 'rgb(34, 197, 94)',
       backgroundColor: 'rgba(34, 197, 94, 0.1)',
-      tension: 0.3
     }]
   };
 }
@@ -153,10 +148,8 @@ function getChartOptions(title) {
     responsive: true,
     plugins: {
       title: {
-        display: false
       },
       legend: {
-        display: false
       }
     },
     scales: {

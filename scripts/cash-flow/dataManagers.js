@@ -104,7 +104,6 @@ export function prepareComparisonData(cashFlowData, accrualData) {
     month,
     cashFlow: cashFlowData.byMonth[month] || 0,
     accrual: accrualData.byMonth[month] || 0,
-    difference: (cashFlowData.byMonth[month] || 0) - (accrualData.byMonth[month] || 0)
   }));
   
   return {
@@ -112,7 +111,6 @@ export function prepareComparisonData(cashFlowData, accrualData) {
     totals: {
       cashFlow: cashFlowData.total,
       accrual: accrualData.total,
-      difference: cashFlowData.total - accrualData.total
     }
   };
 }
@@ -127,7 +125,6 @@ const reportCache = {
   set(key, value) {
     this.data.set(key, {
       value,
-      timestamp: Date.now()
   },
   
   get(key) {
@@ -175,8 +172,6 @@ export function transformExpenseData(expenses, transformType) {
       return createCategoryBreakdown(expenses);
     case 'allocation_analysis':
       return createAllocationAnalysis(expenses);
-    default:
-      return expenses;
   }
 }
 
@@ -194,7 +189,6 @@ function createMonthlySummary(expenses) {
       summary[monthKey] = {
         total: 0,
         count: 0,
-        categories: {}
       };
     }
     
@@ -223,7 +217,6 @@ function createCategoryBreakdown(expenses) {
       breakdown[category] = {
         total: 0,
         count: 0,
-        items: []
       };
     }
     
@@ -232,7 +225,6 @@ function createCategoryBreakdown(expenses) {
     breakdown[category].items.push({
       date: expense.date,
       amount: amount,
-      note: expense.note || ''
     });
   });
   
@@ -248,7 +240,6 @@ function createAllocationAnalysis(expenses) {
     nonAllocated: [],
     totalAllocated: 0,
     totalNonAllocated: 0,
-    allocationRate: 0
   };
   
   expenses.forEach(expense => {

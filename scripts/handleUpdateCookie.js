@@ -25,10 +25,13 @@ export async function handleUpdateCookie(index, transactionList) {
     const { BACKEND_URL } = getConstants();
     showProcessingModal("Đang tải cookie...");
     
-      action: "getCookieAndFileName",
-      accountSheetId: transaction.accountSheetId
-    
     const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "getCookieAndFileName",
+        accountSheetId: transaction.accountSheetId
+      })
     });
     const result = await response.json();
     

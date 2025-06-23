@@ -38,7 +38,6 @@ export async function loadExpenseAnalysis(options = {}) {
     const expenses = window.expenseList || getFromStorage('expenses') || [];
     
       transactions: transactions.length,
-      expenses: expenses.length
     
     // Get date range from options or global filters
     const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
@@ -152,7 +151,6 @@ function calculateExpenseMetrics(expenses) {
       largestExpense = {
         amount: amount,
         category: expense.danhMuc || expense.category || 'N/A',
-        description: expense.moTa || expense.description || 'N/A'
       };
     }
   });
@@ -224,7 +222,6 @@ async function renderExpenseTrendChart(expenses, period) {
         pointHoverRadius: 8,
         pointBackgroundColor: '#ef4444',
         pointBorderColor: '#ffffff',
-        pointBorderWidth: 2
       }]
     },
     options: {
@@ -232,11 +229,9 @@ async function renderExpenseTrendChart(expenses, period) {
       maintainAspectRatio: false,
       interaction: {
         intersect: false,
-        mode: 'index'
       },
       plugins: {
         legend: {
-          display: false
         },
         tooltip: {
           backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -265,7 +260,6 @@ async function renderExpenseTrendChart(expenses, period) {
         },
         x: {
           grid: {
-            display: false
           }
         }
       }
@@ -308,7 +302,6 @@ async function renderExpenseCategoryChart(expenses) {
           '#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9'
         ],
         borderWidth: 2,
-        borderColor: '#ffffff'
       }]
     },
     options: {
@@ -319,7 +312,6 @@ async function renderExpenseCategoryChart(expenses) {
           position: 'right',
           labels: {
             usePointStyle: true,
-            padding: 20
           }
         },
         tooltip: {
@@ -370,14 +362,12 @@ async function renderBudgetComparisonChart(expenses) {
           data: budgetData.budget,
           backgroundColor: 'rgba(59, 130, 246, 0.7)',
           borderColor: '#3b82f6',
-          borderWidth: 1
         },
         {
           label: 'Thực tế',
           data: budgetData.actual,
           backgroundColor: 'rgba(239, 68, 68, 0.7)',
           borderColor: '#ef4444',
-          borderWidth: 1
         }
       ]
     },
@@ -386,7 +376,6 @@ async function renderBudgetComparisonChart(expenses) {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          position: 'top'
         },
         tooltip: {
           callbacks: {
@@ -635,7 +624,6 @@ function calculateExpenseByCategory(expenses) {
   
   return {
     labels: Object.keys(categories),
-    values: Object.values(categories)
   };
 }
 
@@ -661,7 +649,6 @@ function calculateCategoryExpenses(expenses) {
         name: categoryName,
         amount: 0,
         count: 0,
-        type: 'Chi phí'
       };
     }
     
@@ -671,7 +658,6 @@ function calculateCategoryExpenses(expenses) {
   
   return Object.values(categories).map(category => ({
     ...category,
-    avgAmount: category.count > 0 ? category.amount / category.count : 0
   }));
 }
 
@@ -683,7 +669,6 @@ function analyzeExpenseTypes(expenses) {
     amount: parseFloat(expense.soTien || expense.amount || 0),
     isRecurring: Math.random() > 0.5, // Placeholder logic
     frequency: Math.random() > 0.5 ? 'Hàng tháng' : 'Một lần',
-    nextDate: Math.random() > 0.5 ? '15/01/2025' : null
   }));
 }
 
@@ -697,7 +682,6 @@ function generateBudgetAlerts(expenses) {
     {
       type: 'warning',
       title: 'Vượt ngân sách Marketing',
-      description: 'Chi phí marketing đã vượt 85% ngân sách tháng này'
     }
   ];
 }
@@ -707,7 +691,6 @@ function generateOptimizationSuggestions(expenses) {
     {
       title: 'Tối ưu chi phí IT',
       description: 'Có thể tiết kiệm 15% bằng cách gộp các gói dịch vụ',
-      savings: 500000
     }
   ];
 }
@@ -716,7 +699,6 @@ function calculateExpenseForecast(expenses) {
   return {
     nextMonth: 8500000,
     trend: 'up',
-    confidence: 78
   };
 }
 
@@ -724,19 +706,15 @@ function generateExpenseInsights(expenses, transactions) {
   return {
     savingOpportunity: {
       value: '2.5M ₫',
-      description: 'Tiết kiệm tiềm năng từ việc tối ưu hóa quy trình'
     },
     spendingPattern: {
       value: 'Ổn định',
-      description: 'Chi phí duy trì ở mức ổn định trong 3 tháng qua'
     },
     costEfficiency: {
       value: '85%',
-      description: 'Hiệu quả chi phí tốt so với mức trung bình ngành'
     },
     expenseRisk: {
       value: 'Thấp',
-      description: 'Rủi ro chi phí được kiểm soát tốt'
     }
   };
 }

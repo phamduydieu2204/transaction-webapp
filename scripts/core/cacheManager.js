@@ -15,6 +15,7 @@ class CacheManager {
     this.caches.set(key, {
       value,
       expires: Date.now() + ttl
+    });
   }
 
   /**

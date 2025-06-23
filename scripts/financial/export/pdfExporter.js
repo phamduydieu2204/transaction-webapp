@@ -127,7 +127,6 @@ function addSummarySection(doc, metrics, yPosition) {
   
   yPosition = addTableToPDF(doc, summaryData, yPosition, {
     headerStyle: { fillColor: [66, 139, 202] },
-    alternateRowColors: true
   
   return yPosition + 10;
 }
@@ -175,7 +174,6 @@ function addRevenueAnalysis(doc, metrics, yPosition) {
   yPosition = addTableToPDF(doc, revenueData, yPosition, {
     headerStyle: { fillColor: [40, 167, 69] },
     alternateRowColors: true,
-    maxWidth: 170
   
   return yPosition + 10;
 }
@@ -223,7 +221,6 @@ function addExpenseAnalysis(doc, metrics, yPosition) {
   yPosition = addTableToPDF(doc, expenseData, yPosition, {
     headerStyle: { fillColor: [220, 53, 69] },
     alternateRowColors: true,
-    maxWidth: 170
   
   return yPosition + 10;
 }
@@ -271,7 +268,6 @@ function addPerformanceMetrics(doc, metrics, yPosition) {
   
   yPosition = addTableToPDF(doc, performanceData, yPosition, {
     headerStyle: { fillColor: [102, 16, 242] },
-    alternateRowColors: true
   
   // Add footer
   yPosition += 20;

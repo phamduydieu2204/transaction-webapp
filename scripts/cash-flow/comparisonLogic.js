@@ -13,7 +13,6 @@ export function compareViews(cashFlow, accrual) {
     totalDifference: cashFlow.total - accrual.total,
     percentDifference: cashFlow.total > 0 ? ((cashFlow.total - accrual.total) / cashFlow.total * 100) : 0,
     monthlyDifferences: {},
-    insights: []
   };
 
   // Compare by month
@@ -24,7 +23,6 @@ export function compareViews(cashFlow, accrual) {
     comparison.monthlyDifferences[month] = {
       cashFlow: cfAmount,
       accrual: acAmount,
-      difference: cfAmount - acAmount
     };
   });
 
@@ -39,7 +37,6 @@ export function compareViews(cashFlow, accrual) {
   if (cashFlow.largePayments.length > 0) {
     comparison.insights.push({
       type: 'info',
-      message: `Có ${cashFlow.largePayments.length} khoản chi lớn (>10tr) cần phân bổ để báo cáo chính xác hơn`
     });
   }
 
@@ -210,7 +207,6 @@ export function analyzeVariance(comparison) {
   const analysis = {
     significantVariances: [],
     pattern: 'stable',
-    recommendations: []
   };
   
   // Find months with significant variance
@@ -224,7 +220,7 @@ export function analyzeVariance(comparison) {
         month,
         variance,
         percentVariance,
-        type: diff.difference > 0 ? 'cash_higher' : 'accrual_higher'
+      });
     }
   });
   
@@ -239,7 +235,6 @@ export function analyzeVariance(comparison) {
   if (analysis.pattern === 'high_variance') {
     analysis.recommendations.push({
       priority: 'high',
-      message: 'Biến động lớn giữa Cash Flow và Accrual. Cần xem xét lại cách phân bổ chi phí.'
     });
   }
   
@@ -254,7 +249,6 @@ export function calculateReconciliation(cashFlow, accrual) {
     startingCashFlow: cashFlow.total,
     adjustments: [],
     endingAccrual: accrual.total,
-    unexplainedDifference: 0
   };
   
   // Calculate timing differences from allocated expenses
@@ -266,7 +260,6 @@ export function calculateReconciliation(cashFlow, accrual) {
     reconciliation.adjustments.push({
       type: 'timing',
       description: 'Chênh lệch thời gian phân bổ',
-      amount: timingDifference
     });
   }
   

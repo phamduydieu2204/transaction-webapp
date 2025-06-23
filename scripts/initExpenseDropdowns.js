@@ -7,6 +7,8 @@ export async function initExpenseDropdowns() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "getExpenseDropdownOptions" })
+    });
+
     const result = await res.json();
     if (result.status !== "success") return;
 

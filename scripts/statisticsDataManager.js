@@ -195,9 +195,6 @@ export async function getCombinedStatistics(options = {}) {
       timestamp: Date.now()
     };
 
-      expenses: combinedData.expenses.length,
-      transactions: combinedData.transactions.length
-
     return combinedData;
 
   } catch (error) {

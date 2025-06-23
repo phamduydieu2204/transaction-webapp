@@ -53,7 +53,6 @@ export async function loadOverviewReport(options = {}) {
     await ensureDataIsLoaded();
     
       transactionList: window.transactionList ? window.transactionList.length : 0,
-      expenseList: window.expenseList ? window.expenseList.length : 0
     
     // Get data from global variables (primary) or storage (fallback)
     const transactions = window.transactionList || getFromStorage('transactions') || [];
@@ -62,7 +61,6 @@ export async function loadOverviewReport(options = {}) {
       transactions: transactions.length,
       expenses: expenses.length,
       sampleTransaction: transactions[0] ? Object.keys(transactions[0]) : [],
-      sampleExpense: expenses[0] ? Object.keys(expenses[0]) : []
     
     // Get date range from options or global filters
     const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
@@ -535,31 +533,25 @@ function calculateOverviewKPIs(transactions, expenses, dateRange, period = 'this
       current: statusBreakdown.completed.revenue,
       previous: prevStatusBreakdown.completed.revenue,
       growth: completedGrowth,
-      count: statusBreakdown.completed.count
     },
     paid: {
       current: statusBreakdown.paid.revenue,
       previous: prevStatusBreakdown.paid.revenue,
       growth: paidGrowth,
-      count: statusBreakdown.paid.count
     },
     unpaid: {
       current: statusBreakdown.unpaid.revenue,
       previous: prevStatusBreakdown.unpaid.revenue,
       growth: unpaidGrowth,
-      count: statusBreakdown.unpaid.count
     },
     transactions: {
       current: totalTransactions,
       previous: prevTransactionCount,
-      growth: transactionGrowth
     },
     conversion: {
       paymentRate: paymentRate,
       completionRate: completionRate,
-      successRate: successRate
     },
-    totalRevenue: totalRevenue
   };
 }
 
@@ -582,44 +574,37 @@ async function updateKPICards(kpis) {
       value: kpis.grossRevenue || 0,
       growth: kpis.growthRates?.grossRevenue || 0,
       hasGrowthRates: !!kpis.growthRates,
-      growthRates: kpis.growthRates
     
     updateKPICard('grossRevenue', {
       value: kpis.grossRevenue || 0,
       growth: kpis.growthRates?.grossRevenue || 0,
       elementId: 'completed-revenue',
-      changeId: 'completed-change'
     
     updateKPICard('pendingCollection', {
       value: kpis.pendingCollection || 0,
       growth: kpis.growthRates?.pendingCollection || 0,
       elementId: 'paid-revenue', 
-      changeId: 'paid-change'
     
     updateKPICard('pendingPayment', {
       value: kpis.pendingPayment || 0,
       growth: kpis.growthRates?.pendingPayment || 0,
       elementId: 'unpaid-revenue',
-      changeId: 'unpaid-change'
     
     updateKPICard('totalRefunds', {
       value: kpis.totalRefunds || 0,
       growth: kpis.growthRates?.totalRefunds || 0,
       elementId: 'refund-revenue',
-      changeId: 'refund-change'
     
     updateKPICard('refundRate', {
       value: kpis.refundRate || 0,
       growth: 0, // Rate growth calculation can be added later
       elementId: 'refund-rate',
       changeId: 'refund-rate-change',
-      isPercentage: true
     
     updateKPICard('effectiveTransactions', {
       value: kpis.effectiveTransactions || 0,
       growth: kpis.growthRates?.effectiveTransactions || 0,
       elementId: 'total-transactions',
-      changeId: 'transaction-change'
     
     // Update status breakdown with new data
     updateStatusBreakdownWithNewMetrics(kpis);
@@ -630,52 +615,43 @@ async function updateKPICards(kpis) {
       value: kpis.financial?.totalRevenue || 0,
       growth: 0,
       elementId: 'completed-revenue',
-      changeId: 'completed-change'
     
     updateKPICard('pendingCollection', {
       value: kpis.financial?.totalRevenue || 0, 
       growth: 0,
       elementId: 'paid-revenue', 
-      changeId: 'paid-change'
     
     updateKPICard('pendingPayment', {
       value: 0,
       growth: 0,
       elementId: 'unpaid-revenue',
-      changeId: 'unpaid-change'
     
     updateKPICard('totalRefunds', {
       value: 0,
       growth: 0,
       elementId: 'refund-revenue',
-      changeId: 'refund-change'
     
     updateKPICard('refundRate', {
       value: 0,
       growth: 0,
       elementId: 'refund-rate',
       changeId: 'refund-rate-change',
-      isPercentage: true
     
     updateKPICard('effectiveTransactions', {
       value: kpis.revenue?.totalTransactions || 0,
       growth: 0,
       elementId: 'total-transactions',
-      changeId: 'transaction-change'
-    
   } else {
     // Old template fallback - convert new metrics to old structure
     updateKPICard('revenue', {
       value: kpis.grossRevenue || kpis.financial?.totalRevenue || 0,
       growth: kpis.growthRates?.grossRevenue || 0,
       elementId: 'total-revenue',
-      changeId: 'revenue-change'
     
     updateKPICard('transaction', {
       value: kpis.effectiveTransactions || kpis.revenue?.totalTransactions || 0,
       growth: kpis.growthRates?.effectiveTransactions || 0,
       elementId: 'total-transactions',
-      changeId: 'transaction-change'
   }
 }
 
@@ -726,7 +702,6 @@ function updateKPICard(type, data) {
       changeElementClasses: Array.from(changeElement.classList),
       parentClasses: changeElement.parentElement ? Array.from(changeElement.parentElement.classList) : [],
       isMetricTemplate: isMetricTemplate,
-      isBoxTemplate: isBoxTemplate
     
     if (isMetricTemplate) {
       // New metric template (6-box grid)
@@ -734,7 +709,6 @@ function updateKPICard(type, data) {
         isPositive: isPositive,
         arrow: arrow,
         sign: sign,
-        elementId: data.elementId
       
       changeElement.innerHTML = `
         <i class="fas ${arrow}"></i>
@@ -807,7 +781,6 @@ function updateStatusBreakdownWithNewMetrics(kpis) {
     completed: `${kpis.statusBreakdown.completed.count} (${completedPercent.toFixed(1)}%)`,
     paid: `${kpis.statusBreakdown.paid.count} (${paidPercent.toFixed(1)}%)`,
     unpaid: `${kpis.statusBreakdown.unpaid.count} (${unpaidPercent.toFixed(1)}%)`,
-    refunded: `${kpis.statusBreakdown.refunded.count} (${refundedPercent.toFixed(1)}%)`
 }
 
 /**
@@ -953,7 +926,6 @@ function renderRevenueStatusChart(transactions) {
           backgroundColor: '#27ae60',
           borderColor: '#229954',
           borderWidth: 1,
-          order: 1
         },
         {
           label: 'Đã thanh toán',
@@ -961,7 +933,6 @@ function renderRevenueStatusChart(transactions) {
           backgroundColor: '#3498db',
           borderColor: '#2980b9',
           borderWidth: 1,
-          order: 2
         },
         {
           label: 'Hoàn tiền',
@@ -977,7 +948,6 @@ function renderRevenueStatusChart(transactions) {
             // Thicker border for negative values to highlight
             return value < 0 ? 3 : 1;
           },
-          order: 3
         }
       ]
     },
@@ -989,12 +959,10 @@ function renderRevenueStatusChart(transactions) {
           top: 20,
           bottom: 20,
           left: 10,
-          right: 10
         }
       },
       interaction: {
         mode: 'index',
-        intersect: false
       },
       plugins: {
         title: {
@@ -1002,9 +970,7 @@ function renderRevenueStatusChart(transactions) {
           text: `Xu hướng doanh thu theo trạng thái - ${getPeriodDisplayName(currentPeriod)}`,
           font: {
             size: 14,
-            weight: 'bold'
           },
-          padding: 20
         },
         legend: {
           position: 'top',
@@ -1012,7 +978,6 @@ function renderRevenueStatusChart(transactions) {
             usePointStyle: true,
             padding: 15,
             font: {
-              size: 12
             }
           }
         },
@@ -1045,11 +1010,9 @@ function renderRevenueStatusChart(transactions) {
         x: {
           stacked: false, // Changed to false to show individual bars
           grid: {
-            display: false
           },
           ticks: {
             font: {
-              size: 11
             }
           }
         },
@@ -1059,16 +1022,13 @@ function renderRevenueStatusChart(transactions) {
           grace: '10%', // Add 10% padding above and below
           grid: {
             color: 'rgba(0, 0, 0, 0.1)',
-            drawBorder: false
           },
           ticks: {
             callback: function(value) {
               return formatRevenue(value);
             },
             font: {
-              size: 11
             },
-            maxTicksLimit: 8 // Limit ticks for better readability
           },
           // Advanced auto-scale for small values visibility
           afterDataLimits: function(scale) {
@@ -1107,7 +1067,6 @@ function renderRevenueStatusChart(transactions) {
         bar: {
           borderRadius: 3,
           // Ensure minimum bar height for visibility
-          minBarLength: 3
         }
       },
       // Plugin to ensure small bars are visible
@@ -1225,7 +1184,6 @@ function renderStatusDistributionChart(transactions) {
           top: 20,
           bottom: 20,
           left: 20,
-          right: 20
         }
       },
       plugins: {
@@ -1341,7 +1299,6 @@ function renderStatusDistributionChart(transactions) {
       animation: {
         animateScale: true,
         animateRotate: true,
-        duration: 1200
       },
       // Ensure small segments are always visible
       circumference: Math.PI * 2,
@@ -1475,7 +1432,6 @@ function updateStatusDetailTable(statusBreakdown) {
   
   const total = {
     count: statusBreakdown.completed.count + statusBreakdown.paid.count + statusBreakdown.refunded.count,
-    amount: statusBreakdown.completed.amount + statusBreakdown.paid.amount + statusBreakdown.refunded.amount
   };
   
   const tableRows = [
@@ -1485,7 +1441,6 @@ function updateStatusDetailTable(statusBreakdown) {
       count: statusBreakdown.completed.count,
       amount: statusBreakdown.completed.amount,
       percentage: total.count > 0 ? ((statusBreakdown.completed.count / total.count) * 100).toFixed(1) : 0,
-      className: 'status-completed'
     },
     {
       status: 'Đã thanh toán',
@@ -1493,7 +1448,6 @@ function updateStatusDetailTable(statusBreakdown) {
       count: statusBreakdown.paid.count,
       amount: statusBreakdown.paid.amount,
       percentage: total.count > 0 ? ((statusBreakdown.paid.count / total.count) * 100).toFixed(1) : 0,
-      className: 'status-paid'
     },
     {
       status: 'Hoàn tiền',
@@ -1501,7 +1455,6 @@ function updateStatusDetailTable(statusBreakdown) {
       count: statusBreakdown.refunded.count,
       amount: statusBreakdown.refunded.amount,
       percentage: total.count > 0 ? ((statusBreakdown.refunded.count / total.count) * 100).toFixed(1) : 0,
-      className: 'status-refunded' // Special class for highlighting
     }
   ];
   
@@ -1566,7 +1519,6 @@ function getStatusDistributionWithRefund(transactions) {
   return {
     completed: completed,
     paid: paid,
-    refunded: refunded
   };
 }
 
@@ -1599,7 +1551,6 @@ function renderExpenseDistributionChart(expenses) {
           '#e67e22'
         ],
         borderWidth: 2,
-        borderColor: '#fff'
       }]
     },
     options: {
@@ -1607,7 +1558,6 @@ function renderExpenseDistributionChart(expenses) {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          position: 'right'
         }
       }
     }
@@ -1647,7 +1597,6 @@ function getLastSixMonthsDataByStatus(transactions) {
     completed: completed,
     paid: paid,
     refunded: refunded,
-    unpaid: refunded // Backward compatibility
   };
 }
 
@@ -1858,7 +1807,6 @@ function getWeeksInMonth(monthDate) {
     
     weeks.push({
       start: new Date(currentWeekStart),
-      end: new Date(weekEnd)
     });
     
     currentWeekStart.setDate(currentWeekStart.getDate() + 7);
@@ -1910,7 +1858,6 @@ function getExpensesByCategory(expenses) {
   
   return {
     labels: Object.keys(categories),
-    values: Object.values(categories)
   };
 }
 
@@ -1937,7 +1884,6 @@ function renderRevenueTrendChart(transactions) {
         borderColor: '#3498db',
         borderWidth: 2,
         tension: 0.4,
-        fill: true
       }]
     },
     options: {
@@ -1945,7 +1891,6 @@ function renderRevenueTrendChart(transactions) {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          position: 'top'
         }
       },
       scales: {
@@ -2030,7 +1975,6 @@ function updateTopCustomersTable(transactions) {
       customers[customer] = {
         name: customer,
         revenue: 0,
-        transactions: 0
       };
     }
     customers[customer].revenue += t.revenue || 0;
@@ -2184,7 +2128,6 @@ function calculateProductAnalytics(transactions) {
         transactionCount: 0,
         transactions: [],
         firstSale: transactionDate,
-        lastSale: transactionDate
       };
     }
     
@@ -2196,7 +2139,6 @@ function calculateProductAnalytics(transactions) {
       date: transactionDate,
       revenue: revenue,
       quantity: quantity,
-      customer: transaction.tenKhachHang || transaction.customer
     });
     
     // Update date range
@@ -2272,7 +2214,6 @@ function calculateProductAnalytics(transactions) {
     bestsellers: products.filter(p => p.isBestseller),
     hotProducts: products.filter(p => p.isHot),
     slowProducts: products.filter(p => p.isSlow),
-    trendingProducts: products.filter(p => p.isTrending)
   };
 }
 
@@ -2508,7 +2449,6 @@ function calculateCustomerAnalytics(transactions) {
         transactionCount: 0,
         transactions: [],
         firstTransaction: transactionDate,
-        lastTransaction: transactionDate
       };
     }
     
@@ -2522,7 +2462,6 @@ function calculateCustomerAnalytics(transactions) {
     customerData.transactions.push({
       date: transactionDate,
       revenue: revenue,
-      product: t.softwareName
     });
     
     // Update date range
@@ -2564,7 +2503,6 @@ function calculateCustomerAnalytics(transactions) {
       valueScore,
       recentRevenue,
       isActive: daysSinceLast <= 90, // Active if transaction within 90 days
-      isVIP: customer.totalRevenue >= totalRevenue * 0.1 // VIP if >10% of total revenue
     };
   });
   
@@ -2574,7 +2512,6 @@ function calculateCustomerAnalytics(transactions) {
     totalCustomers: customers.length,
     avgCustomerRevenue: totalRevenue / customers.length,
     activeCustomers: customers.filter(c => c.isActive).length,
-    vipCustomers: customers.filter(c => c.isVIP).length
   };
 }
 
@@ -2934,31 +2871,25 @@ function calculateOverviewKPIsNew(transactions, expenses, dateRange, period = 't
       current: statusBreakdown.completed.revenue,
       previous: 0,
       growth: 0,
-      count: statusBreakdown.completed.count
     },
     paid: {
       current: statusBreakdown.paid.revenue,
       previous: 0,
       growth: 0,
-      count: statusBreakdown.paid.count
     },
     unpaid: {
       current: statusBreakdown.unpaid.revenue,
       previous: 0,
       growth: 0,
-      count: statusBreakdown.unpaid.count
     },
     transactions: {
       current: totalTransactions,
       previous: 0,
-      growth: 0
     },
     conversion: {
       paymentRate: 0,
       completionRate: 0,
-      successRate: 0
     },
-    totalRevenue: totalRevenue
   };
 }
 
@@ -3156,7 +3087,6 @@ function categorizePendingTransactions(transactions) {
         ...t,
         waitingDays,
         isUrgent,
-        priority: isUrgent ? 'high' : 'normal'
     }
     
     // Case 2: Chưa thanh toán (cần thu tiền)
@@ -3171,7 +3101,6 @@ function categorizePendingTransactions(transactions) {
         overdueDays,
         isOverdue,
         deliveryDate,
-        priority: isOverdue ? 'high' : 'normal'
     }
   });
   
@@ -3195,7 +3124,6 @@ function categorizePendingTransactions(transactions) {
     needsDelivery,
     needsPayment,
     urgentDelivery: needsDelivery.filter(t => t.isUrgent),
-    overduePayment: needsPayment.filter(t => t.isOverdue)
   };
 }
 
@@ -3572,7 +3500,6 @@ function calculatePendingTransactions(transactions) {
             paidNotDeliveredCount: 0,
             paidNotDeliveredAmount: 0,
             deliveredNotPaidCount: 0,
-            deliveredNotPaidAmount: 0
         }
     };
     
@@ -3688,7 +3615,6 @@ function calculateNormalizedCustomerAnalytics(transactions) {
                 firstTransaction: null,
                 averageOrderValue: 0,
                 refundCount: 0,
-                refundAmount: 0
         }
         
         const customer = customerMap.get(customerKey);
@@ -3766,7 +3692,6 @@ function calculateNormalizedProductAnalytics(transactions) {
                 averageMonths: 0,
                 totalMonths: 0,
                 refundCount: 0,
-                refundAmount: 0
         }
         
         const product = productMap.get(productName);
@@ -4206,7 +4131,6 @@ function exportSoftwareData() {
 function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses, dateRange, allTransactions) {
     transactionsCount: filteredTransactions.length,
     expensesCount: filteredExpenses.length,
-    dateRange: dateRange
   
   // Use pre-filtered transactions for current period metrics
   
@@ -4235,7 +4159,6 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
     previousPeriod: {
       grossRevenue: 0,
       totalRefunds: 0,
-      effectiveTransactions: 0
     }
   };
   
@@ -4257,7 +4180,6 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
         parsedAmount: amount,
         rawStatus: transaction.loaiGiaoDich || transaction.transactionType,
         normalizedStatus: status,
-        rawTransaction: rawTransaction
     }
     
     metrics.totalTransactions++;
@@ -4309,7 +4231,6 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
     paid: metrics.statusBreakdown.paid,
     unpaid: metrics.statusBreakdown.unpaid,
     refunded: metrics.statusBreakdown.refunded,
-    cancelled: metrics.statusBreakdown.cancelled
   
   // Doanh thu gộp = Tổng tiền "đã hoàn tất" + Tổng tiền "đã thanh toán" - Tổng tiền "hoàn tiền"
   metrics.grossRevenue = metrics.statusBreakdown.completed.amount + metrics.statusBreakdown.paid.amount - metrics.totalRefunds;
@@ -4361,7 +4282,6 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
     
       grossRevenue: metrics.previousPeriod.grossRevenue,
       totalRefunds: metrics.previousPeriod.totalRefunds,
-      effectiveTransactions: metrics.previousPeriod.effectiveTransactions
   }
   
   // Calculate growth rates
@@ -4417,7 +4337,6 @@ function calculateSamePeriodPreviousCycle(currentRange) {
   
   const result = {
     start: prevStartDate.toISOString().split('T')[0],
-    end: prevEndDate.toISOString().split('T')[0]
   };
   
   
@@ -4443,7 +4362,6 @@ function calculatePreviousPeriodRange(currentRange) {
   
   return {
     start: prevStartDate.toISOString().split('T')[0],
-    end: prevEndDate.toISOString().split('T')[0]
   };
 }
 

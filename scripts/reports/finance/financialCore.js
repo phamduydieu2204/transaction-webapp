@@ -48,8 +48,6 @@ export class FinancialCore {
             this.expenses = this.extractExpenseData();
             
                 transactions: this.transactions.length,
-                expenses: this.expenses.length
-            
         } catch (error) {
             console.error('❌ Error loading financial data:', error);
             // Use mock data as fallback
@@ -77,7 +75,6 @@ export class FinancialCore {
                     months: parseInt(row.soThangDangKy || row.months || 0),
                     employee: row.tenNhanVien || row.employeeName || '',
                     startDate: row.ngayBatDau || row.startDate || '',
-                    endDate: row.ngayKetThuc || row.endDate || ''
                 };
             }
             
@@ -94,7 +91,6 @@ export class FinancialCore {
                 months: parseInt(row[6]) || 0,
                 employee: row[20] || '',
                 startDate: row[7] || '',
-                endDate: row[8] || ''
             };
         });
     }
@@ -120,7 +116,6 @@ export class FinancialCore {
                     bank: row.nganHang || row.bank || '',
                     recurring: row.thuongXuyen || row.recurring || false,
                     frequency: row.tanSuat || row.frequency || '',
-                    nextDate: row.ngayKeTiep || row.nextDate || ''
                 };
             }
             
@@ -138,7 +133,6 @@ export class FinancialCore {
                 bank: row[10] || '',
                 recurring: row[11] === 'Có' || false,
                 frequency: row[12] || '',
-                nextDate: row[13] || ''
             };
         });
     }
@@ -182,7 +176,6 @@ export class FinancialCore {
                     expenses: 0,
                     profit: 0,
                     transactionCount: 0,
-                    expenseCount: 0
             }
             
             const monthData = monthlyData.get(monthKey);
@@ -204,7 +197,6 @@ export class FinancialCore {
                     expenses: 0,
                     profit: 0,
                     transactionCount: 0,
-                    expenseCount: 0
             }
             
             const monthData = monthlyData.get(monthKey);
@@ -238,7 +230,6 @@ export class FinancialCore {
                     expenses: 0,
                     profit: 0,
                     transactionCount: 0,
-                    expenseCount: 0
             }
             
             const quarterData = quarterlyData.get(quarterKey);
@@ -268,7 +259,6 @@ export class FinancialCore {
                     expenses: 0,
                     profit: 0,
                     transactionCount: 0,
-                    expenseCount: 0
             }
             
             const yearData = yearlyData.get(year);
@@ -296,7 +286,6 @@ export class FinancialCore {
                     category: category,
                     revenue: 0,
                     count: 0,
-                    customers: new Set()
             }
             
             const categoryData = categories.get(category);
@@ -329,7 +318,6 @@ export class FinancialCore {
                     amount: 0,
                     count: 0,
                     recurring: 0,
-                    oneTime: 0
             }
             
             const categoryData = categories.get(category);
@@ -365,7 +353,6 @@ export class FinancialCore {
                 cashIn: monthData.revenue,
                 cashOut: monthData.expenses,
                 netCashFlow: netCashFlow,
-                runningBalance: runningBalance
             });
         });
         
@@ -421,12 +408,10 @@ export class FinancialCore {
             currentMonth: {
                 revenue: currentMonthData.revenue,
                 expenses: currentMonthData.expenses,
-                profit: currentMonthData.profit
             },
             previousMonth: {
                 revenue: previousMonthData.revenue,
                 expenses: previousMonthData.expenses,
-                profit: previousMonthData.profit
             },
             
             // Changes
@@ -446,11 +431,9 @@ export class FinancialCore {
             // Health indicators
             liquidityRatio: this.calculateLiquidityRatio(),
             profitMargin: grossMargin,
-            cashCycleDays: this.calculateCashCycle(),
             
             // Customer metrics
             averageRevenuePerCustomer: this.calculateARPC(),
-            customerAcquisitionCost: this.calculateCAC()
         };
         
     }
@@ -566,7 +549,6 @@ export class FinancialCore {
                 accountNumber: '**** 1234',
                 balance: 125500000,
                 type: 'checking',
-                currency: 'VND'
             }],
             ['backup', {
                 id: 'backup',
@@ -575,7 +557,6 @@ export class FinancialCore {
                 accountNumber: '**** 5678',
                 balance: 45750000,
                 type: 'savings',
-                currency: 'VND'
             }],
             ['operational', {
                 id: 'operational',
@@ -584,7 +565,6 @@ export class FinancialCore {
                 accountNumber: '**** 9012',
                 balance: 12300000,
                 type: 'checking',
-                currency: 'VND'
             }]
         ]);
     }
@@ -600,25 +580,21 @@ export class FinancialCore {
                     value: this.financialMetrics.liquidityRatio,
                     status: this.financialMetrics.liquidityRatio >= 2 ? 'healthy' : 
                            this.financialMetrics.liquidityRatio >= 1 ? 'warning' : 'danger',
-                    description: 'Khả năng thanh toán ngắn hạn'
                 },
                 profitability: {
                     value: this.financialMetrics.profitMargin,
                     status: this.financialMetrics.profitMargin >= 20 ? 'healthy' : 
                            this.financialMetrics.profitMargin >= 10 ? 'warning' : 'danger',
-                    description: 'Tỷ suất lợi nhuận'
                 },
                 cashFlow: {
                     value: this.financialMetrics.cashRunway,
                     status: this.financialMetrics.cashRunway >= 12 ? 'healthy' : 
                            this.financialMetrics.cashRunway >= 6 ? 'warning' : 'danger',
-                    description: 'Runway tài chính'
                 },
                 growth: {
                     value: this.financialMetrics.revenueChange,
                     status: this.financialMetrics.revenueChange >= 10 ? 'healthy' : 
                            this.financialMetrics.revenueChange >= 0 ? 'warning' : 'danger',
-                    description: 'Tăng trưởng doanh thu'
                 }
             }
         };
@@ -658,7 +634,6 @@ export class FinancialCore {
             revenueByCategory: Array.from(this.revenueByCategory.values()),
             expensesByCategory: Array.from(this.expensesByCategory.values()),
             cashFlow: this.cashFlowData,
-            accounts: Array.from(this.accounts.values())
         };
         
         return data;
@@ -677,16 +652,13 @@ export class FinancialCore {
                 revenueChange: this.financialMetrics.revenueChange,
                 expenseChange: this.financialMetrics.expenseChange,
                 profitChange: this.financialMetrics.profitChange,
-                cashRunway: this.financialMetrics.cashRunway
             },
             charts: {
                 monthly: Array.from(this.monthlyData.values()),
                 cashFlow: this.cashFlowData,
                 revenueByCategory: Array.from(this.revenueByCategory.values()),
-                expensesByCategory: Array.from(this.expensesByCategory.values())
             },
             health: this.financialHealth,
-            accounts: Array.from(this.accounts.values())
         };
     }
 }

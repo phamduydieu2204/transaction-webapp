@@ -134,7 +134,6 @@ async function loadExpiringSubscriptions() {
         expiringItems.push({
           ...transaction,
           daysUntilExpiry,
-          isUrgent: daysUntilExpiry <= 30
       }
     }
   });
@@ -229,7 +228,6 @@ async function loadRenewalTrends() {
       key: monthKey,
       label: date.toLocaleDateString('vi-VN', { month: 'short', year: 'numeric' }),
       renewals: renewalsByMonth[monthKey] || 0,
-      newSubs: newSubscriptionsByMonth[monthKey] || 0
     });
   }
   

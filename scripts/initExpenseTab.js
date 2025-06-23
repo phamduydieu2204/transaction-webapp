@@ -57,11 +57,6 @@ export async function initExpenseTab() {
     }
     
     // Debug: Check current expense list state
-      exists: !!window.expenseList,
-      length: window.expenseList?.length || 0,
-      type: typeof window.expenseList,
-      expenseTabInitialized: window.expenseTabInitialized
-    
     // Check if we already have data and don't need to reload
     if (window.expenseTabInitialized && window.expenseList && window.expenseList.length > 0) {
       // Update table with existing data
@@ -95,7 +90,6 @@ async function loadExpensesInBackground() {
   const data = {
     action: 'searchExpenses',
     maNhanVien: window.userInfo.maNhanVien,
-    conditions: {} // Empty conditions to get all expenses
   };
   
   try {
@@ -105,7 +99,11 @@ async function loadExpensesInBackground() {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify({
+        action: 'getExpenseStats',
+        maNhanVien: window.userInfo?.maNhanVien || ''
+      })
+    });
     
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);

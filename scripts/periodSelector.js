@@ -218,7 +218,6 @@ function calculateDateRange(period) {
   if (startDate && endDate) {
     return {
       start: formatDateForFilter(startDate),
-      end: formatDateForFilter(endDate)
     };
   }
   
@@ -250,7 +249,6 @@ function refreshAllReports(dateRange) {
   if (window.refreshStatisticsWithFilters) {
     window.refreshStatisticsWithFilters({
       ...window.globalFilters,
-      dateRange: dateRange
   }
   
   // Refresh current report with new date range
@@ -261,7 +259,6 @@ function refreshAllReports(dateRange) {
     if (window.loadOverviewReport) {
       const options = {
         dateRange: dateRange,
-        period: currentReportPeriod
       };
       window.loadOverviewReport(options);
     }

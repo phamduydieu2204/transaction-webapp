@@ -37,7 +37,6 @@ export class EmployeeDataProcessor {
             departments: Array.from(this.departments.values()),
             kpis: this.calculateKPIs(),
             topPerformers: this.getTopPerformers(),
-            alerts: this.generateAlerts()
         };
         
         return result;
@@ -72,7 +71,6 @@ export class EmployeeDataProcessor {
                     totalDevices: 0,
                     renewalRate: 0,
                     renewals: 0,
-                    newAcquisitions: 0
             }
             
             const employee = this.employees.get(key);
@@ -211,7 +209,6 @@ export class EmployeeDataProcessor {
                     totalCommission: 0,
                     avgPerformance: 0,
                     topPerformer: null,
-                    customerCount: 0
             }
             
             const department = this.departments.get(dept);
@@ -258,7 +255,6 @@ export class EmployeeDataProcessor {
                 employeeChange: 0,
                 revenueChange: 5.2,
                 commissionChange: 3.1,
-                performanceChange: 2.8
             };
         }
         
@@ -274,7 +270,6 @@ export class EmployeeDataProcessor {
             employeeChange: 2.5, // Mock data - would calculate from historical data
             revenueChange: 5.2,
             commissionChange: 3.1,
-            performanceChange: 2.8
         };
     }
 
@@ -301,7 +296,6 @@ export class EmployeeDataProcessor {
                 type: 'warning',
                 message: `${lowPerformers.length} nhân viên có hiệu suất thấp`,
                 details: `Cần hỗ trợ: ${lowPerformers.map(emp => emp.name).join(', ')}`,
-                time: '2 giờ trước'
             });
         }
         
@@ -312,7 +306,6 @@ export class EmployeeDataProcessor {
                 type: 'info',
                 message: `${highPerformers.length} nhân viên hiệu suất xuất sắc`,
                 details: `Xem xét thưởng: ${highPerformers.map(emp => emp.name).join(', ')}`,
-                time: '1 giờ trước'
             });
         }
         
@@ -328,7 +321,6 @@ export class EmployeeDataProcessor {
                 type: 'danger',
                 message: `${inactiveEmployees.length} nhân viên không hoạt động`,
                 details: `Hơn 30 ngày không có giao dịch`,
-                time: '30 phút trước'
             });
         }
         
