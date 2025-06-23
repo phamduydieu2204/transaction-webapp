@@ -4,6 +4,47 @@
  */
 
 // Track in-flight requests
+const pendingRequests = new Map();
+const requestCache = new Map();
+
+/**
+ * Deduplicate identical requests to prevent multiple calls
+ * @param {string} key - Unique identifier for the request
+ * @param {Function} requestFn - Function that makes the actual request
+ * @param {Object} options - Options including cache duration
+ * @returns {Promise} - Request result
+ */
+export async function deduplicateRequest(key, requestFn, options = {}) {
+  const { cacheDuration = 5 * 60 * 1000 } = options; // Default 5 minutes cache
+  
+  // Check if result is in cache
+  if (requestCache.has(key)) {
+    const cached = requestCache.get(key);
+    const age = Date.now() - cached.timestamp;
+    
+    if (age < cacheDuration) {
+      console.log(`🚀 Cache hit for ${key}`);
+      return cached.data;
+    } else {
+      // Remove expired cache
+      requestCache.delete(key);
+    }
+  }
+  
+  // Check if request is already in progress
+  if (pendingRequests.has(key)) {
+    console.log(`⏳ Request pending for ${key}, waiting...`);
+    return await pendingRequests.get(key);
+  }
+  
+  // Make new request
+  console.log(`📡 Making new request for ${key}`);
+  const requestPromise = requestFn()
+    .then(data => {
+      // Cache the result
+      requestCache.set(key, {
+        data,
+        timestamp: Date.now()
       });
       return data;
     })
@@ -84,7 +125,7 @@ export class RequestBatcher {
       batch.forEach((b, index) => {
         b.resolve(results[index]);
       });
-  } catch (error) {
+    } catch (error) {
       // Reject all promises in batch
       batch.forEach(b => {
         b.reject(error);
@@ -117,10 +158,22 @@ export function prefetchData(key, requestFn, options = {}) {
   }
 }
 
+/**
+ * Get cache statistics
+ */
+export function getCacheStats() {
+  return {
+    cacheSize: requestCache.size,
+    pendingRequests: pendingRequests.size,
+    cacheKeys: Array.from(requestCache.keys())
+  };
+}
+
 // Export for global access
 window.requestOptimizer = {
   deduplicateRequest,
   clearRequestCache,
   RequestBatcher,
-  prefetchData
+  prefetchData,
+  getCacheStats
 };
