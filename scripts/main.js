@@ -7,7 +7,7 @@
 
 
 // Import core modules
-import { initializeApp } from './core/appInitializer.js';
+import { initializeApplication } from './core/appInitializer.js';
 import { initializeEventHandlers } from './core/eventManager.js';
 import { initializeStateManager, getState, updateState } from './core/stateManager.js';
 import { switchToTab, initializeTabSystem, switchToIntendedTab } from './core/navigationManager.js';
@@ -231,7 +231,7 @@ async function startApp() {
     }
     
     // Phase 2: Initialize core application
-    await initializeApp();
+    await initializeApplication();
     
     // Phase 3: Setup event handlers
     initializeEventHandlers();
