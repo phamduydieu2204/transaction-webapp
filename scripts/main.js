@@ -36,14 +36,19 @@ async function lazyLoadFunction(functionName, modulePath, exportName = null) {
   }
   
   try {
-    const module = await loadModule(modulePath);
+    // Adjust path if it's in core folder
+    const adjustedPath = modulePath.startsWith('./') && !modulePath.includes('../') 
+      ? modulePath.replace('./', '../') 
+      : modulePath;
+      
+    const module = await loadModule(adjustedPath);
     const fn = exportName ? module[exportName] : module[functionName] || module.default;
     
     if (typeof fn === 'function') {
       moduleCache.set(functionName, fn);
       return fn;
     } else {
-      console.error(`❌ Function ${functionName} not found in ${modulePath}`);
+      console.error(`❌ Function ${functionName} not found in ${adjustedPath}`);
       return null;
     }
   } catch (error) {
@@ -233,7 +238,7 @@ async function startApp() {
     // Phase 4.5: Initialize date defaults and calculations
     setTimeout(async () => {
       try {
-        const { initializeDateCalculations } = await loadModule('./calculateEndDate.js');
+        const { initializeDateCalculations } = await loadModule('../calculateEndDate.js');
         initializeDateCalculations();
       } catch (error) {
         console.error('Failed to initialize date calculations:', error);

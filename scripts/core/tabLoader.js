@@ -23,7 +23,7 @@ const TAB_MODULES = {
   'chi-phi': {
     required: [
       { path: '../initExpenseTab.js', key: 'expenseTab' },
-      { path: '../loadExpenses.js', key: 'expenseLoader' }
+      { path: '../initExpenseTab.js', key: 'expenseLoader' }
     ],
     optional: []
   },
