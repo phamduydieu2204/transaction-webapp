@@ -17,11 +17,6 @@ export async function deleteTransaction(
   openConfirmModal,
   getConstants
 ) {
-    index,
-    transactionListType: typeof transactionList,
-    transactionListLength: transactionList ? transactionList.length : 0,
-    hasUserInfo: !!userInfo
-
   // Validation cơ bản trước
   if (!transactionList || !Array.isArray(transactionList)) {
     console.error("❌ TransactionList không hợp lệ:", transactionList);
