@@ -21,6 +21,7 @@ export async function fetchSoftwareList(
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data)
+        });
         return await response.json();
       },
       { cacheDuration: 10 * 60 * 1000 } // Cache for 10 minutes
