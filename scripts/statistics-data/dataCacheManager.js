@@ -61,8 +61,6 @@ export function updateCache(cacheKey, data) {
     data: data,
     lastFetch: Date.now()
   };
-  
-    Array.isArray(data) ? `${data.length} items` : 'data stored');
 }
 
 /**
@@ -189,6 +187,7 @@ export function cacheSearchResults(query, results) {
     query: query,
     results: results,
     timestamp: Date.now()
+  });
   
   searchCache.lastFetch = Date.now();
 }
