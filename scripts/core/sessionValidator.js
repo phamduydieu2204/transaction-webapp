@@ -203,6 +203,7 @@ async function validateWithServerFast(user) {
       },
       body: JSON.stringify(data),
       signal: controller.signal
+    });
 
     clearTimeout(timeoutId);
 

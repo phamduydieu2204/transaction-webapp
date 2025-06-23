@@ -165,6 +165,7 @@ export async function loadTransactions(userInfo, updateTable, formatDate, editTr
       },
       body: JSON.stringify(data),
       signal: controller.signal
+    });
 
     clearTimeout(timeoutId);
 

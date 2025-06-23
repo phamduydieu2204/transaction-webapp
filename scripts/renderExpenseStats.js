@@ -63,6 +63,7 @@ async function renderExpenseStatsLegacy() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "getExpenseStats" }),
       signal: controller.signal
+    });
 
     clearTimeout(timeoutId);
 
