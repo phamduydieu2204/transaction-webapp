@@ -14,10 +14,7 @@ import { getState, updateState } from './stateManager.js';
 const VALIDATION_CONFIG = {
   checkInterval: 5 * 60 * 1000, // Check every 5 minutes
   onPageLoadCheck: true, // Check immediately on page load
-  retryAttempts: 3,
-  retryDelay: 2000,
   immediateTimeout: 5000, // Faster timeout for immediate validation
-  operationCacheTime: 30 * 1000 // Cache validation for 30 seconds for operations
 };
 
 // Cache for operation validations
@@ -72,8 +69,7 @@ export function initializeSessionValidation() {
       validateCurrentSession();
     }, 500); // Quick check after basic initialization
   }
-  
-  
+
   // Set up periodic validation
   setInterval(() => {
     validateCurrentSession();
@@ -109,7 +105,6 @@ export async function validateSessionImmediate() {
     }
     
     return true;
-    
   } catch (error) {
     console.error('❌ Immediate session validation error:', error);
     // On network errors during startup, allow login but show warning
@@ -158,51 +153,16 @@ export async function validateCurrentSession() {
       await handleInvalidSession();
     } else {
     }
-    
   } catch (error) {
     console.error('❌ Session validation error:', error);
     // Don't logout on network errors, just log them
   } finally {
-    validationInProgress = false;
-  }
-}
-
-/**
- * Fast session validation with server (for immediate checks)
- * @param {Object} user - User object to validate
- * @returns {Promise<boolean>} True if session is valid
- */
-async function validateWithServerFast(user) {
-  const { BACKEND_URL } = getConstants();
-  
-  const data = {
-    action: 'validateSession',
-    maNhanVien: user.maNhanVien,
-    tenNhanVien: user.tenNhanVien,
-    passwordHash: user.passwordHash,
-    currentSessionData: {
-      vaiTro: user.vaiTro,
-      tabNhinThay: user.tabNhinThay,
-      giaoDichNhinThay: user.giaoDichNhinThay,
-      nhinThayGiaoDichCuaAi: user.nhinThayGiaoDichCuaAi,
-      duocSuaGiaoDichCuaAi: user.duocSuaGiaoDichCuaAi,
-      duocXoaGiaoDichCuaAi: user.duocXoaGiaoDichCuaAi
     }
   };
-  
-  
-  try {
-    // Single attempt with faster timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), VALIDATION_CONFIG.immediateTimeout);
+  });
 
-    const response = await fetch(BACKEND_URL, {
-      method: 'POST',
-      headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data),
-      signal: controller.signal
     });
 
     clearTimeout(timeoutId);
@@ -228,45 +188,15 @@ async function validateWithServerFast(user) {
       console.error('❌ Server validation error (fast):', result.message);
       return false;
     }
-    
   } catch (error) {
     console.error('❌ Fast session validation failed:', error);
-    throw error; // Re-throw for caller to handle
-  }
-}
-
-/**
- * Validate session with server
- * @param {Object} user - User object to validate
- * @returns {Promise<boolean>} True if session is valid
- */
-async function validateWithServer(user) {
-  const { BACKEND_URL } = getConstants();
-  
-  const data = {
-    action: 'validateSession',
-    maNhanVien: user.maNhanVien,
-    tenNhanVien: user.tenNhanVien,
     passwordHash: user.passwordHash, // Include password hash for validation
-    currentSessionData: {
-      vaiTro: user.vaiTro,
-      tabNhinThay: user.tabNhinThay,
-      giaoDichNhinThay: user.giaoDichNhinThay,
-      nhinThayGiaoDichCuaAi: user.nhinThayGiaoDichCuaAi,
-      duocSuaGiaoDichCuaAi: user.duocSuaGiaoDichCuaAi,
-      duocXoaGiaoDichCuaAi: user.duocXoaGiaoDichCuaAi
     }
   };
-  
-  
-  for (let attempt = 1; attempt <= VALIDATION_CONFIG.retryAttempts; attempt++) {
-    try {
-      const response = await fetch(BACKEND_URL, {
-        method: 'POST',
-        headers: {
+  });
+
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
       });
       
       if (!response.ok) {
@@ -290,8 +220,7 @@ async function validateWithServer(user) {
         console.error('❌ Server validation error:', result.message);
         return false;
       }
-      
-    } catch (error) {
+  } catch (error) {
       console.error(`❌ Session validation attempt ${attempt} failed:`, error);
       
       if (attempt < VALIDATION_CONFIG.retryAttempts) {
@@ -402,22 +331,6 @@ export async function validateBeforeOperation() {
   } catch (error) {
     console.error('❌ Session validation failed for operation:', error);
     // Don't block operation on network errors
-    return true;
-  }
-}
-
-/**
- * Add session validation to existing functions
- */
-export function wrapWithSessionValidation(originalFunction, functionName) {
-  return async function(...args) {
-    
-    const isValid = await validateBeforeOperation();
-    if (!isValid) {
-      console.error(`❌ Operation ${functionName} blocked due to invalid session`);
-      return {
-        status: 'error',
-        message: 'Phên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.'
       };
     }
     

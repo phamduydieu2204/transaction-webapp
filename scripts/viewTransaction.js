@@ -1,153 +1,54 @@
 // viewTransaction.js
-
-import { detailModal } from './detailModalUnified.js';
-import { getConstants } from './constants.js';
-
-export async function viewTransaction(indexOrTransaction, transactionList, formatDate) {
-  
-  
-  // Handle both old way (index) and new way (transaction object)
-  let transaction;
-  
-  if (typeof indexOrTransaction === 'number') {
-    // Old way: index was passed
-    transaction = transactionList ? transactionList[indexOrTransaction] : null;
   } else {
     // New way: transaction object was passed
-    transaction = indexOrTransaction;
-  }
-  
-  if (!transaction) {
-    return;
-  }
-  
-  // If formatDate not provided, use default
-  if (!formatDate) {
-    formatDate = (date) => {
-      if (!date) return '';
-      return new Date(date).toLocaleDateString('vi-VN');
-    };
-  }
-
-  // Chuẩn bị dữ liệu cho modal
-  const fields = [
-    { 
-      label: "Mã giao dịch", 
-      value: transaction.transactionId, 
-      showCopy: true,
-      important: true
     },
     { 
-      label: "Ngày giao dịch", 
-      value: formatDate(transaction.transactionDate),
-      type: "date"
     },
     { 
-      label: "Loại giao dịch", 
-      value: transaction.transactionType 
     },
     { 
-      label: "Tên khách hàng", 
-      value: transaction.customerName,
-      important: true
     },
     { 
-      label: "Email", 
-      value: transaction.customerEmail, 
-      showCopy: true,
-      type: "email"
     },
     {
-      label: "Số điện thoại",
-      value: transaction.customerPhone,
-      showCopy: true,
-      showExternalLink: true,
-      type: "phone"
     },
     { 
-      label: "Số tháng đăng ký", 
-      value: transaction.duration 
     },
     { 
-      label: "Ngày bắt đầu", 
-      value: formatDate(transaction.startDate),
-      type: "date"
     },
     { 
-      label: "Ngày kết thúc", 
-      value: formatDate(transaction.endDate),
-      type: "date"
     },
     { 
-      label: "Số thiết bị", 
-      value: transaction.deviceCount 
     },
     { 
-      label: "Tên phần mềm", 
-      value: transaction.softwareName 
     },
     { 
-      label: "Gói phần mềm", 
-      value: transaction.softwarePackage 
     },
     { 
-      label: "Tên tài khoản", 
-      value: transaction.accountName || "" 
     },
     { 
-      label: "ID Sheet Tài Khoản", 
-      value: transaction.accountSheetId || "",
-      showCopy: true,
-      type: "link"
     },
     { 
-      label: "Thông tin đơn hàng", 
-      value: transaction.orderInfo || "", 
-      showCopy: true 
     },
     { 
-      label: "Doanh thu", 
-      value: transaction.revenue,
-      type: "currency",
-      important: true
     },
     { 
-      label: "Ghi chú", 
-      value: transaction.note 
     },
     { 
-      label: "Tên nhân viên", 
-      value: transaction.tenNhanVien 
     },
     { 
-      label: "Mã nhân viên", 
-      value: transaction.maNhanVien 
     }
   ];
 
   // Lấy thông tin tài khoản bổ sung
-  try {
-    const { BACKEND_URL } = getConstants();
-    const res = await fetch(BACKEND_URL, {
-    });
-    const result = await res.json();
-    if (result.status === "success") {
-      fields.push({ 
-        label: "Tên đăng nhập", 
-        value: result.username || "", 
-        showCopy: true,
-        important: true
+  });
+
       });
-      fields.push({ 
-        label: "Mật khẩu đăng nhập", 
-        value: result.password || "", 
-        showCopy: true,
-        important: true
+  });
+
       });
-      fields.push({ 
-        label: "Secret", 
-        value: result.secret || "", 
-        showCopy: true 
+  });
+
       });
     } else {
     }

@@ -44,10 +44,7 @@ async function loadRevenueOverview() {
   // Calculate current and previous month revenue
   const currentMonthRevenue = calculateTotalRevenue(transactions, {
     startDate: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1),
-    endDate: currentMonth
-  
-  const lastMonthRevenue = calculateTotalRevenue(transactions, {
-    startDate: lastMonth,
+  });
     endDate: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 0)
   
   const growthRate = calculateGrowthRate(currentMonthRevenue, lastMonthRevenue);

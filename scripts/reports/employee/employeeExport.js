@@ -21,8 +21,7 @@ export class EmployeeExport {
             this.downloadExcelFile(workbookData, options.filename || 'employee-report.xlsx');
             
             return true;
-            
-        } catch (error) {
+  } catch (error) {
             console.error('❌ Excel export failed:', error);
             return false;
         }
@@ -38,8 +37,7 @@ export class EmployeeExport {
             this.downloadCSVFile(csvData, options.filename || 'employee-report.csv');
             
             return true;
-            
-        } catch (error) {
+  } catch (error) {
             console.error('❌ CSV export failed:', error);
             return false;
         }
@@ -55,8 +53,7 @@ export class EmployeeExport {
             console.log('PDF export not yet implemented');
             alert('Tính năng xuất PDF đang được phát triển');
             return false;
-            
-        } catch (error) {
+  } catch (error) {
             console.error('❌ PDF export failed:', error);
             return false;
         }
@@ -68,7 +65,7 @@ export class EmployeeExport {
     prepareExcelData(employees, departments) {
         const workbook = {
             SheetNames: ['Employees', 'Departments', 'Summary'],
-            Sheets: {}
+            Sheets: {};
         };
 
         // Employee sheet
@@ -86,7 +83,8 @@ export class EmployeeExport {
                 emp.transactionCount || 0,
                 emp.customerCount || 0,
                 emp.performanceScore || 0,
-                emp.performanceLevel || '',
+                emp.performanceLevel || ''
+  });
                 emp.lastActivity || ''
             ]);
         });
@@ -104,7 +102,8 @@ export class EmployeeExport {
                 dept.employeeCount || 0,
                 dept.totalRevenue || 0,
                 dept.totalCommission || 0,
-                Math.round(dept.avgPerformance || 0),
+                Math.round(dept.avgPerformance || 0)
+  });
                 dept.topPerformer?.name || ''
             ]);
         });
@@ -293,29 +292,6 @@ export class EmployeeExport {
     /**
      * Prepare individual employee report data
      */
-    prepareIndividualReport(employee) {
-        const headers = ['Chỉ số', 'Giá trị'];
-        const data = [
-            headers,
-            ['Mã nhân viên', employee.id],
-            ['Tên nhân viên', employee.name],
-            ['Phòng ban', employee.department],
-            ['Tổng doanh thu', employee.revenue],
-            ['Tổng hoa hồng', employee.commission],
-            ['Số giao dịch', employee.transactionCount],
-            ['Số khách hàng', employee.customerCount],
-            ['Điểm hiệu suất', employee.performanceScore],
-            ['Xếp loại hiệu suất', employee.performanceLevel],
-            ['Tỷ lệ gia hạn', employee.renewalRate + '%'],
-            ['Doanh thu TB/giao dịch', employee.avgDealSize],
-            ['Hoạt động gần nhất', employee.lastActivity]
-        ];
-
-        return {
-            csv: data,
-            excel: {
-                SheetNames: ['Employee Report'],
-                Sheets: {
                     'Employee Report': this.arrayToSheet(data)
                 }
             }
@@ -390,17 +366,6 @@ export class EmployeeExport {
         const format = document.querySelector('input[name="exportFormat"]:checked')?.value || 'csv';
         const exportOptions = Array.from(document.querySelectorAll('input[name="exportData"]:checked'))
             .map(input => input.value);
-
-        const { employees, departments } = this.pendingExportData || {};
-        
-        if (!employees) {
-            alert('Không có dữ liệu để xuất');
-            return;
-        }
-
-        switch (format) {
-            case 'csv':
-                this.exportToCSV(employees);
                 break;
             case 'excel':
                 this.exportToExcel(employees, departments);

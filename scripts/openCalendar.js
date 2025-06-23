@@ -1,23 +1,7 @@
 export function openCalendar(inputId, calculateEndDate, startDateInput, durationInput, endDateInput) {
     // Lấy ngày hiện tại
-    const today = new Date();
-    
-    // Lấy giá trị hiện tại của input (nếu có)
-    const currentValue = document.getElementById(inputId).value;
-    
-    // Kiểm tra xem đã có instance flatpickr chưa
-    const existingInstance = document.getElementById(inputId)._flatpickr;
-    if (existingInstance) {
-      // Luôn jump đến tháng hiện tại khi mở lại
-      existingInstance.jumpToDate(today);
-      existingInstance.open();
-      return;
-    }
-    
-    const fp = flatpickr(`#${inputId}`, {
-      dateFormat: "Y/m/d",
       defaultDate: currentValue || null, // Giữ giá trị hiện tại nếu có
-      inline: false,
+  });
       allowInput: true, // Cho phép nhập thủ công
       clickOpens: false, // Không mở calendar khi click vào input
       disableMobile: true, // Tắt mobile mode để giữ được input thủ công
@@ -41,7 +25,7 @@ export function openCalendar(inputId, calculateEndDate, startDateInput, duration
         if (inputId === "startDate" && typeof calculateEndDate === 'function') {
           try {
             calculateEndDate(startDateInput, durationInput, endDateInput);
-          } catch (error) {
+  } catch (error) {
             console.warn('Error calling calculateEndDate:', error);
           }
         }

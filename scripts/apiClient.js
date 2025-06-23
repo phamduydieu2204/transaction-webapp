@@ -6,14 +6,12 @@ import { getConstants } from './constants.js';
  * @returns {Promise<Response>}
  */
 export async function apiRequest(data) {
-  const { BACKEND_URL } = getConstants();
-  
-  return fetch(BACKEND_URL, {
-    method: 'POST',
-    headers: {
+
+  });
+
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(data)
+
   });
 }
 

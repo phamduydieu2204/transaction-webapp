@@ -4,9 +4,8 @@ function debugLayout() {
     
     // Viewport dimensions
     console.log('📐 Viewport:', {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        devicePixelRatio: window.devicePixelRatio
+  });
+
     });
     
     // Container element analysis
@@ -16,23 +15,9 @@ function debugLayout() {
         const containerStyles = window.getComputedStyle(container);
         
         console.log('📦 Container:', {
-            offsetWidth: container.offsetWidth,
-            clientWidth: container.clientWidth,
-            scrollWidth: container.scrollWidth,
-            boundingRect: {
-                width: containerRect.width,
-                left: containerRect.left,
-                right: containerRect.right
             },
-            computedStyles: {
-                width: containerStyles.width,
-                maxWidth: containerStyles.maxWidth,
-                minWidth: containerStyles.minWidth,
-                margin: containerStyles.margin,
-                padding: containerStyles.padding,
-                boxSizing: containerStyles.boxSizing,
-                position: containerStyles.position,
-                display: containerStyles.display
+  });
+
             }
         });
     } else {
@@ -45,20 +30,9 @@ function debugLayout() {
     const bodyStyles = window.getComputedStyle(body);
     
     console.log('🏢 Body:', {
-        offsetWidth: body.offsetWidth,
-        clientWidth: body.clientWidth,
-        scrollWidth: body.scrollWidth,
-        boundingRect: {
-            width: bodyRect.width,
-            left: bodyRect.left,
-            right: bodyRect.right
         },
-        computedStyles: {
-            width: bodyStyles.width,
-            maxWidth: bodyStyles.maxWidth,
-            margin: bodyStyles.margin,
-            padding: bodyStyles.padding,
-            overflow: bodyStyles.overflow
+  });
+
         }
     });
     
@@ -68,20 +42,9 @@ function debugLayout() {
     const htmlStyles = window.getComputedStyle(html);
     
     console.log('🌐 HTML:', {
-        offsetWidth: html.offsetWidth,
-        clientWidth: html.clientWidth,
-        scrollWidth: html.scrollWidth,
-        boundingRect: {
-            width: htmlRect.width,
-            left: htmlRect.left,
-            right: htmlRect.right
         },
-        computedStyles: {
-            width: htmlStyles.width,
-            maxWidth: htmlStyles.maxWidth,
-            margin: htmlStyles.margin,
-            padding: htmlStyles.padding,
-            overflow: htmlStyles.overflow
+  });
+
         }
     });
     
@@ -96,16 +59,9 @@ function debugLayout() {
             const styles = window.getComputedStyle(current);
             
             console.log(`   Level ${level} - ${current.tagName}${current.className ? '.' + current.className : ''}:`, {
-                offsetWidth: current.offsetWidth,
-                clientWidth: current.clientWidth,
                 boundingRect: { width: rect.width, left: rect.left, right: rect.right },
-                computedStyles: {
-                    width: styles.width,
-                    maxWidth: styles.maxWidth,
-                    margin: styles.margin,
-                    padding: styles.padding,
-                    display: styles.display,
-                    position: styles.position
+  });
+
                 }
             });
             

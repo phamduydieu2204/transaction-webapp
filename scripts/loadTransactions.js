@@ -26,18 +26,7 @@ export async function loadTransactionsOptimized(userInfo, updateTable, formatDat
     console.warn("⚠️ Không có thông tin user, bỏ qua load transactions");
     return { status: "error", message: "Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại." };
   }
-
-  
-  const data = {
-    action: "getTransactions",
-    maNhanVien: userInfo.maNhanVien,
-    vaiTro: userInfo.vaiTro ? userInfo.vaiTro.toLowerCase() : "",
-    giaoDichNhinThay: userInfo.giaoDichNhinThay || "",
-    nhinThayGiaoDichCuaAi: userInfo.nhinThayGiaoDichCuaAi || "",
     // Add pagination parameters (backend needs to support these)
-    page: page,
-    limit: limit,
-    optimized: true
   };
 
   try {
@@ -69,24 +58,13 @@ export async function loadTransactionsOptimized(userInfo, updateTable, formatDat
           clearTimeout(timeoutId);
 
           return response;
-        } catch (error) {
+  } catch (error) {
           clearTimeout(timeoutId);
           throw error;
         }
       },
       { cacheDuration: 2 * 60 * 1000, forceRefresh: !useCache } // 2 minutes cache
     );
-    
-    if (result.status === "success") {
-      const transactions = result.data || [];
-      
-      // ✅ Cache the result for faster subsequent access
-      if (useCache) {
-        window.transactionCache = {
-          data: transactions,
-          page: page,
-          limit: limit,
-          timestamp: Date.now()
         };
       }
 
@@ -142,29 +120,11 @@ export async function loadTransactions(userInfo, updateTable, formatDate, editTr
     console.warn("⚠️ Không có thông tin user, bỏ qua load transactions");
     return { status: "error", message: "Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại." };
   }
-
-  
-  const { BACKEND_URL } = getConstants();
-  const data = {
-    action: "getTransactions",
-    maNhanVien: userInfo.maNhanVien,
-    vaiTro: userInfo.vaiTro ? userInfo.vaiTro.toLowerCase() : "",
-    giaoDichNhinThay: userInfo.giaoDichNhinThay || "",
-    nhinThayGiaoDichCuaAi: userInfo.nhinThayGiaoDichCuaAi || ""
   };
+  });
 
-  try {
-    // ✅ SỬ DỤNG TIMEOUT ĐỂ TRÁNH BLOCK UI QUÁ LÂU
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 giây timeout
-
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(data),
-      signal: controller.signal
     });
 
     clearTimeout(timeoutId);

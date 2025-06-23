@@ -11,16 +11,8 @@ export async function fetchSoftwareList(
 ) {
   const { BACKEND_URL } = getConstants();
   const data = { action: "getSoftwareList" };
-
-  try {
-    // Use request deduplication to prevent duplicate API calls
-    const result = await deduplicateRequest(
-      'software-list',
-      async () => {
-        const response = await fetch(BACKEND_URL, {
-          method: "POST",
+  });
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
         });
         return await response.json();
       },

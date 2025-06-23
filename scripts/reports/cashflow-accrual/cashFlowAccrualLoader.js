@@ -2,20 +2,6 @@
  * Cash Flow vs Accrual Report Loader
  * Handles initialization and UI management for cash flow vs accrual comparison
  */
-
-import { CashFlowAccrualCore } from './cashFlowAccrualCore.js';
-import { CashFlowAccrualCharts } from './cashFlowAccrualCharts.js';
-
-export class CashFlowAccrualLoader {
-    constructor() {
-        this.core = null;
-        this.charts = null;
-        this.isInitialized = false;
-        this.filters = {
-            dateRange: null,
-            categories: [],
-            viewMode: 'both',
-            granularity: 'monthly'
         };
     }
 
@@ -33,8 +19,7 @@ export class CashFlowAccrualLoader {
             this.renderDashboard();
             
             this.isInitialized = true;
-            
-        } catch (error) {
+  } catch (error) {
             console.error('❌ Failed to initialize Cash Flow vs Accrual comparison:', error);
             this.showError('Không thể khởi tạo module so sánh Cash Flow vs Accrual');
         }
@@ -49,8 +34,7 @@ export class CashFlowAccrualLoader {
             
             await this.core.loadData();
             console.log('Cash flow vs accrual data loaded successfully');
-            
-        } catch (error) {
+  } catch (error) {
             console.error('Error loading cash flow vs accrual data:', error);
             throw error;
         } finally {
@@ -124,9 +108,7 @@ export class CashFlowAccrualLoader {
             this.renderInsights();
             this.renderAllocationDetails();
             this.renderFilterOptions();
-            
-            
-        } catch (error) {
+  } catch (error) {
             console.error('Error rendering dashboard:', error);
             this.showError('Không thể hiển thị dashboard');
         }
@@ -428,21 +410,6 @@ export class CashFlowAccrualLoader {
         
         // Get selected categories
         const categoryCheckboxes = document.querySelectorAll('.category-checkbox:checked');
-        this.filters.categories = Array.from(categoryCheckboxes).map(cb => cb.value);
-        
-        this.updateDashboard();
-        this.showSuccess('Đã áp dụng bộ lọc');
-    }
-
-    /**
-     * Reset filters
-     */
-    resetFilters() {
-        this.filters = {
-            dateRange: null,
-            categories: [],
-            viewMode: 'both',
-            granularity: 'monthly'
         };
         
         // Reset form elements
@@ -471,8 +438,7 @@ export class CashFlowAccrualLoader {
             }
             
             this.showSuccess(`Xuất dữ liệu ${format.toUpperCase()} thành công`);
-            
-        } catch (error) {
+  } catch (error) {
             console.error('Export error:', error);
             this.showError('Không thể xuất dữ liệu');
         }
@@ -527,66 +493,16 @@ export class CashFlowAccrualLoader {
             await this.loadData();
             this.renderDashboard();
             this.showSuccess('Đã cập nhật dữ liệu');
-        } catch (error) {
+  } catch (error) {
             console.error('Refresh error:', error);
-            this.showError('Không thể cập nhật dữ liệu');
-        }
-    }
+  });
 
-    /**
-     * Helper methods
-     */
-    formatCurrency(amount) {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
         }).format(amount);
     }
-
-    getStatusText(status) {
-        const statusTexts = {
-            excellent: 'Tuyệt vời',
-            good: 'Tốt',
-            warning: 'Cảnh báo',
-            critical: 'Nghiêm trọng'
         };
-        return statusTexts[status] || status;
-    }
-
-    getInsightIcon(type) {
-        const icons = {
-            info: 'ℹ️',
-            warning: '⚠️',
-            success: '✅'
         };
-        return icons[type] || 'ℹ️';
-    }
-
-    getRecommendationIcon(priority) {
-        const icons = {
-            high: '🔴',
-            medium: '🟡',
-            low: '🟢'
         };
-        return icons[priority] || '🟡';
-    }
-
-    getAllocationMethodText(method) {
-        const methods = {
-            immediate: 'Ngay lập tức',
-            monthly: 'Hàng tháng',
-            annual: 'Hàng năm'
         };
-        return methods[method] || method;
-    }
-
-    /**
-     * Show loading state
-     */
-    showLoading(show) {
-        const loader = document.querySelector('.cashflow-loading');
-        if (loader) {
-            loader.style.display = show ? 'block' : 'none';
         }
     }
 

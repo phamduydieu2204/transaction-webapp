@@ -57,7 +57,7 @@ class DOMBatcher {
     reads.forEach(op => {
       try {
         op.execute();
-      } catch (error) {
+  } catch (error) {
         console.error('DOM read error:', error);
       }
     });
@@ -66,43 +66,16 @@ class DOMBatcher {
     writes.forEach(op => {
       try {
         op.execute();
-      } catch (error) {
+  } catch (error) {
         console.error('DOM write error:', error);
       }
     });
     
     // Clear operations
-    this.operations = [];
-    this.isProcessing = false;
-  }
-}
-
-// Global instance
-const domBatcher = new DOMBatcher();
-
-/**
- * Batch DOM read operation
- */
-export function batchRead(fn) {
-  return new Promise((resolve) => {
-    domBatcher.add({
-      type: 'read',
-      execute: () => {
-        const result = fn();
-        resolve(result);
-      }
-    });
   });
-}
 
-/**
- * Batch DOM write operation
- */
-export function batchWrite(fn) {
-  return new Promise((resolve) => {
-    domBatcher.add({
-      type: 'write',
-      execute: () => {
+  });
+
         const result = fn();
         resolve(result);
       }

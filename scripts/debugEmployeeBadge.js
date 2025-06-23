@@ -9,16 +9,9 @@ export function debugEmployeeBadge() {
   if (window.transactionList && window.transactionList.length > 0) {
     const firstTransaction = window.transactionList[0];
     console.log('📄 First transaction data:', {
-      transactionId: firstTransaction.transactionId,
-      maNhanVien: firstTransaction.maNhanVien,
-      tenNhanVien: firstTransaction.tenNhanVien,
-      employeeCode: firstTransaction.employeeCode,
-      employeeName: firstTransaction.employeeName,
-      staffCode: firstTransaction.staffCode,
-      staffName: firstTransaction.staffName,
-      user: firstTransaction.user,
-      creator: firstTransaction.creator,
-      allKeys: Object.keys(firstTransaction)
+
+  });
+
     });
     
     // Check ALL possible employee-related fields
@@ -37,13 +30,9 @@ export function debugEmployeeBadge() {
     console.log('📄 Sample transaction employee data:');
     sampleTransactions.forEach((t, i) => {
       console.log(`  Transaction ${i + 1}:`, {
-        id: t.transactionId,
-        maNhanVien: t.maNhanVien,
-        tenNhanVien: t.tenNhanVien,
-        employeeCode: t.employeeCode,
-        employeeName: t.employeeName,
-        staffCode: t.staffCode,
-        user: t.user
+
+  });
+
       });
     });
   } else {
@@ -71,13 +60,9 @@ export function debugEmployeeBadge() {
   if (employeeBadges.length > 0) {
     employeeBadges.forEach((badge, i) => {
       console.log(`  Badge ${i + 1}:`, {
-        text: badge.textContent,
-        visible: window.getComputedStyle(badge).display !== 'none',
-        styles: {
-          position: window.getComputedStyle(badge).position,
-          top: window.getComputedStyle(badge).top,
-          right: window.getComputedStyle(badge).right,
-          fontSize: window.getComputedStyle(badge).fontSize
+
+  });
+
         }
       });
     });
@@ -188,18 +173,7 @@ export function testEmployeeColors() {
         { bg: '#17a2b8', border: '#138496', name: 'Cyan' },
         { bg: '#ffc107', border: '#d39e00', name: 'Yellow' },
       ];
-      
-      let hash = 0;
-      for (let i = 0; i < code.length; i++) {
-        const char = code.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash;
-      }
-      
-      const colorIndex = Math.abs(hash) % colors.length;
-      const color = colors[colorIndex];
-      const textColor = colorIndex === 9 ? '#000' : '#fff';
-      
+
       return { ...color, textColor, index: colorIndex };
     };
     
@@ -245,9 +219,7 @@ export function testContactTruncation() {
     'Short text',
     'This is a very long contact information that should be truncated'
   ];
-  
-  testContacts.forEach(contact => {
-    const truncated = contact.length > 15 ? contact.substring(0, 15) + '...' : contact;
+
     console.log(`✂️ "${contact}" → "${truncated}" (${contact.length} → ${truncated.length} chars)`);
   });
   

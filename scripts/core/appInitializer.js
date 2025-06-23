@@ -6,116 +6,10 @@
  */
 
 // Import core dependencies
-import { getConstants } from '../constants.js';
-import { updateAccountList } from '../updateAccountList.js';
-import { updatePackageList } from '../updatePackageList.js';
-import { fetchSoftwareList } from '../fetchSoftwareList.js';
-import { loadTransactions, loadTransactionsOptimized } from '../loadTransactions.js';
-import { ultraFastInit, shouldUseUltraFast } from './ultraFastInit.js';
-import { updateTable } from '../updateTableUltraFast.js';
-import { formatDate } from '../formatDate.js';
-import { editTransaction } from '../editTransaction.js';
-import { deleteTransaction } from '../deleteTransaction.js';
-import { viewTransaction } from '../viewTransaction.js';
-import { initExpenseDropdowns } from '../initExpenseDropdowns.js';
-import { renderExpenseStats } from '../renderExpenseStats.js';
-import { initTotalDisplay } from '../updateTotalDisplay.js';
-import { initExpenseQuickSearch } from '../expenseQuickSearch.js';
-
-/**
- * Initialize global variables and state
- */
-export function initializeGlobals() {
-  // Core state variables
-  window.userInfo = null;
-  window.currentEditIndex = -1;
-  window.currentEditTransactionId = null;
-  window.transactionList = [];
-  window.today = new Date();
-  window.todayFormatted = `${window.today.getFullYear()}/${String(window.today.getMonth() + 1).padStart(2, '0')}/${String(window.today.getDate()).padStart(2, '0')}`;
-  window.currentPage = 1;
-  window.itemsPerPage = 10; // Đồng bộ với yêu cầu: 10 items/trang cho cả transaction và expense
-  window.softwareData = [];
-  window.confirmCallback = null;
-  window.currentSoftwareName = "";
-  window.currentSoftwarePackage = "";
-  window.currentAccountName = "";
-  window.isExpenseSearching = false;
-  window.expenseList = [];
-
-}
-
-/**
- * Load and validate user information from localStorage
- * @returns {boolean} True if user is authenticated
- */
-export function loadUserInfo() {
-  const userData = localStorage.getItem("employeeInfo");
-  
-  try {
-    window.userInfo = userData ? JSON.parse(userData) : null;
   } catch (e) {
     console.error('❌ Error parsing user data:', e);
-    window.userInfo = null;
-  }
-
-  if (!window.userInfo) {
-    console.warn('⚠️ No user information found');
-    return false;
-  }
-
-  return true;
-}
-
-/**
- * Initialize user interface elements
- */
-export function initializeUI() {
-  // Display user welcome message
-  const userWelcomeElement = document.getElementById("userWelcome");
-  if (userWelcomeElement && window.userInfo) {
-    userWelcomeElement.textContent = 
-      `Xin chào ${window.userInfo.tenNhanVien} (${window.userInfo.maNhanVien}) - ${window.userInfo.vaiTro}`;
-  }
-
-  // Initialize total display system
-  initTotalDisplay();
-
-}
-
-/**
- * Load initial data for the application
- */
-export async function loadInitialData() {
-
-  try {
-    // Check if we should use ultra-fast mode
-    if (shouldUseUltraFast()) {
-      const success = await ultraFastInit(window.userInfo);
-      if (success) {
-        return;
-      }
-      console.warn('⚠️ Ultra-fast init failed, falling back to optimized mode');
-    }
-
-    // Phase 1: Critical data only (parallel loading)
-    const softwareDataPromise = loadSoftwareData();
-    
-    // Wait for software data (needed for dropdowns)
-    await softwareDataPromise;
-    
-    // Phase 2: Tab-specific data (parallel loading for statistics)
-    
     // Load both transaction and expense data in parallel
     // This ensures statistics tab has data available immediately
-    const dataPromises = [
-      loadTransactionDataOptimized(),
-      loadExpenseData()
-    ];
-    
-    await Promise.all(dataPromises);
-    
-    // Phase 3: Initialize minimal features
     await initializeMinimalFeatures();
     
     console.log('✅ Initial data loaded successfully (optimized)');
@@ -149,87 +43,22 @@ async function loadSoftwareData() {
 /**
  * Load transaction data optimized for performance
  */
-async function loadTransactionDataOptimized() {
-  
-  try {
-    // Ultra-fast initial load with minimal data
-    const initialPageSize = 10; // Đồng bộ với yêu cầu: 10 items/trang
-    window.currentPage = 1;
-    window.itemsPerPage = initialPageSize;
-    
-    // Show loading indicator immediately
-    const tableBody = document.querySelector('#transactionTable tbody');
-    if (tableBody) {
-      tableBody.innerHTML = '<tr><td colspan="10" class="text-center">🔄 Đang tải dữ liệu...</td></tr>';
-    }
-    
-    // Load transactions without blocking UI using optimized function
-    await loadTransactionsOptimized(
-      window.userInfo,
-      updateTable,
-      formatDate,
-      editTransaction,
-      deleteTransaction,
-      viewTransaction,
-      {
-        page: 1,
-        limit: initialPageSize,
-        useCache: true,
-        showProgress: true
+  });
+
       }
     );
-    
-    
+
     // Preload next page in background after UI settles
-    setTimeout(async () => {
-      if (window.transactionList && window.transactionList.length >= initialPageSize) {
-        // Increase page size for subsequent loads
-        window.itemsPerPage = 10; // Đồng bộ: 10 items/trang
       }
     }, 2000);
-    
   } catch (error) {
     console.error('❌ Failed to load transaction data:', error);
-    const tableBody = document.querySelector('#transactionTable tbody');
-    if (tableBody) {
-      tableBody.innerHTML = '<tr><td colspan="10" class="text-center text-danger">❌ Lỗi tải dữ liệu</td></tr>';
-    }
-  }
-}
-
-/**
- * Legacy transaction data loading (kept for compatibility)
- */
-async function loadTransactionData() {
-  return await loadTransactionDataOptimized();
-}
-
-/**
- * Load expense data for statistics and reports
- */
-async function loadExpenseData() {
-  
-  try {
-    const { BACKEND_URL } = getConstants();
-    
-    if (!window.userInfo || !window.userInfo.maNhanVien) {
-      console.warn('⚠️ No user info available to load expenses');
-      window.expenseList = [];
-      return;
-    }
-    
-    const data = {
-      action: 'searchExpenses',
-      maNhanVien: window.userInfo.maNhanVien,
       conditions: {} // Empty conditions to get all expenses
     };
-    
-    const response = await fetch(BACKEND_URL, {
-      method: 'POST',
-      headers: {
+  });
+
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data)
     });
     
     if (!response.ok) {
@@ -244,7 +73,6 @@ async function loadExpenseData() {
       console.error('❌ Error loading expenses:', result.message);
       window.expenseList = [];
     }
-    
   } catch (error) {
     console.error('❌ Failed to load expense data:', error);
     window.expenseList = [];
@@ -380,71 +208,12 @@ export function initializeConstants() {
     console.log('✅ Constants initialized');
   } catch (error) {
     console.error('❌ Error initializing constants:', error);
-    throw error;
-  }
-}
-
-/**
- * Setup development mode features
- */
-export function setupDevelopmentMode() {
-  const isDevelopment = window.location.hostname === 'localhost' || 
-                       window.location.hostname === '127.0.0.1' ||
-                       window.location.search.includes('debug=true');
-
-  if (isDevelopment) {
-    
-    // Enable debug logging
-    window.DEBUG = true;
-    
-    // Add debug information to window object
-    window.debugInfo = {
-      version: '1.0.0',
-      buildTime: new Date().toISOString(),
-      userAgent: navigator.userAgent
     };
     
     // Log performance information
-    if (window.performance && window.performance.timing) {
-      setTimeout(() => {
-        const timing = window.performance.timing;
-        const loadTime = timing.loadEventEnd - timing.navigationStart;
-      }, 0);
-    }
-  }
-}
-
-/**
- * Main application initialization function
- * @returns {Promise<boolean>} True if initialization successful
- */
-export async function initializeApp() {
-  
-  try {
-    // Step 1: Initialize globals and constants
-    initializeGlobals();
-    initializeConstants();
-    
-    // Step 2: Setup error handling
-    setupErrorHandling();
-    
-    // Step 3: Setup development mode if applicable
-    setupDevelopmentMode();
-    
-    // Step 4: Load and validate user
-    const isAuthenticated = loadUserInfo();
-    if (!isAuthenticated) {
-      return false;
-    }
-    
-    // Step 5: Initialize UI
-    initializeUI();
-    
-    // Step 6: Load initial data
     await loadInitialData();
     
     return true;
-    
   } catch (error) {
     console.error('❌ Application initialization failed:', error);
     

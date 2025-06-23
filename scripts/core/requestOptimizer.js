@@ -4,42 +4,6 @@
  */
 
 // Track in-flight requests
-const pendingRequests = new Map();
-const requestCache = new Map();
-
-/**
- * Deduplicate API requests
- * @param {string} key - Unique key for the request
- * @param {Function} requestFn - Function that returns a promise
- * @param {Object} options - Cache options
- * @returns {Promise} - Cached or new request promise
- */
-export async function deduplicateRequest(key, requestFn, options = {}) {
-  const {
-    cacheDuration = 5 * 60 * 1000, // 5 minutes default
-    forceRefresh = false
-  } = options;
-
-  // Check if request is already in flight
-  if (pendingRequests.has(key)) {
-    return pendingRequests.get(key);
-  }
-
-  // Check cache if not forcing refresh
-  if (!forceRefresh && requestCache.has(key)) {
-    const cached = requestCache.get(key);
-    if (Date.now() - cached.timestamp < cacheDuration) {
-      return Promise.resolve(cached.data);
-    }
-  }
-
-  // Create new request
-  const requestPromise = requestFn()
-    .then(data => {
-      // Cache successful response
-      requestCache.set(key, {
-        data,
-        timestamp: Date.now()
       });
       return data;
     })
@@ -120,7 +84,7 @@ export class RequestBatcher {
       batch.forEach((b, index) => {
         b.resolve(results[index]);
       });
-    } catch (error) {
+  } catch (error) {
       // Reject all promises in batch
       batch.forEach(b => {
         b.reject(error);

@@ -9,33 +9,13 @@ export async function handleUpdateCookie(index, transactionList) {
   
   if (!transaction) {
     console.error('❌ No transaction found at index:', index);
-    return alert("Không tìm thấy giao dịch.");
-  }
-
-  const modal = document.getElementById("updateCookieModal");
-  const currentCookieEl = document.getElementById("currentCookie");
-  const newCookieEl = document.getElementById("newCookie");
-
-  currentCookieEl.value = "";
-  newCookieEl.value = "";
-  window.currentCookieTransaction = transaction;
-
-  // Lấy cookie hiện tại và tên file
-  try {
-    const { BACKEND_URL } = getConstants();
-    showProcessingModal("Đang tải cookie...");
-    
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "getCookieAndFileName",
-        accountSheetId: transaction.accountSheetId
+  });
+
       })
     });
     const result = await response.json();
-    
-    
+
     // Cập nhật cookie content
     currentCookieEl.value = result.cookie || "(Không có dữ liệu)";
     
@@ -48,21 +28,6 @@ export async function handleUpdateCookie(index, transactionList) {
     }
     
     // Lấy thông tin username và password từ API
-    try {
-      const accountResponse = await fetch(BACKEND_URL, {
-      });
-      const accountResult = await accountResponse.json();
-      
-      
-      // Cập nhật username và password
-      const usernameEl = document.getElementById("currentUsername");
-      const passwordEl = document.getElementById("currentPassword");
-      
-      if (accountResult.status === "success") {
-        if (usernameEl) usernameEl.value = accountResult.username || "";
-        if (passwordEl) passwordEl.value = accountResult.password || "";
-      } else {
-        // Fallback: hiển thị accountName nếu không lấy được username
         if (usernameEl) usernameEl.value = transaction.accountName || "";
         if (passwordEl) passwordEl.value = "";
       }
@@ -101,7 +66,6 @@ export function copyCurrentCookie() {
   });
 }
 
-
 export async function confirmUpdateCookie() {
   
   try {
@@ -139,11 +103,11 @@ export async function confirmUpdateCookie() {
       return; // Không đóng modal, để user sửa
     }
 
-    
     const { BACKEND_URL } = getConstants();
     showProcessingModal("Đang cập nhật Cookie...");
     
     const response = await fetch(BACKEND_URL, {
+  });
     });
     
     const result = await response.json();
@@ -184,6 +148,7 @@ export async function cancelUpdateCookie() {
 
     const { BACKEND_URL } = getConstants();
     await fetch(BACKEND_URL, {
+  });
     });
     
   } catch (err) {
@@ -202,8 +167,6 @@ export function closeUpdateCookieModal() {
     console.error('❌ Modal not found');
   }
 }
-
-
 
 function disableInteraction() {
   const overlay = document.getElementById("formOverlay");

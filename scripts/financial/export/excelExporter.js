@@ -88,32 +88,14 @@ function addSummarySheet(workbook, metrics) {
     { width: 20 },
     { width: 15 }
   ];
-
-  XLSX.utils.book_append_sheet(workbook, ws, 'Tổng quan');
-}
-
-/**
- * Add transaction data sheet to workbook
- * @param {Object} workbook - XLSX workbook
- * @param {Array} transactionData - Transaction data
- */
-function addTransactionSheet(workbook, transactionData) {
-  if (!transactionData || transactionData.length === 0) {
-    const ws = XLSX.utils.aoa_to_sheet([['Không có dữ liệu giao dịch']]);
-    XLSX.utils.book_append_sheet(workbook, ws, 'Giao dịch');
-    return;
-  }
-
-  // Prepare transaction data for export
-  const exportData = transactionData.map(transaction => ({
-    'Ngày tạo': transaction.ngayTao || '',
     'Khách hàng': transaction.customer || '',
     'Phần mềm': transaction.software || '',
     'Gói': transaction.package || '',
     'Doanh thu': parseFloat(transaction.revenue) || 0,
     'Ngày bắt đầu': transaction.ngayBatDau || '',
     'Ngày kết thúc': transaction.ngayKetThuc || '',
-    'Loại giao dịch': transaction.transactionType || '',
+    'Loại giao dịch': transaction.transactionType || ''
+  });
     'Ghi chú': transaction.notes || ''
   }));
 
@@ -131,29 +113,11 @@ function addTransactionSheet(workbook, transactionData) {
     { width: 15 }, // Loại giao dịch
     { width: 30 }  // Ghi chú
   ];
-
-  XLSX.utils.book_append_sheet(workbook, ws, 'Giao dịch');
-}
-
-/**
- * Add expense data sheet to workbook
- * @param {Object} workbook - XLSX workbook
- * @param {Array} expenseData - Expense data
- */
-function addExpenseSheet(workbook, expenseData) {
-  if (!expenseData || expenseData.length === 0) {
-    const ws = XLSX.utils.aoa_to_sheet([['Không có dữ liệu chi phí']]);
-    XLSX.utils.book_append_sheet(workbook, ws, 'Chi phí');
-    return;
-  }
-
-  // Prepare expense data for export
-  const exportData = expenseData.map(expense => ({
-    'Ngày tạo': expense.ngayTao || expense.date || '',
     'Loại chi phí': expense.loaiChiPhi || expense.category || '',
     'Mô tả': expense.moTa || expense.description || '',
     'Số tiền': parseFloat(expense.soTien || expense.amount) || 0,
-    'Phương thức thanh toán': expense.phuongThucThanhToan || expense.paymentMethod || '',
+    'Phương thức thanh toán': expense.phuongThucThanhToan || expense.paymentMethod || ''
+  });
     'Ghi chú': expense.ghiChu || expense.notes || ''
   }));
 
@@ -168,42 +132,12 @@ function addExpenseSheet(workbook, expenseData) {
     { width: 20 }, // Phương thức thanh toán
     { width: 30 }  // Ghi chú
   ];
-
-  XLSX.utils.book_append_sheet(workbook, ws, 'Chi phí');
-}
-
-/**
- * Add revenue analysis sheet to workbook
- * @param {Object} workbook - XLSX workbook
- * @param {Object} metrics - Financial metrics
- */
-function addRevenueAnalysisSheet(workbook, metrics) {
-  const revenueByOrgSoftware = metrics.revenueByOrgSoftware || {};
-  
-  if (Object.keys(revenueByOrgSoftware).length === 0) {
-    const ws = XLSX.utils.aoa_to_sheet([['Không có dữ liệu phân tích doanh thu']]);
-    XLSX.utils.book_append_sheet(workbook, ws, 'Phân tích DT');
-    return;
-  }
-
-  // Header
-  const analysisData = [
-    ['PHÂN TÍCH DOANH THU THEO PHẦN MỀM', '', '', '', ''],
-    ['Phần mềm', 'Doanh thu', 'Số giao dịch', 'Trung bình', '% Tổng DT']
-  ];
-
-  const totalRevenue = metrics.totalRevenue || 0;
-
-  // Add software data
-  Object.values(revenueByOrgSoftware)
-    .sort((a, b) => b.revenue - a.revenue)
-    .forEach(software => {
-      const percentage = totalRevenue > 0 ? ((software.revenue / totalRevenue) * 100).toFixed(1) : '0';
       analysisData.push([
         software.name,
         software.revenue,
         software.transactionCount,
-        software.averageValue,
+        software.averageValue
+  });
         percentage + '%'
       ]);
     });
@@ -227,42 +161,12 @@ function addRevenueAnalysisSheet(workbook, metrics) {
     { width: 15 }, // Trung bình
     { width: 12 }  // % Tổng DT
   ];
-
-  XLSX.utils.book_append_sheet(workbook, ws, 'Phân tích DT');
-}
-
-/**
- * Add expense analysis sheet to workbook
- * @param {Object} workbook - XLSX workbook
- * @param {Object} metrics - Financial metrics
- */
-function addExpenseAnalysisSheet(workbook, metrics) {
-  const expensesByCategory = metrics.expensesByCategory || {};
-  
-  if (Object.keys(expensesByCategory).length === 0) {
-    const ws = XLSX.utils.aoa_to_sheet([['Không có dữ liệu phân tích chi phí']]);
-    XLSX.utils.book_append_sheet(workbook, ws, 'Phân tích CP');
-    return;
-  }
-
-  // Header
-  const analysisData = [
-    ['PHÂN TÍCH CHI PHÍ THEO DANH MỤC', '', '', '', ''],
-    ['Danh mục', 'Chi phí', 'Số lượng', 'Trung bình', '% Tổng CP']
-  ];
-
-  const totalExpenses = metrics.totalExpenses || 0;
-
-  // Add category data
-  Object.values(expensesByCategory)
-    .sort((a, b) => b.amount - a.amount)
-    .forEach(category => {
-      const percentage = totalExpenses > 0 ? ((category.amount / totalExpenses) * 100).toFixed(1) : '0';
       analysisData.push([
         category.name,
         category.amount,
         category.count,
-        category.averageAmount,
+        category.averageAmount
+  });
         percentage + '%'
       ]);
     });
@@ -355,7 +259,8 @@ function generateTransactionCSV(transactionData) {
       transaction.customer || '',
       transaction.software || '',
       transaction.package || '',
-      parseFloat(transaction.revenue) || 0,
+      parseFloat(transaction.revenue) || 0
+  });
       transaction.transactionType || ''
     ]);
   });
@@ -376,7 +281,8 @@ function generateExpenseCSV(expenseData) {
     rows.push([
       expense.ngayTao || expense.date || '',
       expense.loaiChiPhi || expense.category || '',
-      expense.moTa || expense.description || '',
+      expense.moTa || expense.description || ''
+  });
       parseFloat(expense.soTien || expense.amount) || 0
     ]);
   });

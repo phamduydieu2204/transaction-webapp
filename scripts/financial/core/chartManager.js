@@ -8,23 +8,6 @@
 /**
  * Global storage for chart instances
  */
-const chartInstances = new Map();
-
-/**
- * Default chart colors palette
- */
-export const CHART_COLORS = {
-  primary: '#007bff',
-  success: '#28a745', 
-  danger: '#dc3545',
-  warning: '#ffc107',
-  info: '#17a2b8',
-  light: '#f8f9fa',
-  dark: '#343a40',
-  revenue: '#28a745',
-  expense: '#dc3545',
-  profit: '#007bff',
-  gradient: {
     revenue: ['#28a745', '#20c997'],
     expense: ['#dc3545', '#fd7e14'],
     profit: ['#007bff', '#6610f2']
@@ -34,42 +17,13 @@ export const CHART_COLORS = {
 /**
  * Default chart options
  */
-export const DEFAULT_CHART_OPTIONS = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      position: 'top',
-      labels: {
-        usePointStyle: true,
-        padding: 20
       }
     },
-    tooltip: {
       backgroundColor: 'rgba(0,0,0,0.8)',
-      titleColor: '#fff',
-      bodyColor: '#fff',
-      borderColor: '#007bff',
-      borderWidth: 1,
-      cornerRadius: 6,
-      displayColors: true
     }
   },
-  scales: {
-    y: {
-      beginAtZero: true,
-      grid: {
         color: 'rgba(0,0,0,0.1)'
       },
-      ticks: {
-        callback: function(value) {
-          return formatCurrencyForChart(value);
-        }
-      }
-    },
-    x: {
-      grid: {
-        display: false
       }
     }
   }
@@ -99,56 +53,13 @@ export function createOrUpdateChart(canvasId, config) {
     return chart;
   } catch (error) {
     console.error(`Error creating chart ${canvasId}:`, error);
-    return null;
-  }
-}
-
-/**
- * Destroy a chart instance
- * @param {string} canvasId - Canvas element ID
- */
-export function destroyChart(canvasId) {
-  if (chartInstances.has(canvasId)) {
-    chartInstances.get(canvasId).destroy();
-    chartInstances.delete(canvasId);
-  }
-}
-
-/**
- * Destroy all chart instances
- */
-export function destroyAllCharts() {
-  chartInstances.forEach((chart, canvasId) => {
-    chart.destroy();
-  });
-  chartInstances.clear();
-}
-
-/**
- * Create line chart configuration
- * @param {Array} labels - Chart labels
- * @param {Array} datasets - Chart datasets
- * @param {Object} options - Additional options
- * @returns {Object} Chart configuration
- */
-export function createLineChartConfig(labels, datasets, options = {}) {
-  return {
-    type: 'line',
-    data: {
-      labels,
-      datasets: datasets.map(dataset => ({
         ...dataset,
-        tension: 0.4,
-        fill: false,
-        pointRadius: 4,
-        pointHoverRadius: 6,
-        borderWidth: 3
+  });
+
       }))
     },
-    options: {
       ...DEFAULT_CHART_OPTIONS,
       ...options,
-      plugins: {
         ...DEFAULT_CHART_OPTIONS.plugins,
         ...options.plugins
       }
@@ -163,21 +74,13 @@ export function createLineChartConfig(labels, datasets, options = {}) {
  * @param {Object} options - Additional options
  * @returns {Object} Chart configuration
  */
-export function createBarChartConfig(labels, datasets, options = {}) {
-  return {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: datasets.map(dataset => ({
         ...dataset,
-        borderRadius: 4,
-        borderSkipped: false
+  });
+
       }))
     },
-    options: {
       ...DEFAULT_CHART_OPTIONS,
       ...options,
-      plugins: {
         ...DEFAULT_CHART_OPTIONS.plugins,
         ...options.plugins
       }
@@ -192,35 +95,10 @@ export function createBarChartConfig(labels, datasets, options = {}) {
  * @param {Object} options - Additional options
  * @returns {Object} Chart configuration
  */
-export function createPieChartConfig(labels, data, options = {}) {
-  const colors = generateColorPalette(labels.length);
-  
-  return {
-    type: 'pie',
-    data: {
-      labels,
-      datasets: [{
-        data,
-        backgroundColor: colors,
-        borderColor: '#fff',
-        borderWidth: 2,
-        hoverOffset: 10
       }]
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'right',
-          labels: {
-            usePointStyle: true,
-            padding: 20
           }
         },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
               const total = context.dataset.data.reduce((a, b) => a + b, 0);
               const percentage = ((context.parsed / total) * 100).toFixed(1);
               return `${context.label}: ${formatCurrencyForChart(context.parsed)} (${percentage}%)`;
@@ -240,22 +118,8 @@ export function createPieChartConfig(labels, data, options = {}) {
  * @param {Object} options - Additional options
  * @returns {Object} Chart configuration
  */
-export function createDoughnutChartConfig(labels, data, options = {}) {
-  const config = createPieChartConfig(labels, data, options);
-  config.type = 'doughnut';
-  
-  return {
-    ...config,
-    options: {
       ...config.options,
-      cutout: '60%',
-      plugins: {
         ...config.options.plugins,
-        legend: {
-          position: 'bottom',
-          labels: {
-            usePointStyle: true,
-            padding: 15
           }
         }
       }

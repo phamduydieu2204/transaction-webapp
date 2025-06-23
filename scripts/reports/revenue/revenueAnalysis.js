@@ -25,22 +25,6 @@ import {
  * @param {Object} options.dateRange - Date range filter {start: 'yyyy/mm/dd', end: 'yyyy/mm/dd'}
  * @param {string} options.period - Period name (e.g., 'this_month', 'last_month')
  */
-export async function loadRevenueAnalysis(options = {}) {
-  
-  try {
-    // Load template
-    await loadRevenueAnalysisHTML();
-    
-    // Ensure data is loaded
-    await ensureDataIsLoaded();
-    
-    // Get data
-    const transactions = window.transactionList || getFromStorage('transactions') || [];
-    const expenses = window.expenseList || getFromStorage('expenses') || [];
-    
-      transactions: transactions.length,
-      expenses: expenses.length
-    
     // Get date range from options or global filters
     const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
     const period = options.period || window.globalFilters?.period || 'this_month';
@@ -60,8 +44,6 @@ export async function loadRevenueAnalysis(options = {}) {
     
     // Setup event handlers
     setupRevenueAnalysisHandlers();
-    
-    
   } catch (error) {
     console.error('❌ Error loading revenue analysis:', error);
     showError('Không thể tải phân tích doanh thu');
@@ -84,8 +66,6 @@ async function loadRevenueAnalysisHTML() {
     const html = await response.text();
     container.innerHTML = html;
     container.classList.add('active');
-    
-    
   } catch (error) {
     console.error('❌ Could not load revenue analysis template:', error);
     throw error;
@@ -140,127 +120,27 @@ function calculateRevenueMetrics(transactions) {
   let grossRevenue = 0; // Doanh thu từ "đã hoàn tất" + "đã thanh toán"
   let refundAmount = 0; // Số tiền hoàn trả từ "hoàn tiền"
   let highestTransaction = { amount: 0, customer: '', product: '' };
-  let validTransactionCount = 0;
-  
-  transactions.forEach(rawTransaction => {
-    const t = normalizeTransaction(rawTransaction);
-    if (!t) return;
-    
-    const status = (t.transactionType || t.loaiGiaoDich || '').toLowerCase().trim();
-    const amount = t.revenue || 0;
-    
-    if (status === 'đã hoàn tất' || status === 'đã thanh toán') {
-      grossRevenue += amount;
-      validTransactionCount++;
-      
-      if (amount > highestTransaction.amount) {
-        highestTransaction = {
-          amount: amount,
-          customer: t.customerName || 'N/A',
-          product: t.softwareName || 'N/A'
+  });
+
         };
       }
     } else if (status === 'hoàn tiền') {
-      refundAmount += Math.abs(amount); // Đảm bảo số dương để trừ
-    }
-  });
-  
-  // Doanh thu gộp = "Đã thanh toán" + "Đã hoàn tất" - "Hoàn tiền"
-  const totalRevenue = grossRevenue - refundAmount;
-  const avgTransactionValue = validTransactionCount > 0 ? totalRevenue / validTransactionCount : 0;
-  
-  return {
-    totalRevenue,
-    grossRevenue, // Doanh thu trước khi trừ hoàn tiền
-    refundAmount, // Số tiền hoàn trả
-    avgTransactionValue,
-    transactionCount: validTransactionCount,
-    highestTransaction
-  };
-}
-
-/**
- * Render revenue trend chart
- */
-async function renderRevenueTrendChart(transactions, period) {
-  
-  const canvas = document.getElementById('revenue-trend-chart');
-  if (!canvas) return;
-  
-  // Ensure Chart.js is loaded
-  if (typeof Chart === 'undefined') {
-    await loadChartJS();
-  }
-  
-  const ctx = canvas.getContext('2d');
-  
-  // Prepare trend data based on period
-  const trendData = prepareTrendData(transactions, period);
-  
-  // Destroy existing chart
-  if (window.revenueTrendChart) {
-    window.revenueTrendChart.destroy();
-  }
-  
-  // Create new chart
-  window.revenueTrendChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: trendData.labels,
-      datasets: [{
-        label: 'Doanh thu',
-        data: trendData.values,
-        borderColor: '#3b82f6',
         backgroundColor: 'rgba(59, 130, 246, 0.1)',
-        borderWidth: 3,
-        fill: true,
-        tension: 0.4,
-        pointRadius: 6,
-        pointHoverRadius: 8,
-        pointBackgroundColor: '#3b82f6',
-        pointBorderColor: '#ffffff',
-        pointBorderWidth: 2
+  });
+
       }]
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: {
-        intersect: false,
-        mode: 'index'
       },
-      plugins: {
-        legend: {
-          display: false
         },
-        tooltip: {
           backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          titleColor: 'white',
-          bodyColor: 'white',
-          borderColor: '#3b82f6',
-          borderWidth: 1,
-          callbacks: {
-            label: function(context) {
               return `Doanh thu: ${formatRevenue(context.parsed.y)}`;
             }
           }
         }
       },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: function(value) {
-              return formatRevenue(value);
-            }
-          },
-          grid: {
             color: 'rgba(0, 0, 0, 0.1)'
           }
         },
-        x: {
-          grid: {
-            display: false
           }
         }
       }
@@ -271,55 +151,15 @@ async function renderRevenueTrendChart(transactions, period) {
 /**
  * Render revenue category chart (pie/bar)
  */
-async function renderRevenueCategoryChart(transactions) {
-  
-  const canvas = document.getElementById('revenue-category-chart');
-  if (!canvas) return;
-  
-  // Ensure Chart.js is loaded
-  if (typeof Chart === 'undefined') {
-    await loadChartJS();
-  }
-  
-  const ctx = canvas.getContext('2d');
-  
-  // Calculate revenue by category/software
-  const categoryData = calculateRevenueByCategory(transactions);
-  
-  // Destroy existing chart
-  if (window.revenueCategoryChart) {
-    window.revenueCategoryChart.destroy();
-  }
-  
-  // Create pie chart
-  window.revenueCategoryChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: categoryData.labels,
-      datasets: [{
-        data: categoryData.values,
-        backgroundColor: [
           '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
           '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'
         ],
-        borderWidth: 2,
-        borderColor: '#ffffff'
       }]
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'right',
-          labels: {
-            usePointStyle: true,
-            padding: 20
+  });
+
           }
         },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
               const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
               const percentage = ((context.parsed / total) * 100).toFixed(1);
               return `${context.label}: ${formatRevenue(context.parsed)} (${percentage}%)`;
@@ -334,81 +174,6 @@ async function renderRevenueCategoryChart(transactions) {
 /**
  * Load top customers by revenue
  */
-async function loadTopCustomersByRevenue(transactions) {
-  
-  const customerRevenue = calculateCustomerRevenue(transactions);
-  const topCustomers = customerRevenue
-    .sort((a, b) => b.revenue - a.revenue)
-    .slice(0, 10);
-  
-  const tbody = document.getElementById('customers-revenue-tbody');
-  if (!tbody) return;
-  
-  if (topCustomers.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="7" class="no-data">Không có dữ liệu khách hàng</td>
-      </tr>
-    `;
-    return;
-  }
-  
-  const totalRevenue = customerRevenue.reduce((sum, c) => sum + c.revenue, 0);
-  
-  tbody.innerHTML = topCustomers.map((customer, index) => {
-    const percentage = totalRevenue > 0 ? ((customer.revenue / totalRevenue) * 100).toFixed(1) : 0;
-    const trend = calculateCustomerTrend(customer.name, transactions);
-    
-    return `
-      <tr>
-        <td class="rank-col">${index + 1}</td>
-        <td class="customer-col">
-          <div class="customer-info">
-            <span class="customer-name">${customer.name}</span>
-            <small class="customer-email">${customer.email || 'N/A'}</small>
-          </div>
-        </td>
-        <td class="transactions-col">${customer.transactionCount}</td>
-        <td class="revenue-col">${formatRevenue(customer.revenue)}</td>
-        <td class="avg-col">${formatRevenue(customer.avgValue)}</td>
-        <td class="percentage-col">${percentage}%</td>
-        <td class="trend-col">
-          <span class="trend ${trend.type}">
-            <i class="fas fa-${trend.icon}"></i>
-            ${trend.value}%
-          </span>
-        </td>
-      </tr>
-    `;
-  }).join('');
-}
-
-/**
- * Load top products by revenue
- */
-async function loadTopProductsByRevenue(transactions) {
-  
-  const productRevenue = calculateProductRevenue(transactions);
-  const topProducts = productRevenue
-    .sort((a, b) => b.revenue - a.revenue)
-    .slice(0, 10);
-  
-  const tbody = document.getElementById('products-revenue-tbody');
-  if (!tbody) return;
-  
-  if (topProducts.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="7" class="no-data">Không có dữ liệu sản phẩm</td>
-      </tr>
-    `;
-    return;
-  }
-  
-  const totalRevenue = productRevenue.reduce((sum, p) => sum + p.revenue, 0);
-  
-  tbody.innerHTML = topProducts.map((product, index) => {
-    const marketShare = totalRevenue > 0 ? ((product.revenue / totalRevenue) * 100).toFixed(1) : 0;
     const performance = calculateProductPerformance(product);
     
     return `
@@ -520,14 +285,6 @@ function updateChangeElement(id, change) {
     element.className = `kpi-change ${isPositive ? 'positive' : 'negative'}`;
   }
 }
-
-function updateInsightElement(id, value) {
-  const element = document.getElementById(id);
-  if (element) element.textContent = value;
-}
-
-function calculatePercentageChange(previous, current) {
-  if (previous === 0) return current > 0 ? 100 : 0;
   return ((current - previous) / previous) * 100;
 }
 
@@ -555,64 +312,10 @@ function prepareTrendData(transactions, period) {
     values: [100000, 150000, 120000, 180000] // Should use trendMetrics.totalRevenue for real implementation
   };
 }
-
-function calculateRevenueByCategory(transactions) {
-  const categories = {};
-  const refunds = {}; // Theo dõi hoàn tiền theo danh mục
-  
-  transactions.forEach(rawTransaction => {
-    const t = normalizeTransaction(rawTransaction);
-    if (!t) return;
-    
-    const status = (t.transactionType || t.loaiGiaoDich || '').toLowerCase().trim();
-    const category = t.softwareName || 'Khác';
-    const revenue = t.revenue || 0;
-    
-    if (!categories[category]) {
-      categories[category] = 0;
-      refunds[category] = 0;
-    }
-    
-    if (status === 'đã hoàn tất' || status === 'đã thanh toán') {
-      categories[category] += revenue;
-    } else if (status === 'hoàn tiền') {
-      refunds[category] += Math.abs(revenue);
-    }
-  });
-  
-  // Tính doanh thu gộp = doanh thu - hoàn tiền cho mỗi danh mục
-  const finalCategories = {};
-  Object.keys(categories).forEach(category => {
-    const netRevenue = categories[category] - refunds[category];
-    if (netRevenue > 0) { // Chỉ hiển thị danh mục có doanh thu dương
-      finalCategories[category] = netRevenue;
-    }
-  });
-  
-  return {
-    labels: Object.keys(finalCategories),
-    values: Object.values(finalCategories)
   };
 }
+  });
 
-function calculateCustomerRevenue(transactions) {
-  const customers = {};
-  
-  transactions.forEach(rawTransaction => {
-    const t = normalizeTransaction(rawTransaction);
-    if (!t) return;
-    
-    const status = (t.transactionType || t.loaiGiaoDich || '').toLowerCase().trim();
-    const customerName = t.customerName || 'Không xác định';
-    const revenue = t.revenue || 0;
-    
-    if (!customers[customerName]) {
-      customers[customerName] = {
-        name: customerName,
-        email: t.customerEmail || '',
-        revenue: 0,
-        refunds: 0,
-        transactionCount: 0
       };
     }
     
@@ -628,32 +331,16 @@ function calculateCustomerRevenue(transactions) {
     .map(customer => {
       const netRevenue = customer.revenue - customer.refunds;
       return {
-        ...customer,
+        ...customer
+  });
         revenue: netRevenue, // Doanh thu gộp sau khi trừ hoàn tiền
-        avgValue: customer.transactionCount > 0 ? netRevenue / customer.transactionCount : 0
       };
     })
     .filter(customer => customer.revenue > 0); // Chỉ hiển thị khách hàng có doanh thu dương
 }
-
-function calculateProductRevenue(transactions) {
-  const products = {};
-  
-  transactions.forEach(rawTransaction => {
-    const t = normalizeTransaction(rawTransaction);
-    if (!t) return;
-    
-    const status = (t.transactionType || t.loaiGiaoDich || '').toLowerCase().trim();
-    const productName = t.softwareName || 'Không xác định';
-    const revenue = t.revenue || 0;
-    
-    if (!products[productName]) {
-      products[productName] = {
-        name: productName,
         category: 'Software', // Could be enhanced with actual categories
-        revenue: 0,
-        refunds: 0,
-        quantity: 0
+  });
+
       };
     }
     
@@ -669,9 +356,9 @@ function calculateProductRevenue(transactions) {
     .map(product => {
       const netRevenue = product.revenue - product.refunds;
       return {
-        ...product,
+        ...product
+  });
         revenue: netRevenue, // Doanh thu gộp sau khi trừ hoàn tiền
-        avgPrice: product.quantity > 0 ? netRevenue / product.quantity : 0
       };
     })
     .filter(product => product.revenue > 0); // Chỉ hiển thị sản phẩm có doanh thu dương
@@ -692,25 +379,9 @@ function calculateProductPerformance(product) {
     return { class: 'average', icon: 'minus', label: 'Trung bình' };
   }
 }
-
-function generateRevenueInsights(transactions) {
-  // Placeholder implementation for insights generation
-  return {
-    bestPerformer: {
-      value: 'Software A',
-      description: 'Đóng góp 35% tổng doanh thu'
     },
-    growthTrend: {
-      value: '+25%',
-      description: 'Tăng trưởng ổn định trong 3 tháng qua'
     },
-    concentration: {
-      value: '80%',
-      description: 'Top 20% khách hàng đóng góp 80% doanh thu'
     },
-    risk: {
-      value: 'Trung bình',
-      description: 'Phụ thuộc vào 3 khách hàng lớn'
     }
   };
 }
@@ -768,5 +439,4 @@ function refreshCustomerTable(view) {
 function refreshProductTable(sort) {
   // Implementation for table refresh
 }
-
 
