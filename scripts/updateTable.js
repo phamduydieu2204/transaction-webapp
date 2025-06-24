@@ -1,4 +1,5 @@
 import { updatePagination } from './pagination.js';
+import { buildTransactionActionArray } from './utils/softwareUtils.js';
 import { updateTotalDisplay } from './updateTotalDisplay.js';
 import { batchWrite, debounce } from './core/domOptimizer.js';
 
@@ -371,30 +372,8 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
       row.classList.add("expired-row");
     }
 
-    const software = (transaction.softwareName || '').toLowerCase();
-    const softwarePackage = (transaction.softwarePackage || '').trim().toLowerCase();
-    const actions = [
-      { value: "", label: "-- Chọn --" },
-      { value: "view", label: "Xem" },
-      { value: "edit", label: "Sửa" },
-      { value: "delete", label: "Xóa" }
-    ];
-    const shouldShowCookie = (
-      software === "helium10 diamon".toLowerCase() ||
-      software === "helium10 platinum".toLowerCase() ||
-      (software === "netflix" && softwarePackage === "share")
-    );
-
-    if (shouldShowCookie) {
-      actions.push({ value: "updateCookie", label: "Cập nhật Cookie" });
-    } else {
-      actions.push({ value: "changePassword", label: "Đổi mật khẩu" });
-    }
-    
-    // Add "Check access" option if transaction has accountSheetId
-    if (transaction.accountSheetId && transaction.accountSheetId.trim() !== '') {
-      actions.push({ value: "checkAccess", label: "Kiểm tra quyền truy cập" });
-    }
+    // Build actions using utility function (includes check access logic)
+    const actions = buildTransactionActionArray(transaction);
 
     const actionOptions = actions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join("\n");
 
