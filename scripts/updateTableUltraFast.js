@@ -47,13 +47,27 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
 
   // Get background color based on transaction type
   const getTransactionRowColor = (transactionType, transactionId) => {
-    // Normalize the transaction type (trim, replace multiple spaces, lowercase)
+    // Normalize the transaction type (remove invisible chars, trim, replace spaces, lowercase)
     const normalizedType = (transactionType || "")
+      .replace(/[\u200B-\u200F\u2028-\u202F\u205F-\u206F\uFEFF]/g, '') // Remove invisible chars
       .trim()
       .replace(/\s+/g, ' ') // Replace multiple spaces with single space
       .toLowerCase();
     
-    // Transaction type normalization fixed - spaces handled properly
+    // Debug specific transaction with detailed character analysis
+    if (transactionId === 'GD2506241556') {
+      console.log('🔍 DEEP DEBUG GD2506241556:', {
+        rawType: transactionType,
+        rawTypeLength: transactionType.length,
+        rawCharCodes: [...transactionType].map(char => ({ char, code: char.charCodeAt(0) })),
+        normalizedType: normalizedType,
+        normalizedLength: normalizedType.length,
+        normalizedCharCodes: [...normalizedType].map(char => ({ char, code: char.charCodeAt(0) })),
+        expectedMatch: normalizedType === "đã hoàn tất",
+        exactBytes: new TextEncoder().encode(transactionType),
+        hasInvisibleChars: /[\u200B-\u200F\u2028-\u202F\u205F-\u206F\uFEFF]/.test(transactionType)
+      });
+    }
     
     switch (normalizedType) {
       case "chưa thanh toán":
@@ -61,12 +75,21 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       case "đã thanh toán":
         return "#E0F7FA"; // Light cyan
       case "hoàn tiền":
+        if (transactionId === 'GD2506241556') {
+          console.log('❌ GD2506241556 WRONGLY matched HOÀN TIỀN!');
+        }
         return "#FFEBEE"; // Light red
       case "hủy giao dịch":
         return "#F5F5F5"; // Light gray
       case "đã hoàn tất":
+        if (transactionId === 'GD2506241556') {
+          console.log('✅ GD2506241556 correctly matched ĐÃ HOÀN TẤT');
+        }
         return ""; // Keep default/current color
       default:
+        if (transactionId === 'GD2506241556') {
+          console.log('❓ GD2506241556 fell to DEFAULT case, normalized:', normalizedType);
+        }
         return ""; // Keep default/current color
     }
   };
