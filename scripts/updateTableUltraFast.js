@@ -228,12 +228,11 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     
     // Debug for first few transactions
     if (index < 3) {
-      console.log(`🔍 Transaction ${index}:`, {
-        id: transaction.transactionId,
-        fileType: transaction.fileType,
-        buildFunctionAvailable: !!window.buildTransactionActionOptions,
-        actionOptions: actionOptions.slice(0, 200) + '...'
-      });
+      console.log(`🔍 Transaction ${index}:`);
+      console.log(`  - id: ${transaction.transactionId}`);
+      console.log(`  - fileType: ${transaction.fileType}`);
+      console.log(`  - buildFunctionAvailable: ${!!window.buildTransactionActionOptions}`);
+      console.log(`  - actionOptions:`, actionOptions);
     }
 
     // Create usage cycle cell with icons and 3 lines

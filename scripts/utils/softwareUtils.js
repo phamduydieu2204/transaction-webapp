@@ -68,14 +68,14 @@ export function getTransactionFileType(transaction) {
   
   // Debug log for first transaction
   if (transaction.transactionId === 'GD2506241926') {
-    console.log('🔍 DEBUG GD2506241926:', {
-      directFileType,
-      fileType: transaction.fileType,
-      loaiTep: transaction.loaiTep,
-      'Loại tệp': transaction['Loại tệp'],
-      type: transaction.type,
-      allKeys: Object.keys(transaction)
-    });
+    console.log('🔍 DEBUG GD2506241926:');
+    console.log('  - directFileType:', directFileType);
+    console.log('  - transaction.fileType:', transaction.fileType);
+    console.log('  - transaction.loaiTep:', transaction.loaiTep);
+    console.log('  - transaction["Loại tệp"]:', transaction['Loại tệp']);
+    console.log('  - transaction.type:', transaction.type);
+    console.log('  - allKeys:', Object.keys(transaction));
+    console.log('  - full transaction:', transaction);
   }
   
   if (directFileType && directFileType.trim() !== '') {
