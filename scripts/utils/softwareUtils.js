@@ -184,7 +184,7 @@ export function buildTransactionActionOptions(transaction) {
     
     // Add specific actions based on file type
     if (fileTypeLower === 'docs') {
-      actionOptions += `<option value="viewCookie">Xem Cookie</option>`;
+      actionOptions += `<option value="updateCookie">Xem Cookie</option>`;
       actionOptions += `<option value="checkAccess">Kiểm tra quyền</option>`;
     } else if (fileTypeLower === 'sheet') {
       actionOptions += `<option value="changePassword">Đổi mật khẩu</option>`;
@@ -217,7 +217,7 @@ export function buildTransactionActionArray(transaction) {
     
     // Add specific actions based on file type
     if (fileTypeLower === 'docs') {
-      actions.push({ value: "viewCookie", label: "Xem Cookie" });
+      actions.push({ value: "updateCookie", label: "Xem Cookie" });
       actions.push({ value: "checkAccess", label: "Kiểm tra quyền" });
     } else if (fileTypeLower === 'sheet') {
       actions.push({ value: "changePassword", label: "Đổi mật khẩu" });
