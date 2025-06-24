@@ -53,6 +53,9 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       .replace(/\s+/g, ' ') // Replace multiple spaces with single space
       .toLowerCase();
     
+    // Debug all transactions to find GD2506241556
+    console.log('🔍 ALL TRANSACTIONS DEBUG:', transactionId, transactionType);
+    
     // Debug specific transaction to check actual values
     if (transactionId === 'GD2506241556') {
       console.log('🔍 SPECIFIC DEBUG for GD2506241556:', {
