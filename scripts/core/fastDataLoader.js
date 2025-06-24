@@ -77,7 +77,7 @@ class FastDataLoader {
    */
   async loadTransactionsPage(user, page = 1, limit = 20) {
     const { BACKEND_URL } = getConstants();
-    const cacheKey = `transactions-${user.id}-page${page}-limit${limit}`;
+    const cacheKey = `transactions-${user.maNhanVien}-page${page}-limit${limit}`;
     
     return deduplicateRequest(cacheKey, async () => {
       const response = await fetch(BACKEND_URL, {
@@ -87,7 +87,7 @@ class FastDataLoader {
           action: 'searchTransactions',
           page,
           limit,
-          maNhanVien: user.id,
+          maNhanVien: user.maNhanVien,
           filters: {}
         })
       });
@@ -105,15 +105,16 @@ class FastDataLoader {
    */
   async loadAllTransactions(user) {
     const { BACKEND_URL } = getConstants();
-    const cacheKey = `all-transactions-${user.id}`;
+    const cacheKey = `all-transactions-${user.maNhanVien}`;
     
     return deduplicateRequest(cacheKey, async () => {
       const response = await fetch(BACKEND_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'loadTransactions',
-          maNhanVien: user.id
+          action: 'searchTransactions',
+          maNhanVien: user.maNhanVien,
+          conditions: {}
         })
       });
 
@@ -130,21 +131,22 @@ class FastDataLoader {
    */
   async loadExpenses(user) {
     const { BACKEND_URL } = getConstants();
-    const cacheKey = `expenses-${user.id}`;
+    const cacheKey = `expenses-${user.maNhanVien}`;
     
     return deduplicateRequest(cacheKey, async () => {
       const response = await fetch(BACKEND_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'loadExpenses',
-          maNhanVien: user.id
+          action: 'searchExpenses',
+          maNhanVien: user.maNhanVien,
+          conditions: {}
         })
       });
 
       const data = await response.json();
       if (data.status === 'success') {
-        return data.expenses || [];
+        return data.data || [];
       }
       throw new Error(data.message || 'Failed to load expenses');
     }, { cacheDuration: 5 * 60 * 1000 });
