@@ -225,6 +225,16 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     const actionOptions = window.buildTransactionActionOptions ? 
       window.buildTransactionActionOptions(transaction) : 
       `<option value="">--</option><option value="view">Xem</option><option value="edit">Sửa</option><option value="delete">Xóa</option>`;
+    
+    // Debug for first few transactions
+    if (index < 3) {
+      console.log(`🔍 Transaction ${index}:`, {
+        id: transaction.transactionId,
+        fileType: transaction.fileType,
+        buildFunctionAvailable: !!window.buildTransactionActionOptions,
+        actionOptions: actionOptions.slice(0, 200) + '...'
+      });
+    }
 
     // Create usage cycle cell with icons and 3 lines
     const usageCycleCell = `

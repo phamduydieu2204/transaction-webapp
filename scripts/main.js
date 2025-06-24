@@ -108,6 +108,9 @@ import { checkSheetAccess } from './checkSheetAccess.js';
 import { editRow, deleteRow } from './legacy.js';
 import { getConstants } from './constants.js';
 
+// Import software utilities for action dropdown logic
+import './utils/softwareUtils.js';
+
 /**
  * Show login form when user is not authenticated
  */
