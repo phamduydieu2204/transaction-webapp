@@ -53,7 +53,23 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       .replace(/\s+/g, ' ') // Replace multiple spaces with single space
       .toLowerCase();
     
-    // Normalization fixed - spaces handled properly
+    // Debug specific transaction to check actual values
+    if (transactionId === 'GD2506241556') {
+      console.log('🔍 SPECIFIC DEBUG for GD2506241556:', {
+        originalType: `"${transactionType}"`,
+        normalizedType: `"${normalizedType}"`,
+        typeLength: normalizedType.length,
+        charCodes: [...normalizedType].map(char => char.charCodeAt(0)),
+        isExpectedMatch: normalizedType === "đã hoàn tất",
+        allCases: {
+          'chưa thanh toán': normalizedType === 'chưa thanh toán',
+          'đã thanh toán': normalizedType === 'đã thanh toán', 
+          'hoàn tiền': normalizedType === 'hoàn tiền',
+          'hủy giao dịch': normalizedType === 'hủy giao dịch',
+          'đã hoàn tất': normalizedType === 'đã hoàn tất'
+        }
+      });
+    }
     
     switch (normalizedType) {
       case "chưa thanh toán":
@@ -61,12 +77,21 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       case "đã thanh toán":
         return "#E0F7FA"; // Light cyan
       case "hoàn tiền":
+        if (transactionId === 'GD2506241556') {
+          console.log('❌ GD2506241556 matched HOÀN TIỀN case - returning pink color!');
+        }
         return "#FFEBEE"; // Light red
       case "hủy giao dịch":
         return "#F5F5F5"; // Light gray
       case "đã hoàn tất":
+        if (transactionId === 'GD2506241556') {
+          console.log('✅ GD2506241556 matched ĐÃ HOÀN TẤT case - returning no color');
+        }
         return ""; // Keep default/current color
       default:
+        if (transactionId === 'GD2506241556') {
+          console.log('❓ GD2506241556 fell to DEFAULT case - returning no color');
+        }
         return ""; // Keep default/current color
     }
   };
@@ -295,11 +320,38 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
         const transaction = paginatedItems[index];
         const rowBackgroundColor = getTransactionRowColor(transaction.transactionType, transaction.transactionId);
         
-        // CSS application logic
+        // Debug CSS application for specific transaction
+        if (transaction.transactionId === 'GD2506241556') {
+          console.log('🎨 CSS DEBUG for GD2506241556:', {
+            transactionType: transaction.transactionType,
+            returnedColor: rowBackgroundColor,
+            willApplyCSS: !!rowBackgroundColor,
+            elementBefore: row.style.backgroundColor,
+            computedBefore: window.getComputedStyle(row).backgroundColor
+          });
+        }
         
         if (rowBackgroundColor) {
           row.style.backgroundColor = rowBackgroundColor;
           row.style.setProperty('background-color', rowBackgroundColor, 'important');
+          
+          // Debug after CSS application
+          if (transaction.transactionId === 'GD2506241556') {
+            console.log('🎨 CSS APPLIED for GD2506241556:', {
+              appliedColor: rowBackgroundColor,
+              elementAfter: row.style.backgroundColor,
+              computedAfter: window.getComputedStyle(row).backgroundColor
+            });
+          }
+        } else {
+          // Debug when no color is applied
+          if (transaction.transactionId === 'GD2506241556') {
+            console.log('🎨 NO CSS for GD2506241556:', {
+              noColorApplied: true,
+              elementStays: row.style.backgroundColor,
+              computedStays: window.getComputedStyle(row).backgroundColor
+            });
+          }
         }
       }
     });
