@@ -56,7 +56,7 @@ function getTempFileTypeMappingByStandardName(standardName) {
 
 /**
  * Get file type from software data based on standardName (Tên chuẩn)
- * @param {string} standardName - Standard name from transaction (Tên chuẩn từ cột M sheet GiaoDich)
+ * @param {string} standardName - Standard name from transaction (Tên chuẩn từ cột T sheet GiaoDich)
  * @returns {string|null} File type ('docs', 'sheet', etc.) or null if not found
  */
 export function getSoftwareFileType(standardName) {
@@ -72,9 +72,9 @@ export function getSoftwareFileType(standardName) {
   
   console.log('🔍 Looking for software match by standardName:', standardName);
   
-  // Find matching software entry by standardName (Tên chuẩn - column M)
+  // Find matching software entry by standardName (Tên chuẩn - column M in PhanMem sheet)
   const matchingSoftware = window.softwareData.find(software => {
-    // Try different possible field names for standardName
+    // Try different possible field names for standardName in software data
     const softwareStandardName = software.standardName || 
                                   software.tenChuan || 
                                   software['Tên chuẩn'] || 
@@ -136,7 +136,7 @@ export function getSoftwareFileType(standardName) {
  * @returns {boolean} True if Cookie actions should be shown
  */
 export function shouldShowCookieActions(transaction) {
-  // Get standardName from transaction (Tên chuẩn - column M from GiaoDich sheet)
+  // Get standardName from transaction (Tên chuẩn - column T from GiaoDich sheet)
   const standardName = transaction.standardName || 
                        transaction.tenChuan || 
                        transaction['Tên chuẩn'] || 
@@ -161,7 +161,7 @@ export function shouldShowCookieActions(transaction) {
  * @returns {boolean} True if Password Change actions should be shown
  */
 export function shouldShowPasswordActions(transaction) {
-  // Get standardName from transaction (Tên chuẩn - column M from GiaoDich sheet)
+  // Get standardName from transaction (Tên chuẩn - column T from GiaoDich sheet)
   const standardName = transaction.standardName || 
                        transaction.tenChuan || 
                        transaction['Tên chuẩn'] || 
@@ -185,7 +185,7 @@ export function shouldShowCheckAccessActions(transaction) {
     return false;
   }
   
-  // Get standardName from transaction (Tên chuẩn - column M from GiaoDich sheet)
+  // Get standardName from transaction (Tên chuẩn - column T from GiaoDich sheet)
   const standardName = transaction.standardName || 
                        transaction.tenChuan || 
                        transaction['Tên chuẩn'] || 
