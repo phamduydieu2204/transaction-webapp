@@ -5,32 +5,7 @@ import { closeProcessingModal } from './closeProcessingModal.js';
 import { renderExpenseStats } from './renderExpenseStats.js';
 
 export async function handleSearchExpense() {
-  // Kiểm tra xem có phải global search không để hiển thị thông báo phù hợp
-  const expenseNote = document.getElementById("expenseNote")?.value?.trim() || "";
   const getValue = (id) => document.getElementById(id)?.value?.trim() || "";
-  
-  const otherFields = [
-    getValue("expenseDate"),
-    getValue("expenseCategory"),
-    getValue("expenseSubCategory"),
-    getValue("expenseProduct"),
-    getValue("expensePackage"),
-    getValue("expenseAmount"),
-    getValue("expenseCurrency"),
-    getValue("expenseBank"),
-    getValue("expenseCard"),
-    getValue("expenseRecurring"),
-    getValue("expenseRenewDate"),
-    getValue("expenseSupplier"),
-    getValue("expenseStatus")
-  ].filter(val => val && val !== "" && val !== "0" && val !== "yyyy/mm/dd");
-  
-  const isQuickGlobalCheck = expenseNote && otherFields.length === 0;
-  
-  showProcessingModal(isQuickGlobalCheck ? 
-    `🌍 Tìm kiếm toàn cục cho: "${expenseNote}"...` : 
-    "Đang tìm kiếm chi phí...");
-  const { BACKEND_URL } = getConstants();
   
   // Kiểm tra có phải admin không
   const isAdmin = window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin";
@@ -61,6 +36,11 @@ export async function handleSearchExpense() {
   
   // Kiểm tra nếu chỉ có trường ghi chú được nhập -> Tìm kiếm toàn cục
   const isGlobalSearch = expenseNote && otherFields.length === 0;
+  
+  showProcessingModal(isGlobalSearch ? 
+    `🌍 Tìm kiếm toàn cục cho: "${expenseNote}"...` : 
+    "Đang tìm kiếm chi phí...");
+  const { BACKEND_URL } = getConstants();
   
   // Lấy các điều kiện tìm kiếm từ form
   const conditions = {};
