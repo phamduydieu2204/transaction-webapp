@@ -53,16 +53,7 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       .replace(/\s+/g, ' ') // Replace multiple spaces with single space
       .toLowerCase();
     
-    // Debug specific transaction
-    if (transactionId === 'GD2506241556') {
-      console.log('🎨 DEBUG màu nền GD2506241556:', {
-        originalType: transactionType,
-        normalizedType: normalizedType,
-        typeLength: normalizedType.length,
-        typeCharCodes: [...normalizedType].map(char => char.charCodeAt(0)),
-        matchesExpected: normalizedType === "đã hoàn tất"
-      });
-    }
+    // Normalization fixed - spaces handled properly
     
     switch (normalizedType) {
       case "chưa thanh toán":
@@ -74,10 +65,8 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       case "hủy giao dịch":
         return "#F5F5F5"; // Light gray
       case "đã hoàn tất":
-        console.log('✅ Matched "đã hoàn tất" - returning empty color for:', transactionId);
         return ""; // Keep default/current color
       default:
-        console.log('❌ No match for type:', normalizedType, 'transaction:', transactionId);
         return ""; // Keep default/current color
     }
   };
@@ -306,15 +295,7 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
         const transaction = paginatedItems[index];
         const rowBackgroundColor = getTransactionRowColor(transaction.transactionType, transaction.transactionId);
         
-        // Debug for specific transaction
-        if (transaction.transactionId === 'GD2506241556') {
-          console.log('🎨 DEBUG CSS application for GD2506241556:', {
-            rowBackgroundColor: rowBackgroundColor,
-            willApplyColor: !!rowBackgroundColor,
-            currentBgColor: row.style.backgroundColor,
-            computedBgColor: window.getComputedStyle(row).backgroundColor
-          });
-        }
+        // CSS application logic
         
         if (rowBackgroundColor) {
           row.style.backgroundColor = rowBackgroundColor;
