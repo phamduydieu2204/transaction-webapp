@@ -12,8 +12,16 @@
  */
 export function getSoftwareFileType(softwareName, softwarePackage, accountName) {
   if (!window.softwareData || !Array.isArray(window.softwareData)) {
+    console.warn('❌ softwareData not available or not an array');
     return null;
   }
+  
+  console.log('🔍 Looking for software match:', {
+    softwareName,
+    softwarePackage,
+    accountName,
+    totalSoftwareData: window.softwareData.length
+  });
   
   // Find matching software entry
   const matchingSoftware = window.softwareData.find(software => {
@@ -21,8 +29,30 @@ export function getSoftwareFileType(softwareName, softwarePackage, accountName) 
     const packageMatch = (software.softwarePackage || '').toLowerCase() === (softwarePackage || '').toLowerCase();
     const accountMatch = (software.accountName || '').toLowerCase() === (accountName || '').toLowerCase();
     
+    // Debug each comparison
+    if (nameMatch && packageMatch) {
+      console.log('📋 Checking software:', {
+        software: software.softwareName,
+        package: software.softwarePackage,
+        account: software.accountName,
+        fileType: software.fileType,
+        nameMatch,
+        packageMatch,
+        accountMatch
+      });
+    }
+    
     return nameMatch && packageMatch && accountMatch;
   });
+  
+  if (matchingSoftware) {
+    console.log('✅ Found matching software:', {
+      softwareName: matchingSoftware.softwareName,
+      fileType: matchingSoftware.fileType
+    });
+  } else {
+    console.log('❌ No matching software found');
+  }
   
   return matchingSoftware ? matchingSoftware.fileType : null;
 }
@@ -89,21 +119,43 @@ export function shouldShowCheckAccessActions(transaction) {
  * @returns {string} HTML string of option elements
  */
 export function buildTransactionActionOptions(transaction) {
+  console.log('🔧 Building action options for transaction:', {
+    softwareName: transaction.softwareName,
+    softwarePackage: transaction.softwarePackage,
+    accountName: transaction.accountName,
+    accountSheetId: transaction.accountSheetId
+  });
+  
   // Always show basic actions
   let actionOptions = `<option value="">--</option><option value="view">Xem</option><option value="edit">Sửa</option><option value="delete">Xóa</option>`;
   
+  // Get file type for debugging
+  const fileType = getSoftwareFileType(
+    transaction.softwareName,
+    transaction.softwarePackage, 
+    transaction.accountName
+  );
+  
+  console.log(`📄 FileType for ${transaction.softwareName}: ${fileType}`);
+  
   // Add Cookie action if fileType is "docs"
-  if (shouldShowCookieActions(transaction)) {
+  const showCookie = shouldShowCookieActions(transaction);
+  console.log(`🍪 Show Cookie: ${showCookie}`);
+  if (showCookie) {
     actionOptions += `<option value="updateCookie">Cookie</option>`;
   }
   
   // Add Password Change action if fileType is "sheet"
-  if (shouldShowPasswordActions(transaction)) {
+  const showPassword = shouldShowPasswordActions(transaction);
+  console.log(`🔑 Show Password: ${showPassword}`);
+  if (showPassword) {
     actionOptions += `<option value="changePassword">Đổi MK</option>`;
   }
   
   // Add Check Access action if conditions are met
-  if (shouldShowCheckAccessActions(transaction)) {
+  const showCheckAccess = shouldShowCheckAccessActions(transaction);
+  console.log(`🔍 Show Check Access: ${showCheckAccess}`);
+  if (showCheckAccess) {
     actionOptions += `<option value="checkAccess">Kiểm tra quyền</option>`;
   }
   
@@ -142,6 +194,49 @@ export function buildTransactionActionArray(transaction) {
   return actions;
 }
 
+// Debug function to check software data
+export function debugSoftwareData() {
+  if (!window.softwareData) {
+    console.error('❌ No software data loaded');
+    return;
+  }
+  
+  console.log('📊 Software Data Summary:');
+  console.log(`Total entries: ${window.softwareData.length}`);
+  
+  // Group by fileType
+  const fileTypeGroups = {};
+  window.softwareData.forEach(item => {
+    const type = item.fileType || 'null/empty';
+    if (!fileTypeGroups[type]) {
+      fileTypeGroups[type] = [];
+    }
+    fileTypeGroups[type].push({
+      name: item.softwareName,
+      package: item.softwarePackage,
+      account: item.accountName
+    });
+  });
+  
+  console.log('\n📄 Software grouped by fileType:');
+  Object.entries(fileTypeGroups).forEach(([type, items]) => {
+    console.log(`\n${type} (${items.length} items):`);
+    console.table(items.slice(0, 5)); // Show first 5 of each type
+  });
+  
+  // Sample entries with fileType
+  const withFileType = window.softwareData.filter(item => item.fileType);
+  console.log(`\n✅ Entries with fileType: ${withFileType.length}`);
+  if (withFileType.length > 0) {
+    console.table(withFileType.slice(0, 10).map(item => ({
+      softwareName: item.softwareName,
+      softwarePackage: item.softwarePackage,
+      accountName: item.accountName,
+      fileType: item.fileType
+    })));
+  }
+}
+
 // Make functions available globally for backward compatibility
 window.getSoftwareFileType = getSoftwareFileType;
 window.shouldShowCookieActions = shouldShowCookieActions;
@@ -149,3 +244,4 @@ window.shouldShowPasswordActions = shouldShowPasswordActions;
 window.shouldShowCheckAccessActions = shouldShowCheckAccessActions;
 window.buildTransactionActionOptions = buildTransactionActionOptions;
 window.buildTransactionActionArray = buildTransactionActionArray;
+window.debugSoftwareData = debugSoftwareData;

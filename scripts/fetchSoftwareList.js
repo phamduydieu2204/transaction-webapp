@@ -30,6 +30,17 @@ export async function fetchSoftwareList(
     if (result.status === "success") {
       // Cập nhật biến toàn cục
       window.softwareData = result.data;
+      
+      // Debug: Log first few software entries to check structure
+      console.log('📦 Software data loaded:', {
+        total: window.softwareData.length,
+        sample: window.softwareData.slice(0, 3).map(item => ({
+          softwareName: item.softwareName,
+          softwarePackage: item.softwarePackage,
+          accountName: item.accountName,
+          fileType: item.fileType
+        }))
+      });
 
       const softwareNames = [...new Set(window.softwareData.map(item => item.softwareName))];
       const softwareNameSelect = document.getElementById("softwareName");
