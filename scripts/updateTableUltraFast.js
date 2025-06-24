@@ -56,17 +56,13 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     
     // Debug specific transaction with detailed character analysis
     if (transactionId === 'GD2506241556') {
-      console.log('🔍 DEEP DEBUG GD2506241556:', {
-        rawType: transactionType,
-        rawTypeLength: transactionType.length,
-        rawCharCodes: [...transactionType].map(char => ({ char, code: char.charCodeAt(0) })),
-        normalizedType: normalizedType,
-        normalizedLength: normalizedType.length,
-        normalizedCharCodes: [...normalizedType].map(char => ({ char, code: char.charCodeAt(0) })),
-        expectedMatch: normalizedType === "đã hoàn tất",
-        exactBytes: new TextEncoder().encode(transactionType),
-        hasInvisibleChars: /[\u200B-\u200F\u2028-\u202F\u205F-\u206F\uFEFF]/.test(transactionType)
-      });
+      console.log('🔍 RAW TYPE:', `"${transactionType}"`);
+      console.log('🔍 RAW CHAR CODES:', [...transactionType].map(char => `${char}(${char.charCodeAt(0)})`));
+      console.log('🔍 NORMALIZED TYPE:', `"${normalizedType}"`);
+      console.log('🔍 NORMALIZED CHAR CODES:', [...normalizedType].map(char => `${char}(${char.charCodeAt(0)})`));
+      console.log('🔍 EXPECTED MATCH:', normalizedType === "đã hoàn tất");
+      console.log('🔍 HAS INVISIBLE CHARS:', /[\u200B-\u200F\u2028-\u202F\u205F-\u206F\uFEFF]/.test(transactionType));
+      console.log('🔍 EXACT BYTES:', Array.from(new TextEncoder().encode(transactionType)));
     }
     
     switch (normalizedType) {
@@ -322,6 +318,25 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
         if (rowBackgroundColor) {
           row.style.backgroundColor = rowBackgroundColor;
           row.style.setProperty('background-color', rowBackgroundColor, 'important');
+        }
+        
+        // Debug for specific transaction - force check final color
+        if (transaction.transactionId === 'GD2506241556') {
+          setTimeout(() => {
+            const computedStyle = window.getComputedStyle(row);
+            console.log('🎨 FINAL COLOR CHECK GD2506241556:', {
+              returnedColor: rowBackgroundColor,
+              inlineStyle: row.style.backgroundColor,
+              computedBgColor: computedStyle.backgroundColor,
+              allBgProperties: {
+                background: computedStyle.background,
+                backgroundImage: computedStyle.backgroundImage,
+                backgroundColor: computedStyle.backgroundColor
+              },
+              rowElement: row,
+              rowClasses: row.className
+            });
+          }, 100);
         }
       }
     });
