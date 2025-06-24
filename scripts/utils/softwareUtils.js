@@ -66,24 +66,10 @@ export function getTransactionFileType(transaction) {
                          transaction['Loại tệp'] || 
                          transaction.type;
   
-  // Debug log for first transaction
-  if (transaction.transactionId === 'GD2506241926') {
-    console.log('🔍 DEBUG GD2506241926:');
-    console.log('  - directFileType:', directFileType);
-    console.log('  - transaction.fileType:', transaction.fileType);
-    console.log('  - transaction.loaiTep:', transaction.loaiTep);
-    console.log('  - transaction["Loại tệp"]:', transaction['Loại tệp']);
-    console.log('  - transaction.type:', transaction.type);
-    console.log('  - allKeys:', Object.keys(transaction));
-    console.log('  - full transaction:', transaction);
-  }
-  
   if (directFileType && directFileType.trim() !== '') {
-    console.log('✅ Found fileType directly from transaction:', directFileType);
     return directFileType.toLowerCase().trim();
   }
   
-  console.log('⚠️ No fileType found in transaction column W');
   return null;
 }
 
@@ -190,14 +176,6 @@ export function buildTransactionActionOptions(transaction) {
   
   // Get file type from column W
   const fileType = getTransactionFileType(transaction);
-  
-  // Debug for specific transaction
-  if (transaction.transactionId === 'GD2506241926') {
-    console.log('🔍 buildTransactionActionOptions for GD2506241926:', {
-      fileType,
-      willAddExtraActions: !!fileType
-    });
-  }
   
   if (fileType) {
     const fileTypeLower = fileType.toLowerCase();
