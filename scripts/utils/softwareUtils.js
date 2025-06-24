@@ -55,12 +55,12 @@ function getTempFileTypeMappingByStandardName(standardName) {
 }
 
 /**
- * Get file type from transaction data or software data
+ * Get file type from transaction data (column W: "Loại tệp")
  * @param {Object} transaction - Transaction object
  * @returns {string|null} File type ('docs', 'sheet', etc.) or null if not found
  */
 export function getTransactionFileType(transaction) {
-  // First, try to get fileType directly from transaction (column W)
+  // Get fileType directly from transaction (column W: "Loại tệp")
   const directFileType = transaction.fileType || 
                          transaction.loaiTep || 
                          transaction['Loại tệp'] || 
@@ -71,18 +71,8 @@ export function getTransactionFileType(transaction) {
     return directFileType.toLowerCase().trim();
   }
   
-  // Fallback: try to get from software data using standardName
-  const standardName = transaction.standardName || 
-                       transaction.tenChuan || 
-                       transaction['Tên chuẩn'] || 
-                       transaction.softwareName;
-  
-  if (!standardName || standardName.trim() === '') {
-    console.warn('❌ No standardName available for fileType lookup');
-    return null;
-  }
-  
-  return getSoftwareFileTypeByStandardName(standardName);
+  console.log('⚠️ No fileType found in transaction column W');
+  return null;
 }
 
 /**
@@ -134,51 +124,33 @@ function getSoftwareFileTypeByStandardName(standardName) {
 }
 
 /**
- * Determine if Cookie actions should be shown based on file type
+ * Determine if Cookie actions should be shown based on file type from column W
  * @param {Object} transaction - Transaction object
  * @returns {boolean} True if Cookie actions should be shown
  */
 export function shouldShowCookieActions(transaction) {
-  // Get standardName from transaction (Tên chuẩn - column T from GiaoDich sheet)
-  const standardName = transaction.standardName || 
-                       transaction.tenChuan || 
-                       transaction['Tên chuẩn'] || 
-                       transaction.softwareName; // fallback to softwareName
-  
-  // Debug: Log available transaction fields for standardName
-  if (!transaction.standardName && !transaction.tenChuan && !transaction['Tên chuẩn']) {
-    console.log('⚠️ No standardName field found in transaction, available fields:', Object.keys(transaction));
-    console.log('🔄 Using fallback:', standardName);
-  }
-  
-  // Get file type from software data to determine action options
-  const fileType = getSoftwareFileTypeByStandardName(standardName);
+  // Get file type directly from transaction (column W: "Loại tệp")
+  const fileType = getTransactionFileType(transaction);
   
   // Only show Cookie if fileType is exactly "docs" (case insensitive)
   return fileType && fileType.toLowerCase() === 'docs';
 }
 
 /**
- * Determine if Password Change actions should be shown based on file type
+ * Determine if Password Change actions should be shown based on file type from column W
  * @param {Object} transaction - Transaction object
  * @returns {boolean} True if Password Change actions should be shown
  */
 export function shouldShowPasswordActions(transaction) {
-  // Get standardName from transaction (Tên chuẩn - column T from GiaoDich sheet)
-  const standardName = transaction.standardName || 
-                       transaction.tenChuan || 
-                       transaction['Tên chuẩn'] || 
-                       transaction.softwareName; // fallback to softwareName
-  
-  // Get file type from software data to determine action options
-  const fileType = getSoftwareFileTypeByStandardName(standardName);
+  // Get file type directly from transaction (column W: "Loại tệp")
+  const fileType = getTransactionFileType(transaction);
   
   // Only show Password Change if fileType is exactly "sheet" (case insensitive)
   return fileType && fileType.toLowerCase() === 'sheet';
 }
 
 /**
- * Determine if Check Access actions should be shown
+ * Determine if Check Access actions should be shown based on file type from column W
  * @param {Object} transaction - Transaction object
  * @returns {boolean} True if Check Access actions should be shown
  */
@@ -188,21 +160,15 @@ export function shouldShowCheckAccessActions(transaction) {
     return false;
   }
   
-  // Get standardName from transaction (Tên chuẩn - column T from GiaoDich sheet)
-  const standardName = transaction.standardName || 
-                       transaction.tenChuan || 
-                       transaction['Tên chuẩn'] || 
-                       transaction.softwareName; // fallback to softwareName
-  
-  // Get file type from software data
-  const fileType = getSoftwareFileTypeByStandardName(standardName);
+  // Get file type directly from transaction (column W: "Loại tệp")
+  const fileType = getTransactionFileType(transaction);
   
   // Show Check Access only if fileType is "docs" or "sheet"
   return fileType && (fileType.toLowerCase() === 'docs' || fileType.toLowerCase() === 'sheet');
 }
 
 /**
- * Build action options for transaction table based on file type
+ * Build action options for transaction table based on file type from column W
  * @param {Object} transaction - Transaction object
  * @returns {string} HTML string of option elements
  */
@@ -210,26 +176,27 @@ export function buildTransactionActionOptions(transaction) {
   // Always show basic actions
   let actionOptions = `<option value="">--</option><option value="view">Xem</option><option value="edit">Sửa</option><option value="delete">Xóa</option>`;
   
-  // Add Cookie action if fileType is "docs"
-  if (shouldShowCookieActions(transaction)) {
-    actionOptions += `<option value="updateCookie">Cookie</option>`;
-  }
+  // Get file type from column W
+  const fileType = getTransactionFileType(transaction);
   
-  // Add Password Change action if fileType is "sheet"
-  if (shouldShowPasswordActions(transaction)) {
-    actionOptions += `<option value="changePassword">Đổi MK</option>`;
-  }
-  
-  // Add Check Access action if conditions are met
-  if (shouldShowCheckAccessActions(transaction)) {
-    actionOptions += `<option value="checkAccess">Kiểm tra quyền</option>`;
+  if (fileType) {
+    const fileTypeLower = fileType.toLowerCase();
+    
+    // Add specific actions based on file type
+    if (fileTypeLower === 'docs') {
+      actionOptions += `<option value="viewCookie">Xem Cookie</option>`;
+      actionOptions += `<option value="checkAccess">Kiểm tra quyền</option>`;
+    } else if (fileTypeLower === 'sheet') {
+      actionOptions += `<option value="changePassword">Đổi mật khẩu</option>`;
+      actionOptions += `<option value="checkAccess">Kiểm tra quyền</option>`;
+    }
   }
   
   return actionOptions;
 }
 
 /**
- * Build action array for transaction table (used in updateTable.js)
+ * Build action array for transaction table based on file type from column W
  * @param {Object} transaction - Transaction object
  * @returns {Array} Array of action objects with value and label
  */
@@ -242,19 +209,20 @@ export function buildTransactionActionArray(transaction) {
     { value: "delete", label: "Xóa" }
   ];
   
-  // Add Cookie action if fileType is "docs"
-  if (shouldShowCookieActions(transaction)) {
-    actions.push({ value: "updateCookie", label: "Cookie" });
-  }
+  // Get file type from column W
+  const fileType = getTransactionFileType(transaction);
   
-  // Add Password Change action if fileType is "sheet"
-  if (shouldShowPasswordActions(transaction)) {
-    actions.push({ value: "changePassword", label: "Đổi MK" });
-  }
-  
-  // Add Check Access action if conditions are met
-  if (shouldShowCheckAccessActions(transaction)) {
-    actions.push({ value: "checkAccess", label: "Kiểm tra quyền" });
+  if (fileType) {
+    const fileTypeLower = fileType.toLowerCase();
+    
+    // Add specific actions based on file type
+    if (fileTypeLower === 'docs') {
+      actions.push({ value: "viewCookie", label: "Xem Cookie" });
+      actions.push({ value: "checkAccess", label: "Kiểm tra quyền" });
+    } else if (fileTypeLower === 'sheet') {
+      actions.push({ value: "changePassword", label: "Đổi mật khẩu" });
+      actions.push({ value: "checkAccess", label: "Kiểm tra quyền" });
+    }
   }
   
   return actions;
