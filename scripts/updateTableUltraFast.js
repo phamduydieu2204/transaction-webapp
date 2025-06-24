@@ -46,9 +46,19 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
   };
 
   // Get background color based on transaction type
-  const getTransactionRowColor = (transactionType) => {
+  const getTransactionRowColor = (transactionType, transactionId) => {
     // Normalize the transaction type (trim and lowercase for comparison)
     const normalizedType = (transactionType || "").trim().toLowerCase();
+    
+    // Debug specific transaction
+    if (transactionId === 'GD2506241556') {
+      console.log('🎨 DEBUG màu nền GD2506241556:', {
+        originalType: transactionType,
+        normalizedType: normalizedType,
+        typeLength: normalizedType.length,
+        typeCharCodes: [...normalizedType].map(char => char.charCodeAt(0))
+      });
+    }
     
     switch (normalizedType) {
       case "chưa thanh toán":
@@ -287,7 +297,7 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     rows.forEach((row, index) => {
       if (index < paginatedItems.length) {
         const transaction = paginatedItems[index];
-        const rowBackgroundColor = getTransactionRowColor(transaction.transactionType);
+        const rowBackgroundColor = getTransactionRowColor(transaction.transactionType, transaction.transactionId);
         if (rowBackgroundColor) {
           row.style.backgroundColor = rowBackgroundColor;
           row.style.setProperty('background-color', rowBackgroundColor, 'important');
