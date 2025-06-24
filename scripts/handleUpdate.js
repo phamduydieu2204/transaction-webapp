@@ -6,9 +6,28 @@ import { cacheManager } from './core/cacheManager.js';
 export async function handleUpdate() {
   console.log("🔄 handleUpdate được gọi");
   
+  // Hiển thị processing modal ngay lập tức để ngăn chặn các hành động tiếp theo
+  if (typeof window.showProcessingModal === 'function') {
+    window.showProcessingModal("Đang xử lý cập nhật...");
+  } else {
+    console.warn('⚠️ showProcessingModal not available, loading function...');
+    // Dynamically load the function if not available
+    try {
+      const { showProcessingModal } = await import('./showProcessingModal.js');
+      window.showProcessingModal = showProcessingModal;
+      showProcessingModal("Đang xử lý cập nhật...");
+    } catch (err) {
+      console.error('❌ Failed to load showProcessingModal:', err);
+    }
+  }
+  
   // Validate session before updating transaction
   const sessionValid = await validateBeforeOperation();
   if (!sessionValid) {
+    // Close processing modal if session validation fails
+    if (typeof window.closeProcessingModal === 'function') {
+      window.closeProcessingModal();
+    }
     return;
   }
   
@@ -21,6 +40,10 @@ export async function handleUpdate() {
   
   if (!currentEditTransactionId) {
     console.error("❌ Không có giao dịch nào đang được chỉnh sửa");
+    // Close processing modal
+    if (typeof window.closeProcessingModal === 'function') {
+      window.closeProcessingModal();
+    }
     window.showResultModal("Vui lòng chọn một giao dịch để chỉnh sửa!", false);
     return;
   }
@@ -29,6 +52,10 @@ export async function handleUpdate() {
   const userInfo = window.getState ? window.getState().user : null;
   if (!userInfo) {
     console.error("❌ Không có thông tin user");
+    // Close processing modal
+    if (typeof window.closeProcessingModal === 'function') {
+      window.closeProcessingModal();
+    }
     window.showResultModal("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.", false);
     return;
   }
@@ -41,6 +68,10 @@ export async function handleUpdate() {
   
   if (!transaction) {
     console.error("❌ Không tìm thấy giao dịch:", currentEditTransactionId);
+    // Close processing modal
+    if (typeof window.closeProcessingModal === 'function') {
+      window.closeProcessingModal();
+    }
     window.showResultModal("Giao dịch không tồn tại hoặc đã bị xóa. Vui lòng thử lại!", false);
     return;
   }
@@ -75,6 +106,10 @@ export async function handleUpdate() {
     if (fieldId === 'revenue' || fieldId === 'duration') {
       const numValue = parseFloat(value);
       if (isNaN(numValue) || numValue <= 0) {
+        // Close processing modal
+        if (typeof window.closeProcessingModal === 'function') {
+          window.closeProcessingModal();
+        }
         window.showResultModal(`${fieldName} không hợp lệ. Vui lòng kiểm tra lại`, false);
         element.focus();
         return;
@@ -82,6 +117,10 @@ export async function handleUpdate() {
     } else {
       // Kiểm tra các trường text/select
       if (!value || value.trim() === "" || value === "0") {
+        // Close processing modal
+        if (typeof window.closeProcessingModal === 'function') {
+          window.closeProcessingModal();
+        }
         window.showResultModal(`${fieldName} không được để trống. Vui lòng kiểm tra lại`, false);
         element.focus();
         return;
@@ -91,18 +130,12 @@ export async function handleUpdate() {
   
   console.log("✅ Validation passed");
   
-  // Hiển thị processing modal
-  if (typeof window.showProcessingModal === 'function') {
-    window.showProcessingModal("Đang cập nhật giao dịch...");
-  } else {
-    console.warn('⚠️ showProcessingModal not available, loading function...');
-    // Dynamically load the function if not available
-    import('./showProcessingModal.js').then(({ showProcessingModal }) => {
-      window.showProcessingModal = showProcessingModal;
-      showProcessingModal("Đang cập nhật giao dịch...");
-    }).catch(err => {
-      console.error('❌ Failed to load showProcessingModal:', err);
-    });
+  // Cập nhật text của processing modal đã hiển thị
+  if (typeof window.updateProcessingModalText === 'function') {
+    window.updateProcessingModalText("Đang gửi dữ liệu lên server...");
+  } else if (typeof window.showProcessingModal === 'function') {
+    // Nếu không có update function, hiển thị lại modal với text mới
+    window.showProcessingModal("Đang gửi dữ liệu lên server...");
   }
   
   // Chuẩn bị dữ liệu gửi lên server
