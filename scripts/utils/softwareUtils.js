@@ -4,6 +4,50 @@
  */
 
 /**
+ * Temporary file type mapping based on software characteristics
+ * This is a fallback until backend provides proper fileType from column Q
+ * @param {string} softwareName - Name of the software
+ * @param {string} softwarePackage - Package of the software
+ * @param {string} accountName - Account name
+ * @returns {string|null} File type or null
+ */
+function getTempFileTypeMapping(softwareName, softwarePackage, accountName) {
+  const name = (softwareName || '').toLowerCase();
+  const pkg = (softwarePackage || '').toLowerCase();
+  
+  // Based on common software patterns - this should be replaced with actual data from backend
+  
+  // Google-based services that typically use Docs
+  if (name.includes('google') || name.includes('drive') || name.includes('docs')) {
+    return 'docs';
+  }
+  
+  // Services that typically use Sheets
+  if (name.includes('sheet') || name.includes('excel') || name.includes('airtable')) {
+    return 'sheet';
+  }
+  
+  // Helium10 - based on existing business logic, appears to be docs-based
+  if (name.includes('helium10') || name.includes('helium 10')) {
+    return 'docs';
+  }
+  
+  // Netflix - based on existing logic, share accounts use docs
+  if (name.includes('netflix') && pkg.includes('share')) {
+    return 'docs';
+  }
+  
+  // Office 365, OneDrive - typically docs
+  if (name.includes('office') || name.includes('onedrive') || name.includes('365')) {
+    return 'docs';
+  }
+  
+  // For now, return null for unknown software
+  // This means only basic actions (view, edit, delete) will be shown
+  return null;
+}
+
+/**
  * Get file type from software data based on software name, package, and account
  * @param {string} softwareName - Name of the software
  * @param {string} softwarePackage - Package of the software
@@ -16,45 +60,53 @@ export function getSoftwareFileType(softwareName, softwarePackage, accountName) 
     return null;
   }
   
-  console.log('🔍 Looking for software match:', {
-    softwareName,
-    softwarePackage,
-    accountName,
-    totalSoftwareData: window.softwareData.length
-  });
-  
   // Find matching software entry
   const matchingSoftware = window.softwareData.find(software => {
     const nameMatch = (software.softwareName || '').toLowerCase() === (softwareName || '').toLowerCase();
     const packageMatch = (software.softwarePackage || '').toLowerCase() === (softwarePackage || '').toLowerCase();
     const accountMatch = (software.accountName || '').toLowerCase() === (accountName || '').toLowerCase();
     
-    // Debug each comparison
-    if (nameMatch && packageMatch) {
-      console.log('📋 Checking software:', {
-        software: software.softwareName,
-        package: software.softwarePackage,
-        account: software.accountName,
-        fileType: software.fileType,
-        nameMatch,
-        packageMatch,
-        accountMatch
-      });
-    }
-    
     return nameMatch && packageMatch && accountMatch;
   });
   
-  if (matchingSoftware) {
-    console.log('✅ Found matching software:', {
-      softwareName: matchingSoftware.softwareName,
-      fileType: matchingSoftware.fileType
-    });
-  } else {
-    console.log('❌ No matching software found');
+  if (!matchingSoftware) {
+    return null;
   }
   
-  return matchingSoftware ? matchingSoftware.fileType : null;
+  // Try different possible field names for fileType (column Q)
+  const fileType = matchingSoftware.fileType || 
+                   matchingSoftware.loaiTep || 
+                   matchingSoftware['loại tệp'] || 
+                   matchingSoftware.FileType ||
+                   matchingSoftware['Loại tệp'] ||
+                   matchingSoftware.file_type ||
+                   matchingSoftware.type;
+  
+  // Log only when no fileType found for debugging
+  if (!fileType || fileType.trim() === '') {
+    console.log('🗂️ No fileType found, available fields:', Object.keys(matchingSoftware));
+  }
+  
+  // If fileType is found, return it
+  if (fileType && fileType.trim() !== '') {
+    return fileType;
+  }
+  
+  // If no fileType in data, use temporary mapping based on software characteristics
+  // This is a fallback until backend provides proper fileType data
+  console.warn('⚠️ No fileType in data, using temporary mapping for:', matchingSoftware.softwareName);
+  
+  const tempFileTypeMapping = getTempFileTypeMapping(
+    matchingSoftware.softwareName,
+    matchingSoftware.softwarePackage,
+    matchingSoftware.accountName
+  );
+  
+  if (tempFileTypeMapping) {
+    console.log('🔄 Using temporary fileType mapping:', tempFileTypeMapping);
+  }
+  
+  return tempFileTypeMapping;
 }
 
 /**
@@ -119,43 +171,21 @@ export function shouldShowCheckAccessActions(transaction) {
  * @returns {string} HTML string of option elements
  */
 export function buildTransactionActionOptions(transaction) {
-  console.log('🔧 Building action options for transaction:', {
-    softwareName: transaction.softwareName,
-    softwarePackage: transaction.softwarePackage,
-    accountName: transaction.accountName,
-    accountSheetId: transaction.accountSheetId
-  });
-  
   // Always show basic actions
   let actionOptions = `<option value="">--</option><option value="view">Xem</option><option value="edit">Sửa</option><option value="delete">Xóa</option>`;
   
-  // Get file type for debugging
-  const fileType = getSoftwareFileType(
-    transaction.softwareName,
-    transaction.softwarePackage, 
-    transaction.accountName
-  );
-  
-  console.log(`📄 FileType for ${transaction.softwareName}: ${fileType}`);
-  
   // Add Cookie action if fileType is "docs"
-  const showCookie = shouldShowCookieActions(transaction);
-  console.log(`🍪 Show Cookie: ${showCookie}`);
-  if (showCookie) {
+  if (shouldShowCookieActions(transaction)) {
     actionOptions += `<option value="updateCookie">Cookie</option>`;
   }
   
   // Add Password Change action if fileType is "sheet"
-  const showPassword = shouldShowPasswordActions(transaction);
-  console.log(`🔑 Show Password: ${showPassword}`);
-  if (showPassword) {
+  if (shouldShowPasswordActions(transaction)) {
     actionOptions += `<option value="changePassword">Đổi MK</option>`;
   }
   
   // Add Check Access action if conditions are met
-  const showCheckAccess = shouldShowCheckAccessActions(transaction);
-  console.log(`🔍 Show Check Access: ${showCheckAccess}`);
-  if (showCheckAccess) {
+  if (shouldShowCheckAccessActions(transaction)) {
     actionOptions += `<option value="checkAccess">Kiểm tra quyền</option>`;
   }
   
