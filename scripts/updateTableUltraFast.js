@@ -47,8 +47,11 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
 
   // Get background color based on transaction type
   const getTransactionRowColor = (transactionType, transactionId) => {
-    // Normalize the transaction type (trim and lowercase for comparison)
-    const normalizedType = (transactionType || "").trim().toLowerCase();
+    // Normalize the transaction type (trim, replace multiple spaces, lowercase)
+    const normalizedType = (transactionType || "")
+      .trim()
+      .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+      .toLowerCase();
     
     // Debug specific transaction
     if (transactionId === 'GD2506241556') {
@@ -56,7 +59,8 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
         originalType: transactionType,
         normalizedType: normalizedType,
         typeLength: normalizedType.length,
-        typeCharCodes: [...normalizedType].map(char => char.charCodeAt(0))
+        typeCharCodes: [...normalizedType].map(char => char.charCodeAt(0)),
+        matchesExpected: normalizedType === "đã hoàn tất"
       });
     }
     
@@ -70,7 +74,10 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       case "hủy giao dịch":
         return "#F5F5F5"; // Light gray
       case "đã hoàn tất":
+        console.log('✅ Matched "đã hoàn tất" - returning empty color for:', transactionId);
+        return ""; // Keep default/current color
       default:
+        console.log('❌ No match for type:', normalizedType, 'transaction:', transactionId);
         return ""; // Keep default/current color
     }
   };
@@ -298,6 +305,17 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       if (index < paginatedItems.length) {
         const transaction = paginatedItems[index];
         const rowBackgroundColor = getTransactionRowColor(transaction.transactionType, transaction.transactionId);
+        
+        // Debug for specific transaction
+        if (transaction.transactionId === 'GD2506241556') {
+          console.log('🎨 DEBUG CSS application for GD2506241556:', {
+            rowBackgroundColor: rowBackgroundColor,
+            willApplyColor: !!rowBackgroundColor,
+            currentBgColor: row.style.backgroundColor,
+            computedBgColor: window.getComputedStyle(row).backgroundColor
+          });
+        }
+        
         if (rowBackgroundColor) {
           row.style.backgroundColor = rowBackgroundColor;
           row.style.setProperty('background-color', rowBackgroundColor, 'important');
