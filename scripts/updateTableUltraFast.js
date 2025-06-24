@@ -1,6 +1,5 @@
 import { updatePagination } from './pagination.js';
 import { batchWrite } from './core/domOptimizer.js';
-import { buildTransactionActionOptions } from './utils/softwareUtils.js';
 
 /**
  * Ultra-fast table update - only renders first page immediately
@@ -39,8 +38,6 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       return sum;
     }, 0);
   }
-
-  // Software utilities imported from utils/softwareUtils.js
 
   // ✅ Pre-calculate common values
   const parseDate = (str) => {
@@ -91,7 +88,13 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     const endDate = parseDate(transaction.endDate);
     const isExpired = endDate < today;
     
-    // Action options are now handled by buildTransactionActionOptions utility
+    const software = (transaction.softwareName || '').toLowerCase();
+    const softwarePackage = (transaction.softwarePackage || '').trim().toLowerCase();
+    
+    const shouldShowCookie = (
+      software.includes("helium10") ||
+      (software === "netflix" && softwarePackage === "share")
+    );
 
     // Simplified phone display
     // Process contact info with proper icons and formatting
@@ -200,8 +203,19 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       </div>
     `;
 
-    // Build action options using utility function
-    const actionOptions = buildTransactionActionOptions(transaction);
+    // Build action options
+    let actionOptions = `<option value="">--</option><option value="view">Xem</option><option value="edit">Sửa</option><option value="delete">Xóa</option>`;
+    
+    if (shouldShowCookie) {
+      actionOptions += `<option value="updateCookie">Cookie</option>`;
+    } else {
+      actionOptions += `<option value="changePassword">Đổi MK</option>`;
+    }
+    
+    // Add check access option if accountSheetId exists
+    if (transaction.accountSheetId && transaction.accountSheetId.trim() !== '') {
+      actionOptions += `<option value="checkAccess">Kiểm tra quyền</option>`;
+    }
 
     // Create usage cycle cell with icons and 3 lines
     const usageCycleCell = `

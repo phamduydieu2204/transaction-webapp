@@ -30,31 +30,6 @@ export async function fetchSoftwareList(
     if (result.status === "success") {
       // Cập nhật biến toàn cục
       window.softwareData = result.data;
-      
-      // Debug: Log first few software entries to check structure
-      console.log('📦 Software data loaded:', {
-        total: window.softwareData.length,
-        sample: window.softwareData.slice(0, 2).map(item => ({
-          softwareName: item.softwareName,
-          softwarePackage: item.softwarePackage,
-          accountName: item.accountName,
-          fileType: item.fileType,
-          allKeys: Object.keys(item)
-        }))
-      });
-      
-      // Check if any item has fileType-related fields
-      const hasFileType = window.softwareData.some(item => 
-        item.fileType || item.loaiTep || item['loại tệp'] || item.FileType
-      );
-      console.log('🔍 Has fileType field:', hasFileType);
-      
-      // Log all unique keys to understand data structure
-      const allKeys = new Set();
-      window.softwareData.forEach(item => {
-        Object.keys(item).forEach(key => allKeys.add(key));
-      });
-      console.log('🗝️ All available keys:', Array.from(allKeys).sort());
 
       const softwareNames = [...new Set(window.softwareData.map(item => item.softwareName))];
       const softwareNameSelect = document.getElementById("softwareName");

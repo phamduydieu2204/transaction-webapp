@@ -1,5 +1,4 @@
 import { updatePagination } from './pagination.js';
-import { buildTransactionActionOptions } from './utils/softwareUtils.js';
 import { updateTotalDisplay } from './updateTotalDisplay.js';
 import { batchWrite } from './core/domOptimizer.js';
 
@@ -68,7 +67,14 @@ export function updateTableOptimized(transactionList, currentPage, itemsPerPage,
     const endDate = parseDate(transaction.endDate);
     const isExpired = endDate < today;
     
-    // Action options are now handled by buildTransactionActionOptions utility
+    const software = (transaction.softwareName || '').toLowerCase();
+    const softwarePackage = (transaction.softwarePackage || '').trim().toLowerCase();
+    
+    const shouldShowCookie = (
+      software === "helium10 diamon".toLowerCase() ||
+      software === "helium10 platinum".toLowerCase() ||
+      (software === "netflix" && softwarePackage === "share")
+    );
 
     const linkHtml = isLink(transaction.customerPhone)
       ? `<a href="${transaction.customerPhone}" target="_blank" title="${transaction.customerPhone}">Liên hệ 🔗</a>`
@@ -82,8 +88,23 @@ export function updateTableOptimized(transactionList, currentPage, itemsPerPage,
       </div>
     `;
 
-    // Build action options using utility function (includes check access logic)
-    const actionOptions = buildTransactionActionOptions(transaction);
+    // Build action options
+    let actionOptions = `
+      <option value="">-- Chọn --</option>
+      <option value="view">Xem</option>
+      <option value="edit">Sửa</option>
+      <option value="delete">Xóa</option>`;
+    
+    if (shouldShowCookie) {
+      actionOptions += `<option value="updateCookie">Cập nhật Cookie</option>`;
+    } else {
+      actionOptions += `<option value="changePassword">Đổi mật khẩu</option>`;
+    }
+    
+    // Add check access option if accountSheetId exists
+    if (transaction.accountSheetId && transaction.accountSheetId.trim() !== '') {
+      actionOptions += `<option value="checkAccess">Kiểm tra quyền truy cập</option>`;
+    }
 
     // Create usage cycle cell with icons and 3 lines
     const usageCycleCell = `
