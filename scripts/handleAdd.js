@@ -146,11 +146,12 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
   try {
     const result = await apiRequestJson(data);
     if (result.status === "success") {
-      // Tạo object giao dịch mới với data từ server
+      // Tạo object giao dịch mới với data từ server (include fileType from backend)
       const newTransaction = {
         transactionId: result.transactionId || `GD${Date.now()}`,
         ...data,
         transactionDate: data.transactionDate,
+        fileType: result.fileType || "", // Include fileType từ backend response
         timestamp: Date.now()
       };
       
