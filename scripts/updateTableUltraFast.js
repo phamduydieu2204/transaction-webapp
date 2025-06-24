@@ -312,7 +312,20 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     rows.forEach((row, index) => {
       if (index < paginatedItems.length) {
         const transaction = paginatedItems[index];
+        
+        // FORCE CLEAR all previous background styles for fresh start
+        row.style.backgroundColor = '';
+        row.style.removeProperty('background-color');
+        
         const rowBackgroundColor = getTransactionRowColor(transaction.transactionType, transaction.transactionId);
+        
+        // FORCE CLEAR previous styles first for updated transactions
+        if (transaction.transactionId === 'GD2506241556') {
+          console.log('🧹 FORCE CLEARING styles for updated transaction GD2506241556');
+          row.style.backgroundColor = '';
+          row.style.removeProperty('background-color');
+          row.className = row.className.replace(/\b(transaction-.*|status-.*|type-.*)\b/g, '').trim();
+        }
         
         // Apply background colors based on transaction type
         if (rowBackgroundColor) {
