@@ -136,6 +136,83 @@ function showLoginForm() {
 }
 
 /**
+ * Fast application initialization for better UX
+ */
+async function initializeAppFast() {
+  try {
+    console.log('⚡ Starting fast app initialization...');
+    
+    // Import fast loader and skeleton
+    const { default: fastDataLoader } = await loadModule('./core/fastDataLoader.js');
+    const SkeletonLoader = (await loadModule('./core/skeletonLoader.js')).default;
+    
+    // Initialize globals and constants
+    const { initializeGlobals } = await loadModule('./core/appInitializer.js');
+    initializeGlobals();
+    
+    // Show skeleton loading immediately
+    SkeletonLoader.showInitialLoadingState();
+    
+    // Get user from state
+    const user = getState()?.user;
+    if (!user) {
+      console.error('❌ No user found for fast initialization');
+      return;
+    }
+    
+    // Phase 1: Load critical data (first 20 transactions + software)
+    console.log('⚡ Loading critical data for immediate display...');
+    const [criticalData, ] = await Promise.allSettled([
+      fastDataLoader.loadCriticalData(user),
+      fastDataLoader.loadSoftwareList()
+    ]);
+    
+    // Update UI immediately with critical data
+    if (criticalData.status === 'fulfilled' && criticalData.value.transactions.length > 0) {
+      console.log('✅ Displaying first 20 transactions immediately');
+      
+      // Load table updater and update immediately
+      const { updateTable } = await loadModule('../updateTableUltraFast.js');
+      const { formatDate } = await loadModule('../formatDate.js');
+      
+      await updateTable(criticalData.value.transactions, 1, formatDate, () => {}, () => {}, () => {});
+      SkeletonLoader.hideAllSkeletons();
+      
+      console.log('✅ Initial data displayed to user');
+    }
+    
+    // Phase 2: Load remaining data in background (non-blocking)
+    setTimeout(async () => {
+      console.log('📊 Loading full data in background...');
+      try {
+        const fullData = await fastDataLoader.loadRemainingData(user);
+        if (fullData && fullData.fullDataLoaded) {
+          console.log('✅ Full data loaded in background');
+          
+          // Refresh UI with full data if user is still on transaction tab
+          const currentTab = document.querySelector('.tab-content.active');
+          if (currentTab && currentTab.id === 'tab-giao-dich') {
+            const { updateTable } = await loadModule('../updateTableUltraFast.js');
+            const { formatDate } = await loadModule('../formatDate.js');
+            await updateTable(fullData.transactions, 1, formatDate, () => {}, () => {}, () => {});
+            console.log('🔄 UI refreshed with full data');
+          }
+        }
+      } catch (error) {
+        console.warn('⚠️ Background data loading failed:', error);
+      }
+    }, 100); // Load in background after 100ms
+    
+    console.log('⚡ Fast initialization complete');
+  } catch (error) {
+    console.error('❌ Fast initialization failed:', error);
+    // Fallback to regular initialization
+    const { initializeApp } = await loadModule('./core/appInitializer.js');
+    await initializeApp();
+  }
+}
+
+/**
  * Application startup sequence
  */
 async function startApp() {
@@ -192,8 +269,8 @@ async function startApp() {
     } else {
     }
     
-    // Phase 2: Initialize core application
-    await initializeApp();
+    // Phase 2: Initialize core application with fast loading
+    await initializeAppFast();
     
     // Phase 3: Setup event handlers
     initializeEventHandlers();

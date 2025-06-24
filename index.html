@@ -85,6 +85,37 @@
   <script type="module">
     console.log('🚀 Index.html: Starting application...');
     
+    // Show immediate loading state
+    const showImmediateLoading = () => {
+      document.body.innerHTML += `
+        <div id="initial-loading" style="
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background: white; z-index: 9999; display: flex;
+          flex-direction: column; justify-content: center; align-items: center;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        ">
+          <div style="text-align: center;">
+            <div style="
+              width: 60px; height: 60px; border: 4px solid #f3f3f3;
+              border-top: 4px solid #007bff; border-radius: 50%;
+              animation: spin 1s linear infinite; margin: 0 auto 20px;
+            "></div>
+            <h2 style="color: #333; margin: 0 0 10px;">Đang tải ứng dụng...</h2>
+            <p style="color: #666; margin: 0;">Vui lòng đợi trong giây lát</p>
+          </div>
+          <style>
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          </style>
+        </div>
+      `;
+    };
+
+    // Show loading immediately
+    showImmediateLoading();
+    
     // Load debug layout script first
     import('./scripts/debugLayout.js')
       .then(() => {
@@ -99,9 +130,32 @@
     import('./scripts/main.js')
       .then(() => {
         console.log('✅ Index.html: Main.js loaded successfully');
+        // Remove initial loading when main app starts
+        setTimeout(() => {
+          const loading = document.getElementById('initial-loading');
+          if (loading) {
+            loading.style.transition = 'opacity 0.3s ease-out';
+            loading.style.opacity = '0';
+            setTimeout(() => loading.remove(), 300);
+          }
+        }, 500);
       })
       .catch(error => {
         console.error('❌ Index.html: Error loading main.js:', error);
+        // Show error state
+        const loading = document.getElementById('initial-loading');
+        if (loading) {
+          loading.innerHTML = `
+            <div style="text-align: center; color: #dc3545;">
+              <h2>Lỗi tải ứng dụng</h2>
+              <p>Vui lòng tải lại trang</p>
+              <button onclick="location.reload()" style="
+                padding: 10px 20px; background: #007bff; color: white;
+                border: none; border-radius: 4px; cursor: pointer;
+              ">Tải lại</button>
+            </div>
+          `;
+        }
       });
       
     // Load partials in background (non-blocking)
