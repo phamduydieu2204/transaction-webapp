@@ -166,15 +166,24 @@ async function initializeAppFast() {
     // Update UI immediately with critical data
     if (criticalData.status === 'fulfilled' && criticalData.value.transactions.length > 0) {
       console.log('✅ Displaying first 20 transactions immediately');
+      console.log('📊 Transaction data sample:', criticalData.value.transactions.slice(0, 2));
       
       // Load table updater and update immediately
-      const { updateTable } = await loadModule('../updateTableUltraFast.js');
+      const { updateTableUltraFast } = await loadModule('../updateTableUltraFast.js');
       const { formatDate } = await loadModule('../formatDate.js');
       
-      await updateTable(criticalData.value.transactions, 1, formatDate, () => {}, () => {}, () => {});
+      console.log('🔧 About to call updateTableUltraFast with:', {
+        count: criticalData.value.transactions.length,
+        page: 1,
+        itemsPerPage: 20
+      });
+      
+      await updateTableUltraFast(criticalData.value.transactions, 1, 20, formatDate, () => {}, () => {}, () => {});
       SkeletonLoader.hideAllSkeletons();
       
       console.log('✅ Initial data displayed to user');
+    } else {
+      console.error('❌ No critical data to display:', criticalData);
     }
     
     // Phase 2: Load remaining data in background (non-blocking)
@@ -188,9 +197,9 @@ async function initializeAppFast() {
           // Refresh UI with full data if user is still on transaction tab
           const currentTab = document.querySelector('.tab-content.active');
           if (currentTab && currentTab.id === 'tab-giao-dich') {
-            const { updateTable } = await loadModule('../updateTableUltraFast.js');
+            const { updateTableUltraFast } = await loadModule('../updateTableUltraFast.js');
             const { formatDate } = await loadModule('../formatDate.js');
-            await updateTable(fullData.transactions, 1, formatDate, () => {}, () => {}, () => {});
+            await updateTableUltraFast(fullData.transactions, 1, 50, formatDate, () => {}, () => {}, () => {});
             console.log('🔄 UI refreshed with full data');
           }
         }

@@ -5,8 +5,20 @@ import { batchWrite } from './core/domOptimizer.js';
  * Ultra-fast table update - only renders first page immediately
  */
 export function updateTableUltraFast(transactionList, currentPage, itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction) {
+  console.log('🔧 updateTableUltraFast called with:', {
+    transactionCount: transactionList?.length || 0,
+    currentPage,
+    itemsPerPage,
+    hasFormatDate: typeof formatDate === 'function'
+  });
+  
   const tableBody = document.querySelector("#transactionTable tbody");
-  if (!tableBody) return;
+  if (!tableBody) {
+    console.error('❌ Table body not found: #transactionTable tbody');
+    return;
+  }
+  
+  console.log('✅ Table body found:', tableBody);
 
 
   // For ultra-fast loading, limit initial render to 25 rows max
