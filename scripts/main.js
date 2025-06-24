@@ -36,19 +36,15 @@ async function lazyLoadFunction(functionName, modulePath, exportName = null) {
   }
   
   try {
-    // Adjust path if it's in core folder
-    const adjustedPath = modulePath.startsWith('./') && !modulePath.includes('../') 
-      ? modulePath.replace('./', '../') 
-      : modulePath;
-      
-    const module = await loadModule(adjustedPath);
+    // Use the path as provided - don't auto-adjust anymore
+    const module = await loadModule(modulePath);
     const fn = exportName ? module[exportName] : module[functionName] || module.default;
     
     if (typeof fn === 'function') {
       moduleCache.set(functionName, fn);
       return fn;
     } else {
-      console.error(`❌ Function ${functionName} not found in ${adjustedPath}`);
+      console.error(`❌ Function ${functionName} not found in ${modulePath}`);
       return null;
     }
   } catch (error) {
@@ -142,12 +138,12 @@ async function initializeAppFast() {
   try {
     console.log('⚡ Starting fast app initialization...');
     
-    // Import fast loader and skeleton
-    const { default: fastDataLoader } = await loadModule('./core/fastDataLoader.js');
-    const SkeletonLoader = (await loadModule('./core/skeletonLoader.js')).default;
+    // Import fast loader and skeleton  
+    const { default: fastDataLoader } = await loadModule('../core/fastDataLoader.js');
+    const SkeletonLoader = (await loadModule('../core/skeletonLoader.js')).default;
     
     // Initialize globals and constants
-    const { initializeGlobals } = await loadModule('./core/appInitializer.js');
+    const { initializeGlobals } = await loadModule('../core/appInitializer.js');
     initializeGlobals();
     
     // Show skeleton loading immediately
@@ -207,7 +203,7 @@ async function initializeAppFast() {
   } catch (error) {
     console.error('❌ Fast initialization failed:', error);
     // Fallback to regular initialization
-    const { initializeApp } = await loadModule('./core/appInitializer.js');
+    const { initializeApp } = await loadModule('../core/appInitializer.js');
     await initializeApp();
   }
 }
