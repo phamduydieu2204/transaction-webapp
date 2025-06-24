@@ -72,7 +72,10 @@ export const TRANSACTION_FIELD_MAPPING = {
   employeeName: ['Tên nhân viên', 'tenNhanVien', 'employee', 'employeeName'],
   
   // Column V: Mã nhân viên
-  employeeId: ['Mã nhân viên', 'maNhanVien', 'employeeId']
+  employeeId: ['Mã nhân viên', 'maNhanVien', 'employeeId'],
+  
+  // Column W: Loại tệp (new column)
+  fileType: ['Loại tệp', 'loaiTep', 'fileType', 'type']
 };
 
 /**

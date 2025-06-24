@@ -55,50 +55,67 @@ function getTempFileTypeMappingByStandardName(standardName) {
 }
 
 /**
- * Get file type from software data based on standardName (Tên chuẩn)
- * @param {string} standardName - Standard name from transaction (Tên chuẩn từ cột T sheet GiaoDich)
+ * Get file type from transaction data or software data
+ * @param {Object} transaction - Transaction object
  * @returns {string|null} File type ('docs', 'sheet', etc.) or null if not found
  */
-export function getSoftwareFileType(standardName) {
+export function getTransactionFileType(transaction) {
+  // First, try to get fileType directly from transaction (column W)
+  const directFileType = transaction.fileType || 
+                         transaction.loaiTep || 
+                         transaction['Loại tệp'] || 
+                         transaction.type;
+  
+  if (directFileType && directFileType.trim() !== '') {
+    console.log('✅ Found fileType directly from transaction:', directFileType);
+    return directFileType.toLowerCase().trim();
+  }
+  
+  // Fallback: try to get from software data using standardName
+  const standardName = transaction.standardName || 
+                       transaction.tenChuan || 
+                       transaction['Tên chuẩn'] || 
+                       transaction.softwareName;
+  
+  if (!standardName || standardName.trim() === '') {
+    console.warn('❌ No standardName available for fileType lookup');
+    return null;
+  }
+  
+  return getSoftwareFileTypeByStandardName(standardName);
+}
+
+/**
+ * Get file type from software data based on standardName (Tên chuẩn) - FALLBACK METHOD
+ * @param {string} standardName - Standard name from transaction
+ * @returns {string|null} File type or null if not found
+ */
+function getSoftwareFileTypeByStandardName(standardName) {
   if (!window.softwareData || !Array.isArray(window.softwareData)) {
     console.warn('❌ softwareData not available or not an array');
     return null;
   }
   
-  if (!standardName || standardName.trim() === '') {
-    console.warn('❌ No standardName provided');
-    return null;
-  }
+  console.log('🔍 Fallback: Looking for software match by standardName:', standardName);
   
-  console.log('🔍 Looking for software match by standardName:', standardName);
-  
-  // Find matching software entry by standardName (Tên chuẩn - column M in PhanMem sheet)
+  // Find matching software entry by standardName
   const matchingSoftware = window.softwareData.find(software => {
-    // Try different possible field names for standardName in software data
     const softwareStandardName = software.standardName || 
                                   software.tenChuan || 
                                   software['Tên chuẩn'] || 
-                                  software.softwareName || // fallback to softwareName if standardName not available
+                                  software.softwareName || 
                                   '';
     
-    const match = softwareStandardName.toLowerCase() === standardName.toLowerCase();
-    
-    if (match) {
-      console.log('📋 Found matching software by standardName:', {
-        inputStandardName: standardName,
-        foundStandardName: softwareStandardName,
-        softwareName: software.softwareName
-      });
-    }
-    
-    return match;
+    return softwareStandardName.toLowerCase() === standardName.toLowerCase();
   });
   
   if (!matchingSoftware) {
-    return null;
+    // Final fallback: use temporary mapping
+    console.warn('⚠️ No software match, using temporary mapping for:', standardName);
+    return getTempFileTypeMappingByStandardName(standardName);
   }
   
-  // Try different possible field names for fileType (column Q)
+  // Try to get fileType from software data
   const fileType = matchingSoftware.fileType || 
                    matchingSoftware.loaiTep || 
                    matchingSoftware['loại tệp'] || 
@@ -107,27 +124,13 @@ export function getSoftwareFileType(standardName) {
                    matchingSoftware.file_type ||
                    matchingSoftware.type;
   
-  // Log only when no fileType found for debugging
-  if (!fileType || fileType.trim() === '') {
-    console.log('🗂️ No fileType found, available fields:', Object.keys(matchingSoftware));
-  }
-  
-  // If fileType is found, return it
   if (fileType && fileType.trim() !== '') {
-    return fileType;
+    return fileType.toLowerCase().trim();
   }
   
-  // If no fileType in data, use temporary mapping based on standardName
-  // This is a fallback until backend provides proper fileType data
-  console.warn('⚠️ No fileType in data, using temporary mapping for standardName:', standardName);
-  
-  const tempFileTypeMapping = getTempFileTypeMappingByStandardName(standardName);
-  
-  if (tempFileTypeMapping) {
-    console.log('🔄 Using temporary fileType mapping:', tempFileTypeMapping);
-  }
-  
-  return tempFileTypeMapping;
+  // Final fallback: temporary mapping
+  console.warn('⚠️ No fileType in software data, using temporary mapping for:', standardName);
+  return getTempFileTypeMappingByStandardName(standardName);
 }
 
 /**
@@ -149,7 +152,7 @@ export function shouldShowCookieActions(transaction) {
   }
   
   // Get file type from software data to determine action options
-  const fileType = getSoftwareFileType(standardName);
+  const fileType = getSoftwareFileTypeByStandardName(standardName);
   
   // Only show Cookie if fileType is exactly "docs" (case insensitive)
   return fileType && fileType.toLowerCase() === 'docs';
@@ -168,7 +171,7 @@ export function shouldShowPasswordActions(transaction) {
                        transaction.softwareName; // fallback to softwareName
   
   // Get file type from software data to determine action options
-  const fileType = getSoftwareFileType(standardName);
+  const fileType = getSoftwareFileTypeByStandardName(standardName);
   
   // Only show Password Change if fileType is exactly "sheet" (case insensitive)
   return fileType && fileType.toLowerCase() === 'sheet';
@@ -192,7 +195,7 @@ export function shouldShowCheckAccessActions(transaction) {
                        transaction.softwareName; // fallback to softwareName
   
   // Get file type from software data
-  const fileType = getSoftwareFileType(standardName);
+  const fileType = getSoftwareFileTypeByStandardName(standardName);
   
   // Show Check Access only if fileType is "docs" or "sheet"
   return fileType && (fileType.toLowerCase() === 'docs' || fileType.toLowerCase() === 'sheet');
@@ -301,7 +304,7 @@ export function debugSoftwareData() {
 }
 
 // Make functions available globally for backward compatibility
-window.getSoftwareFileType = getSoftwareFileType;
+window.getSoftwareFileTypeByStandardName = getSoftwareFileTypeByStandardName;
 window.shouldShowCookieActions = shouldShowCookieActions;
 window.shouldShowPasswordActions = shouldShowPasswordActions;
 window.shouldShowCheckAccessActions = shouldShowCheckAccessActions;
