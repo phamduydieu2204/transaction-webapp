@@ -137,8 +137,8 @@ export async function confirmUpdateCookie() {
     const newCookie = newCookieEl?.value.trim();
     console.log('🍪 New cookie value:', newCookie);
 
-    if (!transaction || !transaction.transactionId) {
-      console.error('❌ No transaction or transaction ID');
+    if (!transaction || !transaction.accountSheetId) {
+      console.error('❌ No transaction or account sheet ID');
       enableInteraction();
       return;
     }
@@ -179,7 +179,6 @@ export async function confirmUpdateCookie() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         action: "updateCookieAndRename",
-        transactionId: transaction.transactionId,
         accountSheetId: transaction.accountSheetId,
         newCookie: newCookie,
         softwareName: transaction.softwareName,
@@ -195,7 +194,7 @@ export async function confirmUpdateCookie() {
     closeProcessingModal();
     
     if (result.status === "success") {
-      showResultModal("✅ Cập nhật cookie thành công!\n\nCookie mới đã được lưu cho giao dịch " + transaction.transactionId, true);
+      showResultModal("✅ Cập nhật cookie thành công!\n\nCookie mới đã được lưu cho tài khoản " + transaction.accountName, true);
       // Chỉ đóng modal khi thành công
       enableInteraction();
       closeUpdateCookieModal();
