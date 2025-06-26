@@ -95,6 +95,8 @@ export async function handleSearch(
     conditions: conditions
   };
 
+  console.log("📤 Tìm kiếm giao dịch với data:", JSON.stringify(data, null, 2));
+
 
   try {
     const result = await apiRequestJson(data);
