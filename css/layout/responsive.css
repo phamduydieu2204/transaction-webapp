@@ -28,6 +28,31 @@
     padding-bottom: 80px;
   }
   
+  /* Mobile form layout - single column for all forms */
+  .form-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  
+  .form-grid > div {
+    width: 100% !important;
+    grid-column: unset !important;
+  }
+  
+  /* Expense form specific mobile layout */
+  #expenseForm.form-grid > div {
+    grid-column: unset !important;
+  }
+  
+  #expenseForm.form-grid > .note-field {
+    grid-column: unset !important;
+  }
+  
+  #expenseForm.form-grid > .button-row {
+    grid-column: unset !important;
+  }
+  
   h1 {
     font-size: 24px;
   }
