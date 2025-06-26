@@ -41,8 +41,8 @@ export async function handleSearch(
     getValue("revenue")
   ].filter(val => val && val !== "" && val !== "0" && val !== "yyyy/mm/dd");
   
-  // Kiểm tra nếu chỉ có trường ghi chú được nhập -> Tìm kiếm toàn cục
-  const isGlobalSearch = note && otherFields.length === 0;
+  // Kiểm tra nếu trường ghi chú có dữ liệu -> Luôn tìm kiếm toàn cục
+  const isGlobalSearch = note && note.trim() !== "";
   
   showProcessingModal(isGlobalSearch ? 
     `🌍 Tìm kiếm toàn cục cho: "${note}"...` : 
@@ -65,9 +65,10 @@ export async function handleSearch(
   const revenue = getValue("revenue");
 
   if (isGlobalSearch) {
-    // Tìm kiếm toàn cục - chỉ gửi text cần tìm
+    // Tìm kiếm toàn cục - chỉ gửi text từ trường ghi chú, bỏ qua tất cả trường khác
     conditions.globalSearchText = note;
     console.log("🌍 Tìm kiếm toàn cục với từ khóa:", note);
+    console.log("🚫 Bỏ qua tất cả trường khác khi có dữ liệu trong ghi chú");
   } else {
     // Tìm kiếm thông thường theo từng trường cụ thể
     console.log("🔍 Tìm kiếm theo trường cụ thể");
