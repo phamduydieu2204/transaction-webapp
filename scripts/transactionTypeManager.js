@@ -66,9 +66,9 @@ export const TRANSACTION_TYPES = {
   
   // Edit rules based on original transaction status
   EDIT_RULES: {
-    "Đã hoàn tất": ["Đã hoàn tất", "Hoàn tiền"],
+    "Đã hoàn tất": ["Đã thanh toán", "Đã hoàn tất", "Hoàn tiền"],
     "Chưa thanh toán": ["Đã hoàn tất", "Chưa thanh toán", "Hủy giao dịch"],
-    "Đã thanh toán": ["Đã hoàn tất", "Đã thanh toán", "Hủy giao dịch"],
+    "Đã thanh toán": ["Đã thanh toán", "Đã hoàn tất", "Hoàn tiền"],
     "Hoàn tiền": ["Hoàn tiền"],
     "Hủy giao dịch": ["Hủy giao dịch"]
   }
