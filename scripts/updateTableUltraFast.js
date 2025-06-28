@@ -226,6 +226,15 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
       window.buildTransactionActionOptions(transaction) : 
       `<option value="">--</option><option value="view">Xem</option><option value="edit">Sửa</option><option value="delete">Xóa</option>`;
     
+    // Debug log for dropdown options
+    if (dataIndex < 3) { // Only log first 3 rows to avoid spam
+      console.log(`🔧 Transaction ${dataIndex} (${transaction.transactionId}):`, {
+        fileType: transaction.fileType,
+        accountSheetId: transaction.accountSheetId,
+        actionOptions: actionOptions
+      });
+    }
+    
 
     // Create usage cycle cell with icons and 3 lines
     const usageCycleCell = `
