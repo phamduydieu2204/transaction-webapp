@@ -428,21 +428,35 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
  * Copy order information to clipboard
  */
 function copyOrderInfo(transaction, button) {
-  const formatDate = (dateStr) => {
-    if (!dateStr) return 'Không có';
-    // Convert YYYY/MM/DD to DD/MM/YYYY
-    const parts = dateStr.split('/');
-    if (parts.length === 3) {
-      return `${parts[2]}/${parts[1]}/${parts[0]}`;
-    }
-    return dateStr;
-  };
+  // Debug log
+  console.log('📋 copyOrderInfo called with transaction:', transaction);
+  console.log('📄 transaction.orderInfo:', transaction.orderInfo);
+  
+  // Ưu tiên sử dụng orderInfo đã được lưu từ backend
+  let orderInfo = '';
+  
+  if (transaction.orderInfo && transaction.orderInfo.trim() !== '') {
+    // Sử dụng orderInfo từ backend (đã bao gồm tất cả thông tin)
+    orderInfo = transaction.orderInfo;
+    console.log('✅ Using orderInfo from backend');
+  } else {
+    console.log('⚠️ No orderInfo from backend, generating fallback');
+    // Fallback: tạo orderInfo nếu không có từ backend
+    const formatDate = (dateStr) => {
+      if (!dateStr) return 'Không có';
+      // Convert YYYY/MM/DD to DD/MM/YYYY
+      const parts = dateStr.split('/');
+      if (parts.length === 3) {
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+      return dateStr;
+    };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('vi-VN').format(amount || 0) + ' VNĐ';
-  };
+    const formatCurrency = (amount) => {
+      return new Intl.NumberFormat('vi-VN').format(amount || 0) + ' VNĐ';
+    };
 
-  const orderInfo = `👤 Tên khách hàng: ${transaction.customerName || 'Không có'}
+    orderInfo = `👤 Tên khách hàng: ${transaction.customerName || 'Không có'}
 📧 Email: ${transaction.customerEmail || 'Không có'}
 🔧 Dịch vụ: ${transaction.softwareName || ''} - ${transaction.softwarePackage || ''} - ${transaction.accountName || ''}
 📅 Số tháng: ${transaction.duration || 0} tháng
@@ -451,6 +465,7 @@ function copyOrderInfo(transaction, button) {
 📞 Liên hệ: ${transaction.customerPhone || 'Không có'}
 📝 Ghi chú: ${transaction.note || 'Không có'}
 🆔 Mã giao dịch: ${transaction.transactionId || 'Không có'}`;
+  }
 
   // Copy to clipboard
   navigator.clipboard.writeText(orderInfo).then(() => {
