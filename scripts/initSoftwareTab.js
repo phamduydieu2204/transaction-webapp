@@ -2101,3 +2101,34 @@ function openSoftwareSheet(index) {
     showResultModalModern('Thành công', `Đã mở Google Sheet cho ${software.softwareName}`, 'success');
   }
 }
+
+// Debug function to check software data note field
+window.debugSoftwareNotes = function() {
+  console.log('🔍 DEBUG: Checking software data for note field...');
+  console.log('📊 Total software items:', window.softwareList?.length || 0);
+  
+  if (window.softwareList && window.softwareList.length > 0) {
+    console.log('📋 Sample software item (first):', window.softwareList[0]);
+    
+    // Check if note field exists in data
+    const itemsWithNotes = window.softwareList.filter(item => item.note && item.note.trim() !== '');
+    console.log('📝 Items with note data:', itemsWithNotes.length);
+    
+    if (itemsWithNotes.length > 0) {
+      console.log('📄 Sample note data:');
+      itemsWithNotes.slice(0, 3).forEach((item, index) => {
+        console.log(`  ${index + 1}. ${item.softwareName} - ${item.softwarePackage}: "${item.note}"`);
+      });
+    } else {
+      console.log('❌ No items found with note data');
+      
+      // Check all field names
+      console.log('🔑 Available fields in first item:');
+      Object.keys(window.softwareList[0]).forEach(key => {
+        console.log(`  - ${key}: ${window.softwareList[0][key]}`);
+      });
+    }
+  } else {
+    console.log('❌ No software data available');
+  }
+};
