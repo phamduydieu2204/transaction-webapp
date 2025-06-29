@@ -4,6 +4,7 @@
  */
 
 import { getConstants } from './constants.js';
+import { handleDeleteSoftware } from './handleDeleteSoftware.js';
 
 // Global variables for software tab
 window.softwareList = [];
@@ -1913,6 +1914,7 @@ function buildSoftwareActionDropdown(fileType, index) {
   let actionOptions = `<option value="">-- Chọn hành động --</option>`;
   actionOptions += `<option value="view">Xem chi tiết</option>`;
   actionOptions += `<option value="edit">Chỉnh sửa</option>`;
+  actionOptions += `<option value="delete">Xóa</option>`;
   actionOptions += `<option value="openSheet">Mở Google Sheet</option>`;
   
   // Add specific actions based on fileType
@@ -2009,6 +2011,16 @@ window.handleSoftwareAction = function(selectElement, index) {
       } else {
         console.error('❌ handleUpdateCookie function not found');
         alert('❌ Chức năng cập nhật cookie chưa sẵn sàng');
+      }
+      break;
+    case 'delete':
+      // Handle software deletion
+      const softwareToDelete = window.softwareList[index];
+      if (softwareToDelete) {
+        handleDeleteSoftware(softwareToDelete, loadSoftwareData);
+      } else {
+        console.error('❌ Software not found at index:', index);
+        alert('❌ Không tìm thấy phần mềm để xóa');
       }
       break;
     default:
