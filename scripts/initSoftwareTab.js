@@ -88,7 +88,7 @@ function updateSoftwareTable() {
   if (pageData.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="9" style="text-align: center; padding: 20px; color: #666;">
+        <td colspan="10" style="text-align: center; padding: 20px; color: #666;">
           Không có dữ liệu phần mềm
         </td>
       </tr>
@@ -119,6 +119,10 @@ function updateSoftwareTable() {
       highlightSearchTerms(software.accountName || '', searchTerms) : 
       escapeHtml(software.accountName || '');
     
+    const note = window.isSoftwareSearching ? 
+      highlightSearchTerms(software.note || '', searchTerms) : 
+      escapeHtml(software.note || '');
+    
     // Build action dropdown based on fileType
     const actionDropdown = buildSoftwareActionDropdown(software.fileType, startIndex + index);
     
@@ -143,6 +147,7 @@ function updateSoftwareTable() {
         <td class="login-info-cell">${loginInfo}</td>
         <td style="text-align: center;">${lastModified}</td>
         <td style="text-align: center;">${renewalDate}</td>
+        <td style="max-width: 200px; word-wrap: break-word;">${note || ''}</td>
         <td style="text-align: center;">
           ${actionDropdown}
         </td>
@@ -421,7 +426,8 @@ function editSoftwareItem(software, index) {
     loginPassword: document.getElementById('loginPassword'),
     loginSecret: document.getElementById('loginSecret'),
     standardName: document.getElementById('standardName'),
-    renewalDate: document.getElementById('renewalDate')
+    renewalDate: document.getElementById('renewalDate'),
+    softwareNote: document.getElementById('softwareNote')
   };
   
   // Batch DOM updates to prevent layout thrashing
@@ -437,6 +443,7 @@ function editSoftwareItem(software, index) {
     if (formElements.loginPassword) formElements.loginPassword.value = software.password || '';
     if (formElements.loginSecret) formElements.loginSecret.value = software.secret || '';
     if (formElements.standardName) formElements.standardName.value = software.standardName || '';
+    if (formElements.softwareNote) formElements.softwareNote.value = software.note || '';
     
     // Handle renewalDate - convert from dd/mm/yyyy to yyyy-mm-dd for input[type="date"]
     if (formElements.renewalDate && software.renewalDate) {
@@ -832,6 +839,7 @@ function getSoftwareFormData() {
     loginUsername: document.getElementById('loginUsername')?.value?.trim() || '',
     loginPassword: document.getElementById('loginPassword')?.value?.trim() || '',
     loginSecret: document.getElementById('loginSecret')?.value?.trim() || '',
+    note: document.getElementById('softwareNote')?.value?.trim() || '',
     standardName: document.getElementById('standardName')?.value?.trim() || '',
     renewalDate: document.getElementById('renewalDate')?.value?.trim() || ''
   };
@@ -1581,6 +1589,7 @@ window.handleSoftwareUpdate = async function() {
       formData.loginUsername !== originalSoftware.username ||
       formData.loginPassword !== originalSoftware.password ||
       formData.loginSecret !== originalSoftware.secret ||
+      formData.note !== (originalSoftware.note || '') ||
       formData.standardName !== originalSoftware.standardName;
     
     if (!hasChanges) {
