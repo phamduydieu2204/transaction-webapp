@@ -124,7 +124,9 @@ function updateSoftwareTable() {
       escapeHtml(software.note || '');
     
     // Build action dropdown based on fileType
-    const actionDropdown = buildSoftwareActionDropdown(software.fileType, startIndex + index);
+    // When searching, use the local index. When not searching, use the global index
+    const actionIndex = window.isSoftwareSearching ? index : (startIndex + index);
+    const actionDropdown = buildSoftwareActionDropdown(software.fileType, actionIndex);
     
     // Get row background color based on date difference
     const rowBackgroundColor = getSoftwareRowColor(software.lastModified, software.passwordChangeDays);
@@ -1951,7 +1953,16 @@ window.handleSoftwareAction = function(selectElement, index) {
       viewSoftwareItem(index);
       break;
     case 'edit':
-      editSoftwareItem(index);
+      // Get the software object from the current displayed list
+      const currentList = window.isSoftwareSearching ? window.softwareList : window.softwareList;
+      const software = currentList[index];
+      if (software) {
+        console.log(`📝 Editing software:`, software);
+        editSoftwareItem(software, index);
+      } else {
+        console.error('❌ Software not found at index:', index, 'in list length:', currentList?.length);
+        alert('❌ Không tìm thấy phần mềm để chỉnh sửa');
+      }
       break;
     case 'openSheet':
       openSoftwareSheet(index);
