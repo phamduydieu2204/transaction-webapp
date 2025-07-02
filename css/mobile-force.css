@@ -3,15 +3,36 @@
    Chrome Mobile Compatibility Override
    ======================================== */
 
+/* PROTECT TAB NAVIGATION - ENSURE TABS ARE ALWAYS VISIBLE */
+.tab-menu,
+.tab-navigation,
+#tab-navigation-container {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 1000 !important;
+}
+
+.tab-menu .tab-button,
+.tab-navigation .tab-button {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
 /* Force mobile layout for ALL mobile devices regardless of browser */
 @media screen and (max-width: 768px),
 @media screen and (max-device-width: 768px),
 @media only screen and (max-width: 768px),
 @media only screen and (max-device-width: 768px) {
   
-  /* FORCE ALL FORMS TO SINGLE COLUMN */
-  .transaction-form-grid,
-  .form-grid {
+  /* FORCE ONLY FORM GRIDS TO SINGLE COLUMN - NOT AFFECTING TABS */
+  form .transaction-form-grid,
+  form .form-grid,
+  #transactionForm .transaction-form-grid,
+  #expenseForm .transaction-form-grid,
+  #softwareForm .transaction-form-grid {
     display: block !important;
     width: 100% !important;
     max-width: 100% !important;

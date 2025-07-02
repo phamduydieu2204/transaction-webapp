@@ -59,8 +59,12 @@
     const style = document.createElement('style');
     style.id = 'mobile-force-styles';
     style.textContent = `
-      .force-mobile-layout .transaction-form-grid,
-      .force-mobile-layout .form-grid {
+      /* Target only form grids - not navigation tabs */
+      .force-mobile-layout form .transaction-form-grid,
+      .force-mobile-layout form .form-grid,
+      .force-mobile-layout #transactionForm .transaction-form-grid,
+      .force-mobile-layout #expenseForm .transaction-form-grid,
+      .force-mobile-layout #softwareForm .transaction-form-grid {
         display: block !important;
         width: 100% !important;
         max-width: 100% !important;
