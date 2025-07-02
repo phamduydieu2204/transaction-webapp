@@ -23,6 +23,7 @@ import {
 } from '../../core/dataMapping.js';
 import { initOverviewLazyLoading, preloadCriticalElements } from '../../utils/lazyLoader.js';
 import { initCSSOptimizations, optimizeFontLoading, addResourceHints } from '../../utils/cssOptimizer.js';
+import { getConstants } from '../../constants.js';
 
 /**
  * Load overview report (Tổng quan kinh doanh)
@@ -3584,9 +3585,6 @@ async function markAsDelivered(transactionId) {
   }
   
   try {
-    // Get constants
-    const { BACKEND_URL } = getConstants();
-    
     // Find the transaction
     const transaction = window.transactionList?.find(t => t.transactionId === transactionId);
     if (!transaction) {
@@ -3599,23 +3597,26 @@ async function markAsDelivered(transactionId) {
       throw new Error('Vui lòng đăng nhập lại');
     }
     
-    // Prepare update data - changing transaction type from "Đã thanh toán" to "Đã hoàn tất"
+    // Get constants
+    const { BACKEND_URL } = getConstants();
+    
+    // Prepare update data using same structure as handleUpdate.js
     const updateData = {
       action: "updateTransaction",
       transactionId: transactionId,
       transactionType: "Đã hoàn tất", // Change from "Đã thanh toán" to "Đã hoàn tất"
       transactionDate: transaction.transactionDate,
       customerName: transaction.customerName,
-      customerEmail: transaction.customerEmail,
+      customerEmail: transaction.customerEmail ? transaction.customerEmail.toLowerCase() : "",
       customerPhone: transaction.customerPhone,
-      duration: transaction.duration,
+      duration: parseInt(transaction.duration) || 0,
       startDate: transaction.startDate,
       endDate: transaction.endDate,
-      deviceCount: transaction.deviceCount,
+      deviceCount: parseInt(transaction.deviceCount) || 0,
       softwareName: transaction.softwareName,
       softwarePackage: transaction.softwarePackage,
       accountName: transaction.accountName,
-      revenue: transaction.revenue,
+      revenue: parseFloat(transaction.revenue) || 0,
       note: transaction.note || "",
       tenNhanVien: transaction.tenNhanVien,
       maNhanVien: transaction.maNhanVien,
@@ -3623,6 +3624,8 @@ async function markAsDelivered(transactionId) {
       editorMaNhanVien: userInfo.maNhanVien,
       duocSuaGiaoDichCuaAi: userInfo.duocSuaGiaoDichCuaAi || "chỉ bản thân"
     };
+    
+    console.log("📤 Dữ liệu cập nhật gửi đi:", JSON.stringify(updateData, null, 2));
     
     // Send update request
     const response = await fetch(BACKEND_URL, {
@@ -3632,19 +3635,20 @@ async function markAsDelivered(transactionId) {
     });
     
     const result = await response.json();
+    console.log("📥 Kết quả từ server:", result);
     
     if (result.status === "success") {
       // Update local transaction data
       transaction.transactionType = "Đã hoàn tất";
       
-      // Clear cache if available
+      // Clear cache if available (same as handleUpdate.js)
       if (window.cacheManager?.clearTransactionCaches) {
         window.cacheManager.clearTransactionCaches();
       }
       
-      // Show success message
-      if (typeof window.showResultModal === 'function') {
-        window.showResultModal("Đã cập nhật trạng thái giao hàng thành công!", true);
+      // Reload transactions if available (same as handleUpdate.js)
+      if (window.loadTransactions) {
+        await window.loadTransactions();
       }
       
       // Reload pending transactions with current date range
@@ -3652,10 +3656,12 @@ async function markAsDelivered(transactionId) {
       const transactions = window.transactionList || [];
       await loadPendingTransactions(transactions, dateRange);
       
-      // Reload transactions if available
-      if (window.loadTransactions) {
-        await window.loadTransactions();
+      // Show success message
+      if (typeof window.showResultModal === 'function') {
+        window.showResultModal("Đã cập nhật trạng thái giao hàng thành công!", true);
       }
+      
+      console.log("✅ Cập nhật trạng thái giao hàng thành công");
     } else {
       throw new Error(result.message || 'Cập nhật thất bại');
     }
