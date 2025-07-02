@@ -3400,7 +3400,7 @@ async function loadNeedsDeliveryTable(needsDelivery, dateRange = null) {
     }
     
     return `
-      <tr class="pending-row ${isUrgent ? 'urgent-row' : ''}" data-transaction-id="${transaction.id || ''}">
+      <tr class="pending-row ${isUrgent ? 'urgent-row' : ''}" data-transaction-id="${transaction.transactionId || transaction.id || ''}">
         <td class="date-cell">
           ${displayDate.toLocaleDateString('vi-VN')}
           ${isUrgent ? '<span class="urgent-badge">🔥 Gấp</span>' : ''}
@@ -3414,10 +3414,10 @@ async function loadNeedsDeliveryTable(needsDelivery, dateRange = null) {
           ${isUrgent ? '<i class="fas fa-exclamation-triangle urgent-icon"></i>' : ''}
         </td>
         <td class="action-cell">
-          <button class="action-btn-small delivery" onclick="markAsDelivered('${transaction.id || ''}')" title="Đánh dấu đã giao hàng">
+          <button class="action-btn-small delivery" onclick="markAsDelivered('${transaction.transactionId || transaction.id || ''}')" title="Đánh dấu đã giao hàng">
             <i class="fas fa-check"></i>
           </button>
-          <button class="action-btn-small details" onclick="viewTransactionDetails('${transaction.id || ''}')" title="Xem chi tiết">
+          <button class="action-btn-small details" onclick="viewTransactionDetails('${transaction.transactionId || transaction.id || ''}')" title="Xem chi tiết">
             <i class="fas fa-eye"></i>
           </button>
         </td>
