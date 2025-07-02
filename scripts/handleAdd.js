@@ -121,7 +121,7 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
   const data = {
     action: "addTransaction",
     transactionType: transactionType,
-    transactionDate: document.getElementById("transactionDate").value || todayFormatted,
+    transactionDate: document.getElementById("transactionDate").value || getTodayFormatted(),
     customerName: document.getElementById("customerName").value,
     customerEmail: document.getElementById("customerEmail").value.toLowerCase(),
     customerPhone: document.getElementById("customerPhone").value,

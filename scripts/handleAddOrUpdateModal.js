@@ -80,15 +80,9 @@ export function openAddOrUpdateModal() {
     
     closeAddOrUpdateModal();
     
-    // Don't reset the form - user wants to keep the data they entered
-    // Just update the date to today and proceed with adding
-    console.log("🆕 Updating date to today and proceeding with add");
-    try {
-      const { setDefaultDates } = await import('./calculateEndDate.js');
-      setDefaultDates(true); // Force update dates to today
-    } catch (error) {
-      console.warn("Could not update dates:", error);
-    }
+    // Keep the form data as-is, including dates that user may have modified
+    // Don't automatically update dates to today - use whatever the user has entered
+    console.log("🆕 Proceeding with add using current form data (including user-modified dates)");
     
     console.log("🆕 Calling handleAdd() for new transaction with current form data");
     if (window.handleAdd) {
