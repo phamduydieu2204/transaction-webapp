@@ -68,31 +68,40 @@ export function setDefaultDates(forceUpdate = false, recalculateEndDate = true) 
  * Initialize date calculations and event listeners
  */
 export function initializeDateCalculations() {
-  // Set default dates to today with recalculation enabled
-  setDefaultDates(true, true); // Force update to today and recalculate end date
+  // Set default dates only if fields are empty (don't force override user's values)
+  setDefaultDates(false, true); // Don't force update, but recalculate end date if needed
   
-  // Add event listeners
+  // Add event listeners (only if not already added)
   const startDateInput = document.getElementById('startDate');
   const durationInput = document.getElementById('duration');
   const endDateInput = document.getElementById('endDate');
   
   if (startDateInput && durationInput && endDateInput) {
-    // Update end date when start date changes
-    startDateInput.addEventListener('change', () => {
-      calculateEndDate(startDateInput, durationInput, endDateInput);
-    });
+    // Check if event listeners are already attached to avoid duplicates
+    if (!startDateInput.hasDateCalculationListeners) {
+      // Update end date when start date changes
+      startDateInput.addEventListener('change', () => {
+        calculateEndDate(startDateInput, durationInput, endDateInput);
+      });
+      
+      // Update end date when user types in start date manually
+      startDateInput.addEventListener('input', () => {
+        calculateEndDate(startDateInput, durationInput, endDateInput);
+      });
+      
+      startDateInput.hasDateCalculationListeners = true;
+    }
     
-    // Update end date when user types in start date manually
-    startDateInput.addEventListener('input', () => {
-      calculateEndDate(startDateInput, durationInput, endDateInput);
-    });
-    
-    // Update end date when duration changes
-    durationInput.addEventListener('change', () => {
-      calculateEndDate(startDateInput, durationInput, endDateInput);
-    });
-    durationInput.addEventListener('input', () => {
-      calculateEndDate(startDateInput, durationInput, endDateInput);
-    });
+    if (!durationInput.hasDateCalculationListeners) {
+      // Update end date when duration changes
+      durationInput.addEventListener('change', () => {
+        calculateEndDate(startDateInput, durationInput, endDateInput);
+      });
+      durationInput.addEventListener('input', () => {
+        calculateEndDate(startDateInput, durationInput, endDateInput);
+      });
+      
+      durationInput.hasDateCalculationListeners = true;
+    }
   }
 }
