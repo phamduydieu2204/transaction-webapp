@@ -29,28 +29,50 @@
   }
   
   /* Mobile form layout - single column for all forms */
-  .form-grid {
+  .form-grid,
+  .transaction-form-grid {
     display: flex !important;
     flex-direction: column !important;
     gap: 10px !important;
   }
   
-  .form-grid > div {
+  .form-grid > div,
+  .transaction-form-grid > div,
+  .transaction-form-grid .form-field {
     width: 100% !important;
     grid-column: unset !important;
+    flex: none !important;
   }
   
-  /* Expense form specific mobile layout */
-  #expenseForm.form-grid > div {
+  /* All forms specific mobile layout */
+  #expenseForm.form-grid > div,
+  #expenseForm.transaction-form-grid > div,
+  #expenseForm.transaction-form-grid .form-field,
+  #transactionForm.transaction-form-grid > div,
+  #transactionForm.transaction-form-grid .form-field,
+  #softwareForm.transaction-form-grid > div,
+  #softwareForm.transaction-form-grid .form-field {
     grid-column: unset !important;
+    width: 100% !important;
+    flex: none !important;
   }
   
-  #expenseForm.form-grid > .note-field {
+  #expenseForm.form-grid > .note-field,
+  #expenseForm.transaction-form-grid > .note-field,
+  .transaction-form-grid .note-field,
+  .transaction-form-grid .note-field-tall {
     grid-column: unset !important;
+    grid-row: unset !important;
+    width: 100% !important;
+    flex: none !important;
   }
   
-  #expenseForm.form-grid > .button-row {
+  #expenseForm.form-grid > .button-row,
+  #expenseForm.transaction-form-grid > .button-row,
+  .transaction-form-grid + .button-row {
     grid-column: unset !important;
+    width: 100% !important;
+    flex: none !important;
   }
   
   h1 {
@@ -159,6 +181,44 @@
   
   .order-info {
     max-width: 120px;
+  }
+  
+  /* Enhanced mobile form layout - ensure all forms are single column */
+  .transaction-form-grid .form-field {
+    margin-bottom: 15px !important;
+  }
+  
+  .transaction-form-grid .form-field label {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 8px !important;
+    font-weight: 600 !important;
+    color: #333 !important;
+  }
+  
+  .transaction-form-grid .form-field input,
+  .transaction-form-grid .form-field select,
+  .transaction-form-grid .form-field textarea {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    font-size: 16px !important; /* Prevent zoom on iOS */
+    padding: 12px !important;
+    min-height: 44px !important; /* Touch-friendly height */
+  }
+  
+  /* Order info container on mobile */
+  .transaction-form-grid .order-info-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  
+  .transaction-form-grid .order-info-container textarea {
+    min-height: 80px !important;
+  }
+  
+  .transaction-form-grid .order-info-dropdown {
+    width: 100% !important;
   }
 }
 

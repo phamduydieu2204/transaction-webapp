@@ -611,7 +611,8 @@ table {
 /* Mobile view - 1 column for better UX */
 @media (max-width: 768px) {
   .transaction-form-grid {
-    grid-template-columns: 1fr !important;
+    display: flex !important;
+    flex-direction: column !important;
     gap: 15px !important;
     padding: 15px !important;
   }
@@ -701,7 +702,8 @@ table {
 /* Very small mobile view - optimized for small screens */
 @media (max-width: 480px) {
   .transaction-form-grid {
-    grid-template-columns: 1fr !important;
+    display: flex !important;
+    flex-direction: column !important;
     gap: 12px !important;
     padding: 12px !important;
   }
