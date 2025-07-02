@@ -3575,14 +3575,103 @@ function exportStatusData() {
 /**
  * Action functions for pending transactions
  */
-function markAsDelivered(transactionId) {
+async function markAsDelivered(transactionId) {
   console.log('🚚 Marking as delivered:', transactionId);
-  // Implementation would update transaction status
-  alert(`Gả lập: Đánh dấu giao dịch ${transactionId} đã giao hàng`);
-  // Reload pending transactions with current date range
-  const dateRange = window.globalFilters?.dateRange || null;
-  const transactions = window.transactionList || [];
-  loadPendingTransactions(transactions, dateRange);
+  
+  // Show processing modal
+  if (typeof window.showProcessingModal === 'function') {
+    window.showProcessingModal("Đang cập nhật trạng thái giao hàng...");
+  }
+  
+  try {
+    // Get constants
+    const { BACKEND_URL } = getConstants();
+    
+    // Find the transaction
+    const transaction = window.transactionList?.find(t => t.transactionId === transactionId);
+    if (!transaction) {
+      throw new Error('Không tìm thấy giao dịch');
+    }
+    
+    // Get user info
+    const userInfo = window.getState ? window.getState().user : null;
+    if (!userInfo) {
+      throw new Error('Vui lòng đăng nhập lại');
+    }
+    
+    // Prepare update data - changing transaction type from "Đã thanh toán" to "Đã hoàn tất"
+    const updateData = {
+      action: "updateTransaction",
+      transactionId: transactionId,
+      transactionType: "Đã hoàn tất", // Change from "Đã thanh toán" to "Đã hoàn tất"
+      transactionDate: transaction.transactionDate,
+      customerName: transaction.customerName,
+      customerEmail: transaction.customerEmail,
+      customerPhone: transaction.customerPhone,
+      duration: transaction.duration,
+      startDate: transaction.startDate,
+      endDate: transaction.endDate,
+      deviceCount: transaction.deviceCount,
+      softwareName: transaction.softwareName,
+      softwarePackage: transaction.softwarePackage,
+      accountName: transaction.accountName,
+      revenue: transaction.revenue,
+      note: transaction.note || "",
+      tenNhanVien: transaction.tenNhanVien,
+      maNhanVien: transaction.maNhanVien,
+      editorTenNhanVien: userInfo.tenNhanVien,
+      editorMaNhanVien: userInfo.maNhanVien,
+      duocSuaGiaoDichCuaAi: userInfo.duocSuaGiaoDichCuaAi || "chỉ bản thân"
+    };
+    
+    // Send update request
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updateData)
+    });
+    
+    const result = await response.json();
+    
+    if (result.status === "success") {
+      // Update local transaction data
+      transaction.transactionType = "Đã hoàn tất";
+      
+      // Clear cache if available
+      if (window.cacheManager?.clearTransactionCaches) {
+        window.cacheManager.clearTransactionCaches();
+      }
+      
+      // Show success message
+      if (typeof window.showResultModal === 'function') {
+        window.showResultModal("Đã cập nhật trạng thái giao hàng thành công!", true);
+      }
+      
+      // Reload pending transactions with current date range
+      const dateRange = window.globalFilters?.dateRange || null;
+      const transactions = window.transactionList || [];
+      await loadPendingTransactions(transactions, dateRange);
+      
+      // Reload transactions if available
+      if (window.loadTransactions) {
+        await window.loadTransactions();
+      }
+    } else {
+      throw new Error(result.message || 'Cập nhật thất bại');
+    }
+  } catch (error) {
+    console.error('❌ Error marking as delivered:', error);
+    if (typeof window.showResultModal === 'function') {
+      window.showResultModal(`Lỗi: ${error.message}`, false);
+    } else {
+      alert(`Lỗi: ${error.message}`);
+    }
+  } finally {
+    // Close processing modal
+    if (typeof window.closeProcessingModal === 'function') {
+      window.closeProcessingModal();
+    }
+  }
 }
 
 function markAsPaid(transactionId) {
@@ -3601,10 +3690,72 @@ function sendPaymentReminder(transactionId) {
   alert(`Gả lập: Gửi nhắc nhở thanh toán cho giao dịch ${transactionId}`);
 }
 
-function viewTransactionDetails(transactionId) {
+async function viewTransactionDetails(transactionId) {
   console.log('👁️ Viewing transaction details:', transactionId);
-  // Implementation would show transaction detail modal
-  alert(`Gả lập: Hiển thị chi tiết giao dịch ${transactionId}`);
+  
+  try {
+    // Find the transaction
+    const transaction = window.transactionList?.find(t => t.transactionId === transactionId);
+    if (!transaction) {
+      throw new Error('Không tìm thấy giao dịch');
+    }
+    
+    // Check if viewTransaction function is available
+    if (typeof window.viewTransaction === 'function') {
+      // Use the existing viewTransaction function
+      await window.viewTransaction(transaction);
+    } else {
+      // Try to load the viewTransaction module
+      try {
+        const { viewTransaction } = await import('../../viewTransaction.js');
+        await viewTransaction(transaction);
+      } catch (importError) {
+        console.error('❌ Could not load viewTransaction module:', importError);
+        
+        // Fallback: Use detailModal directly
+        try {
+          const { detailModal } = await import('../../detailModalUnified.js');
+          const { formatDate } = await import('../../formatDate.js');
+          
+          // Prepare fields for the modal
+          const fields = [
+            { label: "Mã giao dịch", value: transaction.transactionId, showCopy: true, important: true },
+            { label: "Ngày giao dịch", value: formatDate(transaction.transactionDate), type: "date" },
+            { label: "Loại giao dịch", value: transaction.transactionType },
+            { label: "Tên khách hàng", value: transaction.customerName, important: true },
+            { label: "Email", value: transaction.customerEmail, showCopy: true, type: "email" },
+            { label: "Số điện thoại", value: transaction.customerPhone, showCopy: true, showExternalLink: true, type: "phone" },
+            { label: "Số tháng đăng ký", value: transaction.duration },
+            { label: "Ngày bắt đầu", value: formatDate(transaction.startDate), type: "date" },
+            { label: "Ngày kết thúc", value: formatDate(transaction.endDate), type: "date" },
+            { label: "Số thiết bị", value: transaction.deviceCount },
+            { label: "Tên phần mềm", value: transaction.softwareName },
+            { label: "Gói phần mềm", value: transaction.softwarePackage },
+            { label: "Tên tài khoản", value: transaction.accountName || "" },
+            { label: "Doanh thu", value: transaction.revenue, type: "currency", important: true },
+            { label: "Ghi chú", value: transaction.note },
+            { label: "Tên nhân viên", value: transaction.tenNhanVien },
+            { label: "Mã nhân viên", value: transaction.maNhanVien }
+          ];
+          
+          // Show the modal
+          detailModal.show("Chi tiết giao dịch", fields);
+        } catch (modalError) {
+          console.error('❌ Could not load detail modal:', modalError);
+          alert(`Chi tiết giao dịch ${transactionId}:\n\n` +
+                `Khách hàng: ${transaction.customerName}\n` +
+                `Email: ${transaction.customerEmail}\n` +
+                `Điện thoại: ${transaction.customerPhone}\n` +
+                `Phần mềm: ${transaction.softwareName} - ${transaction.softwarePackage}\n` +
+                `Doanh thu: ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(transaction.revenue)}\n` +
+                `Trạng thái: ${transaction.transactionType}`);
+        }
+      }
+    }
+  } catch (error) {
+    console.error('❌ Error viewing transaction details:', error);
+    alert(`Lỗi: ${error.message}`);
+  }
 }
 
 function markAllAsDelivered() {
@@ -4572,3 +4723,7 @@ function calculateGrowthRate(current, previous) {
   if (previous === 0) return current > 0 ? 100 : 0;
   return ((current - previous) / previous) * 100;
 }
+
+// Export functions to window for use in HTML
+window.markAsDelivered = markAsDelivered;
+window.viewTransactionDetails = viewTransactionDetails;
