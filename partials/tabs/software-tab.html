@@ -36,13 +36,19 @@
         
         <div class="form-field">
           <label>Giá bán</label>
-          <input type="text" id="price" placeholder="Nhập giá bán">
+          <input type="text" id="price" list="priceList" placeholder="Chọn hoặc nhập giá bán" autocomplete="off">
+          <datalist id="priceList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
           <div class="error-message" id="price-error"></div>
         </div>
         
         <div class="form-field">
           <label>Số người dùng cho phép</label>
-          <input type="number" id="allowedUsers" placeholder="Nhập số người dùng cho phép" min="1">
+          <input type="number" id="allowedUsers" list="allowedUsersList" placeholder="Chọn hoặc nhập số người dùng" min="1" autocomplete="off">
+          <datalist id="allowedUsersList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
           <div class="error-message" id="allowedUsers-error"></div>
         </div>
         
@@ -61,19 +67,28 @@
         <!-- ✅ Dòng 2: Tên đăng nhập, Mật khẩu đăng nhập, Secret, Tên chuẩn -->
         <div class="form-field">
           <label class="required">Tên đăng nhập <span class="required-asterisk">*</span></label>
-          <input type="text" id="loginUsername" placeholder="Nhập tên đăng nhập" required>
+          <input type="text" id="loginUsername" list="loginUsernameList" placeholder="Chọn hoặc nhập tên đăng nhập" required autocomplete="off">
+          <datalist id="loginUsernameList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
           <div class="error-message" id="loginUsername-error"></div>
         </div>
         
         <div class="form-field">
           <label class="required">Mật khẩu đăng nhập <span class="required-asterisk">*</span></label>
-          <input type="text" id="loginPassword" placeholder="Nhập mật khẩu" required>
+          <input type="text" id="loginPassword" list="loginPasswordList" placeholder="Chọn hoặc nhập mật khẩu" required autocomplete="off">
+          <datalist id="loginPasswordList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
           <div class="error-message" id="loginPassword-error"></div>
         </div>
         
         <div class="form-field">
           <label>Secret</label>
-          <input type="text" id="loginSecret" placeholder="Nhập secret key (nếu có)">
+          <input type="text" id="loginSecret" list="loginSecretList" placeholder="Chọn hoặc nhập secret key" autocomplete="off">
+          <datalist id="loginSecretList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
           <div class="error-message" id="loginSecret-error"></div>
         </div>
         
@@ -89,13 +104,19 @@
         <!-- ✅ Dòng 3: ID Sheet Tài khoản, Ngày gia hạn, Ghi chú -->
         <div class="form-field">
           <label>ID Sheet Tài khoản</label>
-          <input type="text" id="accountSheetId" placeholder="Nhập ID Google Sheet">
+          <input type="text" id="accountSheetId" list="accountSheetIdList" placeholder="Chọn hoặc nhập ID Google Sheet" autocomplete="off">
+          <datalist id="accountSheetIdList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
           <div class="error-message" id="accountSheetId-error"></div>
         </div>
         
         <div class="form-field">
           <label>Ngày gia hạn</label>
-          <input type="date" id="renewalDate">
+          <input type="text" id="renewalDate" list="renewalDateList" placeholder="Chọn hoặc nhập ngày gia hạn" autocomplete="off">
+          <datalist id="renewalDateList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
           <div class="error-message" id="renewalDate-error"></div>
         </div>
         

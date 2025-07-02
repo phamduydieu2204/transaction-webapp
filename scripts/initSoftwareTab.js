@@ -993,6 +993,7 @@ function initSoftwareFormDropdowns() {
       console.log('🔄 Account name changed:', accountNameInput.value);
       // Use debounced update for input events
       debouncedDropdownUpdate();
+      debouncedAuthDropdownUpdate(); // Update auth fields when account changes
     });
     
     accountNameInput.addEventListener('change', () => {
@@ -1001,6 +1002,12 @@ function initSoftwareFormDropdowns() {
       requestAnimationFrame(() => {
         updateOrderInfoDropdown();
         updateStandardNameDropdown();
+        // Update auth-related dropdowns
+        updateLoginUsernameDropdown();
+        updateLoginPasswordDropdown();
+        updateLoginSecretDropdown();
+        updateAccountSheetIdDropdown();
+        updateRenewalDateDropdown();
         autoFillFormFromSelection();
       });
     });
@@ -1061,8 +1068,17 @@ function updateSoftwareFormDropdowns() {
   updateSoftwareNameDropdown();
   updateSoftwarePackageDropdown();
   updateAccountNameDropdown();
+  // Level 1 dropdowns (software + package)
+  updatePriceDropdown();
+  updateAllowedUsersDropdown();
   updateOrderInfoDropdown();
   updateStandardNameDropdown();
+  // Level 2 dropdowns (software + package + account)
+  updateLoginUsernameDropdown();
+  updateLoginPasswordDropdown();
+  updateLoginSecretDropdown();
+  updateAccountSheetIdDropdown();
+  updateRenewalDateDropdown();
 }
 
 // Debug function để kiểm tra dữ liệu
@@ -1116,6 +1132,9 @@ const debouncedDropdownUpdate = debounce(() => {
     try {
       updateSoftwarePackageDropdown();
       updateAccountNameDropdown();
+      // Level 1 dropdowns: based on software name + package
+      updatePriceDropdown();
+      updateAllowedUsersDropdown();
       updateOrderInfoDropdown();
       updateStandardNameDropdown();
     } catch (error) {
@@ -1123,6 +1142,23 @@ const debouncedDropdownUpdate = debounce(() => {
     }
   });
 }, 100); // Reduced from 150ms to 100ms
+
+// Smart debounced dropdown update for auth fields (requires software + package + account)
+const debouncedAuthDropdownUpdate = debounce(() => {
+  // Use requestAnimationFrame to batch DOM updates
+  requestAnimationFrame(() => {
+    try {
+      // Level 2 dropdowns: based on software name + package + account
+      updateLoginUsernameDropdown();
+      updateLoginPasswordDropdown();
+      updateLoginSecretDropdown();
+      updateAccountSheetIdDropdown();
+      updateRenewalDateDropdown();
+    } catch (error) {
+      console.error('Error in debounced auth dropdown update:', error);
+    }
+  });
+}, 100);
 
 // Function để force refresh tất cả dropdowns - cho debugging
 window.forceRefreshDropdowns = function() {
@@ -1443,6 +1479,370 @@ function updateStandardNameDropdown() {
   });
   
   console.log(`✅ Updated standard name dropdown with ${uniqueStandardNames.length} items`);
+}
+
+// ========== LEVEL 1 DROPDOWNS (Software + Package) ==========
+function updatePriceDropdown() {
+  const datalist = document.getElementById('priceList');
+  if (!datalist) {
+    // Create datalist if it doesn't exist
+    const priceInput = document.getElementById('price');
+    if (priceInput) {
+      const newDatalist = document.createElement('datalist');
+      newDatalist.id = 'priceList';
+      priceInput.setAttribute('list', 'priceList');
+      priceInput.parentNode.appendChild(newDatalist);
+    } else {
+      return;
+    }
+  }
+
+  const selectedSoftwareName = document.getElementById('softwareFormName')?.value?.trim();
+  const selectedSoftwarePackage = document.getElementById('softwareFormPackage')?.value?.trim();
+  
+  let prices = [];
+  
+  if (selectedSoftwareName && selectedSoftwarePackage) {
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName && 
+      item.softwarePackage === selectedSoftwarePackage
+    );
+    prices = filteredItems.map(item => item.price).filter(Boolean);
+  } else if (selectedSoftwareName) {
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName
+    );
+    prices = filteredItems.map(item => item.price).filter(Boolean);
+  } else {
+    prices = window.softwareList.map(item => item.price).filter(Boolean);
+  }
+  
+  const uniquePrices = [...new Set(prices)].sort((a, b) => parseFloat(a) - parseFloat(b));
+  
+  const datalistElement = document.getElementById('priceList');
+  datalistElement.innerHTML = '';
+  uniquePrices.forEach(price => {
+    const option = document.createElement('option');
+    option.value = price;
+    datalistElement.appendChild(option);
+  });
+}
+
+function updateAllowedUsersDropdown() {
+  const datalist = document.getElementById('allowedUsersList');
+  if (!datalist) {
+    // Create datalist if it doesn't exist
+    const allowedUsersInput = document.getElementById('allowedUsers');
+    if (allowedUsersInput) {
+      const newDatalist = document.createElement('datalist');
+      newDatalist.id = 'allowedUsersList';
+      allowedUsersInput.setAttribute('list', 'allowedUsersList');
+      allowedUsersInput.parentNode.appendChild(newDatalist);
+    } else {
+      return;
+    }
+  }
+
+  const selectedSoftwareName = document.getElementById('softwareFormName')?.value?.trim();
+  const selectedSoftwarePackage = document.getElementById('softwareFormPackage')?.value?.trim();
+  
+  let allowedUsers = [];
+  
+  if (selectedSoftwareName && selectedSoftwarePackage) {
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName && 
+      item.softwarePackage === selectedSoftwarePackage
+    );
+    allowedUsers = filteredItems.map(item => item.allowedUsers).filter(Boolean);
+  } else if (selectedSoftwareName) {
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName
+    );
+    allowedUsers = filteredItems.map(item => item.allowedUsers).filter(Boolean);
+  } else {
+    allowedUsers = window.softwareList.map(item => item.allowedUsers).filter(Boolean);
+  }
+  
+  const uniqueAllowedUsers = [...new Set(allowedUsers)].sort((a, b) => parseInt(a) - parseInt(b));
+  
+  const datalistElement = document.getElementById('allowedUsersList');
+  datalistElement.innerHTML = '';
+  uniqueAllowedUsers.forEach(count => {
+    const option = document.createElement('option');
+    option.value = count;
+    datalistElement.appendChild(option);
+  });
+}
+
+// ========== LEVEL 2 DROPDOWNS (Software + Package + Account) ==========
+function updateLoginUsernameDropdown() {
+  const datalist = document.getElementById('loginUsernameList');
+  if (!datalist) {
+    // Create datalist if it doesn't exist
+    const loginUsernameInput = document.getElementById('loginUsername');
+    if (loginUsernameInput) {
+      const newDatalist = document.createElement('datalist');
+      newDatalist.id = 'loginUsernameList';
+      loginUsernameInput.setAttribute('list', 'loginUsernameList');
+      loginUsernameInput.parentNode.appendChild(newDatalist);
+    } else {
+      return;
+    }
+  }
+
+  const selectedSoftwareName = document.getElementById('softwareFormName')?.value?.trim();
+  const selectedSoftwarePackage = document.getElementById('softwareFormPackage')?.value?.trim();
+  const selectedAccountName = document.getElementById('softwareFormAccount')?.value?.trim();
+  
+  let usernames = [];
+  
+  if (selectedSoftwareName && selectedSoftwarePackage && selectedAccountName) {
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName && 
+      item.softwarePackage === selectedSoftwarePackage &&
+      item.accountName === selectedAccountName
+    );
+    usernames = filteredItems.map(item => item.username).filter(Boolean);
+  } else if (selectedSoftwareName && selectedSoftwarePackage) {
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName && 
+      item.softwarePackage === selectedSoftwarePackage
+    );
+    usernames = filteredItems.map(item => item.username).filter(Boolean);
+  } else if (selectedSoftwareName) {
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName
+    );
+    usernames = filteredItems.map(item => item.username).filter(Boolean);
+  } else {
+    usernames = window.softwareList.map(item => item.username).filter(Boolean);
+  }
+  
+  const uniqueUsernames = [...new Set(usernames)].sort();
+  
+  const datalistElement = document.getElementById('loginUsernameList');
+  datalistElement.innerHTML = '';
+  uniqueUsernames.forEach(username => {
+    const option = document.createElement('option');
+    option.value = username;
+    datalistElement.appendChild(option);
+  });
+}
+
+function updateLoginPasswordDropdown() {
+  const datalist = document.getElementById('loginPasswordList');
+  if (!datalist) {
+    // Create datalist if it doesn't exist
+    const loginPasswordInput = document.getElementById('loginPassword');
+    if (loginPasswordInput) {
+      const newDatalist = document.createElement('datalist');
+      newDatalist.id = 'loginPasswordList';
+      loginPasswordInput.setAttribute('list', 'loginPasswordList');
+      loginPasswordInput.parentNode.appendChild(newDatalist);
+    } else {
+      return;
+    }
+  }
+
+  const selectedSoftwareName = document.getElementById('softwareFormName')?.value?.trim();
+  const selectedSoftwarePackage = document.getElementById('softwareFormPackage')?.value?.trim();
+  const selectedAccountName = document.getElementById('softwareFormAccount')?.value?.trim();
+  
+  let passwords = [];
+  
+  if (selectedSoftwareName && selectedSoftwarePackage && selectedAccountName) {
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName && 
+      item.softwarePackage === selectedSoftwarePackage &&
+      item.accountName === selectedAccountName
+    );
+    passwords = filteredItems.map(item => item.password).filter(Boolean);
+  } else if (selectedSoftwareName && selectedSoftwarePackage) {
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName && 
+      item.softwarePackage === selectedSoftwarePackage
+    );
+    passwords = filteredItems.map(item => item.password).filter(Boolean);
+  } else if (selectedSoftwareName) {
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName
+    );
+    passwords = filteredItems.map(item => item.password).filter(Boolean);
+  } else {
+    passwords = window.softwareList.map(item => item.password).filter(Boolean);
+  }
+  
+  const uniquePasswords = [...new Set(passwords)];
+  
+  const datalistElement = document.getElementById('loginPasswordList');
+  datalistElement.innerHTML = '';
+  uniquePasswords.forEach(password => {
+    const option = document.createElement('option');
+    option.value = password;
+    datalistElement.appendChild(option);
+  });
+}
+
+function updateLoginSecretDropdown() {
+  const datalist = document.getElementById('loginSecretList');
+  if (!datalist) {
+    // Create datalist if it doesn't exist
+    const loginSecretInput = document.getElementById('loginSecret');
+    if (loginSecretInput) {
+      const newDatalist = document.createElement('datalist');
+      newDatalist.id = 'loginSecretList';
+      loginSecretInput.setAttribute('list', 'loginSecretList');
+      loginSecretInput.parentNode.appendChild(newDatalist);
+    } else {
+      return;
+    }
+  }
+
+  const selectedSoftwareName = document.getElementById('softwareFormName')?.value?.trim();
+  const selectedSoftwarePackage = document.getElementById('softwareFormPackage')?.value?.trim();
+  const selectedAccountName = document.getElementById('softwareFormAccount')?.value?.trim();
+  
+  let secrets = [];
+  
+  if (selectedSoftwareName && selectedSoftwarePackage && selectedAccountName) {
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName && 
+      item.softwarePackage === selectedSoftwarePackage &&
+      item.accountName === selectedAccountName
+    );
+    secrets = filteredItems.map(item => item.secret).filter(Boolean);
+  } else if (selectedSoftwareName && selectedSoftwarePackage) {
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName && 
+      item.softwarePackage === selectedSoftwarePackage
+    );
+    secrets = filteredItems.map(item => item.secret).filter(Boolean);
+  } else if (selectedSoftwareName) {
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName
+    );
+    secrets = filteredItems.map(item => item.secret).filter(Boolean);
+  } else {
+    secrets = window.softwareList.map(item => item.secret).filter(Boolean);
+  }
+  
+  const uniqueSecrets = [...new Set(secrets)];
+  
+  const datalistElement = document.getElementById('loginSecretList');
+  datalistElement.innerHTML = '';
+  uniqueSecrets.forEach(secret => {
+    const option = document.createElement('option');
+    option.value = secret;
+    datalistElement.appendChild(option);
+  });
+}
+
+function updateAccountSheetIdDropdown() {
+  const datalist = document.getElementById('accountSheetIdList');
+  if (!datalist) {
+    // Create datalist if it doesn't exist
+    const accountSheetIdInput = document.getElementById('accountSheetId');
+    if (accountSheetIdInput) {
+      const newDatalist = document.createElement('datalist');
+      newDatalist.id = 'accountSheetIdList';
+      accountSheetIdInput.setAttribute('list', 'accountSheetIdList');
+      accountSheetIdInput.parentNode.appendChild(newDatalist);
+    } else {
+      return;
+    }
+  }
+
+  const selectedSoftwareName = document.getElementById('softwareFormName')?.value?.trim();
+  const selectedSoftwarePackage = document.getElementById('softwareFormPackage')?.value?.trim();
+  const selectedAccountName = document.getElementById('softwareFormAccount')?.value?.trim();
+  
+  let sheetIds = [];
+  
+  if (selectedSoftwareName && selectedSoftwarePackage && selectedAccountName) {
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName && 
+      item.softwarePackage === selectedSoftwarePackage &&
+      item.accountName === selectedAccountName
+    );
+    sheetIds = filteredItems.map(item => item.accountSheetId).filter(Boolean);
+  } else if (selectedSoftwareName && selectedSoftwarePackage) {
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName && 
+      item.softwarePackage === selectedSoftwarePackage
+    );
+    sheetIds = filteredItems.map(item => item.accountSheetId).filter(Boolean);
+  } else if (selectedSoftwareName) {
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName
+    );
+    sheetIds = filteredItems.map(item => item.accountSheetId).filter(Boolean);
+  } else {
+    sheetIds = window.softwareList.map(item => item.accountSheetId).filter(Boolean);
+  }
+  
+  const uniqueSheetIds = [...new Set(sheetIds)];
+  
+  const datalistElement = document.getElementById('accountSheetIdList');
+  datalistElement.innerHTML = '';
+  uniqueSheetIds.forEach(sheetId => {
+    const option = document.createElement('option');
+    option.value = sheetId;
+    datalistElement.appendChild(option);
+  });
+}
+
+function updateRenewalDateDropdown() {
+  const datalist = document.getElementById('renewalDateList');
+  if (!datalist) {
+    // Create datalist if it doesn't exist
+    const renewalDateInput = document.getElementById('renewalDate');
+    if (renewalDateInput) {
+      const newDatalist = document.createElement('datalist');
+      newDatalist.id = 'renewalDateList';
+      renewalDateInput.setAttribute('list', 'renewalDateList');
+      renewalDateInput.parentNode.appendChild(newDatalist);
+    } else {
+      return;
+    }
+  }
+
+  const selectedSoftwareName = document.getElementById('softwareFormName')?.value?.trim();
+  const selectedSoftwarePackage = document.getElementById('softwareFormPackage')?.value?.trim();
+  const selectedAccountName = document.getElementById('softwareFormAccount')?.value?.trim();
+  
+  let renewalDates = [];
+  
+  if (selectedSoftwareName && selectedSoftwarePackage && selectedAccountName) {
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName && 
+      item.softwarePackage === selectedSoftwarePackage &&
+      item.accountName === selectedAccountName
+    );
+    renewalDates = filteredItems.map(item => item.renewalDate).filter(Boolean);
+  } else if (selectedSoftwareName && selectedSoftwarePackage) {
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName && 
+      item.softwarePackage === selectedSoftwarePackage
+    );
+    renewalDates = filteredItems.map(item => item.renewalDate).filter(Boolean);
+  } else if (selectedSoftwareName) {
+    const filteredItems = window.softwareList.filter(item => 
+      item.softwareName === selectedSoftwareName
+    );
+    renewalDates = filteredItems.map(item => item.renewalDate).filter(Boolean);
+  } else {
+    renewalDates = window.softwareList.map(item => item.renewalDate).filter(Boolean);
+  }
+  
+  const uniqueRenewalDates = [...new Set(renewalDates)].sort();
+  
+  const datalistElement = document.getElementById('renewalDateList');
+  datalistElement.innerHTML = '';
+  uniqueRenewalDates.forEach(date => {
+    const option = document.createElement('option');
+    option.value = date;
+    datalistElement.appendChild(option);
+  });
 }
 
 function autoFillFormFromSelection() {
