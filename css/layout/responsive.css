@@ -20,20 +20,23 @@
   }
 }
 
-/* Small screens - Mobile */
-@media (max-width: 768px) {
+/* Small screens - Mobile - Enhanced for Chrome compatibility */
+@media (max-width: 768px), 
+@media screen and (max-device-width: 768px),
+@media screen and (max-width: 768px) and (-webkit-min-device-pixel-ratio: 1) {
   /* Typography adjustments */
   body {
     font-size: 14px;
     padding-bottom: 80px;
   }
   
-  /* Mobile form layout - single column for all forms */
+  /* Force mobile form layout - single column for all forms */
   .form-grid,
   .transaction-form-grid {
     display: flex !important;
     flex-direction: column !important;
     gap: 10px !important;
+    grid-template-columns: none !important;
   }
   
   .form-grid > div,
@@ -219,6 +222,49 @@
   
   .transaction-form-grid .order-info-dropdown {
     width: 100% !important;
+  }
+}
+
+/* Additional mobile support for Chrome and WebKit browsers */
+@media screen and (max-width: 768px) {
+  /* Force flexbox layout for Chrome mobile compatibility */
+  .transaction-form-grid {
+    display: -webkit-flex !important;
+    display: -moz-flex !important;
+    display: -ms-flexbox !important;
+    display: flex !important;
+    -webkit-flex-direction: column !important;
+    -moz-flex-direction: column !important;
+    -ms-flex-direction: column !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
+  }
+  
+  .transaction-form-grid .form-field {
+    -webkit-flex: none !important;
+    -moz-flex: none !important;
+    -ms-flex: none !important;
+    flex: none !important;
+    width: 100% !important;
+    grid-column: unset !important;
+    grid-row: unset !important;
+    display: block !important;
+  }
+}
+
+/* Specific Chrome mobile detection and override */
+@media screen and (-webkit-min-device-pixel-ratio: 1) and (max-width: 768px) {
+  .transaction-form-grid {
+    display: block !important;
+  }
+  
+  .transaction-form-grid .form-field {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 15px !important;
+    float: none !important;
+    clear: both !important;
   }
 }
 

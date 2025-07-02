@@ -608,13 +608,17 @@ table {
   }
 }
 
-/* Mobile view - 1 column for better UX */
-@media (max-width: 768px) {
+/* Mobile view - 1 column for better UX - Enhanced for Chrome compatibility */
+@media (max-width: 768px), 
+@media screen and (max-device-width: 768px),
+@media screen and (-webkit-min-device-pixel-ratio: 1) and (max-width: 768px) {
   .transaction-form-grid {
     display: flex !important;
     flex-direction: column !important;
     gap: 15px !important;
     padding: 15px !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
   }
   
   .transaction-form-grid .form-field {
@@ -699,13 +703,17 @@ table {
   }
 }
 
-/* Very small mobile view - optimized for small screens */
-@media (max-width: 480px) {
+/* Very small mobile view - optimized for small screens - Enhanced for Chrome compatibility */
+@media (max-width: 480px), 
+@media screen and (max-device-width: 480px),
+@media screen and (-webkit-min-device-pixel-ratio: 1) and (max-width: 480px) {
   .transaction-form-grid {
     display: flex !important;
     flex-direction: column !important;
     gap: 12px !important;
     padding: 12px !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
   }
   
   .transaction-form-grid .form-field label {
@@ -734,6 +742,88 @@ table {
     width: auto !important;
     min-width: 120px !important;
     flex: none !important;
+  }
+}
+
+/* ========================================
+   CHROME MOBILE COMPATIBILITY FIX
+   ======================================== */
+
+/* Force mobile layout for Chrome and all WebKit browsers */
+@media screen and (max-width: 768px) {
+  /* Override any grid layout on mobile */
+  .transaction-form-grid {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .transaction-form-grid .form-field {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-bottom: 15px !important;
+    grid-column: unset !important;
+    grid-row: unset !important;
+    float: none !important;
+    clear: both !important;
+    box-sizing: border-box !important;
+  }
+  
+  .transaction-form-grid .form-field label {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .transaction-form-grid .form-field input,
+  .transaction-form-grid .form-field select,
+  .transaction-form-grid .form-field textarea {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    font-size: 16px !important; /* Prevent zoom on iOS */
+    min-height: 44px !important; /* Touch friendly */
+  }
+  
+  /* Special handling for note fields */
+  .transaction-form-grid .note-field-tall {
+    display: block !important;
+    width: 100% !important;
+    grid-column: unset !important;
+    grid-row: unset !important;
+  }
+  
+  .transaction-form-grid .note-field-tall textarea {
+    width: 100% !important;
+    min-height: 100px !important;
+  }
+  
+  /* Order info container */
+  .transaction-form-grid .order-info-container {
+    display: block !important;
+    width: 100% !important;
+  }
+  
+  .transaction-form-grid .order-info-container textarea,
+  .transaction-form-grid .order-info-container select {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 8px !important;
+  }
+}
+
+/* Additional fallback for Chrome mobile user agent detection */
+@media screen and (-webkit-min-device-pixel-ratio: 0) and (max-width: 768px) {
+  .transaction-form-grid {
+    display: block !important;
+  }
+  
+  .transaction-form-grid .form-field {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 15px !important;
   }
 }
 
