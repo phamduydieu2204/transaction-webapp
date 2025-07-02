@@ -1,0 +1,154 @@
+/* ========================================
+   MOBILE FORCE CSS - HIGHEST PRIORITY
+   Chrome Mobile Compatibility Override
+   ======================================== */
+
+/* Force mobile layout for ALL mobile devices regardless of browser */
+@media screen and (max-width: 768px),
+@media screen and (max-device-width: 768px),
+@media only screen and (max-width: 768px),
+@media only screen and (max-device-width: 768px) {
+  
+  /* FORCE ALL FORMS TO SINGLE COLUMN */
+  .transaction-form-grid,
+  .form-grid {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
+    grid-auto-columns: none !important;
+    grid-auto-rows: none !important;
+    flex-direction: column !important;
+    -webkit-flex-direction: column !important;
+    -moz-flex-direction: column !important;
+    -ms-flex-direction: column !important;
+  }
+  
+  /* FORCE ALL FORM FIELDS TO FULL WIDTH BLOCKS */
+  .transaction-form-grid .form-field,
+  .transaction-form-grid > div,
+  .form-grid .form-field,
+  .form-grid > div {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-bottom: 15px !important;
+    grid-column: unset !important;
+    grid-row: unset !important;
+    grid-area: unset !important;
+    float: none !important;
+    clear: both !important;
+    box-sizing: border-box !important;
+    flex: none !important;
+    -webkit-flex: none !important;
+    -moz-flex: none !important;
+    -ms-flex: none !important;
+  }
+  
+  /* FORCE ALL INPUTS TO FULL WIDTH */
+  .transaction-form-grid .form-field input,
+  .transaction-form-grid .form-field select,
+  .transaction-form-grid .form-field textarea,
+  .form-grid .form-field input,
+  .form-grid .form-field select,
+  .form-grid .form-field textarea {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    font-size: 16px !important;
+    min-height: 44px !important;
+    padding: 12px !important;
+    margin: 0 !important;
+  }
+  
+  /* FORCE LABELS TO FULL WIDTH */
+  .transaction-form-grid .form-field label,
+  .form-grid .form-field label {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 8px !important;
+    font-weight: 600 !important;
+  }
+  
+  /* SPECIAL FIELDS */
+  .transaction-form-grid .note-field-tall,
+  .transaction-form-grid .note-field {
+    display: block !important;
+    width: 100% !important;
+    grid-column: unset !important;
+    grid-row: unset !important;
+  }
+  
+  .transaction-form-grid .note-field-tall textarea,
+  .transaction-form-grid .note-field textarea {
+    width: 100% !important;
+    min-height: 100px !important;
+  }
+  
+  /* ORDER INFO CONTAINER */
+  .transaction-form-grid .order-info-container {
+    display: block !important;
+    width: 100% !important;
+  }
+  
+  .transaction-form-grid .order-info-container textarea,
+  .transaction-form-grid .order-info-container select {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 8px !important;
+  }
+  
+  /* EMPTY FIELDS */
+  .transaction-form-grid .form-field-empty {
+    display: none !important;
+  }
+}
+
+/* ADDITIONAL CHROME MOBILE SPECIFIC OVERRIDES */
+@media screen and (-webkit-min-device-pixel-ratio: 1) and (max-width: 768px) {
+  .transaction-form-grid,
+  .form-grid {
+    display: block !important;
+  }
+  
+  .transaction-form-grid .form-field,
+  .form-grid .form-field {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 15px !important;
+  }
+}
+
+/* WEBKIT SPECIFIC OVERRIDES */
+@media screen and (-webkit-min-device-pixel-ratio: 0) and (max-width: 768px) {
+  .transaction-form-grid,
+  .form-grid {
+    display: block !important;
+  }
+  
+  .transaction-form-grid .form-field,
+  .form-grid .form-field {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 15px !important;
+  }
+}
+
+/* FALLBACK FOR ANY WEBKIT BROWSER */
+@supports (-webkit-appearance: none) {
+  @media screen and (max-width: 768px) {
+    .transaction-form-grid,
+    .form-grid {
+      display: block !important;
+    }
+    
+    .transaction-form-grid .form-field,
+    .form-grid .form-field {
+      display: block !important;
+      width: 100% !important;
+      margin-bottom: 15px !important;
+    }
+  }
+}

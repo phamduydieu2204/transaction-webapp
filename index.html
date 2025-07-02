@@ -11,7 +11,45 @@
   <!-- CSS Files -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <!-- Mobile Force CSS - Highest Priority -->
+  <link rel="stylesheet" href="css/mobile-force.css">
   <!-- Local CSS will be loaded with version control -->
+  
+  <!-- Immediate Mobile Detection Script -->
+  <script>
+    (function() {
+      // Immediate mobile detection and CSS injection
+      var isMobile = window.innerWidth <= 768 || 
+                     window.screen.width <= 768 || 
+                     /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent) ||
+                     'ontouchstart' in window || 
+                     navigator.maxTouchPoints > 0 ||
+                     /SM-S918/i.test(navigator.userAgent);
+      
+      if (isMobile) {
+        console.log('📱 Immediate mobile detection: forcing mobile layout');
+        document.documentElement.className += ' mobile-detected';
+        
+        // Inject critical mobile CSS immediately
+        var style = document.createElement('style');
+        style.innerHTML = `
+          .mobile-detected .transaction-form-grid,
+          .mobile-detected .form-grid {
+            display: block !important;
+            width: 100% !important;
+          }
+          .mobile-detected .transaction-form-grid .form-field,
+          .mobile-detected .form-grid .form-field {
+            display: block !important;
+            width: 100% !important;
+            margin-bottom: 15px !important;
+            grid-column: unset !important;
+          }
+        `;
+        document.head.appendChild(style);
+      }
+    })();
+  </script>
 </head>
 <body>
   <div class="container">
@@ -51,7 +89,10 @@
     <div id="modals-container"></div>
   </div>
 
-  <!-- Version Manager - Load first -->
+  <!-- Mobile Force - Load first for immediate mobile detection -->
+  <script src="scripts/mobileForce.js"></script>
+  
+  <!-- Version Manager - Load second -->
   <script src="scripts/versionManager.js"></script>
   
   <!-- Force Reload utility -->
