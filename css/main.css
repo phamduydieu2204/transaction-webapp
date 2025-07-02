@@ -23,6 +23,7 @@
 @import url('components/expense-quick-search.css'); /* Expense quick search component */
 @import url('components/employee-badge.css'); /* Employee badge in info cell */
 @import url('components/tabs.css');
+@import url('components/tab-navigation-purple.css'); /* Purple theme for tab navigation */
 @import url('components/cards.css');
 @import url('components/charts.css');
 @import url('components/reports.css');
