@@ -42,13 +42,13 @@ export function getTodayFormatted() {
 export function setDefaultDates(forceUpdate = false, recalculateEndDate = true) {
   const today = getTodayFormatted();
   
-  // Set transaction date - Always update if forceUpdate is true
+  // Set transaction date - Always set to today on page load, or when forceUpdate is true
   const transactionDateInput = document.getElementById('transactionDate');
   if (transactionDateInput && (!transactionDateInput.value || forceUpdate)) {
     transactionDateInput.value = today;
   }
   
-  // Set start date - Always update if forceUpdate is true
+  // Set start date - Always set to today on page load, or when forceUpdate is true
   const startDateInput = document.getElementById('startDate');
   if (startDateInput && (!startDateInput.value || forceUpdate)) {
     startDateInput.value = today;
@@ -68,8 +68,8 @@ export function setDefaultDates(forceUpdate = false, recalculateEndDate = true) 
  * Initialize date calculations and event listeners
  */
 export function initializeDateCalculations() {
-  // Set default dates with recalculation enabled
-  setDefaultDates(false, true);
+  // Set default dates to today with recalculation enabled
+  setDefaultDates(true, true); // Force update to today and recalculate end date
   
   // Add event listeners
   const startDateInput = document.getElementById('startDate');
