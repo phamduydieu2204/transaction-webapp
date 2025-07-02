@@ -88,7 +88,7 @@ function updateSoftwareTable() {
   if (pageData.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="10" style="text-align: center; padding: 20px; color: #666;">
+        <td colspan="11" style="text-align: center; padding: 20px; color: #666;">
           Không có dữ liệu phần mềm
         </td>
       </tr>
@@ -146,6 +146,7 @@ function updateSoftwareTable() {
         <td>${softwarePackage}</td>
         <td>${accountName}</td>
         <td style="text-align: right;">${price}</td>
+        <td style="text-align: center;">${software.allowedUsers || '-'}</td>
         <td class="login-info-cell">${loginInfo}</td>
         <td style="text-align: center;">${lastModified}</td>
         <td style="text-align: center;">${renewalDate}</td>
@@ -422,6 +423,7 @@ function editSoftwareItem(software, index) {
     softwareFormPackage: document.getElementById('softwareFormPackage'),
     softwareFormAccount: document.getElementById('softwareFormAccount'),
     price: document.getElementById('price'),
+    allowedUsers: document.getElementById('allowedUsers'),
     accountSheetId: document.getElementById('accountSheetId'),
     orderInfo: document.getElementById('orderInfo'),
     loginUsername: document.getElementById('loginUsername'),
@@ -439,6 +441,7 @@ function editSoftwareItem(software, index) {
     if (formElements.softwareFormPackage) formElements.softwareFormPackage.value = software.softwarePackage || '';
     if (formElements.softwareFormAccount) formElements.softwareFormAccount.value = software.accountName || '';
     if (formElements.price) formElements.price.value = software.price || '';
+    if (formElements.allowedUsers) formElements.allowedUsers.value = software.allowedUsers || '';
     if (formElements.accountSheetId) formElements.accountSheetId.value = software.accountSheetId || '';
     if (formElements.orderInfo) formElements.orderInfo.value = software.orderInfo || '';
     if (formElements.loginUsername) formElements.loginUsername.value = software.username || '';
@@ -836,6 +839,7 @@ function getSoftwareFormData() {
     softwarePackage: document.getElementById('softwareFormPackage')?.value?.trim() || '',
     accountName: document.getElementById('softwareFormAccount')?.value?.trim() || '',
     price: document.getElementById('price')?.value?.trim() || '',
+    allowedUsers: document.getElementById('allowedUsers')?.value?.trim() || '',
     accountSheetId: document.getElementById('accountSheetId')?.value?.trim() || '',
     orderInfo: document.getElementById('orderInfo')?.value?.trim() || '',
     loginUsername: document.getElementById('loginUsername')?.value?.trim() || '',
@@ -1490,6 +1494,8 @@ function fillFormFields(matchingSoftware, includeOptionalFields = true) {
   requestAnimationFrame(() => {
     // Fill other form fields with existing data
     const fields = {
+      price: document.getElementById('price'),
+      allowedUsers: document.getElementById('allowedUsers'),
       accountSheetId: document.getElementById('accountSheetId'),
       orderInfo: document.getElementById('orderInfo'),
       loginUsername: document.getElementById('loginUsername'),
@@ -1500,6 +1506,14 @@ function fillFormFields(matchingSoftware, includeOptionalFields = true) {
     
     // Batch all value assignments
     const updates = [];
+    
+    if (fields.price && matchingSoftware.price) {
+      updates.push(() => fields.price.value = matchingSoftware.price);
+    }
+    
+    if (fields.allowedUsers && matchingSoftware.allowedUsers) {
+      updates.push(() => fields.allowedUsers.value = matchingSoftware.allowedUsers);
+    }
     
     if (fields.accountSheetId && matchingSoftware.accountSheetId) {
       updates.push(() => fields.accountSheetId.value = matchingSoftware.accountSheetId);
