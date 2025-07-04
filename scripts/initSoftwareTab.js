@@ -2230,6 +2230,20 @@ function getSoftwareSearchConditions() {
     console.log('📅 DEBUG: Renewal date from form:', conditions.renewalDate);
     console.log('📅 DEBUG: Renewal date type:', typeof conditions.renewalDate);
     console.log('📅 DEBUG: Renewal date length:', conditions.renewalDate.length);
+    
+    // Debug: Test with mock data to verify logic
+    const mockSoftwareData = [
+      { renewalDate: '2025/07/13', softwareName: 'Test Software 1' },
+      { renewalDate: '2025/07/14', softwareName: 'Test Software 2' },
+      { renewalDate: '13/07/2025', softwareName: 'Test Software 3 (old format)' },
+      { renewalDate: '2025/7/13', softwareName: 'Test Software 4 (no pad)' }
+    ];
+    
+    console.log('📅 DEBUG: Testing date matching logic with mock data:');
+    mockSoftwareData.forEach(item => {
+      const matches = item.renewalDate === conditions.renewalDate;
+      console.log(`  ${item.softwareName}: "${item.renewalDate}" === "${conditions.renewalDate}" = ${matches}`);
+    });
   }
   
   return conditions;
