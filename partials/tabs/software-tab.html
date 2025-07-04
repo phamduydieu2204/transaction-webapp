@@ -113,10 +113,10 @@
         
         <div class="form-field">
           <label>Ngày gia hạn</label>
-          <input type="text" id="renewalDate" list="renewalDateList" placeholder="Chọn hoặc nhập ngày gia hạn" autocomplete="off">
-          <datalist id="renewalDateList">
-            <!-- Options sẽ được thêm bằng JavaScript -->
-          </datalist>
+          <div class="date-input-container">
+            <input type="text" id="renewalDate" placeholder="dd/mm/yyyy" autocomplete="off">
+            <i class="fas fa-calendar-alt calendar-icon" onclick="openCalendar('renewalDate')"></i>
+          </div>
           <div class="error-message" id="renewalDate-error"></div>
         </div>
         
