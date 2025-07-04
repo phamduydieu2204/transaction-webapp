@@ -35,11 +35,10 @@ export async function loadProfitAnalysis(options = {}) {
         const transactions = window.transactionList || getFromStorage('transactions') || [];
         const expenses = window.expenseList || getFromStorage('expenses') || [];
         
-// console.log('📊 Profit analysis data:', {
-
-  //             transactions: transactions.length,
-  //             expenses: expenses.length
-  //         });
+        // console.log('📊 Profit analysis data:', {
+        //     transactions: transactions.length,
+        //     expenses: expenses.length
+        // });
   //         
   //         // Get date range from options or global filters
   //         const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
