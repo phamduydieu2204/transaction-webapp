@@ -36,172 +36,174 @@ export async function loadProfitAnalysis(options = {}) {
         const expenses = window.expenseList || getFromStorage('expenses') || [];
         
 // console.log('📊 Profit analysis data:', {
-            transactions: transactions.length,
-            expenses: expenses.length
-        });
-        
-        // Get date range from options or global filters
-        const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
-        const period = options.period || window.globalFilters?.period || 'this_month';
-        
-        // Filter transactions by date range, but keep ALL expenses for allocation calculation
-        const filteredTransactions = filterDataByDateRange(transactions, dateRange);
-        // For expenses: keep all data, let calculateExpenseMetrics handle the filtering logic
-        const allExpenses = expenses;
-        
+
+  //             transactions: transactions.length,
+  //             expenses: expenses.length
+  //         });
+  //         
+  //         // Get date range from options or global filters
+  //         const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
+  //         const period = options.period || window.globalFilters?.period || 'this_month';
+  //         
+  //         // Filter transactions by date range, but keep ALL expenses for allocation calculation
+  //         const filteredTransactions = filterDataByDateRange(transactions, dateRange);
+  //         // For expenses: keep all data, let calculateExpenseMetrics handle the filtering logic
+  //         const allExpenses = expenses;
+  //         
 // console.log('📊 Profit analysis data filtering:', {
-            originalTransactions: transactions.length,
-            filteredTransactions: filteredTransactions.length,
-            allExpensesKept: allExpenses.length,
-            dateRange: dateRange
-        });
-        
-        // Load all components
-        await Promise.all([
-            updateProfitOverviewGrid(filteredTransactions, allExpenses, period, dateRange),
-            updateProfitKPIs(filteredTransactions, allExpenses, period, dateRange),
-            loadProfitAnalysisData(filteredTransactions, allExpenses, dateRange),
-            loadSoftwareProfitAnalysis(filteredTransactions, allExpenses, dateRange),
-            renderProfitTrendChart(filteredTransactions, allExpenses, period),
-            renderProfitBreakdownChart(filteredTransactions, allExpenses, dateRange),
-            updateProfitInsights(filteredTransactions, allExpenses)
-        ]);
-        
-        // Setup tooltips and event handlers
-        setupProfitTooltips();
-        setupProfitAnalysisHandlers();
-        
-        // console.log('✅ Profit analysis report loaded successfully');
-        
-    } catch (error) {
-        console.error('❌ Error loading profit analysis report:', error);
-        showError('Không thể tải phân tích lợi nhuận');
-    }
-}
 
+  //             originalTransactions: transactions.length,
+  //             filteredTransactions: filteredTransactions.length,
+  //             allExpensesKept: allExpenses.length,
+  //             dateRange: dateRange
+  //         });
+  //         
+  //         // Load all components
+  //         await Promise.all([
+  //             updateProfitOverviewGrid(filteredTransactions, allExpenses, period, dateRange),
+  //             updateProfitKPIs(filteredTransactions, allExpenses, period, dateRange),
+  //             loadProfitAnalysisData(filteredTransactions, allExpenses, dateRange),
+  //             loadSoftwareProfitAnalysis(filteredTransactions, allExpenses, dateRange),
+  //             renderProfitTrendChart(filteredTransactions, allExpenses, period),
+  //             renderProfitBreakdownChart(filteredTransactions, allExpenses, dateRange),
+  //             updateProfitInsights(filteredTransactions, allExpenses)
+  //         ]);
+  //         
+  //         // Setup tooltips and event handlers
+  //         setupProfitTooltips();
+  //         setupProfitAnalysisHandlers();
+  //         
+  //         // console.log('✅ Profit analysis report loaded successfully');
+  //         
+  //     } catch (error) {
+  //         console.error('❌ Error loading profit analysis report:', error);
+  //         showError('Không thể tải phân tích lợi nhuận');
+  //     }
+  // }
+  // 
 /**
- * Load the profit analysis HTML template
- */
-async function loadProfitAnalysisHTML() {
-    const container = document.getElementById('report-profit');
-    if (!container) return;
-    
-    try {
-        const response = await fetch('./partials/tabs/report-pages/profit-analysis.html');
-        if (!response.ok) {
-            throw new Error('Template not found');
-        }
-        
-        const html = await response.text();
-        container.innerHTML = html;
-        container.classList.add('active');
-        
-        // console.log('✅ Profit analysis template loaded');
-        
-    } catch (error) {
-        console.error('❌ Could not load profit analysis template:', error);
-        throw error;
-    }
-}
-
+  //  * Load the profit analysis HTML template
+  //  */
+  // async function loadProfitAnalysisHTML() {
+  //     const container = document.getElementById('report-profit');
+  //     if (!container) return;
+  //     
+  //     try {
+  //         const response = await fetch('./partials/tabs/report-pages/profit-analysis.html');
+  //         if (!response.ok) {
+  //             throw new Error('Template not found');
+  //         }
+  //         
+  //         const html = await response.text();
+  //         container.innerHTML = html;
+  //         container.classList.add('active');
+  //         
+  //         // console.log('✅ Profit analysis template loaded');
+  //         
+  //     } catch (error) {
+  //         console.error('❌ Could not load profit analysis template:', error);
+  //         throw error;
+  //     }
+  // }
+  // 
 /**
- * Update profit KPI cards
- */
-async function updateProfitKPIs(transactions, expenses, period, dateRange) {
-    // console.log('💰 Updating profit KPIs');
-    
-    // Calculate current period metrics
-    const revenueMetrics = calculateRevenueMetrics(transactions);
-    const expenseMetrics = calculateExpenseMetrics(expenses, dateRange);
-    const profitMetrics = calculateProfitMetrics(revenueMetrics, expenseMetrics);
-    
-    // Calculate previous period for comparison
-    const previousTransactions = getPreviousPeriodTransactions(transactions, period);
-    const previousExpenses = getPreviousPeriodExpenses(expenses, period);
-    const previousRevenueMetrics = calculateRevenueMetrics(previousTransactions);
-    const previousExpenseMetrics = calculateExpenseMetrics(previousExpenses, dateRange);
-    const previousProfitMetrics = calculateProfitMetrics(previousRevenueMetrics, previousExpenseMetrics);
-    
-    // Update KPI values
-    updateKPIElement('gross-profit-value', formatRevenue(profitMetrics.grossProfit));
-    updateKPIElement('net-profit-value', formatRevenue(profitMetrics.netProfit));
-    updateKPIElement('profit-margin-kpi', `${profitMetrics.profitMargin.toFixed(1)}%`);
-    
-    // Calculate and update changes
-    const grossProfitChange = calculatePercentageChange(
-        previousProfitMetrics.grossProfit, 
-        profitMetrics.grossProfit
-    );
-    const netProfitChange = calculatePercentageChange(
-        previousProfitMetrics.netProfit, 
-        profitMetrics.netProfit
-    );
-    
-    updateChangeElement('gross-profit-change', grossProfitChange);
-    updateChangeElement('net-profit-change', netProfitChange);
-    
-    // Update business efficiency
-    const efficiency = calculateBusinessEfficiency(profitMetrics);
-    updateKPIElement('business-efficiency', efficiency.label);
-    updateKPIElement('efficiency-detail', efficiency.description);
-    
-    // console.log('💰 Profit KPIs updated:', profitMetrics);
-}
-
+  //  * Update profit KPI cards
+  //  */
+  // async function updateProfitKPIs(transactions, expenses, period, dateRange) {
+  //     // console.log('💰 Updating profit KPIs');
+  //     
+  //     // Calculate current period metrics
+  //     const revenueMetrics = calculateRevenueMetrics(transactions);
+  //     const expenseMetrics = calculateExpenseMetrics(expenses, dateRange);
+  //     const profitMetrics = calculateProfitMetrics(revenueMetrics, expenseMetrics);
+  //     
+  //     // Calculate previous period for comparison
+  //     const previousTransactions = getPreviousPeriodTransactions(transactions, period);
+  //     const previousExpenses = getPreviousPeriodExpenses(expenses, period);
+  //     const previousRevenueMetrics = calculateRevenueMetrics(previousTransactions);
+  //     const previousExpenseMetrics = calculateExpenseMetrics(previousExpenses, dateRange);
+  //     const previousProfitMetrics = calculateProfitMetrics(previousRevenueMetrics, previousExpenseMetrics);
+  //     
+  //     // Update KPI values
+  //     updateKPIElement('gross-profit-value', formatRevenue(profitMetrics.grossProfit));
+  //     updateKPIElement('net-profit-value', formatRevenue(profitMetrics.netProfit));
+  //     updateKPIElement('profit-margin-kpi', `${profitMetrics.profitMargin.toFixed(1)}%`);
+  //     
+  //     // Calculate and update changes
+  //     const grossProfitChange = calculatePercentageChange(
+  //         previousProfitMetrics.grossProfit, 
+  //         profitMetrics.grossProfit
+  //     );
+  //     const netProfitChange = calculatePercentageChange(
+  //         previousProfitMetrics.netProfit, 
+  //         profitMetrics.netProfit
+  //     );
+  //     
+  //     updateChangeElement('gross-profit-change', grossProfitChange);
+  //     updateChangeElement('net-profit-change', netProfitChange);
+  //     
+  //     // Update business efficiency
+  //     const efficiency = calculateBusinessEfficiency(profitMetrics);
+  //     updateKPIElement('business-efficiency', efficiency.label);
+  //     updateKPIElement('efficiency-detail', efficiency.description);
+  //     
+  //     // console.log('💰 Profit KPIs updated:', profitMetrics);
+  // }
+  // 
 /**
- * Load profit analysis data into the table
- */
-async function loadProfitAnalysisData(transactions, expenses, dateRange) {
-    // console.log('💰 Loading profit analysis data for table');
-    
-    try {
-        // Calculate metrics
-        const revenueMetrics = calculateRevenueMetrics(transactions);
-        const expenseMetrics = calculateExpenseMetrics(expenses, dateRange);
-        const profitMetrics = calculateProfitMetrics(revenueMetrics, expenseMetrics);
-        
-        // Update table
-        updateProfitTableValues(profitMetrics);
-        updateProfitSummaryCards(profitMetrics);
-        
-        // console.log('💰 Profit analysis data loaded:', profitMetrics);
-        
-    } catch (error) {
-        console.error('❌ Error loading profit analysis data:', error);
-    }
-}
-
+  //  * Load profit analysis data into the table
+  //  */
+  // async function loadProfitAnalysisData(transactions, expenses, dateRange) {
+  //     // console.log('💰 Loading profit analysis data for table');
+  //     
+  //     try {
+  //         // Calculate metrics
+  //         const revenueMetrics = calculateRevenueMetrics(transactions);
+  //         const expenseMetrics = calculateExpenseMetrics(expenses, dateRange);
+  //         const profitMetrics = calculateProfitMetrics(revenueMetrics, expenseMetrics);
+  //         
+  //         // Update table
+  //         updateProfitTableValues(profitMetrics);
+  //         updateProfitSummaryCards(profitMetrics);
+  //         
+  //         // console.log('💰 Profit analysis data loaded:', profitMetrics);
+  //         
+  //     } catch (error) {
+  //         console.error('❌ Error loading profit analysis data:', error);
+  //     }
+  // }
+  // 
 /**
- * Calculate revenue metrics from transactions
- */
-function calculateRevenueMetrics(transactions) {
-    let grossRevenue = 0;
-    let refundAmount = 0;
-    let validTransactionCount = 0;
-    
-    transactions.forEach(rawTransaction => {
-        const t = normalizeTransaction(rawTransaction);
-        if (!t) return;
-        
-        const status = (t.transactionType || t.loaiGiaoDich || '').toLowerCase().trim();
-        const amount = t.revenue || 0;
-        
-        if (status === 'đã hoàn tất' || status === 'đã thanh toán') {
-            grossRevenue += amount;
-            validTransactionCount++;
-        } else if (status === 'hoàn tiền') {
-            refundAmount += Math.abs(amount);
-        }
-    });
-    
-    const totalRevenue = grossRevenue - refundAmount;
-    
-    return {
-        totalRevenue,
-        grossRevenue,
-        refundAmount,
-        transactionCount: validTransactionCount
-    };
+  //  * Calculate revenue metrics from transactions
+  //  */
+  // function calculateRevenueMetrics(transactions) {
+  //     let grossRevenue = 0;
+  //     let refundAmount = 0;
+  //     let validTransactionCount = 0;
+  //     
+  //     transactions.forEach(rawTransaction => {
+  //         const t = normalizeTransaction(rawTransaction);
+  //         if (!t) return;
+  //         
+  //         const status = (t.transactionType || t.loaiGiaoDich || '').toLowerCase().trim();
+  //         const amount = t.revenue || 0;
+  //         
+  //         if (status === 'đã hoàn tất' || status === 'đã thanh toán') {
+  //             grossRevenue += amount;
+  //             validTransactionCount++;
+  //         } else if (status === 'hoàn tiền') {
+  //             refundAmount += Math.abs(amount);
+  //         }
+  //     });
+  //     
+  //     const totalRevenue = grossRevenue - refundAmount;
+  //     
+  //     return {
+  //         totalRevenue,
+  //         grossRevenue,
+  //         refundAmount,
+  //         transactionCount: validTransactionCount
+  //     };
 }
 
 /**
@@ -263,58 +265,62 @@ function calculateExpenseMetrics(expenses, dateRange) {
                     allocatedAmount = amount * effectiveDays / totalDays;
                     
 // console.log(`📊 Renewal < End Date calculation:`, {
-                        renewalDate: !isNaN(renewalDate.getTime()) ? renewalDate.toISOString().split('T')[0] : 'Invalid Date',
-                        rangeEnd: rangeEnd && !isNaN(rangeEnd.getTime()) ? rangeEnd.toISOString().split('T')[0] : 'Invalid Date',
-                        daysToRenewal: daysToRenewal,
-                        daysToToday: daysToToday,
-                        effectiveDays: effectiveDays,
-                        formula: `${amount} * ${effectiveDays} / ${totalDays} = ${allocatedAmount.toFixed(2)}`
-                    });
-                } 
-                // Nếu ngày tái tục >= ngày cuối chu kỳ
-                else {
-                    // Công thức: số tiền * periodDays / totalDays
-                    allocatedAmount = amount * periodDays / totalDays;
-                    
+
+  //                         renewalDate: !isNaN(renewalDate.getTime()) ? renewalDate.toISOString().split('T')[0] : 'Invalid Date',
+  //                         rangeEnd: rangeEnd && !isNaN(rangeEnd.getTime()) ? rangeEnd.toISOString().split('T')[0] : 'Invalid Date',
+  //                         daysToRenewal: daysToRenewal,
+  //                         daysToToday: daysToToday,
+  //                         effectiveDays: effectiveDays,
+  //                         formula: `${amount} * ${effectiveDays} / ${totalDays} = ${allocatedAmount.toFixed(2)}`
+  //                     });
+  //                 } 
+  //                 // Nếu ngày tái tục >= ngày cuối chu kỳ
+  //                 else {
+  //                     // Công thức: số tiền * periodDays / totalDays
+  //                     allocatedAmount = amount * periodDays / totalDays;
+  //                     
 // console.log(`📊 Renewal >= End Date calculation:`, {
-                        renewalDate: !isNaN(renewalDate.getTime()) ? renewalDate.toISOString().split('T')[0] : 'Invalid Date',
-                        rangeEnd: rangeEnd && !isNaN(rangeEnd.getTime()) ? rangeEnd.toISOString().split('T')[0] : 'Invalid Date',
-                        periodDays: periodDays,
-                        formula: `${amount} * ${periodDays} / ${totalDays} = ${allocatedAmount.toFixed(2)}`
-                    });
-                }
-                
-                allocatedCosts += allocatedAmount;
-                
+
+  //                         renewalDate: !isNaN(renewalDate.getTime()) ? renewalDate.toISOString().split('T')[0] : 'Invalid Date',
+  //                         rangeEnd: rangeEnd && !isNaN(rangeEnd.getTime()) ? rangeEnd.toISOString().split('T')[0] : 'Invalid Date',
+  //                         periodDays: periodDays,
+  //                         formula: `${amount} * ${periodDays} / ${totalDays} = ${allocatedAmount.toFixed(2)}`
+  //                     });
+  //                 }
+  //                 
+  //                 allocatedCosts += allocatedAmount;
+  //                 
 // console.log(`📊 Final allocated cost summary:`, {
-                    expenseId: expense.expenseId || 'N/A',
-                    product: expense.product || 'N/A',
-                    amount: amount,
-                    expenseDate: !isNaN(expenseDate.getTime()) ? expenseDate.toISOString().split('T')[0] : 'Invalid Date',
-                    renewalDate: !isNaN(renewalDate.getTime()) ? renewalDate.toISOString().split('T')[0] : 'Invalid Date',
-                    rangeStart: rangeStart && !isNaN(rangeStart.getTime()) ? rangeStart.toISOString().split('T')[0] : 'Invalid Date',
-                    rangeEnd: rangeEnd && !isNaN(rangeEnd.getTime()) ? rangeEnd.toISOString().split('T')[0] : 'Invalid Date',
-                    totalDays: totalDays,
-                    periodDays: periodDays,
-                    isRenewalBeforeEnd: renewalDate < rangeEnd,
-                    allocatedAmount: allocatedAmount.toFixed(2)
-                });
-            }
-        }
-    });
-    
+
+  //                     expenseId: expense.expenseId || 'N/A',
+  //                     product: expense.product || 'N/A',
+  //                     amount: amount,
+  //                     expenseDate: !isNaN(expenseDate.getTime()) ? expenseDate.toISOString().split('T')[0] : 'Invalid Date',
+  //                     renewalDate: !isNaN(renewalDate.getTime()) ? renewalDate.toISOString().split('T')[0] : 'Invalid Date',
+  //                     rangeStart: rangeStart && !isNaN(rangeStart.getTime()) ? rangeStart.toISOString().split('T')[0] : 'Invalid Date',
+  //                     rangeEnd: rangeEnd && !isNaN(rangeEnd.getTime()) ? rangeEnd.toISOString().split('T')[0] : 'Invalid Date',
+  //                     totalDays: totalDays,
+  //                     periodDays: periodDays,
+  //                     isRenewalBeforeEnd: renewalDate < rangeEnd,
+  //                     allocatedAmount: allocatedAmount.toFixed(2)
+  //                 });
+  //             }
+  //         }
+  //     });
+  //     
 // console.log(`💰 Expense metrics calculated:`, {
-        allocatedCosts: allocatedCosts.toFixed(2),
-        directCosts: directCosts.toFixed(2),
-        totalExpensesProcessed: expenses.length,
-        dateRange: dateRange ? `${dateRange.start} to ${dateRange.end}` : 'No date range'
-    });
-    
-    return {
-        allocatedCosts,
-        directCosts,
-        totalCosts: allocatedCosts + directCosts
-    };
+
+  //         allocatedCosts: allocatedCosts.toFixed(2),
+  //         directCosts: directCosts.toFixed(2),
+  //         totalExpensesProcessed: expenses.length,
+  //         dateRange: dateRange ? `${dateRange.start} to ${dateRange.end}` : 'No date range'
+  //     });
+  //     
+  //     return {
+  //         allocatedCosts,
+  //         directCosts,
+  //         totalCosts: allocatedCosts + directCosts
+  //     };
 }
 
 /**
@@ -1289,280 +1295,289 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
     let directCosts = 0;
     
 // console.log(`🔍 DEBUG SOFTWARE ALLOCATED COSTS - START:`, {
-        softwareName: softwareName,
-        totalExpenses: expenses.length,
-        dateRange: dateRange,
-        dateRangeFormatted: dateRange ? `${dateRange.start} to ${dateRange.end}` : 'No date range'
-    });
-    
-    // Log sample expense data to understand structure
-    if (expenses.length > 0) {
-        // console.log(`📋 Sample expense data (first 3 items):`, expenses.slice(0, 3));
-        
-        // Log all possible field names from first expense
-        if (expenses[0]) {
-            // console.log(`📊 Available fields in expense object:`, Object.keys(expenses[0]));
+
+  //         softwareName: softwareName,
+  //         totalExpenses: expenses.length,
+  //         dateRange: dateRange,
+  //         dateRangeFormatted: dateRange ? `${dateRange.start} to ${dateRange.end}` : 'No date range'
+  //     });
+  //     
+  //     // Log sample expense data to understand structure
+  //     if (expenses.length > 0) {
+  //         // console.log(`📋 Sample expense data (first 3 items):`, expenses.slice(0, 3));
+  //         
+  //         // Log all possible field names from first expense
+  //         if (expenses[0]) {
+  //             // console.log(`📊 Available fields in expense object:`, Object.keys(expenses[0]));
 // console.log(`📊 Field values that might contain software name:`, {
-                product: expenses[0].product,
-                tenChuan: expenses[0].tenChuan,
-                standardName: expenses[0].standardName,
-                tenSanPham: expenses[0].tenSanPham,
-                moTa: expenses[0].moTa,
-                description: expenses[0].description
-            });
-            
-            // Check for "Vận hành văn phòng" in all expenses
-            const vanHanhExpenses = expenses.filter(exp => {
-                const product = (exp.product || exp.tenSanPham || '').toLowerCase();
-                const tenChuan = (exp.tenChuan || exp.standardName || '').toLowerCase();
-                const description = (exp.moTa || exp.description || '').toLowerCase();
-                return product.includes('văn phòng') || tenChuan.includes('văn phòng') || description.includes('văn phòng');
-            });
-            
-            // console.log(`🏢 Found ${vanHanhExpenses.length} expenses with "văn phòng":`, vanHanhExpenses);
-        }
-    }
-    
-    let processedCount = 0;
-    let matchedCount = 0;
-    
-    expenses.forEach((expense, index) => {
-        // Log full expense object for first few items
-        if (index < 5) {
-            // console.log(`📦 Expense #${index + 1} full data:`, expense);
-        }
-        
-        // Get software name from expense using tenChuan field (cột T trong sheet ChiPhi)
-        const expenseTenChuan = (expense.tenChuan || expense.standardName || '').trim();
-        const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
-        
-        // Debug: Log field values
-        if (index < 5) {
+
+  //                 product: expenses[0].product,
+  //                 tenChuan: expenses[0].tenChuan,
+  //                 standardName: expenses[0].standardName,
+  //                 tenSanPham: expenses[0].tenSanPham,
+  //                 moTa: expenses[0].moTa,
+  //                 description: expenses[0].description
+  //             });
+  //             
+  //             // Check for "Vận hành văn phòng" in all expenses
+  //             const vanHanhExpenses = expenses.filter(exp => {
+  //                 const product = (exp.product || exp.tenSanPham || '').toLowerCase();
+  //                 const tenChuan = (exp.tenChuan || exp.standardName || '').toLowerCase();
+  //                 const description = (exp.moTa || exp.description || '').toLowerCase();
+  //                 return product.includes('văn phòng') || tenChuan.includes('văn phòng') || description.includes('văn phòng');
+  //             });
+  //             
+  //             // console.log(`🏢 Found ${vanHanhExpenses.length} expenses with "văn phòng":`, vanHanhExpenses);
+  //         }
+  //     }
+  //     
+  //     let processedCount = 0;
+  //     let matchedCount = 0;
+  //     
+  //     expenses.forEach((expense, index) => {
+  //         // Log full expense object for first few items
+  //         if (index < 5) {
+  //             // console.log(`📦 Expense #${index + 1} full data:`, expense);
+  //         }
+  //         
+  //         // Get software name from expense using tenChuan field (cột T trong sheet ChiPhi)
+  //         const expenseTenChuan = (expense.tenChuan || expense.standardName || '').trim();
+  //         const expenseType = (expense.type || expense.loaiKhoanChi || expense.expenseType || '').trim();
+  //         
+  //         // Debug: Log field values
+  //         if (index < 5) {
 // console.log(`🔤 Expense #${index + 1} tenChuan comparison:`, {
-                expenseTenChuan: expenseTenChuan,
-                targetSoftware: softwareName,
-                matches: expenseTenChuan === softwareName,
-                expenseType: expenseType,
-                isBusinessSoftware: expenseType === 'Kinh doanh phần mềm'
-            });
-        }
-        
-        // Only process if this expense belongs to the current software (direct tenChuan match)
-        if (doesExpenseMatchSoftware(expenseTenChuan, softwareName)) {
-            matchedCount++;
+  //                 expenseTenChuan: expenseTenChuan,
+  //                 targetSoftware: softwareName,
+  //                 matches: expenseTenChuan === softwareName,
+  //                 expenseType: expenseType,
+  //                 isBusinessSoftware: expenseType === 'Kinh doanh phần mềm'
+  //             });
+  //         }
+  //         
+  //         // Only process if this expense belongs to the current software (direct tenChuan match)
+  //         if (doesExpenseMatchSoftware(expenseTenChuan, softwareName)) {
+  //             matchedCount++;
 // console.log(`✅ MATCHED expense #${index + 1} for ${softwareName}:`, {
-                expenseId: expense.expenseId || expense.maChiPhi || 'N/A',
-                description: expense.description || expense.moTa || 'N/A',
-                amount: expense.amount || expense.soTien || 0,
-                allocation: expense.periodicAllocation || expense.phanBo || expense.allocation || '',
-                accountingType: expense.accountingType || expense.loaiKeToan || '',
-                date: expense.date || expense.ngayChi || '',
-                renewDate: expense.renewDate || expense.ngayTaiTuc || ''
-            });
-            
-            const amount = parseFloat(expense.amount || expense.soTien || 0);
-            const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
-            const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
-            const expenseDate = new Date(expense.date || expense.ngayChi || '');
-            const renewalDate = new Date(expense.renewDate || expense.ngayTaiTuc || '');
-            const isValidDates = !isNaN(expenseDate.getTime()) && !isNaN(renewalDate.getTime());
-            
+  //                 expenseId: expense.expenseId || expense.maChiPhi || 'N/A',
+  //                 description: expense.description || expense.moTa || 'N/A',
+  //                 amount: expense.amount || expense.soTien || 0,
+  //                 allocation: expense.periodicAllocation || expense.phanBo || expense.allocation || '',
+  //                 accountingType: expense.accountingType || expense.loaiKeToan || '',
+  //                 date: expense.date || expense.ngayChi || '',
+  //                 renewDate: expense.renewDate || expense.ngayTaiTuc || ''
+  //             });
+  //             
+  //             const amount = parseFloat(expense.amount || expense.soTien || 0);
+  //             const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
+  //             const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
+  //             const expenseDate = new Date(expense.date || expense.ngayChi || '');
+  //             const renewalDate = new Date(expense.renewDate || expense.ngayTaiTuc || '');
+  //             const isValidDates = !isNaN(expenseDate.getTime()) && !isNaN(renewalDate.getTime());
+  //             
 // console.log(`🔢 Processing allocation for matched expense:`, {
-                amount: amount,
-                allocation: allocation,
-                accountingType: accountingType,
-                expenseDate: isValidDates ? expenseDate.toISOString().split('T')[0] : 'Invalid Date',
-                renewalDate: isValidDates ? renewalDate.toISOString().split('T')[0] : 'Invalid Date',
-                isValidDates: isValidDates
-            });
-            
-            // Convert dateRange strings to Date objects
-            const rangeStart = dateRange ? new Date(dateRange.start) : null;
-            const rangeEnd = dateRange ? new Date(dateRange.end) : null;
-            
-            // Apply SAME LOGIC as overview-allocated-cost but filtered by software name
-            
-            // Chi phí không phân bổ: Phân bổ = "Không" và Loại kế toán = "COGS" hoặc "OPEX" và Ngày chi trong chu kỳ
-            if (allocation === 'không' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
-                if (rangeStart && rangeEnd && expenseDate >= rangeStart && expenseDate <= rangeEnd) {
-                    directCosts += amount;
+
+  //                 amount: amount,
+  //                 allocation: allocation,
+  //                 accountingType: accountingType,
+  //                 expenseDate: isValidDates ? expenseDate.toISOString().split('T')[0] : 'Invalid Date',
+  //                 renewalDate: isValidDates ? renewalDate.toISOString().split('T')[0] : 'Invalid Date',
+  //                 isValidDates: isValidDates
+  //             });
+  //             
+  //             // Convert dateRange strings to Date objects
+  //             const rangeStart = dateRange ? new Date(dateRange.start) : null;
+  //             const rangeEnd = dateRange ? new Date(dateRange.end) : null;
+  //             
+  //             // Apply SAME LOGIC as overview-allocated-cost but filtered by software name
+  //             
+  //             // Chi phí không phân bổ: Phân bổ = "Không" và Loại kế toán = "COGS" hoặc "OPEX" và Ngày chi trong chu kỳ
+  //             if (allocation === 'không' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
+  //                 if (rangeStart && rangeEnd && expenseDate >= rangeStart && expenseDate <= rangeEnd) {
+  //                     directCosts += amount;
 // console.log(`💸 Added to direct costs: ${amount} (total direct: ${directCosts})`);
-                }
-            }
-            // Chi phí phân bổ: Loại kế toán = "OPEX" hoặc "COGS", Phân bổ = "Có", Ngày tái tục >= Ngày bắt đầu chu kỳ
-            else if (allocation === 'có' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
+  //                 }
+  //             }
+  //             // Chi phí phân bổ: Loại kế toán = "OPEX" hoặc "COGS", Phân bổ = "Có", Ngày tái tục >= Ngày bắt đầu chu kỳ
+  //             else if (allocation === 'có' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
 // console.log(`🔍 Checking allocated cost conditions:`, {
-                    hasDateRange: rangeStart && rangeEnd,
-                    renewalAfterStart: renewalDate >= rangeStart,
-                    validDates: !isNaN(expenseDate.getTime()) && !isNaN(renewalDate.getTime()),
-                    conditionsMet: rangeStart && rangeEnd && renewalDate >= rangeStart && !isNaN(expenseDate.getTime()) && !isNaN(renewalDate.getTime())
-                });
-                
-                if (rangeStart && rangeEnd && renewalDate >= rangeStart && !isNaN(expenseDate.getTime()) && !isNaN(renewalDate.getTime())) {
-                    
-                    // Tính số ngày từ ngày chi đến ngày tái tục
-                    const totalDays = Math.ceil((renewalDate - expenseDate) / (1000 * 60 * 60 * 24));
-                    
-                    // Tính số ngày trong chu kỳ báo cáo
-                    const periodDays = Math.ceil((rangeEnd - rangeStart) / (1000 * 60 * 60 * 24)) + 1;
-                    
-                    let allocatedAmount = 0;
-                    
-                    // Nếu ngày tái tục < ngày cuối chu kỳ
-                    if (renewalDate < rangeEnd) {
-                        // Ngày hiện tại
-                        const today = new Date();
-                        
-                        // Số ngày từ đầu chu kỳ đến ngày tái tục
-                        const daysToRenewal = Math.ceil((renewalDate - rangeStart) / (1000 * 60 * 60 * 24)) + 1;
-                        
-                        // Số ngày từ đầu chu kỳ đến ngày hiện tại
-                        const daysToToday = Math.ceil((today - rangeStart) / (1000 * 60 * 60 * 24)) + 1;
-                        
-                        // Lấy Min(ngày hiện tại - đầu chu kỳ, ngày tái tục - đầu chu kỳ)
-                        const effectiveDays = Math.min(daysToToday, daysToRenewal);
-                        
-                        // Công thức: số tiền * Min(ngày hiện tại - đầu chu kỳ, ngày tái tục - đầu chu kỳ) / (ngày tái tục - ngày chi)
-                        allocatedAmount = amount * effectiveDays / totalDays;
-                        
+
+  //                     hasDateRange: rangeStart && rangeEnd,
+  //                     renewalAfterStart: renewalDate >= rangeStart,
+  //                     validDates: !isNaN(expenseDate.getTime()) && !isNaN(renewalDate.getTime()),
+  //                     conditionsMet: rangeStart && rangeEnd && renewalDate >= rangeStart && !isNaN(expenseDate.getTime()) && !isNaN(renewalDate.getTime())
+  //                 });
+  //                 
+  //                 if (rangeStart && rangeEnd && renewalDate >= rangeStart && !isNaN(expenseDate.getTime()) && !isNaN(renewalDate.getTime())) {
+  //                     
+  //                     // Tính số ngày từ ngày chi đến ngày tái tục
+  //                     const totalDays = Math.ceil((renewalDate - expenseDate) / (1000 * 60 * 60 * 24));
+  //                     
+  //                     // Tính số ngày trong chu kỳ báo cáo
+  //                     const periodDays = Math.ceil((rangeEnd - rangeStart) / (1000 * 60 * 60 * 24)) + 1;
+  //                     
+  //                     let allocatedAmount = 0;
+  //                     
+  //                     // Nếu ngày tái tục < ngày cuối chu kỳ
+  //                     if (renewalDate < rangeEnd) {
+  //                         // Ngày hiện tại
+  //                         const today = new Date();
+  //                         
+  //                         // Số ngày từ đầu chu kỳ đến ngày tái tục
+  //                         const daysToRenewal = Math.ceil((renewalDate - rangeStart) / (1000 * 60 * 60 * 24)) + 1;
+  //                         
+  //                         // Số ngày từ đầu chu kỳ đến ngày hiện tại
+  //                         const daysToToday = Math.ceil((today - rangeStart) / (1000 * 60 * 60 * 24)) + 1;
+  //                         
+  //                         // Lấy Min(ngày hiện tại - đầu chu kỳ, ngày tái tục - đầu chu kỳ)
+  //                         const effectiveDays = Math.min(daysToToday, daysToRenewal);
+  //                         
+  //                         // Công thức: số tiền * Min(ngày hiện tại - đầu chu kỳ, ngày tái tục - đầu chu kỳ) / (ngày tái tục - ngày chi)
+  //                         allocatedAmount = amount * effectiveDays / totalDays;
+  //                         
                         // console.log(`📊 Allocated calculation (renewal < end):`, {
-                        //     amount: amount,
-                        //     effectiveDays: effectiveDays,
-                        //     totalDays: totalDays,
-                        //     formula: `${amount} * ${effectiveDays} / ${totalDays}`,
-                        //     result: allocatedAmount
-                        // });
-                    } 
-                    // Nếu ngày tái tục >= ngày cuối chu kỳ
-                    else {
-                        allocatedAmount = amount * periodDays / totalDays;
-                        
+
+  //                         //     amount: amount,
+  //                         //     effectiveDays: effectiveDays,
+  //                         //     totalDays: totalDays,
+  //                         //     formula: `${amount} * ${effectiveDays} / ${totalDays}`,
+  //                         //     result: allocatedAmount
+  //                         // });
+  //                     } 
+  //                     // Nếu ngày tái tục >= ngày cuối chu kỳ
+  //                     else {
+  //                         allocatedAmount = amount * periodDays / totalDays;
+  //                         
                         // console.log(`📊 Allocated calculation (renewal >= end):`, {
-                        //     amount: amount,
-                        //     periodDays: periodDays,
-                        //     totalDays: totalDays,
-                        //     formula: `${amount} * ${periodDays} / ${totalDays}`,
-                        //     result: allocatedAmount
-                        // });
-                    }
-                    
-                    allocatedCosts += allocatedAmount;
-                    // console.log(`💰 Added to allocated costs: ${allocatedAmount} (total allocated: ${allocatedCosts})`);
-                }
-            }
-        }
-        
-        processedCount++;
-    });
-    
+
+  //                         //     amount: amount,
+  //                         //     periodDays: periodDays,
+  //                         //     totalDays: totalDays,
+  //                         //     formula: `${amount} * ${periodDays} / ${totalDays}`,
+  //                         //     result: allocatedAmount
+  //                         // });
+  //                     }
+  //                     
+  //                     allocatedCosts += allocatedAmount;
+  //                     // console.log(`💰 Added to allocated costs: ${allocatedAmount} (total allocated: ${allocatedCosts})`);
+  //                 }
+  //             }
+  //         }
+  //         
+  //         processedCount++;
+  //     });
+  //     
 // console.log(`💰 SOFTWARE ALLOCATED COSTS FINAL RESULT for ${softwareName}:`, {
-        allocatedCosts: allocatedCosts,
-        directCosts: directCosts,
-        totalExpenses: expenses.length,
-        processedExpenses: processedCount,
-        matchedExpenses: matchedCount,
-        dateRange: dateRange ? `${dateRange.start} to ${dateRange.end}` : 'No date range'
-    });
-    
-    // Return only allocated costs (matching the column name in the table)
-    return allocatedCosts;
-}
-
+  //         allocatedCosts: allocatedCosts,
+  //         directCosts: directCosts,
+  //         totalExpenses: expenses.length,
+  //         processedExpenses: processedCount,
+  //         matchedExpenses: matchedCount,
+  //         dateRange: dateRange ? `${dateRange.start} to ${dateRange.end}` : 'No date range'
+  //     });
+  //     
+  //     // Return only allocated costs (matching the column name in the table)
+  //     return allocatedCosts;
+  // }
+  // 
 /**
- * Calculate direct costs for a specific software (không phân bổ)
- */
-function calculateSoftwareDirectCosts(expenses, softwareName, dateRange) {
+  //  * Calculate direct costs for a specific software (không phân bổ)
+  //  */
+  // function calculateSoftwareDirectCosts(expenses, softwareName, dateRange) {
 // console.log(`🔍 DEBUG SOFTWARE DIRECT COSTS - START:`, {
-        softwareName: softwareName,
-        totalExpenses: expenses.length,
-        dateRange: dateRange ? `${dateRange.start} to ${dateRange.end}` : 'No date range'
-    });
-    
-    let directCosts = 0;
-    let processedCount = 0;
-    let matchedCount = 0;
-    
-    // Convert dateRange strings to Date objects
-    const rangeStart = dateRange ? new Date(dateRange.start) : null;
-    const rangeEnd = dateRange ? new Date(dateRange.end) : null;
-    
-    expenses.forEach((expense, index) => {
-        // Get software name from expense using tenChuan field (cột T trong sheet ChiPhi)
-        const expenseTenChuan = (expense.tenChuan || expense.standardName || '').trim();
-        
-        // Check if this expense tenChuan matches the target software (direct comparison)
-        if (!doesExpenseMatchSoftware(expenseTenChuan, softwareName)) {
-            return;
-        }
-        
-        matchedCount++;
-        
-        const amount = parseFloat(expense.amount || expense.soTien || 0);
-        const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
-        const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
-        const expenseDate = new Date(expense.date || expense.ngayChi || '');
-        const isValidExpenseDate = !isNaN(expenseDate.getTime());
-        
+
+  //         softwareName: softwareName,
+  //         totalExpenses: expenses.length,
+  //         dateRange: dateRange ? `${dateRange.start} to ${dateRange.end}` : 'No date range'
+  //     });
+  //     
+  //     let directCosts = 0;
+  //     let processedCount = 0;
+  //     let matchedCount = 0;
+  //     
+  //     // Convert dateRange strings to Date objects
+  //     const rangeStart = dateRange ? new Date(dateRange.start) : null;
+  //     const rangeEnd = dateRange ? new Date(dateRange.end) : null;
+  //     
+  //     expenses.forEach((expense, index) => {
+  //         // Get software name from expense using tenChuan field (cột T trong sheet ChiPhi)
+  //         const expenseTenChuan = (expense.tenChuan || expense.standardName || '').trim();
+  //         
+  //         // Check if this expense tenChuan matches the target software (direct comparison)
+  //         if (!doesExpenseMatchSoftware(expenseTenChuan, softwareName)) {
+  //             return;
+  //         }
+  //         
+  //         matchedCount++;
+  //         
+  //         const amount = parseFloat(expense.amount || expense.soTien || 0);
+  //         const allocation = (expense.periodicAllocation || expense.phanBo || expense.allocation || '').toLowerCase().trim();
+  //         const accountingType = (expense.accountingType || expense.loaiKeToan || '').trim();
+  //         const expenseDate = new Date(expense.date || expense.ngayChi || '');
+  //         const isValidExpenseDate = !isNaN(expenseDate.getTime());
+  //         
 // console.log(`🔢 Processing direct cost for matched expense (tenChuan):`, {
-            expenseId: expense.expenseId || 'N/A',
-            expenseTenChuan: expenseTenChuan,
-            softwareName: softwareName,
-            directMatch: doesExpenseMatchSoftware(expenseTenChuan, softwareName),
-            amount: amount,
-            allocation: allocation,
-            accountingType: accountingType,
-            expenseDate: isValidExpenseDate ? expenseDate.toISOString().split('T')[0] : 'Invalid Date',
-            isValidExpenseDate: isValidExpenseDate,
-            rangeStart: rangeStart ? rangeStart.toISOString().split('T')[0] : 'No start',
-            rangeEnd: rangeEnd ? rangeEnd.toISOString().split('T')[0] : 'No end',
-            expenseInRange: rangeStart && rangeEnd && isValidExpenseDate && expenseDate >= rangeStart && expenseDate <= rangeEnd
-        });
-        
-        // Chi phí không phân bổ: Phân bổ = "Không" và Loại kế toán = "COGS" hoặc "OPEX" và Ngày chi trong chu kỳ
-        if (allocation === 'không' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
-            // Chỉ tính chi phí không phân bổ nếu ngày chi nằm trong chu kỳ
-            if (rangeStart && rangeEnd && isValidExpenseDate && expenseDate >= rangeStart && expenseDate <= rangeEnd) {
-                directCosts += amount;
-                
+
+  //             expenseId: expense.expenseId || 'N/A',
+  //             expenseTenChuan: expenseTenChuan,
+  //             softwareName: softwareName,
+  //             directMatch: doesExpenseMatchSoftware(expenseTenChuan, softwareName),
+  //             amount: amount,
+  //             allocation: allocation,
+  //             accountingType: accountingType,
+  //             expenseDate: isValidExpenseDate ? expenseDate.toISOString().split('T')[0] : 'Invalid Date',
+  //             isValidExpenseDate: isValidExpenseDate,
+  //             rangeStart: rangeStart ? rangeStart.toISOString().split('T')[0] : 'No start',
+  //             rangeEnd: rangeEnd ? rangeEnd.toISOString().split('T')[0] : 'No end',
+  //             expenseInRange: rangeStart && rangeEnd && isValidExpenseDate && expenseDate >= rangeStart && expenseDate <= rangeEnd
+  //         });
+  //         
+  //         // Chi phí không phân bổ: Phân bổ = "Không" và Loại kế toán = "COGS" hoặc "OPEX" và Ngày chi trong chu kỳ
+  //         if (allocation === 'không' && (accountingType === 'COGS' || accountingType === 'OPEX')) {
+  //             // Chỉ tính chi phí không phân bổ nếu ngày chi nằm trong chu kỳ
+  //             if (rangeStart && rangeEnd && isValidExpenseDate && expenseDate >= rangeStart && expenseDate <= rangeEnd) {
+  //                 directCosts += amount;
+  //                 
 // console.log(`💰 Added direct cost:`, {
-                    amount: amount,
-                    expenseDate: expenseDate.toISOString().split('T')[0],
-                    rangeStart: rangeStart.toISOString().split('T')[0],
-                    rangeEnd: rangeEnd.toISOString().split('T')[0],
-                    runningTotal: directCosts
-                });
-            }
-        }
-        
-        processedCount++;
-    });
-    
+
+  //                     amount: amount,
+  //                     expenseDate: expenseDate.toISOString().split('T')[0],
+  //                     rangeStart: rangeStart.toISOString().split('T')[0],
+  //                     rangeEnd: rangeEnd.toISOString().split('T')[0],
+  //                     runningTotal: directCosts
+  //                 });
+  //             }
+  //         }
+  //         
+  //         processedCount++;
+  //     });
+  //     
 // console.log(`💰 SOFTWARE DIRECT COSTS FINAL RESULT for ${softwareName}:`, {
-        directCosts: directCosts,
-        totalExpenses: expenses.length,
-        processedExpenses: processedCount,
-        matchedExpenses: matchedCount,
-        dateRange: dateRange ? `${dateRange.start} to ${dateRange.end}` : 'No date range'
-    });
-    
-    return directCosts;
-}
-
+  //         directCosts: directCosts,
+  //         totalExpenses: expenses.length,
+  //         processedExpenses: processedCount,
+  //         matchedExpenses: matchedCount,
+  //         dateRange: dateRange ? `${dateRange.start} to ${dateRange.end}` : 'No date range'
+  //     });
+  //     
+  //     return directCosts;
+  // }
+  // 
 /**
- * Format currency with zero handling
- */
-function formatCurrencyForTable(amount) {
-    if (amount === 0 || amount === null || amount === undefined) {
-        return '<span class="zero-value">-</span>';
-    }
-    return formatRevenue(amount);
-}
-
+  //  * Format currency with zero handling
+  //  */
+  // function formatCurrencyForTable(amount) {
+  //     if (amount === 0 || amount === null || amount === undefined) {
+  //         return '<span class="zero-value">-</span>';
+  //     }
+  //     return formatRevenue(amount);
+  // }
+  // 
 /**
- * Get profit status class and label
- */
-function getProfitStatus(profitMargin) {
-    if (profitMargin >= 30) return { class: 'excellent', label: 'Xuất sắc' };
+  //  * Get profit status class and label
+  //  */
+  // function getProfitStatus(profitMargin) {
+  //     if (profitMargin >= 30) return { class: 'excellent', label: 'Xuất sắc' };
     if (profitMargin >= 20) return { class: 'high', label: 'Cao' };
     if (profitMargin >= 10) return { class: 'medium', label: 'Trung bình' };
     if (profitMargin >= 0) return { class: 'low', label: 'Thấp' };

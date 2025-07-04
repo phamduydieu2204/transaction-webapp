@@ -60,49 +60,50 @@ export async function initExpenseTab() {
     
     // Debug: Check current expense list state
 // console.log('🔍 DEBUG: Checking expense list state:', {
-      exists: !!window.expenseList,
-      length: window.expenseList?.length || 0,
-      type: typeof window.expenseList,
-      expenseTabInitialized: window.expenseTabInitialized
-    });
-    
-    // Check if we already have data and don't need to reload
-    if (window.expenseTabInitialized && window.expenseList && window.expenseList.length > 0) {
-      // console.log(`✅ Using cached expense data (${window.expenseList.length} expenses) - no reload needed`);
-      // Update table with existing data
-      updateExpenseTable();
-      // Render expense statistics
-      renderExpenseStats();
-    } else {
-      // console.log('💰 Loading expense data...');
-      await loadExpensesInBackground();
-      // Mark as initialized
-      window.expenseTabInitialized = true;
-    }
-    
-    // console.log('✅ Expense tab initialized');
-  } catch (error) {
-    console.error('❌ Error initializing expense tab:', error);
-  }
-}
 
+  //       exists: !!window.expenseList,
+  //       length: window.expenseList?.length || 0,
+  //       type: typeof window.expenseList,
+  //       expenseTabInitialized: window.expenseTabInitialized
+  //     });
+  //     
+  //     // Check if we already have data and don't need to reload
+  //     if (window.expenseTabInitialized && window.expenseList && window.expenseList.length > 0) {
+  //       // console.log(`✅ Using cached expense data (${window.expenseList.length} expenses) - no reload needed`);
+  //       // Update table with existing data
+  //       updateExpenseTable();
+  //       // Render expense statistics
+  //       renderExpenseStats();
+  //     } else {
+  //       // console.log('💰 Loading expense data...');
+  //       await loadExpensesInBackground();
+  //       // Mark as initialized
+  //       window.expenseTabInitialized = true;
+  //     }
+  //     
+  //     // console.log('✅ Expense tab initialized');
+  //   } catch (error) {
+  //     console.error('❌ Error initializing expense tab:', error);
+  //   }
+  // }
+  // 
 /**
- * Load expenses from backend without modal
- */
-async function loadExpensesInBackground() {
-  const { BACKEND_URL } = getConstants();
-  
-  // Check user info
-  if (!window.userInfo) {
+  //  * Load expenses from backend without modal
+  //  */
+  // async function loadExpensesInBackground() {
+  //   const { BACKEND_URL } = getConstants();
+  //   
+  //   // Check user info
+  //   if (!window.userInfo) {
 // console.warn('⚠️ No user info found');
-    return;
-  }
-  
-  const data = {
-    action: 'loadExpenses', // Changed from 'searchExpenses' to avoid logging as user search
-    maNhanVien: window.userInfo.maNhanVien,
-    conditions: {} // Empty conditions to get all expenses
-  };
+  //     return;
+  //   }
+  //   
+  //   const data = {
+  //     action: 'loadExpenses', // Changed from 'searchExpenses' to avoid logging as user search
+  //     maNhanVien: window.userInfo.maNhanVien,
+  //     conditions: {} // Empty conditions to get all expenses
+  //   };
   
   try {
     // console.log('🔄 Loading expenses in background...');

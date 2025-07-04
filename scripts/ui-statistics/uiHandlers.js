@@ -134,148 +134,150 @@ export function handleStatisticsTabActivation() {
   const tabContentStyle = tabContent ? window.getComputedStyle(tabContent) : null;
   
 // console.log("🔍 DEBUG handleStatisticsTabActivation initial state:", {
-    currentTab: currentTab ? currentTab.dataset.tab : "null",
-    tabContent: tabContent ? "found" : "null",
-    tabDisplay: tabContentStyle ? tabContentStyle.display : "unknown",
-    windowExpenseList: window.expenseList ? window.expenseList.length : "null"
-  });
-  
-  // Import required functions
-  return import('../statisticsUIController.js').then(module => {
-    // Wait for tab to be fully displayed before rendering
-    setTimeout(() => {
-      // ✅ DEBUG: Check state after timeout
-      const currentTabAfter = document.querySelector(".tab-button.active");
-      const tabContentAfter = document.getElementById("tab-thong-ke");
-      const tabContentStyleAfter = tabContentAfter ? window.getComputedStyle(tabContentAfter) : null;
-      
+
+  //     currentTab: currentTab ? currentTab.dataset.tab : "null",
+  //     tabContent: tabContent ? "found" : "null",
+  //     tabDisplay: tabContentStyle ? tabContentStyle.display : "unknown",
+  //     windowExpenseList: window.expenseList ? window.expenseList.length : "null"
+  //   });
+  //   
+  //   // Import required functions
+  //   return import('../statisticsUIController.js').then(module => {
+  //     // Wait for tab to be fully displayed before rendering
+  //     setTimeout(() => {
+  //       // ✅ DEBUG: Check state after timeout
+  //       const currentTabAfter = document.querySelector(".tab-button.active");
+  //       const tabContentAfter = document.getElementById("tab-thong-ke");
+  //       const tabContentStyleAfter = tabContentAfter ? window.getComputedStyle(tabContentAfter) : null;
+  //       
 // console.log("🔍 DEBUG handleStatisticsTabActivation after timeout:", {
-        currentTab: currentTabAfter ? currentTabAfter.dataset.tab : "null",
-        tabContent: tabContentAfter ? "found" : "null",
-        tabDisplay: tabContentStyleAfter ? tabContentStyleAfter.display : "unknown",
-        tableExists: document.querySelector("#monthlySummaryTable") ? "found" : "null",
-        tbodyExists: document.querySelector("#monthlySummaryTable tbody") ? "found" : "null"
-      });
-      
-      // Check if we need to refresh data
-      if (!window.expenseList || window.expenseList.length === 0) {
-        // console.log("🔄 Loading statistics data (no existing data)");
-        if (module.loadStatisticsData) {
-          module.loadStatisticsData();
-        }
-      } else {
-        // console.log("🔄 Refreshing statistics (using existing data)");
-        if (module.refreshStatistics) {
-          module.refreshStatistics();
-        }
-      }
-      
-      // Render any pending data that was stored
-      if (window.pendingStatsData && window.pendingStatsOptions) {
-        // console.log("📊 Rendering pending statistics data...");
-        const { renderMonthlySummaryTable } = import('./statisticsRenderer.js');
-        renderMonthlySummaryTable(window.pendingStatsData, window.pendingStatsOptions);
-        window.pendingStatsData = null;
-        window.pendingStatsOptions = null;
-      }
-    }, 200); // Increased delay to ensure tab is visible
-  });
-}
 
+  //         currentTab: currentTabAfter ? currentTabAfter.dataset.tab : "null",
+  //         tabContent: tabContentAfter ? "found" : "null",
+  //         tabDisplay: tabContentStyleAfter ? tabContentStyleAfter.display : "unknown",
+  //         tableExists: document.querySelector("#monthlySummaryTable") ? "found" : "null",
+  //         tbodyExists: document.querySelector("#monthlySummaryTable tbody") ? "found" : "null"
+  //       });
+  //       
+  //       // Check if we need to refresh data
+  //       if (!window.expenseList || window.expenseList.length === 0) {
+  //         // console.log("🔄 Loading statistics data (no existing data)");
+  //         if (module.loadStatisticsData) {
+  //           module.loadStatisticsData();
+  //         }
+  //       } else {
+  //         // console.log("🔄 Refreshing statistics (using existing data)");
+  //         if (module.refreshStatistics) {
+  //           module.refreshStatistics();
+  //         }
+  //       }
+  //       
+  //       // Render any pending data that was stored
+  //       if (window.pendingStatsData && window.pendingStatsOptions) {
+  //         // console.log("📊 Rendering pending statistics data...");
+  //         const { renderMonthlySummaryTable } = import('./statisticsRenderer.js');
+  //         renderMonthlySummaryTable(window.pendingStatsData, window.pendingStatsOptions);
+  //         window.pendingStatsData = null;
+  //         window.pendingStatsOptions = null;
+  //       }
+  //     }, 200); // Increased delay to ensure tab is visible
+  //   });
+  // }
+  // 
 /**
- * Handles sub-tab switching within statistics
- * @param {string} subTab - Sub-tab identifier
- */
-export function handleSubTabSwitch(subTab, uiState, refreshCallback) {
-  // console.log("🔄 Switching to sub-tab:", subTab);
-  
-  uiState.currentTab = subTab;
-  
-  // Hide all sub-tab content
-  const subTabContents = document.querySelectorAll('.stats-sub-content');
-  subTabContents.forEach(content => content.style.display = 'none');
-  
-  // Show selected sub-tab content
-  const selectedContent = document.getElementById(`stats-${subTab}`);
-  if (selectedContent) {
-    selectedContent.style.display = 'block';
-  }
-  
-  // Update active sub-tab button
-  const subTabButtons = document.querySelectorAll('.stats-sub-tab');
-  subTabButtons.forEach(btn => btn.classList.remove('active'));
-  
-  const activeButton = document.querySelector(`[data-subtab="${subTab}"]`);
-  if (activeButton) {
-    activeButton.classList.add('active');
-  }
-  
-  refreshCallback();
-}
-
+  //  * Handles sub-tab switching within statistics
+  //  * @param {string} subTab - Sub-tab identifier
+  //  */
+  // export function handleSubTabSwitch(subTab, uiState, refreshCallback) {
+  //   // console.log("🔄 Switching to sub-tab:", subTab);
+  //   
+  //   uiState.currentTab = subTab;
+  //   
+  //   // Hide all sub-tab content
+  //   const subTabContents = document.querySelectorAll('.stats-sub-content');
+  //   subTabContents.forEach(content => content.style.display = 'none');
+  //   
+  //   // Show selected sub-tab content
+  //   const selectedContent = document.getElementById(`stats-${subTab}`);
+  //   if (selectedContent) {
+  //     selectedContent.style.display = 'block';
+  //   }
+  //   
+  //   // Update active sub-tab button
+  //   const subTabButtons = document.querySelectorAll('.stats-sub-tab');
+  //   subTabButtons.forEach(btn => btn.classList.remove('active'));
+  //   
+  //   const activeButton = document.querySelector(`[data-subtab="${subTab}"]`);
+  //   if (activeButton) {
+  //     activeButton.classList.add('active');
+  //   }
+  //   
+  //   refreshCallback();
+  // }
+  // 
 /**
- * Handles date range changes
- * @param {string} range - Date range type
- */
-export function handleDateRangeChange(range, uiState, refreshCallback) {
-  // console.log("📅 Date range changed to:", range);
-  
-  uiState.dateRange = range;
-  refreshCallback();
-}
-
+  //  * Handles date range changes
+  //  * @param {string} range - Date range type
+  //  */
+  // export function handleDateRangeChange(range, uiState, refreshCallback) {
+  //   // console.log("📅 Date range changed to:", range);
+  //   
+  //   uiState.dateRange = range;
+  //   refreshCallback();
+  // }
+  // 
 /**
- * Reset UI form controls to default state
- */
-export function resetUIControls() {
-  // console.log("🔄 Resetting UI controls...");
-  
-  // Reset form controls
-  const currencySelect = document.getElementById('statsCurrencyFilter');
-  if (currencySelect) currencySelect.value = "VND";
-  
-  const sortBySelect = document.getElementById('statsSortBy');
-  if (sortBySelect) sortBySelect.value = "month";
-  
-  const sortOrderSelect = document.getElementById('statsSortOrder');
-  if (sortOrderSelect) sortOrderSelect.value = "desc";
-  
-  const growthToggle = document.getElementById('statsGrowthToggle');
-  if (growthToggle) growthToggle.checked = false;
-}
-
+  //  * Reset UI form controls to default state
+  //  */
+  // export function resetUIControls() {
+  //   // console.log("🔄 Resetting UI controls...");
+  //   
+  //   // Reset form controls
+  //   const currencySelect = document.getElementById('statsCurrencyFilter');
+  //   if (currencySelect) currencySelect.value = "VND";
+  //   
+  //   const sortBySelect = document.getElementById('statsSortBy');
+  //   if (sortBySelect) sortBySelect.value = "month";
+  //   
+  //   const sortOrderSelect = document.getElementById('statsSortOrder');
+  //   if (sortOrderSelect) sortOrderSelect.value = "desc";
+  //   
+  //   const growthToggle = document.getElementById('statsGrowthToggle');
+  //   if (growthToggle) growthToggle.checked = false;
+  // }
+  // 
 /**
- * Validate form inputs
- * @param {Object} formData - Form data to validate
- * @returns {Object} - Validation result
- */
-export function validateFormInputs(formData) {
-  const errors = [];
-  
-  // Validate date range
-  if (formData.startDate && formData.endDate) {
-    const start = new Date(formData.startDate);
-    const end = new Date(formData.endDate);
-    
-    if (start > end) {
-      errors.push("Ngày bắt đầu phải nhỏ hơn ngày kết thúc");
-    }
-    
-    if (start > new Date()) {
-      errors.push("Ngày bắt đầu không thể là tương lai");
-    }
-  }
-  
-  // Validate currency
-  const validCurrencies = ['VND', 'USD', 'EUR'];
-  if (formData.currency && !validCurrencies.includes(formData.currency)) {
-    errors.push("Loại tiền tệ không hợp lệ");
-  }
-  
-  return {
-    isValid: errors.length === 0,
-    errors: errors
-  };
+  //  * Validate form inputs
+  //  * @param {Object} formData - Form data to validate
+  //  * @returns {Object} - Validation result
+  //  */
+  // export function validateFormInputs(formData) {
+  //   const errors = [];
+  //   
+  //   // Validate date range
+  //   if (formData.startDate && formData.endDate) {
+  //     const start = new Date(formData.startDate);
+  //     const end = new Date(formData.endDate);
+  //     
+  //     if (start > end) {
+  //       errors.push("Ngày bắt đầu phải nhỏ hơn ngày kết thúc");
+  //     }
+  //     
+  //     if (start > new Date()) {
+  //       errors.push("Ngày bắt đầu không thể là tương lai");
+  //     }
+  //   }
+  //   
+  //   // Validate currency
+  //   const validCurrencies = ['VND', 'USD', 'EUR'];
+  //   if (formData.currency && !validCurrencies.includes(formData.currency)) {
+  //     errors.push("Loại tiền tệ không hợp lệ");
+  //   }
+  //   
+  //   return {
+  //     isValid: errors.length === 0,
+  //     errors: errors
+  //   };
 }
 
 /**

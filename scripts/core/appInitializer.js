@@ -66,10 +66,10 @@ export function loadUserInfo() {
   }
 
 // console.log('✅ User information loaded:', {
-    name: window.userInfo.tenNhanVien,
-    id: window.userInfo.maNhanVien,
-    role: window.userInfo.vaiTro
-  });
+  //   name: window.userInfo.tenNhanVien,
+  //   id: window.userInfo.maNhanVien,
+  //   role: window.userInfo.vaiTro
+  // });
 
   return true;
 }

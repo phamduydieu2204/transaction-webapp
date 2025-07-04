@@ -32,32 +32,33 @@ export class CashFlowAccrualCore {
             this.expenseData = window.expenseList || [];
             
 // console.log('📊 Data loaded:', {
-                transactions: this.transactionData.length,
-                expenses: this.expenseData.length
-            });
-            
-            // Process the data
-            await this.processData();
-            
-            // console.log('✅ Cash flow vs accrual data processing completed');
-            
-        } catch (error) {
-            console.error('❌ Error loading cash flow vs accrual data:', error);
-            throw error;
-        }
-    }
 
-    /**
-     * Process and analyze data
-     */
-    async processData() {
-        // Set default date range if not specified
-        if (!this.dateRange) {
-            const now = new Date();
-            this.dateRange = {
-                start: new Date(now.getFullYear(), 0, 1),
-                end: new Date(now.getFullYear(), 11, 31)
-            };
+  //                 transactions: this.transactionData.length,
+  //                 expenses: this.expenseData.length
+  //             });
+  //             
+  //             // Process the data
+  //             await this.processData();
+  //             
+  //             // console.log('✅ Cash flow vs accrual data processing completed');
+  //             
+  //         } catch (error) {
+  //             console.error('❌ Error loading cash flow vs accrual data:', error);
+  //             throw error;
+  //         }
+  //     }
+  // 
+  //     /**
+  //      * Process and analyze data
+  //      */
+  //     async processData() {
+  //         // Set default date range if not specified
+  //         if (!this.dateRange) {
+  //             const now = new Date();
+  //             this.dateRange = {
+  //                 start: new Date(now.getFullYear(), 0, 1),
+  //                 end: new Date(now.getFullYear(), 11, 31)
+  //             };
         }
 
         // Calculate cash flow view

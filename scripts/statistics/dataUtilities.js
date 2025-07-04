@@ -151,29 +151,30 @@ export function groupExpensesByMonth(data, options = {}) {
   if (!Array.isArray(data)) return summaryMap;
 
 // console.log("📊 Grouping expenses by month:", {
-    recordCount: data.length,
-    currency,
-    sortBy,
-    sortOrder
-  });
 
-  data.forEach(expense => {
-    // Only process specified currency
-    if (expense.currency !== currency) return;
-
-    const normalizedDate = normalizeDate(expense.date);
-    const month = normalizedDate.slice(0, 7); // yyyy/mm
-    const type = expense.type || "Không xác định";
-    const amount = parseFloat(expense.amount) || 0;
-
-    const key = `${month}|${type}`;
-    summaryMap[key] = (summaryMap[key] || 0) + amount;
-  });
-
-  // Convert to array and sort
-  const summaryArray = Object.entries(summaryMap).map(([key, amount]) => {
-    const [month, type] = key.split("|");
-    return { month, type, amount };
+  //     recordCount: data.length,
+  //     currency,
+  //     sortBy,
+  //     sortOrder
+  //   });
+  // 
+  //   data.forEach(expense => {
+  //     // Only process specified currency
+  //     if (expense.currency !== currency) return;
+  // 
+  //     const normalizedDate = normalizeDate(expense.date);
+  //     const month = normalizedDate.slice(0, 7); // yyyy/mm
+  //     const type = expense.type || "Không xác định";
+  //     const amount = parseFloat(expense.amount) || 0;
+  // 
+  //     const key = `${month}|${type}`;
+  //     summaryMap[key] = (summaryMap[key] || 0) + amount;
+  //   });
+  // 
+  //   // Convert to array and sort
+  //   const summaryArray = Object.entries(summaryMap).map(([key, amount]) => {
+  //     const [month, type] = key.split("|");
+  //     return { month, type, amount };
   });
 
   // Sort by specified criteria
@@ -219,29 +220,30 @@ export function groupRevenueByMonth(data, options = {}) {
   if (!Array.isArray(data)) return [];
 
 // console.log("📊 Grouping revenue by month:", {
-    recordCount: data.length,
-    currency,
-    sortBy,
-    sortOrder
-  });
 
-  data.forEach(transaction => {
-    // Only process specified currency
-    if (transaction.currency !== currency) return;
-
-    const normalizedDate = normalizeDate(transaction.transactionDate);
-    const month = normalizedDate.slice(0, 7); // yyyy/mm
-    const software = transaction.softwareName || "Không xác định";
-    const revenue = parseFloat(transaction.revenue) || 0;
-
-    const key = `${month}|${software}`;
-    summaryMap[key] = (summaryMap[key] || 0) + revenue;
-  });
-
-  // Convert to array and sort
-  const summaryArray = Object.entries(summaryMap).map(([key, amount]) => {
-    const [month, software] = key.split("|");
-    return { month, software, amount };
+  //     recordCount: data.length,
+  //     currency,
+  //     sortBy,
+  //     sortOrder
+  //   });
+  // 
+  //   data.forEach(transaction => {
+  //     // Only process specified currency
+  //     if (transaction.currency !== currency) return;
+  // 
+  //     const normalizedDate = normalizeDate(transaction.transactionDate);
+  //     const month = normalizedDate.slice(0, 7); // yyyy/mm
+  //     const software = transaction.softwareName || "Không xác định";
+  //     const revenue = parseFloat(transaction.revenue) || 0;
+  // 
+  //     const key = `${month}|${software}`;
+  //     summaryMap[key] = (summaryMap[key] || 0) + revenue;
+  //   });
+  // 
+  //   // Convert to array and sort
+  //   const summaryArray = Object.entries(summaryMap).map(([key, amount]) => {
+  //     const [month, software] = key.split("|");
+  //     return { month, software, amount };
   });
 
   // Sort by specified criteria

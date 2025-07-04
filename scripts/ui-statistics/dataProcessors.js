@@ -52,24 +52,25 @@ export async function loadStatisticsData(uiState) {
     };
     
 // console.log("📊 Combined data prepared:", {
-      expenses: data.expenses.length,
-      transactions: data.transactions.length
-    });
-    
-    // Store in global variables for compatibility
-    window.expenseList = data.expenses;
-    window.transactionList = data.transactions;
-    
-    // console.log("🎯 Data loading completed");
-    
-    // ✅ DEBUG: Check data loading completion
-    const dataLoadState = {
-      expenseCount: data.expenses ? data.expenses.length : 0,
-      transactionCount: data.transactions ? data.transactions.length : 0,
-      windowExpenseList: window.expenseList ? window.expenseList.length : 0,
-      windowTransactionList: window.transactionList ? window.transactionList.length : 0,
-      isLoadingFlag: uiState.isLoading
-    };
+
+  //       expenses: data.expenses.length,
+  //       transactions: data.transactions.length
+  //     });
+  //     
+  //     // Store in global variables for compatibility
+  //     window.expenseList = data.expenses;
+  //     window.transactionList = data.transactions;
+  //     
+  //     // console.log("🎯 Data loading completed");
+  //     
+  //     // ✅ DEBUG: Check data loading completion
+  //     const dataLoadState = {
+  //       expenseCount: data.expenses ? data.expenses.length : 0,
+  //       transactionCount: data.transactions ? data.transactions.length : 0,
+  //       windowExpenseList: window.expenseList ? window.expenseList.length : 0,
+  //       windowTransactionList: window.transactionList ? window.transactionList.length : 0,
+  //       isLoadingFlag: uiState.isLoading
+  //     };
     
     // console.log("🔍 DEBUG data loading state:", dataLoadState);
     // console.log("✅ Statistics data loaded successfully");
@@ -395,27 +396,28 @@ function cleanupLoadingModals() {
   ].filter(el => el !== null);
   
 // console.log("🔍 DEBUG modal elements:", {
-    foundModals: modalElements.length,
-    modals: modalElements.map(el => ({
-      id: el.id,
-      className: el.className,
-      display: window.getComputedStyle(el).display,
-      visibility: window.getComputedStyle(el).visibility
-    }))
-  });
-  
-  // Force hide any visible modals
-  modalElements.forEach(el => {
-    if (window.getComputedStyle(el).display !== 'none') {
-      // console.log(`🚫 Force hiding modal:`, el.id || el.className);
-      el.style.display = 'none';
-    }
-  });
-}
 
+  //     foundModals: modalElements.length,
+  //     modals: modalElements.map(el => ({
+  //       id: el.id,
+  //       className: el.className,
+  //       display: window.getComputedStyle(el).display,
+  //       visibility: window.getComputedStyle(el).visibility
+  //     }))
+  //   });
+  //   
+  //   // Force hide any visible modals
+  //   modalElements.forEach(el => {
+  //     if (window.getComputedStyle(el).display !== 'none') {
+  //       // console.log(`🚫 Force hiding modal:`, el.id || el.className);
+  //       el.style.display = 'none';
+  //     }
+  //   });
+  // }
+  // 
 // Make functions available globally for legacy compatibility
-window.loadStatisticsData = loadStatisticsData;
-window.processDataForUI = processDataForUI;
-window.forceRefreshData = forceRefreshData;
-
+  // window.loadStatisticsData = loadStatisticsData;
+  // window.processDataForUI = processDataForUI;
+  // window.forceRefreshData = forceRefreshData;
+  // 
 // console.log('✅ dataProcessors.js module loaded successfully');

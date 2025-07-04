@@ -110,83 +110,84 @@ export function updateTransactionTypeForEdit(originalStatus, currentValue = '') 
   if (!select) return;
   
 // console.log('🔄 Updating transaction type dropdown for edit mode:', {
-    originalStatus,
-    currentValue
-  });
-  
-  // Clear existing options except the placeholder
-  while (select.children.length > 1) {
-    select.removeChild(select.lastChild);
-  }
-  
-  // Get allowed options based on original status
-  const allowedOptions = TRANSACTION_TYPES.EDIT_RULES[originalStatus] || [];
-  
-  if (allowedOptions.length === 0) {
+
+  //     originalStatus,
+  //     currentValue
+  //   });
+  //   
+  //   // Clear existing options except the placeholder
+  //   while (select.children.length > 1) {
+  //     select.removeChild(select.lastChild);
+  //   }
+  //   
+  //   // Get allowed options based on original status
+  //   const allowedOptions = TRANSACTION_TYPES.EDIT_RULES[originalStatus] || [];
+  //   
+  //   if (allowedOptions.length === 0) {
 // console.warn(`⚠️ No edit rules found for status: ${originalStatus}`);
-    return;
-  }
-  
-  // Add options in the correct order based on ALL_TYPES sequence
-  TRANSACTION_TYPES.ALL_TYPES.forEach(type => {
-    if (allowedOptions.includes(type.value)) {
-      const option = document.createElement('option');
-      option.value = type.value;
-      option.textContent = type.label;
-      option.title = type.tooltip;
-      select.appendChild(option);
-    }
-  });
-  
-  // `✅ Added ${allowedOptions.length} options for ${originalStatus}:`, allowedOptions;
-  
-  // Set current value if provided
-  if (currentValue && select.querySelector(`option[value="${currentValue}"]`)) {
-    select.value = currentValue;
-    // `✅ Set current value: ${currentValue}`;
-  }
-}
-
+  //     return;
+  //   }
+  //   
+  //   // Add options in the correct order based on ALL_TYPES sequence
+  //   TRANSACTION_TYPES.ALL_TYPES.forEach(type => {
+  //     if (allowedOptions.includes(type.value)) {
+  //       const option = document.createElement('option');
+  //       option.value = type.value;
+  //       option.textContent = type.label;
+  //       option.title = type.tooltip;
+  //       select.appendChild(option);
+  //     }
+  //   });
+  //   
+  //   // `✅ Added ${allowedOptions.length} options for ${originalStatus}:`, allowedOptions;
+  //   
+  //   // Set current value if provided
+  //   if (currentValue && select.querySelector(`option[value="${currentValue}"]`)) {
+  //     select.value = currentValue;
+  //     // `✅ Set current value: ${currentValue}`;
+  //   }
+  // }
+  // 
 /**
- * Get tooltip for a transaction type
- * @param {string} transactionType - The transaction type value
- * @returns {string} The tooltip text
- */
-export function getTransactionTypeTooltip(transactionType) {
-  // Check default types
-  const defaultType = TRANSACTION_TYPES.DEFAULT.find(type => type.value === transactionType);
-  if (defaultType) return defaultType.tooltip;
-  
-  // Check edit states
-  const editState = Object.values(TRANSACTION_TYPES.EDIT_STATES).find(type => type.value === transactionType);
-  if (editState) return editState.tooltip;
-  
-  return '';
-}
-
+  //  * Get tooltip for a transaction type
+  //  * @param {string} transactionType - The transaction type value
+  //  * @returns {string} The tooltip text
+  //  */
+  // export function getTransactionTypeTooltip(transactionType) {
+  //   // Check default types
+  //   const defaultType = TRANSACTION_TYPES.DEFAULT.find(type => type.value === transactionType);
+  //   if (defaultType) return defaultType.tooltip;
+  //   
+  //   // Check edit states
+  //   const editState = Object.values(TRANSACTION_TYPES.EDIT_STATES).find(type => type.value === transactionType);
+  //   if (editState) return editState.tooltip;
+  //   
+  //   return '';
+  // }
+  // 
 /**
- * Check if transaction type is valid for file sharing
- * @param {string} transactionType - The transaction type value
- * @returns {boolean} True if should share files
- */
-export function shouldShareFiles(transactionType) {
-  return transactionType === "Đã hoàn tất" || transactionType === "Dùng thử";
-}
-
+  //  * Check if transaction type is valid for file sharing
+  //  * @param {string} transactionType - The transaction type value
+  //  * @returns {boolean} True if should share files
+  //  */
+  // export function shouldShareFiles(transactionType) {
+  //   return transactionType === "Đã hoàn tất" || transactionType === "Dùng thử";
+  // }
+  // 
 /**
- * Check if transaction type indicates completion
- * @param {string} transactionType - The transaction type value
- * @returns {boolean} True if transaction is completed
- */
-export function isCompletedTransaction(transactionType) {
-  return transactionType === "Đã hoàn tất";
-}
-
+  //  * Check if transaction type indicates completion
+  //  * @param {string} transactionType - The transaction type value
+  //  * @returns {boolean} True if transaction is completed
+  //  */
+  // export function isCompletedTransaction(transactionType) {
+  //   return transactionType === "Đã hoàn tất";
+  // }
+  // 
 /**
- * Check if transaction type indicates a pending state
- * @param {string} transactionType - The transaction type value
- * @returns {boolean} True if transaction is pending
- */
-export function isPendingTransaction(transactionType) {
-  return transactionType === "Chưa thanh toán" || transactionType === "Đã thanh toán";
-}
+  //  * Check if transaction type indicates a pending state
+  //  * @param {string} transactionType - The transaction type value
+  //  * @returns {boolean} True if transaction is pending
+  //  */
+  // export function isPendingTransaction(transactionType) {
+  //   return transactionType === "Chưa thanh toán" || transactionType === "Đã thanh toán";
+  // }

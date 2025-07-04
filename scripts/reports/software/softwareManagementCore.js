@@ -51,392 +51,393 @@ export class SoftwareManagement {
             this.expenses = this.extractExpenseData();
             
 // console.log('📊 Data loaded:', {
-                software: this.softwareAccounts.length,
-                transactions: this.transactions.length,
-                expenses: this.expenses.length
-            });
-            
-        } catch (error) {
-            console.error('❌ Error loading data:', error);
-            // Fallback to mock data if real data is not available
-            this.generateMockData();
-        }
-    }
 
-    // Trích xuất dữ liệu từ sheet PhanMem
-    extractSoftwareData() {
-        // Giả định dữ liệu sheet PhanMem được lưu trong window.softwareData
-        const rawData = window.softwareData || [];
-        
-        return rawData.map((row, index) => ({
-            id: index + 1,
-            tenPhanMem: row[0] || '',           // A: Tên phần mềm
-            goiPhanMem: row[1] || '',           // B: Gói phần mềm
-            giaBan: parseFloat(row[2]) || 0,    // C: Giá bán
-            tenTaiKhoan: row[3] || '',          // D: Tên tài khoản
-            soNguoiDungChoPhep: parseInt(row[4]) || 0,    // E: Số người dùng cho phép
-            soNguoiDungDangHoatDong: parseInt(row[5]) || 0, // F: Số người dùng đang hoạt động
-            idSheetTaiKhoan: row[6] || '',      // G: ID Sheet tài khoản
-            thongTinDonHang: row[7] || '',      // H: Thông tin đơn hàng
-            tenDangNhap: row[8] || '',          // I: Tên đăng nhập
-            matKhauDangNhap: row[9] || '',      // J: Mật khẩu đăng nhập
-            secret: row[10] || '',              // K: Secret
-            linkYeuCauOTP: row[11] || '',       // L: Link yêu cầu OTP
-            tenChuan: row[12] || '',            // M: Tên chuẩn
-            phanTramHoaHong: parseFloat(row[13]) || 0  // N: % Hoa hồng
-        }));
-    }
-
-    // Trích xuất dữ liệu từ sheet GiaoDich
-    extractTransactionData() {
-        // Giả định dữ liệu sheet GiaoDich được lưu trong window.currentTransactionData
-        const rawData = window.currentTransactionData || [];
-        
-        return rawData.map((row, index) => ({
-            id: index + 1,
-            maGiaoDich: row[0] || '',           // A: Mã giao dịch
-            ngayGiaoDich: row[1] || '',         // B: Ngày giao dịch
-            loaiGiaoDich: row[2] || '',         // C: Loại giao dịch
-            tenKhachHang: row[3] || '',         // D: Tên khách hàng
-            email: row[4] || '',                // E: Email
-            lienHe: row[5] || '',               // F: Liên hệ
-            soThangDangKy: parseInt(row[6]) || 0, // G: Số tháng đăng ký
-            ngayBatDau: row[7] || '',           // H: Ngày bắt đầu
-            ngayKetThuc: row[8] || '',          // I: Ngày kết thúc
-            soThietBi: parseInt(row[9]) || 0,   // J: Số thiết bị
-            tenPhanMem: row[10] || '',          // K: Tên phần mềm
-            goiPhanMem: row[11] || '',          // L: Gói phần mềm
-            tenTaiKhoan: row[12] || '',         // M: Tên tài khoản
-            idSheetTaiKhoan: row[13] || '',     // N: ID Sheet Tài khoản
-            capNhatCookie: row[14] || '',       // O: Cập nhật Cookie
-            thongTinDonHang: row[15] || '',     // P: Thông tin đơn hàng
-            doanhThu: parseFloat(row[16]) || 0, // Q: Doanh thu
-            hoaHong: parseFloat(row[17]) || 0,  // R: Hoa hồng
-            ghiChu: row[18] || '',              // S: Ghi chú
-            tenChuan: row[19] || '',            // T: Tên chuẩn
-            tenNhanVien: row[20] || '',         // U: Tên nhân viên
-            maNhanVien: row[21] || ''           // V: Mã nhân viên
-        }));
-    }
-
-    // Trích xuất dữ liệu từ sheet ChiPhi
-    extractExpenseData() {
-        // Giả định dữ liệu sheet ChiPhi được lưu trong window.currentExpenseData
-        const rawData = window.currentExpenseData || [];
-        
-        return rawData.map((row, index) => ({
-            id: index + 1,
-            maChiPhi: row[0] || '',             // A: Mã chi phí
-            ngayChi: row[1] || '',              // B: Ngày chi
-            loaiKeToan: row[2] || '',           // C: Loại kế toán
-            phanBo: row[3] || '',               // D: Phân bổ
-            loaiKhoanChi: row[4] || '',         // E: Loại khoản chi
-            danhMucChung: row[5] || '',         // F: Danh mục chung
-            tenSanPham: row[6] || '',           // G: Tên sản phẩm/Dịch vụ
-            phienBan: row[7] || '',             // H: Phiên bản/Gói dịch vụ
-            soTien: parseFloat(row[8]) || 0,    // I: Số tiền
-            donViTienTe: row[9] || '',          // J: Đơn vị tiền tệ
-            nganHang: row[10] || '',            // K: Ngân hàng/Ví
-            thongTinThe: row[11] || '',         // L: Thông tin thẻ/Tài khoản
-            phuongThucChi: row[12] || '',       // M: Phương thức chi
-            ngayTaiTuc: row[13] || '',          // N: Ngày tái tục
-            nguoiNhan: row[14] || '',           // O: Người nhận hoặc nhà cung cấp
-            trangThai: row[15] || '',           // P: Trạng thái
-            ghiChu: row[16] || '',              // Q: Ghi chú
-            tenChuan: row[17] || '',            // R: Tên chuẩn
-            tenNhanVien: row[18] || '',         // S: Tên nhân viên
-            maNhanVien: row[19] || ''           // T: Mã nhân viên
-        }));
-    }
-
-    // Xử lý và kết hợp dữ liệu
-    processAndCombineData() {
-        // console.log('🔄 Processing and combining data...');
-        
-        // Tạo map dữ liệu phần mềm theo tên chuẩn
-        const softwareMap = new Map();
-        
-        // Xử lý dữ liệu sheet PhanMem
-        this.softwareAccounts.forEach(software => {
-            const key = software.tenChuan || software.tenPhanMem;
-            if (!softwareMap.has(key)) {
-                softwareMap.set(key, {
-                    ...software,
-                    totalRevenue: 0,
-                    totalCost: 0,
-                    profit: 0,
-                    roi: 0,
-                    utilizationRate: 0,
-                    transactions: [],
-                    expenses: [],
-                    status: 'active',
-                    expiryDate: null,
-                    alertLevel: 'normal'
-                });
-            }
-        });
-
-        // Kết hợp dữ liệu từ sheet GiaoDich
-        this.transactions.forEach(transaction => {
-            const key = transaction.tenChuan;
-            if (softwareMap.has(key)) {
-                const software = softwareMap.get(key);
-                software.transactions.push(transaction);
-                software.totalRevenue += transaction.doanhThu || 0;
-                
-                // Cập nhật ngày hết hạn từ giao dịch gần nhất
-                if (transaction.ngayKetThuc) {
-                    const expiryDate = new Date(transaction.ngayKetThuc);
-                    if (!software.expiryDate || expiryDate > new Date(software.expiryDate)) {
-                        software.expiryDate = transaction.ngayKetThuc;
-                    }
-                }
-            }
-        });
-
-        // Kết hợp dữ liệu từ sheet ChiPhi
-        this.expenses.forEach(expense => {
-            const key = expense.tenChuan;
-            if (softwareMap.has(key)) {
-                const software = softwareMap.get(key);
-                software.expenses.push(expense);
-                software.totalCost += expense.soTien || 0;
-                
-                // Cập nhật ngày tái tục từ chi phí
-                if (expense.ngayTaiTuc) {
-                    if (!software.expiryDate || new Date(expense.ngayTaiTuc) > new Date(software.expiryDate)) {
-                        software.expiryDate = expense.ngayTaiTuc;
-                    }
-                }
-            }
-        });
-
-        // Tính toán các chỉ số cho từng phần mềm
-        softwareMap.forEach((software, key) => {
-            // Tính lợi nhuận và ROI
-            software.profit = software.totalRevenue - software.totalCost;
-            software.roi = software.totalCost > 0 ? (software.profit / software.totalCost) * 100 : 0;
-            
-            // Tính tỷ lệ sử dụng
-            if (software.soNguoiDungChoPhep > 0) {
-                software.utilizationRate = (software.soNguoiDungDangHoatDong / software.soNguoiDungChoPhep) * 100;
-            }
-            
-            // Xác định trạng thái và mức cảnh báo
-            software.status = this.determineStatus(software);
-            software.alertLevel = this.determineAlertLevel(software);
-        });
-
-        // Chuyển đổi map thành array và sắp xếp
-        this.filteredAccounts = Array.from(softwareMap.values())
-            .sort((a, b) => b.totalRevenue - a.totalRevenue);
-        
-        // console.log('✅ Data processing completed:', this.filteredAccounts.length, 'software accounts');
-    }
-
-    // Xác định trạng thái phần mềm
-    determineStatus(software) {
-        if (!software.expiryDate) return 'active';
-        
-        const today = new Date();
-        const expiryDate = new Date(software.expiryDate);
-        const daysToExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
-        
-        if (daysToExpiry < 0) return 'expired';
-        if (daysToExpiry <= 7) return 'expiring';
-        return 'active';
-    }
-
-    // Xác định mức cảnh báo
-    determineAlertLevel(software) {
-        const status = this.determineStatus(software);
-        const utilizationRate = software.utilizationRate || 0;
-        
-        if (status === 'expired' || utilizationRate < 30) return 'high';
-        if (status === 'expiring' || utilizationRate < 60) return 'medium';
-        return 'normal';
-    }
-
-    // Tạo dữ liệu mẫu nếu không có dữ liệu thực
-    generateMockData() {
+  //                 software: this.softwareAccounts.length,
+  //                 transactions: this.transactions.length,
+  //                 expenses: this.expenses.length
+  //             });
+  //             
+  //         } catch (error) {
+  //             console.error('❌ Error loading data:', error);
+  //             // Fallback to mock data if real data is not available
+  //             this.generateMockData();
+  //         }
+  //     }
+  // 
+  //     // Trích xuất dữ liệu từ sheet PhanMem
+  //     extractSoftwareData() {
+  //         // Giả định dữ liệu sheet PhanMem được lưu trong window.softwareData
+  //         const rawData = window.softwareData || [];
+  //         
+  //         return rawData.map((row, index) => ({
+  //             id: index + 1,
+  //             tenPhanMem: row[0] || '',           // A: Tên phần mềm
+  //             goiPhanMem: row[1] || '',           // B: Gói phần mềm
+  //             giaBan: parseFloat(row[2]) || 0,    // C: Giá bán
+  //             tenTaiKhoan: row[3] || '',          // D: Tên tài khoản
+  //             soNguoiDungChoPhep: parseInt(row[4]) || 0,    // E: Số người dùng cho phép
+  //             soNguoiDungDangHoatDong: parseInt(row[5]) || 0, // F: Số người dùng đang hoạt động
+  //             idSheetTaiKhoan: row[6] || '',      // G: ID Sheet tài khoản
+  //             thongTinDonHang: row[7] || '',      // H: Thông tin đơn hàng
+  //             tenDangNhap: row[8] || '',          // I: Tên đăng nhập
+  //             matKhauDangNhap: row[9] || '',      // J: Mật khẩu đăng nhập
+  //             secret: row[10] || '',              // K: Secret
+  //             linkYeuCauOTP: row[11] || '',       // L: Link yêu cầu OTP
+  //             tenChuan: row[12] || '',            // M: Tên chuẩn
+  //             phanTramHoaHong: parseFloat(row[13]) || 0  // N: % Hoa hồng
+  //         }));
+  //     }
+  // 
+  //     // Trích xuất dữ liệu từ sheet GiaoDich
+  //     extractTransactionData() {
+  //         // Giả định dữ liệu sheet GiaoDich được lưu trong window.currentTransactionData
+  //         const rawData = window.currentTransactionData || [];
+  //         
+  //         return rawData.map((row, index) => ({
+  //             id: index + 1,
+  //             maGiaoDich: row[0] || '',           // A: Mã giao dịch
+  //             ngayGiaoDich: row[1] || '',         // B: Ngày giao dịch
+  //             loaiGiaoDich: row[2] || '',         // C: Loại giao dịch
+  //             tenKhachHang: row[3] || '',         // D: Tên khách hàng
+  //             email: row[4] || '',                // E: Email
+  //             lienHe: row[5] || '',               // F: Liên hệ
+  //             soThangDangKy: parseInt(row[6]) || 0, // G: Số tháng đăng ký
+  //             ngayBatDau: row[7] || '',           // H: Ngày bắt đầu
+  //             ngayKetThuc: row[8] || '',          // I: Ngày kết thúc
+  //             soThietBi: parseInt(row[9]) || 0,   // J: Số thiết bị
+  //             tenPhanMem: row[10] || '',          // K: Tên phần mềm
+  //             goiPhanMem: row[11] || '',          // L: Gói phần mềm
+  //             tenTaiKhoan: row[12] || '',         // M: Tên tài khoản
+  //             idSheetTaiKhoan: row[13] || '',     // N: ID Sheet Tài khoản
+  //             capNhatCookie: row[14] || '',       // O: Cập nhật Cookie
+  //             thongTinDonHang: row[15] || '',     // P: Thông tin đơn hàng
+  //             doanhThu: parseFloat(row[16]) || 0, // Q: Doanh thu
+  //             hoaHong: parseFloat(row[17]) || 0,  // R: Hoa hồng
+  //             ghiChu: row[18] || '',              // S: Ghi chú
+  //             tenChuan: row[19] || '',            // T: Tên chuẩn
+  //             tenNhanVien: row[20] || '',         // U: Tên nhân viên
+  //             maNhanVien: row[21] || ''           // V: Mã nhân viên
+  //         }));
+  //     }
+  // 
+  //     // Trích xuất dữ liệu từ sheet ChiPhi
+  //     extractExpenseData() {
+  //         // Giả định dữ liệu sheet ChiPhi được lưu trong window.currentExpenseData
+  //         const rawData = window.currentExpenseData || [];
+  //         
+  //         return rawData.map((row, index) => ({
+  //             id: index + 1,
+  //             maChiPhi: row[0] || '',             // A: Mã chi phí
+  //             ngayChi: row[1] || '',              // B: Ngày chi
+  //             loaiKeToan: row[2] || '',           // C: Loại kế toán
+  //             phanBo: row[3] || '',               // D: Phân bổ
+  //             loaiKhoanChi: row[4] || '',         // E: Loại khoản chi
+  //             danhMucChung: row[5] || '',         // F: Danh mục chung
+  //             tenSanPham: row[6] || '',           // G: Tên sản phẩm/Dịch vụ
+  //             phienBan: row[7] || '',             // H: Phiên bản/Gói dịch vụ
+  //             soTien: parseFloat(row[8]) || 0,    // I: Số tiền
+  //             donViTienTe: row[9] || '',          // J: Đơn vị tiền tệ
+  //             nganHang: row[10] || '',            // K: Ngân hàng/Ví
+  //             thongTinThe: row[11] || '',         // L: Thông tin thẻ/Tài khoản
+  //             phuongThucChi: row[12] || '',       // M: Phương thức chi
+  //             ngayTaiTuc: row[13] || '',          // N: Ngày tái tục
+  //             nguoiNhan: row[14] || '',           // O: Người nhận hoặc nhà cung cấp
+  //             trangThai: row[15] || '',           // P: Trạng thái
+  //             ghiChu: row[16] || '',              // Q: Ghi chú
+  //             tenChuan: row[17] || '',            // R: Tên chuẩn
+  //             tenNhanVien: row[18] || '',         // S: Tên nhân viên
+  //             maNhanVien: row[19] || ''           // T: Mã nhân viên
+  //         }));
+  //     }
+  // 
+  //     // Xử lý và kết hợp dữ liệu
+  //     processAndCombineData() {
+  //         // console.log('🔄 Processing and combining data...');
+  //         
+  //         // Tạo map dữ liệu phần mềm theo tên chuẩn
+  //         const softwareMap = new Map();
+  //         
+  //         // Xử lý dữ liệu sheet PhanMem
+  //         this.softwareAccounts.forEach(software => {
+  //             const key = software.tenChuan || software.tenPhanMem;
+  //             if (!softwareMap.has(key)) {
+  //                 softwareMap.set(key, {
+  //                     ...software,
+  //                     totalRevenue: 0,
+  //                     totalCost: 0,
+  //                     profit: 0,
+  //                     roi: 0,
+  //                     utilizationRate: 0,
+  //                     transactions: [],
+  //                     expenses: [],
+  //                     status: 'active',
+  //                     expiryDate: null,
+  //                     alertLevel: 'normal'
+  //                 });
+  //             }
+  //         });
+  // 
+  //         // Kết hợp dữ liệu từ sheet GiaoDich
+  //         this.transactions.forEach(transaction => {
+  //             const key = transaction.tenChuan;
+  //             if (softwareMap.has(key)) {
+  //                 const software = softwareMap.get(key);
+  //                 software.transactions.push(transaction);
+  //                 software.totalRevenue += transaction.doanhThu || 0;
+  //                 
+  //                 // Cập nhật ngày hết hạn từ giao dịch gần nhất
+  //                 if (transaction.ngayKetThuc) {
+  //                     const expiryDate = new Date(transaction.ngayKetThuc);
+  //                     if (!software.expiryDate || expiryDate > new Date(software.expiryDate)) {
+  //                         software.expiryDate = transaction.ngayKetThuc;
+  //                     }
+  //                 }
+  //             }
+  //         });
+  // 
+  //         // Kết hợp dữ liệu từ sheet ChiPhi
+  //         this.expenses.forEach(expense => {
+  //             const key = expense.tenChuan;
+  //             if (softwareMap.has(key)) {
+  //                 const software = softwareMap.get(key);
+  //                 software.expenses.push(expense);
+  //                 software.totalCost += expense.soTien || 0;
+  //                 
+  //                 // Cập nhật ngày tái tục từ chi phí
+  //                 if (expense.ngayTaiTuc) {
+  //                     if (!software.expiryDate || new Date(expense.ngayTaiTuc) > new Date(software.expiryDate)) {
+  //                         software.expiryDate = expense.ngayTaiTuc;
+  //                     }
+  //                 }
+  //             }
+  //         });
+  // 
+  //         // Tính toán các chỉ số cho từng phần mềm
+  //         softwareMap.forEach((software, key) => {
+  //             // Tính lợi nhuận và ROI
+  //             software.profit = software.totalRevenue - software.totalCost;
+  //             software.roi = software.totalCost > 0 ? (software.profit / software.totalCost) * 100 : 0;
+  //             
+  //             // Tính tỷ lệ sử dụng
+  //             if (software.soNguoiDungChoPhep > 0) {
+  //                 software.utilizationRate = (software.soNguoiDungDangHoatDong / software.soNguoiDungChoPhep) * 100;
+  //             }
+  //             
+  //             // Xác định trạng thái và mức cảnh báo
+  //             software.status = this.determineStatus(software);
+  //             software.alertLevel = this.determineAlertLevel(software);
+  //         });
+  // 
+  //         // Chuyển đổi map thành array và sắp xếp
+  //         this.filteredAccounts = Array.from(softwareMap.values())
+  //             .sort((a, b) => b.totalRevenue - a.totalRevenue);
+  //         
+  //         // console.log('✅ Data processing completed:', this.filteredAccounts.length, 'software accounts');
+  //     }
+  // 
+  //     // Xác định trạng thái phần mềm
+  //     determineStatus(software) {
+  //         if (!software.expiryDate) return 'active';
+  //         
+  //         const today = new Date();
+  //         const expiryDate = new Date(software.expiryDate);
+  //         const daysToExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+  //         
+  //         if (daysToExpiry < 0) return 'expired';
+  //         if (daysToExpiry <= 7) return 'expiring';
+  //         return 'active';
+  //     }
+  // 
+  //     // Xác định mức cảnh báo
+  //     determineAlertLevel(software) {
+  //         const status = this.determineStatus(software);
+  //         const utilizationRate = software.utilizationRate || 0;
+  //         
+  //         if (status === 'expired' || utilizationRate < 30) return 'high';
+  //         if (status === 'expiring' || utilizationRate < 60) return 'medium';
+  //         return 'normal';
+  //     }
+  // 
+  //     // Tạo dữ liệu mẫu nếu không có dữ liệu thực
+  //     generateMockData() {
 // console.log('🎭 Generating mock data for demonstration...');
-        
-        this.filteredAccounts = [
-            {
-                id: 1,
-                tenPhanMem: 'Microsoft Office 365',
-                goiPhanMem: 'Business Premium',
-                tenTaiKhoan: 'company@domain.com',
-                soNguoiDungChoPhep: 50,
-                soNguoiDungDangHoatDong: 42,
-                utilizationRate: 84,
-                totalRevenue: 25000000,
-                totalCost: 18000000,
-                profit: 7000000,
-                roi: 38.9,
-                expiryDate: '2024-12-31',
-                status: 'active',
-                alertLevel: 'normal',
-                tenChuan: 'office365'
-            },
-            {
-                id: 2,
-                tenPhanMem: 'Adobe Creative Cloud',
-                goiPhanMem: 'Team',
-                tenTaiKhoan: 'design@domain.com',
-                soNguoiDungChoPhep: 10,
-                soNguoiDungDangHoatDong: 8,
-                utilizationRate: 80,
-                totalRevenue: 15000000,
-                totalCost: 12000000,
-                profit: 3000000,
-                roi: 25.0,
-                expiryDate: '2024-07-15',
-                status: 'expiring',
-                alertLevel: 'medium',
-                tenChuan: 'adobe_cc'
-            },
-            {
-                id: 3,
-                tenPhanMem: 'Google Workspace',
-                goiPhanMem: 'Business Standard',
-                tenTaiKhoan: 'admin@domain.com',
-                soNguoiDungChoPhep: 30,
-                soNguoiDungDangHoatDong: 28,
-                utilizationRate: 93.3,
-                totalRevenue: 18000000,
-                totalCost: 10800000,
-                profit: 7200000,
-                roi: 66.7,
-                expiryDate: '2025-03-20',
-                status: 'active',
-                alertLevel: 'normal',
-                tenChuan: 'google_workspace'
-            },
-            {
-                id: 4,
-                tenPhanMem: 'Slack',
-                goiPhanMem: 'Pro',
-                tenTaiKhoan: 'team@domain.com',
-                soNguoiDungChoPhep: 25,
-                soNguoiDungDangHoatDong: 15,
-                utilizationRate: 60,
-                totalRevenue: 8000000,
-                totalCost: 6000000,
-                profit: 2000000,
-                roi: 33.3,
-                expiryDate: '2024-06-30',
-                status: 'expiring',
-                alertLevel: 'medium',
-                tenChuan: 'slack_pro'
-            },
-            {
-                id: 5,
-                tenPhanMem: 'Zoom',
-                goiPhanMem: 'Business',
-                tenTaiKhoan: 'meetings@domain.com',
-                soNguoiDungChoPhep: 20,
-                soNguoiDungDangHoatDong: 5,
-                utilizationRate: 25,
-                totalRevenue: 4000000,
-                totalCost: 4800000,
-                profit: -800000,
-                roi: -16.7,
-                expiryDate: '2024-05-10',
-                status: 'expired',
-                alertLevel: 'high',
-                tenChuan: 'zoom_business'
-            }
-        ];
-    }
-
-    // Render KPI Dashboard
-    renderKPIDashboard() {
-        const container = document.querySelector('.software-kpi-dashboard');
-        if (!container) return;
-
-        const totalAccounts = this.filteredAccounts.length;
-        const totalRevenue = this.filteredAccounts.reduce((sum, acc) => sum + acc.totalRevenue, 0);
-        const totalCost = this.filteredAccounts.reduce((sum, acc) => sum + acc.totalCost, 0);
-        const totalProfit = totalRevenue - totalCost;
-        const avgUtilization = totalAccounts > 0 ? 
-            this.filteredAccounts.reduce((sum, acc) => sum + acc.utilizationRate, 0) / totalAccounts : 0;
-        const activeAccounts = this.filteredAccounts.filter(acc => acc.status === 'active').length;
-        const expiringAccounts = this.filteredAccounts.filter(acc => acc.status === 'expiring').length;
-        const expiredAccounts = this.filteredAccounts.filter(acc => acc.status === 'expired').length;
-
-        container.innerHTML = `
-            <div class="kpi-grid">
-                <div class="kpi-card revenue">
-                    <div class="kpi-icon">💰</div>
-                    <div class="kpi-content">
-                        <div class="kpi-value">${formatCurrency(totalRevenue)}</div>
-                        <div class="kpi-label">Tổng doanh thu</div>
-                        <div class="kpi-trend positive">+${((totalRevenue / (totalRevenue + totalCost)) * 100).toFixed(1)}% tỷ suất</div>
-                    </div>
-                </div>
-
-                <div class="kpi-card cost">
-                    <div class="kpi-icon">💸</div>
-                    <div class="kpi-content">
-                        <div class="kpi-value">${formatCurrency(totalCost)}</div>
-                        <div class="kpi-label">Tổng chi phí</div>
-                        <div class="kpi-trend neutral">${totalAccounts} tài khoản</div>
-                    </div>
-                </div>
-
-                <div class="kpi-card profit">
-                    <div class="kpi-icon">📈</div>
-                    <div class="kpi-content">
-                        <div class="kpi-value">${formatCurrency(totalProfit)}</div>
-                        <div class="kpi-label">Lợi nhuận</div>
-                        <div class="kpi-trend ${totalProfit >= 0 ? 'positive' : 'negative'}">
-                            ${totalProfit >= 0 ? '+' : ''}${((totalProfit / totalCost) * 100).toFixed(1)}% ROI
-                        </div>
-                    </div>
-                </div>
-
-                <div class="kpi-card utilization">
-                    <div class="kpi-icon">👥</div>
-                    <div class="kpi-content">
-                        <div class="kpi-value">${avgUtilization.toFixed(1)}%</div>
-                        <div class="kpi-label">Tỷ lệ sử dụng TB</div>
-                        <div class="kpi-trend ${avgUtilization >= 80 ? 'positive' : avgUtilization >= 60 ? 'neutral' : 'negative'}">
-                            Mục tiêu: 80%
-                        </div>
-                    </div>
-                </div>
-
-                <div class="kpi-card accounts">
-                    <div class="kpi-icon">📊</div>
-                    <div class="kpi-content">
-                        <div class="kpi-value">${totalAccounts}</div>
-                        <div class="kpi-label">Tổng tài khoản</div>
-                        <div class="kpi-trend neutral">${activeAccounts} hoạt động</div>
-                    </div>
-                </div>
-
-                <div class="kpi-card alerts">
-                    <div class="kpi-icon">🚨</div>
-                    <div class="kpi-content">
-                        <div class="kpi-value">${expiringAccounts + expiredAccounts}</div>
-                        <div class="kpi-label">Cần chú ý</div>
-                        <div class="kpi-trend ${expiringAccounts + expiredAccounts > 0 ? 'negative' : 'positive'}">
-                            ${expiredAccounts} hết hạn, ${expiringAccounts} sắp hết hạn
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    // Render Overview Cards
-    renderOverviewCards() {
-        const container = document.querySelector('.overview-cards');
-        if (!container) return;
-
-        // Thống kê theo phần mềm
-        const softwareStats = {};
+  //         
+  //         this.filteredAccounts = [
+  //             {
+  //                 id: 1,
+  //                 tenPhanMem: 'Microsoft Office 365',
+  //                 goiPhanMem: 'Business Premium',
+  //                 tenTaiKhoan: 'company@domain.com',
+  //                 soNguoiDungChoPhep: 50,
+  //                 soNguoiDungDangHoatDong: 42,
+  //                 utilizationRate: 84,
+  //                 totalRevenue: 25000000,
+  //                 totalCost: 18000000,
+  //                 profit: 7000000,
+  //                 roi: 38.9,
+  //                 expiryDate: '2024-12-31',
+  //                 status: 'active',
+  //                 alertLevel: 'normal',
+  //                 tenChuan: 'office365'
+  //             },
+  //             {
+  //                 id: 2,
+  //                 tenPhanMem: 'Adobe Creative Cloud',
+  //                 goiPhanMem: 'Team',
+  //                 tenTaiKhoan: 'design@domain.com',
+  //                 soNguoiDungChoPhep: 10,
+  //                 soNguoiDungDangHoatDong: 8,
+  //                 utilizationRate: 80,
+  //                 totalRevenue: 15000000,
+  //                 totalCost: 12000000,
+  //                 profit: 3000000,
+  //                 roi: 25.0,
+  //                 expiryDate: '2024-07-15',
+  //                 status: 'expiring',
+  //                 alertLevel: 'medium',
+  //                 tenChuan: 'adobe_cc'
+  //             },
+  //             {
+  //                 id: 3,
+  //                 tenPhanMem: 'Google Workspace',
+  //                 goiPhanMem: 'Business Standard',
+  //                 tenTaiKhoan: 'admin@domain.com',
+  //                 soNguoiDungChoPhep: 30,
+  //                 soNguoiDungDangHoatDong: 28,
+  //                 utilizationRate: 93.3,
+  //                 totalRevenue: 18000000,
+  //                 totalCost: 10800000,
+  //                 profit: 7200000,
+  //                 roi: 66.7,
+  //                 expiryDate: '2025-03-20',
+  //                 status: 'active',
+  //                 alertLevel: 'normal',
+  //                 tenChuan: 'google_workspace'
+  //             },
+  //             {
+  //                 id: 4,
+  //                 tenPhanMem: 'Slack',
+  //                 goiPhanMem: 'Pro',
+  //                 tenTaiKhoan: 'team@domain.com',
+  //                 soNguoiDungChoPhep: 25,
+  //                 soNguoiDungDangHoatDong: 15,
+  //                 utilizationRate: 60,
+  //                 totalRevenue: 8000000,
+  //                 totalCost: 6000000,
+  //                 profit: 2000000,
+  //                 roi: 33.3,
+  //                 expiryDate: '2024-06-30',
+  //                 status: 'expiring',
+  //                 alertLevel: 'medium',
+  //                 tenChuan: 'slack_pro'
+  //             },
+  //             {
+  //                 id: 5,
+  //                 tenPhanMem: 'Zoom',
+  //                 goiPhanMem: 'Business',
+  //                 tenTaiKhoan: 'meetings@domain.com',
+  //                 soNguoiDungChoPhep: 20,
+  //                 soNguoiDungDangHoatDong: 5,
+  //                 utilizationRate: 25,
+  //                 totalRevenue: 4000000,
+  //                 totalCost: 4800000,
+  //                 profit: -800000,
+  //                 roi: -16.7,
+  //                 expiryDate: '2024-05-10',
+  //                 status: 'expired',
+  //                 alertLevel: 'high',
+  //                 tenChuan: 'zoom_business'
+  //             }
+  //         ];
+  //     }
+  // 
+  //     // Render KPI Dashboard
+  //     renderKPIDashboard() {
+  //         const container = document.querySelector('.software-kpi-dashboard');
+  //         if (!container) return;
+  // 
+  //         const totalAccounts = this.filteredAccounts.length;
+  //         const totalRevenue = this.filteredAccounts.reduce((sum, acc) => sum + acc.totalRevenue, 0);
+  //         const totalCost = this.filteredAccounts.reduce((sum, acc) => sum + acc.totalCost, 0);
+  //         const totalProfit = totalRevenue - totalCost;
+  //         const avgUtilization = totalAccounts > 0 ? 
+  //             this.filteredAccounts.reduce((sum, acc) => sum + acc.utilizationRate, 0) / totalAccounts : 0;
+  //         const activeAccounts = this.filteredAccounts.filter(acc => acc.status === 'active').length;
+  //         const expiringAccounts = this.filteredAccounts.filter(acc => acc.status === 'expiring').length;
+  //         const expiredAccounts = this.filteredAccounts.filter(acc => acc.status === 'expired').length;
+  // 
+  //         container.innerHTML = `
+  //             <div class="kpi-grid">
+  //                 <div class="kpi-card revenue">
+  //                     <div class="kpi-icon">💰</div>
+  //                     <div class="kpi-content">
+  //                         <div class="kpi-value">${formatCurrency(totalRevenue)}</div>
+  //                         <div class="kpi-label">Tổng doanh thu</div>
+  //                         <div class="kpi-trend positive">+${((totalRevenue / (totalRevenue + totalCost)) * 100).toFixed(1)}% tỷ suất</div>
+  //                     </div>
+  //                 </div>
+  // 
+  //                 <div class="kpi-card cost">
+  //                     <div class="kpi-icon">💸</div>
+  //                     <div class="kpi-content">
+  //                         <div class="kpi-value">${formatCurrency(totalCost)}</div>
+  //                         <div class="kpi-label">Tổng chi phí</div>
+  //                         <div class="kpi-trend neutral">${totalAccounts} tài khoản</div>
+  //                     </div>
+  //                 </div>
+  // 
+  //                 <div class="kpi-card profit">
+  //                     <div class="kpi-icon">📈</div>
+  //                     <div class="kpi-content">
+  //                         <div class="kpi-value">${formatCurrency(totalProfit)}</div>
+  //                         <div class="kpi-label">Lợi nhuận</div>
+  //                         <div class="kpi-trend ${totalProfit >= 0 ? 'positive' : 'negative'}">
+  //                             ${totalProfit >= 0 ? '+' : ''}${((totalProfit / totalCost) * 100).toFixed(1)}% ROI
+  //                         </div>
+  //                     </div>
+  //                 </div>
+  // 
+  //                 <div class="kpi-card utilization">
+  //                     <div class="kpi-icon">👥</div>
+  //                     <div class="kpi-content">
+  //                         <div class="kpi-value">${avgUtilization.toFixed(1)}%</div>
+  //                         <div class="kpi-label">Tỷ lệ sử dụng TB</div>
+  //                         <div class="kpi-trend ${avgUtilization >= 80 ? 'positive' : avgUtilization >= 60 ? 'neutral' : 'negative'}">
+  //                             Mục tiêu: 80%
+  //                         </div>
+  //                     </div>
+  //                 </div>
+  // 
+  //                 <div class="kpi-card accounts">
+  //                     <div class="kpi-icon">📊</div>
+  //                     <div class="kpi-content">
+  //                         <div class="kpi-value">${totalAccounts}</div>
+  //                         <div class="kpi-label">Tổng tài khoản</div>
+  //                         <div class="kpi-trend neutral">${activeAccounts} hoạt động</div>
+  //                     </div>
+  //                 </div>
+  // 
+  //                 <div class="kpi-card alerts">
+  //                     <div class="kpi-icon">🚨</div>
+  //                     <div class="kpi-content">
+  //                         <div class="kpi-value">${expiringAccounts + expiredAccounts}</div>
+  //                         <div class="kpi-label">Cần chú ý</div>
+  //                         <div class="kpi-trend ${expiringAccounts + expiredAccounts > 0 ? 'negative' : 'positive'}">
+  //                             ${expiredAccounts} hết hạn, ${expiringAccounts} sắp hết hạn
+  //                         </div>
+  //                     </div>
+  //                 </div>
+  //             </div>
+  //         `;
+  //     }
+  // 
+  //     // Render Overview Cards
+  //     renderOverviewCards() {
+  //         const container = document.querySelector('.overview-cards');
+  //         if (!container) return;
+  // 
+  //         // Thống kê theo phần mềm
+  //         const softwareStats = {};
         this.filteredAccounts.forEach(acc => {
             const software = acc.tenPhanMem;
             if (!softwareStats[software]) {

@@ -67,171 +67,172 @@ function handleTransactionActionByIndex(selectElement) {
   }
   
 // console.log('🔍 Found transaction:', {
-    action,
-    globalIndex,
-    transaction,
-    transactionId: transaction.transactionId,
-    transactionListLength: window.transactionList ? window.transactionList.length : 0
-  });
-  
-  // Execute action based on selection
-  switch (action) {
-    case 'view':
-      if (typeof window.viewTransaction === 'function') {
-        // Pass globalIndex directly - it's already the correct index
-        // console.log('🔍 View action - using globalIndex:', globalIndex);
-        window.viewTransaction(globalIndex, window.transactionList, window.formatDate);
-      }
-      break;
-    case 'edit':
-      if (typeof window.editTransaction === 'function') {
-        window.editTransaction(globalIndex, window.transactionList, window.fetchSoftwareList, window.updatePackageList, window.updateAccountList);
-      }
-      break;
-    case 'delete':
-      if (typeof window.deleteTransaction === 'function') {
-        window.deleteTransaction(globalIndex);
-      }
-      break;
-    case 'updateCookie':
+
+  //     action,
+  //     globalIndex,
+  //     transaction,
+  //     transactionId: transaction.transactionId,
+  //     transactionListLength: window.transactionList ? window.transactionList.length : 0
+  //   });
+  //   
+  //   // Execute action based on selection
+  //   switch (action) {
+  //     case 'view':
+  //       if (typeof window.viewTransaction === 'function') {
+  //         // Pass globalIndex directly - it's already the correct index
+  //         // console.log('🔍 View action - using globalIndex:', globalIndex);
+  //         window.viewTransaction(globalIndex, window.transactionList, window.formatDate);
+  //       }
+  //       break;
+  //     case 'edit':
+  //       if (typeof window.editTransaction === 'function') {
+  //         window.editTransaction(globalIndex, window.transactionList, window.fetchSoftwareList, window.updatePackageList, window.updateAccountList);
+  //       }
+  //       break;
+  //     case 'delete':
+  //       if (typeof window.deleteTransaction === 'function') {
+  //         window.deleteTransaction(globalIndex);
+  //       }
+  //       break;
+  //     case 'updateCookie':
 // console.log('🍪 Update cookie action triggered for index:', globalIndex);
 // console.log('🍪 Transaction:', transaction);
 // console.log('🍪 handleUpdateCookie function exists:', typeof window.handleUpdateCookie === 'function');
-      if (typeof window.handleUpdateCookie === 'function') {
-        window.handleUpdateCookie(globalIndex);
-      } else {
-        console.error('❌ handleUpdateCookie function not found');
-      }
-      break;
-    case 'changePassword':
-      if (typeof window.handleChangePassword === 'function') {
-        window.handleChangePassword(globalIndex);
-      }
-      break;
-    case 'checkAccess':
-      if (typeof window.checkSheetAccess === 'function') {
-        window.checkSheetAccess(transaction);
-      } else {
-        console.error('checkSheetAccess function not found');
-      }
-      break;
-  }
-}
-
+  //       if (typeof window.handleUpdateCookie === 'function') {
+  //         window.handleUpdateCookie(globalIndex);
+  //       } else {
+  //         console.error('❌ handleUpdateCookie function not found');
+  //       }
+  //       break;
+  //     case 'changePassword':
+  //       if (typeof window.handleChangePassword === 'function') {
+  //         window.handleChangePassword(globalIndex);
+  //       }
+  //       break;
+  //     case 'checkAccess':
+  //       if (typeof window.checkSheetAccess === 'function') {
+  //         window.checkSheetAccess(transaction);
+  //       } else {
+  //         console.error('checkSheetAccess function not found');
+  //       }
+  //       break;
+  //   }
+  // }
+  // 
 // Make transaction pagination functions available globally
-window.transactionFirstPage = transactionFirstPage;
-window.transactionPrevPage = transactionPrevPage;
-window.transactionNextPage = transactionNextPage;
-window.transactionLastPage = transactionLastPage;
-window.transactionGoToPage = transactionGoToPage;
-window.handleTransactionActionByIndex = handleTransactionActionByIndex;
-
+  // window.transactionFirstPage = transactionFirstPage;
+  // window.transactionPrevPage = transactionPrevPage;
+  // window.transactionNextPage = transactionNextPage;
+  // window.transactionLastPage = transactionLastPage;
+  // window.transactionGoToPage = transactionGoToPage;
+  // window.handleTransactionActionByIndex = handleTransactionActionByIndex;
+  // 
 /**
- * Update transaction pagination - Giống hoàn toàn expense table
- */
-function updateTransactionPagination(totalPages, currentPage) {
-  const pagination = document.getElementById("pagination");
-  if (!pagination) return;
-
-  pagination.innerHTML = "";
-
-  // Thêm nút "Tất cả" nếu đang trong trạng thái tìm kiếm
-  if (window.isSearching) {
-    const allBtn = document.createElement("button");
-    allBtn.textContent = "Tất cả";
-    allBtn.className = "pagination-btn all-btn";
-    allBtn.addEventListener("click", () => {
-      window.isSearching = false;
-      window.currentPage = 1;
-      if (typeof window.loadTransactions === 'function') {
-        window.loadTransactions();
-      }
-    });
-    pagination.appendChild(allBtn);
-  }
-
-  if (totalPages <= 1) return;
-
-  // First button
-  const firstButton = document.createElement("button");
-  firstButton.textContent = "«";
-  firstButton.className = "pagination-btn";
-  firstButton.onclick = transactionFirstPage;
-  firstButton.disabled = currentPage === 1;
-  pagination.appendChild(firstButton);
-
-  // Previous button
-  const prevButton = document.createElement("button");
-  prevButton.textContent = "‹";
-  prevButton.className = "pagination-btn";
-  prevButton.onclick = transactionPrevPage;
-  prevButton.disabled = currentPage === 1;
-  pagination.appendChild(prevButton);
-
-  // Page numbers
-  const maxVisiblePages = 5;
-  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-  let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-  if (endPage - startPage + 1 < maxVisiblePages) {
-    startPage = Math.max(1, endPage - maxVisiblePages + 1);
-  }
-
-  if (startPage > 1) {
-    const dots = document.createElement("span");
-    dots.textContent = "...";
-    dots.className = "pagination-dots";
-    pagination.appendChild(dots);
-  }
-
-  for (let i = startPage; i <= endPage; i++) {
-    const pageButton = document.createElement("button");
-    pageButton.textContent = i;
-    pageButton.className = "pagination-btn";
-    pageButton.onclick = () => transactionGoToPage(i);
-    if (i === currentPage) {
-      pageButton.classList.add("active");
-    }
-    pagination.appendChild(pageButton);
-  }
-
-  if (endPage < totalPages) {
-    const dots = document.createElement("span");
-    dots.textContent = "...";
-    dots.className = "pagination-dots";
-    pagination.appendChild(dots);
-  }
-
-  // Next button
-  const nextButton = document.createElement("button");
-  nextButton.textContent = "›";
-  nextButton.className = "pagination-btn";
-  nextButton.onclick = transactionNextPage;
-  nextButton.disabled = currentPage === totalPages;
-  pagination.appendChild(nextButton);
-
-  // Last button
-  const lastButton = document.createElement("button");
-  lastButton.textContent = "»";
-  lastButton.className = "pagination-btn";
-  lastButton.onclick = transactionLastPage;
-  lastButton.disabled = currentPage === totalPages;
-  pagination.appendChild(lastButton);
-}
-
+  //  * Update transaction pagination - Giống hoàn toàn expense table
+  //  */
+  // function updateTransactionPagination(totalPages, currentPage) {
+  //   const pagination = document.getElementById("pagination");
+  //   if (!pagination) return;
+  // 
+  //   pagination.innerHTML = "";
+  // 
+  //   // Thêm nút "Tất cả" nếu đang trong trạng thái tìm kiếm
+  //   if (window.isSearching) {
+  //     const allBtn = document.createElement("button");
+  //     allBtn.textContent = "Tất cả";
+  //     allBtn.className = "pagination-btn all-btn";
+  //     allBtn.addEventListener("click", () => {
+  //       window.isSearching = false;
+  //       window.currentPage = 1;
+  //       if (typeof window.loadTransactions === 'function') {
+  //         window.loadTransactions();
+  //       }
+  //     });
+  //     pagination.appendChild(allBtn);
+  //   }
+  // 
+  //   if (totalPages <= 1) return;
+  // 
+  //   // First button
+  //   const firstButton = document.createElement("button");
+  //   firstButton.textContent = "«";
+  //   firstButton.className = "pagination-btn";
+  //   firstButton.onclick = transactionFirstPage;
+  //   firstButton.disabled = currentPage === 1;
+  //   pagination.appendChild(firstButton);
+  // 
+  //   // Previous button
+  //   const prevButton = document.createElement("button");
+  //   prevButton.textContent = "‹";
+  //   prevButton.className = "pagination-btn";
+  //   prevButton.onclick = transactionPrevPage;
+  //   prevButton.disabled = currentPage === 1;
+  //   pagination.appendChild(prevButton);
+  // 
+  //   // Page numbers
+  //   const maxVisiblePages = 5;
+  //   let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+  //   let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+  // 
+  //   if (endPage - startPage + 1 < maxVisiblePages) {
+  //     startPage = Math.max(1, endPage - maxVisiblePages + 1);
+  //   }
+  // 
+  //   if (startPage > 1) {
+  //     const dots = document.createElement("span");
+  //     dots.textContent = "...";
+  //     dots.className = "pagination-dots";
+  //     pagination.appendChild(dots);
+  //   }
+  // 
+  //   for (let i = startPage; i <= endPage; i++) {
+  //     const pageButton = document.createElement("button");
+  //     pageButton.textContent = i;
+  //     pageButton.className = "pagination-btn";
+  //     pageButton.onclick = () => transactionGoToPage(i);
+  //     if (i === currentPage) {
+  //       pageButton.classList.add("active");
+  //     }
+  //     pagination.appendChild(pageButton);
+  //   }
+  // 
+  //   if (endPage < totalPages) {
+  //     const dots = document.createElement("span");
+  //     dots.textContent = "...";
+  //     dots.className = "pagination-dots";
+  //     pagination.appendChild(dots);
+  //   }
+  // 
+  //   // Next button
+  //   const nextButton = document.createElement("button");
+  //   nextButton.textContent = "›";
+  //   nextButton.className = "pagination-btn";
+  //   nextButton.onclick = transactionNextPage;
+  //   nextButton.disabled = currentPage === totalPages;
+  //   pagination.appendChild(nextButton);
+  // 
+  //   // Last button
+  //   const lastButton = document.createElement("button");
+  //   lastButton.textContent = "»";
+  //   lastButton.className = "pagination-btn";
+  //   lastButton.onclick = transactionLastPage;
+  //   lastButton.disabled = currentPage === totalPages;
+  //   pagination.appendChild(lastButton);
+  // }
+  // 
 /**
- * Copy order information to clipboard
- */
-function copyOrderInfo(transaction, button) {
-  const formatDate = (dateStr) => {
-    if (!dateStr) return 'Không có';
-    // Convert YYYY/MM/DD to DD/MM/YYYY
-    const parts = dateStr.split('/');
-    if (parts.length === 3) {
-      return `${parts[2]}/${parts[1]}/${parts[0]}`;
-    }
-    return dateStr;
-  };
+  //  * Copy order information to clipboard
+  //  */
+  // function copyOrderInfo(transaction, button) {
+  //   const formatDate = (dateStr) => {
+  //     if (!dateStr) return 'Không có';
+  //     // Convert YYYY/MM/DD to DD/MM/YYYY
+  //     const parts = dateStr.split('/');
+  //     if (parts.length === 3) {
+  //       return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  //     }
+  //     return dateStr;
+  //   };
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN').format(amount || 0) + ' VNĐ';
@@ -461,135 +462,136 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     // Debug employee code
     if (index === 0) {
 // console.log('🔍 First transaction employee data:', {
-        maNhanVien: transaction.maNhanVien,
-        tenNhanVien: transaction.tenNhanVien,
-        employeeCode: employeeCode,
-        color: employeeColor,
-        allKeys: Object.keys(transaction)
-      });
-      // console.log('🔍 Employee code determined:', employeeCode);
-    }
-    
-    const infoCell = `
-      <div class="info-cell-container" style="position: relative; line-height: 1.2;">
-        <!-- Line 1: Employee Code (right aligned) -->
-        <div class="employee-line" style="display: flex; align-items: center; justify-content: flex-end; margin-bottom: 2px; white-space: nowrap; overflow: hidden;">
-          <span class="employee-badge" style="font-size: 10px; color: ${employeeColor.textColor}; font-weight: bold; background: ${employeeColor.bg}; padding: 1px 4px; border-radius: 3px; border: 1px solid ${employeeColor.border}; box-shadow: 0 1px 2px rgba(0,0,0,0.2);">${employeeCode}</span>
-        </div>
-        
-        <!-- Line 2: Contact Info -->
-        <div class="contact-info-line" style="display: flex; align-items: center; margin-bottom: 2px; white-space: nowrap; overflow: hidden;">
-          <span style="margin-right: 4px; font-size: 12px;">${contactIcon}</span>
-          <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; font-size: 12px;">${contactDisplay}</span>
-          <button class="copy-btn" data-content="${contactInfo.replace(/"/g, '&quot;')}" title="Sao chép thông tin liên hệ" style="margin-left: 4px;">📄</button>
-        </div>
-        
-        <!-- Line 3: Order Info -->
-        <div class="order-info-line" style="display: flex; align-items: center; white-space: nowrap; overflow: hidden;">
-          <span style="margin-right: 4px; font-size: 12px;">📦</span>
-          <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; font-size: 12px;">Thông tin đơn hàng</span>
-          <button class="copy-btn" data-content="${(transaction.orderInfo || "").replace(/"/g, '&quot;')}" title="Sao chép thông tin đơn hàng" style="margin-left: 4px;">📄</button>
-        </div>
-      </div>
-    `;
 
-    // Create usage cycle cell with icons and 3 lines
-    const usageCycleCell = `
-      <div class="usage-cycle-cell">
-        <div class="cycle-line">📅 ${transaction.duration || 0} tháng</div>
-        <div class="cycle-line">▶️ ${formatDate(transaction.startDate)}</div>
-        <div class="cycle-line">⏹️ ${formatDate(transaction.endDate)}</div>
-      </div>
-    `;
-    
-    // Software info - allow full content and wrap
-    const softwareInfo = `
-      <div class="software-info-cell">
-        ${transaction.softwareName} - ${transaction.softwarePackage}${transaction.accountName ? ` - ${transaction.accountName}` : ""}
-      </div>
-    `;
-
-    // Gộp tên và email khách hàng trong 1 ô
-    const customerInfo = `${transaction.customerName}<br><small>${transaction.customerEmail}</small>`;
-    
-    // Create transaction ID cell with copy order button
-    const transactionIdCell = `
-      <div class="transaction-id-cell">
-        <div style="font-weight: bold; margin-bottom: 4px;">${transaction.transactionId}</div>
-        <button class="copy-order-btn" data-transaction='${JSON.stringify(transaction).replace(/'/g, "&apos;")}' title="Copy thông tin đơn hàng" style="display: flex; align-items: center; padding: 4px 8px; font-size: 14px; border: 1px solid #007bff; background: #e7f3ff; color: #007bff; cursor: pointer; border-radius: 3px; white-space: nowrap;">
-          📋
-        </button>
-      </div>
-    `;
-
-    row.innerHTML = `
-      <td>${transactionIdCell}</td>
-      <td>${formatDate(transaction.transactionDate)}</td>
-      <td>${transaction.transactionType}</td>
-      <td>${customerInfo}</td>
-      <td>${usageCycleCell}</td>
-      <td>${transaction.deviceCount}</td>
-      <td>${softwareInfo}</td>
-      <td>${transaction.revenue}</td>
-      <td>${(transaction.note || "").replace(/\n/g, "<br>")}</td>
-      <td>${infoCell}</td>
-      <td>
-        <select class="action-select" data-index="${globalIndex}" onchange="handleTransactionActionByIndex(this)">
-          ${actionOptions}
-        </select>
-      </td>
-    `;
-
-    const copyBtn = row.querySelector(".copy-btn");
-    if (copyBtn) {
-      copyBtn.addEventListener("click", () => {
-        const content = copyBtn.getAttribute("data-content") || "";
-        navigator.clipboard.writeText(content);
-        alert("Đã sao chép thông tin đơn hàng.");
-      });
-    }
-
-    tableBody.appendChild(row);
-    
-    // Apply background color after the row is appended to DOM
-    const rowBackgroundColor = getTransactionRowColor(transaction.transactionType);
-    if (rowBackgroundColor) {
-      row.style.backgroundColor = rowBackgroundColor;
-      row.style.setProperty('background-color', rowBackgroundColor, 'important');
-    }
-  });
-
-  // ✅ Cập nhật phân trang - Sử dụng structure giống expense table
-  updateTransactionPagination(totalPages, currentPage);
-
-  // ✅ Lưu tổng doanh thu vào biến global và cập nhật hiển thị
-  window.totalRevenue = totalRevenue;
-  // console.log("✅ Đã lưu totalRevenue:", totalRevenue);
-
-  // Không cần cập nhật hiển thị totals nữa - đã xóa
-  // console.log("✅ Đã lưu totalRevenue:", totalRevenue, "- Không hiển thị totals");
-  
-  // ✅ Add event listener for copy order buttons
-  if (!tableBody.hasAttribute('data-copy-events-attached')) {
-    tableBody.setAttribute('data-copy-events-attached', 'true');
-    
-    tableBody.addEventListener('click', (e) => {
-      // Handle copy order button clicks
-      if (e.target.matches('.copy-order-btn') || e.target.closest('.copy-order-btn')) {
-        const button = e.target.matches('.copy-order-btn') ? e.target : e.target.closest('.copy-order-btn');
-        const transactionData = button.dataset.transaction;
-        
-        if (transactionData) {
-          try {
-            const transaction = JSON.parse(transactionData.replace(/&apos;/g, "'"));
-            copyOrderInfo(transaction, button);
-          } catch (error) {
-            console.error('Error parsing transaction data:', error);
-          }
-        }
-      }
-    });
-  }
-  
-  // Đã loại bỏ debugTable để tăng performance
-}
+  //         maNhanVien: transaction.maNhanVien,
+  //         tenNhanVien: transaction.tenNhanVien,
+  //         employeeCode: employeeCode,
+  //         color: employeeColor,
+  //         allKeys: Object.keys(transaction)
+  //       });
+  //       // console.log('🔍 Employee code determined:', employeeCode);
+  //     }
+  //     
+  //     const infoCell = `
+  //       <div class="info-cell-container" style="position: relative; line-height: 1.2;">
+  //         <!-- Line 1: Employee Code (right aligned) -->
+  //         <div class="employee-line" style="display: flex; align-items: center; justify-content: flex-end; margin-bottom: 2px; white-space: nowrap; overflow: hidden;">
+  //           <span class="employee-badge" style="font-size: 10px; color: ${employeeColor.textColor}; font-weight: bold; background: ${employeeColor.bg}; padding: 1px 4px; border-radius: 3px; border: 1px solid ${employeeColor.border}; box-shadow: 0 1px 2px rgba(0,0,0,0.2);">${employeeCode}</span>
+  //         </div>
+  //         
+  //         <!-- Line 2: Contact Info -->
+  //         <div class="contact-info-line" style="display: flex; align-items: center; margin-bottom: 2px; white-space: nowrap; overflow: hidden;">
+  //           <span style="margin-right: 4px; font-size: 12px;">${contactIcon}</span>
+  //           <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; font-size: 12px;">${contactDisplay}</span>
+  //           <button class="copy-btn" data-content="${contactInfo.replace(/"/g, '&quot;')}" title="Sao chép thông tin liên hệ" style="margin-left: 4px;">📄</button>
+  //         </div>
+  //         
+  //         <!-- Line 3: Order Info -->
+  //         <div class="order-info-line" style="display: flex; align-items: center; white-space: nowrap; overflow: hidden;">
+  //           <span style="margin-right: 4px; font-size: 12px;">📦</span>
+  //           <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; font-size: 12px;">Thông tin đơn hàng</span>
+  //           <button class="copy-btn" data-content="${(transaction.orderInfo || "").replace(/"/g, '&quot;')}" title="Sao chép thông tin đơn hàng" style="margin-left: 4px;">📄</button>
+  //         </div>
+  //       </div>
+  //     `;
+  // 
+  //     // Create usage cycle cell with icons and 3 lines
+  //     const usageCycleCell = `
+  //       <div class="usage-cycle-cell">
+  //         <div class="cycle-line">📅 ${transaction.duration || 0} tháng</div>
+  //         <div class="cycle-line">▶️ ${formatDate(transaction.startDate)}</div>
+  //         <div class="cycle-line">⏹️ ${formatDate(transaction.endDate)}</div>
+  //       </div>
+  //     `;
+  //     
+  //     // Software info - allow full content and wrap
+  //     const softwareInfo = `
+  //       <div class="software-info-cell">
+  //         ${transaction.softwareName} - ${transaction.softwarePackage}${transaction.accountName ? ` - ${transaction.accountName}` : ""}
+  //       </div>
+  //     `;
+  // 
+  //     // Gộp tên và email khách hàng trong 1 ô
+  //     const customerInfo = `${transaction.customerName}<br><small>${transaction.customerEmail}</small>`;
+  //     
+  //     // Create transaction ID cell with copy order button
+  //     const transactionIdCell = `
+  //       <div class="transaction-id-cell">
+  //         <div style="font-weight: bold; margin-bottom: 4px;">${transaction.transactionId}</div>
+  //         <button class="copy-order-btn" data-transaction='${JSON.stringify(transaction).replace(/'/g, "&apos;")}' title="Copy thông tin đơn hàng" style="display: flex; align-items: center; padding: 4px 8px; font-size: 14px; border: 1px solid #007bff; background: #e7f3ff; color: #007bff; cursor: pointer; border-radius: 3px; white-space: nowrap;">
+  //           📋
+  //         </button>
+  //       </div>
+  //     `;
+  // 
+  //     row.innerHTML = `
+  //       <td>${transactionIdCell}</td>
+  //       <td>${formatDate(transaction.transactionDate)}</td>
+  //       <td>${transaction.transactionType}</td>
+  //       <td>${customerInfo}</td>
+  //       <td>${usageCycleCell}</td>
+  //       <td>${transaction.deviceCount}</td>
+  //       <td>${softwareInfo}</td>
+  //       <td>${transaction.revenue}</td>
+  //       <td>${(transaction.note || "").replace(/\n/g, "<br>")}</td>
+  //       <td>${infoCell}</td>
+  //       <td>
+  //         <select class="action-select" data-index="${globalIndex}" onchange="handleTransactionActionByIndex(this)">
+  //           ${actionOptions}
+  //         </select>
+  //       </td>
+  //     `;
+  // 
+  //     const copyBtn = row.querySelector(".copy-btn");
+  //     if (copyBtn) {
+  //       copyBtn.addEventListener("click", () => {
+  //         const content = copyBtn.getAttribute("data-content") || "";
+  //         navigator.clipboard.writeText(content);
+  //         alert("Đã sao chép thông tin đơn hàng.");
+  //       });
+  //     }
+  // 
+  //     tableBody.appendChild(row);
+  //     
+  //     // Apply background color after the row is appended to DOM
+  //     const rowBackgroundColor = getTransactionRowColor(transaction.transactionType);
+  //     if (rowBackgroundColor) {
+  //       row.style.backgroundColor = rowBackgroundColor;
+  //       row.style.setProperty('background-color', rowBackgroundColor, 'important');
+  //     }
+  //   });
+  // 
+  //   // ✅ Cập nhật phân trang - Sử dụng structure giống expense table
+  //   updateTransactionPagination(totalPages, currentPage);
+  // 
+  //   // ✅ Lưu tổng doanh thu vào biến global và cập nhật hiển thị
+  //   window.totalRevenue = totalRevenue;
+  //   // console.log("✅ Đã lưu totalRevenue:", totalRevenue);
+  // 
+  //   // Không cần cập nhật hiển thị totals nữa - đã xóa
+  //   // console.log("✅ Đã lưu totalRevenue:", totalRevenue, "- Không hiển thị totals");
+  //   
+  //   // ✅ Add event listener for copy order buttons
+  //   if (!tableBody.hasAttribute('data-copy-events-attached')) {
+  //     tableBody.setAttribute('data-copy-events-attached', 'true');
+  //     
+  //     tableBody.addEventListener('click', (e) => {
+  //       // Handle copy order button clicks
+  //       if (e.target.matches('.copy-order-btn') || e.target.closest('.copy-order-btn')) {
+  //         const button = e.target.matches('.copy-order-btn') ? e.target : e.target.closest('.copy-order-btn');
+  //         const transactionData = button.dataset.transaction;
+  //         
+  //         if (transactionData) {
+  //           try {
+  //             const transaction = JSON.parse(transactionData.replace(/&apos;/g, "'"));
+  //             copyOrderInfo(transaction, button);
+  //           } catch (error) {
+  //             console.error('Error parsing transaction data:', error);
+  //           }
+  //         }
+  //       }
+  //     });
+  //   }
+  //   
+  //   // Đã loại bỏ debugTable để tăng performance
+  // }

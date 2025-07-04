@@ -163,21 +163,22 @@ function hideLoadingElements() {
   ].filter(el => el !== null);
 
 // console.log("🔍 DEBUG loading elements after render:", {
-    foundLoadingElements: loadingElements.length,
-    loadingElements: loadingElements.map(el => ({
-      tagName: el.tagName,
-      className: el.className,
-      id: el.id,
-      display: window.getComputedStyle(el).display,
-      visibility: window.getComputedStyle(el).visibility
-    }))
-  });
 
-  // Hide any visible loading elements
-  loadingElements.forEach(el => {
-    if (window.getComputedStyle(el).display !== 'none') {
-      // console.log(`🚫 Hiding loading element:`, el.className || el.id);
-      el.style.display = 'none';
-    }
-  });
-}
+  //     foundLoadingElements: loadingElements.length,
+  //     loadingElements: loadingElements.map(el => ({
+  //       tagName: el.tagName,
+  //       className: el.className,
+  //       id: el.id,
+  //       display: window.getComputedStyle(el).display,
+  //       visibility: window.getComputedStyle(el).visibility
+  //     }))
+  //   });
+  // 
+  //   // Hide any visible loading elements
+  //   loadingElements.forEach(el => {
+  //     if (window.getComputedStyle(el).display !== 'none') {
+  //       // console.log(`🚫 Hiding loading element:`, el.className || el.id);
+  //       el.style.display = 'none';
+  //     }
+  //   });
+  // }

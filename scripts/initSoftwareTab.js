@@ -2028,60 +2028,61 @@ window.handleSoftwareSearch = async function() {
       if (result.data.length > 0) {
         // console.log('📊 DEBUG Frontend v3: First result renewal date:', result.data[0].renewalDate);
         // console.log('📊 DEBUG Frontend v3: Sample results:', result.data.slice(0, 3).map(item => ({
-        //   name: item.softwareName,
-        //   renewalDate: item.renewalDate,
-        //   renewalDateType: typeof item.renewalDate
-        // })));
-      } else {
-        // console.log('⚠️ DEBUG Frontend v3: No results found for conditions:', conditions);
-      }
-      
-      // Set search mode and update software list
-      window.isSoftwareSearching = true;
-      window.softwareList = result.data || [];
-      window.currentSoftwarePage = 1;
-      
-      // Update display
-      updateSoftwareTable();
-      updateSoftwareTotalDisplay();
-      
-      // Show success message
-      const message = result.message || `Tìm thấy ${result.data.length} phần mềm phù hợp`;
-      if (typeof showResultModalModern === 'function') {
-        showResultModalModern('Tìm kiếm thành công!', message, 'success');
-      } else {
-        alert('✅ ' + message);
-      }
-      
-      // console.log('✅ Software search completed:', result.data.length, 'results');
-      
-    } else {
-      // Show error message
-      console.error('❌ Error searching software:', result.message);
-      
-      if (typeof showResultModalModern === 'function') {
-        showResultModalModern('Lỗi!', result.message || 'Có lỗi xảy ra khi tìm kiếm phần mềm', 'error');
-      } else {
-        alert('❌ ' + (result.message || 'Có lỗi xảy ra khi tìm kiếm phần mềm'));
-      }
-    }
-    
-  } catch (error) {
-    console.error('❌ Error in handleSoftwareSearch:', error);
-    
-    // Close processing modal if it's open
-    if (typeof closeProcessingModalModern === 'function') {
-      closeProcessingModalModern();
-    }
-    
-    const errorMessage = 'Có lỗi xảy ra khi tìm kiếm phần mềm. Vui lòng thử lại.';
-    if (typeof showResultModalModern === 'function') {
-      showResultModalModern('Lỗi!', errorMessage, 'error');
-    } else {
-      alert('❌ ' + errorMessage);
-    }
-  }
-};
+
+  //         //   name: item.softwareName,
+  //         //   renewalDate: item.renewalDate,
+  //         //   renewalDateType: typeof item.renewalDate
+  //         // })));
+  //       } else {
+  //         // console.log('⚠️ DEBUG Frontend v3: No results found for conditions:', conditions);
+  //       }
+  //       
+  //       // Set search mode and update software list
+  //       window.isSoftwareSearching = true;
+  //       window.softwareList = result.data || [];
+  //       window.currentSoftwarePage = 1;
+  //       
+  //       // Update display
+  //       updateSoftwareTable();
+  //       updateSoftwareTotalDisplay();
+  //       
+  //       // Show success message
+  //       const message = result.message || `Tìm thấy ${result.data.length} phần mềm phù hợp`;
+  //       if (typeof showResultModalModern === 'function') {
+  //         showResultModalModern('Tìm kiếm thành công!', message, 'success');
+  //       } else {
+  //         alert('✅ ' + message);
+  //       }
+  //       
+  //       // console.log('✅ Software search completed:', result.data.length, 'results');
+  //       
+  //     } else {
+  //       // Show error message
+  //       console.error('❌ Error searching software:', result.message);
+  //       
+  //       if (typeof showResultModalModern === 'function') {
+  //         showResultModalModern('Lỗi!', result.message || 'Có lỗi xảy ra khi tìm kiếm phần mềm', 'error');
+  //       } else {
+  //         alert('❌ ' + (result.message || 'Có lỗi xảy ra khi tìm kiếm phần mềm'));
+  //       }
+  //     }
+  //     
+  //   } catch (error) {
+  //     console.error('❌ Error in handleSoftwareSearch:', error);
+  //     
+  //     // Close processing modal if it's open
+  //     if (typeof closeProcessingModalModern === 'function') {
+  //       closeProcessingModalModern();
+  //     }
+  //     
+  //     const errorMessage = 'Có lỗi xảy ra khi tìm kiếm phần mềm. Vui lòng thử lại.';
+  //     if (typeof showResultModalModern === 'function') {
+  //       showResultModalModern('Lỗi!', errorMessage, 'error');
+  //     } else {
+  //       alert('❌ ' + errorMessage);
+  //     }
+  //   }
+  // };
 
 function getSoftwareSearchConditions() {
   const conditions = {};

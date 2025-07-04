@@ -332,134 +332,135 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
           setTimeout(() => {
             const computedStyle = window.getComputedStyle(row);
 // console.log('🎨 FINAL COLOR CHECK GD2506241556:', {
-              returnedColor: rowBackgroundColor,
-              inlineStyle: row.style.backgroundColor,
-              computedBgColor: computedStyle.backgroundColor,
-              allBgProperties: {
-                background: computedStyle.background,
-                backgroundImage: computedStyle.backgroundImage,
-                backgroundColor: computedStyle.backgroundColor
-              },
-              rowElement: row,
-              rowClasses: row.className
-            });
-          }, 100);
-        }
-      }
-    });
-  });
 
-  // ✅ Single event delegation setup (if not already done)
-  if (!tableBody.hasAttribute('data-events-attached')) {
-    batchWrite(() => {
-      tableBody.setAttribute('data-events-attached', 'true');
-      
-      // Ultra-lightweight event delegation
-      tableBody.addEventListener('change', (e) => {
-        if (e.target.matches('.action-select')) {
-          const action = e.target.value;
-          const index = parseInt(e.target.dataset.index);
-          
+  //               returnedColor: rowBackgroundColor,
+  //               inlineStyle: row.style.backgroundColor,
+  //               computedBgColor: computedStyle.backgroundColor,
+  //               allBgProperties: {
+  //                 background: computedStyle.background,
+  //                 backgroundImage: computedStyle.backgroundImage,
+  //                 backgroundColor: computedStyle.backgroundColor
+  //               },
+  //               rowElement: row,
+  //               rowClasses: row.className
+  //             });
+  //           }, 100);
+  //         }
+  //       }
+  //     });
+  //   });
+  // 
+  //   // ✅ Single event delegation setup (if not already done)
+  //   if (!tableBody.hasAttribute('data-events-attached')) {
+  //     batchWrite(() => {
+  //       tableBody.setAttribute('data-events-attached', 'true');
+  //       
+  //       // Ultra-lightweight event delegation
+  //       tableBody.addEventListener('change', (e) => {
+  //         if (e.target.matches('.action-select')) {
+  //           const action = e.target.value;
+  //           const index = parseInt(e.target.dataset.index);
+  //           
 // console.log(`📌 Action select changed - action: ${action}, data-index: ${index}`);
 // console.log(`   - window.isSearching: ${window.isSearching}`);
-          
-          // Always use the global window.transactionList which is updated after refund
-          const currentList = window.transactionList || transactionList;
+  //           
+  //           // Always use the global window.transactionList which is updated after refund
+  //           const currentList = window.transactionList || transactionList;
 // console.log(`   - Using list with length: ${currentList.length}`);
 // console.log(`   - window.transactionList.length: ${window.transactionList ? window.transactionList.length : 'undefined'}`);
 // console.log(`   - transactionList (closure).length: ${transactionList.length}`);
-          
-          if (action && index >= 0) {
-            handleTableAction(action, index, currentList);
-            e.target.value = "";
-          }
-        }
-      });
-
-      tableBody.addEventListener('click', (e) => {
-        if (e.target.matches('.copy-btn')) {
-          const content = e.target.dataset.content || "";
-          navigator.clipboard.writeText(content);
-          e.target.textContent = '✓';
-          setTimeout(() => e.target.textContent = '📋', 800);
-        }
-        
-        // Handle copy order button clicks
-        if (e.target.matches('.copy-order-btn') || e.target.closest('.copy-order-btn')) {
-          const button = e.target.matches('.copy-order-btn') ? e.target : e.target.closest('.copy-order-btn');
-          const transactionData = button.dataset.transaction;
-          
-          if (transactionData) {
-            try {
-              const transaction = JSON.parse(transactionData.replace(/&apos;/g, "'"));
-              copyOrderInfo(transaction, button);
-            } catch (error) {
-              console.error('Error parsing transaction data:', error);
-            }
-          }
-        }
-      });
-    });
-  }
-
-  // ✅ Update pagination with corrected page size
-  const refreshTable = () =>
-    updateTableUltraFast(window.transactionList, window.currentPage, actualItemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
-
-  updatePagination(
-    totalPages,
-    window.currentPage,
-    () => window.firstPage(refreshTable),
-    () => window.prevPage(refreshTable),
-    () => window.nextPage(refreshTable, actualItemsPerPage),
-    () => window.lastPage(refreshTable, actualItemsPerPage),
-    (page) => window.goToPage(page, refreshTable)
-  );
-
-  // ✅ Save revenue and log performance
-  window.totalRevenue = totalRevenue;
-  
-  // ✅ Schedule background calculation of full revenue if needed
-  if (!window.isSearching && paginatedItems.length < transactionList.length) {
-    setTimeout(() => {
-      const fullRevenue = transactionList.reduce((sum, t) => {
-        if (t.transactionDate && t.transactionDate.startsWith(todayFormatted)) {
-          return sum + (parseFloat(t.revenue) || 0);
-        }
-        return sum;
-      }, 0);
-      window.totalRevenue = fullRevenue;
-    }, 100);
-  }
-}
-
+  //           
+  //           if (action && index >= 0) {
+  //             handleTableAction(action, index, currentList);
+  //             e.target.value = "";
+  //           }
+  //         }
+  //       });
+  // 
+  //       tableBody.addEventListener('click', (e) => {
+  //         if (e.target.matches('.copy-btn')) {
+  //           const content = e.target.dataset.content || "";
+  //           navigator.clipboard.writeText(content);
+  //           e.target.textContent = '✓';
+  //           setTimeout(() => e.target.textContent = '📋', 800);
+  //         }
+  //         
+  //         // Handle copy order button clicks
+  //         if (e.target.matches('.copy-order-btn') || e.target.closest('.copy-order-btn')) {
+  //           const button = e.target.matches('.copy-order-btn') ? e.target : e.target.closest('.copy-order-btn');
+  //           const transactionData = button.dataset.transaction;
+  //           
+  //           if (transactionData) {
+  //             try {
+  //               const transaction = JSON.parse(transactionData.replace(/&apos;/g, "'"));
+  //               copyOrderInfo(transaction, button);
+  //             } catch (error) {
+  //               console.error('Error parsing transaction data:', error);
+  //             }
+  //           }
+  //         }
+  //       });
+  //     });
+  //   }
+  // 
+  //   // ✅ Update pagination with corrected page size
+  //   const refreshTable = () =>
+  //     updateTableUltraFast(window.transactionList, window.currentPage, actualItemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
+  // 
+  //   updatePagination(
+  //     totalPages,
+  //     window.currentPage,
+  //     () => window.firstPage(refreshTable),
+  //     () => window.prevPage(refreshTable),
+  //     () => window.nextPage(refreshTable, actualItemsPerPage),
+  //     () => window.lastPage(refreshTable, actualItemsPerPage),
+  //     (page) => window.goToPage(page, refreshTable)
+  //   );
+  // 
+  //   // ✅ Save revenue and log performance
+  //   window.totalRevenue = totalRevenue;
+  //   
+  //   // ✅ Schedule background calculation of full revenue if needed
+  //   if (!window.isSearching && paginatedItems.length < transactionList.length) {
+  //     setTimeout(() => {
+  //       const fullRevenue = transactionList.reduce((sum, t) => {
+  //         if (t.transactionDate && t.transactionDate.startsWith(todayFormatted)) {
+  //           return sum + (parseFloat(t.revenue) || 0);
+  //         }
+  //         return sum;
+  //       }, 0);
+  //       window.totalRevenue = fullRevenue;
+  //     }, 100);
+  //   }
+  // }
+  // 
 /**
- * Copy order information to clipboard
- */
-function copyOrderInfo(transaction, button) {
-  // Debug log
-  // console.log('📋 copyOrderInfo called with transaction:', transaction);
-  // console.log('📄 transaction.orderInfo:', transaction.orderInfo);
-  
-  // Ưu tiên sử dụng orderInfo đã được lưu từ backend
-  let orderInfo = '';
-  
-  if (transaction.orderInfo && transaction.orderInfo.trim() !== '') {
-    // Sử dụng orderInfo từ backend (đã bao gồm tất cả thông tin)
-    orderInfo = transaction.orderInfo;
-    // console.log('✅ Using orderInfo from backend');
-  } else {
-    // console.log('⚠️ No orderInfo from backend, generating fallback');
-    // Fallback: tạo orderInfo nếu không có từ backend
-    const formatDate = (dateStr) => {
-      if (!dateStr) return 'Không có';
-      // Convert YYYY/MM/DD to DD/MM/YYYY
-      const parts = dateStr.split('/');
-      if (parts.length === 3) {
-        return `${parts[2]}/${parts[1]}/${parts[0]}`;
-      }
-      return dateStr;
-    };
+  //  * Copy order information to clipboard
+  //  */
+  // function copyOrderInfo(transaction, button) {
+  //   // Debug log
+  //   // console.log('📋 copyOrderInfo called with transaction:', transaction);
+  //   // console.log('📄 transaction.orderInfo:', transaction.orderInfo);
+  //   
+  //   // Ưu tiên sử dụng orderInfo đã được lưu từ backend
+  //   let orderInfo = '';
+  //   
+  //   if (transaction.orderInfo && transaction.orderInfo.trim() !== '') {
+  //     // Sử dụng orderInfo từ backend (đã bao gồm tất cả thông tin)
+  //     orderInfo = transaction.orderInfo;
+  //     // console.log('✅ Using orderInfo from backend');
+  //   } else {
+  //     // console.log('⚠️ No orderInfo from backend, generating fallback');
+  //     // Fallback: tạo orderInfo nếu không có từ backend
+  //     const formatDate = (dateStr) => {
+  //       if (!dateStr) return 'Không có';
+  //       // Convert YYYY/MM/DD to DD/MM/YYYY
+  //       const parts = dateStr.split('/');
+  //       if (parts.length === 3) {
+  //         return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  //       }
+  //       return dateStr;
+  //     };
 
     const formatCurrency = (amount) => {
       return new Intl.NumberFormat('vi-VN').format(amount || 0) + ' VNĐ';

@@ -352,29 +352,30 @@ export function calculateGrowthMetrics(transactionData, expenseData, dateRange) 
     }
     
 // console.log('📊 Growth calculation:', {
-      currentMonthRevenue,
-      prevMonthRevenue,
-      revenueGrowth,
-      currentMonthTransactions: currentMonthTransactions.length,
-      prevMonthTransactions: prevMonthTransactions.length,
-      transactionGrowth
-    });
-    
-  } catch (error) {
+
+  //       currentMonthRevenue,
+  //       prevMonthRevenue,
+  //       revenueGrowth,
+  //       currentMonthTransactions: currentMonthTransactions.length,
+  //       prevMonthTransactions: prevMonthTransactions.length,
+  //       transactionGrowth
+  //     });
+  //     
+  //   } catch (error) {
 // console.warn('⚠️ Error calculating growth metrics:', error);
-  }
-  
-  return {
-    revenueGrowth: isFinite(revenueGrowth) ? revenueGrowth : 0,
-    expenseGrowth: isFinite(expenseGrowth) ? expenseGrowth : 0,
-    profitGrowth: isFinite(profitGrowth) ? profitGrowth : 0,
-    transactionGrowth: isFinite(transactionGrowth) ? transactionGrowth : 0,
-    // Add current values for reference
-    currentRevenue,
-    currentExpenses,
-    currentProfit,
-    currentTransactionCount
-  };
+  //   }
+  //   
+  //   return {
+  //     revenueGrowth: isFinite(revenueGrowth) ? revenueGrowth : 0,
+  //     expenseGrowth: isFinite(expenseGrowth) ? expenseGrowth : 0,
+  //     profitGrowth: isFinite(profitGrowth) ? profitGrowth : 0,
+  //     transactionGrowth: isFinite(transactionGrowth) ? transactionGrowth : 0,
+  //     // Add current values for reference
+  //     currentRevenue,
+  //     currentExpenses,
+  //     currentProfit,
+  //     currentTransactionCount
+  //   };
 }
 
 /**

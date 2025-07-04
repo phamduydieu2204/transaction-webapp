@@ -29,10 +29,10 @@ export async function renderCashFlowVsAccrualReport(expenseData, options = {}) {
   }
 
 // console.log("💰 Rendering Cash Flow vs Accrual Report:", {
-    expenses: expenseData.length,
-    dateRange,
-    useCache
-  });
+  //   expenses: expenseData.length,
+  //   dateRange,
+  //   useCache
+  // });
 
   try {
     // Fetch data if needed

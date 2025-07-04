@@ -200,22 +200,23 @@ export async function loadTransactions(userInfo, updateTable, formatDate, editTr
                                    (activeTabButton && activeTabButton.dataset.tab === "tab-giao-dich");
       
 // console.log("🔍 Tab check:", {
-        activeTabId: activeTab ? activeTab.id : "none",
-        activeTabButtonData: activeTabButton ? activeTabButton.dataset.tab : "none",
-        isTransactionTabActive,
-        willUpdateTable: isTransactionTabActive
-      });
-      
-      // ✅ ALWAYS UPDATE TABLE IF WE HAVE TRANSACTION DATA
-      if (window.transactionList && window.transactionList.length >= 0) {
-        // console.log("🔄 Updating transaction table with", window.transactionList.length, "transactions");
-        updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
-      } else {
-        // console.log("ℹ️ No transaction data to update");
-      }
 
-      // console.log("✅ Load transactions thành công:", window.transactionList.length, "giao dịch");
-      return { status: "success", data: window.transactionList };
+  //         activeTabId: activeTab ? activeTab.id : "none",
+  //         activeTabButtonData: activeTabButton ? activeTabButton.dataset.tab : "none",
+  //         isTransactionTabActive,
+  //         willUpdateTable: isTransactionTabActive
+  //       });
+  //       
+  //       // ✅ ALWAYS UPDATE TABLE IF WE HAVE TRANSACTION DATA
+  //       if (window.transactionList && window.transactionList.length >= 0) {
+  //         // console.log("🔄 Updating transaction table with", window.transactionList.length, "transactions");
+  //         updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
+  //       } else {
+  //         // console.log("ℹ️ No transaction data to update");
+  //       }
+  // 
+  //       // console.log("✅ Load transactions thành công:", window.transactionList.length, "giao dịch");
+  //       return { status: "success", data: window.transactionList };
       
     } else {
       const errorMsg = result.message || "Không thể tải danh sách giao dịch!";

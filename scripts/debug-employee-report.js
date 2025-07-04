@@ -7,36 +7,40 @@ window.debugEmployeeReport = function() {
     // console.log('🔍 Debugging Employee Report...');
     
 // console.log('Available functions:', {
-        loadEmployeeReport: typeof window.loadEmployeeReport,
-        initEmployeeReport: typeof window.initEmployeeReport,
-        cleanupEmployeeReport: typeof window.cleanupEmployeeReport
-    });
-    
+
+  //         loadEmployeeReport: typeof window.loadEmployeeReport,
+  //         initEmployeeReport: typeof window.initEmployeeReport,
+  //         cleanupEmployeeReport: typeof window.cleanupEmployeeReport
+  //     });
+  //     
 // console.log('Container check:', {
-        reportEmployee: !!document.getElementById('report-employee'),
-        reportPagesContainer: !!document.getElementById('report-pages-container')
-    });
-    
+
+  //         reportEmployee: !!document.getElementById('report-employee'),
+  //         reportPagesContainer: !!document.getElementById('report-pages-container')
+  //     });
+  //     
 // console.log('Menu items:', {
-        employeeMenuItem: !!document.querySelector('[data-report="employee"]'),
-        menuItems: document.querySelectorAll('.menu-item').length
-    });
-    
+
+  //         employeeMenuItem: !!document.querySelector('[data-report="employee"]'),
+  //         menuItems: document.querySelectorAll('.menu-item').length
+  //     });
+  //     
 // console.log('Global data:', {
-        transactionData: window.currentTransactionData ? window.currentTransactionData.length : 'undefined',
-        expenseData: window.currentExpenseData ? window.currentExpenseData.length : 'undefined',
-        transactionList: window.transactionList ? window.transactionList.length : 'undefined',
-        expenseList: window.expenseList ? window.expenseList.length : 'undefined'
-    });
-    
-    // Try to manually trigger employee report
+
+  //         transactionData: window.currentTransactionData ? window.currentTransactionData.length : 'undefined',
+  //         expenseData: window.currentExpenseData ? window.currentExpenseData.length : 'undefined',
+  //         transactionList: window.transactionList ? window.transactionList.length : 'undefined',
+  //         expenseList: window.expenseList ? window.expenseList.length : 'undefined'
+  //     });
+  //     
+  //     // Try to manually trigger employee report
 // console.log('🧪 Testing manual employee report load...');
-    if (window.loadEmployeeReport) {
-        window.loadEmployeeReport();
-    } else {
-        console.error('❌ loadEmployeeReport function not available');
-    }
-};
+  //     if (window.loadEmployeeReport) {
+  //         window.loadEmployeeReport();
+  //     } else {
+  //         console.error('❌ loadEmployeeReport function not available');
+  //     }
+  // };
 
 window.testEmployeeReportTemplate = async function() {
 // console.log('🧪 Testing employee report template load...');

@@ -48,72 +48,73 @@ export async function loadCustomerManagement(options = {}) {
     const expenses = window.expenseList || getFromStorage('expenses') || [];
     
 // console.log('👥 Customer management data:', {
-      transactions: transactions.length,
-      expenses: expenses.length
-    });
-    
-    // Get date range from options or global filters
-    const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
-    const period = options.period || window.globalFilters?.period || 'this_month';
-    
-    // Filter data by date range
-    const filteredTransactions = filterDataByDateRange(transactions, dateRange);
-    
-    // Process customer data
-    const customerData = processCustomerData(filteredTransactions);
-    
-    // Load all components
-    await Promise.all([
-      updateCustomerKPIs(customerData, period),
-      renderCustomerAcquisitionChart(customerData, period),
-      renderCustomerLifecycleChart(customerData),
-      updateCustomerSegmentation(customerData),
-      loadActiveCustomersTable(customerData),
-      loadCustomerInsights(customerData),
-      updateCRMTools(customerData)
-    ]);
-    
-    // Setup event handlers
-    setupCustomerManagementHandlers();
-    
-    // console.log('✅ Customer management loaded successfully');
-    
-  } catch (error) {
-    console.error('❌ Error loading customer management:', error);
-    showError('Không thể tải quản lý khách hàng');
-  }
-}
 
+  //       transactions: transactions.length,
+  //       expenses: expenses.length
+  //     });
+  //     
+  //     // Get date range from options or global filters
+  //     const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
+  //     const period = options.period || window.globalFilters?.period || 'this_month';
+  //     
+  //     // Filter data by date range
+  //     const filteredTransactions = filterDataByDateRange(transactions, dateRange);
+  //     
+  //     // Process customer data
+  //     const customerData = processCustomerData(filteredTransactions);
+  //     
+  //     // Load all components
+  //     await Promise.all([
+  //       updateCustomerKPIs(customerData, period),
+  //       renderCustomerAcquisitionChart(customerData, period),
+  //       renderCustomerLifecycleChart(customerData),
+  //       updateCustomerSegmentation(customerData),
+  //       loadActiveCustomersTable(customerData),
+  //       loadCustomerInsights(customerData),
+  //       updateCRMTools(customerData)
+  //     ]);
+  //     
+  //     // Setup event handlers
+  //     setupCustomerManagementHandlers();
+  //     
+  //     // console.log('✅ Customer management loaded successfully');
+  //     
+  //   } catch (error) {
+  //     console.error('❌ Error loading customer management:', error);
+  //     showError('Không thể tải quản lý khách hàng');
+  //   }
+  // }
+  // 
 /**
- * Load the customer management HTML template
- */
-async function loadCustomerManagementHTML() {
-  const container = document.getElementById('report-customer');
-  if (!container) return;
-  
-  try {
-    const response = await fetch('./partials/tabs/report-pages/customer-management.html');
-    if (!response.ok) {
-      throw new Error('Template not found');
-    }
-    
-    const html = await response.text();
-    container.innerHTML = html;
-    container.classList.add('active');
-    
-    // console.log('✅ Customer management template loaded');
-    
-  } catch (error) {
-    console.error('❌ Could not load customer management template:', error);
-    throw error;
-  }
-}
-
+  //  * Load the customer management HTML template
+  //  */
+  // async function loadCustomerManagementHTML() {
+  //   const container = document.getElementById('report-customer');
+  //   if (!container) return;
+  //   
+  //   try {
+  //     const response = await fetch('./partials/tabs/report-pages/customer-management.html');
+  //     if (!response.ok) {
+  //       throw new Error('Template not found');
+  //     }
+  //     
+  //     const html = await response.text();
+  //     container.innerHTML = html;
+  //     container.classList.add('active');
+  //     
+  //     // console.log('✅ Customer management template loaded');
+  //     
+  //   } catch (error) {
+  //     console.error('❌ Could not load customer management template:', error);
+  //     throw error;
+  //   }
+  // }
+  // 
 /**
- * Process raw transaction data to extract customer information
- */
-function processCustomerData(transactions) {
-  const customers = {};
+  //  * Process raw transaction data to extract customer information
+  //  */
+  // function processCustomerData(transactions) {
+  //   const customers = {};
   const currentDate = new Date();
   
   transactions.forEach(rawTransaction => {

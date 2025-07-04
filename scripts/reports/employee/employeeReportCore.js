@@ -65,50 +65,51 @@ export class EmployeeReportCore {
             this.expenses = this.extractExpenseData();
             
 // console.log('📊 Employee data loaded:', {
-                transactions: this.transactions.length,
-                expenses: this.expenses.length
-            });
-            
-        } catch (error) {
-            console.error('❌ Error loading employee data:', error);
-            // Fallback to mock data if real data is not available
-            this.generateMockData();
-        }
-    }
 
-    // Trích xuất dữ liệu từ sheet GiaoDich
-    extractTransactionData() {
-        const rawData = this.transactions || [];
-        
-        // Handle both array and object formats
-        return rawData.map((row, index) => {
-            // If data is already in object format
-            if (typeof row === 'object' && !Array.isArray(row)) {
-                return {
-                    id: index + 1,
-                    maGiaoDich: row.maGiaoDich || row.transactionCode || '',
-                    ngayGiaoDich: row.ngayGiaoDich || row.date || '',
-                    loaiGiaoDich: row.loaiGiaoDich || row.type || '',
-                    tenKhachHang: row.tenKhachHang || row.customerName || '',
-                    email: row.email || '',
-                    lienHe: row.lienHe || row.contact || '',
-                    soThangDangKy: parseInt(row.soThangDangKy || row.months || 0),
-                    ngayBatDau: row.ngayBatDau || row.startDate || '',
-                    ngayKetThuc: row.ngayKetThuc || row.endDate || '',
-                    soThietBi: parseInt(row.soThietBi || row.devices || 0),
-                    tenPhanMem: row.tenPhanMem || row.software || '',
-                    goiPhanMem: row.goiPhanMem || row.package || '',
-                    tenTaiKhoan: row.tenTaiKhoan || row.accountName || '',
-                    idSheetTaiKhoan: row.idSheetTaiKhoan || row.sheetId || '',
-                    capNhatCookie: row.capNhatCookie || row.updateCookie || '',
-                    thongTinDonHang: row.thongTinDonHang || row.orderInfo || '',
-                    doanhThu: parseFloat(row.doanhThu || row.revenue || 0),
-                    hoaHong: parseFloat(row.hoaHong || row.commission || 0),
-                    ghiChu: row.ghiChu || row.note || '',
-                    tenChuan: row.tenChuan || row.standardName || '',
-                    tenNhanVien: row.tenNhanVien || row.employeeName || '',
-                    maNhanVien: row.maNhanVien || row.employeeCode || ''
-                };
+  //                 transactions: this.transactions.length,
+  //                 expenses: this.expenses.length
+  //             });
+  //             
+  //         } catch (error) {
+  //             console.error('❌ Error loading employee data:', error);
+  //             // Fallback to mock data if real data is not available
+  //             this.generateMockData();
+  //         }
+  //     }
+  // 
+  //     // Trích xuất dữ liệu từ sheet GiaoDich
+  //     extractTransactionData() {
+  //         const rawData = this.transactions || [];
+  //         
+  //         // Handle both array and object formats
+  //         return rawData.map((row, index) => {
+  //             // If data is already in object format
+  //             if (typeof row === 'object' && !Array.isArray(row)) {
+  //                 return {
+  //                     id: index + 1,
+  //                     maGiaoDich: row.maGiaoDich || row.transactionCode || '',
+  //                     ngayGiaoDich: row.ngayGiaoDich || row.date || '',
+  //                     loaiGiaoDich: row.loaiGiaoDich || row.type || '',
+  //                     tenKhachHang: row.tenKhachHang || row.customerName || '',
+  //                     email: row.email || '',
+  //                     lienHe: row.lienHe || row.contact || '',
+  //                     soThangDangKy: parseInt(row.soThangDangKy || row.months || 0),
+  //                     ngayBatDau: row.ngayBatDau || row.startDate || '',
+  //                     ngayKetThuc: row.ngayKetThuc || row.endDate || '',
+  //                     soThietBi: parseInt(row.soThietBi || row.devices || 0),
+  //                     tenPhanMem: row.tenPhanMem || row.software || '',
+  //                     goiPhanMem: row.goiPhanMem || row.package || '',
+  //                     tenTaiKhoan: row.tenTaiKhoan || row.accountName || '',
+  //                     idSheetTaiKhoan: row.idSheetTaiKhoan || row.sheetId || '',
+  //                     capNhatCookie: row.capNhatCookie || row.updateCookie || '',
+  //                     thongTinDonHang: row.thongTinDonHang || row.orderInfo || '',
+  //                     doanhThu: parseFloat(row.doanhThu || row.revenue || 0),
+  //                     hoaHong: parseFloat(row.hoaHong || row.commission || 0),
+  //                     ghiChu: row.ghiChu || row.note || '',
+  //                     tenChuan: row.tenChuan || row.standardName || '',
+  //                     tenNhanVien: row.tenNhanVien || row.employeeName || '',
+  //                     maNhanVien: row.maNhanVien || row.employeeCode || ''
+  //                 };
             }
             
             // If data is in array format

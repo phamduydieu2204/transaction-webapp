@@ -39,117 +39,118 @@ export async function loadExpenseAnalysis(options = {}) {
     const expenses = window.expenseList || getFromStorage('expenses') || [];
     
 // console.log('💸 Expense analysis data:', {
-      transactions: transactions.length,
-      expenses: expenses.length
-    });
-    
-    // Get date range from options or global filters
-    const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
-    const period = options.period || window.globalFilters?.period || 'this_month';
-    
-    // Filter data by date range
-    const filteredExpenses = filterDataByDateRange(expenses, dateRange);
-    const filteredTransactions = filterDataByDateRange(transactions, dateRange);
-    
-    // Load all components
-    await Promise.all([
-      updateExpenseKPIs(filteredExpenses, filteredTransactions, period),
-      renderExpenseTrendChart(filteredExpenses, period),
-      renderExpenseCategoryChart(filteredExpenses),
-      renderBudgetComparisonChart(filteredExpenses),
-      loadTopExpenseCategories(filteredExpenses),
-      loadExpenseTypes(filteredExpenses),
-      updateExpenseControlDashboard(filteredExpenses, filteredTransactions)
-    ]);
-    
-    // Setup event handlers
-    setupExpenseAnalysisHandlers();
-    
-    // console.log('✅ Expense analysis loaded successfully');
-    
-  } catch (error) {
-    console.error('❌ Error loading expense analysis:', error);
-    showError('Không thể tải phân tích chi phí');
-  }
-}
 
+  //       transactions: transactions.length,
+  //       expenses: expenses.length
+  //     });
+  //     
+  //     // Get date range from options or global filters
+  //     const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
+  //     const period = options.period || window.globalFilters?.period || 'this_month';
+  //     
+  //     // Filter data by date range
+  //     const filteredExpenses = filterDataByDateRange(expenses, dateRange);
+  //     const filteredTransactions = filterDataByDateRange(transactions, dateRange);
+  //     
+  //     // Load all components
+  //     await Promise.all([
+  //       updateExpenseKPIs(filteredExpenses, filteredTransactions, period),
+  //       renderExpenseTrendChart(filteredExpenses, period),
+  //       renderExpenseCategoryChart(filteredExpenses),
+  //       renderBudgetComparisonChart(filteredExpenses),
+  //       loadTopExpenseCategories(filteredExpenses),
+  //       loadExpenseTypes(filteredExpenses),
+  //       updateExpenseControlDashboard(filteredExpenses, filteredTransactions)
+  //     ]);
+  //     
+  //     // Setup event handlers
+  //     setupExpenseAnalysisHandlers();
+  //     
+  //     // console.log('✅ Expense analysis loaded successfully');
+  //     
+  //   } catch (error) {
+  //     console.error('❌ Error loading expense analysis:', error);
+  //     showError('Không thể tải phân tích chi phí');
+  //   }
+  // }
+  // 
 /**
- * Load the expense analysis HTML template
- */
-async function loadExpenseAnalysisHTML() {
-  const container = document.getElementById('report-expense');
-  if (!container) return;
-  
-  try {
-    const response = await fetch('./partials/tabs/report-pages/expense-analysis.html');
-    if (!response.ok) {
-      throw new Error('Template not found');
-    }
-    
-    const html = await response.text();
-    container.innerHTML = html;
-    container.classList.add('active');
-    
-    // console.log('✅ Expense analysis template loaded');
-    
-  } catch (error) {
-    console.error('❌ Could not load expense analysis template:', error);
-    throw error;
-  }
-}
-
+  //  * Load the expense analysis HTML template
+  //  */
+  // async function loadExpenseAnalysisHTML() {
+  //   const container = document.getElementById('report-expense');
+  //   if (!container) return;
+  //   
+  //   try {
+  //     const response = await fetch('./partials/tabs/report-pages/expense-analysis.html');
+  //     if (!response.ok) {
+  //       throw new Error('Template not found');
+  //     }
+  //     
+  //     const html = await response.text();
+  //     container.innerHTML = html;
+  //     container.classList.add('active');
+  //     
+  //     // console.log('✅ Expense analysis template loaded');
+  //     
+  //   } catch (error) {
+  //     console.error('❌ Could not load expense analysis template:', error);
+  //     throw error;
+  //   }
+  // }
+  // 
 /**
- * Update expense KPI cards
- */
-async function updateExpenseKPIs(expenses, transactions, period) {
-  // console.log('💰 Updating expense KPIs');
-  
-  // Calculate current period metrics
-  const currentMetrics = calculateExpenseMetrics(expenses);
-  const revenueMetrics = calculateRevenueMetrics(transactions);
-  
-  // Calculate previous period for comparison
-  const previousExpenses = getPreviousPeriodExpenses(expenses, period);
-  const previousMetrics = calculateExpenseMetrics(previousExpenses);
-  
-  // Update KPI values
-  updateKPIElement('total-expense-value', formatRevenue(currentMetrics.totalExpense));
-  updateKPIElement('avg-expense-value', formatRevenue(currentMetrics.avgExpenseValue));
-  updateKPIElement('largest-expense', formatRevenue(currentMetrics.largestExpense.amount));
-  
-  // Calculate expense ratio
-  const expenseRatio = revenueMetrics.totalRevenue > 0 ? 
-    (currentMetrics.totalExpense / revenueMetrics.totalRevenue) * 100 : 0;
-  updateKPIElement('expense-ratio-value', `${expenseRatio.toFixed(1)}%`);
-  
-  // Calculate and update changes
-  const expenseChange = calculatePercentageChange(
-    previousMetrics.totalExpense, 
-    currentMetrics.totalExpense
-  );
-  const avgChange = calculatePercentageChange(
-    previousMetrics.avgExpenseValue, 
-    currentMetrics.avgExpenseValue
-  );
-  
-  updateChangeElement('total-expense-change', expenseChange);
-  updateChangeElement('avg-expense-change', avgChange);
-  
-  // Update largest expense details
-  if (currentMetrics.largestExpense.description) {
-    updateKPIElement('largest-expense-detail', 
-      `${currentMetrics.largestExpense.category || 'N/A'} - ${currentMetrics.largestExpense.description}`);
-  }
-  
-  // console.log('💰 Expense KPIs updated:', currentMetrics);
-}
-
+  //  * Update expense KPI cards
+  //  */
+  // async function updateExpenseKPIs(expenses, transactions, period) {
+  //   // console.log('💰 Updating expense KPIs');
+  //   
+  //   // Calculate current period metrics
+  //   const currentMetrics = calculateExpenseMetrics(expenses);
+  //   const revenueMetrics = calculateRevenueMetrics(transactions);
+  //   
+  //   // Calculate previous period for comparison
+  //   const previousExpenses = getPreviousPeriodExpenses(expenses, period);
+  //   const previousMetrics = calculateExpenseMetrics(previousExpenses);
+  //   
+  //   // Update KPI values
+  //   updateKPIElement('total-expense-value', formatRevenue(currentMetrics.totalExpense));
+  //   updateKPIElement('avg-expense-value', formatRevenue(currentMetrics.avgExpenseValue));
+  //   updateKPIElement('largest-expense', formatRevenue(currentMetrics.largestExpense.amount));
+  //   
+  //   // Calculate expense ratio
+  //   const expenseRatio = revenueMetrics.totalRevenue > 0 ? 
+  //     (currentMetrics.totalExpense / revenueMetrics.totalRevenue) * 100 : 0;
+  //   updateKPIElement('expense-ratio-value', `${expenseRatio.toFixed(1)}%`);
+  //   
+  //   // Calculate and update changes
+  //   const expenseChange = calculatePercentageChange(
+  //     previousMetrics.totalExpense, 
+  //     currentMetrics.totalExpense
+  //   );
+  //   const avgChange = calculatePercentageChange(
+  //     previousMetrics.avgExpenseValue, 
+  //     currentMetrics.avgExpenseValue
+  //   );
+  //   
+  //   updateChangeElement('total-expense-change', expenseChange);
+  //   updateChangeElement('avg-expense-change', avgChange);
+  //   
+  //   // Update largest expense details
+  //   if (currentMetrics.largestExpense.description) {
+  //     updateKPIElement('largest-expense-detail', 
+  //       `${currentMetrics.largestExpense.category || 'N/A'} - ${currentMetrics.largestExpense.description}`);
+  //   }
+  //   
+  //   // console.log('💰 Expense KPIs updated:', currentMetrics);
+  // }
+  // 
 /**
- * Calculate expense metrics from expenses
- */
-function calculateExpenseMetrics(expenses) {
-  let totalExpense = 0;
-  let largestExpense = { amount: 0, category: '', description: '' };
+  //  * Calculate expense metrics from expenses
+  //  */
+  // function calculateExpenseMetrics(expenses) {
+  //   let totalExpense = 0;
+  //   let largestExpense = { amount: 0, category: '', description: '' };
   
   expenses.forEach(expense => {
     const amount = parseFloat(expense.soTien || expense.amount || 0);

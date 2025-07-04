@@ -168,54 +168,56 @@ async function refreshStatistics() {
     const isThongKeTab = currentTab && currentTab.dataset.tab === "tab-thong-ke";
     
 // console.log("🔍 DEBUG refreshStatistics:", {
-      currentTab: currentTab ? currentTab.dataset.tab : "null",
-      isThongKeTab: isThongKeTab,
-      shouldRenderEnhanced: isThongKeTab
-    });
-    
-    if (!isThongKeTab) {
-      // console.log("⏭️ Not in statistics tab, skipping enhanced render");
-      return;
-    }
-    
-    const expenseData = window.expenseList || [];
-    const transactionData = window.transactionList || [];
-    
-    // Process data using modular processor
-    const processedData = processDataForUI(expenseData, transactionData, uiState);
-    
-// console.log("🎯 About to call renderEnhancedStatistics with processed data:", {
-      expenseCount: expenseData.length,
-      transactionCount: transactionData.length,
-      hasFinancialAnalysis: !!processedData.financialAnalysis
-    });
-    
-    // Render using modular chart renderer
-    await renderEnhancedStatistics(
-      processedData.expenseData, 
-      processedData.transactionData, 
-      processedData.financialAnalysis,
-      window.globalFilters
-    );
-    
-    // Clear loading state
-    uiState.isLoading = false;
-    uiState.lastError = null;
-    
-    // console.log("✅ Statistics refreshed successfully using orchestrator");
-    
-  } catch (error) {
-    console.error("❌ Failed to refresh statistics:", error);
-    showErrorMessage("Có lỗi xảy ra khi cập nhật thống kê");
-  }
-}
 
+  //       currentTab: currentTab ? currentTab.dataset.tab : "null",
+  //       isThongKeTab: isThongKeTab,
+  //       shouldRenderEnhanced: isThongKeTab
+  //     });
+  //     
+  //     if (!isThongKeTab) {
+  //       // console.log("⏭️ Not in statistics tab, skipping enhanced render");
+  //       return;
+  //     }
+  //     
+  //     const expenseData = window.expenseList || [];
+  //     const transactionData = window.transactionList || [];
+  //     
+  //     // Process data using modular processor
+  //     const processedData = processDataForUI(expenseData, transactionData, uiState);
+  //     
+// console.log("🎯 About to call renderEnhancedStatistics with processed data:", {
+
+  //       expenseCount: expenseData.length,
+  //       transactionCount: transactionData.length,
+  //       hasFinancialAnalysis: !!processedData.financialAnalysis
+  //     });
+  //     
+  //     // Render using modular chart renderer
+  //     await renderEnhancedStatistics(
+  //       processedData.expenseData, 
+  //       processedData.transactionData, 
+  //       processedData.financialAnalysis,
+  //       window.globalFilters
+  //     );
+  //     
+  //     // Clear loading state
+  //     uiState.isLoading = false;
+  //     uiState.lastError = null;
+  //     
+  //     // console.log("✅ Statistics refreshed successfully using orchestrator");
+  //     
+  //   } catch (error) {
+  //     console.error("❌ Failed to refresh statistics:", error);
+  //     showErrorMessage("Có lỗi xảy ra khi cập nhật thống kê");
+  //   }
+  // }
+  // 
 /**
- * Gets current UI state
- * @returns {Object} - Current UI state
- */
-export function getUIState() {
-  return { ...uiState };
+  //  * Gets current UI state
+  //  * @returns {Object} - Current UI state
+  //  */
+  // export function getUIState() {
+  //   return { ...uiState };
 }
 
 /**

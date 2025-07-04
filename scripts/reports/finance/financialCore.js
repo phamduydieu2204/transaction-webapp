@@ -50,39 +50,40 @@ export class FinancialCore {
             this.expenses = this.extractExpenseData();
             
 // console.log('📊 Financial data loaded:', {
-                transactions: this.transactions.length,
-                expenses: this.expenses.length
-            });
-            
-        } catch (error) {
-            console.error('❌ Error loading financial data:', error);
-            // Use mock data as fallback
-            this.generateMockFinancialData();
-        }
-    }
 
-    /**
-     * Extract transaction data for financial analysis
-     */
-    extractTransactionData() {
-        const rawData = window.currentTransactionData || window.transactionList || [];
-        
-        return rawData.map((row, index) => {
-            if (typeof row === 'object' && !Array.isArray(row)) {
-                return {
-                    id: index + 1,
-                    date: row.ngayGiaoDich || row.date || '',
-                    type: row.loaiGiaoDich || row.type || '',
-                    customer: row.tenKhachHang || row.customerName || '',
-                    revenue: parseFloat(row.doanhThu || row.revenue || 0),
-                    commission: parseFloat(row.hoaHong || row.commission || 0),
-                    software: row.tenPhanMem || row.softwareName || '',
-                    package: row.goiPhanMem || row.package || '',
-                    months: parseInt(row.soThangDangKy || row.months || 0),
-                    employee: row.tenNhanVien || row.employeeName || '',
-                    startDate: row.ngayBatDau || row.startDate || '',
-                    endDate: row.ngayKetThuc || row.endDate || ''
-                };
+  //                 transactions: this.transactions.length,
+  //                 expenses: this.expenses.length
+  //             });
+  //             
+  //         } catch (error) {
+  //             console.error('❌ Error loading financial data:', error);
+  //             // Use mock data as fallback
+  //             this.generateMockFinancialData();
+  //         }
+  //     }
+  // 
+  //     /**
+  //      * Extract transaction data for financial analysis
+  //      */
+  //     extractTransactionData() {
+  //         const rawData = window.currentTransactionData || window.transactionList || [];
+  //         
+  //         return rawData.map((row, index) => {
+  //             if (typeof row === 'object' && !Array.isArray(row)) {
+  //                 return {
+  //                     id: index + 1,
+  //                     date: row.ngayGiaoDich || row.date || '',
+  //                     type: row.loaiGiaoDich || row.type || '',
+  //                     customer: row.tenKhachHang || row.customerName || '',
+  //                     revenue: parseFloat(row.doanhThu || row.revenue || 0),
+  //                     commission: parseFloat(row.hoaHong || row.commission || 0),
+  //                     software: row.tenPhanMem || row.softwareName || '',
+  //                     package: row.goiPhanMem || row.package || '',
+  //                     months: parseInt(row.soThangDangKy || row.months || 0),
+  //                     employee: row.tenNhanVien || row.employeeName || '',
+  //                     startDate: row.ngayBatDau || row.startDate || '',
+  //                     endDate: row.ngayKetThuc || row.endDate || ''
+  //                 };
             }
             
             // Handle array format
