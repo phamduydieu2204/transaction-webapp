@@ -780,11 +780,11 @@ function updateKPICard(type, data) {
                          changeElement.parentElement?.classList.contains('kpi-box');
     
     // console.log(`🔍 Template Detection for ${type} (${data.changeId}):`, {
-      changeElementClasses: Array.from(changeElement.classList),
-      parentClasses: changeElement.parentElement ? Array.from(changeElement.parentElement.classList) : [],
-      isMetricTemplate: isMetricTemplate,
-      isBoxTemplate: isBoxTemplate
-    });
+    //   changeElementClasses: Array.from(changeElement.classList),
+    //   parentClasses: changeElement.parentElement ? Array.from(changeElement.parentElement.classList) : [],
+    //   isMetricTemplate: isMetricTemplate,
+    //   isBoxTemplate: isBoxTemplate
+    // });
     
     if (isMetricTemplate) {
       // New metric template (6-box grid)

@@ -2028,10 +2028,10 @@ window.handleSoftwareSearch = async function() {
       if (result.data.length > 0) {
         // console.log('📊 DEBUG Frontend v3: First result renewal date:', result.data[0].renewalDate);
         // console.log('📊 DEBUG Frontend v3: Sample results:', result.data.slice(0, 3).map(item => ({
-          name: item.softwareName,
-          renewalDate: item.renewalDate,
-          renewalDateType: typeof item.renewalDate
-        })));
+        //   name: item.softwareName,
+        //   renewalDate: item.renewalDate,
+        //   renewalDateType: typeof item.renewalDate
+        // })));
       } else {
         // console.log('⚠️ DEBUG Frontend v3: No results found for conditions:', conditions);
       }

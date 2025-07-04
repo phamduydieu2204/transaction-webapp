@@ -1426,24 +1426,24 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
                         allocatedAmount = amount * effectiveDays / totalDays;
                         
                         // console.log(`📊 Allocated calculation (renewal < end):`, {
-                            amount: amount,
-                            effectiveDays: effectiveDays,
-                            totalDays: totalDays,
-                            formula: `${amount} * ${effectiveDays} / ${totalDays}`,
-                            result: allocatedAmount
-                        });
+                        //     amount: amount,
+                        //     effectiveDays: effectiveDays,
+                        //     totalDays: totalDays,
+                        //     formula: `${amount} * ${effectiveDays} / ${totalDays}`,
+                        //     result: allocatedAmount
+                        // });
                     } 
                     // Nếu ngày tái tục >= ngày cuối chu kỳ
                     else {
                         allocatedAmount = amount * periodDays / totalDays;
                         
                         // console.log(`📊 Allocated calculation (renewal >= end):`, {
-                            amount: amount,
-                            periodDays: periodDays,
-                            totalDays: totalDays,
-                            formula: `${amount} * ${periodDays} / ${totalDays}`,
-                            result: allocatedAmount
-                        });
+                        //     amount: amount,
+                        //     periodDays: periodDays,
+                        //     totalDays: totalDays,
+                        //     formula: `${amount} * ${periodDays} / ${totalDays}`,
+                        //     result: allocatedAmount
+                        // });
                     }
                     
                     allocatedCosts += allocatedAmount;
