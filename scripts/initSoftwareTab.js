@@ -5,6 +5,7 @@
 
 import { getConstants } from './constants.js';
 import { handleDeleteSoftware } from './handleDeleteSoftware.js';
+import { apiRequestJson } from './apiClient.js';
 
 // Global variables for software tab
 window.softwareList = [];
@@ -29,19 +30,11 @@ export function initSoftwareTab() {
 
 async function loadSoftwareData() {
   try {
-    const { BACKEND_URL } = getConstants();
-    
     console.log('🔄 Loading software data...');
     
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "getSoftwareListFull" // We'll need to create this action
-      })
+    const result = await apiRequestJson({
+      action: "getSoftwareListFull"
     });
-    
-    const result = await response.json();
     
     if (result.status === "success") {
       window.softwareList = result.data || [];
@@ -530,17 +523,10 @@ window.handleSoftwareAdd = async function() {
     }
     
     // Call backend API
-    const { BACKEND_URL } = getConstants();
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "addSoftware",
-        ...formData
-      })
+    const result = await apiRequestJson({
+      action: "addSoftware",
+      ...formData
     });
-    
-    const result = await response.json();
     
     // Close processing modal
     if (typeof closeProcessingModalModern === 'function') {
@@ -642,17 +628,10 @@ window.handleSoftwareUpdate = async function() {
     console.log('Software update data:', updateData);
     
     // Call backend API
-    const { BACKEND_URL } = getConstants();
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "updateSoftware",
-        ...updateData
-      })
+    const result = await apiRequestJson({
+      action: "updateSoftware",
+      ...updateData
     });
-    
-    const result = await response.json();
     
     // Close processing modal
     if (typeof closeProcessingModalModern === 'function') {
@@ -1937,17 +1916,10 @@ window.handleSoftwareUpdate = async function() {
     };
     
     // Call backend API
-    const { BACKEND_URL } = getConstants();
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "updateSoftware",
-        ...updateData
-      })
+    const result = await apiRequestJson({
+      action: "updateSoftware",
+      ...updateData
     });
-    
-    const result = await response.json();
     
     // Close processing modal
     if (typeof closeProcessingModalModern === 'function') {
@@ -2029,21 +2001,18 @@ window.handleSoftwareSearch = async function() {
       showProcessingModalModern('Đang tìm kiếm phần mềm...', 'Vui lòng đợi trong giây lát');
     }
     
-    // Call backend API
-    const { BACKEND_URL } = getConstants();
-    const requestBody = {
-      action: "searchSoftware",
+    // Get user info for authentication
+    const userInfo = window.getUserInfo ? window.getUserInfo() : { maNhanVien: 'ADMIN' };
+    
+    // Call backend API using apiRequestJson (same as transaction search)
+    const requestData = {
+      action: "searchSoftware", 
+      maNhanVien: userInfo.maNhanVien,
       conditions: conditions
     };
-    console.log('🔍 SOFTWARE SEARCH - Sending request:', requestBody);
+    console.log('🔍 SOFTWARE SEARCH - Sending request:', requestData);
     
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestBody)
-    });
-    
-    const result = await response.json();
+    const result = await apiRequestJson(requestData);
     
     // Close processing modal
     if (typeof closeProcessingModalModern === 'function') {
