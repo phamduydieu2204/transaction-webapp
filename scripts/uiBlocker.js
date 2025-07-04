@@ -90,7 +90,7 @@ class UIBlocker {
     // Khôi phục scroll
     document.body.style.overflow = '';
 
-    console.log('🔓 UI unblocked');
+// console.log('🔓 UI unblocked');
   }
 
   /**

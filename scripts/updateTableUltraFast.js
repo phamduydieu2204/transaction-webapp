@@ -84,7 +84,7 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
         return ""; // Keep default/current color
       default:
         if (transactionId === 'GD2506241556') {
-          console.log('❓ GD2506241556 fell to DEFAULT case, normalized:', normalizedType);
+// console.log('❓ GD2506241556 fell to DEFAULT case, normalized:', normalizedType);
         }
         return ""; // Keep default/current color
     }
@@ -102,11 +102,11 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     // Debug log cho giao dịch hoàn tiền
     if (transaction.transactionType === "Hoàn tiền" || transaction.transactionType === "Hoàn Tiền") {
       // console.log(`🔍 DEBUG Hoàn tiền - ID: ${transaction.transactionId}`);
-      console.log(`   - index trong page: ${index}`);
-      console.log(`   - startIndex: ${startIndex}`);
-      console.log(`   - actualIndex tìm được: ${actualIndex}`);
-      console.log(`   - dataIndex sẽ dùng: ${dataIndex}`);
-      console.log(`   - transactionList.length: ${transactionList.length}`);
+// console.log(`   - index trong page: ${index}`);
+// console.log(`   - startIndex: ${startIndex}`);
+// console.log(`   - actualIndex tìm được: ${actualIndex}`);
+// console.log(`   - dataIndex sẽ dùng: ${dataIndex}`);
+// console.log(`   - transactionList.length: ${transactionList.length}`);
     }
     
     
@@ -315,7 +315,7 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
         
         // FORCE CLEAR previous styles first for updated transactions
         if (transaction.transactionId === 'GD2506241556') {
-          console.log('🧹 FORCE CLEARING styles for updated transaction GD2506241556');
+// console.log('🧹 FORCE CLEARING styles for updated transaction GD2506241556');
           row.style.backgroundColor = '';
           row.style.removeProperty('background-color');
           row.className = row.className.replace(/\b(transaction-.*|status-.*|type-.*)\b/g, '').trim();
@@ -331,7 +331,7 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
         if (transaction.transactionId === 'GD2506241556') {
           setTimeout(() => {
             const computedStyle = window.getComputedStyle(row);
-            console.log('🎨 FINAL COLOR CHECK GD2506241556:', {
+// console.log('🎨 FINAL COLOR CHECK GD2506241556:', {
               returnedColor: rowBackgroundColor,
               inlineStyle: row.style.backgroundColor,
               computedBgColor: computedStyle.backgroundColor,
@@ -360,14 +360,14 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
           const action = e.target.value;
           const index = parseInt(e.target.dataset.index);
           
-          console.log(`📌 Action select changed - action: ${action}, data-index: ${index}`);
-          console.log(`   - window.isSearching: ${window.isSearching}`);
+// console.log(`📌 Action select changed - action: ${action}, data-index: ${index}`);
+// console.log(`   - window.isSearching: ${window.isSearching}`);
           
           // Always use the global window.transactionList which is updated after refund
           const currentList = window.transactionList || transactionList;
-          console.log(`   - Using list with length: ${currentList.length}`);
-          console.log(`   - window.transactionList.length: ${window.transactionList ? window.transactionList.length : 'undefined'}`);
-          console.log(`   - transactionList (closure).length: ${transactionList.length}`);
+// console.log(`   - Using list with length: ${currentList.length}`);
+// console.log(`   - window.transactionList.length: ${window.transactionList ? window.transactionList.length : 'undefined'}`);
+// console.log(`   - transactionList (closure).length: ${transactionList.length}`);
           
           if (action && index >= 0) {
             handleTableAction(action, index, currentList);
@@ -517,7 +517,7 @@ function copyOrderInfo(transaction, button) {
  */
 function handleTableAction(action, index, transactionList) {
   // console.log(`🎯 handleTableAction called - action: ${action}, index: ${index}`);
-  console.log(`   - transactionList.length: ${transactionList.length}`);
+// console.log(`   - transactionList.length: ${transactionList.length}`);
   
   // Get the actual transaction object
   const transaction = transactionList[index];
@@ -527,7 +527,7 @@ function handleTableAction(action, index, transactionList) {
     return;
   }
   
-  console.log(`   - Transaction found: ${transaction.transactionId} - ${transaction.transactionType}`);
+// console.log(`   - Transaction found: ${transaction.transactionId} - ${transaction.transactionType}`);
   if (transaction.transactionType === "Hoàn tiền" || transaction.transactionType === "Hoàn Tiền") {
     // console.log(`   🔍 Đây là giao dịch hoàn tiền!`);
   }

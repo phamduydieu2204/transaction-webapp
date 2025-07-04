@@ -4,10 +4,10 @@ import { showProcessingModal } from './showProcessingModal.js';
 import { closeProcessingModal } from './closeProcessingModal.js';
 
 export async function handleUpdateCookie(index, transactionList) {
-  console.log('🍪 handleUpdateCookie called with:', { index, transactionListLength: transactionList?.length });
+// console.log('🍪 handleUpdateCookie called with:', { index, transactionListLength: transactionList?.length });
   
   const transaction = transactionList?.[index];
-  console.log('🍪 Found transaction:', transaction);
+// console.log('🍪 Found transaction:', transaction);
   
   if (!transaction) {
     console.error('❌ No transaction found at index:', index);
@@ -15,7 +15,7 @@ export async function handleUpdateCookie(index, transactionList) {
   }
 
   const modal = document.getElementById("updateCookieModal");
-  console.log('🍪 Modal found:', !!modal);
+// console.log('🍪 Modal found:', !!modal);
   const currentCookieEl = document.getElementById("currentCookie");
   const newCookieEl = document.getElementById("newCookie");
 
@@ -28,7 +28,7 @@ export async function handleUpdateCookie(index, transactionList) {
     const { BACKEND_URL } = getConstants();
     showProcessingModal("Đang tải cookie...");
     
-    console.log('🍪 Request data:', {
+// console.log('🍪 Request data:', {
       action: "getCookieAndFileName",
       accountSheetId: transaction.accountSheetId
     });
@@ -43,7 +43,7 @@ export async function handleUpdateCookie(index, transactionList) {
     });
     const result = await response.json();
     
-    console.log('🍪 Response result:', result);
+// console.log('🍪 Response result:', result);
     
     // Cập nhật cookie content
     currentCookieEl.value = result.cookie || "(Không có dữ liệu)";
@@ -103,10 +103,10 @@ export async function handleUpdateCookie(index, transactionList) {
 }
 
 export function copyCurrentCookie() {
-  console.log('🍪 copyCurrentCookie called');
+// console.log('🍪 copyCurrentCookie called');
   
   const val = document.getElementById("currentCookie").value;
-  console.log('🍪 Current cookie value:', val);
+// console.log('🍪 Current cookie value:', val);
   
   if (!val || val === "(Không có dữ liệu)") {
     showResultModal("⚠️ Không có cookie để sao chép!", false);
@@ -124,18 +124,18 @@ export function copyCurrentCookie() {
 
 
 export async function confirmUpdateCookie() {
-  console.log('🍪 confirmUpdateCookie called');
+// console.log('🍪 confirmUpdateCookie called');
   
   try {
     disableInteraction();
     const transaction = window.currentCookieTransaction;
-    console.log('🍪 Current transaction:', transaction);
+// console.log('🍪 Current transaction:', transaction);
     
     const newCookieEl = document.getElementById("newCookie");
-    console.log('🍪 New cookie element found:', !!newCookieEl);
+// console.log('🍪 New cookie element found:', !!newCookieEl);
     
     const newCookie = newCookieEl?.value.trim();
-    console.log('🍪 New cookie value:', newCookie);
+// console.log('🍪 New cookie value:', newCookie);
 
     if (!transaction || !transaction.accountSheetId) {
       console.error('❌ No transaction or account sheet ID');
@@ -189,7 +189,7 @@ export async function confirmUpdateCookie() {
     });
     
     const result = await response.json();
-    console.log('🍪 Update result:', result);
+// console.log('🍪 Update result:', result);
     
     closeProcessingModal();
     
@@ -214,12 +214,12 @@ export async function confirmUpdateCookie() {
 }
 
 export async function cancelUpdateCookie() {
-  console.log('🍪 cancelUpdateCookie called');
+// console.log('🍪 cancelUpdateCookie called');
   
   try {
     disableInteraction();
     const transaction = window.currentCookieTransaction;
-    console.log('🍪 Cancel transaction:', transaction);
+// console.log('🍪 Cancel transaction:', transaction);
     
     if (!transaction?.transactionId) {
       // console.log('❌ No transaction to cancel');
@@ -241,7 +241,7 @@ export async function cancelUpdateCookie() {
     // console.log('✅ Cancel log sent successfully');
     
   } catch (err) {
-    console.warn("❌ Không thể gửi log hủy cập nhật cookie:", err.message);
+// console.warn("❌ Không thể gửi log hủy cập nhật cookie:", err.message);
   } finally {
     enableInteraction();
     closeUpdateCookieModal();
@@ -249,7 +249,7 @@ export async function cancelUpdateCookie() {
 }
 
 export function closeUpdateCookieModal() {
-  console.log('🍪 closeUpdateCookieModal called');
+// console.log('🍪 closeUpdateCookieModal called');
   const modal = document.getElementById("updateCookieModal");
   if (modal) {
     modal.style.display = "none";
@@ -272,7 +272,7 @@ function disableInteraction() {
 }
 
 function enableInteraction() {
-  console.log('🔓 Enabling interaction'); 
+// console.log('🔓 Enabling interaction'); 
   const overlay = document.getElementById("formOverlay");
   if (overlay) {
     overlay.style.display = "none";

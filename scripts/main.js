@@ -321,10 +321,10 @@ window.debugEmployeeReport = function() {
         }
     };
     
-    console.log('Debug results:', results);
+// console.log('Debug results:', results);
     
     // Try to manually trigger employee report
-    console.log('🧪 Testing manual employee report load...');
+// console.log('🧪 Testing manual employee report load...');
     if (window.loadEmployeeReport) {
         window.loadEmployeeReport();
     } else {
@@ -340,7 +340,7 @@ window.forceEmployeeReport = function() {
     // Hide all report pages
     const reportPages = document.querySelectorAll('.report-page');
     reportPages.forEach(page => page.classList.remove('active'));
-    console.log('Hidden report pages:', reportPages.length);
+// console.log('Hidden report pages:', reportPages.length);
     
     // Show employee report page
     const employeePage = document.getElementById('report-employee');
@@ -398,10 +398,10 @@ window.debugFinancialManagement = function() {
         }
     };
     
-    console.table(results.functions);
-    console.table(results.containers);
-    console.table(results.menuItems);
-    console.table(results.currentPage);
+    // console.table(results.functions);
+    // console.table(results.containers);
+    // console.table(results.menuItems);
+    // console.table(results.currentPage);
     
     // Test loading function
     if (typeof window.loadFinancialManagement === 'function') {
@@ -420,7 +420,7 @@ window.forceFinancialManagement = function() {
     // Hide all report pages
     const reportPages = document.querySelectorAll('.report-page');
     reportPages.forEach(page => page.classList.remove('active'));
-    console.log('Hidden report pages:', reportPages.length);
+// console.log('Hidden report pages:', reportPages.length);
     
     // Show financial report page
     const financePage = document.getElementById('report-finance');
@@ -475,10 +475,10 @@ window.debugCashFlowAccrual = function() {
         }
     };
     
-    console.table(results.functions);
-    console.table(results.containers);
-    console.table(results.menuItems);
-    console.table(results.currentPage);
+    // console.table(results.functions);
+    // console.table(results.containers);
+    // console.table(results.menuItems);
+    // console.table(results.currentPage);
     
     // Test loading function
     if (typeof window.loadCashFlowAccrualReport === 'function') {
@@ -497,7 +497,7 @@ window.forceCashFlowAccrual = function() {
     // Hide all report pages
     const reportPages = document.querySelectorAll('.report-page');
     reportPages.forEach(page => page.classList.remove('active'));
-    console.log('Hidden report pages:', reportPages.length);
+// console.log('Hidden report pages:', reportPages.length);
     
     // Show cash flow accrual report page
     const cashflowPage = document.getElementById('report-cashflow-accrual');
@@ -627,7 +627,7 @@ window.initSoftwareTab = () => {
   if (typeof initSoftwareTab === 'function') {
     return initSoftwareTab();
   } else {
-    console.warn('⚠️ initSoftwareTab function not available');
+// console.warn('⚠️ initSoftwareTab function not available');
   }
 };
 window.closeModal = closeModal;

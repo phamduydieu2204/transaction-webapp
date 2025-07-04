@@ -14,7 +14,7 @@ window.softwareItemsPerPage = 10;
 window.currentEditSoftwareIndex = -1;
 
 export function initSoftwareTab() {
-  console.log('💿 Initializing software tab...');
+// console.log('💿 Initializing software tab...');
   
   // Initialize pagination controls
   initSoftwarePagination();
@@ -383,10 +383,10 @@ window.handleSoftwareAction = function(selectElement, index) {
   switch (action) {
     case 'view':
       // TODO: Implement view details
-      console.log('View software:', software);
+// console.log('View software:', software);
       break;
     case 'edit':
-      console.log('Edit software:', software);
+// console.log('Edit software:', software);
       editSoftwareItem(software, index);
       break;
     case 'openSheet':
@@ -625,7 +625,7 @@ window.handleSoftwareUpdate = async function() {
       ...formData
     };
     
-    console.log('Software update data:', updateData);
+// console.log('Software update data:', updateData);
     
     // Call backend API
     const result = await apiRequestJson({
@@ -769,7 +769,7 @@ function validateSoftwareForm(formData) {
   
   // Show summary error if validation fails
   if (!isValid) {
-    console.warn('🔺 Form validation errors:', errors);
+// console.warn('🔺 Form validation errors:', errors);
     if (typeof showResultModalModern === 'function') {
       showResultModalModern(
         'Lỗi nhập liệu!', 
@@ -962,16 +962,16 @@ function updateSoftwareFormDropdowns() {
 // Debug function để kiểm tra dữ liệu
 window.debugSoftwareDropdowns = function() {
   // console.log('🔍 DEBUG: Software List Data');
-  console.log('Total items:', window.softwareList.length);
-  console.log('Sample data:', window.softwareList.slice(0, 3));
+// console.log('Total items:', window.softwareList.length);
+// console.log('Sample data:', window.softwareList.slice(0, 3));
   
   // Unique software names
   const uniqueNames = [...new Set(window.softwareList.map(item => item.softwareName))].filter(Boolean);
-  console.log('Unique software names:', uniqueNames);
+// console.log('Unique software names:', uniqueNames);
   
   // Unique order info
   const uniqueOrderInfo = [...new Set(window.softwareList.map(item => item.orderInfo))].filter(Boolean);
-  console.log('Unique order info:', uniqueOrderInfo);
+// console.log('Unique order info:', uniqueOrderInfo);
   
   // Test filtering for first software
   if (uniqueNames.length > 0) {
@@ -980,13 +980,13 @@ window.debugSoftwareDropdowns = function() {
       .filter(item => item.softwareName === testSoftware)
       .map(item => item.softwarePackage)
       .filter(Boolean);
-    console.log(`Packages for "${testSoftware}":`, [...new Set(packagesForSoftware)]);
+// console.log(`Packages for "${testSoftware}":`, [...new Set(packagesForSoftware)]);
     
     const orderInfoForSoftware = window.softwareList
       .filter(item => item.softwareName === testSoftware)
       .map(item => item.orderInfo)
       .filter(Boolean);
-    console.log(`Order info for "${testSoftware}":`, [...new Set(orderInfoForSoftware)]);
+// console.log(`Order info for "${testSoftware}":`, [...new Set(orderInfoForSoftware)]);
   }
 };
 
@@ -1206,12 +1206,12 @@ function updateOrderInfoDropdown() {
   const selectedAccountName = document.getElementById('softwareFormAccount')?.value?.trim();
   
   if (!dropdown) {
-    console.warn('⚠️ orderInfoDropdown select not found');
+// console.warn('⚠️ orderInfoDropdown select not found');
     return;
   }
   
   if (!window.softwareList || window.softwareList.length === 0) {
-    console.warn('⚠️ No software data available for order info dropdown');
+// console.warn('⚠️ No software data available for order info dropdown');
     return;
   }
   
@@ -2015,7 +2015,7 @@ window.handleSoftwareSearch = async function() {
     const result = await apiRequestJson(requestData);
     
     // Debug: Log raw response from backend
-    console.log('📥 DEBUG Frontend v3: Raw API response:', result);
+// console.log('📥 DEBUG Frontend v3: Raw API response:', result);
     
     // Close processing modal
     if (typeof closeProcessingModalModern === 'function') {
@@ -2356,7 +2356,7 @@ window.handleSoftwareAction = function(selectElement, index) {
       }
       break;
     default:
-      console.warn(`⚠️ Unknown action: ${action}`);
+// console.warn(`⚠️ Unknown action: ${action}`);
   }
 };
 
@@ -2411,7 +2411,7 @@ function openSoftwareSheet(index) {
     return;
   }
   
-  console.log('🔗 Opening Google Sheet for:', software.softwareName, 'ID:', software.accountSheetId);
+// console.log('🔗 Opening Google Sheet for:', software.softwareName, 'ID:', software.accountSheetId);
   
   // Construct Google Sheets URL
   const sheetUrl = `https://docs.google.com/spreadsheets/d/${software.accountSheetId}/edit`;
@@ -2440,7 +2440,7 @@ window.debugSoftwareNotes = function() {
     if (itemsWithNotes.length > 0) {
       // console.log('📄 Sample note data:');
       itemsWithNotes.slice(0, 3).forEach((item, index) => {
-        console.log(`  ${index + 1}. ${item.softwareName} - ${item.softwarePackage}: "${item.note}"`);
+// console.log(`  ${index + 1}. ${item.softwareName} - ${item.softwarePackage}: "${item.note}"`);
       });
     } else {
       // console.log('❌ No items found with note data');
@@ -2448,7 +2448,7 @@ window.debugSoftwareNotes = function() {
       // Check all field names
       // console.log('🔑 Available fields in first item:');
       Object.keys(window.softwareList[0]).forEach(key => {
-        console.log(`  - ${key}: ${window.softwareList[0][key]}`);
+// console.log(`  - ${key}: ${window.softwareList[0][key]}`);
       });
     }
   } else {

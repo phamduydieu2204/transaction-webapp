@@ -34,7 +34,7 @@ const customerState = {
  * @param {string} options.period - Period name (e.g., 'this_month', 'last_month')
  */
 export async function loadCustomerManagement(options = {}) {
-  console.log('👥 Loading customer management with options:', options);
+// console.log('👥 Loading customer management with options:', options);
   
   try {
     // Load template
@@ -47,7 +47,7 @@ export async function loadCustomerManagement(options = {}) {
     const transactions = window.transactionList || getFromStorage('transactions') || [];
     const expenses = window.expenseList || getFromStorage('expenses') || [];
     
-    console.log('👥 Customer management data:', {
+// console.log('👥 Customer management data:', {
       transactions: transactions.length,
       expenses: expenses.length
     });
@@ -207,7 +207,7 @@ function processCustomerData(transactions) {
  * Update customer KPI cards
  */
 async function updateCustomerKPIs(customerData, period) {
-  console.log('👥 Updating customer KPIs');
+// console.log('👥 Updating customer KPIs');
   
   // Calculate previous period for comparison
   const previousData = calculatePreviousPeriodCustomers(customerData, period);
@@ -226,7 +226,7 @@ async function updateCustomerKPIs(customerData, period) {
   updateChangeElement('total-customers-change', totalChange, 'count');
   updateChangeElement('active-customers-change', activePercentageChange, 'percentage');
   
-  console.log('👥 Customer KPIs updated:', customerData);
+// console.log('👥 Customer KPIs updated:', customerData);
 }
 
 /**
@@ -928,7 +928,7 @@ window.exportCustomerReport = function() {
 };
 
 window.openAddCustomerModal = function() {
-  console.log('➕ Opening add customer modal...');
+// console.log('➕ Opening add customer modal...');
 };
 
 window.exportCustomerData = function() {
@@ -966,7 +966,7 @@ window.editCustomer = function(customerId) {
 };
 
 window.messageCustomer = function(customerId) {
-  console.log(`💬 Messaging customer: ${customerId}`);
+// console.log(`💬 Messaging customer: ${customerId}`);
 };
 
 window.executeInsightAction = function(action, customerId) {
@@ -998,7 +998,7 @@ window.goToCustomerPage = function(page) {
 
 // CRM Tools functions
 window.sendBulkEmail = function() {
-  console.log('📧 Sending bulk email...');
+// console.log('📧 Sending bulk email...');
 };
 
 window.sendBulkSMS = function() {
@@ -1006,23 +1006,23 @@ window.sendBulkSMS = function() {
 };
 
 window.createNewsletter = function() {
-  console.log('📰 Creating newsletter...');
+// console.log('📰 Creating newsletter...');
 };
 
 window.viewPendingTickets = function() {
-  console.log('🎫 Viewing pending tickets...');
+// console.log('🎫 Viewing pending tickets...');
 };
 
 window.createNewTicket = function() {
-  console.log('🆕 Creating new ticket...');
+// console.log('🆕 Creating new ticket...');
 };
 
 window.manageLoyaltyProgram = function() {
-  console.log('🎁 Managing loyalty program...');
+// console.log('🎁 Managing loyalty program...');
 };
 
 window.distributeRewards = function() {
-  console.log('🏆 Distributing rewards...');
+// console.log('🏆 Distributing rewards...');
 };
 
 window.generateCustomerReport = function() {

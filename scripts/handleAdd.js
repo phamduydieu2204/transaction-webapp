@@ -35,7 +35,7 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
   
   // Kiểm tra nếu đang trong tiến trình sửa thì hiển thị modal ngay tức thì
   if (window.currentEditTransactionId !== null) {
-    console.log("Đang trong tiến trình sửa, mở modal lựa chọn thêm/cập nhật...");
+// console.log("Đang trong tiến trình sửa, mở modal lựa chọn thêm/cập nhật...");
     openAddOrUpdateModal();
     return;
   }
@@ -139,7 +139,7 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
     originalTransactionId: transactionType === "Hoàn Tiền" ? currentEditTransactionId : null
   };
 
-  console.log("📤 Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
+// console.log("📤 Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
 
   try {
     const result = await apiRequestJson(data);

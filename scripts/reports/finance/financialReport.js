@@ -12,7 +12,7 @@ let financialLoader = null;
  */
 export async function loadFinancialManagement() {
     try {
-        console.log('🏦 Loading Financial Management...');
+// console.log('🏦 Loading Financial Management...');
         
         // Cleanup previous instance if exists
         if (financialLoader) {
@@ -48,7 +48,7 @@ async function loadFinancialTemplate() {
     try {
         const response = await fetch('./partials/tabs/report-pages/financial-management.html');
         if (!response.ok) {
-            console.warn('⚠️ Financial template not found, using fallback');
+// console.warn('⚠️ Financial template not found, using fallback');
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
@@ -173,7 +173,7 @@ function showFinancialError(message) {
  */
 export async function initFinancialManagement() {
     try {
-        console.log('🏦 Initializing Financial Management...');
+// console.log('🏦 Initializing Financial Management...');
         await loadFinancialManagement();
     } catch (error) {
         console.error('❌ Failed to initialize Financial Management:', error);
@@ -188,7 +188,7 @@ export function cleanupFinancialManagement() {
         financialLoader.destroy();
         financialLoader = null;
     }
-    console.log('🧹 Financial Management cleaned up');
+// console.log('🧹 Financial Management cleaned up');
 }
 
 // Make functions available globally

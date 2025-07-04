@@ -66,7 +66,7 @@ function handleTransactionActionByIndex(selectElement) {
     return;
   }
   
-  console.log('🔍 Found transaction:', {
+// console.log('🔍 Found transaction:', {
     action,
     globalIndex,
     transaction,
@@ -94,9 +94,9 @@ function handleTransactionActionByIndex(selectElement) {
       }
       break;
     case 'updateCookie':
-      console.log('🍪 Update cookie action triggered for index:', globalIndex);
-      console.log('🍪 Transaction:', transaction);
-      console.log('🍪 handleUpdateCookie function exists:', typeof window.handleUpdateCookie === 'function');
+// console.log('🍪 Update cookie action triggered for index:', globalIndex);
+// console.log('🍪 Transaction:', transaction);
+// console.log('🍪 handleUpdateCookie function exists:', typeof window.handleUpdateCookie === 'function');
       if (typeof window.handleUpdateCookie === 'function') {
         window.handleUpdateCookie(globalIndex);
       } else {
@@ -304,10 +304,10 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
   const isLink = (text) => /^https?:\/\//i.test(text);
 
-  console.log("📌 BẮT ĐẦU HIỂN THỊ GIAO DỊCH");
-  console.log("🟢 Vai trò:", window.userInfo?.vaiTro);
-  console.log("🟢 isSearching:", window.isSearching);
-  console.log("🟢 todayFormatted:", todayFormatted);
+// console.log("📌 BẮT ĐẦU HIỂN THỊ GIAO DỊCH");
+// console.log("🟢 Vai trò:", window.userInfo?.vaiTro);
+// console.log("🟢 isSearching:", window.isSearching);
+// console.log("🟢 todayFormatted:", todayFormatted);
 
   // Get background color based on transaction type
   const getTransactionRowColor = (transactionType) => {
@@ -460,7 +460,7 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
     // Debug employee code
     if (index === 0) {
-      console.log('🔍 First transaction employee data:', {
+// console.log('🔍 First transaction employee data:', {
         maNhanVien: transaction.maNhanVien,
         tenNhanVien: transaction.tenNhanVien,
         employeeCode: employeeCode,

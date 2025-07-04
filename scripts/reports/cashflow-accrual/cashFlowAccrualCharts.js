@@ -576,7 +576,7 @@ export class CashFlowAccrualCharts {
                 delete this.charts[chartKey];
             }
         });
-        console.log('All cash flow vs accrual charts destroyed');
+// console.log('All cash flow vs accrual charts destroyed');
     }
 
     /**

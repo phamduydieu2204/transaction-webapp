@@ -109,7 +109,7 @@ export function updateTransactionTypeForEdit(originalStatus, currentValue = '') 
   const select = document.getElementById('transactionType');
   if (!select) return;
   
-  console.log('🔄 Updating transaction type dropdown for edit mode:', {
+// console.log('🔄 Updating transaction type dropdown for edit mode:', {
     originalStatus,
     currentValue
   });
@@ -123,7 +123,7 @@ export function updateTransactionTypeForEdit(originalStatus, currentValue = '') 
   const allowedOptions = TRANSACTION_TYPES.EDIT_RULES[originalStatus] || [];
   
   if (allowedOptions.length === 0) {
-    console.warn(`⚠️ No edit rules found for status: ${originalStatus}`);
+// console.warn(`⚠️ No edit rules found for status: ${originalStatus}`);
     return;
   }
   

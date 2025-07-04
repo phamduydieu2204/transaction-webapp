@@ -307,7 +307,7 @@ export function copyCategoryDataToClipboard(categoryData) {
   clipboardText += `\nTotal: ${formatCurrency(totalExpense, 'VND')}`;
   
   navigator.clipboard.writeText(clipboardText).then(() => {
-    console.log('Category data copied to clipboard');
+// console.log('Category data copied to clipboard');
   }).catch(err => {
     console.error('Failed to copy to clipboard:', err);
   });

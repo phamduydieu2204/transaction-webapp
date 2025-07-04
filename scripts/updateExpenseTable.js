@@ -169,7 +169,7 @@ window.expenseGoToPage = expenseGoToPage;
 export function updateExpenseTable() {
   const table = document.querySelector('#expenseListTable');
   if (!table) {
-    console.warn('⚠️ Expense table not found');
+// console.warn('⚠️ Expense table not found');
     return;
   }
   
@@ -177,7 +177,7 @@ export function updateExpenseTable() {
   const tableBody = table.querySelector('tbody');
   
   if (!tableBody) {
-    console.warn('⚠️ Expense table body not found');
+// console.warn('⚠️ Expense table body not found');
     return;
   }
   
@@ -252,7 +252,7 @@ function createExpenseRow(expense, index) {
     // console.log('🔍 DEBUG: Sample expense data structure:', expense);
     // console.log('🔍 Available keys:', Object.keys(expense));
     // Debug ngày tái tục
-    console.log('📅 DEBUG: Renew date fields:', {
+// console.log('📅 DEBUG: Renew date fields:', {
       renewDate: expense.renewDate,
       expenseRenewDate: expense.expenseRenewDate,
       ngayTaiTuc: expense.ngayTaiTuc

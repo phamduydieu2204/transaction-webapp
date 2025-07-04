@@ -184,7 +184,7 @@ export class StatisticsViewController {
       if (element) return element;
     }
     
-    console.warn(`View element not found for: ${viewName}`);
+// console.warn(`View element not found for: ${viewName}`);
     return null;
   }
   
@@ -460,7 +460,7 @@ export const layoutManager = new LayoutManager();
  * Initialize view controllers
  */
 export function initializeViewControllers() {
-  console.log("🎮 Initializing view controllers...");
+// console.log("🎮 Initializing view controllers...");
   
   // Register default views
   viewController.registerView('overview', {

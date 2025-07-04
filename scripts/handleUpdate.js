@@ -10,7 +10,7 @@ export async function handleUpdate() {
   if (typeof window.showProcessingModal === 'function') {
     window.showProcessingModal("Đang xử lý cập nhật...");
   } else {
-    console.warn('⚠️ showProcessingModal not available, loading function...');
+// console.warn('⚠️ showProcessingModal not available, loading function...');
     // Dynamically load the function if not available
     try {
       const { showProcessingModal } = await import('./showProcessingModal.js');
@@ -164,7 +164,7 @@ export async function handleUpdate() {
     duocSuaGiaoDichCuaAi: userInfo.duocSuaGiaoDichCuaAi || "chỉ bản thân"
   };
 
-  console.log("📤 Dữ liệu cập nhật gửi đi:", JSON.stringify(data, null, 2));
+// console.log("📤 Dữ liệu cập nhật gửi đi:", JSON.stringify(data, null, 2));
 
   try {
     const response = await fetch(BACKEND_URL, {
@@ -174,7 +174,7 @@ export async function handleUpdate() {
     });
 
     const result = await response.json();
-    console.log("📥 Kết quả từ server:", result);
+// console.log("📥 Kết quả từ server:", result);
 
     if (result.status === "success") {
       // Reset currentEditTransactionId

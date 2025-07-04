@@ -32,10 +32,10 @@ window.reportState = reportState;
  * Initialize report menu controller
  */
 export function initReportMenu() {
-  console.log('🎮 Initializing report menu controller');
+// console.log('🎮 Initializing report menu controller');
   
   // Check if containers exist
-  console.log('🔍 Checking containers:', {
+// console.log('🔍 Checking containers:', {
     revenueChart: !!document.getElementById('revenueChart'),
     topProducts: !!document.getElementById('topProducts'),
     topCustomers: !!document.getElementById('topCustomers'),
@@ -159,7 +159,7 @@ async function loadReport(reportType) {
         await loadRenewalReport();
         break;
       default:
-        console.warn(`Unknown report type: ${reportType}`);
+// console.warn(`Unknown report type: ${reportType}`);
     }
   } catch (error) {
     console.error(`Error loading report ${reportType}:`, error);

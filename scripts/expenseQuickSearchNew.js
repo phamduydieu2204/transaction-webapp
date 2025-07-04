@@ -9,7 +9,7 @@ export function initExpenseQuickSearchNew() {
   const searchDropdown = document.getElementById('expenseSearchDropdown');
   
   if (!searchInput || !searchDropdown) {
-    console.warn('Expense quick search elements not found');
+// console.warn('Expense quick search elements not found');
     return;
   }
 
@@ -165,7 +165,7 @@ export function initExpenseQuickSearchNew() {
    * Select an item and fill form
    */
   function selectItem(item) {
-    console.log('Selected item:', item);
+// console.log('Selected item:', item);
     
     // Fill form fields
     fillFormField('expenseCategory', item.type);

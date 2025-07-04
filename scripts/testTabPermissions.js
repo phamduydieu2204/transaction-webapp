@@ -1,5 +1,5 @@
 // Test tab permissions parsing
-console.log('=== Testing Tab Permissions ===');
+// console.log('=== Testing Tab Permissions ===');
 
 const TAB_MAPPING = {
   'tất cả': ['giao-dich', 'chi-phi', 'thong-ke', 'bao-cao', 'cai-dat'],
@@ -26,11 +26,11 @@ testInputs.forEach(input => {
   
   // Split by | or , and trim
   const permissions = input.split(/[|,]/).map(p => p.trim()).filter(p => p.length > 0);
-  console.log('  Parsed permissions:', permissions);
+// console.log('  Parsed permissions:', permissions);
   
   const allowedTabs = new Set();
   permissions.forEach(permission => {
-    console.log(`  Checking: "${permission}"`);
+// console.log(`  Checking: "${permission}"`);
     if (TAB_MAPPING[permission]) {
       // console.log(`    ✅ Found: ${TAB_MAPPING[permission]}`);
       TAB_MAPPING[permission].forEach(tabId => allowedTabs.add(tabId));
@@ -39,10 +39,10 @@ testInputs.forEach(input => {
     }
   });
   
-  console.log('  Final allowed tabs:', Array.from(allowedTabs));
+// console.log('  Final allowed tabs:', Array.from(allowedTabs));
 });
 
 // console.log('\n🗂️ Available mappings:');
 Object.entries(TAB_MAPPING).forEach(([key, value]) => {
-  console.log(`  "${key}" -> ${value}`);
+// console.log(`  "${key}" -> ${value}`);
 });

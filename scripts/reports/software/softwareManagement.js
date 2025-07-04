@@ -19,7 +19,7 @@ let softwareManagementInstance = null;
  * @param {string} options.period - Period filter
  */
 export async function loadSoftwareManagement(options = {}) {
-    console.log('💻 Loading software management report', options);
+// console.log('💻 Loading software management report', options);
     
     try {
         // Get container
@@ -76,7 +76,7 @@ async function loadSoftwareTemplate(container) {
         }
         
     } catch (error) {
-        console.warn('Could not load software template file, using inline template');
+// console.warn('Could not load software template file, using inline template');
         container.innerHTML = createInlineSoftwareTemplate();
     }
 }

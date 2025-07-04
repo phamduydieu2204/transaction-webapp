@@ -57,7 +57,7 @@ export async function fetchExpenseData(options = {}) {
   const { valid, invalid } = validateExpenseArray(rawData);
   
   if (invalid.length > 0) {
-    console.warn(`⚠️ ${invalid.length} invalid expense records found`);
+// console.warn(`⚠️ ${invalid.length} invalid expense records found`);
   }
 
   const normalizedData = normalizeExpenseData(valid);
@@ -89,7 +89,7 @@ export async function fetchTransactionData(options = {}) {
   const { valid, invalid } = validateTransactionArray(rawData);
   
   if (invalid.length > 0) {
-    console.warn(`⚠️ ${invalid.length} invalid transaction records found`);
+// console.warn(`⚠️ ${invalid.length} invalid transaction records found`);
   }
 
   const normalizedData = normalizeTransactionData(valid);
@@ -196,7 +196,7 @@ export async function getCombinedStatistics(options = {}) {
       timestamp: Date.now()
     };
 
-    console.log("✅ Combined statistics data ready:", {
+// console.log("✅ Combined statistics data ready:", {
       expenses: combinedData.expenses.length,
       transactions: combinedData.transactions.length
     });
@@ -229,7 +229,7 @@ export async function preloadStatisticsData(options = {}) {
     if (background) {
       // Fire and forget
       Promise.all(promises).catch(error => {
-        console.warn("⚠️ Background preload failed:", error);
+// console.warn("⚠️ Background preload failed:", error);
       });
     } else {
       // Wait for completion
@@ -254,7 +254,7 @@ export async function preloadStatisticsData(options = {}) {
  * @returns {Promise<void>}
  */
 export async function exportData(data, format = "csv", filename = "statistics") {
-  console.log(`📤 Exporting ${data.length} records as ${format}...`);
+// console.log(`📤 Exporting ${data.length} records as ${format}...`);
 
   try {
     let content = "";

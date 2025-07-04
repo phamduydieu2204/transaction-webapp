@@ -101,7 +101,7 @@ export async function initializePartials() {
           partialCache.set(partialPath, html);
         }
       } catch (error) {
-        console.warn(`Failed to preload ${partialPath}:`, error);
+// console.warn(`Failed to preload ${partialPath}:`, error);
       }
     });
     

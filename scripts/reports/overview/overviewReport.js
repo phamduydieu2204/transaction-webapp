@@ -54,7 +54,7 @@ export async function loadOverviewReport(options = {}) {
     // Ensure data is loaded before proceeding
     await ensureDataIsLoaded();
     
-    console.log('🔍 Checking data availability:', {
+// console.log('🔍 Checking data availability:', {
       transactionList: window.transactionList ? window.transactionList.length : 0,
       expenseList: window.expenseList ? window.expenseList.length : 0
     });
@@ -63,7 +63,7 @@ export async function loadOverviewReport(options = {}) {
     const transactions = window.transactionList || getFromStorage('transactions') || [];
     const expenses = window.expenseList || getFromStorage('expenses') || [];
     
-    console.log('📊 Data found:', {
+// console.log('📊 Data found:', {
       transactions: transactions.length,
       expenses: expenses.length,
       sampleTransaction: transactions[0] ? Object.keys(transactions[0]) : [],
@@ -87,11 +87,11 @@ export async function loadOverviewReport(options = {}) {
     // Calculate KPIs with filtered data (and pass unfiltered data for comparison)
     const kpis = calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses, dateRange, transactions);
     // console.log('💰 Calculated Updated KPIs:');
-    console.log('  - Doanh thu gộp:', kpis.grossRevenue);
-    console.log('  - Tiền đang chờ thu:', kpis.pendingCollection);
-    console.log('  - Tiền đang chờ chi:', kpis.pendingPayment);
-    console.log('  - Tổng tiền hoàn trả:', kpis.totalRefunds);
-    console.log('  - Tỷ lệ hoàn tiền:', kpis.refundRate);
+// console.log('  - Doanh thu gộp:', kpis.grossRevenue);
+// console.log('  - Tiền đang chờ thu:', kpis.pendingCollection);
+// console.log('  - Tiền đang chờ chi:', kpis.pendingPayment);
+// console.log('  - Tổng tiền hoàn trả:', kpis.totalRefunds);
+// console.log('  - Tỷ lệ hoàn tiền:', kpis.refundRate);
     
     // Update all components
     // console.log('🚀 Loading overview components...');
@@ -166,7 +166,7 @@ async function loadOverviewHTML() {
       const unpaidElement = document.getElementById('unpaid-revenue');
       const revenueStatusChart = document.getElementById('revenue-status-chart');
       const statusDistChart = document.getElementById('status-distribution-chart');
-      console.log('🔍 Template verification:', {
+// console.log('🔍 Template verification:', {
         'completed-revenue': !!completedElement,
         'paid-revenue': !!paidElement,
         'unpaid-revenue': !!unpaidElement,
@@ -181,7 +181,7 @@ async function loadOverviewHTML() {
     
   } catch (error) {
     console.error('❌ CRITICAL: Could not load new template:', error);
-    console.warn('🚫 NOT using fallback - forcing error to fix issue');
+// console.warn('🚫 NOT using fallback - forcing error to fix issue');
     throw error;  // Force error instead of using fallback
   }
 }
@@ -379,11 +379,11 @@ function calculateOverviewKPIs(transactions, expenses, dateRange, period = 'this
   const currentYear = now.getFullYear();
   
   // console.log('📅 🆕 NEW FIXED Date filtering setup:');
-  console.log(`  - Period parameter: "${period}"`);
-  console.log(`  - Period === 'all_time':`, period === 'all_time');
-  console.log(`  - Using date range:`, dateRange);
-  console.log(`  - Total transactions to filter: ${transactions.length}`);
-  console.log(`  - Total expenses to filter: ${expenses.length}`);
+// console.log(`  - Period parameter: "${period}"`);
+// console.log(`  - Period === 'all_time':`, period === 'all_time');
+// console.log(`  - Using date range:`, dateRange);
+// console.log(`  - Total transactions to filter: ${transactions.length}`);
+// console.log(`  - Total expenses to filter: ${expenses.length}`);
   
   // NEW SIMPLIFIED LOGIC - Filter data based on period first
   let filteredTransactions, filteredExpenses;
@@ -403,8 +403,8 @@ function calculateOverviewKPIs(transactions, expenses, dateRange, period = 'this
     filteredExpenses = filterDataByDateRange(expenses, dateRange);
     
     // console.log('📊 Filtered by date range:');
-    console.log(`  - Transactions: ${transactions.length} → ${filteredTransactions.length}`);
-    console.log(`  - Expenses: ${expenses.length} → ${filteredExpenses.length}`);
+// console.log(`  - Transactions: ${transactions.length} → ${filteredTransactions.length}`);
+// console.log(`  - Expenses: ${expenses.length} → ${filteredExpenses.length}`);
   } else {
     // Default to current month if no date range
     // console.log('📅 Using current month fallback for period:', period);
@@ -464,11 +464,11 @@ function calculateOverviewKPIs(transactions, expenses, dateRange, period = 'this
   const totalTransactions = filteredTransactions.length;
   
   // console.log('📊 Revenue calculation by status:');
-  console.log('  - Completed:', statusBreakdown.completed);
-  console.log('  - Paid:', statusBreakdown.paid);
-  console.log('  - Unpaid:', statusBreakdown.unpaid);
-  console.log('  - Total revenue:', totalRevenue);
-  console.log('  - Total transactions:', totalTransactions);
+// console.log('  - Completed:', statusBreakdown.completed);
+// console.log('  - Paid:', statusBreakdown.paid);
+// console.log('  - Unpaid:', statusBreakdown.unpaid);
+// console.log('  - Total revenue:', totalRevenue);
+// console.log('  - Total transactions:', totalTransactions);
   
   // Calculate conversion rates
   const paymentRate = statusBreakdown.unpaid.count > 0 
@@ -482,10 +482,10 @@ function calculateOverviewKPIs(transactions, expenses, dateRange, period = 'this
     : 0;
   
   // console.log('📊 Revenue calculation by status:');
-  console.log('  - Completed:', statusBreakdown.completed);
-  console.log('  - Paid:', statusBreakdown.paid);
-  console.log('  - Unpaid:', statusBreakdown.unpaid);
-  console.log('  - Total transactions:', totalTransactions);
+// console.log('  - Completed:', statusBreakdown.completed);
+// console.log('  - Paid:', statusBreakdown.paid);
+// console.log('  - Unpaid:', statusBreakdown.unpaid);
+// console.log('  - Total transactions:', totalTransactions);
   
   // Calculate previous period for comparison
   let prevDateRange = null;
@@ -599,7 +599,7 @@ function calculateOverviewKPIs(transactions, expenses, dateRange, period = 'this
  * Update KPI cards with calculated data
  */
 async function updateKPICards(kpis) {
-  console.log('✨ UPDATED updateKPICards - Using new business metrics structure');
+// console.log('✨ UPDATED updateKPICards - Using new business metrics structure');
   // console.log('📊 New KPIs data structure:', kpis);
   
   // Check if we have the new metrics structure (with grossRevenue, pendingCollection, etc.)
@@ -611,10 +611,10 @@ async function updateKPICards(kpis) {
   
   if (newTemplate && hasNewMetrics) {
     // New template - Use updated business metrics structure
-    console.log('🆕 Using new template with updated business metrics structure');
+// console.log('🆕 Using new template with updated business metrics structure');
     
     // Map updated business metrics to KPI cards
-    console.log('🎯 Updating Gross Revenue KPI Card:', {
+// console.log('🎯 Updating Gross Revenue KPI Card:', {
       value: kpis.grossRevenue || 0,
       growth: kpis.growthRates?.grossRevenue || 0,
       hasGrowthRates: !!kpis.growthRates,
@@ -743,17 +743,17 @@ function updateKPICard(type, data) {
   // console.log(`🔍 Element found:`, !!valueElement);
   
   if (!valueElement) {
-    console.warn(`❌ KPI element not found: ${data.elementId}`);
-    console.warn(`🔍 Available elements with 'revenue' in ID:`, 
+// console.warn(`❌ KPI element not found: ${data.elementId}`);
+// console.warn(`🔍 Available elements with 'revenue' in ID:`, 
       Array.from(document.querySelectorAll('[id*="revenue"]')).map(el => el.id));
     return;
   }
   
   // console.log(`💰 Updating KPI ${type}:`);
-  console.log(`  - Element ID: ${data.elementId}`);
-  console.log(`  - Raw value: ${data.value}`);
-  console.log(`  - Growth: ${data.growth}%`);
-  console.log(`  - Is percentage: ${data.isPercentage}`);
+// console.log(`  - Element ID: ${data.elementId}`);
+// console.log(`  - Raw value: ${data.value}`);
+// console.log(`  - Growth: ${data.growth}%`);
+// console.log(`  - Is percentage: ${data.isPercentage}`);
   
   if (valueElement) {
     if (data.isPercentage) {
@@ -788,7 +788,7 @@ function updateKPICard(type, data) {
     
     if (isMetricTemplate) {
       // New metric template (6-box grid)
-      console.log(`🎯 Applying NEW METRIC template for ${type}:`, {
+// console.log(`🎯 Applying NEW METRIC template for ${type}:`, {
         growth: data.growth,
         isPositive: isPositive,
         arrow: arrow,
@@ -865,7 +865,7 @@ function updateStatusBreakdownWithNewMetrics(kpis) {
   if (unpaidBar) unpaidBar.style.width = unpaidPercent + '%';
   if (refundedBar) refundedBar.style.width = refundedPercent + '%';
   
-  console.log('📊 Status breakdown updated:', {
+// console.log('📊 Status breakdown updated:', {
     completed: `${kpis.statusBreakdown.completed.count} (${completedPercent.toFixed(1)}%)`,
     paid: `${kpis.statusBreakdown.paid.count} (${paidPercent.toFixed(1)}%)`,
     unpaid: `${kpis.statusBreakdown.unpaid.count} (${unpaidPercent.toFixed(1)}%)`,
@@ -1493,7 +1493,7 @@ function renderStatusDistributionChart(transactions) {
   // Update the detailed status table
   updateStatusDetailTable(statusBreakdown);
   
-  console.log('🍰 Status distribution chart with details rendered:', statusBreakdown);
+// console.log('🍰 Status distribution chart with details rendered:', statusBreakdown);
 }
 
 /**
@@ -2191,7 +2191,7 @@ async function loadTopProducts(transactions = []) {
   try {
     const container = document.getElementById('top-software-body');
     if (!container) {
-      console.warn('❌ Top products container not found');
+// console.warn('❌ Top products container not found');
       return;
     }
 
@@ -2512,7 +2512,7 @@ async function loadTopCustomers(transactions = []) {
   try {
     const container = document.getElementById('top-customers-body');
     if (!container) {
-      console.warn('❌ Top customers container not found');
+// console.warn('❌ Top customers container not found');
       return;
     }
 
@@ -2821,7 +2821,7 @@ async function loadSummaryStats() {
   try {
     const container = document.getElementById('summaryStats');
     if (!container) {
-      console.warn('❌ Summary stats container not found');
+// console.warn('❌ Summary stats container not found');
       return;
     }
 
@@ -2932,22 +2932,22 @@ function calculateOverviewKPIsNew(transactions, expenses, dateRange, period = 't
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
   
-  console.log('🆕 🔥 NEW FUNCTION - Date filtering setup:');
-  console.log(`  - Period parameter: "${period}"`);
-  console.log(`  - Period === 'all_time':`, period === 'all_time');
-  console.log(`  - Total transactions to filter: ${transactions.length}`);
-  console.log(`  - Total expenses to filter: ${expenses.length}`);
+// console.log('🆕 🔥 NEW FUNCTION - Date filtering setup:');
+// console.log(`  - Period parameter: "${period}"`);
+// console.log(`  - Period === 'all_time':`, period === 'all_time');
+// console.log(`  - Total transactions to filter: ${transactions.length}`);
+// console.log(`  - Total expenses to filter: ${expenses.length}`);
   
   // Filter data based on period - SIMPLIFIED LOGIC
   let filteredTransactions, filteredExpenses;
   
   if (period === 'all_time') {
-    console.log('🆕 💯 ALL TIME ACTIVATED - NO FILTERING!');
+// console.log('🆕 💯 ALL TIME ACTIVATED - NO FILTERING!');
     filteredTransactions = transactions;
     filteredExpenses = expenses;
-    console.log('🆕 💯 RESULT: transactions =', filteredTransactions.length);
+// console.log('🆕 💯 RESULT: transactions =', filteredTransactions.length);
   } else {
-    console.log('🆕 Using current month filter for period:', period);
+// console.log('🆕 Using current month filter for period:', period);
     filteredTransactions = transactions.filter(t => {
       const rawDate = t.transactionDate || t.ngayGiaoDich || t.date;
       const transactionDate = new Date(rawDate);
@@ -3000,8 +3000,8 @@ function calculateOverviewKPIsNew(transactions, expenses, dateRange, period = 't
   const totalTransactions = filteredTransactions.length;
   
   // console.log('🆕 📊 NEW FUNCTION Revenue calculation:');
-  console.log('  - Filtered transactions:', totalTransactions);
-  console.log('  - Total revenue calculated:', totalRevenue);
+// console.log('  - Filtered transactions:', totalTransactions);
+// console.log('  - Total revenue calculated:', totalRevenue);
   
   return {
     statusBreakdown: statusBreakdown,
@@ -3577,7 +3577,7 @@ function exportStatusData() {
  * Action functions for pending transactions
  */
 async function markAsDelivered(transactionId) {
-  console.log('🚚 Marking as delivered:', transactionId);
+// console.log('🚚 Marking as delivered:', transactionId);
   
   // Show processing modal
   if (typeof window.showProcessingModal === 'function') {
@@ -3625,7 +3625,7 @@ async function markAsDelivered(transactionId) {
       duocSuaGiaoDichCuaAi: userInfo.duocSuaGiaoDichCuaAi || "chỉ bản thân"
     };
     
-    console.log("📤 Dữ liệu cập nhật gửi đi:", JSON.stringify(updateData, null, 2));
+// console.log("📤 Dữ liệu cập nhật gửi đi:", JSON.stringify(updateData, null, 2));
     
     // Send update request
     const response = await fetch(BACKEND_URL, {
@@ -3635,7 +3635,7 @@ async function markAsDelivered(transactionId) {
     });
     
     const result = await response.json();
-    console.log("📥 Kết quả từ server:", result);
+// console.log("📥 Kết quả từ server:", result);
     
     if (result.status === "success") {
       // Update local transaction data
@@ -3765,7 +3765,7 @@ async function viewTransactionDetails(transactionId) {
 }
 
 function markAllAsDelivered() {
-  console.log('🚚 Marking all as delivered');
+// console.log('🚚 Marking all as delivered');
   const checkedRows = document.querySelectorAll('.needs-delivery-table input[type="checkbox"]:checked');
   if (checkedRows.length === 0) {
     alert('Vui lòng chọn ít nhất một giao dịch');
@@ -3804,7 +3804,7 @@ function showOverdueDetails() {
 }
 
 function showUrgentDeliveries() {
-  console.log('🎆 Showing urgent deliveries');
+// console.log('🎆 Showing urgent deliveries');
   alert('Gả lập: Hiển thị danh sách giao hàng gấp');
 }
 
@@ -4242,7 +4242,7 @@ window.calculateProductScore = calculateProductScore;
  * @param {string} customerIdentifier - Customer email or name to view
  */
 function viewCustomerDetails(customerIdentifier) {
-  console.log('👥 Viewing customer details:', customerIdentifier);
+// console.log('👥 Viewing customer details:', customerIdentifier);
   
   const transactions = window.transactionList || [];
   const customerTransactions = transactions.filter(rawTransaction => {
@@ -4281,7 +4281,7 @@ function viewCustomerDetails(customerIdentifier) {
  * @param {string} productName - Product name to view
  */
 function viewProductDetails(productName) {
-  console.log('📺 Viewing product details:', productName);
+// console.log('📺 Viewing product details:', productName);
   
   const transactions = window.transactionList || [];
   const productTransactions = transactions.filter(rawTransaction => {
@@ -4459,8 +4459,8 @@ function exportSoftwareData() {
  * @returns {Object} Updated business metrics
  */
 function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses, dateRange, allTransactions) {
-  console.log('🧮 Calculating updated business metrics with new logic...');
-  console.log('📊 Input data:', {
+// console.log('🧮 Calculating updated business metrics with new logic...');
+// console.log('📊 Input data:', {
     transactionsCount: filteredTransactions.length,
     expensesCount: filteredExpenses.length,
     dateRange: dateRange
@@ -4515,7 +4515,7 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
     
     // Debug first few transactions
     if (index < 5) {
-      console.log(`💳 Transaction ${index}:`, {
+// console.log(`💳 Transaction ${index}:`, {
         rawAmount: transaction.amount || transaction.doanhThu || transaction.revenue,
         parsedAmount: amount,
         rawStatus: transaction.loaiGiaoDich || transaction.transactionType,
@@ -4561,7 +4561,7 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
         break;
         
       default:
-        console.warn(`⚠️ Unknown transaction status: "${status}"`);
+// console.warn(`⚠️ Unknown transaction status: "${status}"`);
         // Treat unknown status as effective transaction
         metrics.effectiveTransactions++;
         break;
@@ -4569,7 +4569,7 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
   });
   
   // Calculate derived metrics
-  console.log('📊 Raw status breakdown before calculations:', {
+// console.log('📊 Raw status breakdown before calculations:', {
     completed: metrics.statusBreakdown.completed,
     paid: metrics.statusBreakdown.paid,
     unpaid: metrics.statusBreakdown.unpaid,
@@ -4628,7 +4628,7 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
     
     metrics.previousPeriod.grossRevenue -= metrics.previousPeriod.totalRefunds;
     
-    console.log('📊 Previous same period metrics:', {
+// console.log('📊 Previous same period metrics:', {
       grossRevenue: metrics.previousPeriod.grossRevenue,
       totalRefunds: metrics.previousPeriod.totalRefunds,
       effectiveTransactions: metrics.previousPeriod.effectiveTransactions
@@ -4645,14 +4645,14 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
   };
   
   // console.log('📈 DOANH THU GỘP - Growth Rate Calculation:');
-  console.log(`  Current Gross Revenue: ${metrics.grossRevenue}`);
-  console.log(`  Previous Period Gross Revenue: ${metrics.previousPeriod.grossRevenue}`);
-  console.log(`  Growth Rate: ${metrics.growthRates.grossRevenue.toFixed(2)}%`);
+// console.log(`  Current Gross Revenue: ${metrics.grossRevenue}`);
+// console.log(`  Previous Period Gross Revenue: ${metrics.previousPeriod.grossRevenue}`);
+// console.log(`  Growth Rate: ${metrics.growthRates.grossRevenue.toFixed(2)}%`);
   
   // console.log('📈 Final metrics calculated:');
   // console.log('  💰 Doanh thu gộp:', formatCurrency(metrics.grossRevenue));
-  console.log('  ⏳ Tiền đang chờ thu:', formatCurrency(metrics.pendingCollection));
-  console.log('  💸 Tiền đang chờ chi:', formatCurrency(metrics.pendingPayment));
+// console.log('  ⏳ Tiền đang chờ thu:', formatCurrency(metrics.pendingCollection));
+// console.log('  💸 Tiền đang chờ chi:', formatCurrency(metrics.pendingPayment));
   // console.log('  🔄 Tổng tiền hoàn trả:', formatCurrency(metrics.totalRefunds));
   // console.log('  📊 Tỷ lệ hoàn tiền:', `${metrics.refundRate.toFixed(2)}%`);
   // console.log('  📋 Status breakdown:', metrics.statusBreakdown);

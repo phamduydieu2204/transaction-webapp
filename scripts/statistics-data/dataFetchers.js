@@ -49,7 +49,7 @@ export async function fetchExpenseData(options = {}) {
 
   } catch (error) {
     if (error.name === 'AbortError') {
-      console.warn(`⚠️ Expense data fetch timeout after ${timeout}ms`);
+// console.warn(`⚠️ Expense data fetch timeout after ${timeout}ms`);
       throw new Error("Request timeout - please try again");
     } else {
       console.error("❌ Error fetching expense data:", error);
@@ -100,7 +100,7 @@ export async function fetchTransactionData(options = {}) {
 
   } catch (error) {
     if (error.name === 'AbortError') {
-      console.warn(`⚠️ Transaction data fetch timeout after ${timeout}ms`);
+// console.warn(`⚠️ Transaction data fetch timeout after ${timeout}ms`);
       throw new Error("Request timeout - please try again");
     } else {
       console.error("❌ Error fetching transaction data:", error);
@@ -154,7 +154,7 @@ export async function fetchExpenseOptions(options = {}) {
 
   } catch (error) {
     if (error.name === 'AbortError') {
-      console.warn(`⚠️ Expense options fetch timeout after ${timeout}ms`);
+// console.warn(`⚠️ Expense options fetch timeout after ${timeout}ms`);
       throw new Error("Request timeout - please try again");
     } else {
       console.error("❌ Error fetching expense options:", error);
@@ -208,7 +208,7 @@ export async function searchExpenses(filters, options = {}) {
 
   } catch (error) {
     if (error.name === 'AbortError') {
-      console.warn(`⚠️ Expense search timeout after ${timeout}ms`);
+// console.warn(`⚠️ Expense search timeout after ${timeout}ms`);
       throw new Error("Search timeout - please try again");
     } else {
       console.error("❌ Error searching expenses:", error);
@@ -262,7 +262,7 @@ export async function searchTransactions(filters, options = {}) {
 
   } catch (error) {
     if (error.name === 'AbortError') {
-      console.warn(`⚠️ Transaction search timeout after ${timeout}ms`);
+// console.warn(`⚠️ Transaction search timeout after ${timeout}ms`);
       throw new Error("Search timeout - please try again");
     } else {
       console.error("❌ Error searching transactions:", error);

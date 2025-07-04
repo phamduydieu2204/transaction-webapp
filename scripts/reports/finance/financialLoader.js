@@ -25,7 +25,7 @@ export class FinancialLoader {
      */
     async initialize() {
         try {
-            console.log('Initializing Financial Management...');
+// console.log('Initializing Financial Management...');
             
             this.core = new FinancialCore();
             this.charts = new FinancialCharts();
@@ -51,7 +51,7 @@ export class FinancialLoader {
             this.showLoading(true);
             
             await this.core.loadData();
-            console.log('Financial data loaded successfully');
+// console.log('Financial data loaded successfully');
             
         } catch (error) {
             console.error('Error loading financial data:', error);
@@ -115,7 +115,7 @@ export class FinancialLoader {
      */
     renderDashboard() {
         try {
-            console.log('Rendering financial dashboard...');
+// console.log('Rendering financial dashboard...');
             
             this.renderKPICards();
             this.renderFinancialCharts();
@@ -507,7 +507,7 @@ export class FinancialLoader {
             this.charts.destroy();
         }
         this.isInitialized = false;
-        console.log('Financial Management destroyed');
+// console.log('Financial Management destroyed');
     }
 }
 

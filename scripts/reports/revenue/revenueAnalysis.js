@@ -39,7 +39,7 @@ export async function loadRevenueAnalysis(options = {}) {
     const transactions = window.transactionList || getFromStorage('transactions') || [];
     const expenses = window.expenseList || getFromStorage('expenses') || [];
     
-    console.log('📊 Revenue analysis data:', {
+// console.log('📊 Revenue analysis data:', {
       transactions: transactions.length,
       expenses: expenses.length
     });
@@ -280,7 +280,7 @@ async function renderRevenueTrendChart(transactions, period) {
  * Render revenue category chart (pie/bar)
  */
 async function renderRevenueCategoryChart(transactions) {
-  console.log('🍰 Rendering revenue category chart');
+// console.log('🍰 Rendering revenue category chart');
   
   const canvas = document.getElementById('revenue-category-chart');
   if (!canvas) return;
@@ -344,7 +344,7 @@ async function renderRevenueCategoryChart(transactions) {
  * Load top customers by revenue
  */
 async function loadTopCustomersByRevenue(transactions) {
-  console.log('👥 Loading top customers by revenue');
+// console.log('👥 Loading top customers by revenue');
   
   const customerRevenue = calculateCustomerRevenue(transactions);
   const topCustomers = customerRevenue
@@ -397,7 +397,7 @@ async function loadTopCustomersByRevenue(transactions) {
  * Load top products by revenue
  */
 async function loadTopProductsByRevenue(transactions) {
-  console.log('💻 Loading top products by revenue');
+// console.log('💻 Loading top products by revenue');
   
   const productRevenue = calculateProductRevenue(transactions);
   const topProducts = productRevenue

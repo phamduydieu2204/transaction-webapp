@@ -161,12 +161,12 @@ export function forceFullWidth() {
         const finalRect = finalContainer.getBoundingClientRect();
         
         // '✅ FORCE FULL-WIDTH RESULT:';
-        console.log('- Container width:', finalRect.width);
-        console.log('- Viewport width:', window.innerWidth);
-        console.log('- Success:', finalRect.width >= window.innerWidth - 5 ? 'YES' : 'NO');
-        console.log('- Left position:', finalRect.left);
-        console.log('- Right position:', finalRect.right);
-        console.log('- Coverage:', (finalRect.width / window.innerWidth * 100).toFixed(1) + '%');
+// console.log('- Container width:', finalRect.width);
+// console.log('- Viewport width:', window.innerWidth);
+// console.log('- Success:', finalRect.width >= window.innerWidth - 5 ? 'YES' : 'NO');
+// console.log('- Left position:', finalRect.left);
+// console.log('- Right position:', finalRect.right);
+// console.log('- Coverage:', (finalRect.width / window.innerWidth * 100).toFixed(1) + '%');
     }, 100);
 }
 

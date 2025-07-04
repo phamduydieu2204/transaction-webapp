@@ -52,7 +52,7 @@ async function loadOverviewHTML_Optimized() {
     if (loaded) {
       // console.log('✅ Template loaded & verified successfully');
     } else {
-      console.warn('⚠️ Some template elements missing');
+// console.warn('⚠️ Some template elements missing');
     }
     
   } catch (error) {
@@ -168,7 +168,7 @@ async function preloadTemplates() {
     await Promise.all(templates.map(url => templateCache.loadTemplate(url)));
     // console.log('✅ All templates preloaded');
   } catch (error) {
-    console.warn('⚠️ Template preloading failed:', error);
+// console.warn('⚠️ Template preloading failed:', error);
   }
 }
 

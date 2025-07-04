@@ -53,11 +53,11 @@ export class EmployeeExport {
      * Export employee data to PDF
      */
     exportToPDF(employees, departments, charts, options = {}) {
-        console.log('📑 Exporting employee data to PDF...');
+// console.log('📑 Exporting employee data to PDF...');
         
         try {
             // This would require a PDF library like jsPDF
-            console.log('PDF export not yet implemented');
+// console.log('PDF export not yet implemented');
             alert('Tính năng xuất PDF đang được phát triển');
             return false;
             
@@ -292,7 +292,7 @@ export class EmployeeExport {
                 this.downloadExcelFile(reportData.excel, `employee-${employee.id}-report.xlsx`);
                 break;
             default:
-                console.warn('Unsupported export format:', options.format);
+// console.warn('Unsupported export format:', options.format);
         }
     }
 

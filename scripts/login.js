@@ -6,7 +6,7 @@ export function togglePassword() {
 }
 
 export async function handleLogin() {
-  console.log("Bắt đầu đăng nhập...");
+// console.log("Bắt đầu đăng nhập...");
 
   const employeeCode = document.getElementById('employeeCode').value.trim().toUpperCase();
   const password = document.getElementById('password').value.trim();

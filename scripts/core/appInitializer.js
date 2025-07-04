@@ -61,11 +61,11 @@ export function loadUserInfo() {
   }
 
   if (!window.userInfo) {
-    console.warn('⚠️ No user information found');
+// console.warn('⚠️ No user information found');
     return false;
   }
 
-  console.log('✅ User information loaded:', {
+// console.log('✅ User information loaded:', {
     name: window.userInfo.tenNhanVien,
     id: window.userInfo.maNhanVien,
     role: window.userInfo.vaiTro
@@ -106,7 +106,7 @@ export async function loadInitialData() {
         // '✅ Ultra-fast initialization complete';
         return;
       }
-      console.warn('⚠️ Ultra-fast init failed, falling back to optimized mode');
+// console.warn('⚠️ Ultra-fast init failed, falling back to optimized mode');
     }
 
     // Phase 1: Critical data only (parallel loading)
@@ -234,7 +234,7 @@ async function loadExpenseData() {
     const { BACKEND_URL } = getConstants();
     
     if (!window.userInfo || !window.userInfo.maNhanVien) {
-      console.warn('⚠️ No user info available to load expenses');
+// console.warn('⚠️ No user info available to load expenses');
       window.expenseList = [];
       return;
     }
@@ -492,7 +492,7 @@ export async function initializeApp() {
  * Cleanup function for page unload
  */
 export function cleanupApp() {
-  console.log('🧹 Cleaning up application...');
+// console.log('🧹 Cleaning up application...');
   
   // Clear any intervals or timeouts
   if (window.refreshInterval) {
@@ -505,7 +505,7 @@ export function cleanupApp() {
       localStorage.setItem('lastActivity', new Date().toISOString());
     }
   } catch (error) {
-    console.warn('⚠️ Could not save last activity:', error);
+// console.warn('⚠️ Could not save last activity:', error);
   }
   
   // '✅ Application cleanup complete';

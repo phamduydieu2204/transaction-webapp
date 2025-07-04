@@ -17,7 +17,7 @@ export async function deleteTransaction(
   openConfirmModal,
   getConstants
 ) {
-  console.log("🗑️ deleteTransaction được gọi với:", {
+// console.log("🗑️ deleteTransaction được gọi với:", {
     index,
     transactionListType: typeof transactionList,
     transactionListLength: transactionList ? transactionList.length : 0,
@@ -65,7 +65,7 @@ export async function deleteTransaction(
   });
 
   if (!confirmDelete) {
-    console.log("Người dùng hủy xóa giao dịch");
+// console.log("Người dùng hủy xóa giao dịch");
     return;
   }
 
@@ -100,7 +100,7 @@ export async function deleteTransaction(
     duocXoaGiaoDichCuaAi: userInfo.duocXoaGiaoDichCuaAi || "chỉ bản thân"
   };
 
-  console.log("📤 Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
+// console.log("📤 Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
 
   try {
     const response = await fetch(BACKEND_URL, {
@@ -112,7 +112,7 @@ export async function deleteTransaction(
     });
 
     const result = await response.json();
-    console.log("Kết quả từ server:", result);
+// console.log("Kết quả từ server:", result);
 
     if (result.status === "success") {
       // Giao dịch đã được xóa khỏi UI trước đó (optimistic update)

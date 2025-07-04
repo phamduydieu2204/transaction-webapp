@@ -49,7 +49,7 @@ export class FinancialCore {
             this.transactions = this.extractTransactionData();
             this.expenses = this.extractExpenseData();
             
-            console.log('📊 Financial data loaded:', {
+// console.log('📊 Financial data loaded:', {
                 transactions: this.transactions.length,
                 expenses: this.expenses.length
             });

@@ -8,7 +8,7 @@ export function debugEmployeeBadge() {
   // Check if transactions have maNhanVien field
   if (window.transactionList && window.transactionList.length > 0) {
     const firstTransaction = window.transactionList[0];
-    console.log('📄 First transaction data:', {
+// console.log('📄 First transaction data:', {
       transactionId: firstTransaction.transactionId,
       maNhanVien: firstTransaction.maNhanVien,
       tenNhanVien: firstTransaction.tenNhanVien,
@@ -36,7 +36,7 @@ export function debugEmployeeBadge() {
     const sampleTransactions = window.transactionList.slice(0, 3);
     // console.log('📄 Sample transaction employee data:');
     sampleTransactions.forEach((t, i) => {
-      console.log(`  Transaction ${i + 1}:`, {
+// console.log(`  Transaction ${i + 1}:`, {
         id: t.transactionId,
         maNhanVien: t.maNhanVien,
         tenNhanVien: t.tenNhanVien,
@@ -70,7 +70,7 @@ export function debugEmployeeBadge() {
   
   if (employeeBadges.length > 0) {
     employeeBadges.forEach((badge, i) => {
-      console.log(`  Badge ${i + 1}:`, {
+// console.log(`  Badge ${i + 1}:`, {
         text: badge.textContent,
         visible: window.getComputedStyle(badge).display !== 'none',
         styles: {

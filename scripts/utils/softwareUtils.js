@@ -80,7 +80,7 @@ export function getTransactionFileType(transaction) {
  */
 function getSoftwareFileTypeByStandardName(standardName) {
   if (!window.softwareData || !Array.isArray(window.softwareData)) {
-    console.warn('❌ softwareData not available or not an array');
+// console.warn('❌ softwareData not available or not an array');
     return null;
   }
   
@@ -99,7 +99,7 @@ function getSoftwareFileTypeByStandardName(standardName) {
   
   if (!matchingSoftware) {
     // Final fallback: use temporary mapping
-    console.warn('⚠️ No software match, using temporary mapping for:', standardName);
+// console.warn('⚠️ No software match, using temporary mapping for:', standardName);
     return getTempFileTypeMappingByStandardName(standardName);
   }
   
@@ -117,7 +117,7 @@ function getSoftwareFileTypeByStandardName(standardName) {
   }
   
   // Final fallback: temporary mapping
-  console.warn('⚠️ No fileType in software data, using temporary mapping for:', standardName);
+// console.warn('⚠️ No fileType in software data, using temporary mapping for:', standardName);
   return getTempFileTypeMappingByStandardName(standardName);
 }
 
@@ -234,7 +234,7 @@ export function debugSoftwareData() {
   }
   
   // console.log('📊 Software Data Summary:');
-  console.log(`Total entries: ${window.softwareData.length}`);
+// console.log(`Total entries: ${window.softwareData.length}`);
   
   // Group by fileType
   const fileTypeGroups = {};
@@ -252,7 +252,7 @@ export function debugSoftwareData() {
   
   // console.log('\n📄 Software grouped by fileType:');
   Object.entries(fileTypeGroups).forEach(([type, items]) => {
-    console.log(`\n${type} (${items.length} items):`);
+// console.log(`\n${type} (${items.length} items):`);
     console.table(items.slice(0, 5)); // Show first 5 of each type
   });
   

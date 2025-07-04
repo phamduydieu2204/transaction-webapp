@@ -61,7 +61,7 @@ export function showWarningMessage(message) {
     }, 4000);
   }
   
-  console.warn("⚠️ Warning:", message);
+// console.warn("⚠️ Warning:", message);
 }
 
 /**
@@ -506,7 +506,7 @@ export const uiStateManager = new UIStateManager();
 export function cleanupDisplayManagers() {
   loadingManager.hideAllLoading();
   modalManager.hideAllModals();
-  console.log("🧹 Display managers cleaned up");
+// console.log("🧹 Display managers cleaned up");
 }
 
 /**

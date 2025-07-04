@@ -31,7 +31,7 @@ export class CashFlowAccrualCore {
             this.transactionData = window.transactionList || [];
             this.expenseData = window.expenseList || [];
             
-            console.log('📊 Data loaded:', {
+// console.log('📊 Data loaded:', {
                 transactions: this.transactionData.length,
                 expenses: this.expenseData.length
             });

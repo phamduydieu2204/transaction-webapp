@@ -1,5 +1,5 @@
 export function openConfirmModal(message, callback) {
-    console.log("Mở modal xác nhận:", message);
+// console.log("Mở modal xác nhận:", message);
     const modal = document.getElementById("confirmDeleteModal");
     const messageEl = document.getElementById("confirmMessage");
     messageEl.textContent = message;
@@ -8,14 +8,14 @@ export function openConfirmModal(message, callback) {
   }
   
   export function closeConfirmModal() {
-    console.log("Đóng modal xác nhận");
+// console.log("Đóng modal xác nhận");
     const modal = document.getElementById("confirmDeleteModal");
     modal.style.display = "none";
     window.confirmCallback = null;
   }
   
   export function confirmDelete(result) {
-    console.log("Kết quả xác nhận:", result);
+// console.log("Kết quả xác nhận:", result);
     if (window.confirmCallback) {
       window.confirmCallback(result);
     }

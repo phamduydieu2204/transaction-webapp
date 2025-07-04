@@ -90,7 +90,7 @@ export function closeProcessingModal() {
 }
 
 export function showResultModal(message, isSuccess = true) {
-  console.log('📢 showResultModal called:', message, 'success:', isSuccess);
+// console.log('📢 showResultModal called:', message, 'success:', isSuccess);
   
   // First close any processing modals
   closeProcessingModal();

@@ -63,10 +63,10 @@ export async function deduplicateRequest(key, requestFn, options = {}) {
 export function clearRequestCache(key = null) {
   if (key) {
     requestCache.delete(key);
-    console.log(`🧹 Cleared cache for: ${key}`);
+// console.log(`🧹 Cleared cache for: ${key}`);
   } else {
     requestCache.clear();
-    console.log('🧹 Cleared all request cache');
+// console.log('🧹 Cleared all request cache');
   }
 }
 

@@ -16,7 +16,7 @@ export async function initStatisticsTab() {
   
   try {
     // Check if we have transaction data
-    console.log('🔍 Checking data availability:', {
+// console.log('🔍 Checking data availability:', {
       transactionList: window.transactionList ? window.transactionList.length : 0,
       expenseList: window.expenseList ? window.expenseList.length : 0,
       userInfo: !!window.userInfo
@@ -36,7 +36,7 @@ export async function initStatisticsTab() {
       await initReportMenu();
       // console.log('✅ Report menu initialized');
     } else {
-      console.warn('⚠️ initReportMenu not available, loading overview directly');
+// console.warn('⚠️ initReportMenu not available, loading overview directly');
       // Fallback: load overview report directly
       await loadOverviewReport();
     }
@@ -55,7 +55,7 @@ export async function initStatisticsTab() {
 async function loadReportPagesHTML() {
   const container = document.getElementById('report-pages-container');
   if (!container) {
-    console.warn('⚠️ Report pages container not found');
+// console.warn('⚠️ Report pages container not found');
     return;
   }
   
@@ -204,7 +204,7 @@ function loadReportByType(reportType) {
       }
       break;
     default:
-      console.warn('Unknown report type:', reportType);
+// console.warn('Unknown report type:', reportType);
   }
 }
 

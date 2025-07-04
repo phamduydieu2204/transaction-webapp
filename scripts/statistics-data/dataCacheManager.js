@@ -52,7 +52,7 @@ export function isCacheValid(cacheKey) {
  */
 export function updateCache(cacheKey, data) {
   if (!dataCache[cacheKey]) {
-    console.warn(`⚠️ Invalid cache key: ${cacheKey}`);
+// console.warn(`⚠️ Invalid cache key: ${cacheKey}`);
     return;
   }
 
@@ -62,7 +62,7 @@ export function updateCache(cacheKey, data) {
     lastFetch: Date.now()
   };
   
-  console.log(`📦 Cache updated for ${cacheKey}:`, 
+// console.log(`📦 Cache updated for ${cacheKey}:`, 
     Array.isArray(data) ? `${data.length} items` : 'data stored');
 }
 
@@ -307,6 +307,6 @@ export function optimizeCache() {
     }
   });
   
-  console.log(`🧹 Cache optimized: ${removed} expired entries removed`);
+// console.log(`🧹 Cache optimized: ${removed} expired entries removed`);
   return removed;
 }

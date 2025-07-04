@@ -37,7 +37,7 @@ async function reloadExpenseData() {
         window.updateExpenseTable();
       }
     } else {
-      console.warn("⚠️ Failed to reload expense data:", result.message);
+// console.warn("⚠️ Failed to reload expense data:", result.message);
     }
   } catch (error) {
     console.error("❌ Error reloading expense data:", error);

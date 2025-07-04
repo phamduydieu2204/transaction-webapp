@@ -51,7 +51,7 @@ export class FinancialCharts {
     renderCashFlowChart(cashFlowData) {
         const canvas = document.getElementById('cashFlowChart');
         if (!canvas) {
-            console.warn('Cash flow chart canvas not found');
+// console.warn('Cash flow chart canvas not found');
             return;
         }
 
@@ -127,7 +127,7 @@ export class FinancialCharts {
     renderProfitLossChart(monthlyData) {
         const canvas = document.getElementById('profitLossChart');
         if (!canvas) {
-            console.warn('Profit loss chart canvas not found');
+// console.warn('Profit loss chart canvas not found');
             return;
         }
 
@@ -200,7 +200,7 @@ export class FinancialCharts {
     renderBudgetVsActualChart(actualData, budgetData = null) {
         const canvas = document.getElementById('budgetVsActualChart');
         if (!canvas) {
-            console.warn('Budget vs actual chart canvas not found');
+// console.warn('Budget vs actual chart canvas not found');
             return;
         }
 
@@ -279,7 +279,7 @@ export class FinancialCharts {
     renderAccountBalanceChart(accounts) {
         const canvas = document.getElementById('accountBalanceChart');
         if (!canvas) {
-            console.warn('Account balance chart canvas not found');
+// console.warn('Account balance chart canvas not found');
             return;
         }
 
@@ -605,7 +605,7 @@ export class FinancialCharts {
      * Update chart period
      */
     updateChartPeriod(period, financialData) {
-        console.log(`Updating financial charts for period: ${period}`);
+// console.log(`Updating financial charts for period: ${period}`);
         
         // Filter data based on period
         const filteredData = this.filterDataByPeriod(financialData, period);

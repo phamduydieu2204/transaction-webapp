@@ -50,7 +50,7 @@ export class CashFlowAccrualLoader {
             this.showLoading(true);
             
             await this.core.loadData();
-            console.log('Cash flow vs accrual data loaded successfully');
+// console.log('Cash flow vs accrual data loaded successfully');
             
         } catch (error) {
             console.error('Error loading cash flow vs accrual data:', error);
@@ -118,7 +118,7 @@ export class CashFlowAccrualLoader {
      */
     renderDashboard() {
         try {
-            console.log('Rendering cash flow vs accrual dashboard...');
+// console.log('Rendering cash flow vs accrual dashboard...');
             
             this.renderOverviewCards();
             this.renderCharts();
@@ -623,7 +623,7 @@ export class CashFlowAccrualLoader {
             this.charts.destroy();
         }
         this.isInitialized = false;
-        console.log('Cash Flow vs Accrual comparison destroyed');
+// console.log('Cash Flow vs Accrual comparison destroyed');
     }
 }
 

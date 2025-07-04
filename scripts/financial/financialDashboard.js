@@ -8,7 +8,7 @@
  * Date: 2025-01-16
  */
 
-console.warn('⚠️ financial/financialDashboard.js is disabled - use reports/overview/overviewReport.js instead');
+// console.warn('⚠️ financial/financialDashboard.js is disabled - use reports/overview/overviewReport.js instead');
 
 /**
  * DISABLED - Export stub function to prevent import errors

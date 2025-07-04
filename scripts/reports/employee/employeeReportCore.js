@@ -64,7 +64,7 @@ export class EmployeeReportCore {
             this.transactions = this.extractTransactionData();
             this.expenses = this.extractExpenseData();
             
-            console.log('📊 Employee data loaded:', {
+// console.log('📊 Employee data loaded:', {
                 transactions: this.transactions.length,
                 expenses: this.expenses.length
             });
@@ -305,7 +305,7 @@ export class EmployeeReportCore {
 
     // Tạo dữ liệu mẫu nếu không có dữ liệu thực
     generateMockData() {
-        console.log('🎭 Generating mock employee data for demonstration...');
+// console.log('🎭 Generating mock employee data for demonstration...');
         
         const mockEmployees = [
             { name: 'Nguyễn Văn An', code: 'NV001', dept: 'sales' },
@@ -1440,28 +1440,28 @@ export class EmployeeReportCore {
     handleManagementTool(toolId) {
         switch (toolId) {
             case 'performanceReview':
-                console.log('Performance review tool');
+// console.log('Performance review tool');
                 break;
             case 'commissionCalculator':
-                console.log('Commission calculator');
+// console.log('Commission calculator');
                 break;
             case 'goalSetting':
                 this.openKPIModal();
                 break;
             case 'trainingPlan':
-                console.log('Training plan tool');
+// console.log('Training plan tool');
                 break;
             case 'teamAnalytics':
-                console.log('Team analytics tool');
+// console.log('Team analytics tool');
                 break;
             case 'incentiveProgram':
-                console.log('Incentive program tool');
+// console.log('Incentive program tool');
                 break;
         }
     }
 
     reviewGoals() {
-        console.log('Review goals functionality');
+// console.log('Review goals functionality');
     }
 
     // Utility methods

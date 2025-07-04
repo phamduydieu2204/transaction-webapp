@@ -37,7 +37,7 @@ export async function editExpenseRow(e) {
       if (element) {
         element.value = value;
       } else {
-        console.warn(`Element with id "${id}" not found`);
+// console.warn(`Element with id "${id}" not found`);
       }
     };
 

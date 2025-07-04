@@ -13,7 +13,7 @@ let employeeReportLoader = null;
  */
 export async function loadEmployeeReport() {
     try {
-        console.log('🧑‍💼 Loading Employee Report...');
+// console.log('🧑‍💼 Loading Employee Report...');
         
         // Ensure data is loaded first
         await ensureDataIsLoaded();
@@ -130,7 +130,7 @@ export function exportEmployeeReport() {
     if (employeeReportLoader) {
         employeeReportLoader.exportData();
     } else {
-        console.warn('Employee report not initialized');
+// console.warn('Employee report not initialized');
     }
 }
 

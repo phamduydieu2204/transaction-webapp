@@ -114,7 +114,7 @@ function scheduleBackgroundLoading() {
       await fetchSoftwareList(null, [], updatePackageList, updateAccountList);
       // console.log('✅ Background: Software list loaded');
     } catch (error) {
-      console.warn('⚠️ Background software list loading failed:', error);
+// console.warn('⚠️ Background software list loading failed:', error);
     }
   }, 1000);
 
@@ -150,7 +150,7 @@ function scheduleBackgroundLoading() {
       await initExpenseDropdowns();
       // console.log('✅ Background: Expense features loaded');
     } catch (error) {
-      console.warn('⚠️ Background expense loading failed:', error);
+// console.warn('⚠️ Background expense loading failed:', error);
     }
   }, 2000);
 
@@ -174,7 +174,7 @@ function scheduleBackgroundLoading() {
       );
       // console.log('✅ Background: Next page preloaded');
     } catch (error) {
-      console.warn('⚠️ Background preloading failed:', error);
+// console.warn('⚠️ Background preloading failed:', error);
     }
   }, 3000);
 }

@@ -19,7 +19,7 @@ export async function loadRenewalReport() {
     
     const container = document.getElementById('report-renewal');
     if (!container) {
-      console.warn('❌ Renewal report container not found');
+// console.warn('❌ Renewal report container not found');
       return;
     }
     

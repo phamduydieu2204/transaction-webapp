@@ -151,14 +151,14 @@ export async function renderEnhancedStatistics(expenseData, transactionData, fin
     renderExportControls({
       containerId: "statisticsExportControls",
       formats: ["csv", "json"],
-      onExport: window.handleDataExport || (() => console.log("Export handler not found"))
+      onExport: window.handleDataExport || (() => // console.log("Export handler not found"))
     });
     // console.log("✅ Export controls rendered");
     
     // 3. Render Monthly Summary Table với filtered data
     await renderFilteredMonthlySummary(expenseData, globalFilters);
     
-    console.log("🎉 Enhanced Statistics rendering complete!");
+// console.log("🎉 Enhanced Statistics rendering complete!");
     
   } catch (error) {
     console.error("❌ Error rendering enhanced statistics:", error);
@@ -413,7 +413,7 @@ export function clearCharts(containerId) {
   const container = document.getElementById(containerId);
   if (container) {
     container.innerHTML = '';
-    console.log(`🧹 Charts cleared in ${containerId}`);
+// console.log(`🧹 Charts cleared in ${containerId}`);
   }
 }
 

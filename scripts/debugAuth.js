@@ -11,7 +11,7 @@ export function debugAuth() {
   if (authData) {
     try {
       const parsed = JSON.parse(authData);
-      console.log('📄 Auth data:', {
+// console.log('📄 Auth data:', {
         user: parsed.user?.tenNhanVien || 'Unknown',
         loginTime: new Date(parsed.loginTime).toLocaleString(),
         expiryTime: new Date(parsed.expiryTime).toLocaleString(),
@@ -25,7 +25,7 @@ export function debugAuth() {
   // Check state
   if (window.getState) {
     const state = window.getState();
-    console.log('📄 State:', {
+// console.log('📄 State:', {
       isAuthenticated: state.isAuthenticated,
       user: state.user?.tenNhanVien || 'None'
     });
@@ -35,7 +35,7 @@ export function debugAuth() {
 }
 
 export function forceLogout() {
-  console.log('🚪 Force logout...');
+// console.log('🚪 Force logout...');
   
   // Clear localStorage
   localStorage.removeItem('authData');

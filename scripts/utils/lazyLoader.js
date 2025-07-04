@@ -55,7 +55,7 @@ class LazyLoader {
           await this.loadGeneric(element);
           break;
         default:
-          console.warn('Unknown lazy load type:', loadType);
+// console.warn('Unknown lazy load type:', loadType);
       }
     } catch (error) {
       console.error('Lazy loading failed:', error);

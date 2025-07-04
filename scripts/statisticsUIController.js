@@ -70,7 +70,7 @@ window.uiState = uiState;
  * Initializes the statistics UI controller using modular components
  */
 export function initializeStatisticsUI() {
-  console.log("🎮 Initializing statistics UI controller orchestrator");
+// console.log("🎮 Initializing statistics UI controller orchestrator");
   
   // Set flag to indicate UI controller is active
   window.statisticsUIControllerActive = true;
@@ -91,11 +91,11 @@ export function initializeStatisticsUI() {
   // Initialize report menu controller
   import('./reportMenuController.js').then(module => {
     if (module.initReportMenu) {
-      console.log("🎮 Initializing report menu...");
+// console.log("🎮 Initializing report menu...");
       module.initReportMenu();
     }
   }).catch(error => {
-    console.warn("⚠️ Could not load report menu controller:", error);
+// console.warn("⚠️ Could not load report menu controller:", error);
   });
   
   // Load initial data using modular data processor
@@ -117,7 +117,7 @@ export function initializeStatisticsUI() {
  * @param {string} format - Export format
  */
 async function handleDataExport(format) {
-  console.log("📤 Exporting data in format:", format);
+// console.log("📤 Exporting data in format:", format);
   
   try {
     // Use modular data processor for export preparation
@@ -167,7 +167,7 @@ async function refreshStatistics() {
     const currentTab = document.querySelector(".tab-button.active");
     const isThongKeTab = currentTab && currentTab.dataset.tab === "tab-thong-ke";
     
-    console.log("🔍 DEBUG refreshStatistics:", {
+// console.log("🔍 DEBUG refreshStatistics:", {
       currentTab: currentTab ? currentTab.dataset.tab : "null",
       isThongKeTab: isThongKeTab,
       shouldRenderEnhanced: isThongKeTab
@@ -184,7 +184,7 @@ async function refreshStatistics() {
     // Process data using modular processor
     const processedData = processDataForUI(expenseData, transactionData, uiState);
     
-    console.log("🎯 About to call renderEnhancedStatistics with processed data:", {
+// console.log("🎯 About to call renderEnhancedStatistics with processed data:", {
       expenseCount: expenseData.length,
       transactionCount: transactionData.length,
       hasFinancialAnalysis: !!processedData.financialAnalysis
@@ -224,7 +224,7 @@ export function getUIState() {
  */
 export function updateUIState(newState) {
   Object.assign(uiState, newState);
-  console.log("🎮 UI state updated:", uiState);
+// console.log("🎮 UI state updated:", uiState);
 }
 
 /**

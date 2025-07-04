@@ -86,7 +86,7 @@ async function renderExpenseStatsLegacy() {
     }
   } catch (err) {
     if (err.name === 'AbortError') {
-      console.warn("⚠️ Load expense data bị timeout sau 15 giây");
+// console.warn("⚠️ Load expense data bị timeout sau 15 giây");
     } else {
       console.error("❌ Lỗi khi thống kê chi phí (legacy):", err);
     }
@@ -105,11 +105,11 @@ function renderExpenseData(data) {
   const today = new Date();
   const todayFormatted = normalizeDate(today);
 
-  console.log("📌 BẮT ĐẦU TÍNH TỔNG CHI PHÍ VỚI MODULE MỚI");
-  console.log("🟢 Vai trò:", window.userInfo?.vaiTro);
-  console.log("🟢 isExpenseSearching:", window.isExpenseSearching);
-  console.log("🟢 todayFormatted:", todayFormatted);
-  console.log("🟢 Số lượng bản ghi chi phí:", data?.length);
+// console.log("📌 BẮT ĐẦU TÍNH TỔNG CHI PHÍ VỚI MODULE MỚI");
+// console.log("🟢 Vai trò:", window.userInfo?.vaiTro);
+// console.log("🟢 isExpenseSearching:", window.isExpenseSearching);
+// console.log("🟢 todayFormatted:", todayFormatted);
+// console.log("🟢 Số lượng bản ghi chi phí:", data?.length);
 
   // ✅ SỬ DỤNG FUNCTION MỚI ĐỂ TÍNH TỔNG
   const totalExpenses = calculateTotalExpenses(data, {
@@ -397,10 +397,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Lazy load UI controller to avoid circular imports
   import('./statisticsUIController.js').then(module => {
     if (module.initializeStatisticsUI) {
-      console.log("🎮 Initializing statistics UI controller...");
+// console.log("🎮 Initializing statistics UI controller...");
       module.initializeStatisticsUI();
     }
   }).catch(error => {
-    console.warn("⚠️ Could not load statistics UI controller:", error);
+// console.warn("⚠️ Could not load statistics UI controller:", error);
   });
 });

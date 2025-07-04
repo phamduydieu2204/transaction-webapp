@@ -48,7 +48,7 @@ async function loadCashFlowAccrualTemplate() {
     try {
         const response = await fetch('./partials/tabs/report-pages/cashflow-accrual-report.html');
         if (!response.ok) {
-            console.warn('⚠️ Cash flow vs accrual template not found, using fallback');
+// console.warn('⚠️ Cash flow vs accrual template not found, using fallback');
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
@@ -341,7 +341,7 @@ export function cleanupCashFlowAccrualReport() {
         cashFlowAccrualLoader.destroy();
         cashFlowAccrualLoader = null;
     }
-    console.log('🧹 Cash Flow vs Accrual Report cleaned up');
+// console.log('🧹 Cash Flow vs Accrual Report cleaned up');
 }
 
 // Make functions available globally

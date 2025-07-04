@@ -155,13 +155,13 @@ export async function switchToTab(tabName, options = {}) {
     
     // Check authentication if required
     if (TAB_CONFIG[tabName].requiresAuth && !getStateProperty('user')) {
-      console.warn('⚠️ Authentication required for tab:', tabName);
+// console.warn('⚠️ Authentication required for tab:', tabName);
       return false;
     }
     
     // Check tab permissions
     if (!canAccessTab(tabName)) {
-      console.warn('⚠️ Access denied to tab:', tabName);
+// console.warn('⚠️ Access denied to tab:', tabName);
       const allowedTab = getDefaultAllowedTab();
       if (allowedTab !== tabName) {
         // `🔄 Redirecting to allowed tab: ${allowedTab}`;

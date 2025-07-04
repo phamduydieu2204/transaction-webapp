@@ -50,7 +50,7 @@ export class SoftwareManagement {
             this.transactions = this.extractTransactionData();
             this.expenses = this.extractExpenseData();
             
-            console.log('📊 Data loaded:', {
+// console.log('📊 Data loaded:', {
                 software: this.softwareAccounts.length,
                 transactions: this.transactions.length,
                 expenses: this.expenses.length
@@ -259,7 +259,7 @@ export class SoftwareManagement {
 
     // Tạo dữ liệu mẫu nếu không có dữ liệu thực
     generateMockData() {
-        console.log('🎭 Generating mock data for demonstration...');
+// console.log('🎭 Generating mock data for demonstration...');
         
         this.filteredAccounts = [
             {
@@ -1163,12 +1163,12 @@ export class SoftwareManagement {
 
     refreshAccount(accountId) {
         // Implementation for refreshing specific account
-        console.log('Refreshing account:', accountId);
+// console.log('Refreshing account:', accountId);
     }
 
     optimizeAccount(accountId) {
         // Implementation for optimizing account usage
-        console.log('Optimizing account:', accountId);
+// console.log('Optimizing account:', accountId);
     }
 
     showAccountModal(account, editMode = false) {
@@ -1242,22 +1242,22 @@ export class SoftwareManagement {
     handleQuickAction(actionId) {
         switch (actionId) {
             case 'bulkRenewal':
-                console.log('Bulk renewal action');
+// console.log('Bulk renewal action');
                 break;
             case 'utilizationOptimization':
-                console.log('Utilization optimization action');
+// console.log('Utilization optimization action');
                 break;
             case 'costOptimization':
-                console.log('Cost optimization action');
+// console.log('Cost optimization action');
                 break;
             case 'generateSoftwareReport':
                 this.generateReport();
                 break;
             case 'accountSecurity':
-                console.log('Account security action');
+// console.log('Account security action');
                 break;
             case 'licenseCompliance':
-                console.log('License compliance action');
+// console.log('License compliance action');
                 break;
         }
     }
@@ -1292,7 +1292,7 @@ export class SoftwareManagement {
 
     generateReport() {
         // Implementation for generating comprehensive report
-        console.log('Generating comprehensive software report...');
+// console.log('Generating comprehensive software report...');
     }
 
     async refresh() {

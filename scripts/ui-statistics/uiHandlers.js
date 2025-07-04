@@ -133,7 +133,7 @@ export function handleStatisticsTabActivation() {
   const tabContent = document.getElementById("tab-thong-ke");
   const tabContentStyle = tabContent ? window.getComputedStyle(tabContent) : null;
   
-  console.log("🔍 DEBUG handleStatisticsTabActivation initial state:", {
+// console.log("🔍 DEBUG handleStatisticsTabActivation initial state:", {
     currentTab: currentTab ? currentTab.dataset.tab : "null",
     tabContent: tabContent ? "found" : "null",
     tabDisplay: tabContentStyle ? tabContentStyle.display : "unknown",
@@ -149,7 +149,7 @@ export function handleStatisticsTabActivation() {
       const tabContentAfter = document.getElementById("tab-thong-ke");
       const tabContentStyleAfter = tabContentAfter ? window.getComputedStyle(tabContentAfter) : null;
       
-      console.log("🔍 DEBUG handleStatisticsTabActivation after timeout:", {
+// console.log("🔍 DEBUG handleStatisticsTabActivation after timeout:", {
         currentTab: currentTabAfter ? currentTabAfter.dataset.tab : "null",
         tabContent: tabContentAfter ? "found" : "null",
         tabDisplay: tabContentStyleAfter ? tabContentStyleAfter.display : "unknown",

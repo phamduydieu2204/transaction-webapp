@@ -78,13 +78,13 @@ export async function loadTabModules(tabName) {
   
   // Return existing promise if already loading
   if (loadingTabs.has(tabName)) {
-    console.log(`⏳ Tab ${tabName} already loading, waiting...`);
+// console.log(`⏳ Tab ${tabName} already loading, waiting...`);
     return loadingTabs.get(tabName);
   }
   
   const config = TAB_MODULES[tabName];
   if (!config) {
-    console.warn(`⚠️ No configuration found for tab: ${tabName}`);
+// console.warn(`⚠️ No configuration found for tab: ${tabName}`);
     return false;
   }
   
@@ -126,7 +126,7 @@ async function loadTabModulesInternal(tabName, config) {
       // console.log(`🔄 Preloading ${config.optional.length} optional modules for ${tabName}`);
       config.optional.forEach(module => {
         preloadModule(module.path, module.key).catch(error => {
-          console.warn(`⚠️ Failed to preload ${module.key}:`, error);
+// console.warn(`⚠️ Failed to preload ${module.key}:`, error);
         });
       });
     }
@@ -149,7 +149,7 @@ export function preloadTabModules(tabName) {
   if (config.required) {
     config.required.forEach(module => {
       preloadModule(module.path, module.key).catch(error => {
-        console.warn(`⚠️ Failed to preload ${module.key}:`, error);
+// console.warn(`⚠️ Failed to preload ${module.key}:`, error);
       });
     });
   }

@@ -6,23 +6,23 @@
 window.debugEmployeeReport = function() {
     // console.log('🔍 Debugging Employee Report...');
     
-    console.log('Available functions:', {
+// console.log('Available functions:', {
         loadEmployeeReport: typeof window.loadEmployeeReport,
         initEmployeeReport: typeof window.initEmployeeReport,
         cleanupEmployeeReport: typeof window.cleanupEmployeeReport
     });
     
-    console.log('Container check:', {
+// console.log('Container check:', {
         reportEmployee: !!document.getElementById('report-employee'),
         reportPagesContainer: !!document.getElementById('report-pages-container')
     });
     
-    console.log('Menu items:', {
+// console.log('Menu items:', {
         employeeMenuItem: !!document.querySelector('[data-report="employee"]'),
         menuItems: document.querySelectorAll('.menu-item').length
     });
     
-    console.log('Global data:', {
+// console.log('Global data:', {
         transactionData: window.currentTransactionData ? window.currentTransactionData.length : 'undefined',
         expenseData: window.currentExpenseData ? window.currentExpenseData.length : 'undefined',
         transactionList: window.transactionList ? window.transactionList.length : 'undefined',
@@ -30,7 +30,7 @@ window.debugEmployeeReport = function() {
     });
     
     // Try to manually trigger employee report
-    console.log('🧪 Testing manual employee report load...');
+// console.log('🧪 Testing manual employee report load...');
     if (window.loadEmployeeReport) {
         window.loadEmployeeReport();
     } else {
@@ -39,7 +39,7 @@ window.debugEmployeeReport = function() {
 };
 
 window.testEmployeeReportTemplate = async function() {
-    console.log('🧪 Testing employee report template load...');
+// console.log('🧪 Testing employee report template load...');
     
     try {
         const response = await fetch('./partials/tabs/report-pages/employee-report.html');
@@ -49,7 +49,7 @@ window.testEmployeeReportTemplate = async function() {
         
         const html = await response.text();
         // console.log('✅ Template loaded successfully, length:', html.length);
-        console.log('Template preview:', html.substring(0, 200) + '...');
+// console.log('Template preview:', html.substring(0, 200) + '...');
         
         return html;
     } catch (error) {

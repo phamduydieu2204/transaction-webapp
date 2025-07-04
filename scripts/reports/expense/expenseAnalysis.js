@@ -25,7 +25,7 @@ import {
  * @param {string} options.period - Period name (e.g., 'this_month', 'last_month')
  */
 export async function loadExpenseAnalysis(options = {}) {
-  console.log('💸 Loading expense analysis with options:', options);
+// console.log('💸 Loading expense analysis with options:', options);
   
   try {
     // Load template
@@ -38,7 +38,7 @@ export async function loadExpenseAnalysis(options = {}) {
     const transactions = window.transactionList || getFromStorage('transactions') || [];
     const expenses = window.expenseList || getFromStorage('expenses') || [];
     
-    console.log('💸 Expense analysis data:', {
+// console.log('💸 Expense analysis data:', {
       transactions: transactions.length,
       expenses: expenses.length
     });
@@ -285,7 +285,7 @@ async function renderExpenseTrendChart(expenses, period) {
  * Render expense category chart (pie/bar)
  */
 async function renderExpenseCategoryChart(expenses) {
-  console.log('🍰 Rendering expense category chart');
+// console.log('🍰 Rendering expense category chart');
   
   const canvas = document.getElementById('expense-category-chart');
   if (!canvas) return;

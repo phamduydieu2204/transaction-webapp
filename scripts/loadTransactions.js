@@ -24,7 +24,7 @@ export async function loadTransactionsOptimized(userInfo, updateTable, formatDat
 
   // ✅ Kiểm tra nhanh userInfo trước khi gọi API
   if (!userInfo) {
-    console.warn("⚠️ Không có thông tin user, bỏ qua load transactions");
+// console.warn("⚠️ Không có thông tin user, bỏ qua load transactions");
     return { status: "error", message: "Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại." };
   }
 
@@ -130,7 +130,7 @@ export async function loadTransactionsOptimized(userInfo, updateTable, formatDat
     
   } catch (err) {
     if (err.name === 'AbortError') {
-      console.warn("⚠️ Load transactions bị timeout sau 15 giây");
+// console.warn("⚠️ Load transactions bị timeout sau 15 giây");
       return { status: "error", message: "Tải dữ liệu quá lâu, vui lòng thử lại" };
     }
     
@@ -143,7 +143,7 @@ export async function loadTransactionsOptimized(userInfo, updateTable, formatDat
 export async function loadTransactions(userInfo, updateTable, formatDate, editTransaction, deleteTransaction, viewTransaction) {
   // ✅ Kiểm tra nhanh userInfo trước khi gọi API
   if (!userInfo) {
-    console.warn("⚠️ Không có thông tin user, bỏ qua load transactions");
+// console.warn("⚠️ Không có thông tin user, bỏ qua load transactions");
     return { status: "error", message: "Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại." };
   }
 
@@ -199,7 +199,7 @@ export async function loadTransactions(userInfo, updateTable, formatDate, editTr
       const isTransactionTabActive = (activeTab && activeTab.id === "tab-giao-dich") || 
                                    (activeTabButton && activeTabButton.dataset.tab === "tab-giao-dich");
       
-      console.log("🔍 Tab check:", {
+// console.log("🔍 Tab check:", {
         activeTabId: activeTab ? activeTab.id : "none",
         activeTabButtonData: activeTabButton ? activeTabButton.dataset.tab : "none",
         isTransactionTabActive,
@@ -235,7 +235,7 @@ export async function loadTransactions(userInfo, updateTable, formatDate, editTr
     
   } catch (err) {
     if (err.name === 'AbortError') {
-      console.warn("⚠️ Load transactions bị timeout sau 30 giây");
+// console.warn("⚠️ Load transactions bị timeout sau 30 giây");
       return { status: "error", message: "Tải dữ liệu quá lâu, vui lòng thử lại" };
     }
     

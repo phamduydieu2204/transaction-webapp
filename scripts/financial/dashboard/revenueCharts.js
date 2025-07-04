@@ -22,7 +22,7 @@ import {
 export function renderRevenueTrendChart(metrics, containerId = 'revenueTrendChart') {
   const container = document.getElementById(containerId);
   if (!container) {
-    console.warn(`Container #${containerId} not found for revenue trend chart`);
+// console.warn(`Container #${containerId} not found for revenue trend chart`);
     return;
   }
 
@@ -98,7 +98,7 @@ export function renderRevenueTrendChart(metrics, containerId = 'revenueTrendChar
 export function renderRevenueBySoftwareChart(metrics, containerId = 'revenueBySoftwareChart') {
   const container = document.getElementById(containerId);
   if (!container) {
-    console.warn(`Container #${containerId} not found for revenue by software chart`);
+// console.warn(`Container #${containerId} not found for revenue by software chart`);
     return;
   }
 
@@ -155,7 +155,7 @@ export function renderRevenueBySoftwareChart(metrics, containerId = 'revenueBySo
 export function renderMonthlyRevenueChart(metrics, containerId = 'monthlyRevenueChart') {
   const container = document.getElementById(containerId);
   if (!container) {
-    console.warn(`Container #${containerId} not found for monthly revenue chart`);
+// console.warn(`Container #${containerId} not found for monthly revenue chart`);
     return;
   }
 
@@ -228,7 +228,7 @@ export function renderMonthlyRevenueChart(metrics, containerId = 'monthlyRevenue
 export function renderRevenueGrowthChart(metrics, containerId = 'revenueGrowthChart') {
   const container = document.getElementById(containerId);
   if (!container) {
-    console.warn(`Container #${containerId} not found for revenue growth chart`);
+// console.warn(`Container #${containerId} not found for revenue growth chart`);
     return;
   }
 
@@ -318,7 +318,7 @@ export function renderRevenueGrowthChart(metrics, containerId = 'revenueGrowthCh
 export function renderRevenueAnalyticsTable(metrics, containerId = 'revenueAnalyticsTable') {
   const container = document.getElementById(containerId);
   if (!container) {
-    console.warn(`Container #${containerId} not found for revenue analytics table`);
+// console.warn(`Container #${containerId} not found for revenue analytics table`);
     return;
   }
 

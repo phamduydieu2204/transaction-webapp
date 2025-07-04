@@ -3,7 +3,7 @@ export function closeProcessingModal() {
   const modalMessage = document.getElementById("modalMessage");
   
   if (!modal) {
-    console.warn("⚠️ Processing modal not found when trying to close");
+// console.warn("⚠️ Processing modal not found when trying to close");
     return;
   }
   

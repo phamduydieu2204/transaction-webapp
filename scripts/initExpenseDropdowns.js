@@ -17,7 +17,7 @@ export async function initExpenseDropdowns() {
     // Đổ loại khoản chi
     const categorySelect = document.getElementById("expenseCategory");
     if (!categorySelect) {
-      console.warn('⚠️ expenseCategory element not found, skipping dropdown init');
+// console.warn('⚠️ expenseCategory element not found, skipping dropdown init');
       return;
     }
     
@@ -33,14 +33,14 @@ export async function initExpenseDropdowns() {
       const loai = categorySelect.value;
       const danhMucSelect = document.getElementById("expenseSubCategory");
       if (!danhMucSelect) {
-        console.warn('⚠️ expenseSubCategory element not found');
+// console.warn('⚠️ expenseSubCategory element not found');
         return;
       }
       const productSelect = document.getElementById("expenseProduct");
       const packageSelect = document.getElementById("expensePackage");
 
       if (!productSelect || !packageSelect) {
-        console.warn('⚠️ Some expense dropdown elements not found');
+// console.warn('⚠️ Some expense dropdown elements not found');
         return;
       }
 

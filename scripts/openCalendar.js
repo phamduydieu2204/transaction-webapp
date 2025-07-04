@@ -26,7 +26,7 @@ export function openCalendar(inputId, calculateEndDate, startDateInput, duration
             }
           }
         } catch (error) {
-          console.warn('Error calculating target date for endDate calendar:', error);
+// console.warn('Error calculating target date for endDate calendar:', error);
         }
       }
     }
@@ -69,7 +69,7 @@ export function openCalendar(inputId, calculateEndDate, startDateInput, duration
           try {
             calculateEndDate(startDateInput, durationInput, endDateInput);
           } catch (error) {
-            console.warn('Error calling calculateEndDate:', error);
+// console.warn('Error calling calculateEndDate:', error);
           }
         }
       },

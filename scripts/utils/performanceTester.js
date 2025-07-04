@@ -106,7 +106,7 @@ class PerformanceMonitor {
           cumulativeLayoutShift += entry.value;
         }
       });
-      console.log(`📐 Cumulative Layout Shift: ${cumulativeLayoutShift.toFixed(4)}`);
+// console.log(`📐 Cumulative Layout Shift: ${cumulativeLayoutShift.toFixed(4)}`);
     });
     
     clsObserver.observe({ entryTypes: ['layout-shift'] });
@@ -151,7 +151,7 @@ class TemplatePerformanceTester {
    * Test template loading performance
    */
   async testTemplateLoading() {
-    console.log('🧪 Testing template loading performance...');
+// console.log('🧪 Testing template loading performance...');
     
     this.monitor.startTiming('template-total');
     this.monitor.startTiming('template-fetch');
@@ -189,7 +189,7 @@ class TemplatePerformanceTester {
    * Test CSS loading performance
    */
   async testCSSLoading() {
-    console.log('🧪 Testing CSS loading performance...');
+// console.log('🧪 Testing CSS loading performance...');
     
     this.monitor.startTiming('css-critical');
     
@@ -232,7 +232,7 @@ class TemplatePerformanceTester {
    * Test lazy loading performance
    */
   async testLazyLoading() {
-    console.log('🧪 Testing lazy loading performance...');
+// console.log('🧪 Testing lazy loading performance...');
     
     this.monitor.startTiming('lazy-observer');
     
@@ -295,7 +295,7 @@ class TemplatePerformanceTester {
     // Generate report
     this.generateReport();
     
-    console.log('🏁 Performance test completed');
+// console.log('🏁 Performance test completed');
   }
   
   /**
@@ -310,8 +310,8 @@ class TemplatePerformanceTester {
     };
     
     console.group('📊 PERFORMANCE TEST REPORT');
-    console.table(this.results);
-    console.log('Summary:', report.summary);
+    // console.table(this.results);
+// console.log('Summary:', report.summary);
     console.groupEnd();
     
     // Store in sessionStorage for analysis

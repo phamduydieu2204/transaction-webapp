@@ -8,7 +8,7 @@
  * Date: 2025-01-16
  */
 
-console.warn('⚠️ businessOverviewDashboard.js is disabled - use reports/overview/overviewReport.js instead');
+// console.warn('⚠️ businessOverviewDashboard.js is disabled - use reports/overview/overviewReport.js instead');
 
 /**
  * DISABLED - Export stub functions to prevent import errors

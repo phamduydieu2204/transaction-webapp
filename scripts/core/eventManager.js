@@ -378,7 +378,7 @@ export function setupPerformanceMonitoring() {
         const duration = endTime - startTime;
         
         if (duration > 1000) { // Log operations taking more than 1 second
-          console.warn(`⚠️ Slow operation detected: ${duration}ms`, e.target);
+// console.warn(`⚠️ Slow operation detected: ${duration}ms`, e.target);
         }
       }, 0);
     });
@@ -413,14 +413,14 @@ export function initializeEventHandlers() {
  * Cleanup all event listeners
  */
 export function cleanupEventHandlers() {
-  console.log('🧹 Cleaning up event handlers...');
+// console.log('🧹 Cleaning up event handlers...');
 
   eventListeners.forEach((listeners, key) => {
     listeners.forEach(({ element, event, handler, options }) => {
       try {
         element.removeEventListener(event, handler, options);
       } catch (error) {
-        console.warn(`⚠️ Could not remove event listener for ${key}:`, error);
+// console.warn(`⚠️ Could not remove event listener for ${key}:`, error);
       }
     });
   });

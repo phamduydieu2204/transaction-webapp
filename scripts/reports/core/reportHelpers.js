@@ -12,7 +12,7 @@ export async function ensureDataIsLoaded() {
   const maxAttempts = 50; // Wait up to 5 seconds
   
   while (attempts < maxAttempts && (!window.transactionList || !window.expenseList)) {
-    console.log(`⏳ Waiting for data to load... (attempt ${attempts + 1}/${maxAttempts})`);
+// console.log(`⏳ Waiting for data to load... (attempt ${attempts + 1}/${maxAttempts})`);
     await new Promise(resolve => setTimeout(resolve, 100));
     attempts++;
   }
@@ -24,7 +24,7 @@ export async function ensureDataIsLoaded() {
       try {
         await window.loadTransactions();
       } catch (error) {
-        console.warn('⚠️ Failed to load transactions:', error);
+// console.warn('⚠️ Failed to load transactions:', error);
       }
     }
   }
@@ -70,7 +70,7 @@ export async function ensureDataIsLoaded() {
           window.expenseList = [];
         }
       } else {
-        console.warn('⚠️ No user info available to load expenses');
+// console.warn('⚠️ No user info available to load expenses');
         window.expenseList = [];
       }
     } catch (error) {
@@ -83,7 +83,7 @@ export async function ensureDataIsLoaded() {
   if (!window.transactionList) window.transactionList = [];
   if (!window.expenseList) window.expenseList = [];
   
-  console.log('✅ Data ensured:', {
+// console.log('✅ Data ensured:', {
     transactions: window.transactionList.length,
     expenses: window.expenseList.length
   });
@@ -108,7 +108,7 @@ export async function ensureSoftwareDataLoaded() {
         // console.log(`✅ Loaded ${window.softwareList.length} software items`);
       }
     } catch (error) {
-      console.warn('⚠️ Failed to load software list:', error);
+// console.warn('⚠️ Failed to load software list:', error);
       window.softwareList = [];
     }
   }

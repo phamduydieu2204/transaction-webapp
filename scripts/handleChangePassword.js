@@ -146,7 +146,7 @@ async function fetchAccountInfo(softwareName, softwarePackage, accountName) {
         secret: result.secret || ""
       };
     } else {
-      console.warn("Không tìm thấy tài khoản:", result.message);
+// console.warn("Không tìm thấy tài khoản:", result.message);
       return { email: "", password: "", secret: "" };
     }
   } catch (error) {
@@ -175,7 +175,7 @@ async function fetchFileName(accountSheetId) {
         fileName: result.fileName || ""
       };
     } else {
-      console.warn("Không tìm thấy file:", result.message);
+// console.warn("Không tìm thấy file:", result.message);
       return { fileName: "" };
     }
   } catch (error) {

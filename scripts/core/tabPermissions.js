@@ -27,7 +27,7 @@ const TAB_MAPPING = {
  */
 export function parseTabPermissions(tabNhinThay) {
   if (!tabNhinThay) {
-    console.warn('⚠️ No tab permissions found, defaulting to giao-dich');
+// console.warn('⚠️ No tab permissions found, defaulting to giao-dich');
     return ['giao-dich'];
   }
 
@@ -47,12 +47,12 @@ export function parseTabPermissions(tabNhinThay) {
   const allowedTabs = new Set();
   
   permissions.forEach(permission => {
-    console.log(`🔎 Checking permission: "${permission}" (length: ${permission.length})`);
+// console.log(`🔎 Checking permission: "${permission}" (length: ${permission.length})`);
     if (TAB_MAPPING[permission]) {
       // `✅ Found mapping for: "${permission}" -> ${TAB_MAPPING[permission]}`;
       TAB_MAPPING[permission].forEach(tabId => allowedTabs.add(tabId));
     } else {
-      console.warn(`⚠️ Unknown tab permission: "${permission}"`);
+// console.warn(`⚠️ Unknown tab permission: "${permission}"`);
       // '📊 Available mappings:', Object.keys(TAB_MAPPING);
     }
   });
@@ -70,7 +70,7 @@ export function parseTabPermissions(tabNhinThay) {
 export function getUserAllowedTabs() {
   const user = getStateProperty('user');
   if (!user) {
-    console.warn('⚠️ No user found, no tabs allowed');
+// console.warn('⚠️ No user found, no tabs allowed');
     return [];
   }
 
@@ -160,7 +160,7 @@ export function validateTabAccess(requestedTab) {
   
   if (!requestedTab) {
     const defaultTab = getDefaultAllowedTab();
-    console.log(`📍 No tab requested, using default: ${defaultTab}`);
+// console.log(`📍 No tab requested, using default: ${defaultTab}`);
     return defaultTab;
   }
   
@@ -207,7 +207,7 @@ function showAccessDeniedMessage(deniedTab) {
     }, 500);
   }
   
-  console.warn(`🚫 Access denied message shown for tab: ${deniedTab}`);
+// console.warn(`🚫 Access denied message shown for tab: ${deniedTab}`);
 }
 
 /**
@@ -218,7 +218,7 @@ export function initializeTabPermissions() {
   
   const user = getStateProperty('user');
   if (!user) {
-    console.warn('⚠️ No user found, skipping tab permissions');
+// console.warn('⚠️ No user found, skipping tab permissions');
     return false;
   }
   

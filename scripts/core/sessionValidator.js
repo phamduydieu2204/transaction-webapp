@@ -38,7 +38,7 @@ let validationInProgress = false;
  * Handle legacy user logout
  */
 async function handleLegacyUserLogout() {
-  console.log('🚪 Handling legacy user logout...');
+// console.log('🚪 Handling legacy user logout...');
   
   // Show user-friendly message for legacy users
   const message = 'Hệ thống bảo mật đã được cập nhật. Vui lòng đăng nhập lại để tiếp tục sử dụng.';
@@ -146,7 +146,7 @@ export async function validateCurrentSession() {
   
   // Prevent multiple simultaneous validations
   if (validationInProgress) {
-    console.log('⏳ Session validation already in progress');
+// console.log('⏳ Session validation already in progress');
     return;
   }
   
@@ -318,7 +318,7 @@ async function validateWithServer(user) {
       console.error(`❌ Session validation attempt ${attempt} failed:`, error);
       
       if (attempt < VALIDATION_CONFIG.retryAttempts) {
-        console.log(`⏳ Retrying in ${VALIDATION_CONFIG.retryDelay}ms...`);
+// console.log(`⏳ Retrying in ${VALIDATION_CONFIG.retryDelay}ms...`);
         await new Promise(resolve => setTimeout(resolve, VALIDATION_CONFIG.retryDelay));
       } else {
         throw error; // Re-throw on final attempt
@@ -347,7 +347,7 @@ function updateUserDataFromServer(updatedData) {
  * Handle invalid session
  */
 async function handleInvalidSession() {
-  console.log('🚪 Handling invalid session...');
+// console.log('🚪 Handling invalid session...');
   
   // Show user-friendly message
   const message = 'Phiên đăng nhập của bạn đã hết hạn hoặc tài khoản đã bị thay đổi. Vui lòng đăng nhập lại.';

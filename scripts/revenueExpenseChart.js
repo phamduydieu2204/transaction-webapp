@@ -48,7 +48,7 @@ import { formatCurrency } from './statistics/formatters.js';
  * @returns {Object} Data for chart
  */
 export function calculateChartData(transactionData, expenseData, dateRange = null) {
-  console.log('📢 calculateChartData called with:', {
+// console.log('📢 calculateChartData called with:', {
     transactions: transactionData.length,
     expenses: expenseData.length,
     dateRange
@@ -80,7 +80,7 @@ export function calculateLast12MonthsData(transactionData, expenseData) {
  * @param {string} containerId - Container element ID
  */
 export async function renderRevenueExpenseChart(transactionData, expenseData, containerId = 'revenueChart') {
-  console.log('🎯 renderRevenueExpenseChart orchestrator called with:', {
+// console.log('🎯 renderRevenueExpenseChart orchestrator called with:', {
     containerId,
     transactionCount: transactionData.length,
     expenseCount: expenseData.length
@@ -98,7 +98,7 @@ export async function renderRevenueExpenseChart(transactionData, expenseData, co
   const theme = getChartTheme();
   const config = getResponsiveConfig();
   
-  console.log('📆 Calculating chart data...');
+// console.log('📆 Calculating chart data...');
   const chartData = calculateChartData(transactionData, expenseData, dateRange);
   // console.log('📊 Chart data calculated:', chartData);
   
@@ -211,7 +211,7 @@ export async function renderRevenueExpenseChart(transactionData, expenseData, co
     </div>
   `;
   
-  console.log('🔨 Setting container HTML...');
+// console.log('🔨 Setting container HTML...');
   container.innerHTML = chartHTML;
   
   // Apply chart styles and interactivity

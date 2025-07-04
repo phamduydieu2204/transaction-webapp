@@ -59,7 +59,7 @@ export async function initExpenseTab() {
     }
     
     // Debug: Check current expense list state
-    console.log('🔍 DEBUG: Checking expense list state:', {
+// console.log('🔍 DEBUG: Checking expense list state:', {
       exists: !!window.expenseList,
       length: window.expenseList?.length || 0,
       type: typeof window.expenseList,
@@ -94,7 +94,7 @@ async function loadExpensesInBackground() {
   
   // Check user info
   if (!window.userInfo) {
-    console.warn('⚠️ No user info found');
+// console.warn('⚠️ No user info found');
     return;
   }
   

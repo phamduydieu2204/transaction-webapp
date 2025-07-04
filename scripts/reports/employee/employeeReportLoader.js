@@ -22,7 +22,7 @@ class EmployeeReportLoader {
      */
     async init() {
         try {
-            console.log('[Employee Report] Initializing...');
+// console.log('[Employee Report] Initializing...');
             
             // Initialize core module
             this.employeeCore = new EmployeeReportCore();
@@ -37,7 +37,7 @@ class EmployeeReportLoader {
             this.render();
             
             this.isInitialized = true;
-            console.log('[Employee Report] Initialized successfully');
+// console.log('[Employee Report] Initialized successfully');
             
         } catch (error) {
             console.error('[Employee Report] Initialization failed:', error);
@@ -50,25 +50,25 @@ class EmployeeReportLoader {
      */
     async loadData() {
         try {
-            console.log('[Employee Report] Loading data...');
+// console.log('[Employee Report] Loading data...');
             
             // Check multiple possible data sources
             if (window.transactionList && window.expenseList) {
                 this.currentData.transactions = window.transactionList;
                 this.currentData.expenses = window.expenseList;
-                console.log('[Employee Report] Using transactionList/expenseList data');
+// console.log('[Employee Report] Using transactionList/expenseList data');
                 return;
             }
             
             if (window.currentTransactionData && window.currentExpenseData) {
                 this.currentData.transactions = window.currentTransactionData;
                 this.currentData.expenses = window.currentExpenseData;
-                console.log('[Employee Report] Using currentTransactionData/currentExpenseData');
+// console.log('[Employee Report] Using currentTransactionData/currentExpenseData');
                 return;
             }
 
             // If no cached data, generate mock data for testing
-            console.log('[Employee Report] No cached data available, using mock data');
+// console.log('[Employee Report] No cached data available, using mock data');
             this.generateMockData();
             
         } catch (error) {
@@ -185,7 +185,7 @@ class EmployeeReportLoader {
             // Render alerts
             this.renderAlerts(processedData.alerts);
 
-            console.log('[Employee Report] Render completed');
+// console.log('[Employee Report] Render completed');
 
         } catch (error) {
             console.error('[Employee Report] Render failed:', error);
@@ -253,7 +253,7 @@ class EmployeeReportLoader {
      */
     renderCharts(data) {
         if (!this.employeeCore || !this.employeeCore.chartManager) {
-            console.warn('Chart manager not available');
+// console.warn('Chart manager not available');
             return;
         }
 
@@ -521,7 +521,7 @@ class EmployeeReportLoader {
      */
     handleSearch(query) {
         // Filter employees based on search query
-        console.log('[Employee Report] Search:', query);
+// console.log('[Employee Report] Search:', query);
         // Implementation would filter the table data
     }
 
@@ -529,7 +529,7 @@ class EmployeeReportLoader {
      * Handle filter functionality
      */
     handleFilter(filterValue) {
-        console.log('[Employee Report] Filter:', filterValue);
+// console.log('[Employee Report] Filter:', filterValue);
         // Implementation would filter employees by department or other criteria
     }
 
@@ -556,14 +556,14 @@ class EmployeeReportLoader {
             );
         }
 
-        console.log('[Employee Report] Chart period changed:', period);
+// console.log('[Employee Report] Chart period changed:', period);
     }
 
     /**
      * Handle quick actions
      */
     handleQuickAction(action) {
-        console.log('[Employee Report] Quick action:', action);
+// console.log('[Employee Report] Quick action:', action);
         
         switch (action) {
             case 'export':
@@ -583,10 +583,10 @@ class EmployeeReportLoader {
      */
     async refresh() {
         try {
-            console.log('[Employee Report] Refreshing...');
+// console.log('[Employee Report] Refreshing...');
             await this.loadData();
             this.render();
-            console.log('[Employee Report] Refresh completed');
+// console.log('[Employee Report] Refresh completed');
         } catch (error) {
             console.error('[Employee Report] Refresh failed:', error);
             this.handleError('Không thể làm mới báo cáo', error);
@@ -597,10 +597,10 @@ class EmployeeReportLoader {
      * Export data
      */
     exportData() {
-        console.log('[Employee Report] Exporting data...');
+// console.log('[Employee Report] Exporting data...');
         
         if (!this.employeeCore || !this.employeeCore.processedData) {
-            console.warn('No employee data available for export');
+// console.warn('No employee data available for export');
             alert('Không có dữ liệu để xuất. Vui lòng tải lại báo cáo.');
             return;
         }
@@ -613,7 +613,7 @@ class EmployeeReportLoader {
      * Show settings
      */
     showSettings() {
-        console.log('[Employee Report] Showing settings...');
+// console.log('[Employee Report] Showing settings...');
         // Implementation would show settings modal
     }
 

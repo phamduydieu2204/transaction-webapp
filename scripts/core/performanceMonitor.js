@@ -153,7 +153,7 @@ class PerformanceMonitor {
         });
         lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
       } catch (e) {
-        console.warn('LCP measurement not supported');
+// console.warn('LCP measurement not supported');
       }
     }
 
@@ -201,12 +201,12 @@ class PerformanceMonitor {
     };
 
     console.group('📊 Performance Report');
-    console.table(report.timing);
-    console.log('Module Loading:', report.modules);
-    console.log('Tab Switching:', report.tabs);
-    console.log('API Calls:', report.api);
-    if (memory) console.log('Memory Usage:', memory);
-    console.log('Recommendations:', report.recommendations);
+    // console.table(report.timing);
+// console.log('Module Loading:', report.modules);
+// console.log('Tab Switching:', report.tabs);
+// console.log('API Calls:', report.api);
+    if (memory) // console.log('Memory Usage:', memory);
+// console.log('Recommendations:', report.recommendations);
     console.groupEnd();
 
     return report;

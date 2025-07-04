@@ -51,7 +51,7 @@ export async function loadStatisticsData(uiState) {
       timestamp: Date.now()
     };
     
-    console.log("📊 Combined data prepared:", {
+// console.log("📊 Combined data prepared:", {
       expenses: data.expenses.length,
       transactions: data.transactions.length
     });
@@ -322,7 +322,7 @@ export async function filterDataByGlobalFilters(expenseData, transactionData, gl
       filteredExpenseData = filterDataByDateRange(expenseData, globalFilters.dateRange);
       filteredTransactionData = filterDataByDateRange(transactionData, globalFilters.dateRange);
     } catch (error) {
-      console.warn("Could not load filter function, using local implementation");
+// console.warn("Could not load filter function, using local implementation");
       filteredExpenseData = filterDataByDateRange(expenseData, globalFilters.dateRange);
       filteredTransactionData = filterDataByDateRange(transactionData, globalFilters.dateRange);
     }
@@ -394,7 +394,7 @@ function cleanupLoadingModals() {
     document.querySelector('#loading-modal')
   ].filter(el => el !== null);
   
-  console.log("🔍 DEBUG modal elements:", {
+// console.log("🔍 DEBUG modal elements:", {
     foundModals: modalElements.length,
     modals: modalElements.map(el => ({
       id: el.id,

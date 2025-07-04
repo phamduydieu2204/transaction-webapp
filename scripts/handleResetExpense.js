@@ -51,7 +51,7 @@ async function loadAllExpenses() {
   const { BACKEND_URL } = getConstants();
   
   if (!window.userInfo) {
-    console.warn('⚠️ No user info found');
+// console.warn('⚠️ No user info found');
     return;
   }
   

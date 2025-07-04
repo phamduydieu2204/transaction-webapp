@@ -38,7 +38,7 @@ class CSSOptimizer {
       // console.log('✅ Critical CSS loaded inline (', css.length, 'chars)');
       
     } catch (error) {
-      console.warn('⚠️ Critical CSS loading failed:', error);
+// console.warn('⚠️ Critical CSS loading failed:', error);
     }
   }
   
@@ -246,7 +246,7 @@ export function addResourceHints() {
     document.head.appendChild(link);
   });
   
-  console.log('🔗 Resource hints added');
+// console.log('🔗 Resource hints added');
 }
 
 export default CSSOptimizer;

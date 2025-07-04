@@ -11,7 +11,7 @@ export function debugTable() {
     return;
   }
   
-  console.log("📊 Table found:", {
+// console.log("📊 Table found:", {
     id: table.id,
     className: table.className,
     display: window.getComputedStyle(table).display,
@@ -28,7 +28,7 @@ export function debugTable() {
     return;
   }
   
-  console.log("📊 Tbody found:", {
+// console.log("📊 Tbody found:", {
     childCount: tbody.children.length,
     innerHTML: tbody.innerHTML.substring(0, 100) + "...",
     display: window.getComputedStyle(tbody).display,
@@ -39,7 +39,7 @@ export function debugTable() {
   let parent = table.parentElement;
   let level = 1;
   while (parent && level <= 5) {
-    console.log(`📦 Parent Level ${level}:`, {
+// console.log(`📦 Parent Level ${level}:`, {
       tagName: parent.tagName,
       id: parent.id,
       className: parent.className,
@@ -55,7 +55,7 @@ export function debugTable() {
   // Check if there's a table wrapper with scroll
   const tableWrapper = document.querySelector(".table-wrapper, .table-container");
   if (tableWrapper) {
-    console.log("📜 Table wrapper found:", {
+// console.log("📜 Table wrapper found:", {
       className: tableWrapper.className,
       overflow: window.getComputedStyle(tableWrapper).overflow,
       maxHeight: window.getComputedStyle(tableWrapper).maxHeight,

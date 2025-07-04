@@ -162,7 +162,7 @@ function hideLoadingElements() {
     document.querySelector('[class*="spinner"]')
   ].filter(el => el !== null);
 
-  console.log("🔍 DEBUG loading elements after render:", {
+// console.log("🔍 DEBUG loading elements after render:", {
     foundLoadingElements: loadingElements.length,
     loadingElements: loadingElements.map(el => ({
       tagName: el.tagName,

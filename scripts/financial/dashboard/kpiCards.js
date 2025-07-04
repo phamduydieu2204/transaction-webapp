@@ -15,7 +15,7 @@ import { formatCurrencyForChart } from '../core/chartManager.js';
 export function renderOverviewCards(metrics, containerId = 'overviewCards') {
   const container = document.getElementById(containerId);
   if (!container) {
-    console.warn(`Container #${containerId} not found for overview cards`);
+// console.warn(`Container #${containerId} not found for overview cards`);
     return;
   }
 
@@ -149,7 +149,7 @@ function renderTransactionCard(transactionCount, totalRevenue) {
 export function renderCashFlowCards(metrics, containerId = 'cashFlowCards') {
   const container = document.getElementById(containerId);
   if (!container) {
-    console.warn(`Container #${containerId} not found for cash flow cards`);
+// console.warn(`Container #${containerId} not found for cash flow cards`);
     return;
   }
 
@@ -304,7 +304,7 @@ function renderRunwayCard(runwayDays) {
 export function renderPerformanceAlerts(metrics, containerId = 'performanceAlerts') {
   const container = document.getElementById(containerId);
   if (!container) {
-    console.warn(`Container #${containerId} not found for performance alerts`);
+// console.warn(`Container #${containerId} not found for performance alerts`);
     return;
   }
 

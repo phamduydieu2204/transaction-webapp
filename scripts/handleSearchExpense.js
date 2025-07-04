@@ -48,7 +48,7 @@ export async function handleSearchExpense() {
   if (isGlobalSearch) {
     // Tìm kiếm toàn cục - chỉ gửi text cần tìm
     conditions.globalSearchText = expenseNote;
-    console.log("🌍 Tìm kiếm toàn cục với từ khóa:", expenseNote);
+// console.log("🌍 Tìm kiếm toàn cục với từ khóa:", expenseNote);
   } else {
     // Tìm kiếm thông thường theo từng trường cụ thể
     // console.log("🔍 Tìm kiếm theo trường cụ thể");
@@ -114,7 +114,7 @@ export async function handleSearchExpense() {
     conditions: conditions
   };
 
-  console.log("📤 Tìm kiếm chi phí với điều kiện:", JSON.stringify(data, null, 2));
+// console.log("📤 Tìm kiếm chi phí với điều kiện:", JSON.stringify(data, null, 2));
 
   try {
     const res = await fetch(BACKEND_URL, {

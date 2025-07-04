@@ -150,7 +150,7 @@ export function groupExpensesByMonth(data, options = {}) {
 
   if (!Array.isArray(data)) return summaryMap;
 
-  console.log("📊 Grouping expenses by month:", {
+// console.log("📊 Grouping expenses by month:", {
     recordCount: data.length,
     currency,
     sortBy,
@@ -218,7 +218,7 @@ export function groupRevenueByMonth(data, options = {}) {
 
   if (!Array.isArray(data)) return [];
 
-  console.log("📊 Grouping revenue by month:", {
+// console.log("📊 Grouping revenue by month:", {
     recordCount: data.length,
     currency,
     sortBy,

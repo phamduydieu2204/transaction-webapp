@@ -180,7 +180,7 @@ class FastDataLoader {
     // Preload software list as it's common for all users
     const loader = new FastDataLoader();
     loader.loadSoftwareList().catch(err => {
-      console.warn('Failed to preload software list:', err);
+// console.warn('Failed to preload software list:', err);
     });
   }
 }
