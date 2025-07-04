@@ -2149,6 +2149,16 @@ window.handleSoftwareSearch = async function() {
     }
     
     if (result.status === "success") {
+      // Debug: Log kết quả search
+      console.log('📊 DEBUG Frontend: Search results:', result.data.length, 'items');
+      if (result.data.length > 0) {
+        console.log('📊 DEBUG Frontend: First result renewal date:', result.data[0].renewalDate);
+        console.log('📊 DEBUG Frontend: Sample results:', result.data.slice(0, 3).map(item => ({
+          name: item.softwareName,
+          renewalDate: item.renewalDate
+        })));
+      }
+      
       // Set search mode and update software list
       window.isSoftwareSearching = true;
       window.softwareList = result.data || [];
@@ -2224,6 +2234,15 @@ function getSoftwareSearchConditions() {
   if (renewalDate) conditions.renewalDate = renewalDate;
   
   console.log('🔍 Search conditions:', conditions);
+  
+  // Debug: Chi tiết về renewalDate
+  if (conditions.renewalDate) {
+    console.log('📅 DEBUG Frontend: Renewal date value:', `"${conditions.renewalDate}"`);
+    console.log('📅 DEBUG Frontend: Renewal date type:', typeof conditions.renewalDate);
+    console.log('📅 DEBUG Frontend: Renewal date length:', conditions.renewalDate.length);
+    console.log('📅 DEBUG Frontend: Character codes:', conditions.renewalDate.split('').map(c => c.charCodeAt(0)));
+  }
+  
   return conditions;
 }
 
