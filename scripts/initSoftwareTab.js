@@ -2014,6 +2014,9 @@ window.handleSoftwareSearch = async function() {
     
     const result = await apiRequestJson(requestData);
     
+    // Debug: Log raw response from backend
+    console.log('📥 DEBUG Frontend v3: Raw API response:', result);
+    
     // Close processing modal
     if (typeof closeProcessingModalModern === 'function') {
       closeProcessingModalModern();
@@ -2021,13 +2024,16 @@ window.handleSoftwareSearch = async function() {
     
     if (result.status === "success") {
       // Debug: Log kết quả search
-      console.log('📊 DEBUG Frontend: Search results:', result.data.length, 'items');
+      console.log('📊 DEBUG Frontend v3: Search results:', result.data.length, 'items');
       if (result.data.length > 0) {
-        console.log('📊 DEBUG Frontend: First result renewal date:', result.data[0].renewalDate);
-        console.log('📊 DEBUG Frontend: Sample results:', result.data.slice(0, 3).map(item => ({
+        console.log('📊 DEBUG Frontend v3: First result renewal date:', result.data[0].renewalDate);
+        console.log('📊 DEBUG Frontend v3: Sample results:', result.data.slice(0, 3).map(item => ({
           name: item.softwareName,
-          renewalDate: item.renewalDate
+          renewalDate: item.renewalDate,
+          renewalDateType: typeof item.renewalDate
         })));
+      } else {
+        console.log('⚠️ DEBUG Frontend v3: No results found for conditions:', conditions);
       }
       
       // Set search mode and update software list
