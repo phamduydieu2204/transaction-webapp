@@ -21,9 +21,6 @@ export function initSoftwareTab() {
   // Initialize form dropdowns
   initSoftwareFormDropdowns();
   
-  // Initialize date picker for renewal date
-  initRenewalDatePicker();
-  
   // Load software data
   loadSoftwareData();
   
@@ -376,36 +373,6 @@ function updateSoftwarePagination() {
   lastButton.onclick = window.softwareLastPage;
   lastButton.disabled = window.currentSoftwarePage === totalPages;
   pagination.appendChild(lastButton);
-}
-
-function initRenewalDatePicker() {
-  const renewalDateInput = document.getElementById('renewalDate');
-  if (!renewalDateInput) return;
-  
-  // Initialize Flatpickr for renewal date
-  flatpickr(renewalDateInput, {
-    dateFormat: "Y/m/d", // yyyy/mm/dd format
-    allowInput: true,
-    clickOpens: false, // Don't open on input click, only on icon click
-    disableMobile: true,
-    locale: {
-      firstDayOfWeek: 1 // Monday
-    },
-    onChange: function(selectedDates, dateStr) {
-      // Update the input value with formatted date
-      renewalDateInput.value = dateStr;
-    }
-  });
-  
-  // Make sure the calendar icon works with the new onclick handler
-  const calendarIcon = renewalDateInput.nextElementSibling;
-  if (calendarIcon && calendarIcon.classList.contains('calendar-icon')) {
-    calendarIcon.onclick = function() {
-      if (renewalDateInput._flatpickr) {
-        renewalDateInput._flatpickr.open();
-      }
-    };
-  }
 }
 
 // Global functions - Legacy support
