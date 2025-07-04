@@ -3,7 +3,7 @@
  */
 
 export function debugEmployeeBadge() {
-  console.log('🔍 === EMPLOYEE BADGE DEBUG START ===');
+  // console.log('🔍 === EMPLOYEE BADGE DEBUG START ===');
   
   // Check if transactions have maNhanVien field
   if (window.transactionList && window.transactionList.length > 0) {
@@ -30,11 +30,11 @@ export function debugEmployeeBadge() {
       key.toLowerCase().includes('create') ||
       key.toLowerCase().includes('ma')
     );
-    console.log('📄 Possible employee fields:', employeeFields);
+    // console.log('📄 Possible employee fields:', employeeFields);
     
     // Check multiple transactions
     const sampleTransactions = window.transactionList.slice(0, 3);
-    console.log('📄 Sample transaction employee data:');
+    // console.log('📄 Sample transaction employee data:');
     sampleTransactions.forEach((t, i) => {
       console.log(`  Transaction ${i + 1}:`, {
         id: t.transactionId,
@@ -47,26 +47,26 @@ export function debugEmployeeBadge() {
       });
     });
   } else {
-    console.log('❌ No transaction data found');
+    // console.log('❌ No transaction data found');
   }
   
   // Check DOM elements
   const infoCells = document.querySelectorAll('.info-cell-container');
-  console.log('📄 Found info cells:', infoCells.length);
+  // console.log('📄 Found info cells:', infoCells.length);
   
   // Check for table rows
   const tableRows = document.querySelectorAll('#transactionTable tbody tr');
-  console.log('📄 Found table rows:', tableRows.length);
+  // console.log('📄 Found table rows:', tableRows.length);
   
   // Check table body specifically
   const tableBody = document.querySelector('#transactionTable tbody');
-  console.log('📄 Table body exists:', !!tableBody);
+  // console.log('📄 Table body exists:', !!tableBody);
   if (tableBody) {
-    console.log('📄 Table body HTML preview:', tableBody.innerHTML.substring(0, 500));
+    // console.log('📄 Table body HTML preview:', tableBody.innerHTML.substring(0, 500));
   }
   
   const employeeBadges = document.querySelectorAll('.employee-badge');
-  console.log('📄 Found employee badges:', employeeBadges.length);
+  // console.log('📄 Found employee badges:', employeeBadges.length);
   
   if (employeeBadges.length > 0) {
     employeeBadges.forEach((badge, i) => {
@@ -85,14 +85,14 @@ export function debugEmployeeBadge() {
   
   // Check CSS
   const cssLink = document.querySelector('link[href*="employee-badge.css"]');
-  console.log('📄 Employee badge CSS loaded:', !!cssLink);
+  // console.log('📄 Employee badge CSS loaded:', !!cssLink);
   
-  console.log('🔍 === EMPLOYEE BADGE DEBUG END ===');
+  // console.log('🔍 === EMPLOYEE BADGE DEBUG END ===');
 }
 
 // Debug after table render
 export function debugEmployeeBadgeAfterRender() {
-  console.log('🔍 === EMPLOYEE BADGE DEBUG AFTER RENDER ===');
+  // console.log('🔍 === EMPLOYEE BADGE DEBUG AFTER RENDER ===');
   
   // Wait a bit for DOM to settle
   setTimeout(() => {
@@ -102,11 +102,11 @@ export function debugEmployeeBadgeAfterRender() {
 
 // Force table update and then debug
 export function forceTableUpdateAndDebug() {
-  console.log('🔄 Forcing table update and debug...');
+  // console.log('🔄 Forcing table update and debug...');
   
   // Try to trigger loadTransactions to refresh data and table
   if (window.loadTransactions && typeof window.loadTransactions === 'function' && window.userInfo) {
-    console.log('🔄 Triggering loadTransactions to refresh table...');
+    // console.log('🔄 Triggering loadTransactions to refresh table...');
     
     window.loadTransactions(
       window.userInfo,
@@ -116,12 +116,12 @@ export function forceTableUpdateAndDebug() {
       window.deleteTransaction,
       window.viewTransaction
     ).then(() => {
-      console.log('✅ Load transactions completed');
+      // console.log('✅ Load transactions completed');
       setTimeout(() => {
         debugEmployeeBadge();
       }, 300);
     }).catch(err => {
-      console.log('❌ Load transactions failed:', err);
+      // console.log('❌ Load transactions failed:', err);
       fallbackTableUpdate();
     });
   } else {
@@ -131,19 +131,19 @@ export function forceTableUpdateAndDebug() {
 
 // Fallback table update method
 function fallbackTableUpdate() {
-  console.log('🔄 Using fallback table update...');
+  // console.log('🔄 Using fallback table update...');
   
   // Trigger table update if possible
   if (window.transactionList && window.formatDate) {
     const currentPage = window.currentPage || 1;
     const itemsPerPage = window.itemsPerPage || 10;
     
-    console.log('🔄 Updating table with current data...');
+    // console.log('🔄 Updating table with current data...');
     
     // Try to use the correct update function
     const updateFn = window.updateTableUltraFast || window.updateTable;
     if (updateFn && typeof updateFn === 'function') {
-      console.log('🔄 Using update function:', updateFn.name);
+      // console.log('🔄 Using update function:', updateFn.name);
       updateFn(
         window.transactionList, 
         currentPage, 
@@ -154,7 +154,7 @@ function fallbackTableUpdate() {
         window.viewTransaction
       );
     } else {
-      console.log('❌ No update function found');
+      // console.log('❌ No update function found');
     }
     
     // Debug after update
@@ -162,14 +162,14 @@ function fallbackTableUpdate() {
       debugEmployeeBadge();
     }, 200);
   } else {
-    console.log('❌ Cannot force table update - missing dependencies');
+    // console.log('❌ Cannot force table update - missing dependencies');
     debugEmployeeBadge();
   }
 }
 
 // Test employee colors
 export function testEmployeeColors() {
-  console.log('🎨 === EMPLOYEE COLOR TEST ===');
+  // console.log('🎨 === EMPLOYEE COLOR TEST ===');
   
   const testCodes = ['ADMIN', 'NV01', 'NV02', 'MANAGER', 'SALE01', 'TECH01', 'SUPPORT', 'QA01', 'DEV01', 'HR01'];
   
@@ -204,38 +204,38 @@ export function testEmployeeColors() {
     };
     
     const color = getEmployeeColor(code);
-    console.log(`🎨 ${code}: ${color.name} (${color.bg}) - Index: ${color.index}`);
+    // console.log(`🎨 ${code}: ${color.name} (${color.bg}) - Index: ${color.index}`);
   });
   
-  console.log('🎨 === COLOR TEST END ===');
+  // console.log('🎨 === COLOR TEST END ===');
 }
 
 // Quick reload to see new layout
 export function quickReload() {
-  console.log('🔄 Reloading page to see new layout...');
+  // console.log('🔄 Reloading page to see new layout...');
   window.location.reload(true);
 }
 
 // Check which update function is being used
 export function checkUpdateFunction() {
-  console.log('🔍 === UPDATE FUNCTION CHECK ===');
-  console.log('🔍 window.updateTable exists:', typeof window.updateTable);
-  console.log('🔍 window.updateTableUltraFast exists:', typeof window.updateTableUltraFast);
-  console.log('🔍 window.loadTransactions exists:', typeof window.loadTransactions);
-  console.log('🔍 window.userInfo exists:', !!window.userInfo);
-  console.log('🔍 window.formatDate exists:', typeof window.formatDate);
+  // console.log('🔍 === UPDATE FUNCTION CHECK ===');
+  // console.log('🔍 window.updateTable exists:', typeof window.updateTable);
+  // console.log('🔍 window.updateTableUltraFast exists:', typeof window.updateTableUltraFast);
+  // console.log('🔍 window.loadTransactions exists:', typeof window.loadTransactions);
+  // console.log('🔍 window.userInfo exists:', !!window.userInfo);
+  // console.log('🔍 window.formatDate exists:', typeof window.formatDate);
   
   // Check main.js imports
-  console.log('🔍 Checking imports in main.js...');
+  // console.log('🔍 Checking imports in main.js...');
   const scripts = document.querySelectorAll('script[src*="main.js"]');
-  console.log('🔍 Main.js scripts found:', scripts.length);
+  // console.log('🔍 Main.js scripts found:', scripts.length);
   
-  console.log('🔍 === END CHECK ===');
+  // console.log('🔍 === END CHECK ===');
 }
 
 // Test contact truncation
 export function testContactTruncation() {
-  console.log('✂️ === CONTACT TRUNCATION TEST ===');
+  // console.log('✂️ === CONTACT TRUNCATION TEST ===');
   
   const testContacts = [
     'user@example.com',
@@ -248,10 +248,10 @@ export function testContactTruncation() {
   
   testContacts.forEach(contact => {
     const truncated = contact.length > 15 ? contact.substring(0, 15) + '...' : contact;
-    console.log(`✂️ "${contact}" → "${truncated}" (${contact.length} → ${truncated.length} chars)`);
+    // console.log(`✂️ "${contact}" → "${truncated}" (${contact.length} → ${truncated.length} chars)`);
   });
   
-  console.log('✂️ === TRUNCATION TEST END ===');
+  // console.log('✂️ === TRUNCATION TEST END ===');
 }
 
 // Make available globally

@@ -5,7 +5,7 @@
  * Handles view transitions, layout changes, and responsive behavior
  */
 
-console.log('📦 viewControllers.js module loading...');
+// console.log('📦 viewControllers.js module loading...');
 
 import { showInfoMessage, showWarningMessage } from './displayManagers.js';
 
@@ -31,7 +31,7 @@ export class StatisticsViewController {
    */
   async switchToView(viewName, options = {}) {
     try {
-      console.log(`🔄 Switching to view: ${viewName}`);
+      // console.log(`🔄 Switching to view: ${viewName}`);
       
       const {
         animate = true,
@@ -83,7 +83,7 @@ export class StatisticsViewController {
         options
       });
       
-      console.log(`✅ Switched to view: ${viewName}`);
+      // console.log(`✅ Switched to view: ${viewName}`);
       
     } catch (error) {
       console.error(`❌ Error switching to view ${viewName}:`, error);
@@ -96,7 +96,7 @@ export class StatisticsViewController {
    */
   async goBack() {
     if (this.viewHistory.length === 0) {
-      console.log("📝 No previous view in history");
+      // console.log("📝 No previous view in history");
       return;
     }
     
@@ -489,7 +489,7 @@ export function initializeViewControllers() {
   // Initial layout setup
   layoutManager.handleResize();
   
-  console.log("✅ View controllers initialized");
+  // console.log("✅ View controllers initialized");
 }
 
 /**
@@ -537,4 +537,4 @@ window.viewController = viewController;
 window.layoutManager = layoutManager;
 window.initializeViewControllers = initializeViewControllers;
 
-console.log('✅ viewControllers.js module loaded successfully');
+// console.log('✅ viewControllers.js module loaded successfully');

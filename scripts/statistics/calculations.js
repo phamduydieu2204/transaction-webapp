@@ -71,7 +71,7 @@ export function calculateTotalExpenses(data, options = {}) {
     totals[expenseCurrency] += amount;
   });
 
-  console.log("✅ Expense totals calculated:", totals);
+  // console.log("✅ Expense totals calculated:", totals);
   return totals;
 }
 
@@ -146,7 +146,7 @@ export function calculateTotalRevenue(data, options = {}) {
     totals[transactionCurrency] += revenue;
   });
 
-  console.log("✅ Revenue totals calculated:", totals);
+  // console.log("✅ Revenue totals calculated:", totals);
   return totals;
 }
 
@@ -186,7 +186,7 @@ export function calculateFinancialAnalysis(revenue, expenses) {
     overallMargin: totalRevenue > 0 ? ((totalRevenue - totalExpenses) / totalRevenue) * 100 : 0
   };
 
-  console.log("📈 Financial analysis completed:", analysis.summary);
+  // console.log("📈 Financial analysis completed:", analysis.summary);
   return analysis;
 }
 

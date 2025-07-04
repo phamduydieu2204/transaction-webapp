@@ -24,7 +24,7 @@ export async function loadCustomerReport() {
       loadCustomerActivity()
     ]);
     
-    console.log('✅ Customer report loaded');
+    // console.log('✅ Customer report loaded');
   } catch (error) {
     console.error('❌ Error loading customer report:', error);
     showError('Không thể tải báo cáo khách hàng');

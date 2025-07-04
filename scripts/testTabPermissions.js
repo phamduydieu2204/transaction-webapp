@@ -22,7 +22,7 @@ const testInputs = [
 ];
 
 testInputs.forEach(input => {
-  console.log(`\n📝 Testing input: "${input}"`);
+  // console.log(`\n📝 Testing input: "${input}"`);
   
   // Split by | or , and trim
   const permissions = input.split(/[|,]/).map(p => p.trim()).filter(p => p.length > 0);
@@ -32,17 +32,17 @@ testInputs.forEach(input => {
   permissions.forEach(permission => {
     console.log(`  Checking: "${permission}"`);
     if (TAB_MAPPING[permission]) {
-      console.log(`    ✅ Found: ${TAB_MAPPING[permission]}`);
+      // console.log(`    ✅ Found: ${TAB_MAPPING[permission]}`);
       TAB_MAPPING[permission].forEach(tabId => allowedTabs.add(tabId));
     } else {
-      console.log(`    ❌ Not found`);
+      // console.log(`    ❌ Not found`);
     }
   });
   
   console.log('  Final allowed tabs:', Array.from(allowedTabs));
 });
 
-console.log('\n🗂️ Available mappings:');
+// console.log('\n🗂️ Available mappings:');
 Object.entries(TAB_MAPPING).forEach(([key, value]) => {
   console.log(`  "${key}" -> ${value}`);
 });

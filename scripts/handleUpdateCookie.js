@@ -70,7 +70,7 @@ export async function handleUpdateCookie(index, transactionList) {
       });
       const accountResult = await accountResponse.json();
       
-      console.log('🔐 Account info result:', accountResult);
+      // console.log('🔐 Account info result:', accountResult);
       
       // Cập nhật username và password
       const usernameEl = document.getElementById("currentUsername");
@@ -114,7 +114,7 @@ export function copyCurrentCookie() {
   }
   
   navigator.clipboard.writeText(val).then(() => {
-    console.log('✅ Cookie copied successfully');
+    // console.log('✅ Cookie copied successfully');
     showResultModal("✅ Đã sao chép cookie thành công!", true);
   }).catch((err) => {
     console.error('❌ Copy failed:', err);
@@ -145,31 +145,31 @@ export async function confirmUpdateCookie() {
     
     // Kiểm tra cookie mới có rỗng không
     if (!newCookie) {
-      console.log('❌ Empty cookie');
+      // console.log('❌ Empty cookie');
       enableInteraction();
-      console.log('🔔 Showing alert for empty cookie');
+      // console.log('🔔 Showing alert for empty cookie');
       alert("⚠️ Vui lòng nhập cookie mới trước khi cập nhật!");
       return; // Không đóng modal, để user sửa
     }
     
     // Kiểm tra cookie có quá ngắn không (có thể là lỗi)
     if (newCookie.length < 10) {
-      console.log('❌ Cookie too short');
+      // console.log('❌ Cookie too short');
       enableInteraction();
-      console.log('🔔 Showing alert for short cookie');
+      // console.log('🔔 Showing alert for short cookie');
       alert("⚠️ Cookie có vẻ quá ngắn. Vui lòng kiểm tra lại!");
       return; // Không đóng modal, để user sửa
     }
     
     // Kiểm tra cookie có chứa ký tự đặc biệt cần thiết không
     if (!newCookie.includes('=')) {
-      console.log('❌ Cookie invalid format');
+      // console.log('❌ Cookie invalid format');
       enableInteraction();
       alert("⚠️ Cookie có vẻ không đúng định dạng. Cookie thường chứa dấu '='.");
       return; // Không đóng modal, để user sửa
     }
 
-    console.log('✅ All validations passed, proceeding with update');
+    // console.log('✅ All validations passed, proceeding with update');
     
     const { BACKEND_URL } = getConstants();
     showProcessingModal("Đang cập nhật Cookie...");
@@ -222,7 +222,7 @@ export async function cancelUpdateCookie() {
     console.log('🍪 Cancel transaction:', transaction);
     
     if (!transaction?.transactionId) {
-      console.log('❌ No transaction to cancel');
+      // console.log('❌ No transaction to cancel');
       enableInteraction();
       closeUpdateCookieModal();
       return;
@@ -238,7 +238,7 @@ export async function cancelUpdateCookie() {
         type: "cancel"
       })
     });
-    console.log('✅ Cancel log sent successfully');
+    // console.log('✅ Cancel log sent successfully');
     
   } catch (err) {
     console.warn("❌ Không thể gửi log hủy cập nhật cookie:", err.message);
@@ -253,7 +253,7 @@ export function closeUpdateCookieModal() {
   const modal = document.getElementById("updateCookieModal");
   if (modal) {
     modal.style.display = "none";
-    console.log('✅ Modal closed');
+    // console.log('✅ Modal closed');
   } else {
     console.error('❌ Modal not found');
   }
@@ -262,7 +262,7 @@ export function closeUpdateCookieModal() {
 
 
 function disableInteraction() {
-  console.log('🔒 Disabling interaction');
+  // console.log('🔒 Disabling interaction');
   const overlay = document.getElementById("formOverlay");
   if (overlay) {
     overlay.style.display = "block";
@@ -282,10 +282,10 @@ function enableInteraction() {
 }
 
 export function copyUsername() {
-  console.log('👤 copyUsername called');
+  // console.log('👤 copyUsername called');
   
   const val = document.getElementById("currentUsername").value;
-  console.log('👤 Username value:', val);
+  // console.log('👤 Username value:', val);
   
   if (!val) {
     showResultModal("⚠️ Không có tên đăng nhập để sao chép!", false);
@@ -293,7 +293,7 @@ export function copyUsername() {
   }
   
   navigator.clipboard.writeText(val).then(() => {
-    console.log('✅ Username copied successfully');
+    // console.log('✅ Username copied successfully');
     showResultModal("✅ Đã sao chép tên đăng nhập!", true);
   }).catch((err) => {
     console.error('❌ Copy failed:', err);
@@ -302,10 +302,10 @@ export function copyUsername() {
 }
 
 export function copyPassword() {
-  console.log('🔑 copyPassword called');
+  // console.log('🔑 copyPassword called');
   
   const val = document.getElementById("currentPassword").value;
-  console.log('🔑 Password value:', val ? '***' : '(empty)');
+  // console.log('🔑 Password value:', val ? '***' : '(empty)');
   
   if (!val) {
     showResultModal("⚠️ Không có mật khẩu để sao chép!", false);
@@ -313,7 +313,7 @@ export function copyPassword() {
   }
   
   navigator.clipboard.writeText(val).then(() => {
-    console.log('✅ Password copied successfully');
+    // console.log('✅ Password copied successfully');
     showResultModal("✅ Đã sao chép mật khẩu!", true);
   }).catch((err) => {
     console.error('❌ Copy failed:', err);

@@ -362,7 +362,7 @@ export function clearPersistedState() {
       }
     });
     
-    console.log('🗑️ Persisted state cleared');
+    // console.log('🗑️ Persisted state cleared');
   } catch (error) {
     console.error('❌ Error clearing persisted state:', error);
   }

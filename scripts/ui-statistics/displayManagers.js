@@ -5,7 +5,7 @@
  * Handles loading states, notifications, modal management
  */
 
-console.log('📦 displayManagers.js module loading...');
+// console.log('📦 displayManagers.js module loading...');
 
 /**
  * Shows success message to user
@@ -23,7 +23,7 @@ export function showSuccessMessage(message) {
     }, 3000);
   }
   
-  console.log("✅ Success:", message);
+  // console.log("✅ Success:", message);
 }
 
 /**
@@ -80,7 +80,7 @@ export function showInfoMessage(message) {
     }, 3000);
   }
   
-  console.log("ℹ️ Info:", message);
+  // console.log("ℹ️ Info:", message);
 }
 
 /**
@@ -128,7 +128,7 @@ export class LoadingManager {
       this.loadingTimeouts.set(elementId, timeoutId);
     }
     
-    console.log(`🔄 Loading started for ${elementId}`);
+    // console.log(`🔄 Loading started for ${elementId}`);
   }
   
   /**
@@ -154,7 +154,7 @@ export class LoadingManager {
     element.classList.remove('loading');
     this.loadingElements.delete(elementId);
     
-    console.log(`✅ Loading ended for ${elementId}`);
+    // console.log(`✅ Loading ended for ${elementId}`);
   }
   
   /**
@@ -241,7 +241,7 @@ export class ModalManager {
       }
     }
     
-    console.log(`📱 Modal ${modalId} shown`);
+    // console.log(`📱 Modal ${modalId} shown`);
   }
   
   /**
@@ -266,7 +266,7 @@ export class ModalManager {
     // Clean up keyboard handlers
     this.cleanupKeyboardHandlers(modalId);
     
-    console.log(`🚫 Modal ${modalId} hidden`);
+    // console.log(`🚫 Modal ${modalId} hidden`);
   }
   
   /**
@@ -604,4 +604,4 @@ window.loadingManager = loadingManager;
 window.modalManager = modalManager;
 window.uiStateManager = uiStateManager;
 
-console.log('✅ displayManagers.js module loaded successfully');
+// console.log('✅ displayManagers.js module loaded successfully');

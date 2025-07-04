@@ -72,7 +72,7 @@ class UIBlocker {
     // Ngăn scroll
     document.body.style.overflow = 'hidden';
 
-    console.log('🔒 UI blocked');
+    // console.log('🔒 UI blocked');
   }
 
   /**

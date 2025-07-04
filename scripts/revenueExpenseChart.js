@@ -5,7 +5,7 @@
  * Coordinates between specialized chart modules
  */
 
-console.log('📦 revenueExpenseChart.js orchestrator loading...');
+// console.log('📦 revenueExpenseChart.js orchestrator loading...');
 
 // Import specialized chart modules
 import { 
@@ -55,7 +55,7 @@ export function calculateChartData(transactionData, expenseData, dateRange = nul
   });
   
   const granularity = determineGranularity(dateRange);
-  console.log('📅 Granularity:', granularity);
+  // console.log('📅 Granularity:', granularity);
   
   return aggregateDataByPeriod(transactionData, expenseData, dateRange, granularity);
 }
@@ -100,12 +100,12 @@ export async function renderRevenueExpenseChart(transactionData, expenseData, co
   
   console.log('📆 Calculating chart data...');
   const chartData = calculateChartData(transactionData, expenseData, dateRange);
-  console.log('📊 Chart data calculated:', chartData);
+  // console.log('📊 Chart data calculated:', chartData);
   
   // Calculate compare data if needed
   let compareData = null;
   if (compareMode !== 'none' && dateRange) {
-    console.log('🔄 Calculating compare data...');
+    // console.log('🔄 Calculating compare data...');
     const compareRange = getCompareDateRange(compareMode, dateRange);
     
     try {
@@ -117,7 +117,7 @@ export async function renderRevenueExpenseChart(transactionData, expenseData, co
       const compareExpenses = filterDataByDateRange(allExpenses, compareRange, window.globalFilters);
       
       compareData = calculateChartData(compareTransactions, compareExpenses, compareRange);
-      console.log('🔄 Compare data calculated:', compareData);
+      // console.log('🔄 Compare data calculated:', compareData);
     } catch (error) {
       console.error('❌ Error loading compare data:', error);
     }
@@ -217,7 +217,7 @@ export async function renderRevenueExpenseChart(transactionData, expenseData, co
   // Apply chart styles and interactivity
   applyChartStyles(containerId);
   addChartInteractivity(containerId);
-  console.log('✅ Chart rendered successfully with modular components');
+  // console.log('✅ Chart rendered successfully with modular components');
 }
 
 // Helper functions for chart generation
@@ -417,4 +417,4 @@ window.calculateLast12MonthsData = calculateLast12MonthsData;
 window.renderRevenueExpenseChart = renderRevenueExpenseChart;
 window.addRevenueExpenseChartStyles = addRevenueExpenseChartStyles;
 
-console.log('✅ revenueExpenseChart.js module loaded successfully');
+// console.log('✅ revenueExpenseChart.js module loaded successfully');

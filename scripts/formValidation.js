@@ -223,7 +223,7 @@ window.setupRealTimeValidation = setupRealTimeValidation;
 // Auto-setup when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   setupRealTimeValidation();
-  console.log('✅ Form validation setup complete');
+  // console.log('✅ Form validation setup complete');
 });
 
 export { validateForm, clearValidationErrors, showValidationSummary, setupRealTimeValidation };

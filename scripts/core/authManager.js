@@ -119,7 +119,7 @@ function checkSessionValidity() {
 function isSessionValid(authData) {
     // '🔐 Checking session validity...';
     if (!authData || !authData.expiryTime) {
-        console.log('❌ Session invalid: No auth data or expiry time');
+        // console.log('❌ Session invalid: No auth data or expiry time');
         return false;
     }
     

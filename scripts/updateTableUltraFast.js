@@ -56,13 +56,13 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     
     // Debug specific transaction with detailed character analysis
     if (transactionId === 'GD2506241556') {
-      console.log('🔍 RAW TYPE:', `"${transactionType}"`);
-      console.log('🔍 RAW CHAR CODES:', [...transactionType].map(char => `${char}(${char.charCodeAt(0)})`));
-      console.log('🔍 NORMALIZED TYPE:', `"${normalizedType}"`);
-      console.log('🔍 NORMALIZED CHAR CODES:', [...normalizedType].map(char => `${char}(${char.charCodeAt(0)})`));
-      console.log('🔍 EXPECTED MATCH:', normalizedType === "đã hoàn tất");
-      console.log('🔍 HAS INVISIBLE CHARS:', /[\u200B-\u200F\u2028-\u202F\u205F-\u206F\uFEFF]/.test(transactionType));
-      console.log('🔍 EXACT BYTES:', Array.from(new TextEncoder().encode(transactionType)));
+      // console.log('🔍 RAW TYPE:', `"${transactionType}"`);
+      // console.log('🔍 RAW CHAR CODES:', [...transactionType].map(char => `${char}(${char.charCodeAt(0)})`));
+      // console.log('🔍 NORMALIZED TYPE:', `"${normalizedType}"`);
+      // console.log('🔍 NORMALIZED CHAR CODES:', [...normalizedType].map(char => `${char}(${char.charCodeAt(0)})`));
+      // console.log('🔍 EXPECTED MATCH:', normalizedType === "đã hoàn tất");
+      // console.log('🔍 HAS INVISIBLE CHARS:', /[\u200B-\u200F\u2028-\u202F\u205F-\u206F\uFEFF]/.test(transactionType));
+      // console.log('🔍 EXACT BYTES:', Array.from(new TextEncoder().encode(transactionType)));
     }
     
     switch (normalizedType) {
@@ -72,14 +72,14 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
         return "#E0F7FA"; // Light cyan
       case "hoàn tiền":
         if (transactionId === 'GD2506241556') {
-          console.log('❌ GD2506241556 WRONGLY matched HOÀN TIỀN!');
+          // console.log('❌ GD2506241556 WRONGLY matched HOÀN TIỀN!');
         }
         return "#FFEBEE"; // Light red
       case "hủy giao dịch":
         return "#F5F5F5"; // Light gray
       case "đã hoàn tất":
         if (transactionId === 'GD2506241556') {
-          console.log('✅ GD2506241556 correctly matched ĐÃ HOÀN TẤT');
+          // console.log('✅ GD2506241556 correctly matched ĐÃ HOÀN TẤT');
         }
         return ""; // Keep default/current color
       default:
@@ -101,7 +101,7 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     
     // Debug log cho giao dịch hoàn tiền
     if (transaction.transactionType === "Hoàn tiền" || transaction.transactionType === "Hoàn Tiền") {
-      console.log(`🔍 DEBUG Hoàn tiền - ID: ${transaction.transactionId}`);
+      // console.log(`🔍 DEBUG Hoàn tiền - ID: ${transaction.transactionId}`);
       console.log(`   - index trong page: ${index}`);
       console.log(`   - startIndex: ${startIndex}`);
       console.log(`   - actualIndex tìm được: ${actualIndex}`);
@@ -228,7 +228,7 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
     
     // Debug log for dropdown options
     if (dataIndex < 3) { // Only log first 3 rows to avoid spam
-      console.log(`🔧 Transaction ${dataIndex} (${transaction.transactionId}):`, {
+      // console.log(`🔧 Transaction ${dataIndex} (${transaction.transactionId}):`, {
         fileType: transaction.fileType,
         accountSheetId: transaction.accountSheetId,
         actionOptions: actionOptions
@@ -438,8 +438,8 @@ export function updateTableUltraFast(transactionList, currentPage, itemsPerPage,
  */
 function copyOrderInfo(transaction, button) {
   // Debug log
-  console.log('📋 copyOrderInfo called with transaction:', transaction);
-  console.log('📄 transaction.orderInfo:', transaction.orderInfo);
+  // console.log('📋 copyOrderInfo called with transaction:', transaction);
+  // console.log('📄 transaction.orderInfo:', transaction.orderInfo);
   
   // Ưu tiên sử dụng orderInfo đã được lưu từ backend
   let orderInfo = '';
@@ -447,9 +447,9 @@ function copyOrderInfo(transaction, button) {
   if (transaction.orderInfo && transaction.orderInfo.trim() !== '') {
     // Sử dụng orderInfo từ backend (đã bao gồm tất cả thông tin)
     orderInfo = transaction.orderInfo;
-    console.log('✅ Using orderInfo from backend');
+    // console.log('✅ Using orderInfo from backend');
   } else {
-    console.log('⚠️ No orderInfo from backend, generating fallback');
+    // console.log('⚠️ No orderInfo from backend, generating fallback');
     // Fallback: tạo orderInfo nếu không có từ backend
     const formatDate = (dateStr) => {
       if (!dateStr) return 'Không có';
@@ -516,7 +516,7 @@ function copyOrderInfo(transaction, button) {
  * Handle table actions efficiently
  */
 function handleTableAction(action, index, transactionList) {
-  console.log(`🎯 handleTableAction called - action: ${action}, index: ${index}`);
+  // console.log(`🎯 handleTableAction called - action: ${action}, index: ${index}`);
   console.log(`   - transactionList.length: ${transactionList.length}`);
   
   // Get the actual transaction object
@@ -529,7 +529,7 @@ function handleTableAction(action, index, transactionList) {
   
   console.log(`   - Transaction found: ${transaction.transactionId} - ${transaction.transactionType}`);
   if (transaction.transactionType === "Hoàn tiền" || transaction.transactionType === "Hoàn Tiền") {
-    console.log(`   🔍 Đây là giao dịch hoàn tiền!`);
+    // console.log(`   🔍 Đây là giao dịch hoàn tiền!`);
   }
   
   switch(action) {

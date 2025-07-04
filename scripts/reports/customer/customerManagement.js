@@ -76,7 +76,7 @@ export async function loadCustomerManagement(options = {}) {
     // Setup event handlers
     setupCustomerManagementHandlers();
     
-    console.log('✅ Customer management loaded successfully');
+    // console.log('✅ Customer management loaded successfully');
     
   } catch (error) {
     console.error('❌ Error loading customer management:', error);
@@ -101,7 +101,7 @@ async function loadCustomerManagementHTML() {
     container.innerHTML = html;
     container.classList.add('active');
     
-    console.log('✅ Customer management template loaded');
+    // console.log('✅ Customer management template loaded');
     
   } catch (error) {
     console.error('❌ Could not load customer management template:', error);
@@ -233,7 +233,7 @@ async function updateCustomerKPIs(customerData, period) {
  * Render customer acquisition chart
  */
 async function renderCustomerAcquisitionChart(customerData, period) {
-  console.log('📈 Rendering customer acquisition chart');
+  // console.log('📈 Rendering customer acquisition chart');
   
   const canvas = document.getElementById('customer-acquisition-chart');
   if (!canvas) return;
@@ -321,7 +321,7 @@ async function renderCustomerAcquisitionChart(customerData, period) {
  * Render customer lifecycle chart
  */
 async function renderCustomerLifecycleChart(customerData) {
-  console.log('🔄 Rendering customer lifecycle chart');
+  // console.log('🔄 Rendering customer lifecycle chart');
   
   const canvas = document.getElementById('customer-lifecycle-chart');
   if (!canvas) return;
@@ -394,7 +394,7 @@ async function renderCustomerLifecycleChart(customerData) {
  * Update customer segmentation
  */
 async function updateCustomerSegmentation(customerData) {
-  console.log('🎯 Updating customer segmentation');
+  // console.log('🎯 Updating customer segmentation');
   
   const segments = calculateSegmentMetrics(customerData);
   
@@ -422,7 +422,7 @@ async function updateCustomerSegmentation(customerData) {
  * Load active customers table
  */
 async function loadActiveCustomersTable(customerData) {
-  console.log('📋 Loading active customers table');
+  // console.log('📋 Loading active customers table');
   
   customerState.filteredCustomers = customerData.customers;
   customerState.totalCustomers = customerData.customers.length;
@@ -511,7 +511,7 @@ function renderCustomersTable() {
  * Load customer insights
  */
 async function loadCustomerInsights(customerData) {
-  console.log('💡 Loading customer insights');
+  // console.log('💡 Loading customer insights');
   
   const insights = generateCustomerInsights(customerData, customerState.currentInsight);
   
@@ -559,7 +559,7 @@ async function loadCustomerInsights(customerData) {
  * Update CRM tools
  */
 async function updateCRMTools(customerData) {
-  console.log('🛠️ Updating CRM tools');
+  // console.log('🛠️ Updating CRM tools');
   
   // Update communication stats
   updateKPIElement('recent-emails', '12'); // Placeholder
@@ -924,7 +924,7 @@ window.refreshCustomerManagement = function() {
 };
 
 window.exportCustomerReport = function() {
-  console.log('📊 Exporting customer report...');
+  // console.log('📊 Exporting customer report...');
 };
 
 window.openAddCustomerModal = function() {
@@ -932,23 +932,23 @@ window.openAddCustomerModal = function() {
 };
 
 window.exportCustomerData = function() {
-  console.log('📊 Exporting customer data...');
+  // console.log('📊 Exporting customer data...');
 };
 
 window.toggleCustomerLifecycleView = function(viewType) {
-  console.log(`🔄 Toggling lifecycle chart to ${viewType} view`);
+  // console.log(`🔄 Toggling lifecycle chart to ${viewType} view`);
 };
 
 window.filterCustomers = function() {
   const searchTerm = document.getElementById('customer-search').value.toLowerCase();
   // Implementation for customer filtering
-  console.log(`🔍 Filtering customers by: ${searchTerm}`);
+  // console.log(`🔍 Filtering customers by: ${searchTerm}`);
 };
 
 window.filterByStatus = function() {
   const status = document.getElementById('customer-status-filter').value;
   // Implementation for status filtering
-  console.log(`🔍 Filtering customers by status: ${status}`);
+  // console.log(`🔍 Filtering customers by status: ${status}`);
 };
 
 window.toggleSelectAll = function() {
@@ -958,11 +958,11 @@ window.toggleSelectAll = function() {
 };
 
 window.viewCustomerDetails = function(customerId) {
-  console.log(`👁️ Viewing customer details: ${customerId}`);
+  // console.log(`👁️ Viewing customer details: ${customerId}`);
 };
 
 window.editCustomer = function(customerId) {
-  console.log(`✏️ Editing customer: ${customerId}`);
+  // console.log(`✏️ Editing customer: ${customerId}`);
 };
 
 window.messageCustomer = function(customerId) {
@@ -970,7 +970,7 @@ window.messageCustomer = function(customerId) {
 };
 
 window.executeInsightAction = function(action, customerId) {
-  console.log(`🎯 Executing action ${action} for customer: ${customerId}`);
+  // console.log(`🎯 Executing action ${action} for customer: ${customerId}`);
 };
 
 window.previousCustomerPage = function() {
@@ -1002,7 +1002,7 @@ window.sendBulkEmail = function() {
 };
 
 window.sendBulkSMS = function() {
-  console.log('📱 Sending bulk SMS...');
+  // console.log('📱 Sending bulk SMS...');
 };
 
 window.createNewsletter = function() {
@@ -1026,21 +1026,21 @@ window.distributeRewards = function() {
 };
 
 window.generateCustomerReport = function() {
-  console.log('📄 Generating customer report...');
+  // console.log('📄 Generating customer report...');
 };
 
 window.scheduleReport = function() {
-  console.log('📅 Scheduling report...');
+  // console.log('📅 Scheduling report...');
 };
 
 function refreshAcquisitionChart(view) {
-  console.log(`🔄 Refreshing acquisition chart for view: ${view}`);
+  // console.log(`🔄 Refreshing acquisition chart for view: ${view}`);
 }
 
 function refreshSegmentation() {
-  console.log(`🔄 Refreshing segmentation for: ${customerState.currentSegment}`);
+  // console.log(`🔄 Refreshing segmentation for: ${customerState.currentSegment}`);
 }
 
 function refreshInsights() {
-  console.log(`🔄 Refreshing insights for: ${customerState.currentInsight}`);
+  // console.log(`🔄 Refreshing insights for: ${customerState.currentInsight}`);
 }

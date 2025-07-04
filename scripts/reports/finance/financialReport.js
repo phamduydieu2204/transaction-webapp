@@ -28,7 +28,7 @@ export async function loadFinancialManagement() {
         // Initialize the financial management
         await financialLoader.initialize();
         
-        console.log('✅ Financial Management loaded successfully');
+        // console.log('✅ Financial Management loaded successfully');
         
     } catch (error) {
         console.error('❌ Error loading Financial Management:', error);
@@ -55,10 +55,10 @@ async function loadFinancialTemplate() {
         const html = await response.text();
         container.innerHTML = html;
         
-        console.log('📄 Financial management template loaded from file');
+        // console.log('📄 Financial management template loaded from file');
         
     } catch (error) {
-        console.log('📄 Using fallback financial template');
+        // console.log('📄 Using fallback financial template');
         // Always use fallback template for now
         container.innerHTML = `
             <div class="financial-management-container">

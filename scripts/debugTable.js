@@ -2,7 +2,7 @@
  * Debug table visibility issues
  */
 export function debugTable() {
-  console.log("🔍 === TABLE DEBUG START ===");
+  // console.log("🔍 === TABLE DEBUG START ===");
   
   // Check table element
   const table = document.querySelector("#transactionTable");
@@ -63,7 +63,7 @@ export function debugTable() {
     });
   }
   
-  console.log("🔍 === TABLE DEBUG END ===");
+  // console.log("🔍 === TABLE DEBUG END ===");
 }
 
 // Auto-run after a delay

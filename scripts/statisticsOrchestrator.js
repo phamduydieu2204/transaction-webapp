@@ -37,5 +37,5 @@ export const StatisticsAPI = {
   }
 };
 
-console.log('📊 Statistics functions available directly from statisticsCore.js');
+// console.log('📊 Statistics functions available directly from statisticsCore.js');
 window.StatisticsAPI = StatisticsAPI;

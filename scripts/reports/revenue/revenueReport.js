@@ -12,7 +12,7 @@ import { calculateTotalRevenue, groupByTimePeriod, calculateGrowthRate } from '.
  * Load revenue report
  */
 export async function loadRevenueReport() {
-  console.log('💰 Loading revenue report');
+  // console.log('💰 Loading revenue report');
   
   try {
     await ensureDataIsLoaded();
@@ -24,7 +24,7 @@ export async function loadRevenueReport() {
       loadRevenueByCustomer()
     ]);
     
-    console.log('✅ Revenue report loaded');
+    // console.log('✅ Revenue report loaded');
   } catch (error) {
     console.error('❌ Error loading revenue report:', error);
     showError('Không thể tải báo cáo doanh thu');

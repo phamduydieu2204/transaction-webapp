@@ -104,7 +104,7 @@ export function calculateTotalExpenses(data, options = {}) {
     totals[expenseCurrency] += amount;
   });
 
-  console.log("✅ Expense totals calculated:", totals);
+  // console.log("✅ Expense totals calculated:", totals);
   return totals;
 }
 
@@ -179,7 +179,7 @@ export function calculateTotalRevenue(data, options = {}) {
     totals[transactionCurrency] += revenue;
   });
 
-  console.log("✅ Revenue totals calculated:", totals);
+  // console.log("✅ Revenue totals calculated:", totals);
   return totals;
 }
 
@@ -247,7 +247,7 @@ export function groupExpensesByMonth(data, options = {}) {
     return sortOrder === "desc" ? -comparison : comparison;
   });
 
-  console.log("✅ Monthly grouping completed:", summaryArray.length, "entries");
+  // console.log("✅ Monthly grouping completed:", summaryArray.length, "entries");
   return summaryArray;
 }
 
@@ -315,7 +315,7 @@ export function groupRevenueByMonth(data, options = {}) {
     return sortOrder === "desc" ? -comparison : comparison;
   });
 
-  console.log("✅ Revenue grouping completed:", summaryArray.length, "entries");
+  // console.log("✅ Revenue grouping completed:", summaryArray.length, "entries");
   return summaryArray;
 }
 
@@ -355,7 +355,7 @@ export function calculateFinancialAnalysis(revenue, expenses) {
     overallMargin: totalRevenue > 0 ? ((totalRevenue - totalExpenses) / totalRevenue) * 100 : 0
   };
 
-  console.log("📈 Financial analysis completed:", analysis.summary);
+  // console.log("📈 Financial analysis completed:", analysis.summary);
   return analysis;
 }
 
@@ -415,7 +415,7 @@ export function getDateRange(period, referenceDate = new Date()) {
       ranges.end = normalizeDate(today);
   }
 
-  console.log(`📅 Generated ${period} range:`, ranges);
+  // console.log(`📅 Generated ${period} range:`, ranges);
   return ranges;
 }
 
@@ -1186,7 +1186,7 @@ export function calculateExpensesByCategory(expenseData) {
  * @returns {Object} - Comprehensive business metrics
  */
 export function calculateBusinessMetrics(transactionData, expenseData, dateRange = null) {
-  console.log("📊 Calculating business metrics for period:", dateRange);
+  // console.log("📊 Calculating business metrics for period:", dateRange);
   
   // Apply date range filtering if specified
   let filteredTransactions = transactionData;

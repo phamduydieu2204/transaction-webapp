@@ -42,6 +42,6 @@ swContent = swContent.replace(
 );
 fs.writeFileSync(swFile, swContent);
 
-console.log(`✅ Version updated to ${newVersion}`);
-console.log(`📅 Last update: ${versionData.lastUpdate}`);
-console.log(`🚀 Ready to deploy!`);
+// console.log(`✅ Version updated to ${newVersion}`);
+// console.log(`📅 Last update: ${versionData.lastUpdate}`);
+// console.log(`🚀 Ready to deploy!`);

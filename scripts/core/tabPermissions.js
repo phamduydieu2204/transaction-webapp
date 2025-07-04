@@ -31,7 +31,7 @@ export function parseTabPermissions(tabNhinThay) {
     return ['giao-dich'];
   }
 
-  console.log('📝 Raw tabNhinThay input:', JSON.stringify(tabNhinThay));
+  // console.log('📝 Raw tabNhinThay input:', JSON.stringify(tabNhinThay));
   
   // Split by | or , and trim
   const permissions = tabNhinThay.split(/[|,]/).map(p => p.trim()).filter(p => p.length > 0);
@@ -91,7 +91,7 @@ export function canAccessTab(tabId) {
   
   // Fallback: if no tabs are allowed but user exists, allow giao-dich
   if (!canAccess && allowedTabs.length === 0 && tabId === 'giao-dich') {
-    console.log('⚠️ No tabs allowed, fallback to allowing giao-dich');
+    // console.log('⚠️ No tabs allowed, fallback to allowing giao-dich');
     return true;
   }
   
@@ -128,7 +128,7 @@ export function filterAllowedTabs(allTabs) {
  * Hide tabs that user doesn't have permission to see
  */
 export function hideUnauthorizedTabs() {
-  console.log('🔒 Hiding unauthorized tabs...');
+  // console.log('🔒 Hiding unauthorized tabs...');
   
   const allowedTabs = getUserAllowedTabs();
   const allTabButtons = document.querySelectorAll('.tab-button');
@@ -143,7 +143,7 @@ export function hideUnauthorizedTabs() {
     } else {
       button.style.display = 'none';
       button.setAttribute('disabled', 'true');
-      console.log(`❌ Tab hidden: ${tabId}`);
+      // console.log(`❌ Tab hidden: ${tabId}`);
     }
   });
   
@@ -169,7 +169,7 @@ export function validateTabAccess(requestedTab) {
     return requestedTab;
   } else {
     const defaultTab = getDefaultAllowedTab();
-    console.log(`❌ Access denied to tab: ${requestedTab}, redirecting to: ${defaultTab}`);
+    // console.log(`❌ Access denied to tab: ${requestedTab}, redirecting to: ${defaultTab}`);
     
     // Show access denied message
     showAccessDeniedMessage(requestedTab);
@@ -222,7 +222,7 @@ export function initializeTabPermissions() {
     return false;
   }
   
-  console.log(`👤 User: ${user.tenNhanVien} | Permissions: ${user.tabNhinThay}`);
+  // console.log(`👤 User: ${user.tenNhanVien} | Permissions: ${user.tabNhinThay}`);
   
   // Hide unauthorized tabs
   hideUnauthorizedTabs();

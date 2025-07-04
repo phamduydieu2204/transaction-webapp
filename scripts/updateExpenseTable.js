@@ -42,7 +42,7 @@ if (typeof window !== 'undefined') {
  * Force refresh expense table (useful after adding new expense)
  */
 export function refreshExpenseTable() {
-  console.log('🔄 Force refreshing expense table...');
+  // console.log('🔄 Force refreshing expense table...');
   // Reset to first page to show newest expense
   window.currentExpensePage = 1;
   updateExpenseTable();
@@ -238,7 +238,7 @@ export function updateExpenseTable() {
   // Update pagination - Sử dụng component chung như transaction table
   updateExpensePagination(totalPages, currentPage);
   
-  console.log(`📄 Displayed ${paginatedExpenses.length} expenses (page ${currentPage}/${totalPages}) with pagination`);
+  // console.log(`📄 Displayed ${paginatedExpenses.length} expenses (page ${currentPage}/${totalPages}) with pagination`);
 }
 
 /**
@@ -249,8 +249,8 @@ function createExpenseRow(expense, index) {
   
   // Debug log để xem cấu trúc dữ liệu
   if (index === 0) {
-    console.log('🔍 DEBUG: Sample expense data structure:', expense);
-    console.log('🔍 Available keys:', Object.keys(expense));
+    // console.log('🔍 DEBUG: Sample expense data structure:', expense);
+    // console.log('🔍 Available keys:', Object.keys(expense));
     // Debug ngày tái tục
     console.log('📅 DEBUG: Renew date fields:', {
       renewDate: expense.renewDate,

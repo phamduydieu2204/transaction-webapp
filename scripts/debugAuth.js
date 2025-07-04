@@ -3,11 +3,11 @@
  */
 
 export function debugAuth() {
-  console.log('🔍 === AUTH DEBUG START ===');
+  // console.log('🔍 === AUTH DEBUG START ===');
   
   // Check localStorage
   const authData = localStorage.getItem('authData');
-  console.log('📄 localStorage authData:', authData ? 'Found' : 'Not found');
+  // console.log('📄 localStorage authData:', authData ? 'Found' : 'Not found');
   if (authData) {
     try {
       const parsed = JSON.parse(authData);
@@ -18,7 +18,7 @@ export function debugAuth() {
         isExpired: Date.now() > parsed.expiryTime
       });
     } catch (e) {
-      console.log('📄 Invalid JSON in authData');
+      // console.log('📄 Invalid JSON in authData');
     }
   }
   
@@ -31,7 +31,7 @@ export function debugAuth() {
     });
   }
   
-  console.log('🔍 === AUTH DEBUG END ===');
+  // console.log('🔍 === AUTH DEBUG END ===');
 }
 
 export function forceLogout() {

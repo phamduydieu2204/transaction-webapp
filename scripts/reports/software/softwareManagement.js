@@ -39,7 +39,7 @@ export async function loadSoftwareManagement(options = {}) {
         // Initialize with data
         await softwareManagementInstance.initialize();
         
-        console.log('✅ Software management report loaded successfully');
+        // console.log('✅ Software management report loaded successfully');
         
     } catch (error) {
         console.error('❌ Error loading software management report:', error);

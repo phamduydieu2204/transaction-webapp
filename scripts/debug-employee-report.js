@@ -4,7 +4,7 @@
  */
 
 window.debugEmployeeReport = function() {
-    console.log('🔍 Debugging Employee Report...');
+    // console.log('🔍 Debugging Employee Report...');
     
     console.log('Available functions:', {
         loadEmployeeReport: typeof window.loadEmployeeReport,
@@ -48,7 +48,7 @@ window.testEmployeeReportTemplate = async function() {
         }
         
         const html = await response.text();
-        console.log('✅ Template loaded successfully, length:', html.length);
+        // console.log('✅ Template loaded successfully, length:', html.length);
         console.log('Template preview:', html.substring(0, 200) + '...');
         
         return html;
@@ -59,7 +59,7 @@ window.testEmployeeReportTemplate = async function() {
 };
 
 window.forceEmployeeReport = function() {
-    console.log('🔧 Force loading employee report...');
+    // console.log('🔧 Force loading employee report...');
     
     // Hide all report pages
     const reportPages = document.querySelectorAll('.report-page');
@@ -69,13 +69,13 @@ window.forceEmployeeReport = function() {
     const employeePage = document.getElementById('report-employee');
     if (employeePage) {
         employeePage.classList.add('active');
-        console.log('✅ Employee page shown');
+        // console.log('✅ Employee page shown');
         
         // Force load template
         window.testEmployeeReportTemplate().then(html => {
             if (html) {
                 employeePage.innerHTML = html;
-                console.log('✅ Template injected directly');
+                // console.log('✅ Template injected directly');
             }
         });
         
@@ -90,7 +90,7 @@ window.forceEmployeeReport = function() {
     const employeeMenuItem = document.querySelector('[data-report="employee"]');
     if (employeeMenuItem) {
         employeeMenuItem.classList.add('active');
-        console.log('✅ Employee menu item activated');
+        // console.log('✅ Employee menu item activated');
     }
 };
 

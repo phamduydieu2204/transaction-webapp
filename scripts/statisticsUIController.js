@@ -5,7 +5,7 @@
  * Coordinates between specialized UI modules
  */
 
-console.log('📦 statisticsUIController.js orchestrator loading...');
+// console.log('📦 statisticsUIController.js orchestrator loading...');
 
 // Import specialized UI modules
 import {
@@ -109,7 +109,7 @@ export function initializeStatisticsUI() {
   // Expose refresh function for global filters
   window.refreshStatisticsWithFilters = refreshStatisticsWithFilters;
   
-  console.log("✅ Statistics UI controller orchestrator initialized");
+  // console.log("✅ Statistics UI controller orchestrator initialized");
 }
 
 /**
@@ -161,7 +161,7 @@ async function refreshStatistics() {
   if (uiState.isLoading) return;
   
   try {
-    console.log("🔄 Refreshing statistics display using orchestrator...");
+    // console.log("🔄 Refreshing statistics display using orchestrator...");
     
     // Check if we're in statistics tab
     const currentTab = document.querySelector(".tab-button.active");
@@ -174,7 +174,7 @@ async function refreshStatistics() {
     });
     
     if (!isThongKeTab) {
-      console.log("⏭️ Not in statistics tab, skipping enhanced render");
+      // console.log("⏭️ Not in statistics tab, skipping enhanced render");
       return;
     }
     
@@ -202,7 +202,7 @@ async function refreshStatistics() {
     uiState.isLoading = false;
     uiState.lastError = null;
     
-    console.log("✅ Statistics refreshed successfully using orchestrator");
+    // console.log("✅ Statistics refreshed successfully using orchestrator");
     
   } catch (error) {
     console.error("❌ Failed to refresh statistics:", error);
@@ -231,7 +231,7 @@ export function updateUIState(newState) {
  * Forces refresh of statistics using modular data processor
  */
 export async function forceRefresh() {
-  console.log("🔄 Forcing statistics refresh using orchestrator...");
+  // console.log("🔄 Forcing statistics refresh using orchestrator...");
   
   try {
     const data = await forceRefreshData(uiState);
@@ -249,7 +249,7 @@ export async function forceRefresh() {
  * Resets UI to default state using modular UI handlers
  */
 export function resetUI() {
-  console.log("🔄 Resetting statistics UI using orchestrator...");
+  // console.log("🔄 Resetting statistics UI using orchestrator...");
   
   uiState.currentTab = "overview";
   uiState.dateRange = "month";
@@ -272,7 +272,7 @@ export function resetUI() {
  * Refresh statistics với global filters using modular components
  */
 async function refreshStatisticsWithFilters(globalFilters) {
-  console.log("🔄 Refreshing statistics with global filters using orchestrator:", globalFilters);
+  // console.log("🔄 Refreshing statistics with global filters using orchestrator:", globalFilters);
   
   try {
     const expenseData = window.expenseList || [];
@@ -289,7 +289,7 @@ async function refreshStatisticsWithFilters(globalFilters) {
       globalFilters
     );
     
-    console.log("✅ Statistics refreshed with filters using orchestrator");
+    // console.log("✅ Statistics refreshed with filters using orchestrator");
   } catch (error) {
     console.error("❌ Error refreshing statistics with filters:", error);
   }
@@ -304,4 +304,4 @@ window.updateUIState = updateUIState;
 window.forceRefresh = forceRefresh;
 window.resetUI = resetUI;
 
-console.log('✅ statisticsUIController.js orchestrator loaded successfully');
+// console.log('✅ statisticsUIController.js orchestrator loaded successfully');

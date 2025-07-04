@@ -17,7 +17,7 @@ export async function fetchExpenseData(options = {}) {
   const { timeout = 15000 } = options;
   const { BACKEND_URL } = getConstants();
   
-  console.log("🔄 Fetching expense data from API...");
+  // console.log("🔄 Fetching expense data from API...");
 
   try {
     // Setup timeout
@@ -41,7 +41,7 @@ export async function fetchExpenseData(options = {}) {
 
     if (result.status === "success") {
       const expenseData = result.data || [];
-      console.log("✅ Expense data fetched successfully:", expenseData.length, "records");
+      // console.log("✅ Expense data fetched successfully:", expenseData.length, "records");
       return expenseData;
     } else {
       throw new Error(result.message || "Unknown API error");
@@ -68,7 +68,7 @@ export async function fetchTransactionData(options = {}) {
   const { timeout = 15000 } = options;
   const { BACKEND_URL } = getConstants();
   
-  console.log("🔄 Fetching transaction data from API...");
+  // console.log("🔄 Fetching transaction data from API...");
 
   try {
     // Setup timeout
@@ -92,7 +92,7 @@ export async function fetchTransactionData(options = {}) {
 
     if (result.status === "success") {
       const transactionData = result.data || [];
-      console.log("✅ Transaction data fetched successfully:", transactionData.length, "records");
+      // console.log("✅ Transaction data fetched successfully:", transactionData.length, "records");
       return transactionData;
     } else {
       throw new Error(result.message || "Unknown API error");
@@ -119,7 +119,7 @@ export async function fetchExpenseOptions(options = {}) {
   const { timeout = 10000 } = options;
   const { BACKEND_URL } = getConstants();
   
-  console.log("🔄 Fetching expense options from API...");
+  // console.log("🔄 Fetching expense options from API...");
 
   try {
     // Setup timeout
@@ -146,7 +146,7 @@ export async function fetchExpenseOptions(options = {}) {
         expenseMap: result.expenseMap || {},
         bankMap: result.bankMap || {}
       };
-      console.log("✅ Expense options fetched successfully");
+      // console.log("✅ Expense options fetched successfully");
       return optionsData;
     } else {
       throw new Error(result.message || "Unknown API error");
@@ -173,7 +173,7 @@ export async function searchExpenses(filters, options = {}) {
   const { timeout = 15000 } = options;
   const { BACKEND_URL } = getConstants();
   
-  console.log("🔍 Searching expenses with filters:", filters);
+  // console.log("🔍 Searching expenses with filters:", filters);
 
   try {
     // Setup timeout
@@ -184,7 +184,7 @@ export async function searchExpenses(filters, options = {}) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
-        action: "searchExpenses",
+        action: "searchExpenses", // Keep as searchExpenses for user-initiated searches
         ...filters
       }),
       signal: controller.signal
@@ -200,7 +200,7 @@ export async function searchExpenses(filters, options = {}) {
 
     if (result.status === "success") {
       const searchResults = result.data || [];
-      console.log("✅ Expense search completed:", searchResults.length, "results");
+      // console.log("✅ Expense search completed:", searchResults.length, "results");
       return searchResults;
     } else {
       throw new Error(result.message || "Search failed");
@@ -227,7 +227,7 @@ export async function searchTransactions(filters, options = {}) {
   const { timeout = 15000 } = options;
   const { BACKEND_URL } = getConstants();
   
-  console.log("🔍 Searching transactions with filters:", filters);
+  // console.log("🔍 Searching transactions with filters:", filters);
 
   try {
     // Setup timeout
@@ -254,7 +254,7 @@ export async function searchTransactions(filters, options = {}) {
 
     if (result.status === "success") {
       const searchResults = result.data || [];
-      console.log("✅ Transaction search completed:", searchResults.length, "results");
+      // console.log("✅ Transaction search completed:", searchResults.length, "results");
       return searchResults;
     } else {
       throw new Error(result.message || "Search failed");

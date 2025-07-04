@@ -11,7 +11,7 @@ import { normalizeDate } from '../statisticsCore.js';
  * Calculate comprehensive business metrics
  */
 export function calculateBusinessMetrics(transactionData, expenseData, dateRange) {
-  console.log("📊 Calculating business metrics for period:", dateRange);
+  // console.log("📊 Calculating business metrics for period:", dateRange);
   
   // Basic financial metrics
   const totalRevenue = calculateTotalRevenue(transactionData);

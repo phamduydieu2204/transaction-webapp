@@ -22,7 +22,7 @@ export class SoftwareManagement {
         if (this.isInitialized) return;
         
         try {
-            console.log('🔧 Initializing Software Management with actual sheet data...');
+            // console.log('🔧 Initializing Software Management with actual sheet data...');
             
             this.setupEventListeners();
             await this.loadAllData();
@@ -35,7 +35,7 @@ export class SoftwareManagement {
             this.renderAlertsSection();
             
             this.isInitialized = true;
-            console.log('✅ Software Management initialized successfully');
+            // console.log('✅ Software Management initialized successfully');
             
         } catch (error) {
             console.error('❌ Error initializing Software Management:', error);
@@ -151,7 +151,7 @@ export class SoftwareManagement {
 
     // Xử lý và kết hợp dữ liệu
     processAndCombineData() {
-        console.log('🔄 Processing and combining data...');
+        // console.log('🔄 Processing and combining data...');
         
         // Tạo map dữ liệu phần mềm theo tên chuẩn
         const softwareMap = new Map();
@@ -231,7 +231,7 @@ export class SoftwareManagement {
         this.filteredAccounts = Array.from(softwareMap.values())
             .sort((a, b) => b.totalRevenue - a.totalRevenue);
         
-        console.log('✅ Data processing completed:', this.filteredAccounts.length, 'software accounts');
+        // console.log('✅ Data processing completed:', this.filteredAccounts.length, 'software accounts');
     }
 
     // Xác định trạng thái phần mềm
@@ -1296,7 +1296,7 @@ export class SoftwareManagement {
     }
 
     async refresh() {
-        console.log('🔄 Refreshing software management data...');
+        // console.log('🔄 Refreshing software management data...');
         this.isInitialized = false;
         await this.initialize();
     }

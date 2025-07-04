@@ -16,7 +16,7 @@ class FastDataLoader {
    * Load only critical data needed for initial render
    */
   async loadCriticalData(user) {
-    console.log('⚡ Loading critical data for fast initial render...');
+    // console.log('⚡ Loading critical data for fast initial render...');
     
     try {
       // Load only first page of transactions (10-20 items)
@@ -27,7 +27,7 @@ class FastDataLoader {
       window.currentTransactionData = transactions;
       
       this.criticalDataLoaded = true;
-      console.log('✅ Critical data loaded');
+      // console.log('✅ Critical data loaded');
       
       return { transactions, criticalOnly: true };
     } catch (error) {
@@ -40,7 +40,7 @@ class FastDataLoader {
    * Load remaining data in background
    */
   async loadRemainingData(user) {
-    console.log('📊 Loading remaining data in background...');
+    // console.log('📊 Loading remaining data in background...');
     
     try {
       // Load all data in parallel
@@ -58,7 +58,7 @@ class FastDataLoader {
       window.softwareData = software;
 
       this.fullDataLoaded = true;
-      console.log('✅ All data loaded in background');
+      // console.log('✅ All data loaded in background');
 
       return { 
         transactions: allTransactions, 

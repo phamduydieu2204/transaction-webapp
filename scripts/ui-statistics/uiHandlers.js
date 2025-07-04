@@ -5,7 +5,7 @@
  * Handles tab switching, form inputs, user interactions
  */
 
-console.log('📦 uiHandlers.js module loading...');
+// console.log('📦 uiHandlers.js module loading...');
 
 /**
  * Sets up tab switching listeners
@@ -126,7 +126,7 @@ export function setupExportControls(exportHandler) {
  * Handles main statistics tab activation
  */
 export function handleStatisticsTabActivation() {
-  console.log("📊 Statistics tab activated");
+  // console.log("📊 Statistics tab activated");
   
   // ✅ DEBUG: Check initial state
   const currentTab = document.querySelector(".tab-button.active");
@@ -159,12 +159,12 @@ export function handleStatisticsTabActivation() {
       
       // Check if we need to refresh data
       if (!window.expenseList || window.expenseList.length === 0) {
-        console.log("🔄 Loading statistics data (no existing data)");
+        // console.log("🔄 Loading statistics data (no existing data)");
         if (module.loadStatisticsData) {
           module.loadStatisticsData();
         }
       } else {
-        console.log("🔄 Refreshing statistics (using existing data)");
+        // console.log("🔄 Refreshing statistics (using existing data)");
         if (module.refreshStatistics) {
           module.refreshStatistics();
         }
@@ -172,7 +172,7 @@ export function handleStatisticsTabActivation() {
       
       // Render any pending data that was stored
       if (window.pendingStatsData && window.pendingStatsOptions) {
-        console.log("📊 Rendering pending statistics data...");
+        // console.log("📊 Rendering pending statistics data...");
         const { renderMonthlySummaryTable } = import('./statisticsRenderer.js');
         renderMonthlySummaryTable(window.pendingStatsData, window.pendingStatsOptions);
         window.pendingStatsData = null;
@@ -187,7 +187,7 @@ export function handleStatisticsTabActivation() {
  * @param {string} subTab - Sub-tab identifier
  */
 export function handleSubTabSwitch(subTab, uiState, refreshCallback) {
-  console.log("🔄 Switching to sub-tab:", subTab);
+  // console.log("🔄 Switching to sub-tab:", subTab);
   
   uiState.currentTab = subTab;
   
@@ -218,7 +218,7 @@ export function handleSubTabSwitch(subTab, uiState, refreshCallback) {
  * @param {string} range - Date range type
  */
 export function handleDateRangeChange(range, uiState, refreshCallback) {
-  console.log("📅 Date range changed to:", range);
+  // console.log("📅 Date range changed to:", range);
   
   uiState.dateRange = range;
   refreshCallback();
@@ -228,7 +228,7 @@ export function handleDateRangeChange(range, uiState, refreshCallback) {
  * Reset UI form controls to default state
  */
 export function resetUIControls() {
-  console.log("🔄 Resetting UI controls...");
+  // console.log("🔄 Resetting UI controls...");
   
   // Reset form controls
   const currencySelect = document.getElementById('statsCurrencyFilter');
@@ -326,4 +326,4 @@ window.setupTabListeners = setupTabListeners;
 window.setupFilterControls = setupFilterControls;
 window.handleStatisticsTabActivation = handleStatisticsTabActivation;
 
-console.log('✅ uiHandlers.js module loaded successfully');
+// console.log('✅ uiHandlers.js module loaded successfully');

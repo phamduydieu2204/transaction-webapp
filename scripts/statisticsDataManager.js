@@ -175,7 +175,7 @@ export async function getCombinedStatistics(options = {}) {
     includeExpenses = true
   } = options;
 
-  console.log("📊 Fetching combined statistics data...");
+  // console.log("📊 Fetching combined statistics data...");
 
   try {
     const promises = [];
@@ -217,7 +217,7 @@ export async function getCombinedStatistics(options = {}) {
 export async function preloadStatisticsData(options = {}) {
   const { background = true } = options;
 
-  console.log("🚀 Preloading statistics data...");
+  // console.log("🚀 Preloading statistics data...");
 
   try {
     const promises = [
@@ -234,7 +234,7 @@ export async function preloadStatisticsData(options = {}) {
     } else {
       // Wait for completion
       await Promise.all(promises);
-      console.log("✅ Statistics data preloaded successfully");
+      // console.log("✅ Statistics data preloaded successfully");
     }
 
     // Optimize cache
@@ -291,7 +291,7 @@ export async function exportData(data, format = "csv", filename = "statistics") 
     
     URL.revokeObjectURL(url);
     
-    console.log("✅ Export completed successfully");
+    // console.log("✅ Export completed successfully");
     
   } catch (error) {
     console.error("❌ Export failed:", error);

@@ -84,7 +84,7 @@ function getSoftwareFileTypeByStandardName(standardName) {
     return null;
   }
   
-  console.log('🔍 Fallback: Looking for software match by standardName:', standardName);
+  // console.log('🔍 Fallback: Looking for software match by standardName:', standardName);
   
   // Find matching software entry by standardName
   const matchingSoftware = window.softwareData.find(software => {
@@ -233,7 +233,7 @@ export function debugSoftwareData() {
     return;
   }
   
-  console.log('📊 Software Data Summary:');
+  // console.log('📊 Software Data Summary:');
   console.log(`Total entries: ${window.softwareData.length}`);
   
   // Group by fileType
@@ -250,7 +250,7 @@ export function debugSoftwareData() {
     });
   });
   
-  console.log('\n📄 Software grouped by fileType:');
+  // console.log('\n📄 Software grouped by fileType:');
   Object.entries(fileTypeGroups).forEach(([type, items]) => {
     console.log(`\n${type} (${items.length} items):`);
     console.table(items.slice(0, 5)); // Show first 5 of each type
@@ -258,7 +258,7 @@ export function debugSoftwareData() {
   
   // Sample entries with fileType
   const withFileType = window.softwareData.filter(item => item.fileType);
-  console.log(`\n✅ Entries with fileType: ${withFileType.length}`);
+  // console.log(`\n✅ Entries with fileType: ${withFileType.length}`);
   if (withFileType.length > 0) {
     console.table(withFileType.slice(0, 10).map(item => ({
       softwareName: item.softwareName,

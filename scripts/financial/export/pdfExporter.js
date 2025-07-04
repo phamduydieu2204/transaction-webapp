@@ -57,7 +57,7 @@ export function exportFinancialDashboardToPDF(metrics, transactionData, expenseD
     // Save PDF
     doc.save(filename);
     
-    console.log(`✅ Exported financial dashboard to PDF: ${filename}`);
+    // console.log(`✅ Exported financial dashboard to PDF: ${filename}`);
     return true;
   } catch (error) {
     console.error('❌ Error exporting to PDF:', error);
@@ -426,7 +426,7 @@ function exportToPrintFallback() {
       printWindow.print();
     }, 500);
     
-    console.log('✅ Opened print dialog as fallback');
+    // console.log('✅ Opened print dialog as fallback');
   } catch (error) {
     console.error('❌ Error in print fallback:', error);
     alert('Không thể xuất PDF. Vui lòng thử sao chép nội dung dashboard thủ công.');

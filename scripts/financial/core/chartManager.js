@@ -414,6 +414,6 @@ export function initChartManager() {
     Chart.defaults.color = '#495057';
   }
   
-  console.log('✅ Chart manager initialized');
+  // console.log('✅ Chart manager initialized');
   return true;
 }

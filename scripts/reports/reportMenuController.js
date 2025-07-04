@@ -53,7 +53,7 @@ export function initReportMenu() {
   window.exportCurrentReport = exportCurrentReport;
   window.loadReport = loadReport;
   
-  console.log('✅ Report menu controller initialized');
+  // console.log('✅ Report menu controller initialized');
 }
 
 /**
@@ -83,7 +83,7 @@ function setupMenuHandlers() {
 async function loadReport(reportType) {
   if (reportState.isLoading) return;
   
-  console.log(`📊 Loading report: ${reportType}`);
+  // console.log(`📊 Loading report: ${reportType}`);
   
   reportState.currentReport = reportType;
   reportState.isLoading = true;

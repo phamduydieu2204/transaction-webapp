@@ -25,12 +25,12 @@ export function initSoftwareTab() {
   // Load software data
   loadSoftwareData();
   
-  console.log('✅ Software tab initialized');
+  // console.log('✅ Software tab initialized');
 }
 
 async function loadSoftwareData() {
   try {
-    console.log('🔄 Loading software data...');
+    // console.log('🔄 Loading software data...');
     
     const result = await apiRequestJson({
       action: "getSoftwareListFull"
@@ -38,15 +38,15 @@ async function loadSoftwareData() {
     
     if (result.status === "success") {
       window.softwareList = result.data || [];
-      console.log(`✅ Loaded ${window.softwareList.length} software items`);
+      // console.log(`✅ Loaded ${window.softwareList.length} software items`);
       
       // Debug: Log sample data to check fields
       if (window.softwareList.length > 0) {
-        console.log('📋 Sample software data:', window.softwareList[0]);
+        // console.log('📋 Sample software data:', window.softwareList[0]);
         const hasOrderInfo = window.softwareList.some(item => item.orderInfo);
         const hasPasswordChangeDays = window.softwareList.some(item => item.passwordChangeDays);
-        console.log(`📋 Has orderInfo data: ${hasOrderInfo}`);
-        console.log(`📋 Has passwordChangeDays data: ${hasPasswordChangeDays}`);
+        // console.log(`📋 Has orderInfo data: ${hasOrderInfo}`);
+        // console.log(`📋 Has passwordChangeDays data: ${hasPasswordChangeDays}`);
       }
       
       // Update display
@@ -405,7 +405,7 @@ window.handleSoftwareAction = function(selectElement, index) {
 // ========================================
 
 function editSoftwareItem(software, index) {
-  console.log(`📝 Editing software at index ${index}:`, software);
+  // console.log(`📝 Editing software at index ${index}:`, software);
   
   // Set the edit index
   window.currentEditSoftwareIndex = index;
@@ -478,7 +478,7 @@ function editSoftwareItem(software, index) {
       );
     }
     
-    console.log(`✅ Software data loaded into form for editing`);
+    // console.log(`✅ Software data loaded into form for editing`);
   });
   
   // Reset the action select
@@ -498,7 +498,7 @@ window.copyToClipboard = function(text) {
   
   navigator.clipboard.writeText(text).then(() => {
     // Show a brief success indicator
-    console.log('✅ Copied to clipboard:', text);
+    // console.log('✅ Copied to clipboard:', text);
   }).catch(() => {
     alert('❌ Không thể sao chép dữ liệu!');
   });
@@ -506,7 +506,7 @@ window.copyToClipboard = function(text) {
 
 // Software form handlers
 window.handleSoftwareAdd = async function() {
-  console.log('🔄 Adding new software...');
+  // console.log('🔄 Adding new software...');
   
   try {
     // Get form data
@@ -547,7 +547,7 @@ window.handleSoftwareAdd = async function() {
       // Reload software data to reflect changes
       await loadSoftwareData();
       
-      console.log('✅ Software added successfully:', result.data);
+      // console.log('✅ Software added successfully:', result.data);
       
     } else {
       // Show error message
@@ -577,7 +577,7 @@ window.handleSoftwareAdd = async function() {
 };
 
 window.handleSoftwareUpdate = async function() {
-  console.log('🔄 Updating software...');
+  // console.log('🔄 Updating software...');
   
   // Check if we're in edit mode
   if (window.currentEditSoftwareIndex === -1) {
@@ -652,7 +652,7 @@ window.handleSoftwareUpdate = async function() {
       // Reload software data to reflect changes
       await loadSoftwareData();
       
-      console.log('✅ Software updated successfully:', result.data);
+      // console.log('✅ Software updated successfully:', result.data);
       
     } else {
       // Show error message
@@ -683,7 +683,7 @@ window.handleSoftwareUpdate = async function() {
 
 
 window.handleSoftwareReset = function() {
-  console.log('🔄 Resetting software form...');
+  // console.log('🔄 Resetting software form...');
   
   // Clear all form fields
   const form = document.getElementById('softwareForm');
@@ -705,10 +705,10 @@ window.handleSoftwareReset = function() {
     // Reload original data
     loadSoftwareData();
     
-    console.log('🔄 Cleared search mode and reloaded original data');
+    // console.log('🔄 Cleared search mode and reloaded original data');
   }
   
-  console.log('✅ Software form reset complete');
+  // console.log('✅ Software form reset complete');
 };
 
 function getSoftwareFormData() {
@@ -815,7 +815,7 @@ function clearSoftwareFormErrors() {
 
 // Dropdown management functions
 function initSoftwareFormDropdowns() {
-  console.log('🔧 Initializing software form dropdowns...');
+  // console.log('🔧 Initializing software form dropdowns...');
   
   // Add event listeners for cascading dropdowns
   const softwareNameInput = document.getElementById('softwareFormName');
@@ -825,7 +825,7 @@ function initSoftwareFormDropdowns() {
   if (softwareNameInput) {
     // Clear dependent fields when software name changes
     softwareNameInput.addEventListener('input', () => {
-      console.log('🔄 Software name changed:', softwareNameInput.value);
+      // console.log('🔄 Software name changed:', softwareNameInput.value);
       // Clear dependent fields only if they have values to avoid unnecessary DOM updates
       if (softwarePackageInput && softwarePackageInput.value) softwarePackageInput.value = '';
       if (accountNameInput && accountNameInput.value) accountNameInput.value = '';
@@ -834,7 +834,7 @@ function initSoftwareFormDropdowns() {
     });
     
     softwareNameInput.addEventListener('change', () => {
-      console.log('🔄 Software name confirmed:', softwareNameInput.value);
+      // console.log('🔄 Software name confirmed:', softwareNameInput.value);
       // Batch these updates in a single requestAnimationFrame
       requestAnimationFrame(() => {
         updateSoftwarePackageDropdown();
@@ -848,7 +848,7 @@ function initSoftwareFormDropdowns() {
   if (softwarePackageInput) {
     // Clear dependent fields when package changes
     softwarePackageInput.addEventListener('input', () => {
-      console.log('🔄 Software package changed:', softwarePackageInput.value);
+      // console.log('🔄 Software package changed:', softwarePackageInput.value);
       // Clear dependent fields only if they have values to avoid unnecessary DOM updates
       if (accountNameInput && accountNameInput.value) accountNameInput.value = '';
       // Use debounced update for input events
@@ -856,7 +856,7 @@ function initSoftwareFormDropdowns() {
     });
     
     softwarePackageInput.addEventListener('change', () => {
-      console.log('🔄 Software package confirmed:', softwarePackageInput.value);
+      // console.log('🔄 Software package confirmed:', softwarePackageInput.value);
       // Batch these updates in a single requestAnimationFrame
       requestAnimationFrame(() => {
         updateAccountNameDropdown();
@@ -868,14 +868,14 @@ function initSoftwareFormDropdowns() {
   
   if (accountNameInput) {
     accountNameInput.addEventListener('input', () => {
-      console.log('🔄 Account name changed:', accountNameInput.value);
+      // console.log('🔄 Account name changed:', accountNameInput.value);
       // Use debounced update for input events
       debouncedDropdownUpdate();
       debouncedAuthDropdownUpdate(); // Update auth fields when account changes
     });
     
     accountNameInput.addEventListener('change', () => {
-      console.log('🔄 Account name selected:', accountNameInput.value);
+      // console.log('🔄 Account name selected:', accountNameInput.value);
       // Batch these updates in a single requestAnimationFrame
       requestAnimationFrame(() => {
         updateOrderInfoDropdown();
@@ -895,19 +895,19 @@ function initSoftwareFormDropdowns() {
   const orderInfoInput = document.getElementById('orderInfo');
   if (orderInfoInput) {
     orderInfoInput.addEventListener('input', () => {
-      console.log('🔄 Order info changed (typing):', orderInfoInput.value);
+      // console.log('🔄 Order info changed (typing):', orderInfoInput.value);
       // Don't auto-fill during typing to avoid interrupting user input
     });
     
     orderInfoInput.addEventListener('change', () => {
-      console.log('🔄 Order info selected/entered:', orderInfoInput.value);
+      // console.log('🔄 Order info selected/entered:', orderInfoInput.value);
       // Try to auto-fill if we have a complete selection or manual entry
       autoFillFormFromSelection();
     });
     
     // Also handle when user selects from datalist dropdown
     orderInfoInput.addEventListener('blur', () => {
-      console.log('🔄 Order info field lost focus:', orderInfoInput.value);
+      // console.log('🔄 Order info field lost focus:', orderInfoInput.value);
       // Auto-fill when user finishes entering/selecting value
       if (orderInfoInput.value.trim()) {
         autoFillFormFromSelection();
@@ -919,19 +919,19 @@ function initSoftwareFormDropdowns() {
   const standardNameInput = document.getElementById('standardName');
   if (standardNameInput) {
     standardNameInput.addEventListener('input', () => {
-      console.log('🔄 Standard name changed (typing):', standardNameInput.value);
+      // console.log('🔄 Standard name changed (typing):', standardNameInput.value);
       // Don't auto-fill during typing to avoid interrupting user input
     });
     
     standardNameInput.addEventListener('change', () => {
-      console.log('🔄 Standard name selected/entered:', standardNameInput.value);
+      // console.log('🔄 Standard name selected/entered:', standardNameInput.value);
       // Try to auto-fill if we have a complete selection or manual entry
       autoFillFormFromSelection();
     });
     
     // Also handle when user selects from datalist dropdown
     standardNameInput.addEventListener('blur', () => {
-      console.log('🔄 Standard name field lost focus:', standardNameInput.value);
+      // console.log('🔄 Standard name field lost focus:', standardNameInput.value);
       // Auto-fill when user finishes entering/selecting value
       if (standardNameInput.value.trim()) {
         autoFillFormFromSelection();
@@ -939,7 +939,7 @@ function initSoftwareFormDropdowns() {
     });
   }
   
-  console.log('✅ Software form dropdowns initialized');
+  // console.log('✅ Software form dropdowns initialized');
 }
 
 function updateSoftwareFormDropdowns() {
@@ -961,7 +961,7 @@ function updateSoftwareFormDropdowns() {
 
 // Debug function để kiểm tra dữ liệu
 window.debugSoftwareDropdowns = function() {
-  console.log('🔍 DEBUG: Software List Data');
+  // console.log('🔍 DEBUG: Software List Data');
   console.log('Total items:', window.softwareList.length);
   console.log('Sample data:', window.softwareList.slice(0, 3));
   
@@ -1040,9 +1040,9 @@ const debouncedAuthDropdownUpdate = debounce(() => {
 
 // Function để force refresh tất cả dropdowns - cho debugging
 window.forceRefreshDropdowns = function() {
-  console.log('🔄 Force refreshing all dropdowns...');
+  // console.log('🔄 Force refreshing all dropdowns...');
   updateSoftwareFormDropdowns();
-  console.log('✅ All dropdowns refreshed');
+  // console.log('✅ All dropdowns refreshed');
 };
 
 // Function để xử lý khi chọn từ order info dropdown
@@ -1051,7 +1051,7 @@ window.selectOrderInfo = function(value) {
     const orderInfoTextarea = document.getElementById('orderInfo');
     if (orderInfoTextarea) {
       orderInfoTextarea.value = value;
-      console.log('✅ Selected order info:', value);
+      // console.log('✅ Selected order info:', value);
       
       // Reset dropdown to default
       const dropdown = document.getElementById('orderInfoDropdown');
@@ -1079,7 +1079,7 @@ function updateSoftwareNameDropdown() {
     datalist.appendChild(option);
   });
   
-  console.log(`✅ Updated software name dropdown with ${uniqueNames.length} items`);
+  // console.log(`✅ Updated software name dropdown with ${uniqueNames.length} items`);
 }
 
 function updateSoftwarePackageDropdown() {
@@ -1088,7 +1088,7 @@ function updateSoftwarePackageDropdown() {
   
   if (!datalist) return;
   
-  console.log(`🔍 Filtering packages for software: "${selectedSoftwareName}"`);
+  // console.log(`🔍 Filtering packages for software: "${selectedSoftwareName}"`);
   
   let packages = [];
   
@@ -1098,7 +1098,7 @@ function updateSoftwarePackageDropdown() {
       item.softwareName === selectedSoftwareName
     );
     
-    console.log(`📊 Found ${filteredItems.length} items matching software name`);
+    // console.log(`📊 Found ${filteredItems.length} items matching software name`);
     
     packages = filteredItems
       .map(item => item.softwarePackage)
@@ -1106,13 +1106,13 @@ function updateSoftwarePackageDropdown() {
   } else {
     // Show all packages if no software name selected
     packages = window.softwareList.map(item => item.softwarePackage).filter(Boolean);
-    console.log(`📊 Showing all packages (no filter)`);
+    // console.log(`📊 Showing all packages (no filter)`);
   }
   
   // Get unique packages and sort
   const uniquePackages = [...new Set(packages)].sort();
   
-  console.log(`📦 Available packages:`, uniquePackages);
+  // console.log(`📦 Available packages:`, uniquePackages);
   
   // Check if the content would be the same to avoid unnecessary DOM updates
   const currentOptions = Array.from(datalist.children).map(option => option.value);
@@ -1134,9 +1134,9 @@ function updateSoftwarePackageDropdown() {
   }
   
   if (!isSame) {
-    console.log(`✅ Updated software package dropdown with ${uniquePackages.length} items`);
+    // console.log(`✅ Updated software package dropdown with ${uniquePackages.length} items`);
   } else {
-    console.log(`⏭️ Software package dropdown unchanged (${uniquePackages.length} items)`);
+    // console.log(`⏭️ Software package dropdown unchanged (${uniquePackages.length} items)`);
   }
 }
 
@@ -1147,7 +1147,7 @@ function updateAccountNameDropdown() {
   
   if (!datalist) return;
   
-  console.log(`🔍 Filtering accounts for software: "${selectedSoftwareName}", package: "${selectedSoftwarePackage}"`);
+  // console.log(`🔍 Filtering accounts for software: "${selectedSoftwareName}", package: "${selectedSoftwarePackage}"`);
   
   let accounts = [];
   let filterDescription = '';
@@ -1160,7 +1160,7 @@ function updateAccountNameDropdown() {
     );
     
     filterDescription = `software "${selectedSoftwareName}" AND package "${selectedSoftwarePackage}"`;
-    console.log(`📊 Found ${filteredItems.length} items matching both criteria`);
+    // console.log(`📊 Found ${filteredItems.length} items matching both criteria`);
     
     accounts = filteredItems
       .map(item => item.accountName)
@@ -1172,7 +1172,7 @@ function updateAccountNameDropdown() {
     );
     
     filterDescription = `software "${selectedSoftwareName}" only`;
-    console.log(`📊 Found ${filteredItems.length} items matching software name only`);
+    // console.log(`📊 Found ${filteredItems.length} items matching software name only`);
     
     accounts = filteredItems
       .map(item => item.accountName)
@@ -1181,13 +1181,13 @@ function updateAccountNameDropdown() {
     // Show all accounts if no filters
     accounts = window.softwareList.map(item => item.accountName).filter(Boolean);
     filterDescription = 'no filter (showing all)';
-    console.log(`📊 Showing all accounts (no filter)`);
+    // console.log(`📊 Showing all accounts (no filter)`);
   }
   
   // Get unique accounts and sort
   const uniqueAccounts = [...new Set(accounts)].sort();
   
-  console.log(`🏢 Available accounts for ${filterDescription}:`, uniqueAccounts);
+  // console.log(`🏢 Available accounts for ${filterDescription}:`, uniqueAccounts);
   
   datalist.innerHTML = '';
   uniqueAccounts.forEach(account => {
@@ -1196,7 +1196,7 @@ function updateAccountNameDropdown() {
     datalist.appendChild(option);
   });
   
-  console.log(`✅ Updated account name dropdown with ${uniqueAccounts.length} items`);
+  // console.log(`✅ Updated account name dropdown with ${uniqueAccounts.length} items`);
 }
 
 function updateOrderInfoDropdown() {
@@ -1215,7 +1215,7 @@ function updateOrderInfoDropdown() {
     return;
   }
   
-  console.log(`🔍 Filtering order info for software: "${selectedSoftwareName}", package: "${selectedSoftwarePackage}", account: "${selectedAccountName}"`);
+  // console.log(`🔍 Filtering order info for software: "${selectedSoftwareName}", package: "${selectedSoftwarePackage}", account: "${selectedAccountName}"`);
   
   let orderInfoList = [];
   let filterDescription = '';
@@ -1229,7 +1229,7 @@ function updateOrderInfoDropdown() {
     );
     
     filterDescription = `all three criteria`;
-    console.log(`📊 Found ${filteredItems.length} items matching all criteria`);
+    // console.log(`📊 Found ${filteredItems.length} items matching all criteria`);
     
     orderInfoList = filteredItems
       .map(item => item.orderInfo)
@@ -1242,7 +1242,7 @@ function updateOrderInfoDropdown() {
     );
     
     filterDescription = `software "${selectedSoftwareName}" AND package "${selectedSoftwarePackage}"`;
-    console.log(`📊 Found ${filteredItems.length} items matching software and package`);
+    // console.log(`📊 Found ${filteredItems.length} items matching software and package`);
     
     orderInfoList = filteredItems
       .map(item => item.orderInfo)
@@ -1254,7 +1254,7 @@ function updateOrderInfoDropdown() {
     );
     
     filterDescription = `software "${selectedSoftwareName}" only`;
-    console.log(`📊 Found ${filteredItems.length} items matching software name only`);
+    // console.log(`📊 Found ${filteredItems.length} items matching software name only`);
     
     orderInfoList = filteredItems
       .map(item => item.orderInfo)
@@ -1263,13 +1263,13 @@ function updateOrderInfoDropdown() {
     // Show all order info if no filters
     orderInfoList = window.softwareList.map(item => item.orderInfo).filter(Boolean);
     filterDescription = 'no filter (showing all)';
-    console.log(`📊 Showing all order info (no filter)`);
+    // console.log(`📊 Showing all order info (no filter)`);
   }
   
   // Get unique order info and sort
   const uniqueOrderInfo = [...new Set(orderInfoList)].sort();
   
-  console.log(`📋 Available order info for ${filterDescription}:`, uniqueOrderInfo);
+  // console.log(`📋 Available order info for ${filterDescription}:`, uniqueOrderInfo);
   
   // Clear existing options (keep first option)
   dropdown.innerHTML = '<option value="">-- Chọn từ danh sách có sẵn --</option>';
@@ -1282,7 +1282,7 @@ function updateOrderInfoDropdown() {
     dropdown.appendChild(option);
   });
   
-  console.log(`✅ Updated order info dropdown with ${uniqueOrderInfo.length} items`);
+  // console.log(`✅ Updated order info dropdown with ${uniqueOrderInfo.length} items`);
 }
 
 function updateStandardNameDropdown() {
@@ -1293,7 +1293,7 @@ function updateStandardNameDropdown() {
   
   if (!datalist) return;
   
-  console.log(`🔍 Filtering standard names for software: "${selectedSoftwareName}", package: "${selectedSoftwarePackage}", account: "${selectedAccountName}"`);
+  // console.log(`🔍 Filtering standard names for software: "${selectedSoftwareName}", package: "${selectedSoftwarePackage}", account: "${selectedAccountName}"`);
   
   let standardNames = [];
   let filterDescription = '';
@@ -1307,7 +1307,7 @@ function updateStandardNameDropdown() {
     );
     
     filterDescription = `all three criteria`;
-    console.log(`📊 Found ${filteredItems.length} items matching all criteria`);
+    // console.log(`📊 Found ${filteredItems.length} items matching all criteria`);
     
     standardNames = filteredItems
       .map(item => item.standardName)
@@ -1320,7 +1320,7 @@ function updateStandardNameDropdown() {
     );
     
     filterDescription = `software "${selectedSoftwareName}" AND package "${selectedSoftwarePackage}"`;
-    console.log(`📊 Found ${filteredItems.length} items matching software and package`);
+    // console.log(`📊 Found ${filteredItems.length} items matching software and package`);
     
     standardNames = filteredItems
       .map(item => item.standardName)
@@ -1332,7 +1332,7 @@ function updateStandardNameDropdown() {
     );
     
     filterDescription = `software "${selectedSoftwareName}" only`;
-    console.log(`📊 Found ${filteredItems.length} items matching software name only`);
+    // console.log(`📊 Found ${filteredItems.length} items matching software name only`);
     
     standardNames = filteredItems
       .map(item => item.standardName)
@@ -1341,13 +1341,13 @@ function updateStandardNameDropdown() {
     // Show all standard names if no filters
     standardNames = window.softwareList.map(item => item.standardName).filter(Boolean);
     filterDescription = 'no filter (showing all)';
-    console.log(`📊 Showing all standard names (no filter)`);
+    // console.log(`📊 Showing all standard names (no filter)`);
   }
   
   // Get unique standard names and sort
   const uniqueStandardNames = [...new Set(standardNames)].sort();
   
-  console.log(`📋 Available standard names for ${filterDescription}:`, uniqueStandardNames);
+  // console.log(`📋 Available standard names for ${filterDescription}:`, uniqueStandardNames);
   
   datalist.innerHTML = '';
   uniqueStandardNames.forEach(name => {
@@ -1356,7 +1356,7 @@ function updateStandardNameDropdown() {
     datalist.appendChild(option);
   });
   
-  console.log(`✅ Updated standard name dropdown with ${uniqueStandardNames.length} items`);
+  // console.log(`✅ Updated standard name dropdown with ${uniqueStandardNames.length} items`);
 }
 
 // ========== LEVEL 1 DROPDOWNS (Software + Package) ==========
@@ -1741,7 +1741,7 @@ function autoFillFormFromSelection() {
     );
     
     if (exactMatch) {
-      console.log('🎯 Found exact match with standard name:', exactMatch);
+      // console.log('🎯 Found exact match with standard name:', exactMatch);
       fillFormFields(exactMatch);
       return;
     }
@@ -1756,17 +1756,17 @@ function autoFillFormFromSelection() {
     );
     
     if (partialMatch) {
-      console.log('🔄 Found partial match (without standard name):', partialMatch);
+      // console.log('🔄 Found partial match (without standard name):', partialMatch);
       fillFormFields(partialMatch, false); // Don't overwrite standard name if user typed it
       return;
     }
   }
   
-  console.log('ℹ️ No matching software found for auto-fill');
+  // console.log('ℹ️ No matching software found for auto-fill');
 }
 
 function fillFormFields(matchingSoftware, includeOptionalFields = true) {
-  console.log('🔄 Auto-filling form from selection:', matchingSoftware);
+  // console.log('🔄 Auto-filling form from selection:', matchingSoftware);
   
   // Batch DOM operations to prevent layout thrashing
   requestAnimationFrame(() => {
@@ -1832,10 +1832,10 @@ function fillFormFields(matchingSoftware, includeOptionalFields = true) {
     const editIndex = window.softwareList.indexOf(matchingSoftware);
     if (editIndex !== -1) {
       window.currentEditSoftwareIndex = editIndex;
-      console.log(`📝 Set edit index to: ${editIndex}`);
+      // console.log(`📝 Set edit index to: ${editIndex}`);
     }
     
-    console.log('✅ Form auto-filled successfully');
+    // console.log('✅ Form auto-filled successfully');
   });
 }
 
@@ -1844,7 +1844,7 @@ function fillFormFields(matchingSoftware, includeOptionalFields = true) {
 // ========================================
 
 window.handleSoftwareUpdate = async function() {
-  console.log('🔄 Updating software...');
+  // console.log('🔄 Updating software...');
   
   try {
     // Check if we have a software selected for editing
@@ -1941,7 +1941,7 @@ window.handleSoftwareUpdate = async function() {
       // Reload software data to reflect changes
       await loadSoftwareData();
       
-      console.log('✅ Software updated successfully:', result.data);
+      // console.log('✅ Software updated successfully:', result.data);
       
     } else {
       // Show error message
@@ -1976,7 +1976,7 @@ window.handleSoftwareUpdate = async function() {
 // ========================================
 
 window.handleSoftwareSearch = async function() {
-  console.log('🔍 SOFTWARE SEARCH - Starting software search from frontend...');
+  // console.log('🔍 SOFTWARE SEARCH - Starting software search from frontend...');
   
   try {
     // Get search conditions from form
@@ -2010,7 +2010,7 @@ window.handleSoftwareSearch = async function() {
       maNhanVien: userInfo.maNhanVien,
       conditions: conditions
     };
-    console.log('🔍 SOFTWARE SEARCH - Sending request:', requestData);
+    // console.log('🔍 SOFTWARE SEARCH - Sending request:', requestData);
     
     const result = await apiRequestJson(requestData);
     
@@ -2024,16 +2024,16 @@ window.handleSoftwareSearch = async function() {
     
     if (result.status === "success") {
       // Debug: Log kết quả search
-      console.log('📊 DEBUG Frontend v3: Search results:', result.data.length, 'items');
+      // console.log('📊 DEBUG Frontend v3: Search results:', result.data.length, 'items');
       if (result.data.length > 0) {
-        console.log('📊 DEBUG Frontend v3: First result renewal date:', result.data[0].renewalDate);
-        console.log('📊 DEBUG Frontend v3: Sample results:', result.data.slice(0, 3).map(item => ({
+        // console.log('📊 DEBUG Frontend v3: First result renewal date:', result.data[0].renewalDate);
+        // console.log('📊 DEBUG Frontend v3: Sample results:', result.data.slice(0, 3).map(item => ({
           name: item.softwareName,
           renewalDate: item.renewalDate,
           renewalDateType: typeof item.renewalDate
         })));
       } else {
-        console.log('⚠️ DEBUG Frontend v3: No results found for conditions:', conditions);
+        // console.log('⚠️ DEBUG Frontend v3: No results found for conditions:', conditions);
       }
       
       // Set search mode and update software list
@@ -2053,7 +2053,7 @@ window.handleSoftwareSearch = async function() {
         alert('✅ ' + message);
       }
       
-      console.log('✅ Software search completed:', result.data.length, 'results');
+      // console.log('✅ Software search completed:', result.data.length, 'results');
       
     } else {
       // Show error message
@@ -2110,14 +2110,14 @@ function getSoftwareSearchConditions() {
   if (standardName) conditions.standardName = standardName;
   if (renewalDate) conditions.renewalDate = renewalDate;
   
-  console.log('🔍 Search conditions:', conditions);
+  // console.log('🔍 Search conditions:', conditions);
   
   // Debug: Chi tiết về renewalDate
   if (conditions.renewalDate) {
-    console.log('📅 DEBUG Frontend: Renewal date value:', `"${conditions.renewalDate}"`);
-    console.log('📅 DEBUG Frontend: Renewal date type:', typeof conditions.renewalDate);
-    console.log('📅 DEBUG Frontend: Renewal date length:', conditions.renewalDate.length);
-    console.log('📅 DEBUG Frontend: Character codes:', conditions.renewalDate.split('').map(c => c.charCodeAt(0)));
+    // console.log('📅 DEBUG Frontend: Renewal date value:', `"${conditions.renewalDate}"`);
+    // console.log('📅 DEBUG Frontend: Renewal date type:', typeof conditions.renewalDate);
+    // console.log('📅 DEBUG Frontend: Renewal date length:', conditions.renewalDate.length);
+    // console.log('📅 DEBUG Frontend: Character codes:', conditions.renewalDate.split('').map(c => c.charCodeAt(0)));
   }
   
   return conditions;
@@ -2125,7 +2125,7 @@ function getSoftwareSearchConditions() {
 
 // Function to clear search and return to normal view
 window.clearSoftwareSearch = function() {
-  console.log('🔄 Clearing software search...');
+  // console.log('🔄 Clearing software search...');
   
   // Reset search state
   window.isSoftwareSearching = false;
@@ -2137,7 +2137,7 @@ window.clearSoftwareSearch = function() {
   // Reset form
   window.handleSoftwareReset();
   
-  console.log('✅ Software search cleared');
+  // console.log('✅ Software search cleared');
 };
 
 // Function to highlight search terms in text
@@ -2255,7 +2255,7 @@ window.handleSoftwareAction = function(selectElement, index) {
   const action = selectElement.value;
   if (!action) return;
   
-  console.log(`🎯 Software action: ${action} for index ${index}`);
+  // console.log(`🎯 Software action: ${action} for index ${index}`);
   
   // Reset select to default
   selectElement.value = '';
@@ -2269,7 +2269,7 @@ window.handleSoftwareAction = function(selectElement, index) {
       const currentList = window.isSoftwareSearching ? window.softwareList : window.softwareList;
       const software = currentList[index];
       if (software) {
-        console.log(`📝 Editing software:`, software);
+        // console.log(`📝 Editing software:`, software);
         editSoftwareItem(software, index);
       } else {
         console.error('❌ Software not found at index:', index, 'in list length:', currentList?.length);
@@ -2368,7 +2368,7 @@ function viewSoftwareItem(index) {
     return;
   }
   
-  console.log('👁️ Viewing software:', software.softwareName);
+  // console.log('👁️ Viewing software:', software.softwareName);
   
   // Use existing modal system to show software details
   if (typeof showResultModalModern === 'function') {
@@ -2427,31 +2427,31 @@ function openSoftwareSheet(index) {
 
 // Debug function to check software data note field
 window.debugSoftwareNotes = function() {
-  console.log('🔍 DEBUG: Checking software data for note field...');
-  console.log('📊 Total software items:', window.softwareList?.length || 0);
+  // console.log('🔍 DEBUG: Checking software data for note field...');
+  // console.log('📊 Total software items:', window.softwareList?.length || 0);
   
   if (window.softwareList && window.softwareList.length > 0) {
-    console.log('📋 Sample software item (first):', window.softwareList[0]);
+    // console.log('📋 Sample software item (first):', window.softwareList[0]);
     
     // Check if note field exists in data
     const itemsWithNotes = window.softwareList.filter(item => item.note && item.note.trim() !== '');
-    console.log('📝 Items with note data:', itemsWithNotes.length);
+    // console.log('📝 Items with note data:', itemsWithNotes.length);
     
     if (itemsWithNotes.length > 0) {
-      console.log('📄 Sample note data:');
+      // console.log('📄 Sample note data:');
       itemsWithNotes.slice(0, 3).forEach((item, index) => {
         console.log(`  ${index + 1}. ${item.softwareName} - ${item.softwarePackage}: "${item.note}"`);
       });
     } else {
-      console.log('❌ No items found with note data');
+      // console.log('❌ No items found with note data');
       
       // Check all field names
-      console.log('🔑 Available fields in first item:');
+      // console.log('🔑 Available fields in first item:');
       Object.keys(window.softwareList[0]).forEach(key => {
         console.log(`  - ${key}: ${window.softwareList[0][key]}`);
       });
     }
   } else {
-    console.log('❌ No software data available');
+    // console.log('❌ No software data available');
   }
 };

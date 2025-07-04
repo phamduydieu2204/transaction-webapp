@@ -12,7 +12,7 @@ import { calculateDaysBetween, calculateRenewalRate } from '../core/reportCalcul
  * Load renewal report
  */
 export async function loadRenewalReport() {
-  console.log('🔄 Loading renewal report');
+  // console.log('🔄 Loading renewal report');
   
   try {
     await ensureDataIsLoaded();
@@ -40,7 +40,7 @@ export async function loadRenewalReport() {
       loadRenewalTrends()
     ]);
     
-    console.log('✅ Renewal report loaded');
+    // console.log('✅ Renewal report loaded');
   } catch (error) {
     console.error('❌ Error loading renewal report:', error);
     showError('Không thể tải báo cáo gia hạn');

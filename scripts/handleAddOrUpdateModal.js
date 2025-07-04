@@ -93,13 +93,13 @@ export function openAddOrUpdateModal() {
   }
   
   export function handleUpdateTransactionFromModal() {
-    console.log("🔄 handleUpdateTransactionFromModal called");
+    // console.log("🔄 handleUpdateTransactionFromModal called");
     closeAddOrUpdateModal();
     window.handleUpdate(); // Gọi handleUpdate() luôn
   }
   
   export function handleCancelModal() {
-    console.log("❌ handleCancelModal called");
+    // console.log("❌ handleCancelModal called");
     closeAddOrUpdateModal();
   }
   

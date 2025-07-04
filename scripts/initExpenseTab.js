@@ -46,7 +46,7 @@ function setDefaultExpenseValues() {
  * Initialize expense tab data
  */
 export async function initExpenseTab() {
-  console.log('📊 Initializing expense tab...');
+  // console.log('📊 Initializing expense tab...');
   
   try {
     // Set default values for form
@@ -55,7 +55,7 @@ export async function initExpenseTab() {
     // Initialize quick search
     if (typeof window.initExpenseQuickSearchNew === 'function') {
       window.initExpenseQuickSearchNew();
-      console.log('🔍 Expense quick search initialized');
+      // console.log('🔍 Expense quick search initialized');
     }
     
     // Debug: Check current expense list state
@@ -68,19 +68,19 @@ export async function initExpenseTab() {
     
     // Check if we already have data and don't need to reload
     if (window.expenseTabInitialized && window.expenseList && window.expenseList.length > 0) {
-      console.log(`✅ Using cached expense data (${window.expenseList.length} expenses) - no reload needed`);
+      // console.log(`✅ Using cached expense data (${window.expenseList.length} expenses) - no reload needed`);
       // Update table with existing data
       updateExpenseTable();
       // Render expense statistics
       renderExpenseStats();
     } else {
-      console.log('💰 Loading expense data...');
+      // console.log('💰 Loading expense data...');
       await loadExpensesInBackground();
       // Mark as initialized
       window.expenseTabInitialized = true;
     }
     
-    console.log('✅ Expense tab initialized');
+    // console.log('✅ Expense tab initialized');
   } catch (error) {
     console.error('❌ Error initializing expense tab:', error);
   }
@@ -105,7 +105,7 @@ async function loadExpensesInBackground() {
   };
   
   try {
-    console.log('🔄 Loading expenses in background...');
+    // console.log('🔄 Loading expenses in background...');
     
     const response = await fetch(BACKEND_URL, {
       method: 'POST',
@@ -127,7 +127,7 @@ async function loadExpensesInBackground() {
       window.currentExpensePage = 1;
       window.isExpenseSearching = false;
       
-      console.log(`✅ Loaded ${window.expenseList.length} expenses in background`);
+      // console.log(`✅ Loaded ${window.expenseList.length} expenses in background`);
       
       // Update table
       updateExpenseTable();
@@ -171,7 +171,7 @@ async function loadExpenses() {
 function resetExpenseTabState() {
   window.expenseTabInitialized = false;
   window.expenseList = [];
-  console.log('🔄 Expense tab state reset');
+  // console.log('🔄 Expense tab state reset');
 }
 
 // Make functions globally available

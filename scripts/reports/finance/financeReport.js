@@ -43,7 +43,7 @@ export async function loadFinanceReport() {
     `;
     
     container.innerHTML = html;
-    console.log('✅ Finance report placeholder loaded');
+    // console.log('✅ Finance report placeholder loaded');
   } catch (error) {
     console.error('❌ Error loading finance report:', error);
     showError('Không thể tải báo cáo tài chính');

@@ -103,14 +103,14 @@ export function getTransactionField(transaction, fieldName) {
   for (const key of possibleKeys) {
     if (transaction.hasOwnProperty(key) && transaction[key] !== undefined && transaction[key] !== null) {
       // if (fieldName === 'customerName' || fieldName === 'email' || fieldName === 'softwareName') {
-      //   console.log(`✅ Found ${fieldName} with key "${key}":`, transaction[key]);
+      //   // console.log(`✅ Found ${fieldName} with key "${key}":`, transaction[key]);
       // }
       return transaction[key];
     }
   }
   
   // if (fieldName === 'customerName' || fieldName === 'email' || fieldName === 'softwareName') {
-  //   console.log(`❌ No value found for ${fieldName}`);
+  //   // console.log(`❌ No value found for ${fieldName}`);
   // }
   
   return null;

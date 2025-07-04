@@ -12,7 +12,7 @@ let cashFlowAccrualLoader = null;
  */
 export async function loadCashFlowAccrualReport() {
     try {
-        console.log('⚖️ Loading Cash Flow vs Accrual Report...');
+        // console.log('⚖️ Loading Cash Flow vs Accrual Report...');
         
         // Cleanup previous instance if exists
         if (cashFlowAccrualLoader) {
@@ -28,7 +28,7 @@ export async function loadCashFlowAccrualReport() {
         // Initialize the comparison
         await cashFlowAccrualLoader.initialize();
         
-        console.log('✅ Cash Flow vs Accrual Report loaded successfully');
+        // console.log('✅ Cash Flow vs Accrual Report loaded successfully');
         
     } catch (error) {
         console.error('❌ Error loading Cash Flow vs Accrual Report:', error);
@@ -55,10 +55,10 @@ async function loadCashFlowAccrualTemplate() {
         const html = await response.text();
         container.innerHTML = html;
         
-        console.log('📄 Cash flow vs accrual template loaded from file');
+        // console.log('📄 Cash flow vs accrual template loaded from file');
         
     } catch (error) {
-        console.log('📄 Using fallback cash flow vs accrual template');
+        // console.log('📄 Using fallback cash flow vs accrual template');
         // Fallback template
         container.innerHTML = `
             <div class="cashflow-accrual-container">
@@ -326,7 +326,7 @@ function showCashFlowAccrualError(message) {
  */
 export async function initCashFlowAccrualReport() {
     try {
-        console.log('⚖️ Initializing Cash Flow vs Accrual Report...');
+        // console.log('⚖️ Initializing Cash Flow vs Accrual Report...');
         await loadCashFlowAccrualReport();
     } catch (error) {
         console.error('❌ Failed to initialize Cash Flow vs Accrual Report:', error);

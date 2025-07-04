@@ -35,7 +35,7 @@ export class FinancialLoader {
             this.renderDashboard();
             
             this.isInitialized = true;
-            console.log('✅ Financial Management initialized successfully');
+            // console.log('✅ Financial Management initialized successfully');
             
         } catch (error) {
             console.error('❌ Failed to initialize Financial Management:', error);
@@ -123,7 +123,7 @@ export class FinancialLoader {
             this.renderProfitLossStatement();
             this.renderBudgetPlanning();
             
-            console.log('✅ Financial dashboard rendered');
+            // console.log('✅ Financial dashboard rendered');
             
         } catch (error) {
             console.error('Error rendering financial dashboard:', error);
@@ -483,7 +483,7 @@ export class FinancialLoader {
         if (window.showResultModalModern) {
             window.showResultModalModern(message, 'success');
         } else {
-            console.log('✅', message);
+            // console.log('✅', message);
         }
     }
 

@@ -16,7 +16,7 @@ import { ensureDataIsLoaded, showError } from '../core/reportHelpers.js';
  * @param {string} options.period - Period filter
  */
 export async function loadProfitAnalysis(options = {}) {
-    console.log('💰 Loading profit analysis report', options);
+    // console.log('💰 Loading profit analysis report', options);
     
     try {
         // Get container
@@ -71,7 +71,7 @@ export async function loadProfitAnalysis(options = {}) {
         setupProfitTooltips();
         setupProfitAnalysisHandlers();
         
-        console.log('✅ Profit analysis report loaded successfully');
+        // console.log('✅ Profit analysis report loaded successfully');
         
     } catch (error) {
         console.error('❌ Error loading profit analysis report:', error);
@@ -96,7 +96,7 @@ async function loadProfitAnalysisHTML() {
         container.innerHTML = html;
         container.classList.add('active');
         
-        console.log('✅ Profit analysis template loaded');
+        // console.log('✅ Profit analysis template loaded');
         
     } catch (error) {
         console.error('❌ Could not load profit analysis template:', error);
@@ -108,7 +108,7 @@ async function loadProfitAnalysisHTML() {
  * Update profit KPI cards
  */
 async function updateProfitKPIs(transactions, expenses, period, dateRange) {
-    console.log('💰 Updating profit KPIs');
+    // console.log('💰 Updating profit KPIs');
     
     // Calculate current period metrics
     const revenueMetrics = calculateRevenueMetrics(transactions);
@@ -145,14 +145,14 @@ async function updateProfitKPIs(transactions, expenses, period, dateRange) {
     updateKPIElement('business-efficiency', efficiency.label);
     updateKPIElement('efficiency-detail', efficiency.description);
     
-    console.log('💰 Profit KPIs updated:', profitMetrics);
+    // console.log('💰 Profit KPIs updated:', profitMetrics);
 }
 
 /**
  * Load profit analysis data into the table
  */
 async function loadProfitAnalysisData(transactions, expenses, dateRange) {
-    console.log('💰 Loading profit analysis data for table');
+    // console.log('💰 Loading profit analysis data for table');
     
     try {
         // Calculate metrics
@@ -164,7 +164,7 @@ async function loadProfitAnalysisData(transactions, expenses, dateRange) {
         updateProfitTableValues(profitMetrics);
         updateProfitSummaryCards(profitMetrics);
         
-        console.log('💰 Profit analysis data loaded:', profitMetrics);
+        // console.log('💰 Profit analysis data loaded:', profitMetrics);
         
     } catch (error) {
         console.error('❌ Error loading profit analysis data:', error);
@@ -407,7 +407,7 @@ function updateProfitSummaryCards(metrics) {
  * Render profit trend chart
  */
 async function renderProfitTrendChart(transactions, expenses, period) {
-    console.log('📈 Rendering profit trend chart');
+    // console.log('📈 Rendering profit trend chart');
     
     const canvas = document.getElementById('profit-trend-chart');
     if (!canvas) return;
@@ -548,7 +548,7 @@ async function renderProfitBreakdownChart(transactions, expenses, dateRange) {
  * Update profit insights
  */
 async function updateProfitInsights(transactions, expenses) {
-    console.log('💡 Updating profit insights');
+    // console.log('💡 Updating profit insights');
     
     const insights = generateProfitInsights(transactions, expenses);
     
@@ -883,7 +883,7 @@ function updateTooltipPosition(event, tooltip) {
 }
 
 function refreshProfitChart(period) {
-    console.log(`🔄 Refreshing profit chart for period: ${period}`);
+    // console.log(`🔄 Refreshing profit chart for period: ${period}`);
     // Implementation for chart refresh
 }
 
@@ -893,19 +893,19 @@ window.refreshProfitAnalysis = function() {
 };
 
 window.exportProfitReport = function() {
-    console.log('📊 Exporting profit report...');
+    // console.log('📊 Exporting profit report...');
     // Implementation for export functionality
 };
 
 window.toggleChartView = function(chartType, viewType) {
-    console.log(`🔄 Toggling ${chartType} chart to ${viewType} view`);
+    // console.log(`🔄 Toggling ${chartType} chart to ${viewType} view`);
 };
 
 /**
  * Update the profit overview grid (6 KPI cards)
  */
 async function updateProfitOverviewGrid(transactions, expenses, period, dateRange) {
-    console.log('💰 Updating profit overview grid');
+    // console.log('💰 Updating profit overview grid');
     
     // Calculate current period metrics
     const revenueMetrics = calculateRevenueMetrics(transactions);
@@ -949,7 +949,7 @@ async function updateProfitOverviewGrid(transactions, expenses, period, dateRang
     
     updateKPIElement('overview-margin-status', marginStatus);
     
-    console.log('💰 Profit overview grid updated');
+    // console.log('💰 Profit overview grid updated');
 }
 
 /**
@@ -1044,8 +1044,8 @@ function doesExpenseMatchSoftware(expenseTenChuan, targetSoftwareName) {
 function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
     const softwareNames = new Set();
     
-    console.log('🔍 BƯỚC 1: Liệt kê danh sách tên chuẩn duy nhất từ 3 nguồn...');
-    console.log('📅 Chu kỳ báo cáo:', dateRange ? `${dateRange.start} đến ${dateRange.end}` : 'Không xác định');
+    // console.log('🔍 BƯỚC 1: Liệt kê danh sách tên chuẩn duy nhất từ 3 nguồn...');
+    // console.log('📅 Chu kỳ báo cáo:', dateRange ? `${dateRange.start} đến ${dateRange.end}` : 'Không xác định');
     
     // Nguồn 1: Tên chuẩn trong sheet GiaoDich có doanh thu nằm trong chu kỳ báo cáo
     let revenueSource = 0;
@@ -1082,8 +1082,8 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
         }
     });
     
-    console.log(`✅ Nguồn 1 - GiaoDich có doanh thu: ${revenueSource} records, ${revenueNames.size} tên chuẩn unique`);
-    console.log(`📋 Danh sách từ GiaoDich:`, Array.from(revenueNames).sort());
+    // console.log(`✅ Nguồn 1 - GiaoDich có doanh thu: ${revenueSource} records, ${revenueNames.size} tên chuẩn unique`);
+    // console.log(`📋 Danh sách từ GiaoDich:`, Array.from(revenueNames).sort());
     
     // Nguồn 2: Tên chuẩn có chi phí nằm trong chu kỳ báo cáo (sheet ChiPhi)
     let directCostSource = 0;
@@ -1138,8 +1138,8 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
         }
     });
     
-    console.log(`✅ Nguồn 2 - ChiPhi trong chu kỳ: ${directCostSource} records, ${directCostNames.size} tên chuẩn unique`);
-    console.log(`📋 Danh sách từ ChiPhi:`, Array.from(directCostNames).sort());
+    // console.log(`✅ Nguồn 2 - ChiPhi trong chu kỳ: ${directCostSource} records, ${directCostNames.size} tên chuẩn unique`);
+    // console.log(`📋 Danh sách từ ChiPhi:`, Array.from(directCostNames).sort());
     
     // Nguồn 3: Tên chuẩn có chi phí phân bổ (Ngày tái tục >= ngày bắt đầu chu kỳ, Phân bổ = "Có", COGS/OPEX)
     let allocatedCostSource = 0;
@@ -1216,15 +1216,15 @@ function getSoftwareNamesFromAllSources(transactions, expenses, dateRange) {
         }
     });
     
-    console.log(`✅ Nguồn 3 - Chi phí phân bổ: ${allocatedCostSource} records, ${allocatedCostNames.size} tên chuẩn unique`);
-    console.log(`📋 Danh sách từ Chi phí phân bổ:`, Array.from(allocatedCostNames).sort());
+    // console.log(`✅ Nguồn 3 - Chi phí phân bổ: ${allocatedCostSource} records, ${allocatedCostNames.size} tên chuẩn unique`);
+    // console.log(`📋 Danh sách từ Chi phí phân bổ:`, Array.from(allocatedCostNames).sort());
     
     // Tổng hợp kết quả
     const finalList = Array.from(softwareNames).sort();
-    console.log(`\n🎯 KẾT QUẢ BƯỚC 1 - Danh sách tên chuẩn duy nhất:`);
-    console.log(`📊 Tổng số tên chuẩn unique: ${finalList.length}`);
-    console.log(`📋 Danh sách cuối cùng:`, finalList);
-    console.log(`📈 Thống kê nguồn dữ liệu:`);
+    // console.log(`\n🎯 KẾT QUẢ BƯỚC 1 - Danh sách tên chuẩn duy nhất:`);
+    // console.log(`📊 Tổng số tên chuẩn unique: ${finalList.length}`);
+    // console.log(`📋 Danh sách cuối cùng:`, finalList);
+    // console.log(`📈 Thống kê nguồn dữ liệu:`);
     console.log(`   - Từ GiaoDich có doanh thu: ${revenueNames.size} tên chuẩn`);
     console.log(`   - Từ ChiPhi trong chu kỳ: ${directCostNames.size} tên chuẩn`);
     console.log(`   - Từ Chi phí phân bổ: ${allocatedCostNames.size} tên chuẩn`);
@@ -1297,11 +1297,11 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
     
     // Log sample expense data to understand structure
     if (expenses.length > 0) {
-        console.log(`📋 Sample expense data (first 3 items):`, expenses.slice(0, 3));
+        // console.log(`📋 Sample expense data (first 3 items):`, expenses.slice(0, 3));
         
         // Log all possible field names from first expense
         if (expenses[0]) {
-            console.log(`📊 Available fields in expense object:`, Object.keys(expenses[0]));
+            // console.log(`📊 Available fields in expense object:`, Object.keys(expenses[0]));
             console.log(`📊 Field values that might contain software name:`, {
                 product: expenses[0].product,
                 tenChuan: expenses[0].tenChuan,
@@ -1319,7 +1319,7 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
                 return product.includes('văn phòng') || tenChuan.includes('văn phòng') || description.includes('văn phòng');
             });
             
-            console.log(`🏢 Found ${vanHanhExpenses.length} expenses with "văn phòng":`, vanHanhExpenses);
+            // console.log(`🏢 Found ${vanHanhExpenses.length} expenses with "văn phòng":`, vanHanhExpenses);
         }
     }
     
@@ -1329,7 +1329,7 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
     expenses.forEach((expense, index) => {
         // Log full expense object for first few items
         if (index < 5) {
-            console.log(`📦 Expense #${index + 1} full data:`, expense);
+            // console.log(`📦 Expense #${index + 1} full data:`, expense);
         }
         
         // Get software name from expense using tenChuan field (cột T trong sheet ChiPhi)
@@ -1425,7 +1425,7 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
                         // Công thức: số tiền * Min(ngày hiện tại - đầu chu kỳ, ngày tái tục - đầu chu kỳ) / (ngày tái tục - ngày chi)
                         allocatedAmount = amount * effectiveDays / totalDays;
                         
-                        console.log(`📊 Allocated calculation (renewal < end):`, {
+                        // console.log(`📊 Allocated calculation (renewal < end):`, {
                             amount: amount,
                             effectiveDays: effectiveDays,
                             totalDays: totalDays,
@@ -1437,7 +1437,7 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
                     else {
                         allocatedAmount = amount * periodDays / totalDays;
                         
-                        console.log(`📊 Allocated calculation (renewal >= end):`, {
+                        // console.log(`📊 Allocated calculation (renewal >= end):`, {
                             amount: amount,
                             periodDays: periodDays,
                             totalDays: totalDays,
@@ -1447,7 +1447,7 @@ function calculateSoftwareAllocatedCosts(expenses, softwareName, dateRange) {
                     }
                     
                     allocatedCosts += allocatedAmount;
-                    console.log(`💰 Added to allocated costs: ${allocatedAmount} (total allocated: ${allocatedCosts})`);
+                    // console.log(`💰 Added to allocated costs: ${allocatedAmount} (total allocated: ${allocatedCosts})`);
                 }
             }
         }
@@ -1736,7 +1736,7 @@ function filterSoftwareProfitTable(searchTerm) {
  * Sort software profit table
  */
 function sortSoftwareProfitTable(sortBy) {
-    console.log(`🔄 Sorting software profit table by: ${sortBy}`);
+    // console.log(`🔄 Sorting software profit table by: ${sortBy}`);
     // Implementation for table sorting
 }
 
@@ -1761,7 +1761,7 @@ window.refreshSoftwareProfitData = function() {
 };
 
 window.exportSoftwareProfitReport = function() {
-    console.log('📊 Exporting software profit report...');
+    // console.log('📊 Exporting software profit report...');
     // Implementation for export functionality
 };
 

@@ -12,7 +12,7 @@ export class EmployeeExport {
      * Export employee data to Excel
      */
     exportToExcel(employees, departments, options = {}) {
-        console.log('📊 Exporting employee data to Excel...');
+        // console.log('📊 Exporting employee data to Excel...');
         
         try {
             // Create workbook data
@@ -21,7 +21,7 @@ export class EmployeeExport {
             // Create and download Excel file
             this.downloadExcelFile(workbookData, options.filename || 'employee-report.xlsx');
             
-            console.log('✅ Excel export completed');
+            // console.log('✅ Excel export completed');
             return true;
             
         } catch (error) {
@@ -34,13 +34,13 @@ export class EmployeeExport {
      * Export employee data to CSV
      */
     exportToCSV(employees, options = {}) {
-        console.log('📄 Exporting employee data to CSV...');
+        // console.log('📄 Exporting employee data to CSV...');
         
         try {
             const csvData = this.prepareCSVData(employees);
             this.downloadCSVFile(csvData, options.filename || 'employee-report.csv');
             
-            console.log('✅ CSV export completed');
+            // console.log('✅ CSV export completed');
             return true;
             
         } catch (error) {
@@ -280,7 +280,7 @@ export class EmployeeExport {
      * Export individual employee report
      */
     exportEmployeeReport(employee, options = {}) {
-        console.log(`📊 Exporting individual report for ${employee.name}...`);
+        // console.log(`📊 Exporting individual report for ${employee.name}...`);
         
         const reportData = this.prepareIndividualReport(employee);
         

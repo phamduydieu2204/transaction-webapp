@@ -17,7 +17,7 @@ export async function loadTransactionsOptimized(userInfo, updateTable, formatDat
 
   // ✅ Kiểm tra cache trước
   if (useCache && window.transactionCache && window.transactionCache.page === page && window.transactionCache.limit === limit) {
-    console.log('📦 Using cached transaction data for page', page);
+    // console.log('📦 Using cached transaction data for page', page);
     updateTable(window.transactionCache.data, page, limit, formatDate, editTransaction, deleteTransaction, viewTransaction);
     return { status: "success", data: window.transactionCache.data, cached: true };
   }
@@ -28,7 +28,7 @@ export async function loadTransactionsOptimized(userInfo, updateTable, formatDat
     return { status: "error", message: "Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại." };
   }
 
-  console.log(`🔄 Loading transactions (page ${page}, limit ${limit})...`);
+  // console.log(`🔄 Loading transactions (page ${page}, limit ${limit})...`);
   
   const data = {
     action: "getTransactions",
@@ -115,11 +115,11 @@ export async function loadTransactionsOptimized(userInfo, updateTable, formatDat
       const isTransactionTabActive = activeTab && activeTab.id === "tab-giao-dich";
       
       if (isTransactionTabActive || page === 1) {
-        console.log(`🔄 Updating table with ${transactions.length} transactions (page ${page})`);
+        // console.log(`🔄 Updating table with ${transactions.length} transactions (page ${page})`);
         updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
       }
 
-      console.log(`✅ Load transactions successful: ${transactions.length} transactions (page ${page})`);
+      // console.log(`✅ Load transactions successful: ${transactions.length} transactions (page ${page})`);
       return { status: "success", data: transactions, page: page, total: result.total || transactions.length };
       
     } else {
@@ -147,7 +147,7 @@ export async function loadTransactions(userInfo, updateTable, formatDate, editTr
     return { status: "error", message: "Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại." };
   }
 
-  console.log("🔄 Bắt đầu load transactions...");
+  // console.log("🔄 Bắt đầu load transactions...");
   
   const { BACKEND_URL } = getConstants();
   const data = {
@@ -208,13 +208,13 @@ export async function loadTransactions(userInfo, updateTable, formatDate, editTr
       
       // ✅ ALWAYS UPDATE TABLE IF WE HAVE TRANSACTION DATA
       if (window.transactionList && window.transactionList.length >= 0) {
-        console.log("🔄 Updating transaction table with", window.transactionList.length, "transactions");
+        // console.log("🔄 Updating transaction table with", window.transactionList.length, "transactions");
         updateTable(window.transactionList, window.currentPage, window.itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction);
       } else {
-        console.log("ℹ️ No transaction data to update");
+        // console.log("ℹ️ No transaction data to update");
       }
 
-      console.log("✅ Load transactions thành công:", window.transactionList.length, "giao dịch");
+      // console.log("✅ Load transactions thành công:", window.transactionList.length, "giao dịch");
       return { status: "success", data: window.transactionList };
       
     } else {

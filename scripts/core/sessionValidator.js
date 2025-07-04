@@ -95,13 +95,13 @@ export async function validateSessionImmediate() {
   const user = getState().user;
   
   if (!user || !user.maNhanVien) {
-    console.log('👤 No user session to validate immediately');
+    // console.log('👤 No user session to validate immediately');
     return true;
   }
   
   // Check if user has passwordHash (new login) or is legacy user
   if (!user.passwordHash) {
-    console.log('⚠️ Legacy user without passwordHash detected - forcing re-login immediately');
+    // console.log('⚠️ Legacy user without passwordHash detected - forcing re-login immediately');
     await handleLegacyUserLogout();
     return false;
   }
@@ -121,7 +121,7 @@ export async function validateSessionImmediate() {
   } catch (error) {
     console.error('❌ Immediate session validation error:', error);
     // On network errors during startup, allow login but show warning
-    console.log('⚠️ Network error during immediate validation - allowing login with warning');
+    // console.log('⚠️ Network error during immediate validation - allowing login with warning');
     return true;
   }
 }
@@ -133,13 +133,13 @@ export async function validateCurrentSession() {
   const user = getState().user;
   
   if (!user || !user.maNhanVien) {
-    console.log('👤 No user session to validate');
+    // console.log('👤 No user session to validate');
     return true; // No session to validate
   }
   
   // Check if user has passwordHash (new login) or is legacy user
   if (!user.passwordHash) {
-    console.log('⚠️ Legacy user without passwordHash detected - forcing re-login');
+    // console.log('⚠️ Legacy user without passwordHash detected - forcing re-login');
     await handleLegacyUserLogout();
     return false;
   }
@@ -403,7 +403,7 @@ export async function validateBeforeOperation() {
   
   const user = getState().user;
   if (!user) {
-    console.log('❌ No user session for operation');
+    // console.log('❌ No user session for operation');
     return false;
   }
   

@@ -51,7 +51,7 @@ export async function deleteTransaction(
     return;
   }
 
-  console.log("✅ Transaction found:", transaction.transactionId);
+  // console.log("✅ Transaction found:", transaction.transactionId);
 
   const confirmMessage = `Bạn có chắc muốn xóa giao dịch ${transaction.transactionId}? ${
     transaction.accountSheetId && transaction.customerEmail

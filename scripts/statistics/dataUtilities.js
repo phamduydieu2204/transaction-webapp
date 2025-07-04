@@ -197,7 +197,7 @@ export function groupExpensesByMonth(data, options = {}) {
     return sortOrder === "desc" ? -comparison : comparison;
   });
 
-  console.log("✅ Monthly grouping completed:", summaryArray.length, "entries");
+  // console.log("✅ Monthly grouping completed:", summaryArray.length, "entries");
   return summaryArray;
 }
 
@@ -265,7 +265,7 @@ export function groupRevenueByMonth(data, options = {}) {
     return sortOrder === "desc" ? -comparison : comparison;
   });
 
-  console.log("✅ Revenue grouping completed:", summaryArray.length, "entries");
+  // console.log("✅ Revenue grouping completed:", summaryArray.length, "entries");
   return summaryArray;
 }
 

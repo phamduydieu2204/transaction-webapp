@@ -54,7 +54,7 @@ function handleTransactionActionByIndex(selectElement) {
   if (!action) return;
   
   const globalIndex = parseInt(selectElement.dataset.index);
-  console.log('🔍 Transaction action:', action, 'Index:', globalIndex);
+  // console.log('🔍 Transaction action:', action, 'Index:', globalIndex);
   
   // Reset dropdown to default
   selectElement.value = '';
@@ -79,7 +79,7 @@ function handleTransactionActionByIndex(selectElement) {
     case 'view':
       if (typeof window.viewTransaction === 'function') {
         // Pass globalIndex directly - it's already the correct index
-        console.log('🔍 View action - using globalIndex:', globalIndex);
+        // console.log('🔍 View action - using globalIndex:', globalIndex);
         window.viewTransaction(globalIndex, window.transactionList, window.formatDate);
       }
       break;
@@ -341,7 +341,7 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     totalRevenue = transactionList.reduce((sum, t) => {
       return sum + (parseFloat(t.revenue) || 0);
     }, 0);
-    console.log("🔍 Đang tìm kiếm - Tổng doanh thu:", totalRevenue);
+    // console.log("🔍 Đang tìm kiếm - Tổng doanh thu:", totalRevenue);
   } else {
     totalRevenue = transactionList.reduce((sum, t) => {
       if (t.transactionDate && t.transactionDate.startsWith(todayFormatted)) {
@@ -349,7 +349,7 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
       }
       return sum;
     }, 0);
-    console.log("📅 Không tìm kiếm - Tổng doanh thu hôm nay:", totalRevenue);
+    // console.log("📅 Không tìm kiếm - Tổng doanh thu hôm nay:", totalRevenue);
   }
 
   // ✅ Build and append rows
@@ -467,7 +467,7 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
         color: employeeColor,
         allKeys: Object.keys(transaction)
       });
-      console.log('🔍 Employee code determined:', employeeCode);
+      // console.log('🔍 Employee code determined:', employeeCode);
     }
     
     const infoCell = `
@@ -564,10 +564,10 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
   // ✅ Lưu tổng doanh thu vào biến global và cập nhật hiển thị
   window.totalRevenue = totalRevenue;
-  console.log("✅ Đã lưu totalRevenue:", totalRevenue);
+  // console.log("✅ Đã lưu totalRevenue:", totalRevenue);
 
   // Không cần cập nhật hiển thị totals nữa - đã xóa
-  console.log("✅ Đã lưu totalRevenue:", totalRevenue, "- Không hiển thị totals");
+  // console.log("✅ Đã lưu totalRevenue:", totalRevenue, "- Không hiển thị totals");
   
   // ✅ Add event listener for copy order buttons
   if (!tableBody.hasAttribute('data-copy-events-attached')) {

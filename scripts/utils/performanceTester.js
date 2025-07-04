@@ -26,7 +26,7 @@ class PerformanceMonitor {
     performance.mark(markName);
     this.marks.set(name, { start: markName, startTime: performance.now() });
     
-    console.log(`⏱️ Started timing: ${name}`);
+    // console.log(`⏱️ Started timing: ${name}`);
   }
   
   /**
@@ -47,7 +47,7 @@ class PerformanceMonitor {
     
     this.measures.set(name, duration);
     
-    console.log(`✅ ${name}: ${duration.toFixed(2)}ms`);
+    // console.log(`✅ ${name}: ${duration.toFixed(2)}ms`);
     return duration;
   }
   
@@ -78,7 +78,7 @@ class PerformanceMonitor {
     const observer = new PerformanceObserver((list) => {
       list.getEntries().forEach((entry) => {
         if (entry.name === 'first-contentful-paint') {
-          console.log(`🎨 First Contentful Paint: ${entry.startTime.toFixed(2)}ms`);
+          // console.log(`🎨 First Contentful Paint: ${entry.startTime.toFixed(2)}ms`);
         }
       });
     });
@@ -91,7 +91,7 @@ class PerformanceMonitor {
       const lcpObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
         const lastEntry = entries[entries.length - 1];
-        console.log(`🖼️ Largest Contentful Paint: ${lastEntry.startTime.toFixed(2)}ms`);
+        // console.log(`🖼️ Largest Contentful Paint: ${lastEntry.startTime.toFixed(2)}ms`);
       });
       
       lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
@@ -120,7 +120,7 @@ class PerformanceMonitor {
     const resourceObserver = new PerformanceObserver((list) => {
       list.getEntries().forEach((entry) => {
         if (entry.name.includes('.css') || entry.name.includes('.js') || entry.name.includes('.html')) {
-          console.log(`📦 Resource loaded: ${entry.name.split('/').pop()} (${entry.duration.toFixed(2)}ms)`);
+          // console.log(`📦 Resource loaded: ${entry.name.split('/').pop()} (${entry.duration.toFixed(2)}ms)`);
         }
       });
     });
@@ -178,7 +178,7 @@ class TemplatePerformanceTester {
       
       this.results.templateLoading = this.monitor.getResults();
       
-      console.log('✅ Template loading test completed');
+      // console.log('✅ Template loading test completed');
       
     } catch (error) {
       console.error('❌ Template loading test failed:', error);
@@ -225,7 +225,7 @@ class TemplatePerformanceTester {
     document.head.removeChild(link);
     
     this.results.cssLoading = this.monitor.getResults();
-    console.log('✅ CSS loading test completed');
+    // console.log('✅ CSS loading test completed');
   }
   
   /**
@@ -274,14 +274,14 @@ class TemplatePerformanceTester {
     testElements.forEach(element => document.body.removeChild(element));
     
     this.results.lazyLoading = this.monitor.getResults();
-    console.log(`✅ Lazy loading test completed (observed: ${observedCount})`);
+    // console.log(`✅ Lazy loading test completed (observed: ${observedCount})`);
   }
   
   /**
    * Run comprehensive performance test
    */
   async runFullTest() {
-    console.log('🚀 Starting comprehensive performance test...');
+    // console.log('🚀 Starting comprehensive performance test...');
     
     // Start monitoring
     this.monitor.monitorWebVitals();
@@ -369,7 +369,7 @@ export const PerfUtils = {
     const start = performance.now();
     const result = fn();
     const end = performance.now();
-    console.log(`⏱️ ${name}: ${(end - start).toFixed(2)}ms`);
+    // console.log(`⏱️ ${name}: ${(end - start).toFixed(2)}ms`);
     return result;
   },
   

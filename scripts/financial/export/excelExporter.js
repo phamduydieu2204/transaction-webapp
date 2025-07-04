@@ -40,7 +40,7 @@ export function exportFinancialDashboardToExcel(metrics, transactionData, expens
     // Export file
     XLSX.writeFile(workbook, filename);
     
-    console.log(`✅ Exported financial dashboard to ${filename}`);
+    // console.log(`✅ Exported financial dashboard to ${filename}`);
     return true;
   } catch (error) {
     console.error('❌ Error exporting to Excel:', error);
@@ -315,7 +315,7 @@ function exportToCSVFallback(metrics, transactionData, expenseData) {
       downloadCSV(expenseCSV, 'expenses.csv');
     }
     
-    console.log('✅ Exported data as CSV files');
+    // console.log('✅ Exported data as CSV files');
   } catch (error) {
     console.error('❌ Error in CSV fallback export:', error);
     alert('Không thể xuất dữ liệu. Vui lòng thử lại sau.');

@@ -26,7 +26,7 @@ import {
  * @param {string} options.period - Period name (e.g., 'this_month', 'last_month')
  */
 export async function loadRevenueAnalysis(options = {}) {
-  console.log('📈 Loading revenue analysis with options:', options);
+  // console.log('📈 Loading revenue analysis with options:', options);
   
   try {
     // Load template
@@ -64,7 +64,7 @@ export async function loadRevenueAnalysis(options = {}) {
     // Setup event handlers
     setupRevenueAnalysisHandlers();
     
-    console.log('✅ Revenue analysis loaded successfully');
+    // console.log('✅ Revenue analysis loaded successfully');
     
   } catch (error) {
     console.error('❌ Error loading revenue analysis:', error);
@@ -89,7 +89,7 @@ async function loadRevenueAnalysisHTML() {
     container.innerHTML = html;
     container.classList.add('active');
     
-    console.log('✅ Revenue analysis template loaded');
+    // console.log('✅ Revenue analysis template loaded');
     
   } catch (error) {
     console.error('❌ Could not load revenue analysis template:', error);
@@ -101,7 +101,7 @@ async function loadRevenueAnalysisHTML() {
  * Update revenue KPI cards
  */
 async function updateRevenueKPIs(transactions, period) {
-  console.log('💰 Updating revenue KPIs');
+  // console.log('💰 Updating revenue KPIs');
   
   // Calculate current period metrics
   const currentMetrics = calculateRevenueMetrics(transactions);
@@ -137,7 +137,7 @@ async function updateRevenueKPIs(transactions, period) {
       `${currentMetrics.highestTransaction.customer} - ${currentMetrics.highestTransaction.product || 'N/A'}`);
   }
   
-  console.log('💰 Revenue KPIs updated:', currentMetrics);
+  // console.log('💰 Revenue KPIs updated:', currentMetrics);
 }
 
 /**
@@ -190,7 +190,7 @@ function calculateRevenueMetrics(transactions) {
  * Render revenue trend chart
  */
 async function renderRevenueTrendChart(transactions, period) {
-  console.log('📈 Rendering revenue trend chart');
+  // console.log('📈 Rendering revenue trend chart');
   
   const canvas = document.getElementById('revenue-trend-chart');
   if (!canvas) return;
@@ -450,7 +450,7 @@ async function loadTopProductsByRevenue(transactions) {
  * Update revenue insights
  */
 async function updateRevenueInsights(transactions) {
-  console.log('💡 Updating revenue insights');
+  // console.log('💡 Updating revenue insights');
   
   const insights = generateRevenueInsights(transactions);
   
@@ -757,34 +757,34 @@ window.refreshRevenueAnalysis = function() {
 };
 
 window.exportRevenueReport = function() {
-  console.log('📊 Exporting revenue report...');
+  // console.log('📊 Exporting revenue report...');
   // Implementation for export functionality
 };
 
 window.exportCustomerRevenueData = function() {
-  console.log('📊 Exporting customer revenue data...');
+  // console.log('📊 Exporting customer revenue data...');
 };
 
 window.exportProductRevenueData = function() {
-  console.log('📊 Exporting product revenue data...');
+  // console.log('📊 Exporting product revenue data...');
 };
 
 window.toggleChartView = function(chartType, viewType) {
-  console.log(`🔄 Toggling ${chartType} chart to ${viewType} view`);
+  // console.log(`🔄 Toggling ${chartType} chart to ${viewType} view`);
 };
 
 function refreshRevenueChart(period) {
-  console.log(`🔄 Refreshing revenue chart for period: ${period}`);
+  // console.log(`🔄 Refreshing revenue chart for period: ${period}`);
   // Implementation for chart refresh
 }
 
 function refreshCustomerTable(view) {
-  console.log(`🔄 Refreshing customer table for view: ${view}`);
+  // console.log(`🔄 Refreshing customer table for view: ${view}`);
   // Implementation for table refresh
 }
 
 function refreshProductTable(sort) {
-  console.log(`🔄 Refreshing product table for sort: ${sort}`);
+  // console.log(`🔄 Refreshing product table for sort: ${sort}`);
   // Implementation for table refresh
 }
 

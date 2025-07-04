@@ -15,7 +15,7 @@ export class EmployeeDataProcessor {
      * Process transaction and expense data to calculate employee metrics
      */
     processEmployeeData(transactions = [], expenses = []) {
-        console.log('📊 Processing employee data...', { transactions: transactions.length, expenses: expenses.length });
+        // console.log('📊 Processing employee data...', { transactions: transactions.length, expenses: expenses.length });
         
         // Clear previous data
         this.employees.clear();
@@ -41,7 +41,7 @@ export class EmployeeDataProcessor {
             alerts: this.generateAlerts()
         };
         
-        console.log('✅ Employee data processed:', result);
+        // console.log('✅ Employee data processed:', result);
         return result;
     }
 

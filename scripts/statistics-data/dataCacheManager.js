@@ -73,11 +73,11 @@ export function updateCache(cacheKey, data) {
  */
 export function getFromCache(cacheKey) {
   if (!isCacheValid(cacheKey)) {
-    console.log(`⏱️ Cache miss or expired for ${cacheKey}`);
+    // console.log(`⏱️ Cache miss or expired for ${cacheKey}`);
     return null;
   }
   
-  console.log(`📦 Cache hit for ${cacheKey}`);
+  // console.log(`📦 Cache hit for ${cacheKey}`);
   return dataCache[cacheKey].data;
 }
 
@@ -96,7 +96,7 @@ export function clearCache(cacheKey = null) {
         dataCache[cacheKey].data.clear();
       }
       
-      console.log(`🗑️ Cache cleared for ${cacheKey}`);
+      // console.log(`🗑️ Cache cleared for ${cacheKey}`);
     }
   } else {
     Object.keys(dataCache).forEach(key => {
@@ -108,7 +108,7 @@ export function clearCache(cacheKey = null) {
         dataCache[key].data = new Map();
       }
     });
-    console.log("🗑️ All caches cleared");
+    // console.log("🗑️ All caches cleared");
   }
 }
 
@@ -153,7 +153,7 @@ export function getCacheStatus() {
 export function setCacheTTL(cacheKey, ttl) {
   if (dataCache[cacheKey] && typeof ttl === 'number' && ttl > 0) {
     dataCache[cacheKey].ttl = ttl;
-    console.log(`⏱️ TTL updated for ${cacheKey}: ${ttl}ms`);
+    // console.log(`⏱️ TTL updated for ${cacheKey}: ${ttl}ms`);
   }
 }
 
@@ -187,7 +187,7 @@ export function cacheSearchResults(query, results) {
     // Remove oldest entry
     const firstKey = searchCache.data.keys().next().value;
     searchCache.data.delete(firstKey);
-    console.log(`🗑️ Removed oldest search cache entry`);
+    // console.log(`🗑️ Removed oldest search cache entry`);
   }
   
   searchCache.data.set(queryHash, {
@@ -197,7 +197,7 @@ export function cacheSearchResults(query, results) {
   });
   
   searchCache.lastFetch = Date.now();
-  console.log(`📦 Cached search results: ${results.length} items`);
+  // console.log(`📦 Cached search results: ${results.length} items`);
 }
 
 /**
@@ -218,11 +218,11 @@ export function getCachedSearchResults(query) {
   
   if (age > searchCache.ttl) {
     searchCache.data.delete(queryHash);
-    console.log(`⏱️ Search cache expired for query`);
+    // console.log(`⏱️ Search cache expired for query`);
     return null;
   }
   
-  console.log(`📦 Search cache hit: ${cached.results.length} items`);
+  // console.log(`📦 Search cache hit: ${cached.results.length} items`);
   return cached.results;
 }
 
@@ -234,7 +234,7 @@ export function getCachedSearchResults(query) {
 export function preloadCache(cacheKey, data) {
   if (dataCache[cacheKey]) {
     updateCache(cacheKey, data);
-    console.log(`🚀 Cache preloaded for ${cacheKey}`);
+    // console.log(`🚀 Cache preloaded for ${cacheKey}`);
   }
 }
 
