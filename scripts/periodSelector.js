@@ -291,7 +291,7 @@ function showCustomDatePicker() {
  * Initialize period selector
  */
 export function initPeriodSelector() {
-  console.log('📅 Initializing period selector');
+  // Initializing period selector
   
   // Set initial period from saved filters
   if (window.globalFilters && window.globalFilters.period) {

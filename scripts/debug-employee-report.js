@@ -94,7 +94,7 @@ window.forceEmployeeReport = function() {
     }
 };
 
-console.log('🔧 Employee report debug functions loaded:');
-console.log('- debugEmployeeReport()');
-console.log('- testEmployeeReportTemplate()');
-console.log('- forceEmployeeReport()');
+// Employee report debug functions loaded:
+// - debugEmployeeReport()
+// - testEmployeeReportTemplate()
+// - forceEmployeeReport()

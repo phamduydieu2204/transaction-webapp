@@ -91,7 +91,7 @@ window.handleExpenseAction = handleExpenseAction;
  * Force remove internal scroll from expense table containers
  */
 function forceRemoveInternalScroll() {
-  console.log('🚫 FORCE: Removing internal scroll from expense containers...');
+  // Removing internal scroll from expense containers...
   
   // List of selectors that might have scroll
   const scrollSelectors = [
@@ -111,7 +111,7 @@ function forceRemoveInternalScroll() {
         el.style.overflowY = 'visible';
         el.style.maxHeight = 'none';
         el.style.height = 'auto';
-        console.log(`🚫 Removed scroll from: ${selector}`);
+        // Removed scroll from container
       }
     });
   });

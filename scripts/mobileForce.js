@@ -20,15 +20,7 @@
     // Galaxy S23 Ultra specific detection
     const isGalaxyS23Ultra = /SM-S918/i.test(userAgent) || screenWidth === 1440;
     
-    console.log('🔍 Mobile Detection:', {
-      userAgent: userAgent,
-      screenWidth: screenWidth,
-      viewportWidth: viewportWidth,
-      isMobileUserAgent: isMobileUserAgent,
-      isMobileScreen: isMobileScreen,
-      isTouchDevice: isTouchDevice,
-      isGalaxyS23Ultra: isGalaxyS23Ultra
-    });
+    // Debug info removed for cleaner console
     
     return isMobileUserAgent || isMobileScreen || isTouchDevice || isGalaxyS23Ultra;
   }
@@ -39,18 +31,14 @@
     const isChrome = /Chrome/i.test(userAgent) && !/Edge/i.test(userAgent);
     const isMobile = isMobileDevice();
     
-    console.log('🔍 Chrome Mobile Detection:', {
-      isChrome: isChrome,
-      isMobile: isMobile,
-      userAgent: userAgent
-    });
+    // Debug info removed for cleaner console
     
     return isChrome && isMobile;
   }
 
   // Force mobile layout function
   function forceMobileLayout() {
-    console.log('📱 Forcing mobile layout...');
+    // Mobile layout applied silently
     
     // Add mobile class to body
     document.body.classList.add('force-mobile-layout');
@@ -138,7 +126,7 @@
     // Insert style at the end of head to ensure highest priority
     document.head.appendChild(style);
     
-    console.log('✅ Mobile layout forced with inline styles');
+    // Mobile layout applied
   }
 
   // Apply mobile layout if needed
@@ -147,7 +135,7 @@
     const isChromeMobile = isChromeOnMobile();
     
     if (isMobile || isChromeMobile) {
-      console.log('📱 Mobile device detected, forcing mobile layout');
+      // Mobile device detected, applying layout
       forceMobileLayout();
       
       // Also force on resize
@@ -172,7 +160,6 @@
   }
 
   // Initialize
-  console.log('🚀 Mobile Force Layout initialized');
   applyMobileLayoutIfNeeded();
 
   // Export for manual triggering

@@ -1,13 +1,13 @@
-// Debug layout width issues
+// Debug layout width issues (silent mode)
 function debugLayout() {
-    console.log('🔍 === LAYOUT DEBUG START ===');
+    // Layout debug running silently
     
     // Viewport dimensions
-    console.log('📐 Viewport:', {
+    const viewportData = {
         width: window.innerWidth,
         height: window.innerHeight,
         devicePixelRatio: window.devicePixelRatio
-    });
+    };
     
     // Container element analysis
     const container = document.querySelector('.container');
@@ -15,7 +15,7 @@ function debugLayout() {
         const containerRect = container.getBoundingClientRect();
         const containerStyles = window.getComputedStyle(container);
         
-        console.log('📦 Container:', {
+        const containerData = {
             offsetWidth: container.offsetWidth,
             clientWidth: container.clientWidth,
             scrollWidth: container.scrollWidth,
@@ -34,9 +34,7 @@ function debugLayout() {
                 position: containerStyles.position,
                 display: containerStyles.display
             }
-        });
-    } else {
-        console.log('❌ Container element not found');
+        };
     }
     
     // Body element analysis
@@ -44,7 +42,7 @@ function debugLayout() {
     const bodyRect = body.getBoundingClientRect();
     const bodyStyles = window.getComputedStyle(body);
     
-    console.log('🏢 Body:', {
+    const bodyData = {
         offsetWidth: body.offsetWidth,
         clientWidth: body.clientWidth,
         scrollWidth: body.scrollWidth,
@@ -60,14 +58,14 @@ function debugLayout() {
             padding: bodyStyles.padding,
             overflow: bodyStyles.overflow
         }
-    });
+    };
     
     // HTML element analysis
     const html = document.documentElement;
     const htmlRect = html.getBoundingClientRect();
     const htmlStyles = window.getComputedStyle(html);
     
-    console.log('🌐 HTML:', {
+    const htmlData = {
         offsetWidth: html.offsetWidth,
         clientWidth: html.clientWidth,
         scrollWidth: html.scrollWidth,
@@ -83,11 +81,11 @@ function debugLayout() {
             padding: htmlStyles.padding,
             overflow: htmlStyles.overflow
         }
-    });
+    };
     
     // Check all parent elements of container
     if (container) {
-        console.log('🔗 Parent elements chain:');
+        const parentChain = [];
         let current = container.parentElement;
         let level = 1;
         
@@ -95,7 +93,10 @@ function debugLayout() {
             const rect = current.getBoundingClientRect();
             const styles = window.getComputedStyle(current);
             
-            console.log(`   Level ${level} - ${current.tagName}${current.className ? '.' + current.className : ''}:`, {
+            parentChain.push({
+                level: level,
+                tagName: current.tagName,
+                className: current.className,
                 offsetWidth: current.offsetWidth,
                 clientWidth: current.clientWidth,
                 boundingRect: { width: rect.width, left: rect.left, right: rect.right },
@@ -114,7 +115,7 @@ function debugLayout() {
         }
     }
     
-    console.log('🔍 === LAYOUT DEBUG END ===');
+    // Layout debug completed silently
 }
 
 // Export the function
@@ -127,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Also run when window resizes
 window.addEventListener('resize', () => {
-    console.log('📏 Window resized');
+    // Window resized - running debug
     debugLayout();
 });
 
