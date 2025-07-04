@@ -702,107 +702,6 @@ window.handleSoftwareUpdate = async function() {
   }
 };
 
-window.handleSoftwareSearch = async function() {
-  console.log('🔍 Searching software...');
-  
-  // Get form data
-  const formData = getSoftwareFormData();
-  
-  // Check if at least one search field is filled
-  const hasSearchCriteria = Object.values(formData).some(value => value && value.trim() !== '');
-  
-  if (!hasSearchCriteria) {
-    if (typeof showResultModalModern === 'function') {
-      showResultModalModern('Thông báo!', 'Vui lòng nhập ít nhất một tiêu chí tìm kiếm', 'warning');
-    } else {
-      alert('⚠️ Vui lòng nhập ít nhất một tiêu chí tìm kiếm');
-    }
-    return;
-  }
-  
-  try {
-    // Show processing modal
-    if (typeof showProcessingModalModern === 'function') {
-      showProcessingModalModern('Đang tìm kiếm phần mềm...', 'Vui lòng đợi trong giây lát');
-    }
-    
-    // Prepare search conditions (only include non-empty fields)
-    const searchConditions = {};
-    Object.entries(formData).forEach(([key, value]) => {
-      if (value && value.trim() !== '') {
-        searchConditions[key] = value.trim();
-      }
-    });
-    
-    console.log('Software search conditions:', searchConditions);
-    
-    // Call backend API
-    const { BACKEND_URL } = getConstants();
-    const response = await fetch(BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "searchSoftware",
-        conditions: searchConditions
-      })
-    });
-    
-    const result = await response.json();
-    
-    // Close processing modal
-    if (typeof closeProcessingModalModern === 'function') {
-      closeProcessingModalModern();
-    }
-    
-    if (result.status === "success") {
-      // Store search results and enable search mode
-      window.softwareList = result.data || [];
-      window.isSoftwareSearching = true;
-      window.softwareSearchTerms = Object.values(searchConditions);
-      
-      // Reset to first page
-      window.currentSoftwarePage = 1;
-      
-      // Update display
-      updateSoftwareTable();
-      updateSoftwareTotalDisplay();
-      
-      // Show success message
-      const message = result.message || `Tìm thấy ${result.data.length} phần mềm phù hợp`;
-      if (typeof showResultModalModern === 'function') {
-        showResultModalModern('Kết quả tìm kiếm!', message, 'success');
-      } else {
-        alert('✅ ' + message);
-      }
-      
-      console.log('✅ Software search completed:', result.data.length, 'results found');
-      
-    } else {
-      // Show error message
-      const errorMessage = result.message || 'Có lỗi xảy ra khi tìm kiếm phần mềm';
-      if (typeof showResultModalModern === 'function') {
-        showResultModalModern('Lỗi!', errorMessage, 'error');
-      } else {
-        alert('❌ ' + errorMessage);
-      }
-      console.error('❌ Error searching software:', result.message);
-    }
-    
-  } catch (error) {
-    // Close processing modal if still open
-    if (typeof closeProcessingModalModern === 'function') {
-      closeProcessingModalModern();
-    }
-    
-    const errorMessage = 'Lỗi kết nối: ' + error.message;
-    if (typeof showResultModalModern === 'function') {
-      showResultModalModern('Lỗi kết nối!', errorMessage, 'error');
-    } else {
-      alert('❌ ' + errorMessage);
-    }
-    console.error('❌ Network error searching software:', error);
-  }
-};
 
 window.handleSoftwareReset = function() {
   console.log('🔄 Resetting software form...');
@@ -2105,7 +2004,7 @@ window.handleSoftwareUpdate = async function() {
 // ========================================
 
 window.handleSoftwareSearch = async function() {
-  console.log('🔍 Searching software...');
+  console.log('🔍 SOFTWARE SEARCH - Starting software search from frontend...');
   
   try {
     // Get search conditions from form
@@ -2132,13 +2031,16 @@ window.handleSoftwareSearch = async function() {
     
     // Call backend API
     const { BACKEND_URL } = getConstants();
+    const requestBody = {
+      action: "searchSoftware",
+      conditions: conditions
+    };
+    console.log('🔍 SOFTWARE SEARCH - Sending request:', requestBody);
+    
     const response = await fetch(BACKEND_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "searchSoftware",
-        conditions: conditions
-      })
+      body: JSON.stringify(requestBody)
     });
     
     const result = await response.json();
