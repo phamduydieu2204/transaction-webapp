@@ -2243,6 +2243,7 @@ function getSoftwareSearchConditions() {
   const orderInfo = getValue('orderInfo');
   const loginUsername = getValue('loginUsername');
   const standardName = getValue('standardName');
+  const renewalDate = getValue('renewalDate');
   
   // Add non-empty conditions
   if (softwareName) conditions.softwareName = softwareName;
@@ -2253,6 +2254,7 @@ function getSoftwareSearchConditions() {
   if (orderInfo) conditions.orderInfo = orderInfo;
   if (loginUsername) conditions.username = loginUsername;
   if (standardName) conditions.standardName = standardName;
+  if (renewalDate) conditions.renewalDate = renewalDate;
   
   console.log('🔍 Search conditions:', conditions);
   return conditions;
