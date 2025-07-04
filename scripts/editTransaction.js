@@ -49,34 +49,34 @@ export async function editTransaction(index, transactionList, fetchSoftwareList,
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 
-// console.log("📥 editTransaction - gọi fetchSoftwareList với:", {
-
+  // console.log("📥 editTransaction - gọi fetchSoftwareList với:", {
   //   softwareNameValue,
   //   softwarePackageValue,
   //   accountNameValue
   // });
-// console.log("🔎 typeof fetchSoftwareList =", typeof fetchSoftwareList);
-  //   // Đã loại bỏ showProcessingModal để tránh trùng lặp với uiBlocker
-  // 
-  //   // ✅ Cập nhật danh sách dropdown với các giá trị gốc cần giữ lại
-  //   await fetchSoftwareList(
-  //     softwareNameValue,
-  //     window.softwareData,
-  //     updatePackageList,
-  //     updateAccountList,
-  //     softwarePackageValue,
-  //     accountNameValue
-  //   );
-  //   
-  //     // Đã loại bỏ closeProcessingModal để tránh trùng lặp với uiBlocker
-  // 
-  //   // Setup transaction type dropdown for edit mode
-  //   updateTransactionTypeForEdit(transactionTypeValue, transactionTypeValue);
-  //   
-  //   // Loại bỏ cảnh báo theo yêu cầu của user
-  // 
-  //   // Gắn sự kiện 'change' cho dropdown tài khoản để cập nhật biến toàn cục tương ứng
-  //   accountNameSelect.addEventListener('change', () => {
-  //     window.currentAccountName = accountNameSelect.value;
-  //   });
-  // }
+  // console.log("🔎 typeof fetchSoftwareList =", typeof fetchSoftwareList);
+  
+  // Đã loại bỏ showProcessingModal để tránh trùng lặp với uiBlocker
+
+  // ✅ Cập nhật danh sách dropdown với các giá trị gốc cần giữ lại
+  await fetchSoftwareList(
+    softwareNameValue,
+    window.softwareData,
+    updatePackageList,
+    updateAccountList,
+    softwarePackageValue,
+    accountNameValue
+  );
+  
+  // Đã loại bỏ closeProcessingModal để tránh trùng lặp với uiBlocker
+
+  // Setup transaction type dropdown for edit mode
+  updateTransactionTypeForEdit(transactionTypeValue, transactionTypeValue);
+  
+  // Loại bỏ cảnh báo theo yêu cầu của user
+
+  // Gắn sự kiện 'change' cho dropdown tài khoản để cập nhật biến toàn cục tương ứng
+  accountNameSelect.addEventListener('change', () => {
+    window.currentAccountName = accountNameSelect.value;
+  });
+}
