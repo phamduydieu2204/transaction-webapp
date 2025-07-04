@@ -384,7 +384,7 @@ function initRenewalDatePicker() {
   
   // Initialize Flatpickr for renewal date
   flatpickr(renewalDateInput, {
-    dateFormat: "d/m/Y", // Vietnamese date format
+    dateFormat: "Y/m/d", // yyyy/mm/dd format
     allowInput: true,
     clickOpens: false, // Don't open on input click, only on icon click
     disableMobile: true,
