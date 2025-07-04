@@ -261,7 +261,7 @@ export function persistState() {
         JSON.stringify(criticalState)
       );
       
-      console.log('💾 Critical state saved as fallback');
+      // '💾 Critical state saved as fallback';
     } catch (fallbackError) {
       console.error('❌ Could not save critical state:', fallbackError);
     }
@@ -398,7 +398,7 @@ export function resetState() {
   };
   
   updateState(defaultState, true);
-  console.log('🔄 State reset to defaults');
+  // '🔄 State reset to defaults';
 }
 
 /**
@@ -435,7 +435,7 @@ export function cleanupStateManager() {
   // Clear listeners
   stateListeners.clear();
   
-  console.log('✅ State manager cleanup complete');
+  // '✅ State manager cleanup complete';
 }
 
 /**

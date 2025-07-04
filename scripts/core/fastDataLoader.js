@@ -138,7 +138,7 @@ class FastDataLoader {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'searchExpenses',
+          action: 'loadExpenses', // Changed from 'searchExpenses' to avoid logging as user search
           maNhanVien: user.maNhanVien,
           conditions: {}
         })

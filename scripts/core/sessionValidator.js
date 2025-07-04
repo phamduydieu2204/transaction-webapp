@@ -66,7 +66,7 @@ async function handleLegacyUserLogout() {
  * Initialize session validation system
  */
 export function initializeSessionValidation() {
-  console.log('🔐 Initializing session validation system...');
+  // '🔐 Initializing session validation system...';
   
   // Check on page load if user is logged in
   if (VALIDATION_CONFIG.onPageLoadCheck) {
@@ -75,14 +75,14 @@ export function initializeSessionValidation() {
     }, 500); // Quick check after basic initialization
   }
   
-  console.log('✅ Session validation enabled');
+  // '✅ Session validation enabled';
   
   // Set up periodic validation
   setInterval(() => {
     validateCurrentSession();
   }, VALIDATION_CONFIG.checkInterval);
   
-  console.log('✅ Session validation system initialized');
+  // '✅ Session validation system initialized';
 }
 
 /**
@@ -90,7 +90,7 @@ export function initializeSessionValidation() {
  * Used during app initialization to prevent loading invalid sessions
  */
 export async function validateSessionImmediate() {
-  console.log('⚡ Immediate session validation...');
+  // '⚡ Immediate session validation...';
   
   const user = getState().user;
   
@@ -115,7 +115,7 @@ export async function validateSessionImmediate() {
       return false;
     }
     
-    console.log('✅ Immediate session validation successful');
+    // '✅ Immediate session validation successful';
     return true;
     
   } catch (error) {
@@ -153,14 +153,14 @@ export async function validateCurrentSession() {
   // Check if we validated recently
   const now = Date.now();
   if (now - lastValidation < 60000) { // Don't validate more than once per minute
-    console.log('⚡ Session validated recently, skipping');
+    // '⚡ Session validated recently, skipping';
     return;
   }
   
-  console.log('🔍 Validating session for user:', user.tenNhanVien);
-  console.log('🔑 User has passwordHash:', !!user.passwordHash);
+  // '🔍 Validating session for user:', user.tenNhanVien;
+  // '🔑 User has passwordHash:', !!user.passwordHash;
   if (user.passwordHash) {
-    console.log('🔑 PasswordHash preview:', user.passwordHash.substring(0, 8) + '...');
+    // '🔑 PasswordHash preview:', user.passwordHash.substring(0, 8 + '...');
   }
   validationInProgress = true;
   
@@ -172,7 +172,7 @@ export async function validateCurrentSession() {
       console.error('❌ Session validation failed - forcing logout');
       await handleInvalidSession();
     } else {
-      console.log('✅ Session validation successful');
+      // '✅ Session validation successful';
     }
     
   } catch (error) {
@@ -206,7 +206,7 @@ async function validateWithServerFast(user) {
     }
   };
   
-  console.log('⚡ Fast session validation request...');
+  // '⚡ Fast session validation request...';
   
   try {
     // Single attempt with faster timeout
@@ -232,13 +232,13 @@ async function validateWithServerFast(user) {
     
     if (result.status === 'success') {
       if (result.sessionValid === false) {
-        console.log('📋 Server says session is invalid:', result.reason || 'Unknown reason');
+        // '📋 Server says session is invalid:', result.reason || 'Unknown reason';
         return false;
       }
       
       // Check if user data has changed significantly
       if (result.updatedUserData) {
-        console.log('🔄 User data updated from server (fast)');
+        // '🔄 User data updated from server (fast');
         updateUserDataFromServer(result.updatedUserData);
       }
       
@@ -277,8 +277,8 @@ async function validateWithServer(user) {
     }
   };
   
-  console.log('📡 Sending session validation request...');
-  console.log('📋 Request data:', JSON.stringify(data, null, 2));
+  // '📡 Sending session validation request...';
+  // '📋 Request data:', JSON.stringify(data, null, 2);
   
   for (let attempt = 1; attempt <= VALIDATION_CONFIG.retryAttempts; attempt++) {
     try {
@@ -298,13 +298,13 @@ async function validateWithServer(user) {
       
       if (result.status === 'success') {
         if (result.sessionValid === false) {
-          console.log('📋 Server says session is invalid:', result.reason || 'Unknown reason');
+          // '📋 Server says session is invalid:', result.reason || 'Unknown reason';
           return false;
         }
         
         // Check if user data has changed significantly
         if (result.updatedUserData) {
-          console.log('🔄 User data updated from server');
+          // '🔄 User data updated from server';
           updateUserDataFromServer(result.updatedUserData);
         }
         
@@ -340,7 +340,7 @@ function updateUserDataFromServer(updatedData) {
   };
   
   updateState({ user: updatedUser });
-  console.log('✅ User data updated from server');
+  // '✅ User data updated from server';
 }
 
 /**
@@ -375,7 +375,7 @@ async function handleInvalidSession() {
  * Force session validation (can be called manually)
  */
 export async function forceSessionValidation() {
-  console.log('🔄 Forcing session validation...');
+  // '🔄 Forcing session validation...';
   lastValidation = 0; // Reset last validation time
   await validateCurrentSession();
 }
@@ -399,7 +399,7 @@ export function isValidationInProgress() {
  * @returns {Promise<boolean>} True if session is valid
  */
 export async function validateBeforeOperation() {
-  console.log('🔍 Validating session before operation...');
+  // '🔍 Validating session before operation...';
   
   const user = getState().user;
   if (!user) {
@@ -410,7 +410,7 @@ export async function validateBeforeOperation() {
   // Check cache first
   const now = Date.now();
   if (now - lastOperationValidation < VALIDATION_CONFIG.operationCacheTime) {
-    console.log('✅ Using cached validation result:', lastOperationResult);
+    // '✅ Using cached validation result:', lastOperationResult;
     return lastOperationResult;
   }
   
@@ -427,7 +427,7 @@ export async function validateBeforeOperation() {
       return false;
     }
     
-    console.log('✅ Session valid for operation');
+    // '✅ Session valid for operation';
     return true;
   } catch (error) {
     console.error('❌ Session validation failed for operation:', error);
@@ -441,7 +441,7 @@ export async function validateBeforeOperation() {
  */
 export function wrapWithSessionValidation(originalFunction, functionName) {
   return async function(...args) {
-    console.log(`🔐 Session check for ${functionName}`);
+    // `🔐 Session check for ${functionName}`;
     
     const isValid = await validateBeforeOperation();
     if (!isValid) {

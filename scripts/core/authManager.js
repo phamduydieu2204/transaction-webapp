@@ -117,7 +117,7 @@ function checkSessionValidity() {
  * Validate session data
  */
 function isSessionValid(authData) {
-    console.log('🔐 Checking session validity...');
+    // '🔐 Checking session validity...';
     if (!authData || !authData.expiryTime) {
         console.log('❌ Session invalid: No auth data or expiry time');
         return false;
@@ -125,9 +125,9 @@ function isSessionValid(authData) {
     
     const now = Date.now();
     const isValid = now < authData.expiryTime;
-    console.log(`🔐 Session expiry: ${new Date(authData.expiryTime).toLocaleString()}`);
-    console.log(`🔐 Current time: ${new Date(now).toLocaleString()}`);
-    console.log(`🔐 Session valid: ${isValid}`);
+    // `🔐 Session expiry: ${new Date(authData.expiryTime.toLocaleString()}`);
+    // `🔐 Current time: ${new Date(now.toLocaleString()}`);
+    // `🔐 Session valid: ${isValid}`;
     
     return isValid;
 }

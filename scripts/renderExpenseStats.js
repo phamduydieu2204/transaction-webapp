@@ -18,13 +18,13 @@ export async function renderExpenseStats() {
   const isThongKeTab = currentTab && currentTab.dataset.tab === "tab-thong-ke";
   
   if (!isChiPhiTab && !isThongKeTab) {
-    console.log("⏭️ Không ở tab chi phí/thống kê, bỏ qua render");
+    // "⏭️ Không ở tab chi phí/thống kê, bỏ qua render";
     return;
   }
   
   // ✅ SKIP THỐNG KÊ NẾU UI CONTROLLER ĐÃ XỬ LÝ
   if (isThongKeTab && window.statisticsUIControllerActive) {
-    console.log("⏭️ Statistics UI Controller đang xử lý, bỏ qua renderExpenseStats");
+    // "⏭️ Statistics UI Controller đang xử lý, bỏ qua renderExpenseStats";
     return;
   }
   
@@ -34,7 +34,7 @@ export async function renderExpenseStats() {
     return;
   }
   
-  console.log("🔄 Bắt đầu load expense data bằng module mới...");
+  // "🔄 Bắt đầu load expense data bằng module mới...";
   
   try {
     // ✅ Force refresh để lấy data mới nhất từ server
@@ -43,12 +43,12 @@ export async function renderExpenseStats() {
     window.expenseList = expenseData || [];
     window.isExpenseSearching = false;
     renderExpenseData(expenseData);
-    console.log("✅ Load expense data thành công:", expenseData.length, "chi phí");
+    // "✅ Load expense data thành công:", expenseData.length, "chi phí";
     
   } catch (err) {
     console.error("❌ Lỗi khi thống kê chi phí:", err);
     // Fallback to old method if new module fails
-    console.log("🔄 Thử phương pháp cũ...");
+    // "🔄 Thử phương pháp cũ...";
     await renderExpenseStatsLegacy();
   }
 }
@@ -80,7 +80,7 @@ async function renderExpenseStatsLegacy() {
       window.expenseList = result.data || [];
       window.isExpenseSearching = false;
       renderExpenseData(result.data);
-      console.log("✅ Legacy load expense data thành công:", result.data.length, "chi phí");
+      // "✅ Legacy load expense data thành công:", result.data.length, "chi phí";
     } else {
       console.error("❌ Lỗi từ server:", result.message);
     }
@@ -94,7 +94,7 @@ async function renderExpenseStatsLegacy() {
 }
 
 function renderExpenseData(data) {
-  console.log("🔍 DEBUG: Dữ liệu chi phí nhận được:", data);
+  // "🔍 DEBUG: Dữ liệu chi phí nhận được:", data;
   
   // ✅ KIỂM TRA LẠI TAB HIỆN TẠI TRƯỚC KHI RENDER
   const currentTab = document.querySelector(".tab-button.active");
@@ -119,13 +119,13 @@ function renderExpenseData(data) {
   });
 
   const totalExpense = totalExpenses.VND || 0;
-  console.log("✅ Tổng chi phí tính được:", totalExpense);
+  // "✅ Tổng chi phí tính được:", totalExpense;
 
   // ✅ Lưu tổng chi phí vào biến global và cập nhật hiển thị
   window.totalExpense = totalExpense;
 
   // Không cần cập nhật hiển thị totals nữa - đã xóa
-  console.log("✅ Đã lưu totalExpense:", totalExpense, "- Không hiển thị totals");
+  // "✅ Đã lưu totalExpense:", totalExpense, "- Không hiển thị totals";
 
   // ✅ CHỈ RENDER BẢNG NẾU ĐANG Ở TAB TƯƠNG ỨNG
   if (isChiPhiTab) {
@@ -145,7 +145,7 @@ function renderExpenseSummaryModular(data) {
     const isThongKeTab = currentTab && currentTab.dataset.tab === "tab-thong-ke";
     
     if (!isThongKeTab) {
-      console.log("⏭️ Not on statistics tab, skipping modular summary");
+      // "⏭️ Not on statistics tab, skipping modular summary";
       return;
     }
 
@@ -160,7 +160,7 @@ function renderExpenseSummaryModular(data) {
       showGrowthRate: false
     });
 
-    console.log("✅ Statistics summary rendered with new modules");
+    // "✅ Statistics summary rendered with new modules";
   } catch (error) {
     console.error("❌ Error rendering modular summary:", error);
     // Fallback to legacy method

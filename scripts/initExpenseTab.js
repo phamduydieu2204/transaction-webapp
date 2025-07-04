@@ -99,7 +99,7 @@ async function loadExpensesInBackground() {
   }
   
   const data = {
-    action: 'searchExpenses',
+    action: 'loadExpenses', // Changed from 'searchExpenses' to avoid logging as user search
     maNhanVien: window.userInfo.maNhanVien,
     conditions: {} // Empty conditions to get all expenses
   };

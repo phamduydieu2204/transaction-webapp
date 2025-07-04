@@ -43,7 +43,7 @@ export function initializeGlobals() {
   window.isExpenseSearching = false;
   window.expenseList = [];
 
-  console.log('✅ Global variables initialized');
+  // '✅ Global variables initialized';
 }
 
 /**
@@ -88,37 +88,37 @@ export function initializeUI() {
   // Initialize total display system
   initTotalDisplay();
 
-  console.log('✅ UI elements initialized');
+  // '✅ UI elements initialized';
 }
 
 /**
  * Load initial data for the application
  */
 export async function loadInitialData() {
-  console.log('🚀 Loading initial data...');
+  // '🚀 Loading initial data...';
 
   try {
     // Check if we should use ultra-fast mode
     if (shouldUseUltraFast()) {
-      console.log('⚡ Using ULTRA-FAST mode for performance');
+      // '⚡ Using ULTRA-FAST mode for performance';
       const success = await ultraFastInit(window.userInfo);
       if (success) {
-        console.log('✅ Ultra-fast initialization complete');
+        // '✅ Ultra-fast initialization complete';
         return;
       }
       console.warn('⚠️ Ultra-fast init failed, falling back to optimized mode');
     }
 
     // Phase 1: Critical data only (parallel loading)
-    console.log('🚀 Phase 1: Loading critical data...');
+    // '🚀 Phase 1: Loading critical data...';
     const softwareDataPromise = loadSoftwareData();
     
     // Wait for software data (needed for dropdowns)
     await softwareDataPromise;
-    console.log('✅ Software data loaded');
+    // '✅ Software data loaded';
     
     // Phase 2: Tab-specific data (parallel loading for statistics)
-    console.log('🚀 Phase 2: Loading tab-specific data...');
+    // '🚀 Phase 2: Loading tab-specific data...';
     
     // Load both transaction and expense data in parallel
     // This ensures statistics tab has data available immediately
@@ -128,14 +128,14 @@ export async function loadInitialData() {
     ];
     
     await Promise.all(dataPromises);
-    console.log('✅ Transaction and expense data loaded');
+    // '✅ Transaction and expense data loaded';
     
     // Phase 3: Initialize minimal features
-    console.log('🚀 Phase 3: Initializing minimal features...');
+    // '🚀 Phase 3: Initializing minimal features...';
     await initializeMinimalFeatures();
-    console.log('✅ Minimal features initialized');
+    // '✅ Minimal features initialized';
     
-    console.log('✅ Initial data loaded successfully (optimized)');
+    // '✅ Initial data loaded successfully (optimized');
   } catch (error) {
     console.error('❌ Error loading initial data:', error);
     throw error;
@@ -156,7 +156,7 @@ async function loadSoftwareData() {
       null, // softwarePackageToKeep
       null  // accountNameToKeep
     );
-    console.log('✅ Software data loaded');
+    // '✅ Software data loaded';
   } catch (error) {
     console.error('❌ Error loading software data:', error);
     // Continue execution even if software data fails
@@ -167,7 +167,7 @@ async function loadSoftwareData() {
  * Load transaction data optimized for performance
  */
 async function loadTransactionDataOptimized() {
-  console.log('📊 Loading transaction data (optimized)...');
+  // '📊 Loading transaction data (optimized...');
   
   try {
     // Ultra-fast initial load with minimal data
@@ -197,12 +197,12 @@ async function loadTransactionDataOptimized() {
       }
     );
     
-    console.log('✅ Initial transaction data loaded');
+    // '✅ Initial transaction data loaded';
     
     // Preload next page in background after UI settles
     setTimeout(async () => {
       if (window.transactionList && window.transactionList.length >= initialPageSize) {
-        console.log('🔄 Preloading additional transaction data...');
+        // '🔄 Preloading additional transaction data...';
         // Increase page size for subsequent loads
         window.itemsPerPage = 10; // Đồng bộ: 10 items/trang
       }
@@ -228,7 +228,7 @@ async function loadTransactionData() {
  * Load expense data for statistics and reports
  */
 async function loadExpenseData() {
-  console.log('📊 Loading expense data...');
+  // '📊 Loading expense data...';
   
   try {
     const { BACKEND_URL } = getConstants();
@@ -240,7 +240,7 @@ async function loadExpenseData() {
     }
     
     const data = {
-      action: 'searchExpenses',
+      action: 'loadExpenses', // Changed from 'searchExpenses' to avoid logging as user search
       maNhanVien: window.userInfo.maNhanVien,
       conditions: {} // Empty conditions to get all expenses
     };
@@ -261,7 +261,7 @@ async function loadExpenseData() {
     
     if (result.status === 'success') {
       window.expenseList = result.data || [];
-      console.log(`✅ Loaded ${window.expenseList.length} expenses`);
+      // `✅ Loaded ${window.expenseList.length} expenses`;
     } else {
       console.error('❌ Error loading expenses:', result.message);
       window.expenseList = [];
@@ -277,7 +277,7 @@ async function loadExpenseData() {
  * Initialize minimal features for immediate interaction
  */
 async function initializeMinimalFeatures() {
-  console.log('⚡ Initializing minimal features...');
+  // '⚡ Initializing minimal features...';
   
   try {
     // Only initialize features needed for immediate interaction
@@ -301,7 +301,7 @@ async function initializeMinimalFeatures() {
       initializeHeavyFeatures();
     }, 3000);
     
-    console.log('✅ Minimal features initialized');
+    // '✅ Minimal features initialized';
   } catch (error) {
     console.error('❌ Error initializing minimal features:', error);
     // Continue with basic functionality
@@ -312,14 +312,14 @@ async function initializeMinimalFeatures() {
  * Initialize heavy features in background
  */
 async function initializeHeavyFeatures() {
-  console.log('📈 Initializing heavy features in background...');
+  // '📈 Initializing heavy features in background...';
   
   try {
     // Initialize expense features (only when needed)
     await initializeExpenseFeatures();
     
     // Initialize other heavy features on-demand
-    console.log('📊 Heavy features available for lazy loading');
+    // '📊 Heavy features available for lazy loading';
   } catch (error) {
     console.error('❌ Error initializing heavy features:', error);
   }
@@ -342,7 +342,7 @@ async function initializeExpenseFeatures() {
     // Initialize expense quick search
     initExpenseQuickSearch();
     
-    console.log('✅ Expense features initialized');
+    // '✅ Expense features initialized';
   } catch (error) {
     console.error('❌ Error initializing expense features:', error);
     // Continue execution even if expense features fail
@@ -388,7 +388,7 @@ export function setupErrorHandling() {
     }
   });
 
-  console.log('✅ Error handling setup complete');
+  // '✅ Error handling setup complete';
 }
 
 /**
@@ -402,7 +402,7 @@ export function initializeConstants() {
     // Make constants globally available if needed
     window.APP_CONSTANTS = constants;
     
-    console.log('✅ Constants initialized');
+    // '✅ Constants initialized';
   } catch (error) {
     console.error('❌ Error initializing constants:', error);
     throw error;
@@ -418,7 +418,7 @@ export function setupDevelopmentMode() {
                        window.location.search.includes('debug=true');
 
   if (isDevelopment) {
-    console.log('🔧 Development mode enabled');
+    // '🔧 Development mode enabled';
     
     // Enable debug logging
     window.DEBUG = true;
@@ -435,7 +435,7 @@ export function setupDevelopmentMode() {
       setTimeout(() => {
         const timing = window.performance.timing;
         const loadTime = timing.loadEventEnd - timing.navigationStart;
-        console.log(`📊 Page load time: ${loadTime}ms`);
+        // `📊 Page load time: ${loadTime}ms`;
       }, 0);
     }
   }
@@ -446,7 +446,7 @@ export function setupDevelopmentMode() {
  * @returns {Promise<boolean>} True if initialization successful
  */
 export async function initializeApp() {
-  console.log('🚀 Starting application initialization...');
+  // '🚀 Starting application initialization...';
   
   try {
     // Step 1: Initialize globals and constants
@@ -471,7 +471,7 @@ export async function initializeApp() {
     // Step 6: Load initial data
     await loadInitialData();
     
-    console.log('✅ Application initialization complete');
+    // '✅ Application initialization complete';
     return true;
     
   } catch (error) {
@@ -508,7 +508,7 @@ export function cleanupApp() {
     console.warn('⚠️ Could not save last activity:', error);
   }
   
-  console.log('✅ Application cleanup complete');
+  // '✅ Application cleanup complete';
 }
 
 // Setup cleanup on page unload

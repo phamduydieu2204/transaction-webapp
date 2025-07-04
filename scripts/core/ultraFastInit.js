@@ -127,7 +127,7 @@ function scheduleBackgroundLoading() {
       
       if (window.userInfo && window.userInfo.maNhanVien) {
         const data = {
-          action: 'searchExpenses',
+          action: 'loadExpenses', // Changed from 'searchExpenses' to avoid logging as user search
           maNhanVien: window.userInfo.maNhanVien,
           conditions: {}
         };

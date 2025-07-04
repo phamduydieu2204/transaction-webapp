@@ -1,6 +1,6 @@
 // Force full-width layout - Ultimate solution
 export function forceFullWidth() {
-    console.log('🔧 FORCE FULL-WIDTH LAYOUT');
+    // '🔧 FORCE FULL-WIDTH LAYOUT';
     
     // Remove all width constraints from body and html
     const html = document.documentElement;
@@ -160,7 +160,7 @@ export function forceFullWidth() {
         const finalContainer = document.querySelector('.container');
         const finalRect = finalContainer.getBoundingClientRect();
         
-        console.log('✅ FORCE FULL-WIDTH RESULT:');
+        // '✅ FORCE FULL-WIDTH RESULT:';
         console.log('- Container width:', finalRect.width);
         console.log('- Viewport width:', window.innerWidth);
         console.log('- Success:', finalRect.width >= window.innerWidth - 5 ? 'YES' : 'NO');
