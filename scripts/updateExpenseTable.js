@@ -17,12 +17,12 @@ window.handleDeleteExpense = handleDeleteExpense;
 window.updateExpenseTable = updateExpenseTable;
 
 // Force refresh on load to show new structure
-console.log('👁️ Loading unified detail modals for view functionality...');
+// Loading unified detail modals for view functionality...
 if (typeof window !== 'undefined') {
   // Schedule refresh after DOM is ready
   setTimeout(() => {
     if (window.expenseList && window.expenseList.length > 0) {
-      console.log('🎨 Refreshing expense table with transaction-style UI...');
+      // Refreshing expense table with transaction-style UI...
       updateExpenseTable();
     }
   }, 100);
@@ -30,7 +30,7 @@ if (typeof window !== 'undefined') {
   // Also schedule a longer refresh to catch late-loading data
   setTimeout(() => {
     if (window.expenseList && window.expenseList.length > 0) {
-      console.log('🎨 Final refresh for expense table styling...');
+      // Final refresh for expense table styling...
       updateExpenseTable();
     }
     // FORCE: Remove any remaining scroll on containers

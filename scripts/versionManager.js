@@ -115,7 +115,7 @@ class VersionManager {
     if ('serviceWorker' in navigator) {
       try {
         const registration = await navigator.serviceWorker.register('./sw.js');
-        console.log('Service Worker registered:', registration);
+        // Service Worker registered successfully
         
         // Check for updates
         registration.addEventListener('updatefound', () => {

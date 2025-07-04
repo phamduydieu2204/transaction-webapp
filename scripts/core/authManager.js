@@ -162,9 +162,9 @@ function saveAuthToStorage(authData) {
  */
 function loadAuthFromStorage() {
     try {
-        console.log('🔍 Looking for auth data with key:', AUTH_STORAGE_KEY);
+        // Looking for auth data...
         const data = localStorage.getItem(AUTH_STORAGE_KEY);
-        console.log('🔍 Raw auth data:', data ? `Found (${data.length} chars)` : 'Not found');
+        // Raw auth data checked
         return data ? JSON.parse(data) : null;
     } catch (error) {
         console.error('Failed to load auth data:', error);
@@ -255,19 +255,19 @@ export const authManager = {
     extendSession,
     checkSessionExpiry,
     loadSession: () => {
-        console.log('📱 AuthManager: Loading session...');
+        // AuthManager: Loading session...
         const auth = loadAuthFromStorage();
-        console.log('📱 AuthManager: Auth data from storage:', auth ? 'Found' : 'Not found');
+        // AuthManager: Auth data from storage...
         
         if (auth && isSessionValid(auth)) {
-            console.log('✅ AuthManager: Session is valid');
+            // AuthManager: Session is valid
             updateState({ 
                 user: auth.user,
                 sessionStart: auth.sessionStart 
             });
             return true;
         }
-        console.log('❌ AuthManager: No valid session');
+        // AuthManager: No valid session
         return false;
     }
 };

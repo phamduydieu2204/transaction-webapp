@@ -16,11 +16,11 @@ const STATIC_ASSETS = [
 
 // Install event - cache static assets
 self.addEventListener('install', event => {
-  console.log('[SW] Installing service worker...');
+  // Installing service worker...
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('[SW] Caching static assets');
+        // Caching static assets
         return cache.addAll(STATIC_ASSETS);
       })
       .then(() => self.skipWaiting())
@@ -29,7 +29,7 @@ self.addEventListener('install', event => {
 
 // Activate event - clean old caches
 self.addEventListener('activate', event => {
-  console.log('[SW] Activating service worker...');
+  // Activating service worker...
   event.waitUntil(
     caches.keys()
       .then(cacheNames => {

@@ -8,38 +8,38 @@
  * Date: 2025-01-16
  */
 
-console.warn('⚠️ statisticsRenderer.js is disabled - rendering handled directly in overviewReport.js');
+// statisticsRenderer.js is disabled - rendering handled directly in overviewReport.js
 
 /**
  * DISABLED - Export stub functions to prevent import errors
  */
 export function renderMonthlySummaryTable(summaryData, options = {}) {
-  console.error('❌ renderMonthlySummaryTable is disabled. Use overviewReport.js instead');
+  // renderMonthlySummaryTable is disabled. Use overviewReport.js instead
   return;
 }
 
 export function renderFinancialOverview(financialData, options = {}) {
-  console.error('❌ renderFinancialOverview is disabled. Use overviewReport.js instead');
+  // renderFinancialOverview is disabled. Use overviewReport.js instead
   return;
 }
 
 export function renderSimpleChart(data, options = {}) {
-  console.error('❌ renderSimpleChart is disabled. Use overviewReport.js instead');
+  // renderSimpleChart is disabled. Use overviewReport.js instead
   return;
 }
 
 export function renderExportControls(options = {}) {
-  console.error('❌ renderExportControls is disabled. Use overviewReport.js instead');
+  // renderExportControls is disabled. Use overviewReport.js instead
   return;
 }
 
 export function renderLoadingState(containerId, message) {
-  console.error('❌ renderLoadingState is disabled. Use overviewReport.js instead');
+  // renderLoadingState is disabled. Use overviewReport.js instead
   return;
 }
 
 export function renderErrorState(containerId, error) {
-  console.error('❌ renderErrorState is disabled. Use overviewReport.js instead');
+  // renderErrorState is disabled. Use overviewReport.js instead
   return;
 }
 
@@ -48,7 +48,7 @@ export function renderErrorState(containerId, error) {
  */
 class StatisticsRenderer {
   constructor() {
-    console.error('❌ StatisticsRenderer class is disabled');
+    // StatisticsRenderer class is disabled
   }
 }
 

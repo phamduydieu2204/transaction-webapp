@@ -74,7 +74,7 @@ let autoSaveInterval = null;
  * Initialize state manager
  */
 export function initializeStateManager() {
-  console.log('🔄 Initializing state manager...');
+  // Initializing state manager...
   
   try {
     // Load saved state from localStorage
@@ -89,7 +89,7 @@ export function initializeStateManager() {
     // Make state globally available
     window.appState = appState;
     
-    console.log('✅ State manager initialized');
+    // State manager initialized
     return true;
   } catch (error) {
     console.error('❌ Error initializing state manager:', error);
@@ -244,7 +244,7 @@ export function persistState() {
       JSON.stringify(stateToSave)
     );
     
-    console.log('💾 State persisted to localStorage');
+    // State persisted to localStorage
   } catch (error) {
     console.error('❌ Error persisting state:', error);
     
@@ -290,9 +290,9 @@ function loadPersistedState() {
           }
         });
         
-        console.log('✅ State loaded from localStorage');
+        // State loaded from localStorage
       } else {
-        console.log('⚠️ Saved state is too old, using default state');
+        // Saved state is too old, using default state
       }
     }
     
@@ -303,7 +303,7 @@ function loadPersistedState() {
       appState.user = parsedCriticalState.user;
       appState.activeTab = parsedCriticalState.activeTab;
       
-      console.log('✅ Critical state loaded as fallback');
+      // Critical state loaded as fallback
     }
     
   } catch (error) {
@@ -323,7 +323,7 @@ function setupAutoSave() {
     persistState();
   }, STATE_CONFIG.autoSaveInterval);
   
-  console.log('⏰ Auto-save setup complete');
+  // Auto-save setup complete
 }
 
 /**
@@ -347,7 +347,7 @@ function setupStateValidation() {
     appState.itemsPerPage = 50;
   }
   
-  console.log('✅ State validation complete');
+  // State validation complete
 }
 
 /**
