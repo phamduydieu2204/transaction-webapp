@@ -588,5 +588,5 @@ function handleTableAction(action, index, transactionList) {
   }
 }
 
-// Export as default updateTable
+// Export the updateTable function - fixed syntax
 export { updateTableUltraFast as updateTable };
