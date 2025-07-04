@@ -4,9 +4,25 @@ export function showProcessingModal(message = "Hệ thống đang thực thi..."
     const modalClose = document.getElementById("modalClose");
     const modalTitle = document.getElementById("modalTitle");
   
-    modalTitle.textContent = "Thông báo";
-    modalMessage.textContent = message;
-    modalClose.style.display = "none";
+    // Check if elements exist before setting properties
+    if (!modal) {
+        console.error("❌ Processing modal not found - using alert fallback");
+        alert(message);
+        return;
+    }
+    
+    if (modalTitle) {
+        modalTitle.textContent = "Thông báo";
+    }
+    
+    if (modalMessage) {
+        modalMessage.textContent = message;
+    }
+    
+    if (modalClose) {
+        modalClose.style.display = "none";
+    }
+    
     modal.style.display = "block";
   
     document.querySelectorAll("input, select, textarea, button").forEach(element => {
