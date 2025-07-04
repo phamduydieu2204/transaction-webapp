@@ -2224,6 +2224,14 @@ function getSoftwareSearchConditions() {
   if (renewalDate) conditions.renewalDate = renewalDate;
   
   console.log('🔍 Search conditions:', conditions);
+  
+  // Debug: Log specifically the renewal date
+  if (conditions.renewalDate) {
+    console.log('📅 DEBUG: Renewal date from form:', conditions.renewalDate);
+    console.log('📅 DEBUG: Renewal date type:', typeof conditions.renewalDate);
+    console.log('📅 DEBUG: Renewal date length:', conditions.renewalDate.length);
+  }
+  
   return conditions;
 }
 
