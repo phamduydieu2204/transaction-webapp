@@ -596,6 +596,31 @@ window.handleSoftwareAdd = async function() {
     // Get form data
     const formData = getSoftwareFormData();
     
+    // Debug log the form data being sent
+    console.log('🔍 Form data being sent to server:', {
+      loginUsername: formData.loginUsername,
+      loginPassword: formData.loginPassword,
+      templateFile: formData.templateFile,
+      accountSheetId: formData.accountSheetId,
+      softwareName: formData.softwareName,
+      softwarePackage: formData.softwarePackage,
+      accountName: formData.accountName
+    });
+    
+    // Also log the actual DOM element values to compare
+    const usernameElement = document.getElementById('loginUsername');
+    const passwordElement = document.getElementById('loginPassword');
+    const checkboxElement = document.getElementById('templateFile');
+    
+    console.log('🔍 DOM element values (direct read):', {
+      usernameFromDOM: usernameElement?.value || 'NOT_FOUND',
+      passwordFromDOM: passwordElement?.value || 'NOT_FOUND', 
+      checkboxFromDOM: checkboxElement?.checked || false,
+      usernameElementExists: !!usernameElement,
+      passwordElementExists: !!passwordElement,
+      checkboxElementExists: !!checkboxElement
+    });
+    
     // Validate required fields
     if (!validateSoftwareForm(formData)) {
       return;
