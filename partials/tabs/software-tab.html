@@ -126,8 +126,14 @@
           <div class="error-message" id="softwareNote-error"></div>
         </div>
         
-        <!-- Empty field for layout alignment -->
-        <div class="form-field-empty"></div>
+        <div class="form-field">
+          <label>Loại tệp</label>
+          <input type="text" id="fileType" list="fileTypeList" placeholder="Chọn hoặc nhập loại tệp" autocomplete="off">
+          <datalist id="fileTypeList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
+          <div class="error-message" id="fileType-error"></div>
+        </div>
       </div>
 
       <!-- Buttons -->
@@ -170,6 +176,7 @@
             <th>Thông tin đăng nhập</th>
             <th>Ngày thay đổi</th>
             <th>Ngày gia hạn</th>
+            <th>Loại tệp</th>
             <th>Ghi chú</th>
             <th>Hành động</th>
           </tr>

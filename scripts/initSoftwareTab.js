@@ -81,7 +81,7 @@ function updateSoftwareTable() {
   if (pageData.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="11" style="text-align: center; padding: 20px; color: #666;">
+        <td colspan="12" style="text-align: center; padding: 20px; color: #666;">
           Không có dữ liệu phần mềm
         </td>
       </tr>
@@ -143,6 +143,7 @@ function updateSoftwareTable() {
         <td class="login-info-cell">${loginInfo}</td>
         <td style="text-align: center;">${lastModified}</td>
         <td style="text-align: center;">${renewalDate}</td>
+        <td>${escapeHtml(software.fileType || '')}</td>
         <td style="max-width: 200px; word-wrap: break-word;">${note || ''}</td>
         <td style="text-align: center;">
           ${actionDropdown}
@@ -424,7 +425,8 @@ function editSoftwareItem(software, index) {
     loginSecret: document.getElementById('loginSecret'),
     standardName: document.getElementById('standardName'),
     renewalDate: document.getElementById('renewalDate'),
-    softwareNote: document.getElementById('softwareNote')
+    softwareNote: document.getElementById('softwareNote'),
+    fileType: document.getElementById('fileType')
   };
   
   // Batch DOM updates to prevent layout thrashing
@@ -442,6 +444,7 @@ function editSoftwareItem(software, index) {
     if (formElements.loginSecret) formElements.loginSecret.value = software.secret || '';
     if (formElements.standardName) formElements.standardName.value = software.standardName || '';
     if (formElements.softwareNote) formElements.softwareNote.value = software.note || '';
+    if (formElements.fileType) formElements.fileType.value = software.fileType || '';
     
     // Handle renewalDate - convert from dd/mm/yyyy to yyyy-mm-dd for input[type="date"]
     if (formElements.renewalDate && software.renewalDate) {
@@ -725,7 +728,8 @@ function getSoftwareFormData() {
     loginSecret: document.getElementById('loginSecret')?.value?.trim() || '',
     note: document.getElementById('softwareNote')?.value?.trim() || '',
     standardName: document.getElementById('standardName')?.value?.trim() || '',
-    renewalDate: document.getElementById('renewalDate')?.value?.trim() || ''
+    renewalDate: document.getElementById('renewalDate')?.value?.trim() || '',
+    fileType: document.getElementById('fileType')?.value?.trim() || ''
   };
 }
 
@@ -951,6 +955,7 @@ function updateSoftwareFormDropdowns() {
   updateAllowedUsersDropdown();
   updateOrderInfoDropdown();
   updateStandardNameDropdown();
+  updateFileTypeDropdown();
   // Level 2 dropdowns (software + package + account)
   updateLoginUsernameDropdown();
   updateLoginPasswordDropdown();
@@ -1015,6 +1020,7 @@ const debouncedDropdownUpdate = debounce(() => {
       updateAllowedUsersDropdown();
       updateOrderInfoDropdown();
       updateStandardNameDropdown();
+      updateFileTypeDropdown();
     } catch (error) {
       console.error('Error in debounced dropdown update:', error);
     }
@@ -1719,6 +1725,28 @@ function updateRenewalDateDropdown() {
   uniqueRenewalDates.forEach(date => {
     const option = document.createElement('option');
     option.value = date;
+    datalistElement.appendChild(option);
+  });
+}
+
+function updateFileTypeDropdown() {
+  const datalistElement = document.getElementById('fileTypeList');
+  if (!datalistElement) return;
+  
+  // Clear existing options
+  datalistElement.innerHTML = '';
+  
+  // Get unique file types from column Q
+  const uniqueFileTypes = [...new Set(
+    window.softwareList
+      .map(item => item.fileType)
+      .filter(fileType => fileType && fileType.trim() !== '')
+  )].sort();
+  
+  // Populate datalist
+  uniqueFileTypes.forEach(fileType => {
+    const option = document.createElement('option');
+    option.value = fileType;
     datalistElement.appendChild(option);
   });
 }
