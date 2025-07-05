@@ -25,7 +25,86 @@ export function initSoftwareTab() {
   // Load software data
   loadSoftwareData();
   
+  // Debug checkbox positioning
+  debugCheckboxPosition();
+  
   console.log('✅ Software tab initialized');
+}
+
+// Debug function to check checkbox positioning
+function debugCheckboxPosition() {
+  setTimeout(() => {
+    console.log('🔍 ===== DEBUG CHECKBOX POSITION =====');
+    
+    const accountSheetInput = document.getElementById('accountSheetId');
+    const checkbox = document.getElementById('templateFile');
+    const container = document.querySelector('.date-input-container');
+    
+    if (accountSheetInput) {
+      const inputRect = accountSheetInput.getBoundingClientRect();
+      const inputStyles = window.getComputedStyle(accountSheetInput);
+      console.log('📏 ID Sheet Input:', {
+        width: inputRect.width,
+        height: inputRect.height,
+        paddingRight: inputStyles.paddingRight,
+        actualPaddingRight: parseFloat(inputStyles.paddingRight),
+        position: inputRect
+      });
+    } else {
+      console.error('❌ ID Sheet input not found!');
+    }
+    
+    if (checkbox) {
+      const checkboxRect = checkbox.getBoundingClientRect();
+      const checkboxStyles = window.getComputedStyle(checkbox);
+      console.log('☑️ Checkbox:', {
+        width: checkboxRect.width,
+        height: checkboxRect.height,
+        position: checkboxStyles.position,
+        right: checkboxStyles.right,
+        top: checkboxStyles.top,
+        transform: checkboxStyles.transform,
+        zIndex: checkboxStyles.zIndex,
+        rect: checkboxRect
+      });
+      
+      // Check if checkbox is overlapping input text area
+      if (accountSheetInput && checkbox) {
+        const inputRect = accountSheetInput.getBoundingClientRect();
+        const checkboxRect = checkbox.getBoundingClientRect();
+        const overlap = inputRect.right - checkboxRect.left;
+        const inputPaddingRight = parseFloat(window.getComputedStyle(accountSheetInput).paddingRight);
+        
+        console.log('🔄 Overlap Analysis:', {
+          inputRight: inputRect.right,
+          checkboxLeft: checkboxRect.left,
+          overlap: overlap,
+          inputPaddingRight: inputPaddingRight,
+          isOverlapping: overlap > inputPaddingRight ? 'YES ⚠️' : 'NO ✅'
+        });
+      }
+    } else {
+      console.error('❌ Checkbox not found!');
+    }
+    
+    if (container) {
+      const containerRect = container.getBoundingClientRect();
+      const containerStyles = window.getComputedStyle(container);
+      console.log('📦 Container:', {
+        width: containerRect.width,
+        height: containerRect.height,
+        position: containerStyles.position,
+        rect: containerRect
+      });
+    }
+    
+    console.log('🔍 ===== END DEBUG =====');
+  }, 500); // Wait for DOM to fully render
+}
+
+// Global debug function that can be called from console
+window.debugCheckboxNow = function() {
+  debugCheckboxPosition();
 }
 
 async function loadSoftwareData() {
