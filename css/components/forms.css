@@ -198,7 +198,7 @@ option.unavailable {
 /* Template checkbox styling */
 .template-checkbox {
   position: absolute;
-  right: 8px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
   width: 16px !important;
@@ -214,6 +214,7 @@ option.unavailable {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+  z-index: 1;
 }
 
 .template-checkbox:hover {
@@ -237,5 +238,5 @@ option.unavailable {
 
 /* Ensure the input has proper padding when checkbox is present */
 .date-input-container input[type="text"]#accountSheetId {
-  padding-right: 35px !important;
+  padding-right: 40px !important;
 }
