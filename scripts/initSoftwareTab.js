@@ -426,7 +426,8 @@ function editSoftwareItem(software, index) {
     standardName: document.getElementById('standardName'),
     renewalDate: document.getElementById('renewalDate'),
     softwareNote: document.getElementById('softwareNote'),
-    fileType: document.getElementById('fileType')
+    fileType: document.getElementById('fileType'),
+    templateFile: document.getElementById('templateFile')
   };
   
   // Batch DOM updates to prevent layout thrashing
@@ -445,6 +446,7 @@ function editSoftwareItem(software, index) {
     if (formElements.standardName) formElements.standardName.value = software.standardName || '';
     if (formElements.softwareNote) formElements.softwareNote.value = software.note || '';
     if (formElements.fileType) formElements.fileType.value = software.fileType || '';
+    if (formElements.templateFile) formElements.templateFile.checked = software.templateFile || false;
     
     // Handle renewalDate - convert from dd/mm/yyyy to yyyy-mm-dd for input[type="date"]
     if (formElements.renewalDate && software.renewalDate) {
@@ -729,7 +731,8 @@ function getSoftwareFormData() {
     note: document.getElementById('softwareNote')?.value?.trim() || '',
     standardName: document.getElementById('standardName')?.value?.trim() || '',
     renewalDate: document.getElementById('renewalDate')?.value?.trim() || '',
-    fileType: document.getElementById('fileType')?.value?.trim() || ''
+    fileType: document.getElementById('fileType')?.value?.trim() || '',
+    templateFile: document.getElementById('templateFile')?.checked || false
   };
 }
 
