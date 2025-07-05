@@ -62,171 +62,168 @@ export function calculateTotalExpenses(data, options = {}) {
 
   if (!Array.isArray(data)) return totals;
 
-// console.log("🧮 Calculating expenses:", {
+  console.log("🧮 Calculating expenses:", {
+    recordCount: data.length,
+    isSearching,
+    targetDate,
+    currency
+  });
 
-  //     recordCount: data.length,
-  //     isSearching,
-  //     targetDate,
-  //     currency
-  //   });
-  // 
-  //   data.forEach(expense => {
-  //     const expenseCurrency = expense.currency || "VND";
-  //     const amount = parseFloat(expense.amount) || 0;
-  //     
-  //     // Skip if specific currency filter is set and doesn't match
-  //     if (currency && expenseCurrency !== currency) return;
-  // 
-  //     // If searching, include all results
-  //     if (isSearching) {
-  //       totals[expenseCurrency] += amount;
-  //       return;
-  //     }
-  // 
-  //     // If target date is specified, filter by date
-  //     if (targetDate) {
-  //       const normalizedDate = normalizeDate(expense.date);
-  //       if (normalizedDate === targetDate) {
-  //         totals[expenseCurrency] += amount;
-  //       }
-  //       return;
-  //     }
-  // 
-  //     // If date range is specified
-  //     if (dateRange && dateRange.start && dateRange.end) {
-  //       const normalizedDate = normalizeDate(expense.date);
-  //       if (normalizedDate >= dateRange.start && normalizedDate <= dateRange.end) {
-  //         totals[expenseCurrency] += amount;
-  //       }
-  //       return;
-  //     }
-  // 
-  //     // Default: include all
-  //     totals[expenseCurrency] += amount;
-  //   });
-  // 
-  //   // console.log("✅ Expense totals calculated:", totals);
-  //   return totals;
-  // }
-  // 
+  data.forEach(expense => {
+    const expenseCurrency = expense.currency || "VND";
+    const amount = parseFloat(expense.amount) || 0;
+    
+    // Skip if specific currency filter is set and doesn't match
+    if (currency && expenseCurrency !== currency) return;
+
+    // If searching, include all results
+    if (isSearching) {
+      totals[expenseCurrency] += amount;
+      return;
+    }
+
+    // If target date is specified, filter by date
+    if (targetDate) {
+      const normalizedDate = normalizeDate(expense.date);
+      if (normalizedDate === targetDate) {
+        totals[expenseCurrency] += amount;
+      }
+      return;
+    }
+
+    // If date range is specified
+    if (dateRange && dateRange.start && dateRange.end) {
+      const normalizedDate = normalizeDate(expense.date);
+      if (normalizedDate >= dateRange.start && normalizedDate <= dateRange.end) {
+        totals[expenseCurrency] += amount;
+      }
+      return;
+    }
+
+    // Default: include all
+    totals[expenseCurrency] += amount;
+  });
+
+  console.log("✅ Expense totals calculated:", totals);
+  return totals;
+}
+
 /**
-  //  * Calculates total revenue with filtering options
-  //  * @param {Array} data - Array of transaction records
-  //  * @param {Object} options - Calculation options
-  //  * @returns {Object} - Calculated totals by currency
-  //  */
-  // export function calculateTotalRevenue(data, options = {}) {
-  //   const {
-  //     isSearching = false,
-  //     targetDate = null,
-  //     currency = null,
-  //     dateRange = null,
-  //     userRole = null
-  //   } = options;
-  // 
-  //   const totals = {
-  //     VND: 0,
-  //     USD: 0,
-  //     NGN: 0
-  //   };
+ * Calculates total revenue with filtering options
+ * @param {Array} data - Array of transaction records
+ * @param {Object} options - Calculation options
+ * @returns {Object} - Calculated totals by currency
+ */
+export function calculateTotalRevenue(data, options = {}) {
+  const {
+    isSearching = false,
+    targetDate = null,
+    currency = null,
+    dateRange = null,
+    userRole = null
+  } = options;
+
+  const totals = {
+    VND: 0,
+    USD: 0,
+    NGN: 0
+  };
 
   if (!Array.isArray(data)) return totals;
 
-// console.log("🧮 Calculating revenue:", {
+  console.log("🧮 Calculating revenue:", {
+    recordCount: data.length,
+    isSearching,
+    targetDate,
+    currency,
+    userRole
+  });
 
-  //     recordCount: data.length,
-  //     isSearching,
-  //     targetDate,
-  //     currency,
-  //     userRole
-  //   });
-  // 
-  //   data.forEach(transaction => {
-  //     const transactionCurrency = transaction.currency || "VND";
-  //     const revenue = parseFloat(transaction.revenue) || 0;
-  //     
-  //     // Skip if specific currency filter is set and doesn't match
-  //     if (currency && transactionCurrency !== currency) return;
-  // 
-  //     // Apply user role filtering if needed
-  //     if (userRole && userRole !== "admin") {
-  //       // Add role-based filtering logic here
-  //     }
-  // 
-  //     // If searching, include all results
-  //     if (isSearching) {
-  //       totals[transactionCurrency] += revenue;
-  //       return;
-  //     }
-  // 
-  //     // If target date is specified, filter by date
-  //     if (targetDate) {
-  //       const normalizedDate = normalizeDate(transaction.transactionDate);
-  //       if (normalizedDate === targetDate) {
-  //         totals[transactionCurrency] += revenue;
-  //       }
-  //       return;
-  //     }
-  // 
-  //     // If date range is specified
-  //     if (dateRange && dateRange.start && dateRange.end) {
-  //       const normalizedDate = normalizeDate(transaction.transactionDate);
-  //       if (normalizedDate >= dateRange.start && normalizedDate <= dateRange.end) {
-  //         totals[transactionCurrency] += revenue;
-  //       }
-  //       return;
-  //     }
-  // 
-  //     // Default: include all
-  //     totals[transactionCurrency] += revenue;
-  //   });
-  // 
-  //   // console.log("✅ Revenue totals calculated:", totals);
-  //   return totals;
-  // }
-  // 
+  data.forEach(transaction => {
+    const transactionCurrency = transaction.currency || "VND";
+    const revenue = parseFloat(transaction.revenue) || 0;
+    
+    // Skip if specific currency filter is set and doesn't match
+    if (currency && transactionCurrency !== currency) return;
+
+    // Apply user role filtering if needed
+    if (userRole && userRole !== "admin") {
+      // Add role-based filtering logic here
+    }
+
+    // If searching, include all results
+    if (isSearching) {
+      totals[transactionCurrency] += revenue;
+      return;
+    }
+
+    // If target date is specified, filter by date
+    if (targetDate) {
+      const normalizedDate = normalizeDate(transaction.transactionDate);
+      if (normalizedDate === targetDate) {
+        totals[transactionCurrency] += revenue;
+      }
+      return;
+    }
+
+    // If date range is specified
+    if (dateRange && dateRange.start && dateRange.end) {
+      const normalizedDate = normalizeDate(transaction.transactionDate);
+      if (normalizedDate >= dateRange.start && normalizedDate <= dateRange.end) {
+        totals[transactionCurrency] += revenue;
+      }
+      return;
+    }
+
+    // Default: include all
+    totals[transactionCurrency] += revenue;
+  });
+
+  console.log("✅ Revenue totals calculated:", totals);
+  return totals;
+}
+
 /**
-  //  * Groups expenses by month and type for summary statistics
-  //  * @param {Array} data - Array of expense records
-  //  * @param {Object} options - Grouping options
-  //  * @returns {Object} - Grouped data by month and type
-  //  */
-  // export function groupExpensesByMonth(data, options = {}) {
-  //   const {
-  //     currency = "VND",
-  //     sortBy = "month", // "month", "amount", "type"
-  //     sortOrder = "desc" // "asc", "desc"
-  //   } = options;
-  // 
-  //   const summaryMap = {};
+ * Groups expenses by month and type for summary statistics
+ * @param {Array} data - Array of expense records
+ * @param {Object} options - Grouping options
+ * @returns {Object} - Grouped data by month and type
+ */
+export function groupExpensesByMonth(data, options = {}) {
+  const {
+    currency = "VND",
+    sortBy = "month", // "month", "amount", "type"
+    sortOrder = "desc" // "asc", "desc"
+  } = options;
+
+  const summaryMap = {};
 
   if (!Array.isArray(data)) return summaryMap;
 
-// console.log("📊 Grouping expenses by month:", {
+  console.log("📊 Grouping expenses by month:", {
+    recordCount: data.length,
+    currency,
+    sortBy,
+    sortOrder
+  });
 
-  //     recordCount: data.length,
-  //     currency,
-  //     sortBy,
-  //     sortOrder
-  //   });
-  // 
-  //   data.forEach(expense => {
-  //     // Only process specified currency
-  //     if (expense.currency !== currency) return;
-  // 
-  //     const normalizedDate = normalizeDate(expense.date);
-  //     const month = normalizedDate.slice(0, 7); // yyyy/mm
-  //     const type = expense.type || "Không xác định";
-  //     const amount = parseFloat(expense.amount) || 0;
-  // 
-  //     const key = `${month}|${type}`;
-  //     summaryMap[key] = (summaryMap[key] || 0) + amount;
-  //   });
-  // 
-  //   // Convert to array and sort
-  //   const summaryArray = Object.entries(summaryMap).map(([key, amount]) => {
-  //     const [month, type] = key.split("|");
-  //     return { month, type, amount };
+  data.forEach(expense => {
+    // Only process specified currency
+    if (expense.currency !== currency) return;
+
+    const normalizedDate = normalizeDate(expense.date);
+    const month = normalizedDate.slice(0, 7); // yyyy/mm
+    const type = expense.type || "Không xác định";
+    const amount = parseFloat(expense.amount) || 0;
+
+    const key = `${month}|${type}`;
+    summaryMap[key] = (summaryMap[key] || 0) + amount;
+  });
+
+  // Convert to array and sort
+  const summaryArray = Object.entries(summaryMap).map(([key, amount]) => {
+    const [month, type] = key.split("|");
+    return { month, type, amount };
   });
 
   // Sort by specified criteria
@@ -250,7 +247,7 @@ export function calculateTotalExpenses(data, options = {}) {
     return sortOrder === "desc" ? -comparison : comparison;
   });
 
-  // console.log("✅ Monthly grouping completed:", summaryArray.length, "entries");
+  console.log("✅ Monthly grouping completed:", summaryArray.length, "entries");
   return summaryArray;
 }
 
@@ -271,31 +268,30 @@ export function groupRevenueByMonth(data, options = {}) {
 
   if (!Array.isArray(data)) return [];
 
-// console.log("📊 Grouping revenue by month:", {
+  console.log("📊 Grouping revenue by month:", {
+    recordCount: data.length,
+    currency,
+    sortBy,
+    sortOrder
+  });
 
-  //     recordCount: data.length,
-  //     currency,
-  //     sortBy,
-  //     sortOrder
-  //   });
-  // 
-  //   data.forEach(transaction => {
-  //     // Only process specified currency
-  //     if (transaction.currency !== currency) return;
-  // 
-  //     const normalizedDate = normalizeDate(transaction.transactionDate);
-  //     const month = normalizedDate.slice(0, 7); // yyyy/mm
-  //     const software = transaction.softwareName || "Không xác định";
-  //     const revenue = parseFloat(transaction.revenue) || 0;
-  // 
-  //     const key = `${month}|${software}`;
-  //     summaryMap[key] = (summaryMap[key] || 0) + revenue;
-  //   });
-  // 
-  //   // Convert to array and sort
-  //   const summaryArray = Object.entries(summaryMap).map(([key, amount]) => {
-  //     const [month, software] = key.split("|");
-  //     return { month, software, amount };
+  data.forEach(transaction => {
+    // Only process specified currency
+    if (transaction.currency !== currency) return;
+
+    const normalizedDate = normalizeDate(transaction.transactionDate);
+    const month = normalizedDate.slice(0, 7); // yyyy/mm
+    const software = transaction.softwareName || "Không xác định";
+    const revenue = parseFloat(transaction.revenue) || 0;
+
+    const key = `${month}|${software}`;
+    summaryMap[key] = (summaryMap[key] || 0) + revenue;
+  });
+
+  // Convert to array and sort
+  const summaryArray = Object.entries(summaryMap).map(([key, amount]) => {
+    const [month, software] = key.split("|");
+    return { month, software, amount };
   });
 
   // Sort by specified criteria
@@ -319,7 +315,7 @@ export function groupRevenueByMonth(data, options = {}) {
     return sortOrder === "desc" ? -comparison : comparison;
   });
 
-  // console.log("✅ Revenue grouping completed:", summaryArray.length, "entries");
+  console.log("✅ Revenue grouping completed:", summaryArray.length, "entries");
   return summaryArray;
 }
 
@@ -359,7 +355,7 @@ export function calculateFinancialAnalysis(revenue, expenses) {
     overallMargin: totalRevenue > 0 ? ((totalRevenue - totalExpenses) / totalRevenue) * 100 : 0
   };
 
-  // console.log("📈 Financial analysis completed:", analysis.summary);
+  console.log("📈 Financial analysis completed:", analysis.summary);
   return analysis;
 }
 
@@ -419,7 +415,7 @@ export function getDateRange(period, referenceDate = new Date()) {
       ranges.end = normalizeDate(today);
   }
 
-  // console.log(`📅 Generated ${period} range:`, ranges);
+  console.log(`📅 Generated ${period} range:`, ranges);
   return ranges;
 }
 
@@ -580,96 +576,95 @@ export function calculateAllocatedExpense(expense, dateRange) {
   if ((expense.product && (expense.product.includes('Helium10') || expense.product.includes('Trả lương'))) || 
       (expense.description && (expense.description.includes('Helium10') || expense.description.includes('Trả lương'))) ||
       (expense['Tên sản phẩm/Dịch vụ'] && expense['Tên sản phẩm/Dịch vụ'].includes('Trả lương'))) {
-// console.log(`🔍 DEBUG - Salary/Helium10 expense object:`, {
-
-  //       fullExpense: expense,
-  //       keys: Object.keys(expense),
-  //       periodicAllocation: expense.periodicAllocation,
-  //       'Phân bổ': expense['Phân bổ'],
-  //       renewDate: expense.renewDate,
-  //       'Ngày tái tục': expense['Ngày tái tục'],
-  //       date: expense.date,
-  //       'Ngày chi': expense['Ngày chi'],
-  //       amount: expense.amount,
-  //       'Số tiền': expense['Số tiền']
-  //     });
-  //   }
-  //   
-  //   // Check multiple possible field names for allocation
-  //   const allocationValue = expense.periodicAllocation || expense['Phân bổ'] || expense.allocation;
-  //   
-  //   // If no allocation needed, return 0
-  //   if (!allocationValue || (allocationValue !== 'Có' && allocationValue !== 'Có')) {
-// console.log(`❌ ${expense.product || expense.description || 'Unknown'} - No allocation:`, {
-  //       periodicAllocation: expense.periodicAllocation,
-  //       'Phân bổ': expense['Phân bổ'],
-  //       allocation: expense.allocation,
-  //       allocationValue: allocationValue,
-  //       reason: 'allocation field not "Có"'
-  //     });
-  //     return 0;
-  //   }
-  //   
-  //   // Parse dates - both transaction date and renewal date are required
-  //   // Check multiple possible field names for dates
-  //   const dateValue = expense.date || expense['Ngày chi'] || expense.transactionDate;
-  //   const renewDateValue = expense.renewDate || expense['Ngày tái tục'] || expense.renewalDate;
-  //   
-  //   const transactionDate = dateValue ? new Date(normalizeDate(dateValue)) : null;
-  //   const renewalDate = renewDateValue ? new Date(normalizeDate(renewDateValue)) : null;
-  //   
-// console.log(`📅 Date parsing for ${expense.product || expense.description}:`, {
-  //     originalDate: expense.date,
-  //     'Ngày chi': expense['Ngày chi'],
-  //     dateValue,
-  //     originalRenewDate: expense.renewDate,
-  //     'Ngày tái tục': expense['Ngày tái tục'],
-  //     renewDateValue,
-  //     parsedTransactionDate: transactionDate,
-  //     parsedRenewalDate: renewalDate
-  //   });
-  //   
-  //   // Must have both dates for allocation
-  //   if (!transactionDate || !renewalDate || renewalDate <= transactionDate) {
-// console.log(`❌ ${expense.product || expense['Tên sản phẩm/Dịch vụ'] || expense.description} - Invalid dates:`, {
-  //       transactionDate: dateValue,
-  //       renewalDate: renewDateValue,
-  //       parsedTransactionDate: transactionDate,
-  //       parsedRenewalDate: renewalDate,
-  //       reason: !transactionDate ? 'No transaction date' : 
-  //              !renewalDate ? 'No renewal date' : 
-  //              'Renewal date <= transaction date'
-  //     });
-  //     return 0;
-  //   }
-  //   
-  //   // Calculate total validity period in days (inclusive of both start and end dates)
-  //   const totalValidityDays = Math.ceil((renewalDate - transactionDate) / (1000 * 60 * 60 * 24)) + 1;
-  //   
-  //   // Calculate daily amount - check multiple field names
-  //   const amountValue = expense.amount || expense['Số tiền'] || 0;
-  //   const totalAmount = parseFloat(amountValue) || 0;
-  //   
-// console.log(`💰 Amount parsing for ${expense.product || expense['Tên sản phẩm/Dịch vụ']}:`, {
-  //     originalAmount: expense.amount,
-  //     'Số tiền': expense['Số tiền'],
-  //     amountValue,
-  //     totalAmount,
-  //     totalValidityDays
-  //   });
-  //   const dailyAmount = totalAmount / totalValidityDays;
-  //   
-  //   // If no date range specified, return amount for current month
-  //   if (!dateRange || !dateRange.start || !dateRange.end) {
-  //     // Default to current month
-  //     const today = new Date();
-  //     const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-  //     const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-  //     
-  //     dateRange = {
-  //       start: normalizeDate(monthStart),
-  //       end: normalizeDate(monthEnd)
-  //     };
+    console.log(`🔍 DEBUG - Salary/Helium10 expense object:`, {
+      fullExpense: expense,
+      keys: Object.keys(expense),
+      periodicAllocation: expense.periodicAllocation,
+      'Phân bổ': expense['Phân bổ'],
+      renewDate: expense.renewDate,
+      'Ngày tái tục': expense['Ngày tái tục'],
+      date: expense.date,
+      'Ngày chi': expense['Ngày chi'],
+      amount: expense.amount,
+      'Số tiền': expense['Số tiền']
+    });
+  }
+  
+  // Check multiple possible field names for allocation
+  const allocationValue = expense.periodicAllocation || expense['Phân bổ'] || expense.allocation;
+  
+  // If no allocation needed, return 0
+  if (!allocationValue || (allocationValue !== 'Có' && allocationValue !== 'Có')) {
+    console.log(`❌ ${expense.product || expense.description || 'Unknown'} - No allocation:`, {
+      periodicAllocation: expense.periodicAllocation,
+      'Phân bổ': expense['Phân bổ'],
+      allocation: expense.allocation,
+      allocationValue: allocationValue,
+      reason: 'allocation field not "Có"'
+    });
+    return 0;
+  }
+  
+  // Parse dates - both transaction date and renewal date are required
+  // Check multiple possible field names for dates
+  const dateValue = expense.date || expense['Ngày chi'] || expense.transactionDate;
+  const renewDateValue = expense.renewDate || expense['Ngày tái tục'] || expense.renewalDate;
+  
+  const transactionDate = dateValue ? new Date(normalizeDate(dateValue)) : null;
+  const renewalDate = renewDateValue ? new Date(normalizeDate(renewDateValue)) : null;
+  
+  console.log(`📅 Date parsing for ${expense.product || expense.description}:`, {
+    originalDate: expense.date,
+    'Ngày chi': expense['Ngày chi'],
+    dateValue,
+    originalRenewDate: expense.renewDate,
+    'Ngày tái tục': expense['Ngày tái tục'],
+    renewDateValue,
+    parsedTransactionDate: transactionDate,
+    parsedRenewalDate: renewalDate
+  });
+  
+  // Must have both dates for allocation
+  if (!transactionDate || !renewalDate || renewalDate <= transactionDate) {
+    console.log(`❌ ${expense.product || expense['Tên sản phẩm/Dịch vụ'] || expense.description} - Invalid dates:`, {
+      transactionDate: dateValue,
+      renewalDate: renewDateValue,
+      parsedTransactionDate: transactionDate,
+      parsedRenewalDate: renewalDate,
+      reason: !transactionDate ? 'No transaction date' : 
+             !renewalDate ? 'No renewal date' : 
+             'Renewal date <= transaction date'
+    });
+    return 0;
+  }
+  
+  // Calculate total validity period in days (inclusive of both start and end dates)
+  const totalValidityDays = Math.ceil((renewalDate - transactionDate) / (1000 * 60 * 60 * 24)) + 1;
+  
+  // Calculate daily amount - check multiple field names
+  const amountValue = expense.amount || expense['Số tiền'] || 0;
+  const totalAmount = parseFloat(amountValue) || 0;
+  
+  console.log(`💰 Amount parsing for ${expense.product || expense['Tên sản phẩm/Dịch vụ']}:`, {
+    originalAmount: expense.amount,
+    'Số tiền': expense['Số tiền'],
+    amountValue,
+    totalAmount,
+    totalValidityDays
+  });
+  const dailyAmount = totalAmount / totalValidityDays;
+  
+  // If no date range specified, return amount for current month
+  if (!dateRange || !dateRange.start || !dateRange.end) {
+    // Default to current month
+    const today = new Date();
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+    const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    
+    dateRange = {
+      start: normalizeDate(monthStart),
+      end: normalizeDate(monthEnd)
+    };
   }
   
   // Parse target period
@@ -683,67 +678,65 @@ export function calculateAllocatedExpense(expense, dateRange) {
   // Special handling for monthly salary payments
   if (expense.product && expense.product.includes('Trả lương') || 
       expense['Tên sản phẩm/Dịch vụ'] && expense['Tên sản phẩm/Dịch vụ'].includes('Trả lương')) {
-// console.log(`💵 Salary payment debug:`, {
+    console.log(`💵 Salary payment debug:`, {
+      transactionDate: normalizeDate(transactionDate),
+      renewalDate: normalizeDate(renewalDate),
+      periodStart: normalizeDate(periodStart),
+      periodEnd: normalizeDate(periodEnd),
+      overlapStart: normalizeDate(overlapStart),
+      overlapEnd: normalizeDate(overlapEnd),
+      'transactionDate.getTime()': transactionDate.getTime(),
+      'renewalDate.getTime()': renewalDate.getTime(),
+      'diff in ms': renewalDate.getTime() - transactionDate.getTime(),
+      'diff in days (raw)': (renewalDate.getTime() - transactionDate.getTime()) / (1000 * 60 * 60 * 24)
+    });
+  }
+  
+  // If no overlap, return 0
+  if (overlapStart > overlapEnd) {
+    return 0;
+  }
+  
+  // Calculate days that software is valid within the target period
+  // Note: We add 1 because both start and end dates are inclusive
+  const validDaysInPeriod = Math.ceil((overlapEnd - overlapStart) / (1000 * 60 * 60 * 24)) + 1;
+  
+  // Return allocated amount for the overlapping period
+  const allocatedAmount = dailyAmount * validDaysInPeriod;
+  
+  console.log(`📊 Allocated expense calculation:`, {
+    expense: expense.product || expense.description,
+    totalAmount,
+    transactionDate: normalizeDate(transactionDate),
+    renewalDate: normalizeDate(renewalDate),
+    totalValidityDays,
+    dailyAmount: dailyAmount.toFixed(2),
+    periodRange: `${dateRange.start} to ${dateRange.end}`,
+    overlapStart: normalizeDate(overlapStart),
+    overlapEnd: normalizeDate(overlapEnd),
+    validDaysInPeriod,
+    calculation: `${dailyAmount.toFixed(2)} × ${validDaysInPeriod} days`,
+    allocatedAmount: allocatedAmount.toFixed(2)
+  });
+  
+  return allocatedAmount;
+}
 
-  //       transactionDate: normalizeDate(transactionDate),
-  //       renewalDate: normalizeDate(renewalDate),
-  //       periodStart: normalizeDate(periodStart),
-  //       periodEnd: normalizeDate(periodEnd),
-  //       overlapStart: normalizeDate(overlapStart),
-  //       overlapEnd: normalizeDate(overlapEnd),
-  //       'transactionDate.getTime()': transactionDate.getTime(),
-  //       'renewalDate.getTime()': renewalDate.getTime(),
-  //       'diff in ms': renewalDate.getTime() - transactionDate.getTime(),
-  //       'diff in days (raw)': (renewalDate.getTime() - transactionDate.getTime()) / (1000 * 60 * 60 * 24)
-  //     });
-  //   }
-  //   
-  //   // If no overlap, return 0
-  //   if (overlapStart > overlapEnd) {
-  //     return 0;
-  //   }
-  //   
-  //   // Calculate days that software is valid within the target period
-  //   // Note: We add 1 because both start and end dates are inclusive
-  //   const validDaysInPeriod = Math.ceil((overlapEnd - overlapStart) / (1000 * 60 * 60 * 24)) + 1;
-  //   
-  //   // Return allocated amount for the overlapping period
-  //   const allocatedAmount = dailyAmount * validDaysInPeriod;
-  //   
-// console.log(`📊 Allocated expense calculation:`, {
-
-  //     expense: expense.product || expense.description,
-  //     totalAmount,
-  //     transactionDate: normalizeDate(transactionDate),
-  //     renewalDate: normalizeDate(renewalDate),
-  //     totalValidityDays,
-  //     dailyAmount: dailyAmount.toFixed(2),
-  //     periodRange: `${dateRange.start} to ${dateRange.end}`,
-  //     overlapStart: normalizeDate(overlapStart),
-  //     overlapEnd: normalizeDate(overlapEnd),
-  //     validDaysInPeriod,
-  //     calculation: `${dailyAmount.toFixed(2)} × ${validDaysInPeriod} days`,
-  //     allocatedAmount: allocatedAmount.toFixed(2)
-  //   });
-  //   
-  //   return allocatedAmount;
-  // }
-  // 
 /**
-  //  * Calculate monthly allocated expenses for current month
-  //  * This function calculates the portion of each expense that should be allocated to the current month
-  //  * based on the software's validity period
-  //  * @param {Array} expenses - Array of expense records
-  //  * @param {Object} targetMonth - Target month {year, month} or null for current month
-  //  * @returns {Object} - Summary of allocated vs actual expenses
-  //  */
-  // export function calculateMonthlyExpenseBreakdown(expenses, targetMonth = null) {
-  //   if (!targetMonth) {
-  //     const now = new Date();
-  //     targetMonth = {
-  //       year: now.getFullYear(),
-  //       month: now.getMonth() + 1 // 1-indexed
-  //     };
+ * Calculate monthly allocated expenses for current month
+ * This function calculates the portion of each expense that should be allocated to the current month
+ * based on the software's validity period
+ * @param {Array} expenses - Array of expense records
+ * @param {Object} targetMonth - Target month {year, month} or null for current month
+ * @returns {Object} - Summary of allocated vs actual expenses
+ */
+export function calculateMonthlyExpenseBreakdown(expenses, targetMonth = null) {
+  if (!targetMonth) {
+    const now = new Date();
+    targetMonth = {
+      year: now.getFullYear(),
+      month: now.getMonth() + 1 // 1-indexed
+    };
   }
   
   // Create date range for target month
@@ -813,7 +806,7 @@ export function calculateAllocatedExpense(expense, dateRange) {
     breakdown.totalActualExpense += convertToVND(currData.actual, currency);
   });
   
-// console.log(`📅 Monthly expense breakdown for ${breakdown.targetMonth}:`, {
+  console.log(`📅 Monthly expense breakdown for ${breakdown.targetMonth}:`, {
     totalAllocated: breakdown.totalAllocatedExpense,
     totalActual: breakdown.totalActualExpense,
     allocatedCount: breakdown.allocatedDetails.length,
@@ -907,7 +900,7 @@ export function testAllocationLogic(testCases = null) {
     result.overallPassed = result.allocated.passed && result.actual.passed;
     results.push(result);
     
-// console.log(`🗺️ Test: ${test.name}`, {
+    console.log(`🗺️ Test: ${test.name}`, {
       allocated: result.allocated,
       actual: result.actual,
       passed: result.overallPassed
@@ -915,7 +908,7 @@ export function testAllocationLogic(testCases = null) {
   });
   
   const totalPassed = results.filter(r => r.overallPassed).length;
-// console.log(`🏆 Test Results: ${totalPassed}/${results.length} tests passed`);
+  console.log(`🏆 Test Results: ${totalPassed}/${results.length} tests passed`);
   
   return results;
 }
@@ -951,70 +944,67 @@ export function calculateActualExpense(expense, dateRange) {
   if (expenseDate >= periodStart && expenseDate <= periodEnd) {
     const amount = parseFloat(expense.amount) || 0;
     
-// console.log(`💰 Actual expense calculation:`, {
+    console.log(`💰 Actual expense calculation:`, {
+      expense: expense.product || expense.description,
+      expenseDate: normalizeDate(expenseDate),
+      periodRange: `${dateRange.start} to ${dateRange.end}`,
+      amount,
+      included: true
+    });
+    
+    return amount;
+  }
+  
+  return 0;
+}
 
-  //       expense: expense.product || expense.description,
-  //       expenseDate: normalizeDate(expenseDate),
-  //       periodRange: `${dateRange.start} to ${dateRange.end}`,
-  //       amount,
-  //       included: true
-  //     });
-  //     
-  //     return amount;
-  //   }
-  //   
-  //   return 0;
-  // }
-  // 
 /**
-  //  * Calculates ROI by matching transactions and expenses using Tên chuẩn
-  //  * @param {Array} transactions - Transaction records
-  //  * @param {Array} expenses - Expense records
-  //  * @param {Object} dateRange - Optional date range for allocation calculation
-  //  * @returns {Array} - ROI analysis results
-  //  */
-  // export function calculateROIByTenChuan(transactions, expenses, dateRange = null) {
-  //   // Filter out expenses with accountingType = "Không liên quan"
-  //   const filteredExpenses = expenses.filter(expense => {
-  //     // Check multiple possible field names for accountingType
-  //     const accountingType = expense.accountingType || expense['Loại kế toán'] || '';
-  //     
-  //     if (accountingType === 'Không liên quan') {
-// console.log(`🚫 Excluding expense from ROI:`, {
-
-  //         product: expense.product || expense['Tên sản phẩm/Dịch vụ'],
-  //         accountingType: accountingType,
-  //         amount: expense.amount || expense['Số tiền']
-  //       });
-  //       return false;
-  //     }
-  //     return true;
-  //   });
-  //   
-// console.log(`🛡️ Filtered expenses for ROI:`, {
-
-  //     original: expenses.length,
-  //     filtered: filteredExpenses.length,
-  //     excluded: expenses.length - filteredExpenses.length
-  //   });
-  //   
-  //   const transactionGroups = groupTransactionsByTenChuan(transactions);
-  //   const expenseGroups = groupExpensesByTenChuan(filteredExpenses);
-  //   
-  //   const roiAnalysis = [];
-  //   
-  //   // Get all unique Tên chuẩn from both transactions and expenses
-  //   const allTenChuan = new Set([
-  //     ...Object.keys(transactionGroups),
-  //     ...Object.keys(expenseGroups)
-  //   ]);
-  //   
-  //   allTenChuan.forEach(tenChuan => {
-  //     const transactionData = transactionGroups[tenChuan] || {
-  //       totalRevenue: 0,
-  //       uniqueCustomers: 0,
-  //       transactions: []
-  //     };
+ * Calculates ROI by matching transactions and expenses using Tên chuẩn
+ * @param {Array} transactions - Transaction records
+ * @param {Array} expenses - Expense records
+ * @param {Object} dateRange - Optional date range for allocation calculation
+ * @returns {Array} - ROI analysis results
+ */
+export function calculateROIByTenChuan(transactions, expenses, dateRange = null) {
+  // Filter out expenses with accountingType = "Không liên quan"
+  const filteredExpenses = expenses.filter(expense => {
+    // Check multiple possible field names for accountingType
+    const accountingType = expense.accountingType || expense['Loại kế toán'] || '';
+    
+    if (accountingType === 'Không liên quan') {
+      console.log(`🚫 Excluding expense from ROI:`, {
+        product: expense.product || expense['Tên sản phẩm/Dịch vụ'],
+        accountingType: accountingType,
+        amount: expense.amount || expense['Số tiền']
+      });
+      return false;
+    }
+    return true;
+  });
+  
+  console.log(`🛡️ Filtered expenses for ROI:`, {
+    original: expenses.length,
+    filtered: filteredExpenses.length,
+    excluded: expenses.length - filteredExpenses.length
+  });
+  
+  const transactionGroups = groupTransactionsByTenChuan(transactions);
+  const expenseGroups = groupExpensesByTenChuan(filteredExpenses);
+  
+  const roiAnalysis = [];
+  
+  // Get all unique Tên chuẩn from both transactions and expenses
+  const allTenChuan = new Set([
+    ...Object.keys(transactionGroups),
+    ...Object.keys(expenseGroups)
+  ]);
+  
+  allTenChuan.forEach(tenChuan => {
+    const transactionData = transactionGroups[tenChuan] || {
+      totalRevenue: 0,
+      uniqueCustomers: 0,
+      transactions: []
+    };
     
     const expenseData = expenseGroups[tenChuan] || {
       totalAmount: { VND: 0, USD: 0, NGN: 0 },
@@ -1041,7 +1031,7 @@ export function calculateActualExpense(expense, dateRange) {
       if (allocatedAmount > 0) {
         // Has periodic allocation
         allocatedExpenseVND += convertToVND(allocatedAmount, currency);
-// console.log(`📊 ${tenChuan} - Allocated expense:`, {
+        console.log(`📊 ${tenChuan} - Allocated expense:`, {
           product: expense.product,
           allocatedAmount,
           currency,
@@ -1052,7 +1042,7 @@ export function calculateActualExpense(expense, dateRange) {
         const actualAmount = calculateActualExpense(expense, dateRange);
         if (actualAmount > 0) {
           allocatedExpenseVND += convertToVND(actualAmount, currency);
-// console.log(`💰 ${tenChuan} - Non-allocated actual expense:`, {
+          console.log(`💰 ${tenChuan} - Non-allocated actual expense:`, {
             product: expense.product,
             actualAmount,
             currency,
@@ -1196,7 +1186,7 @@ export function calculateExpensesByCategory(expenseData) {
  * @returns {Object} - Comprehensive business metrics
  */
 export function calculateBusinessMetrics(transactionData, expenseData, dateRange = null) {
-  // console.log("📊 Calculating business metrics for period:", dateRange);
+  console.log("📊 Calculating business metrics for period:", dateRange);
   
   // Apply date range filtering if specified
   let filteredTransactions = transactionData;

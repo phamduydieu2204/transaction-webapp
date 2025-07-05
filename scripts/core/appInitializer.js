@@ -43,7 +43,7 @@ export function initializeGlobals() {
   window.isExpenseSearching = false;
   window.expenseList = [];
 
-  // '✅ Global variables initialized';
+  console.log('✅ Global variables initialized');
 }
 
 /**
@@ -61,15 +61,15 @@ export function loadUserInfo() {
   }
 
   if (!window.userInfo) {
-// console.warn('⚠️ No user information found');
+    console.warn('⚠️ No user information found');
     return false;
   }
 
-// console.log('✅ User information loaded:', {
-  //   name: window.userInfo.tenNhanVien,
-  //   id: window.userInfo.maNhanVien,
-  //   role: window.userInfo.vaiTro
-  // });
+  console.log('✅ User information loaded:', {
+    name: window.userInfo.tenNhanVien,
+    id: window.userInfo.maNhanVien,
+    role: window.userInfo.vaiTro
+  });
 
   return true;
 }
@@ -88,37 +88,37 @@ export function initializeUI() {
   // Initialize total display system
   initTotalDisplay();
 
-  // '✅ UI elements initialized';
+  console.log('✅ UI elements initialized');
 }
 
 /**
  * Load initial data for the application
  */
 export async function loadInitialData() {
-  // '🚀 Loading initial data...';
+  console.log('🚀 Loading initial data...');
 
   try {
     // Check if we should use ultra-fast mode
     if (shouldUseUltraFast()) {
-      // '⚡ Using ULTRA-FAST mode for performance';
+      console.log('⚡ Using ULTRA-FAST mode for performance');
       const success = await ultraFastInit(window.userInfo);
       if (success) {
-        // '✅ Ultra-fast initialization complete';
+        console.log('✅ Ultra-fast initialization complete');
         return;
       }
-// console.warn('⚠️ Ultra-fast init failed, falling back to optimized mode');
+      console.warn('⚠️ Ultra-fast init failed, falling back to optimized mode');
     }
 
     // Phase 1: Critical data only (parallel loading)
-    // '🚀 Phase 1: Loading critical data...';
+    console.log('🚀 Phase 1: Loading critical data...');
     const softwareDataPromise = loadSoftwareData();
     
     // Wait for software data (needed for dropdowns)
     await softwareDataPromise;
-    // '✅ Software data loaded';
+    console.log('✅ Software data loaded');
     
     // Phase 2: Tab-specific data (parallel loading for statistics)
-    // '🚀 Phase 2: Loading tab-specific data...';
+    console.log('🚀 Phase 2: Loading tab-specific data...');
     
     // Load both transaction and expense data in parallel
     // This ensures statistics tab has data available immediately
@@ -128,14 +128,14 @@ export async function loadInitialData() {
     ];
     
     await Promise.all(dataPromises);
-    // '✅ Transaction and expense data loaded';
+    console.log('✅ Transaction and expense data loaded');
     
     // Phase 3: Initialize minimal features
-    // '🚀 Phase 3: Initializing minimal features...';
+    console.log('🚀 Phase 3: Initializing minimal features...');
     await initializeMinimalFeatures();
-    // '✅ Minimal features initialized';
+    console.log('✅ Minimal features initialized');
     
-    // '✅ Initial data loaded successfully (optimized');
+    console.log('✅ Initial data loaded successfully (optimized)');
   } catch (error) {
     console.error('❌ Error loading initial data:', error);
     throw error;
@@ -156,7 +156,7 @@ async function loadSoftwareData() {
       null, // softwarePackageToKeep
       null  // accountNameToKeep
     );
-    // '✅ Software data loaded';
+    console.log('✅ Software data loaded');
   } catch (error) {
     console.error('❌ Error loading software data:', error);
     // Continue execution even if software data fails
@@ -167,7 +167,7 @@ async function loadSoftwareData() {
  * Load transaction data optimized for performance
  */
 async function loadTransactionDataOptimized() {
-  // '📊 Loading transaction data (optimized...');
+  console.log('📊 Loading transaction data (optimized)...');
   
   try {
     // Ultra-fast initial load with minimal data
@@ -197,12 +197,12 @@ async function loadTransactionDataOptimized() {
       }
     );
     
-    // '✅ Initial transaction data loaded';
+    console.log('✅ Initial transaction data loaded');
     
     // Preload next page in background after UI settles
     setTimeout(async () => {
       if (window.transactionList && window.transactionList.length >= initialPageSize) {
-        // '🔄 Preloading additional transaction data...';
+        console.log('🔄 Preloading additional transaction data...');
         // Increase page size for subsequent loads
         window.itemsPerPage = 10; // Đồng bộ: 10 items/trang
       }
@@ -228,19 +228,19 @@ async function loadTransactionData() {
  * Load expense data for statistics and reports
  */
 async function loadExpenseData() {
-  // '📊 Loading expense data...';
+  console.log('📊 Loading expense data...');
   
   try {
     const { BACKEND_URL } = getConstants();
     
     if (!window.userInfo || !window.userInfo.maNhanVien) {
-// console.warn('⚠️ No user info available to load expenses');
+      console.warn('⚠️ No user info available to load expenses');
       window.expenseList = [];
       return;
     }
     
     const data = {
-      action: 'loadExpenses', // Changed from 'searchExpenses' to avoid logging as user search
+      action: 'searchExpenses',
       maNhanVien: window.userInfo.maNhanVien,
       conditions: {} // Empty conditions to get all expenses
     };
@@ -261,7 +261,7 @@ async function loadExpenseData() {
     
     if (result.status === 'success') {
       window.expenseList = result.data || [];
-      // `✅ Loaded ${window.expenseList.length} expenses`;
+      console.log(`✅ Loaded ${window.expenseList.length} expenses`);
     } else {
       console.error('❌ Error loading expenses:', result.message);
       window.expenseList = [];
@@ -277,7 +277,7 @@ async function loadExpenseData() {
  * Initialize minimal features for immediate interaction
  */
 async function initializeMinimalFeatures() {
-  // '⚡ Initializing minimal features...';
+  console.log('⚡ Initializing minimal features...');
   
   try {
     // Only initialize features needed for immediate interaction
@@ -301,7 +301,7 @@ async function initializeMinimalFeatures() {
       initializeHeavyFeatures();
     }, 3000);
     
-    // '✅ Minimal features initialized';
+    console.log('✅ Minimal features initialized');
   } catch (error) {
     console.error('❌ Error initializing minimal features:', error);
     // Continue with basic functionality
@@ -312,14 +312,14 @@ async function initializeMinimalFeatures() {
  * Initialize heavy features in background
  */
 async function initializeHeavyFeatures() {
-  // '📈 Initializing heavy features in background...';
+  console.log('📈 Initializing heavy features in background...');
   
   try {
     // Initialize expense features (only when needed)
     await initializeExpenseFeatures();
     
     // Initialize other heavy features on-demand
-    // '📊 Heavy features available for lazy loading';
+    console.log('📊 Heavy features available for lazy loading');
   } catch (error) {
     console.error('❌ Error initializing heavy features:', error);
   }
@@ -342,7 +342,7 @@ async function initializeExpenseFeatures() {
     // Initialize expense quick search
     initExpenseQuickSearch();
     
-    // '✅ Expense features initialized';
+    console.log('✅ Expense features initialized');
   } catch (error) {
     console.error('❌ Error initializing expense features:', error);
     // Continue execution even if expense features fail
@@ -388,7 +388,7 @@ export function setupErrorHandling() {
     }
   });
 
-  // '✅ Error handling setup complete';
+  console.log('✅ Error handling setup complete');
 }
 
 /**
@@ -402,7 +402,7 @@ export function initializeConstants() {
     // Make constants globally available if needed
     window.APP_CONSTANTS = constants;
     
-    // '✅ Constants initialized';
+    console.log('✅ Constants initialized');
   } catch (error) {
     console.error('❌ Error initializing constants:', error);
     throw error;
@@ -418,7 +418,7 @@ export function setupDevelopmentMode() {
                        window.location.search.includes('debug=true');
 
   if (isDevelopment) {
-    // '🔧 Development mode enabled';
+    console.log('🔧 Development mode enabled');
     
     // Enable debug logging
     window.DEBUG = true;
@@ -435,7 +435,7 @@ export function setupDevelopmentMode() {
       setTimeout(() => {
         const timing = window.performance.timing;
         const loadTime = timing.loadEventEnd - timing.navigationStart;
-        // `📊 Page load time: ${loadTime}ms`;
+        console.log(`📊 Page load time: ${loadTime}ms`);
       }, 0);
     }
   }
@@ -446,7 +446,7 @@ export function setupDevelopmentMode() {
  * @returns {Promise<boolean>} True if initialization successful
  */
 export async function initializeApp() {
-  // '🚀 Starting application initialization...';
+  console.log('🚀 Starting application initialization...');
   
   try {
     // Step 1: Initialize globals and constants
@@ -471,7 +471,7 @@ export async function initializeApp() {
     // Step 6: Load initial data
     await loadInitialData();
     
-    // '✅ Application initialization complete';
+    console.log('✅ Application initialization complete');
     return true;
     
   } catch (error) {
@@ -492,7 +492,7 @@ export async function initializeApp() {
  * Cleanup function for page unload
  */
 export function cleanupApp() {
-// console.log('🧹 Cleaning up application...');
+  console.log('🧹 Cleaning up application...');
   
   // Clear any intervals or timeouts
   if (window.refreshInterval) {
@@ -505,10 +505,10 @@ export function cleanupApp() {
       localStorage.setItem('lastActivity', new Date().toISOString());
     }
   } catch (error) {
-// console.warn('⚠️ Could not save last activity:', error);
+    console.warn('⚠️ Could not save last activity:', error);
   }
   
-  // '✅ Application cleanup complete';
+  console.log('✅ Application cleanup complete');
 }
 
 // Setup cleanup on page unload

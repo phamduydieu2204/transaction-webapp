@@ -51,18 +51,18 @@ async function loadAllExpenses() {
   const { BACKEND_URL } = getConstants();
   
   if (!window.userInfo) {
-// console.warn('⚠️ No user info found');
+    console.warn('⚠️ No user info found');
     return;
   }
   
   const data = {
-    action: 'loadExpenses', // Changed from 'searchExpenses' to avoid logging as user search
+    action: 'searchExpenses',
     maNhanVien: window.userInfo.maNhanVien,
     conditions: {} // Empty conditions to get all expenses
   };
   
   try {
-    // console.log('🔄 Reloading all expenses...');
+    console.log('🔄 Reloading all expenses...');
     
     const response = await fetch(BACKEND_URL, {
       method: 'POST',
@@ -84,7 +84,7 @@ async function loadAllExpenses() {
       window.currentExpensePage = 1;
       window.isExpenseSearching = false;
       
-      // console.log(`✅ Reloaded ${window.expenseList.length} expenses`);
+      console.log(`✅ Reloaded ${window.expenseList.length} expenses`);
       
       // Update table immediately
       if (typeof window.updateExpenseTable === 'function') {

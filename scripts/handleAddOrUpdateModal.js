@@ -5,7 +5,7 @@ export function openAddOrUpdateModal() {
     if (modal) {
       modal.style.display = 'block';
     } else {
-// console.warn('addOrUpdateModal not found, creating it...');
+      console.warn('addOrUpdateModal not found, creating it...');
       createAddOrUpdateModal();
     }
   }
@@ -66,7 +66,7 @@ export function openAddOrUpdateModal() {
   }
   
   export async function handleAddNewTransaction() {
-// console.log("🆕 handleAddNewTransaction called - clearing edit state");
+    console.log("🆕 handleAddNewTransaction called - clearing edit state");
     window.currentEditTransactionId = null;
     window.currentEditIndex = -1;
     
@@ -82,9 +82,9 @@ export function openAddOrUpdateModal() {
     
     // Keep the form data as-is, including dates that user may have modified
     // Don't automatically update dates to today - use whatever the user has entered
-// console.log("🆕 Proceeding with add using current form data (including user-modified dates)");
+    console.log("🆕 Proceeding with add using current form data (including user-modified dates)");
     
-// console.log("🆕 Calling handleAdd() for new transaction with current form data");
+    console.log("🆕 Calling handleAdd() for new transaction with current form data");
     if (window.handleAdd) {
       window.handleAdd();
     } else {
@@ -93,13 +93,13 @@ export function openAddOrUpdateModal() {
   }
   
   export function handleUpdateTransactionFromModal() {
-    // console.log("🔄 handleUpdateTransactionFromModal called");
+    console.log("🔄 handleUpdateTransactionFromModal called");
     closeAddOrUpdateModal();
     window.handleUpdate(); // Gọi handleUpdate() luôn
   }
   
   export function handleCancelModal() {
-    // console.log("❌ handleCancelModal called");
+    console.log("❌ handleCancelModal called");
     closeAddOrUpdateModal();
   }
   

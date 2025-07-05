@@ -70,7 +70,7 @@ class VersionManager {
         this.showUpdateNotification();
       }
     } catch (error) {
-// console.log('Version check skipped:', error.message);
+      console.log('Version check skipped:', error.message);
     }
   }
 

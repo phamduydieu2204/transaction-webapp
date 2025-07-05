@@ -21,7 +21,7 @@ import {
 export function renderProfitTrendChart(metrics, containerId = 'profitTrendChart') {
   const container = document.getElementById(containerId);
   if (!container) {
-// console.warn(`Container #${containerId} not found for profit trend chart`);
+    console.warn(`Container #${containerId} not found for profit trend chart`);
     return;
   }
 
@@ -124,7 +124,7 @@ export function renderProfitTrendChart(metrics, containerId = 'profitTrendChart'
 export function renderProfitBySoftwareChart(metrics, containerId = 'profitBySoftwareChart') {
   const container = document.getElementById(containerId);
   if (!container) {
-// console.warn(`Container #${containerId} not found for profit by software chart`);
+    console.warn(`Container #${containerId} not found for profit by software chart`);
     return;
   }
 
@@ -221,7 +221,7 @@ export function renderProfitBySoftwareChart(metrics, containerId = 'profitBySoft
 export function renderQuarterlyProfitChart(metrics, containerId = 'quarterlyProfitChart') {
   const container = document.getElementById(containerId);
   if (!container) {
-// console.warn(`Container #${containerId} not found for quarterly profit chart`);
+    console.warn(`Container #${containerId} not found for quarterly profit chart`);
     return;
   }
 
@@ -317,7 +317,7 @@ export function renderQuarterlyProfitChart(metrics, containerId = 'quarterlyProf
 export function renderProfitMarginChart(metrics, containerId = 'profitMarginChart') {
   const container = document.getElementById(containerId);
   if (!container) {
-// console.warn(`Container #${containerId} not found for profit margin chart`);
+    console.warn(`Container #${containerId} not found for profit margin chart`);
     return;
   }
 

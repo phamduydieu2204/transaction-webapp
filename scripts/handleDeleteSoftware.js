@@ -24,7 +24,7 @@ export async function handleDeleteSoftware(software, reloadCallback) {
   const { BACKEND_URL } = getConstants();
   
   try {
-    // console.log('🗑️ Bắt đầu xóa phần mềm:', software);
+    console.log('🗑️ Bắt đầu xóa phần mềm:', software);
     
     const response = await fetch(BACKEND_URL, {
       method: "POST",
@@ -56,7 +56,7 @@ export async function handleDeleteSoftware(software, reloadCallback) {
         await window.loadSoftwareData();
       }
       
-      // console.log('✅ Đã xóa phần mềm thành công:', result.data);
+      console.log('✅ Đã xóa phần mềm thành công:', result.data);
       
     } else {
       alert("❌ Không thể xóa phần mềm: " + result.message);

@@ -4,7 +4,7 @@
  */
 
 export function showProcessingModal(message = "Hệ thống đang thực thi...") {
-  // console.log('🔄 showProcessingModal called:', message);
+  console.log('🔄 showProcessingModal called:', message);
   
   // Hide any existing result modals first
   hideAllResultModals();
@@ -21,7 +21,7 @@ export function showProcessingModal(message = "Hệ thống đang thực thi..."
     if (modalClose) modalClose.style.display = "none";
     
     oldModal.style.display = "block";
-    // console.log('✅ Old processing modal shown');
+    console.log('✅ Old processing modal shown');
   }
   
   // Also create/show modern modal
@@ -49,7 +49,7 @@ export function showProcessingModal(message = "Hệ thống đang thực thi..."
       </div>
     `;
     document.body.appendChild(modernModal);
-    // console.log('✅ Modern processing modal created');
+    console.log('✅ Modern processing modal created');
   }
 
   const messageText = modernModal.querySelector("#messageText");
@@ -58,7 +58,7 @@ export function showProcessingModal(message = "Hệ thống đang thực thi..."
   }
   
   modernModal.style.display = "block";
-  // console.log('✅ Modern processing modal shown');
+  console.log('✅ Modern processing modal shown');
 
   // Disable form elements
   document.querySelectorAll("input, select, textarea, button").forEach(element => {
@@ -67,20 +67,20 @@ export function showProcessingModal(message = "Hệ thống đang thực thi..."
 }
 
 export function closeProcessingModal() {
-  // console.log('❌ closeProcessingModal called');
+  console.log('❌ closeProcessingModal called');
   
   // Close old modal
   const oldModal = document.getElementById("processingModal");
   if (oldModal) {
     oldModal.style.display = "none";
-    // console.log('✅ Old processing modal closed');
+    console.log('✅ Old processing modal closed');
   }
   
   // Close modern modal
   const modernModal = document.getElementById("processingModalModern");
   if (modernModal) {
     modernModal.style.display = "none";
-    // console.log('✅ Modern processing modal closed');
+    console.log('✅ Modern processing modal closed');
   }
   
   // Enable all form elements
@@ -90,7 +90,7 @@ export function closeProcessingModal() {
 }
 
 export function showResultModal(message, isSuccess = true) {
-// console.log('📢 showResultModal called:', message, 'success:', isSuccess);
+  console.log('📢 showResultModal called:', message, 'success:', isSuccess);
   
   // First close any processing modals
   closeProcessingModal();
@@ -139,7 +139,7 @@ export function showResultModal(message, isSuccess = true) {
       document.querySelectorAll("input, select, textarea, button").forEach(element => {
         element.disabled = false;
       });
-      // console.log('✅ Result modal closed');
+      console.log('✅ Result modal closed');
     };
     
     // Click outside to close
@@ -149,7 +149,7 @@ export function showResultModal(message, isSuccess = true) {
       }
     });
     
-    // console.log('✅ Result modal created');
+    console.log('✅ Result modal created');
   }
   
   // Update modal content
@@ -179,7 +179,7 @@ export function showResultModal(message, isSuccess = true) {
   
   // Show modal
   modal.style.display = 'block';
-  // console.log('✅ Result modal shown');
+  console.log('✅ Result modal shown');
   
   // Enable all form elements
   document.querySelectorAll("input, select, textarea, button").forEach(element => {

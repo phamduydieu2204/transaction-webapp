@@ -37,7 +37,7 @@ function closePeriodDropdown(event) {
  * Select report period
  */
 window.selectReportPeriod = function(period) {
-  // console.log('📅 Selecting report period:', period);
+  console.log('📅 Selecting report period:', period);
   
   // Update selected period
   currentReportPeriod = period;
@@ -240,7 +240,7 @@ function formatDateForFilter(date) {
  * Refresh all reports with new date range
  */
 function refreshAllReports(dateRange) {
-  // console.log('🔄 Refreshing all reports with date range:', dateRange);
+  console.log('🔄 Refreshing all reports with date range:', dateRange);
   
   // Update filter panel if exists
   if (window.updatePeriodFilter) {

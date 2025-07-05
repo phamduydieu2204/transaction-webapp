@@ -101,7 +101,7 @@ export async function initializePartials() {
           partialCache.set(partialPath, html);
         }
       } catch (error) {
-// console.warn(`Failed to preload ${partialPath}:`, error);
+        console.warn(`Failed to preload ${partialPath}:`, error);
       }
     });
     
@@ -118,15 +118,8 @@ export async function initializePartials() {
     // Phase 2: Inject remaining components using cached data
     
     // Use requestIdleCallback for non-critical components
-    const injectNonCritical = async () => {
-      // Load modals container first, then wait for it to complete
-      const modalsContainer = allPartials.find(p => p.elementId === 'modals-container');
-      if (modalsContainer) {
-        await loadPartial(modalsContainer.elementId, modalsContainer.partialPath, true);
-      }
-      
-      // Then load other non-critical components
-      const nonCriticalPartials = allPartials.filter(p => p.priority > 1 && p.elementId !== 'modals-container');
+    const injectNonCritical = () => {
+      const nonCriticalPartials = allPartials.filter(p => p.priority > 1);
       nonCriticalPartials.forEach(({ elementId, partialPath }) => {
         requestAnimationFrame(() => {
           loadPartial(elementId, partialPath, true);
@@ -135,9 +128,9 @@ export async function initializePartials() {
     };
     
     if ('requestIdleCallback' in window) {
-      requestIdleCallback(() => injectNonCritical(), { timeout: 1000 });
+      requestIdleCallback(injectNonCritical, { timeout: 1000 });
     } else {
-      setTimeout(() => injectNonCritical(), 10);
+      setTimeout(injectNonCritical, 10);
     }
     
     // Non-critical component injection scheduled

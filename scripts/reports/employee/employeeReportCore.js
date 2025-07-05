@@ -36,7 +36,7 @@ export class EmployeeReportCore {
         if (this.isInitialized) return;
         
         try {
-            // console.log('🔧 Initializing Employee Report with actual sheet data...');
+            console.log('🔧 Initializing Employee Report with actual sheet data...');
             
             this.setupEventListeners();
             await this.loadAllData();
@@ -50,7 +50,7 @@ export class EmployeeReportCore {
             this.renderRankingSection();
             
             this.isInitialized = true;
-            // console.log('✅ Employee Report initialized successfully');
+            console.log('✅ Employee Report initialized successfully');
             
         } catch (error) {
             console.error('❌ Error initializing Employee Report:', error);
@@ -64,52 +64,51 @@ export class EmployeeReportCore {
             this.transactions = this.extractTransactionData();
             this.expenses = this.extractExpenseData();
             
-// console.log('📊 Employee data loaded:', {
+            console.log('📊 Employee data loaded:', {
+                transactions: this.transactions.length,
+                expenses: this.expenses.length
+            });
+            
+        } catch (error) {
+            console.error('❌ Error loading employee data:', error);
+            // Fallback to mock data if real data is not available
+            this.generateMockData();
+        }
+    }
 
-  //                 transactions: this.transactions.length,
-  //                 expenses: this.expenses.length
-  //             });
-  //             
-  //         } catch (error) {
-  //             console.error('❌ Error loading employee data:', error);
-  //             // Fallback to mock data if real data is not available
-  //             this.generateMockData();
-  //         }
-  //     }
-  // 
-  //     // Trích xuất dữ liệu từ sheet GiaoDich
-  //     extractTransactionData() {
-  //         const rawData = this.transactions || [];
-  //         
-  //         // Handle both array and object formats
-  //         return rawData.map((row, index) => {
-  //             // If data is already in object format
-  //             if (typeof row === 'object' && !Array.isArray(row)) {
-  //                 return {
-  //                     id: index + 1,
-  //                     maGiaoDich: row.maGiaoDich || row.transactionCode || '',
-  //                     ngayGiaoDich: row.ngayGiaoDich || row.date || '',
-  //                     loaiGiaoDich: row.loaiGiaoDich || row.type || '',
-  //                     tenKhachHang: row.tenKhachHang || row.customerName || '',
-  //                     email: row.email || '',
-  //                     lienHe: row.lienHe || row.contact || '',
-  //                     soThangDangKy: parseInt(row.soThangDangKy || row.months || 0),
-  //                     ngayBatDau: row.ngayBatDau || row.startDate || '',
-  //                     ngayKetThuc: row.ngayKetThuc || row.endDate || '',
-  //                     soThietBi: parseInt(row.soThietBi || row.devices || 0),
-  //                     tenPhanMem: row.tenPhanMem || row.software || '',
-  //                     goiPhanMem: row.goiPhanMem || row.package || '',
-  //                     tenTaiKhoan: row.tenTaiKhoan || row.accountName || '',
-  //                     idSheetTaiKhoan: row.idSheetTaiKhoan || row.sheetId || '',
-  //                     capNhatCookie: row.capNhatCookie || row.updateCookie || '',
-  //                     thongTinDonHang: row.thongTinDonHang || row.orderInfo || '',
-  //                     doanhThu: parseFloat(row.doanhThu || row.revenue || 0),
-  //                     hoaHong: parseFloat(row.hoaHong || row.commission || 0),
-  //                     ghiChu: row.ghiChu || row.note || '',
-  //                     tenChuan: row.tenChuan || row.standardName || '',
-  //                     tenNhanVien: row.tenNhanVien || row.employeeName || '',
-  //                     maNhanVien: row.maNhanVien || row.employeeCode || ''
-  //                 };
+    // Trích xuất dữ liệu từ sheet GiaoDich
+    extractTransactionData() {
+        const rawData = this.transactions || [];
+        
+        // Handle both array and object formats
+        return rawData.map((row, index) => {
+            // If data is already in object format
+            if (typeof row === 'object' && !Array.isArray(row)) {
+                return {
+                    id: index + 1,
+                    maGiaoDich: row.maGiaoDich || row.transactionCode || '',
+                    ngayGiaoDich: row.ngayGiaoDich || row.date || '',
+                    loaiGiaoDich: row.loaiGiaoDich || row.type || '',
+                    tenKhachHang: row.tenKhachHang || row.customerName || '',
+                    email: row.email || '',
+                    lienHe: row.lienHe || row.contact || '',
+                    soThangDangKy: parseInt(row.soThangDangKy || row.months || 0),
+                    ngayBatDau: row.ngayBatDau || row.startDate || '',
+                    ngayKetThuc: row.ngayKetThuc || row.endDate || '',
+                    soThietBi: parseInt(row.soThietBi || row.devices || 0),
+                    tenPhanMem: row.tenPhanMem || row.software || '',
+                    goiPhanMem: row.goiPhanMem || row.package || '',
+                    tenTaiKhoan: row.tenTaiKhoan || row.accountName || '',
+                    idSheetTaiKhoan: row.idSheetTaiKhoan || row.sheetId || '',
+                    capNhatCookie: row.capNhatCookie || row.updateCookie || '',
+                    thongTinDonHang: row.thongTinDonHang || row.orderInfo || '',
+                    doanhThu: parseFloat(row.doanhThu || row.revenue || 0),
+                    hoaHong: parseFloat(row.hoaHong || row.commission || 0),
+                    ghiChu: row.ghiChu || row.note || '',
+                    tenChuan: row.tenChuan || row.standardName || '',
+                    tenNhanVien: row.tenNhanVien || row.employeeName || '',
+                    maNhanVien: row.maNhanVien || row.employeeCode || ''
+                };
             }
             
             // If data is in array format
@@ -203,7 +202,7 @@ export class EmployeeReportCore {
 
     // Method mới để xử lý tất cả dữ liệu sử dụng EmployeeDataProcessor
     processAllData(transactions = [], expenses = []) {
-        // console.log('🔄 Processing all employee data...');
+        console.log('🔄 Processing all employee data...');
         
         // Use the new data processor
         this.processedData = this.dataProcessor.processEmployeeData(transactions, expenses);
@@ -212,13 +211,13 @@ export class EmployeeReportCore {
         this.employees = this.processedData.employees;
         this.filteredEmployees = [...this.employees];
         
-        // console.log('✅ All employee data processed:', this.processedData);
+        console.log('✅ All employee data processed:', this.processedData);
         return this.processedData;
     }
 
     // Xử lý và tính toán dữ liệu nhân viên (legacy method - keep for compatibility)
     processEmployeeData() {
-        // console.log('🔄 Processing employee data...');
+        console.log('🔄 Processing employee data...');
         
         // Tạo map nhân viên
         const employeeMap = new Map();
@@ -301,12 +300,12 @@ export class EmployeeReportCore {
         
         this.filteredEmployees = [...this.employees];
         
-        // console.log('✅ Employee data processing completed:', this.employees.length, 'employees');
+        console.log('✅ Employee data processing completed:', this.employees.length, 'employees');
     }
 
     // Tạo dữ liệu mẫu nếu không có dữ liệu thực
     generateMockData() {
-// console.log('🎭 Generating mock employee data for demonstration...');
+        console.log('🎭 Generating mock employee data for demonstration...');
         
         const mockEmployees = [
             { name: 'Nguyễn Văn An', code: 'NV001', dept: 'sales' },
@@ -1441,28 +1440,28 @@ export class EmployeeReportCore {
     handleManagementTool(toolId) {
         switch (toolId) {
             case 'performanceReview':
-// console.log('Performance review tool');
+                console.log('Performance review tool');
                 break;
             case 'commissionCalculator':
-// console.log('Commission calculator');
+                console.log('Commission calculator');
                 break;
             case 'goalSetting':
                 this.openKPIModal();
                 break;
             case 'trainingPlan':
-// console.log('Training plan tool');
+                console.log('Training plan tool');
                 break;
             case 'teamAnalytics':
-// console.log('Team analytics tool');
+                console.log('Team analytics tool');
                 break;
             case 'incentiveProgram':
-// console.log('Incentive program tool');
+                console.log('Incentive program tool');
                 break;
         }
     }
 
     reviewGoals() {
-// console.log('Review goals functionality');
+        console.log('Review goals functionality');
     }
 
     // Utility methods
@@ -1544,7 +1543,7 @@ export class EmployeeReportCore {
     }
 
     async refresh() {
-        // console.log('🔄 Refreshing employee report data...');
+        console.log('🔄 Refreshing employee report data...');
         this.isInitialized = false;
         await this.initialize();
     }

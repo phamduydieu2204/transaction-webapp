@@ -25,7 +25,7 @@ import {
  * @param {string} options.period - Period name (e.g., 'this_month', 'last_month')
  */
 export async function loadExpenseAnalysis(options = {}) {
-// console.log('💸 Loading expense analysis with options:', options);
+  console.log('💸 Loading expense analysis with options:', options);
   
   try {
     // Load template
@@ -38,119 +38,118 @@ export async function loadExpenseAnalysis(options = {}) {
     const transactions = window.transactionList || getFromStorage('transactions') || [];
     const expenses = window.expenseList || getFromStorage('expenses') || [];
     
-// console.log('💸 Expense analysis data:', {
+    console.log('💸 Expense analysis data:', {
+      transactions: transactions.length,
+      expenses: expenses.length
+    });
+    
+    // Get date range from options or global filters
+    const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
+    const period = options.period || window.globalFilters?.period || 'this_month';
+    
+    // Filter data by date range
+    const filteredExpenses = filterDataByDateRange(expenses, dateRange);
+    const filteredTransactions = filterDataByDateRange(transactions, dateRange);
+    
+    // Load all components
+    await Promise.all([
+      updateExpenseKPIs(filteredExpenses, filteredTransactions, period),
+      renderExpenseTrendChart(filteredExpenses, period),
+      renderExpenseCategoryChart(filteredExpenses),
+      renderBudgetComparisonChart(filteredExpenses),
+      loadTopExpenseCategories(filteredExpenses),
+      loadExpenseTypes(filteredExpenses),
+      updateExpenseControlDashboard(filteredExpenses, filteredTransactions)
+    ]);
+    
+    // Setup event handlers
+    setupExpenseAnalysisHandlers();
+    
+    console.log('✅ Expense analysis loaded successfully');
+    
+  } catch (error) {
+    console.error('❌ Error loading expense analysis:', error);
+    showError('Không thể tải phân tích chi phí');
+  }
+}
 
-  //       transactions: transactions.length,
-  //       expenses: expenses.length
-  //     });
-  //     
-  //     // Get date range from options or global filters
-  //     const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
-  //     const period = options.period || window.globalFilters?.period || 'this_month';
-  //     
-  //     // Filter data by date range
-  //     const filteredExpenses = filterDataByDateRange(expenses, dateRange);
-  //     const filteredTransactions = filterDataByDateRange(transactions, dateRange);
-  //     
-  //     // Load all components
-  //     await Promise.all([
-  //       updateExpenseKPIs(filteredExpenses, filteredTransactions, period),
-  //       renderExpenseTrendChart(filteredExpenses, period),
-  //       renderExpenseCategoryChart(filteredExpenses),
-  //       renderBudgetComparisonChart(filteredExpenses),
-  //       loadTopExpenseCategories(filteredExpenses),
-  //       loadExpenseTypes(filteredExpenses),
-  //       updateExpenseControlDashboard(filteredExpenses, filteredTransactions)
-  //     ]);
-  //     
-  //     // Setup event handlers
-  //     setupExpenseAnalysisHandlers();
-  //     
-  //     // console.log('✅ Expense analysis loaded successfully');
-  //     
-  //   } catch (error) {
-  //     console.error('❌ Error loading expense analysis:', error);
-  //     showError('Không thể tải phân tích chi phí');
-  //   }
-  // }
-  // 
 /**
-  //  * Load the expense analysis HTML template
-  //  */
-  // async function loadExpenseAnalysisHTML() {
-  //   const container = document.getElementById('report-expense');
-  //   if (!container) return;
-  //   
-  //   try {
-  //     const response = await fetch('./partials/tabs/report-pages/expense-analysis.html');
-  //     if (!response.ok) {
-  //       throw new Error('Template not found');
-  //     }
-  //     
-  //     const html = await response.text();
-  //     container.innerHTML = html;
-  //     container.classList.add('active');
-  //     
-  //     // console.log('✅ Expense analysis template loaded');
-  //     
-  //   } catch (error) {
-  //     console.error('❌ Could not load expense analysis template:', error);
-  //     throw error;
-  //   }
-  // }
-  // 
+ * Load the expense analysis HTML template
+ */
+async function loadExpenseAnalysisHTML() {
+  const container = document.getElementById('report-expense');
+  if (!container) return;
+  
+  try {
+    const response = await fetch('./partials/tabs/report-pages/expense-analysis.html');
+    if (!response.ok) {
+      throw new Error('Template not found');
+    }
+    
+    const html = await response.text();
+    container.innerHTML = html;
+    container.classList.add('active');
+    
+    console.log('✅ Expense analysis template loaded');
+    
+  } catch (error) {
+    console.error('❌ Could not load expense analysis template:', error);
+    throw error;
+  }
+}
+
 /**
-  //  * Update expense KPI cards
-  //  */
-  // async function updateExpenseKPIs(expenses, transactions, period) {
-  //   // console.log('💰 Updating expense KPIs');
-  //   
-  //   // Calculate current period metrics
-  //   const currentMetrics = calculateExpenseMetrics(expenses);
-  //   const revenueMetrics = calculateRevenueMetrics(transactions);
-  //   
-  //   // Calculate previous period for comparison
-  //   const previousExpenses = getPreviousPeriodExpenses(expenses, period);
-  //   const previousMetrics = calculateExpenseMetrics(previousExpenses);
-  //   
-  //   // Update KPI values
-  //   updateKPIElement('total-expense-value', formatRevenue(currentMetrics.totalExpense));
-  //   updateKPIElement('avg-expense-value', formatRevenue(currentMetrics.avgExpenseValue));
-  //   updateKPIElement('largest-expense', formatRevenue(currentMetrics.largestExpense.amount));
-  //   
-  //   // Calculate expense ratio
-  //   const expenseRatio = revenueMetrics.totalRevenue > 0 ? 
-  //     (currentMetrics.totalExpense / revenueMetrics.totalRevenue) * 100 : 0;
-  //   updateKPIElement('expense-ratio-value', `${expenseRatio.toFixed(1)}%`);
-  //   
-  //   // Calculate and update changes
-  //   const expenseChange = calculatePercentageChange(
-  //     previousMetrics.totalExpense, 
-  //     currentMetrics.totalExpense
-  //   );
-  //   const avgChange = calculatePercentageChange(
-  //     previousMetrics.avgExpenseValue, 
-  //     currentMetrics.avgExpenseValue
-  //   );
-  //   
-  //   updateChangeElement('total-expense-change', expenseChange);
-  //   updateChangeElement('avg-expense-change', avgChange);
-  //   
-  //   // Update largest expense details
-  //   if (currentMetrics.largestExpense.description) {
-  //     updateKPIElement('largest-expense-detail', 
-  //       `${currentMetrics.largestExpense.category || 'N/A'} - ${currentMetrics.largestExpense.description}`);
-  //   }
-  //   
-  //   // console.log('💰 Expense KPIs updated:', currentMetrics);
-  // }
-  // 
+ * Update expense KPI cards
+ */
+async function updateExpenseKPIs(expenses, transactions, period) {
+  console.log('💰 Updating expense KPIs');
+  
+  // Calculate current period metrics
+  const currentMetrics = calculateExpenseMetrics(expenses);
+  const revenueMetrics = calculateRevenueMetrics(transactions);
+  
+  // Calculate previous period for comparison
+  const previousExpenses = getPreviousPeriodExpenses(expenses, period);
+  const previousMetrics = calculateExpenseMetrics(previousExpenses);
+  
+  // Update KPI values
+  updateKPIElement('total-expense-value', formatRevenue(currentMetrics.totalExpense));
+  updateKPIElement('avg-expense-value', formatRevenue(currentMetrics.avgExpenseValue));
+  updateKPIElement('largest-expense', formatRevenue(currentMetrics.largestExpense.amount));
+  
+  // Calculate expense ratio
+  const expenseRatio = revenueMetrics.totalRevenue > 0 ? 
+    (currentMetrics.totalExpense / revenueMetrics.totalRevenue) * 100 : 0;
+  updateKPIElement('expense-ratio-value', `${expenseRatio.toFixed(1)}%`);
+  
+  // Calculate and update changes
+  const expenseChange = calculatePercentageChange(
+    previousMetrics.totalExpense, 
+    currentMetrics.totalExpense
+  );
+  const avgChange = calculatePercentageChange(
+    previousMetrics.avgExpenseValue, 
+    currentMetrics.avgExpenseValue
+  );
+  
+  updateChangeElement('total-expense-change', expenseChange);
+  updateChangeElement('avg-expense-change', avgChange);
+  
+  // Update largest expense details
+  if (currentMetrics.largestExpense.description) {
+    updateKPIElement('largest-expense-detail', 
+      `${currentMetrics.largestExpense.category || 'N/A'} - ${currentMetrics.largestExpense.description}`);
+  }
+  
+  console.log('💰 Expense KPIs updated:', currentMetrics);
+}
+
 /**
-  //  * Calculate expense metrics from expenses
-  //  */
-  // function calculateExpenseMetrics(expenses) {
-  //   let totalExpense = 0;
-  //   let largestExpense = { amount: 0, category: '', description: '' };
+ * Calculate expense metrics from expenses
+ */
+function calculateExpenseMetrics(expenses) {
+  let totalExpense = 0;
+  let largestExpense = { amount: 0, category: '', description: '' };
   
   expenses.forEach(expense => {
     const amount = parseFloat(expense.soTien || expense.amount || 0);
@@ -196,7 +195,7 @@ function calculateRevenueMetrics(transactions) {
  * Render expense trend chart
  */
 async function renderExpenseTrendChart(expenses, period) {
-  // console.log('📈 Rendering expense trend chart');
+  console.log('📈 Rendering expense trend chart');
   
   const canvas = document.getElementById('expense-trend-chart');
   if (!canvas) return;
@@ -286,7 +285,7 @@ async function renderExpenseTrendChart(expenses, period) {
  * Render expense category chart (pie/bar)
  */
 async function renderExpenseCategoryChart(expenses) {
-// console.log('🍰 Rendering expense category chart');
+  console.log('🍰 Rendering expense category chart');
   
   const canvas = document.getElementById('expense-category-chart');
   if (!canvas) return;
@@ -350,7 +349,7 @@ async function renderExpenseCategoryChart(expenses) {
  * Render budget comparison chart
  */
 async function renderBudgetComparisonChart(expenses) {
-  // console.log('📊 Rendering budget comparison chart');
+  console.log('📊 Rendering budget comparison chart');
   
   const canvas = document.getElementById('budget-comparison-chart');
   if (!canvas) return;
@@ -425,7 +424,7 @@ async function renderBudgetComparisonChart(expenses) {
  * Load top expense categories
  */
 async function loadTopExpenseCategories(expenses) {
-  // console.log('📋 Loading top expense categories');
+  console.log('📋 Loading top expense categories');
   
   const categoryExpenses = calculateCategoryExpenses(expenses);
   const topCategories = categoryExpenses
@@ -478,7 +477,7 @@ async function loadTopExpenseCategories(expenses) {
  * Load expense types (recurring vs one-time)
  */
 async function loadExpenseTypes(expenses) {
-  // console.log('🔄 Loading expense types');
+  console.log('🔄 Loading expense types');
   
   const expenseTypes = analyzeExpenseTypes(expenses);
   
@@ -524,7 +523,7 @@ async function loadExpenseTypes(expenses) {
  * Update expense control dashboard
  */
 async function updateExpenseControlDashboard(expenses, transactions) {
-  // console.log('🛡️ Updating expense control dashboard');
+  console.log('🛡️ Updating expense control dashboard');
   
   // Update budget alerts
   const budgetAlerts = generateBudgetAlerts(expenses);
@@ -836,42 +835,42 @@ window.refreshExpenseAnalysis = function() {
 };
 
 window.exportExpenseReport = function() {
-  // console.log('📊 Exporting expense report...');
+  console.log('📊 Exporting expense report...');
   // Implementation for export functionality
 };
 
 window.exportCategoryExpenseData = function() {
-  // console.log('📊 Exporting category expense data...');
+  console.log('📊 Exporting category expense data...');
 };
 
 window.exportExpenseTypesData = function() {
-  // console.log('📊 Exporting expense types data...');
+  console.log('📊 Exporting expense types data...');
 };
 
 window.toggleExpenseChartView = function(chartType, viewType) {
-  // console.log(`🔄 Toggling ${chartType} chart to ${viewType} view`);
+  console.log(`🔄 Toggling ${chartType} chart to ${viewType} view`);
 };
 
 window.editExpense = function(expenseId) {
-  // console.log(`✏️ Editing expense: ${expenseId}`);
+  console.log(`✏️ Editing expense: ${expenseId}`);
 };
 
 function refreshExpenseChart(period) {
-  // console.log(`🔄 Refreshing expense chart for period: ${period}`);
+  console.log(`🔄 Refreshing expense chart for period: ${period}`);
   // Implementation for chart refresh
 }
 
 function refreshBudgetChart(view) {
-  // console.log(`🔄 Refreshing budget chart for view: ${view}`);
+  console.log(`🔄 Refreshing budget chart for view: ${view}`);
   // Implementation for budget chart refresh
 }
 
 function refreshExpenseTable(view) {
-  // console.log(`🔄 Refreshing expense table for view: ${view}`);
+  console.log(`🔄 Refreshing expense table for view: ${view}`);
   // Implementation for table refresh
 }
 
 function filterExpenseTypes(filter) {
-  // console.log(`🔄 Filtering expense types: ${filter}`);
+  console.log(`🔄 Filtering expense types: ${filter}`);
   // Implementation for expense type filtering
 }

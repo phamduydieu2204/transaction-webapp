@@ -203,7 +203,7 @@ export function optimizeFormInputs() {
     // Add optimized listener
     newInput.addEventListener('input', debounce((e) => {
       // Validation logic here
-// console.log('Input changed:', e.target.value);
+      console.log('Input changed:', e.target.value);
     }, 300));
   });
 }

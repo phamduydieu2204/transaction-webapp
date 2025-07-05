@@ -205,7 +205,7 @@ export async function addBusinessDashboardInteractivity(metrics) {
   // Initialize tooltip functionality
   initializeTooltips();
   
-  // console.log("✅ Business dashboard interactivity added");
+  console.log("✅ Business dashboard interactivity added");
 }
 
 /**
@@ -228,7 +228,7 @@ function initializeTooltips() {
     });
   });
   
-  // console.log("✅ Tooltips initialized for", tooltipElements.length, "elements");
+  console.log("✅ Tooltips initialized for", tooltipElements.length, "elements");
 }
 
 /**

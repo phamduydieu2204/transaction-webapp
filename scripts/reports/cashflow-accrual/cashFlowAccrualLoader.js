@@ -24,7 +24,7 @@ export class CashFlowAccrualLoader {
      */
     async initialize() {
         try {
-            // console.log('🔄 Initializing Cash Flow vs Accrual comparison...');
+            console.log('🔄 Initializing Cash Flow vs Accrual comparison...');
             
             this.core = new CashFlowAccrualCore();
             this.charts = new CashFlowAccrualCharts();
@@ -34,7 +34,7 @@ export class CashFlowAccrualLoader {
             this.renderDashboard();
             
             this.isInitialized = true;
-            // console.log('✅ Cash Flow vs Accrual comparison initialized successfully');
+            console.log('✅ Cash Flow vs Accrual comparison initialized successfully');
             
         } catch (error) {
             console.error('❌ Failed to initialize Cash Flow vs Accrual comparison:', error);
@@ -50,7 +50,7 @@ export class CashFlowAccrualLoader {
             this.showLoading(true);
             
             await this.core.loadData();
-// console.log('Cash flow vs accrual data loaded successfully');
+            console.log('Cash flow vs accrual data loaded successfully');
             
         } catch (error) {
             console.error('Error loading cash flow vs accrual data:', error);
@@ -118,7 +118,7 @@ export class CashFlowAccrualLoader {
      */
     renderDashboard() {
         try {
-// console.log('Rendering cash flow vs accrual dashboard...');
+            console.log('Rendering cash flow vs accrual dashboard...');
             
             this.renderOverviewCards();
             this.renderCharts();
@@ -127,7 +127,7 @@ export class CashFlowAccrualLoader {
             this.renderAllocationDetails();
             this.renderFilterOptions();
             
-            // console.log('✅ Cash flow vs accrual dashboard rendered');
+            console.log('✅ Cash flow vs accrual dashboard rendered');
             
         } catch (error) {
             console.error('Error rendering dashboard:', error);
@@ -600,7 +600,7 @@ export class CashFlowAccrualLoader {
         if (window.showResultModalModern) {
             window.showResultModalModern(message, 'success');
         } else {
-            // console.log('✅', message);
+            console.log('✅', message);
         }
     }
 
@@ -623,7 +623,7 @@ export class CashFlowAccrualLoader {
             this.charts.destroy();
         }
         this.isInitialized = false;
-// console.log('Cash Flow vs Accrual comparison destroyed');
+        console.log('Cash Flow vs Accrual comparison destroyed');
     }
 }
 

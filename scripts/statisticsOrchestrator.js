@@ -8,7 +8,7 @@
  * Date: 2025-01-16
  */
 
-// console.warn('⚠️ statisticsOrchestrator.js is disabled - import directly from statisticsCore.js instead');
+console.warn('⚠️ statisticsOrchestrator.js is disabled - import directly from statisticsCore.js instead');
 
 // Re-export main functions from statisticsCore for backward compatibility
 export {
@@ -37,5 +37,5 @@ export const StatisticsAPI = {
   }
 };
 
-// console.log('📊 Statistics functions available directly from statisticsCore.js');
+console.log('📊 Statistics functions available directly from statisticsCore.js');
 window.StatisticsAPI = StatisticsAPI;

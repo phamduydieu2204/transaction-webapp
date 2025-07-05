@@ -128,7 +128,7 @@ export function updateState(updates, persist = true) {
       if (appState.hasOwnProperty(key)) {
         appState[key] = updates[key];
       } else {
-// console.warn(`⚠️ Unknown state property: ${key}`);
+        console.warn(`⚠️ Unknown state property: ${key}`);
       }
     });
     
@@ -233,7 +233,7 @@ export function persistState() {
     const sizeInBytes = new Blob([stateString]).size;
     
     if (sizeInBytes > STATE_CONFIG.maxStorageSize) {
-// console.warn('⚠️ State too large for localStorage, compressing...');
+      console.warn('⚠️ State too large for localStorage, compressing...');
       // Implement compression or selective saving
       stateToSave.transactions = stateToSave.transactions.slice(-100); // Keep only last 100
       stateToSave.expenses = stateToSave.expenses.slice(-100);
@@ -261,7 +261,7 @@ export function persistState() {
         JSON.stringify(criticalState)
       );
       
-      // '💾 Critical state saved as fallback';
+      console.log('💾 Critical state saved as fallback');
     } catch (fallbackError) {
       console.error('❌ Could not save critical state:', fallbackError);
     }
@@ -362,7 +362,7 @@ export function clearPersistedState() {
       }
     });
     
-    // console.log('🗑️ Persisted state cleared');
+    console.log('🗑️ Persisted state cleared');
   } catch (error) {
     console.error('❌ Error clearing persisted state:', error);
   }
@@ -398,7 +398,7 @@ export function resetState() {
   };
   
   updateState(defaultState, true);
-  // '🔄 State reset to defaults';
+  console.log('🔄 State reset to defaults');
 }
 
 /**
@@ -422,7 +422,7 @@ export function getStateStats() {
  * Cleanup state manager
  */
 export function cleanupStateManager() {
-// console.log('🧹 Cleaning up state manager...');
+  console.log('🧹 Cleaning up state manager...');
   
   if (autoSaveInterval) {
     clearInterval(autoSaveInterval);
@@ -435,7 +435,7 @@ export function cleanupStateManager() {
   // Clear listeners
   stateListeners.clear();
   
-  // '✅ State manager cleanup complete';
+  console.log('✅ State manager cleanup complete');
 }
 
 /**
@@ -466,7 +466,7 @@ export function getFromStorage(key) {
     
     return null;
   } catch (error) {
-// console.warn(`⚠️ Error getting ${key} from storage:`, error);
+    console.warn(`⚠️ Error getting ${key} from storage:`, error);
     return null;
   }
 }

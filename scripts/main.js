@@ -297,7 +297,7 @@ window.showResultModal = showResultModal;
 
 // Employee report debug functions (inline for immediate availability)
 window.debugEmployeeReport = function() {
-    // console.log('🔍 Debugging Employee Report...');
+    console.log('🔍 Debugging Employee Report...');
     
     const results = {
         functions: {
@@ -321,10 +321,10 @@ window.debugEmployeeReport = function() {
         }
     };
     
-// console.log('Debug results:', results);
+    console.log('Debug results:', results);
     
     // Try to manually trigger employee report
-// console.log('🧪 Testing manual employee report load...');
+    console.log('🧪 Testing manual employee report load...');
     if (window.loadEmployeeReport) {
         window.loadEmployeeReport();
     } else {
@@ -335,25 +335,25 @@ window.debugEmployeeReport = function() {
 };
 
 window.forceEmployeeReport = function() {
-    // console.log('🔧 Force loading employee report...');
+    console.log('🔧 Force loading employee report...');
     
     // Hide all report pages
     const reportPages = document.querySelectorAll('.report-page');
     reportPages.forEach(page => page.classList.remove('active'));
-// console.log('Hidden report pages:', reportPages.length);
+    console.log('Hidden report pages:', reportPages.length);
     
     // Show employee report page
     const employeePage = document.getElementById('report-employee');
     if (employeePage) {
         employeePage.classList.add('active');
-        // console.log('✅ Employee page shown');
+        console.log('✅ Employee page shown');
         
         // Force load template
         fetch('./partials/tabs/report-pages/employee-report.html')
             .then(response => response.text())
             .then(html => {
                 employeePage.innerHTML = html;
-                // console.log('✅ Template injected directly');
+                console.log('✅ Template injected directly');
             })
             .catch(error => {
                 console.error('❌ Template load failed:', error);
@@ -370,13 +370,13 @@ window.forceEmployeeReport = function() {
     const employeeMenuItem = document.querySelector('[data-report="employee"]');
     if (employeeMenuItem) {
         employeeMenuItem.classList.add('active');
-        // console.log('✅ Employee menu item activated');
+        console.log('✅ Employee menu item activated');
     }
 };
 
 // Financial Management debug functions (inline for immediate availability)
 window.debugFinancialManagement = function() {
-    // console.log('🔍 Debugging Financial Management...');
+    console.log('🔍 Debugging Financial Management...');
     
     const results = {
         functions: {
@@ -398,14 +398,14 @@ window.debugFinancialManagement = function() {
         }
     };
     
-    // console.table(results.functions);
-    // console.table(results.containers);
-    // console.table(results.menuItems);
-    // console.table(results.currentPage);
+    console.table(results.functions);
+    console.table(results.containers);
+    console.table(results.menuItems);
+    console.table(results.currentPage);
     
     // Test loading function
     if (typeof window.loadFinancialManagement === 'function') {
-        // console.log('✅ Testing loadFinancialManagement...');
+        console.log('✅ Testing loadFinancialManagement...');
         window.loadFinancialManagement();
     } else {
         console.error('❌ loadFinancialManagement function not available');
@@ -415,23 +415,23 @@ window.debugFinancialManagement = function() {
 };
 
 window.forceFinancialManagement = function() {
-    // console.log('🔧 Force loading financial management...');
+    console.log('🔧 Force loading financial management...');
     
     // Hide all report pages
     const reportPages = document.querySelectorAll('.report-page');
     reportPages.forEach(page => page.classList.remove('active'));
-// console.log('Hidden report pages:', reportPages.length);
+    console.log('Hidden report pages:', reportPages.length);
     
     // Show financial report page
     const financePage = document.getElementById('report-finance');
     if (financePage) {
         financePage.classList.add('active');
-        // console.log('✅ Finance page shown');
+        console.log('✅ Finance page shown');
         
         // Force load financial management
         if (typeof window.loadFinancialManagement === 'function') {
             window.loadFinancialManagement();
-            // console.log('✅ Financial management forced');
+            console.log('✅ Financial management forced');
         } else {
             console.error('❌ loadFinancialManagement not available');
         }
@@ -447,13 +447,13 @@ window.forceFinancialManagement = function() {
     const financeMenuItem = document.querySelector('[data-report="finance"]');
     if (financeMenuItem) {
         financeMenuItem.classList.add('active');
-        // console.log('✅ Finance menu item activated');
+        console.log('✅ Finance menu item activated');
     }
 };
 
 // Cash Flow vs Accrual debug functions (inline for immediate availability)
 window.debugCashFlowAccrual = function() {
-    // console.log('🔍 Debugging Cash Flow vs Accrual...');
+    console.log('🔍 Debugging Cash Flow vs Accrual...');
     
     const results = {
         functions: {
@@ -475,14 +475,14 @@ window.debugCashFlowAccrual = function() {
         }
     };
     
-    // console.table(results.functions);
-    // console.table(results.containers);
-    // console.table(results.menuItems);
-    // console.table(results.currentPage);
+    console.table(results.functions);
+    console.table(results.containers);
+    console.table(results.menuItems);
+    console.table(results.currentPage);
     
     // Test loading function
     if (typeof window.loadCashFlowAccrualReport === 'function') {
-        // console.log('✅ Testing loadCashFlowAccrualReport...');
+        console.log('✅ Testing loadCashFlowAccrualReport...');
         window.loadCashFlowAccrualReport();
     } else {
         console.error('❌ loadCashFlowAccrualReport function not available');
@@ -492,23 +492,23 @@ window.debugCashFlowAccrual = function() {
 };
 
 window.forceCashFlowAccrual = function() {
-    // console.log('🔧 Force loading cash flow vs accrual...');
+    console.log('🔧 Force loading cash flow vs accrual...');
     
     // Hide all report pages
     const reportPages = document.querySelectorAll('.report-page');
     reportPages.forEach(page => page.classList.remove('active'));
-// console.log('Hidden report pages:', reportPages.length);
+    console.log('Hidden report pages:', reportPages.length);
     
     // Show cash flow accrual report page
     const cashflowPage = document.getElementById('report-cashflow-accrual');
     if (cashflowPage) {
         cashflowPage.classList.add('active');
-        // console.log('✅ Cash flow accrual page shown');
+        console.log('✅ Cash flow accrual page shown');
         
         // Force load cash flow accrual
         if (typeof window.loadCashFlowAccrualReport === 'function') {
             window.loadCashFlowAccrualReport();
-            // console.log('✅ Cash flow accrual forced');
+            console.log('✅ Cash flow accrual forced');
         } else {
             console.error('❌ loadCashFlowAccrualReport not available');
         }
@@ -524,7 +524,7 @@ window.forceCashFlowAccrual = function() {
     const cashflowMenuItem = document.querySelector('[data-report="cashflow-accrual"]');
     if (cashflowMenuItem) {
         cashflowMenuItem.classList.add('active');
-        // console.log('✅ Cash flow accrual menu item activated');
+        console.log('✅ Cash flow accrual menu item activated');
     }
 };
 
@@ -627,7 +627,7 @@ window.initSoftwareTab = () => {
   if (typeof initSoftwareTab === 'function') {
     return initSoftwareTab();
   } else {
-// console.warn('⚠️ initSoftwareTab function not available');
+    console.warn('⚠️ initSoftwareTab function not available');
   }
 };
 window.closeModal = closeModal;
@@ -669,5 +669,4 @@ window.currentExpensePage = 1;
 
 // Start the app immediately when module loads
 startApp().catch(error => {
-  console.error('Failed to start app:', error);
 });

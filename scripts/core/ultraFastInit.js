@@ -16,7 +16,7 @@ import { deduplicateRequest } from './requestOptimizer.js';
  * Load critical functions needed for basic operations
  */
 async function loadCriticalFunctions() {
-  // console.log('⚡ Loading critical functions...');
+  console.log('⚡ Loading critical functions...');
   
   try {
     // Import and attach modal functions
@@ -29,7 +29,7 @@ async function loadCriticalFunctions() {
     window.closeProcessingModal = closeProcessingModal;
     window.showResultModal = showResultModal;
     
-    // console.log('✅ Critical modal functions loaded');
+    console.log('✅ Critical modal functions loaded');
     
     // Load other critical functions
     const { updatePackageList } = await import('../updatePackageList.js');
@@ -38,7 +38,7 @@ async function loadCriticalFunctions() {
     window.updatePackageList = updatePackageList;
     window.updateAccountList = updateAccountList;
     
-    // console.log('✅ Critical utility functions loaded');
+    console.log('✅ Critical utility functions loaded');
     
   } catch (error) {
     console.error('❌ Failed to load critical functions:', error);
@@ -50,7 +50,7 @@ async function loadCriticalFunctions() {
  * Ultra-fast app initialization - skips everything non-essential
  */
 export async function ultraFastInit(userInfo) {
-  // console.log('🚀 ULTRA-FAST INIT: Starting...');
+  console.log('🚀 ULTRA-FAST INIT: Starting...');
   const startTime = Date.now();
 
   try {
@@ -65,7 +65,7 @@ export async function ultraFastInit(userInfo) {
     await loadCriticalFunctions();
 
     // Step 2: Load only the most critical 15 transactions
-    // console.log('⚡ Loading first 15 transactions only...');
+    console.log('⚡ Loading first 15 transactions only...');
     
     const result = await loadTransactionsOptimized(
       userInfo,
@@ -83,7 +83,7 @@ export async function ultraFastInit(userInfo) {
     );
 
     if (result.status === 'success') {
-      // console.log(`⚡ Ultra-fast load complete: ${result.data.length} transactions in ${Date.now() - startTime}ms`);
+      console.log(`⚡ Ultra-fast load complete: ${result.data.length} transactions in ${Date.now() - startTime}ms`);
       
       // Step 3: Schedule background loading of remaining features
       scheduleBackgroundLoading();
@@ -106,28 +106,28 @@ function scheduleBackgroundLoading() {
   // Load software list in background (for dropdowns)
   setTimeout(async () => {
     try {
-      // console.log('🔄 Background: Loading software list...');
+      console.log('🔄 Background: Loading software list...');
       const { fetchSoftwareList } = await import('../fetchSoftwareList.js');
       const { updatePackageList } = await import('../updatePackageList.js');
       const { updateAccountList } = await import('../updateAccountList.js');
       
       await fetchSoftwareList(null, [], updatePackageList, updateAccountList);
-      // console.log('✅ Background: Software list loaded');
+      console.log('✅ Background: Software list loaded');
     } catch (error) {
-// console.warn('⚠️ Background software list loading failed:', error);
+      console.warn('⚠️ Background software list loading failed:', error);
     }
   }, 1000);
 
   // Load expense data in background
   setTimeout(async () => {
     try {
-      // console.log('🔄 Background: Loading expense data...');
+      console.log('🔄 Background: Loading expense data...');
       const { getConstants } = await import('../constants.js');
       const { BACKEND_URL } = getConstants();
       
       if (window.userInfo && window.userInfo.maNhanVien) {
         const data = {
-          action: 'loadExpenses', // Changed from 'searchExpenses' to avoid logging as user search
+          action: 'searchExpenses',
           maNhanVien: window.userInfo.maNhanVien,
           conditions: {}
         };
@@ -141,23 +141,23 @@ function scheduleBackgroundLoading() {
         const result = await response.json();
         if (result.status === 'success') {
           window.expenseList = result.data || [];
-          // console.log(`✅ Background: Loaded ${window.expenseList.length} expenses`);
+          console.log(`✅ Background: Loaded ${window.expenseList.length} expenses`);
         }
       }
       
       // Then load expense features
       const { initExpenseDropdowns } = await import('../initExpenseDropdowns.js');
       await initExpenseDropdowns();
-      // console.log('✅ Background: Expense features loaded');
+      console.log('✅ Background: Expense features loaded');
     } catch (error) {
-// console.warn('⚠️ Background expense loading failed:', error);
+      console.warn('⚠️ Background expense loading failed:', error);
     }
   }, 2000);
 
   // Preload next page of transactions
   setTimeout(async () => {
     try {
-      // console.log('🔄 Background: Preloading next transactions...');
+      console.log('🔄 Background: Preloading next transactions...');
       await loadTransactionsOptimized(
         window.userInfo,
         () => {}, // No UI update
@@ -172,9 +172,9 @@ function scheduleBackgroundLoading() {
           showProgress: false
         }
       );
-      // console.log('✅ Background: Next page preloaded');
+      console.log('✅ Background: Next page preloaded');
     } catch (error) {
-// console.warn('⚠️ Background preloading failed:', error);
+      console.warn('⚠️ Background preloading failed:', error);
     }
   }, 3000);
 }

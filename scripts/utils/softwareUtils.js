@@ -80,11 +80,11 @@ export function getTransactionFileType(transaction) {
  */
 function getSoftwareFileTypeByStandardName(standardName) {
   if (!window.softwareData || !Array.isArray(window.softwareData)) {
-// console.warn('❌ softwareData not available or not an array');
+    console.warn('❌ softwareData not available or not an array');
     return null;
   }
   
-  // console.log('🔍 Fallback: Looking for software match by standardName:', standardName);
+  console.log('🔍 Fallback: Looking for software match by standardName:', standardName);
   
   // Find matching software entry by standardName
   const matchingSoftware = window.softwareData.find(software => {
@@ -99,7 +99,7 @@ function getSoftwareFileTypeByStandardName(standardName) {
   
   if (!matchingSoftware) {
     // Final fallback: use temporary mapping
-// console.warn('⚠️ No software match, using temporary mapping for:', standardName);
+    console.warn('⚠️ No software match, using temporary mapping for:', standardName);
     return getTempFileTypeMappingByStandardName(standardName);
   }
   
@@ -117,7 +117,7 @@ function getSoftwareFileTypeByStandardName(standardName) {
   }
   
   // Final fallback: temporary mapping
-// console.warn('⚠️ No fileType in software data, using temporary mapping for:', standardName);
+  console.warn('⚠️ No fileType in software data, using temporary mapping for:', standardName);
   return getTempFileTypeMappingByStandardName(standardName);
 }
 
@@ -233,8 +233,8 @@ export function debugSoftwareData() {
     return;
   }
   
-  // console.log('📊 Software Data Summary:');
-// console.log(`Total entries: ${window.softwareData.length}`);
+  console.log('📊 Software Data Summary:');
+  console.log(`Total entries: ${window.softwareData.length}`);
   
   // Group by fileType
   const fileTypeGroups = {};
@@ -250,15 +250,15 @@ export function debugSoftwareData() {
     });
   });
   
-  // console.log('\n📄 Software grouped by fileType:');
+  console.log('\n📄 Software grouped by fileType:');
   Object.entries(fileTypeGroups).forEach(([type, items]) => {
-// console.log(`\n${type} (${items.length} items):`);
+    console.log(`\n${type} (${items.length} items):`);
     console.table(items.slice(0, 5)); // Show first 5 of each type
   });
   
   // Sample entries with fileType
   const withFileType = window.softwareData.filter(item => item.fileType);
-  // console.log(`\n✅ Entries with fileType: ${withFileType.length}`);
+  console.log(`\n✅ Entries with fileType: ${withFileType.length}`);
   if (withFileType.length > 0) {
     console.table(withFileType.slice(0, 10).map(item => ({
       softwareName: item.softwareName,

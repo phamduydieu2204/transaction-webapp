@@ -67,11 +67,11 @@ export async function handleSearch(
   if (isGlobalSearch) {
     // Tìm kiếm toàn cục - chỉ gửi text từ trường ghi chú, bỏ qua tất cả trường khác
     conditions.globalSearchText = note;
-// console.log("🌍 Tìm kiếm toàn cục với từ khóa:", note);
-    // console.log("🚫 Bỏ qua tất cả trường khác khi có dữ liệu trong ghi chú");
+    console.log("🌍 Tìm kiếm toàn cục với từ khóa:", note);
+    console.log("🚫 Bỏ qua tất cả trường khác khi có dữ liệu trong ghi chú");
   } else {
     // Tìm kiếm thông thường theo từng trường cụ thể
-    // console.log("🔍 Tìm kiếm theo trường cụ thể");
+    console.log("🔍 Tìm kiếm theo trường cụ thể");
     
     if (transactionType) conditions.transactionType = transactionType;
     if (transactionDate && transactionDate !== "yyyy/mm/dd") conditions.transactionDate = transactionDate;
@@ -96,7 +96,7 @@ export async function handleSearch(
     conditions: conditions
   };
 
-// console.log("📤 Tìm kiếm giao dịch với data:", JSON.stringify(data, null, 2));
+  console.log("📤 Tìm kiếm giao dịch với data:", JSON.stringify(data, null, 2));
 
 
   try {

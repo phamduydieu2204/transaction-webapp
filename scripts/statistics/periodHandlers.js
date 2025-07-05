@@ -63,7 +63,7 @@ export function getDateRange(period, referenceDate = new Date()) {
       ranges.end = normalizeDate(today);
   }
 
-  // console.log(`📅 Generated ${period} range:`, ranges);
+  console.log(`📅 Generated ${period} range:`, ranges);
   return ranges;
 }
 
@@ -78,12 +78,12 @@ export function getCustomDateRange(startDate, endDate) {
   const end = normalizeDate(endDate);
   
   if (!start || !end) {
-// console.warn("Invalid date range provided");
+    console.warn("Invalid date range provided");
     return getDateRange("month"); // Fallback to current month
   }
   
   if (start > end) {
-// console.warn("Start date is after end date, swapping");
+    console.warn("Start date is after end date, swapping");
     return { start: end, end: start };
   }
   
@@ -225,7 +225,7 @@ export function getDaysBetween(startDate, endDate) {
   const end = new Date(normalizeDate(endDate));
   
   if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-// console.warn("Invalid dates provided for day calculation");
+    console.warn("Invalid dates provided for day calculation");
     return 0;
   }
   
@@ -261,7 +261,7 @@ export function getMonthsInRange(startDate, endDate) {
   const end = new Date(normalizeDate(endDate));
   
   if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-// console.warn("Invalid date range for month generation");
+    console.warn("Invalid date range for month generation");
     return months;
   }
   
@@ -289,7 +289,7 @@ export function getFiscalYear(date, fiscalYearStart = 1) {
   const dateObj = new Date(normalizeDate(date));
   
   if (isNaN(dateObj.getTime())) {
-// console.warn("Invalid date for fiscal year calculation");
+    console.warn("Invalid date for fiscal year calculation");
     return new Date().getFullYear();
   }
   

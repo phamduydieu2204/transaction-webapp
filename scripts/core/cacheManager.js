@@ -71,7 +71,7 @@ class CacheManager {
     this.clear('transactions');
     this.clear('transaction-stats');
     
-// console.log('🧹 Transaction caches cleared');
+    console.log('🧹 Transaction caches cleared');
   }
 
   /**
@@ -86,7 +86,7 @@ class CacheManager {
     this.clear('expenses');
     this.clear('expense-stats');
     
-// console.log('🧹 Expense caches cleared');
+    console.log('🧹 Expense caches cleared');
   }
 }
 

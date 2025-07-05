@@ -23,7 +23,7 @@ export class FinancialCore {
         if (this.isInitialized) return;
         
         try {
-            // console.log('💰 Initializing Financial Core...');
+            console.log('💰 Initializing Financial Core...');
             
             await this.loadFinancialData();
             this.processFinancialData();
@@ -32,7 +32,7 @@ export class FinancialCore {
             this.generateFinancialHealth();
             
             this.isInitialized = true;
-            // console.log('✅ Financial Core initialized successfully');
+            console.log('✅ Financial Core initialized successfully');
             
         } catch (error) {
             console.error('❌ Error initializing Financial Core:', error);
@@ -49,41 +49,40 @@ export class FinancialCore {
             this.transactions = this.extractTransactionData();
             this.expenses = this.extractExpenseData();
             
-// console.log('📊 Financial data loaded:', {
+            console.log('📊 Financial data loaded:', {
+                transactions: this.transactions.length,
+                expenses: this.expenses.length
+            });
+            
+        } catch (error) {
+            console.error('❌ Error loading financial data:', error);
+            // Use mock data as fallback
+            this.generateMockFinancialData();
+        }
+    }
 
-  //                 transactions: this.transactions.length,
-  //                 expenses: this.expenses.length
-  //             });
-  //             
-  //         } catch (error) {
-  //             console.error('❌ Error loading financial data:', error);
-  //             // Use mock data as fallback
-  //             this.generateMockFinancialData();
-  //         }
-  //     }
-  // 
-  //     /**
-  //      * Extract transaction data for financial analysis
-  //      */
-  //     extractTransactionData() {
-  //         const rawData = window.currentTransactionData || window.transactionList || [];
-  //         
-  //         return rawData.map((row, index) => {
-  //             if (typeof row === 'object' && !Array.isArray(row)) {
-  //                 return {
-  //                     id: index + 1,
-  //                     date: row.ngayGiaoDich || row.date || '',
-  //                     type: row.loaiGiaoDich || row.type || '',
-  //                     customer: row.tenKhachHang || row.customerName || '',
-  //                     revenue: parseFloat(row.doanhThu || row.revenue || 0),
-  //                     commission: parseFloat(row.hoaHong || row.commission || 0),
-  //                     software: row.tenPhanMem || row.softwareName || '',
-  //                     package: row.goiPhanMem || row.package || '',
-  //                     months: parseInt(row.soThangDangKy || row.months || 0),
-  //                     employee: row.tenNhanVien || row.employeeName || '',
-  //                     startDate: row.ngayBatDau || row.startDate || '',
-  //                     endDate: row.ngayKetThuc || row.endDate || ''
-  //                 };
+    /**
+     * Extract transaction data for financial analysis
+     */
+    extractTransactionData() {
+        const rawData = window.currentTransactionData || window.transactionList || [];
+        
+        return rawData.map((row, index) => {
+            if (typeof row === 'object' && !Array.isArray(row)) {
+                return {
+                    id: index + 1,
+                    date: row.ngayGiaoDich || row.date || '',
+                    type: row.loaiGiaoDich || row.type || '',
+                    customer: row.tenKhachHang || row.customerName || '',
+                    revenue: parseFloat(row.doanhThu || row.revenue || 0),
+                    commission: parseFloat(row.hoaHong || row.commission || 0),
+                    software: row.tenPhanMem || row.softwareName || '',
+                    package: row.goiPhanMem || row.package || '',
+                    months: parseInt(row.soThangDangKy || row.months || 0),
+                    employee: row.tenNhanVien || row.employeeName || '',
+                    startDate: row.ngayBatDau || row.startDate || '',
+                    endDate: row.ngayKetThuc || row.endDate || ''
+                };
             }
             
             // Handle array format
@@ -152,7 +151,7 @@ export class FinancialCore {
      * Process financial data for analysis
      */
     processFinancialData() {
-        // console.log('🔄 Processing financial data...');
+        console.log('🔄 Processing financial data...');
         
         // Process by time periods
         this.monthlyData = this.groupByMonth();
@@ -166,7 +165,7 @@ export class FinancialCore {
         // Calculate cash flow
         this.cashFlowData = this.calculateCashFlow();
         
-        // console.log('✅ Financial data processed');
+        console.log('✅ Financial data processed');
     }
 
     /**
@@ -389,7 +388,7 @@ export class FinancialCore {
      * Calculate financial metrics and KPIs
      */
     calculateFinancialMetrics() {
-        // console.log('📊 Calculating financial metrics...');
+        console.log('📊 Calculating financial metrics...');
         
         const totalRevenue = this.transactions.reduce((sum, t) => sum + t.revenue, 0);
         const totalExpenses = this.expenses.reduce((sum, e) => sum + e.amount, 0);
@@ -467,7 +466,7 @@ export class FinancialCore {
             customerAcquisitionCost: this.calculateCAC()
         };
         
-        // console.log('✅ Financial metrics calculated:', this.financialMetrics);
+        console.log('✅ Financial metrics calculated:', this.financialMetrics);
     }
 
     /**
@@ -646,7 +645,7 @@ export class FinancialCore {
      * Generate mock data for testing
      */
     generateMockFinancialData() {
-        // console.log('📝 Generating mock financial data...');
+        console.log('📝 Generating mock financial data...');
         
         // Mock transactions
         this.transactions = [
@@ -667,7 +666,7 @@ export class FinancialCore {
      * Export financial data
      */
     exportFinancialData(format = 'csv') {
-        // console.log(`📊 Exporting financial data as ${format}...`);
+        console.log(`📊 Exporting financial data as ${format}...`);
         
         const data = {
             metrics: this.financialMetrics,

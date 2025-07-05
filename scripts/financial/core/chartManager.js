@@ -342,7 +342,7 @@ export function formatCurrencyForChart(value) {
 export function updateChartData(canvasId, newData) {
   const chart = chartInstances.get(canvasId);
   if (!chart) {
-// console.warn(`Chart ${canvasId} not found for update`);
+    console.warn(`Chart ${canvasId} not found for update`);
     return;
   }
   
@@ -371,7 +371,7 @@ export function animateChart(canvasId) {
 export function exportChartAsImage(canvasId, filename = 'chart.png') {
   const chart = chartInstances.get(canvasId);
   if (!chart) {
-// console.warn(`Chart ${canvasId} not found for export`);
+    console.warn(`Chart ${canvasId} not found for export`);
     return;
   }
   
@@ -403,7 +403,7 @@ export function isChartJSAvailable() {
  */
 export function initChartManager() {
   if (!isChartJSAvailable()) {
-// console.warn('Chart.js is not loaded. Charts will not be available.');
+    console.warn('Chart.js is not loaded. Charts will not be available.');
     return false;
   }
   
@@ -414,6 +414,6 @@ export function initChartManager() {
     Chart.defaults.color = '#495057';
   }
   
-  // console.log('✅ Chart manager initialized');
+  console.log('✅ Chart manager initialized');
   return true;
 }

@@ -72,23 +72,23 @@ const loadingTabs = new Map();
 export async function loadTabModules(tabName) {
   // Return if already loaded
   if (loadedTabs.has(tabName)) {
-    // console.log(`✅ Tab ${tabName} already loaded`);
+    console.log(`✅ Tab ${tabName} already loaded`);
     return true;
   }
   
   // Return existing promise if already loading
   if (loadingTabs.has(tabName)) {
-// console.log(`⏳ Tab ${tabName} already loading, waiting...`);
+    console.log(`⏳ Tab ${tabName} already loading, waiting...`);
     return loadingTabs.get(tabName);
   }
   
   const config = TAB_MODULES[tabName];
   if (!config) {
-// console.warn(`⚠️ No configuration found for tab: ${tabName}`);
+    console.warn(`⚠️ No configuration found for tab: ${tabName}`);
     return false;
   }
   
-  // console.log(`🔄 Loading tab modules for: ${tabName}`);
+  console.log(`🔄 Loading tab modules for: ${tabName}`);
   
   // Create loading promise
   const loadingPromise = loadTabModulesInternal(tabName, config);
@@ -98,7 +98,7 @@ export async function loadTabModules(tabName) {
     const result = await loadingPromise;
     if (result) {
       loadedTabs.add(tabName);
-      // console.log(`✅ Tab ${tabName} loaded successfully`);
+      console.log(`✅ Tab ${tabName} loaded successfully`);
     }
     return result;
   } finally {
@@ -113,7 +113,7 @@ async function loadTabModulesInternal(tabName, config) {
   try {
     // Load required modules first
     if (config.required && config.required.length > 0) {
-      // console.log(`📦 Loading ${config.required.length} required modules for ${tabName}`);
+      console.log(`📦 Loading ${config.required.length} required modules for ${tabName}`);
       await Promise.all(
         config.required.map(module => 
           loadModule(module.path, module.key)
@@ -123,10 +123,10 @@ async function loadTabModulesInternal(tabName, config) {
     
     // Preload optional modules in background (non-blocking)
     if (config.optional && config.optional.length > 0) {
-      // console.log(`🔄 Preloading ${config.optional.length} optional modules for ${tabName}`);
+      console.log(`🔄 Preloading ${config.optional.length} optional modules for ${tabName}`);
       config.optional.forEach(module => {
         preloadModule(module.path, module.key).catch(error => {
-// console.warn(`⚠️ Failed to preload ${module.key}:`, error);
+          console.warn(`⚠️ Failed to preload ${module.key}:`, error);
         });
       });
     }
@@ -149,7 +149,7 @@ export function preloadTabModules(tabName) {
   if (config.required) {
     config.required.forEach(module => {
       preloadModule(module.path, module.key).catch(error => {
-// console.warn(`⚠️ Failed to preload ${module.key}:`, error);
+        console.warn(`⚠️ Failed to preload ${module.key}:`, error);
       });
     });
   }

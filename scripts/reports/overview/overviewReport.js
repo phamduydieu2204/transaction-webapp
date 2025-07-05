@@ -32,7 +32,7 @@ import { getConstants } from '../../constants.js';
  * @param {string} options.period - Period name (e.g., 'this_month', 'last_month')
  */
 export async function loadOverviewReport(options = {}) {
-  // console.log('📈 Loading overview report with options:', options);
+  console.log('📈 Loading overview report with options:', options);
   
   try {
     // PERFORMANCE: Initialize optimizations early
@@ -54,299 +54,296 @@ export async function loadOverviewReport(options = {}) {
     // Ensure data is loaded before proceeding
     await ensureDataIsLoaded();
     
-// console.log('🔍 Checking data availability:', {
+    console.log('🔍 Checking data availability:', {
+      transactionList: window.transactionList ? window.transactionList.length : 0,
+      expenseList: window.expenseList ? window.expenseList.length : 0
+    });
+    
+    // Get data from global variables (primary) or storage (fallback)
+    const transactions = window.transactionList || getFromStorage('transactions') || [];
+    const expenses = window.expenseList || getFromStorage('expenses') || [];
+    
+    console.log('📊 Data found:', {
+      transactions: transactions.length,
+      expenses: expenses.length,
+      sampleTransaction: transactions[0] ? Object.keys(transactions[0]) : [],
+      sampleExpense: expenses[0] ? Object.keys(expenses[0]) : []
+    });
+    
+    // Get date range from options or global filters
+    const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
+    const period = options.period || window.globalFilters?.period || 'this_month';
+    
+    console.log('📅 Using date range:', dateRange);
+    console.log('📅 Period:', period);
+    
+    // Update period display
+    updatePeriodDisplay(period);
+    
+    // Filter data by date range FIRST
+    const filteredTransactions = filterDataByDateRange(transactions, dateRange);
+    const filteredExpenses = filterDataByDateRange(expenses, dateRange);
+    
+    // Calculate KPIs with filtered data (and pass unfiltered data for comparison)
+    const kpis = calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses, dateRange, transactions);
+    console.log('💰 Calculated Updated KPIs:');
+    console.log('  - Doanh thu gộp:', kpis.grossRevenue);
+    console.log('  - Tiền đang chờ thu:', kpis.pendingCollection);
+    console.log('  - Tiền đang chờ chi:', kpis.pendingPayment);
+    console.log('  - Tổng tiền hoàn trả:', kpis.totalRefunds);
+    console.log('  - Tỷ lệ hoàn tiền:', kpis.refundRate);
+    
+    // Update all components
+    console.log('🚀 Loading overview components...');
+    
+    // Wait a moment for DOM to be ready
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    await Promise.all([
+      updateKPICards(kpis),
+      loadTopProducts(filteredTransactions),
+      loadTopCustomers(filteredTransactions),
+      loadCharts(filteredTransactions, filteredExpenses),
+      // updateDataTables(filteredTransactions, filteredExpenses), // Removed - status details section removed
+      loadPendingTransactions(filteredTransactions, dateRange)
+    ]);
+    
+    // PERFORMANCE: Initialize lazy loading for non-critical elements
+    initOverviewLazyLoading();
+    
+    console.log('🔄 FORCE CACHE REFRESH - v2.0.1');
+    console.log('✅ Overview report loaded successfully with optimizations');
+    
+  } catch (error) {
+    console.error('❌ Error loading overview report:', error);
+    showOverviewError(error.message);
+  }
+}
 
-  //       transactionList: window.transactionList ? window.transactionList.length : 0,
-  //       expenseList: window.expenseList ? window.expenseList.length : 0
-  //     });
-  //     
-  //     // Get data from global variables (primary) or storage (fallback)
-  //     const transactions = window.transactionList || getFromStorage('transactions') || [];
-  //     const expenses = window.expenseList || getFromStorage('expenses') || [];
-  //     
-// console.log('📊 Data found:', {
+/**
+ * Load the overview report HTML template
+ */
+async function loadOverviewHTML() {
+  const container = document.getElementById('report-overview');
+  if (!container) return;
+  
+  try {
+    const response = await fetch('./partials/tabs/report-pages/overview-report.html');
+    if (!response.ok) {
+      console.error('❌ Overview template not found at:', response.url);
+      throw new Error('Template not found');
+    }
+    
+    const html = await response.text();
+    console.log('✅ Template HTML loaded, length:', html.length);
+    
+    // Find the overview report container and add content to it
+    const overviewPage = document.getElementById('report-overview');
+    if (overviewPage) {
+      console.log('📝 Applying template to existing container');
+      overviewPage.innerHTML = html;
+      overviewPage.classList.add('active');
+      console.log('✅ Template applied to existing container');
+      
+      // Verify template was applied
+      setTimeout(() => {
+        const hasCompleted = !!document.getElementById('completed-revenue');
+        const hasChart = !!document.getElementById('revenue-status-chart');
+        console.log('🗖️ Template verification after apply:', { hasCompleted, hasChart });
+      }, 10);
+    } else {
+      // Fallback: create the structure
+      container.innerHTML = `<div id="report-overview" class="report-page active">${html}</div>`;
+      console.log('✅ Template applied to new container');
+    }
+    
+    console.log('📄 NEW Overview HTML template loaded successfully');
+    
+    // Verify new elements exist
+    setTimeout(() => {
+      const completedElement = document.getElementById('completed-revenue');
+      const paidElement = document.getElementById('paid-revenue');
+      const unpaidElement = document.getElementById('unpaid-revenue');
+      const revenueStatusChart = document.getElementById('revenue-status-chart');
+      const statusDistChart = document.getElementById('status-distribution-chart');
+      console.log('🔍 Template verification:', {
+        'completed-revenue': !!completedElement,
+        'paid-revenue': !!paidElement,
+        'unpaid-revenue': !!unpaidElement,
+        'revenue-status-chart': !!revenueStatusChart,
+        'status-distribution-chart': !!statusDistChart
+      });
+      
+      // Debug: check what's actually in the container
+      const container = document.getElementById('report-overview');
+      console.log('📝 Container content preview:', container?.innerHTML?.substring(0, 200) + '...');
+    }, 50);
+    
+  } catch (error) {
+    console.error('❌ CRITICAL: Could not load new template:', error);
+    console.warn('🚫 NOT using fallback - forcing error to fix issue');
+    throw error;  // Force error instead of using fallback
+  }
+}
 
-  //       transactions: transactions.length,
-  //       expenses: expenses.length,
-  //       sampleTransaction: transactions[0] ? Object.keys(transactions[0]) : [],
-  //       sampleExpense: expenses[0] ? Object.keys(expenses[0]) : []
-  //     });
-  //     
-  //     // Get date range from options or global filters
-  //     const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
-  //     const period = options.period || window.globalFilters?.period || 'this_month';
-  //     
-  //     // console.log('📅 Using date range:', dateRange);
-  //     // console.log('📅 Period:', period);
-  //     
-  //     // Update period display
-  //     updatePeriodDisplay(period);
-  //     
-  //     // Filter data by date range FIRST
-  //     const filteredTransactions = filterDataByDateRange(transactions, dateRange);
-  //     const filteredExpenses = filterDataByDateRange(expenses, dateRange);
-  //     
-  //     // Calculate KPIs with filtered data (and pass unfiltered data for comparison)
-  //     const kpis = calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses, dateRange, transactions);
-  //     // console.log('💰 Calculated Updated KPIs:');
-// console.log('  - Doanh thu gộp:', kpis.grossRevenue);
-// console.log('  - Tiền đang chờ thu:', kpis.pendingCollection);
-// console.log('  - Tiền đang chờ chi:', kpis.pendingPayment);
-// console.log('  - Tổng tiền hoàn trả:', kpis.totalRefunds);
-// console.log('  - Tỷ lệ hoàn tiền:', kpis.refundRate);
-  //     
-  //     // Update all components
-  //     // console.log('🚀 Loading overview components...');
-  //     
-  //     // Wait a moment for DOM to be ready
-  //     await new Promise(resolve => setTimeout(resolve, 100));
-  //     
-  //     await Promise.all([
-  //       updateKPICards(kpis),
-  //       loadTopProducts(filteredTransactions),
-  //       loadTopCustomers(filteredTransactions),
-  //       loadCharts(filteredTransactions, filteredExpenses),
-  //       // updateDataTables(filteredTransactions, filteredExpenses), // Removed - status details section removed
-  //       loadPendingTransactions(filteredTransactions, dateRange)
-  //     ]);
-  //     
-  //     // PERFORMANCE: Initialize lazy loading for non-critical elements
-  //     initOverviewLazyLoading();
-  //     
-  //     // console.log('🔄 FORCE CACHE REFRESH - v2.0.1');
-  //     // console.log('✅ Overview report loaded successfully with optimizations');
-  //     
-  //   } catch (error) {
-  //     console.error('❌ Error loading overview report:', error);
-  //     showOverviewError(error.message);
-  //   }
-  // }
-  // 
 /**
-  //  * Load the overview report HTML template
-  //  */
-  // async function loadOverviewHTML() {
-  //   const container = document.getElementById('report-overview');
-  //   if (!container) return;
-  //   
-  //   try {
-  //     const response = await fetch('./partials/tabs/report-pages/overview-report.html');
-  //     if (!response.ok) {
-  //       console.error('❌ Overview template not found at:', response.url);
-  //       throw new Error('Template not found');
-  //     }
-  //     
-  //     const html = await response.text();
-  //     // console.log('✅ Template HTML loaded, length:', html.length);
-  //     
-  //     // Find the overview report container and add content to it
-  //     const overviewPage = document.getElementById('report-overview');
-  //     if (overviewPage) {
-  //       // console.log('📝 Applying template to existing container');
-  //       overviewPage.innerHTML = html;
-  //       overviewPage.classList.add('active');
-  //       // console.log('✅ Template applied to existing container');
-  //       
-  //       // Verify template was applied
-  //       setTimeout(() => {
-  //         const hasCompleted = !!document.getElementById('completed-revenue');
-  //         const hasChart = !!document.getElementById('revenue-status-chart');
-  //         // console.log('🗖️ Template verification after apply:', { hasCompleted, hasChart });
-  //       }, 10);
-  //     } else {
-  //       // Fallback: create the structure
-  //       container.innerHTML = `<div id="report-overview" class="report-page active">${html}</div>`;
-  //       // console.log('✅ Template applied to new container');
-  //     }
-  //     
-  //     // console.log('📄 NEW Overview HTML template loaded successfully');
-  //     
-  //     // Verify new elements exist
-  //     setTimeout(() => {
-  //       const completedElement = document.getElementById('completed-revenue');
-  //       const paidElement = document.getElementById('paid-revenue');
-  //       const unpaidElement = document.getElementById('unpaid-revenue');
-  //       const revenueStatusChart = document.getElementById('revenue-status-chart');
-  //       const statusDistChart = document.getElementById('status-distribution-chart');
-// console.log('🔍 Template verification:', {
+ * Enhance existing structure with KPI cards
+ */
+function enhanceExistingStructure(container) {
+  // Check if container already has the KPI structure
+  if (container.querySelector('.kpi-grid')) {
+    console.log('📄 KPI structure already exists');
+    return;
+  }
+  
+  // Add KPI cards to the beginning of the container
+  const kpiHTML = `
+    <div class="page-header">
+      <h2>📊 Tổng quan kinh doanh</h2>
+      <div class="header-actions">
+        <button class="btn-refresh" onclick="refreshCurrentReport()">
+          <i class="fas fa-sync-alt"></i> Làm mới
+        </button>
+        <button class="btn-export" onclick="exportCurrentReport()">
+          <i class="fas fa-download"></i> Xuất báo cáo
+        </button>
+      </div>
+    </div>
+    
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card revenue-card">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-content">
+          <div class="kpi-value">0 VNĐ</div>
+          <div class="kpi-title">Doanh thu tháng này</div>
+          <div class="kpi-growth positive">📈 +0.0%</div>
+        </div>
+      </div>
+      
+      <div class="kpi-card expense-card">
+        <div class="kpi-icon">💸</div>
+        <div class="kpi-content">
+          <div class="kpi-value">0 VNĐ</div>
+          <div class="kpi-title">Chi phí tháng này</div>
+          <div class="kpi-growth positive">📈 +0.0%</div>
+        </div>
+      </div>
+      
+      <div class="kpi-card profit-card">
+        <div class="kpi-icon">📈</div>
+        <div class="kpi-content">
+          <div class="kpi-value">0 VNĐ</div>
+          <div class="kpi-title">Lợi nhuận tháng này</div>
+          <div class="kpi-growth positive">📈 +0.0%</div>
+        </div>
+      </div>
+      
+      <div class="kpi-card transaction-card">
+        <div class="kpi-icon">📋</div>
+        <div class="kpi-content">
+          <div class="kpi-value">0</div>
+          <div class="kpi-title">Giao dịch tháng này</div>
+          <div class="kpi-growth positive">📈 +0.0%</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Charts Section -->
+    <div class="charts-section">
+      <div class="chart-row">
+        <div class="chart-container">
+          <h3>📈 Xu hướng doanh thu</h3>
+          <canvas id="revenueTrendChart"></canvas>
+        </div>
+        <div class="chart-container">
+          <h3>🍰 Phân bổ chi phí</h3>
+          <canvas id="expenseDistributionChart"></canvas>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Data Tables Section -->
+    <div class="data-tables-section">
+      <div class="table-row">
+        <div class="data-table-container">
+          <h3>👥 Top khách hàng</h3>
+          <table id="topCustomersTable" class="data-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Khách hàng</th>
+                <th>Doanh thu</th>
+                <th>Giao dịch</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        
+        <div class="data-table-container">
+          <h3>📋 Giao dịch gần đây</h3>
+          <table id="recentTransactionsTable" class="data-table">
+            <thead>
+              <tr>
+                <th>Ngày</th>
+                <th>Khách hàng</th>
+                <th>Sản phẩm</th>
+                <th>Doanh thu</th>
+                <th>Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div class="data-table-container">
+        <h3>💸 Chi phí lớn nhất tháng này</h3>
+        <table id="topExpensesTable" class="data-table">
+          <thead>
+            <tr>
+              <th>Ngày</th>
+              <th>Danh mục</th>
+              <th>Mô tả</th>
+              <th>Số tiền</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  `;
+  
+  // Insert KPI structure at the beginning, keeping existing content
+  const existingContent = container.innerHTML;
+  container.innerHTML = kpiHTML + existingContent;
+  
+  console.log('📄 Overview structure enhanced with KPI cards');
+}
 
-  //         'completed-revenue': !!completedElement,
-  //         'paid-revenue': !!paidElement,
-  //         'unpaid-revenue': !!unpaidElement,
-  //         'revenue-status-chart': !!revenueStatusChart,
-  //         'status-distribution-chart': !!statusDistChart
-  //       });
-  //       
-  //       // Debug: check what's actually in the container
-  //       const container = document.getElementById('report-overview');
-  //       // console.log('📝 Container content preview:', container?.innerHTML?.substring(0, 200) + '...');
-  //     }, 50);
-  //     
-  //   } catch (error) {
-  //     console.error('❌ CRITICAL: Could not load new template:', error);
-// console.warn('🚫 NOT using fallback - forcing error to fix issue');
-  //     throw error;  // Force error instead of using fallback
-  //   }
-  // }
-  // 
 /**
-  //  * Enhance existing structure with KPI cards
-  //  */
-  // function enhanceExistingStructure(container) {
-  //   // Check if container already has the KPI structure
-  //   if (container.querySelector('.kpi-grid')) {
-  //     // console.log('📄 KPI structure already exists');
-  //     return;
-  //   }
-  //   
-  //   // Add KPI cards to the beginning of the container
-  //   const kpiHTML = `
-  //     <div class="page-header">
-  //       <h2>📊 Tổng quan kinh doanh</h2>
-  //       <div class="header-actions">
-  //         <button class="btn-refresh" onclick="refreshCurrentReport()">
-  //           <i class="fas fa-sync-alt"></i> Làm mới
-  //         </button>
-  //         <button class="btn-export" onclick="exportCurrentReport()">
-  //           <i class="fas fa-download"></i> Xuất báo cáo
-  //         </button>
-  //       </div>
-  //     </div>
-  //     
-  //     <!-- KPI Cards -->
-  //     <div class="kpi-grid">
-  //       <div class="kpi-card revenue-card">
-  //         <div class="kpi-icon">💰</div>
-  //         <div class="kpi-content">
-  //           <div class="kpi-value">0 VNĐ</div>
-  //           <div class="kpi-title">Doanh thu tháng này</div>
-  //           <div class="kpi-growth positive">📈 +0.0%</div>
-  //         </div>
-  //       </div>
-  //       
-  //       <div class="kpi-card expense-card">
-  //         <div class="kpi-icon">💸</div>
-  //         <div class="kpi-content">
-  //           <div class="kpi-value">0 VNĐ</div>
-  //           <div class="kpi-title">Chi phí tháng này</div>
-  //           <div class="kpi-growth positive">📈 +0.0%</div>
-  //         </div>
-  //       </div>
-  //       
-  //       <div class="kpi-card profit-card">
-  //         <div class="kpi-icon">📈</div>
-  //         <div class="kpi-content">
-  //           <div class="kpi-value">0 VNĐ</div>
-  //           <div class="kpi-title">Lợi nhuận tháng này</div>
-  //           <div class="kpi-growth positive">📈 +0.0%</div>
-  //         </div>
-  //       </div>
-  //       
-  //       <div class="kpi-card transaction-card">
-  //         <div class="kpi-icon">📋</div>
-  //         <div class="kpi-content">
-  //           <div class="kpi-value">0</div>
-  //           <div class="kpi-title">Giao dịch tháng này</div>
-  //           <div class="kpi-growth positive">📈 +0.0%</div>
-  //         </div>
-  //       </div>
-  //     </div>
-  //     
-  //     <!-- Charts Section -->
-  //     <div class="charts-section">
-  //       <div class="chart-row">
-  //         <div class="chart-container">
-  //           <h3>📈 Xu hướng doanh thu</h3>
-  //           <canvas id="revenueTrendChart"></canvas>
-  //         </div>
-  //         <div class="chart-container">
-  //           <h3>🍰 Phân bổ chi phí</h3>
-  //           <canvas id="expenseDistributionChart"></canvas>
-  //         </div>
-  //       </div>
-  //     </div>
-  //     
-  //     <!-- Data Tables Section -->
-  //     <div class="data-tables-section">
-  //       <div class="table-row">
-  //         <div class="data-table-container">
-  //           <h3>👥 Top khách hàng</h3>
-  //           <table id="topCustomersTable" class="data-table">
-  //             <thead>
-  //               <tr>
-  //                 <th>#</th>
-  //                 <th>Khách hàng</th>
-  //                 <th>Doanh thu</th>
-  //                 <th>Giao dịch</th>
-  //               </tr>
-  //             </thead>
-  //             <tbody></tbody>
-  //           </table>
-  //         </div>
-  //         
-  //         <div class="data-table-container">
-  //           <h3>📋 Giao dịch gần đây</h3>
-  //           <table id="recentTransactionsTable" class="data-table">
-  //             <thead>
-  //               <tr>
-  //                 <th>Ngày</th>
-  //                 <th>Khách hàng</th>
-  //                 <th>Sản phẩm</th>
-  //                 <th>Doanh thu</th>
-  //                 <th>Trạng thái</th>
-  //               </tr>
-  //             </thead>
-  //             <tbody></tbody>
-  //           </table>
-  //         </div>
-  //       </div>
-  //       
-  //       <div class="data-table-container">
-  //         <h3>💸 Chi phí lớn nhất tháng này</h3>
-  //         <table id="topExpensesTable" class="data-table">
-  //           <thead>
-  //             <tr>
-  //               <th>Ngày</th>
-  //               <th>Danh mục</th>
-  //               <th>Mô tả</th>
-  //               <th>Số tiền</th>
-  //             </tr>
-  //           </thead>
-  //           <tbody></tbody>
-  //         </table>
-  //       </div>
-  //     </div>
-  //   `;
-  //   
-  //   // Insert KPI structure at the beginning, keeping existing content
-  //   const existingContent = container.innerHTML;
-  //   container.innerHTML = kpiHTML + existingContent;
-  //   
-  //   // console.log('📄 Overview structure enhanced with KPI cards');
-  // }
-  // 
-/**
-  //  * Update period display
-  //  */
-  // function updatePeriodDisplay(period) {
-  //   const displayElement = document.getElementById('overview-period-display');
-  //   if (displayElement) {
-  //     const periodLabels = {
-  //       'today': 'Hôm nay',
-  //       'yesterday': 'Hôm qua',
-  //       'this_week': 'Tuần này',
-  //       'last_week': 'Tuần trước',
-  //       'last_7_days': '7 ngày qua',
-  //       'this_month': 'Tháng này',
-  //       'last_month': 'Tháng trước',
-  //       'last_30_days': '30 ngày qua',
-  //       'this_quarter': 'Quý này',
-  //       'last_quarter': 'Quý trước',
-  //       'this_year': 'Năm nay',
-  //       'last_year': 'Năm trước',
-  //       'all_time': 'Tất cả thời gian',
-  //       'custom': 'Tùy chỉnh'
-  //     };
+ * Update period display
+ */
+function updatePeriodDisplay(period) {
+  const displayElement = document.getElementById('overview-period-display');
+  if (displayElement) {
+    const periodLabels = {
+      'today': 'Hôm nay',
+      'yesterday': 'Hôm qua',
+      'this_week': 'Tuần này',
+      'last_week': 'Tuần trước',
+      'last_7_days': '7 ngày qua',
+      'this_month': 'Tháng này',
+      'last_month': 'Tháng trước',
+      'last_30_days': '30 ngày qua',
+      'this_quarter': 'Quý này',
+      'last_quarter': 'Quý trước',
+      'this_year': 'Năm nay',
+      'last_year': 'Năm trước',
+      'all_time': 'Tất cả thời gian',
+      'custom': 'Tùy chỉnh'
+    };
     displayElement.textContent = periodLabels[period] || period;
   }
 }
@@ -381,37 +378,37 @@ function calculateOverviewKPIs(transactions, expenses, dateRange, period = 'this
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
   
-  // console.log('📅 🆕 NEW FIXED Date filtering setup:');
-// console.log(`  - Period parameter: "${period}"`);
-// console.log(`  - Period === 'all_time':`, period === 'all_time');
-// console.log(`  - Using date range:`, dateRange);
-// console.log(`  - Total transactions to filter: ${transactions.length}`);
-// console.log(`  - Total expenses to filter: ${expenses.length}`);
+  console.log('📅 🆕 NEW FIXED Date filtering setup:');
+  console.log(`  - Period parameter: "${period}"`);
+  console.log(`  - Period === 'all_time':`, period === 'all_time');
+  console.log(`  - Using date range:`, dateRange);
+  console.log(`  - Total transactions to filter: ${transactions.length}`);
+  console.log(`  - Total expenses to filter: ${expenses.length}`);
   
   // NEW SIMPLIFIED LOGIC - Filter data based on period first
   let filteredTransactions, filteredExpenses;
   
   // Check period FIRST
-  // console.log('📅 📝 Checking period value...');
+  console.log('📅 📝 Checking period value...');
   if (period && period.toString() === 'all_time') {
     // No filtering for all time
-    // console.log('📅 🔥 💯 🆕 ALL TIME BRANCH ACTIVATED - NO FILTERING!');
+    console.log('📅 🔥 💯 🆕 ALL TIME BRANCH ACTIVATED - NO FILTERING!');
     filteredTransactions = transactions;
     filteredExpenses = expenses;
-    // console.log('📅 💯 Result: transactions =', filteredTransactions.length, ', expenses =', filteredExpenses.length);
+    console.log('📅 💯 Result: transactions =', filteredTransactions.length, ', expenses =', filteredExpenses.length);
   } else if (dateRange && dateRange.start && dateRange.end) {
     // Use provided date range
-    // console.log('📊 Using date range filtering');
+    console.log('📊 Using date range filtering');
     filteredTransactions = filterDataByDateRange(transactions, dateRange);
     filteredExpenses = filterDataByDateRange(expenses, dateRange);
     
-    // console.log('📊 Filtered by date range:');
-// console.log(`  - Transactions: ${transactions.length} → ${filteredTransactions.length}`);
-// console.log(`  - Expenses: ${expenses.length} → ${filteredExpenses.length}`);
+    console.log('📊 Filtered by date range:');
+    console.log(`  - Transactions: ${transactions.length} → ${filteredTransactions.length}`);
+    console.log(`  - Expenses: ${expenses.length} → ${filteredExpenses.length}`);
   } else {
     // Default to current month if no date range
-    // console.log('📅 Using current month fallback for period:', period);
-    // console.log('📅 ❌ CURRENT MONTH FALLBACK ACTIVATED');
+    console.log('📅 Using current month fallback for period:', period);
+    console.log('📅 ❌ CURRENT MONTH FALLBACK ACTIVATED');
     
     filteredTransactions = transactions.filter(rawTransaction => {
       const t = normalizeTransaction(rawTransaction);
@@ -466,12 +463,12 @@ function calculateOverviewKPIs(transactions, expenses, dateRange, period = 'this
   const totalRevenue = statusBreakdown.completed.revenue + statusBreakdown.paid.revenue + statusBreakdown.unpaid.revenue;
   const totalTransactions = filteredTransactions.length;
   
-  // console.log('📊 Revenue calculation by status:');
-// console.log('  - Completed:', statusBreakdown.completed);
-// console.log('  - Paid:', statusBreakdown.paid);
-// console.log('  - Unpaid:', statusBreakdown.unpaid);
-// console.log('  - Total revenue:', totalRevenue);
-// console.log('  - Total transactions:', totalTransactions);
+  console.log('📊 Revenue calculation by status:');
+  console.log('  - Completed:', statusBreakdown.completed);
+  console.log('  - Paid:', statusBreakdown.paid);
+  console.log('  - Unpaid:', statusBreakdown.unpaid);
+  console.log('  - Total revenue:', totalRevenue);
+  console.log('  - Total transactions:', totalTransactions);
   
   // Calculate conversion rates
   const paymentRate = statusBreakdown.unpaid.count > 0 
@@ -484,11 +481,11 @@ function calculateOverviewKPIs(transactions, expenses, dateRange, period = 'this
     ? (statusBreakdown.completed.count / totalTransactions * 100)
     : 0;
   
-  // console.log('📊 Revenue calculation by status:');
-// console.log('  - Completed:', statusBreakdown.completed);
-// console.log('  - Paid:', statusBreakdown.paid);
-// console.log('  - Unpaid:', statusBreakdown.unpaid);
-// console.log('  - Total transactions:', totalTransactions);
+  console.log('📊 Revenue calculation by status:');
+  console.log('  - Completed:', statusBreakdown.completed);
+  console.log('  - Paid:', statusBreakdown.paid);
+  console.log('  - Unpaid:', statusBreakdown.unpaid);
+  console.log('  - Total transactions:', totalTransactions);
   
   // Calculate previous period for comparison
   let prevDateRange = null;
@@ -602,916 +599,914 @@ function calculateOverviewKPIs(transactions, expenses, dateRange, period = 'this
  * Update KPI cards with calculated data
  */
 async function updateKPICards(kpis) {
-// console.log('✨ UPDATED updateKPICards - Using new business metrics structure');
-  // console.log('📊 New KPIs data structure:', kpis);
+  console.log('✨ UPDATED updateKPICards - Using new business metrics structure');
+  console.log('📊 New KPIs data structure:', kpis);
   
   // Check if we have the new metrics structure (with grossRevenue, pendingCollection, etc.)
   const hasNewMetrics = kpis.grossRevenue !== undefined && kpis.statusBreakdown !== undefined;
-  // console.log('🔍 Has new metrics structure:', hasNewMetrics);
+  console.log('🔍 Has new metrics structure:', hasNewMetrics);
   
   // Check if we're using the new template with status-based elements
   const newTemplate = document.getElementById('completed-revenue') !== null;
   
   if (newTemplate && hasNewMetrics) {
     // New template - Use updated business metrics structure
-// console.log('🆕 Using new template with updated business metrics structure');
+    console.log('🆕 Using new template with updated business metrics structure');
     
     // Map updated business metrics to KPI cards
-// console.log('🎯 Updating Gross Revenue KPI Card:', {
+    console.log('🎯 Updating Gross Revenue KPI Card:', {
+      value: kpis.grossRevenue || 0,
+      growth: kpis.growthRates?.grossRevenue || 0,
+      hasGrowthRates: !!kpis.growthRates,
+      growthRates: kpis.growthRates
+    });
+    
+    updateKPICard('grossRevenue', {
+      value: kpis.grossRevenue || 0,
+      growth: kpis.growthRates?.grossRevenue || 0,
+      elementId: 'completed-revenue',
+      changeId: 'completed-change'
+    });
+    
+    updateKPICard('pendingCollection', {
+      value: kpis.pendingCollection || 0,
+      growth: kpis.growthRates?.pendingCollection || 0,
+      elementId: 'paid-revenue', 
+      changeId: 'paid-change'
+    });
+    
+    updateKPICard('pendingPayment', {
+      value: kpis.pendingPayment || 0,
+      growth: kpis.growthRates?.pendingPayment || 0,
+      elementId: 'unpaid-revenue',
+      changeId: 'unpaid-change'
+    });
+    
+    updateKPICard('totalRefunds', {
+      value: kpis.totalRefunds || 0,
+      growth: kpis.growthRates?.totalRefunds || 0,
+      elementId: 'refund-revenue',
+      changeId: 'refund-change'
+    });
+    
+    updateKPICard('refundRate', {
+      value: kpis.refundRate || 0,
+      growth: 0, // Rate growth calculation can be added later
+      elementId: 'refund-rate',
+      changeId: 'refund-rate-change',
+      isPercentage: true
+    });
+    
+    updateKPICard('effectiveTransactions', {
+      value: kpis.effectiveTransactions || 0,
+      growth: kpis.growthRates?.effectiveTransactions || 0,
+      elementId: 'total-transactions',
+      changeId: 'transaction-change'
+    });
+    
+    // Update status breakdown with new data
+    updateStatusBreakdownWithNewMetrics(kpis);
+    
+  } else if (newTemplate && !hasNewMetrics) {
+    // New template but old metrics structure - use legacy mapping
+    console.log('⚠️ Using new template but old metrics structure - legacy mapping');
+    updateKPICard('completed', {
+      value: kpis.financial?.totalRevenue || 0,
+      growth: 0,
+      elementId: 'completed-revenue',
+      changeId: 'completed-change'
+    });
+    
+    updateKPICard('pendingCollection', {
+      value: kpis.financial?.totalRevenue || 0, 
+      growth: 0,
+      elementId: 'paid-revenue', 
+      changeId: 'paid-change'
+    });
+    
+    updateKPICard('pendingPayment', {
+      value: 0,
+      growth: 0,
+      elementId: 'unpaid-revenue',
+      changeId: 'unpaid-change'
+    });
+    
+    updateKPICard('totalRefunds', {
+      value: 0,
+      growth: 0,
+      elementId: 'refund-revenue',
+      changeId: 'refund-change'
+    });
+    
+    updateKPICard('refundRate', {
+      value: 0,
+      growth: 0,
+      elementId: 'refund-rate',
+      changeId: 'refund-rate-change',
+      isPercentage: true
+    });
+    
+    updateKPICard('effectiveTransactions', {
+      value: kpis.revenue?.totalTransactions || 0,
+      growth: 0,
+      elementId: 'total-transactions',
+      changeId: 'transaction-change'
+    });
+    
+  } else {
+    // Old template fallback - convert new metrics to old structure
+    console.log('⚠️ Using old template - converting new metrics to old structure');
+    updateKPICard('revenue', {
+      value: kpis.grossRevenue || kpis.financial?.totalRevenue || 0,
+      growth: kpis.growthRates?.grossRevenue || 0,
+      elementId: 'total-revenue',
+      changeId: 'revenue-change'
+    });
+    
+    updateKPICard('transaction', {
+      value: kpis.effectiveTransactions || kpis.revenue?.totalTransactions || 0,
+      growth: kpis.growthRates?.effectiveTransactions || 0,
+      elementId: 'total-transactions',
+      changeId: 'transaction-change'
+    });
+  }
+}
 
-  //       value: kpis.grossRevenue || 0,
-  //       growth: kpis.growthRates?.grossRevenue || 0,
-  //       hasGrowthRates: !!kpis.growthRates,
-  //       growthRates: kpis.growthRates
-  //     });
-  //     
-  //     updateKPICard('grossRevenue', {
-  //       value: kpis.grossRevenue || 0,
-  //       growth: kpis.growthRates?.grossRevenue || 0,
-  //       elementId: 'completed-revenue',
-  //       changeId: 'completed-change'
-  //     });
-  //     
-  //     updateKPICard('pendingCollection', {
-  //       value: kpis.pendingCollection || 0,
-  //       growth: kpis.growthRates?.pendingCollection || 0,
-  //       elementId: 'paid-revenue', 
-  //       changeId: 'paid-change'
-  //     });
-  //     
-  //     updateKPICard('pendingPayment', {
-  //       value: kpis.pendingPayment || 0,
-  //       growth: kpis.growthRates?.pendingPayment || 0,
-  //       elementId: 'unpaid-revenue',
-  //       changeId: 'unpaid-change'
-  //     });
-  //     
-  //     updateKPICard('totalRefunds', {
-  //       value: kpis.totalRefunds || 0,
-  //       growth: kpis.growthRates?.totalRefunds || 0,
-  //       elementId: 'refund-revenue',
-  //       changeId: 'refund-change'
-  //     });
-  //     
-  //     updateKPICard('refundRate', {
-  //       value: kpis.refundRate || 0,
-  //       growth: 0, // Rate growth calculation can be added later
-  //       elementId: 'refund-rate',
-  //       changeId: 'refund-rate-change',
-  //       isPercentage: true
-  //     });
-  //     
-  //     updateKPICard('effectiveTransactions', {
-  //       value: kpis.effectiveTransactions || 0,
-  //       growth: kpis.growthRates?.effectiveTransactions || 0,
-  //       elementId: 'total-transactions',
-  //       changeId: 'transaction-change'
-  //     });
-  //     
-  //     // Update status breakdown with new data
-  //     updateStatusBreakdownWithNewMetrics(kpis);
-  //     
-  //   } else if (newTemplate && !hasNewMetrics) {
-  //     // New template but old metrics structure - use legacy mapping
-  //     // console.log('⚠️ Using new template but old metrics structure - legacy mapping');
-  //     updateKPICard('completed', {
-  //       value: kpis.financial?.totalRevenue || 0,
-  //       growth: 0,
-  //       elementId: 'completed-revenue',
-  //       changeId: 'completed-change'
-  //     });
-  //     
-  //     updateKPICard('pendingCollection', {
-  //       value: kpis.financial?.totalRevenue || 0, 
-  //       growth: 0,
-  //       elementId: 'paid-revenue', 
-  //       changeId: 'paid-change'
-  //     });
-  //     
-  //     updateKPICard('pendingPayment', {
-  //       value: 0,
-  //       growth: 0,
-  //       elementId: 'unpaid-revenue',
-  //       changeId: 'unpaid-change'
-  //     });
-  //     
-  //     updateKPICard('totalRefunds', {
-  //       value: 0,
-  //       growth: 0,
-  //       elementId: 'refund-revenue',
-  //       changeId: 'refund-change'
-  //     });
-  //     
-  //     updateKPICard('refundRate', {
-  //       value: 0,
-  //       growth: 0,
-  //       elementId: 'refund-rate',
-  //       changeId: 'refund-rate-change',
-  //       isPercentage: true
-  //     });
-  //     
-  //     updateKPICard('effectiveTransactions', {
-  //       value: kpis.revenue?.totalTransactions || 0,
-  //       growth: 0,
-  //       elementId: 'total-transactions',
-  //       changeId: 'transaction-change'
-  //     });
-  //     
-  //   } else {
-  //     // Old template fallback - convert new metrics to old structure
-  //     // console.log('⚠️ Using old template - converting new metrics to old structure');
-  //     updateKPICard('revenue', {
-  //       value: kpis.grossRevenue || kpis.financial?.totalRevenue || 0,
-  //       growth: kpis.growthRates?.grossRevenue || 0,
-  //       elementId: 'total-revenue',
-  //       changeId: 'revenue-change'
-  //     });
-  //     
-  //     updateKPICard('transaction', {
-  //       value: kpis.effectiveTransactions || kpis.revenue?.totalTransactions || 0,
-  //       growth: kpis.growthRates?.effectiveTransactions || 0,
-  //       elementId: 'total-transactions',
-  //       changeId: 'transaction-change'
-  //     });
-  //   }
-  // }
-  // 
 /**
-  //  * Update individual KPI card
-  //  */
-  // function updateKPICard(type, data) {
-  //   const valueElement = document.getElementById(data.elementId);
-  //   const changeElement = document.getElementById(data.changeId);
-  //   
-  //   // console.log(`🔍 Looking for element: ${data.elementId}`);
-  //   // console.log(`🔍 Element found:`, !!valueElement);
-  //   
-  //   if (!valueElement) {
-// console.warn(`❌ KPI element not found: ${data.elementId}`);
-// console.warn(`🔍 Available elements with 'revenue' in ID:`, 
-  //       Array.from(document.querySelectorAll('[id*="revenue"]')).map(el => el.id));
-  //     return;
-  //   }
-  //   
-  //   // console.log(`💰 Updating KPI ${type}:`);
-// console.log(`  - Element ID: ${data.elementId}`);
-// console.log(`  - Raw value: ${data.value}`);
-// console.log(`  - Growth: ${data.growth}%`);
-// console.log(`  - Is percentage: ${data.isPercentage}`);
-  //   
-  //   if (valueElement) {
-  //     if (data.isPercentage) {
-  //       // For percentage values like refund rate
-  //       valueElement.textContent = data.value.toFixed(2) + '%';
-  //     } else if (type.includes('transaction') || type === 'effectiveTransactions') {
-  //       // For transaction counts
-  //       valueElement.textContent = data.value.toLocaleString();
-  //     } else {
-  //       // For currency values
-  //       valueElement.textContent = formatRevenue(data.value);
-  //     }
-  //   }
-  //   
-  //   if (changeElement) {
-  //     const isPositive = data.growth >= 0;
-  //     const arrow = isPositive ? 'fa-arrow-up' : 'fa-arrow-down';
-  //     const sign = data.growth >= 0 ? '+' : '';
-  //     
-  //     // Check which template we're using based on class names
-  //     const isMetricTemplate = changeElement.classList.contains('kpi-metric-change') || 
-  //                             changeElement.parentElement?.classList.contains('kpi-metric-box');
-  //     const isBoxTemplate = changeElement.classList.contains('kpi-box-change') || 
-  //                          changeElement.parentElement?.classList.contains('kpi-box');
-  //     
-  //     // console.log(`🔍 Template Detection for ${type} (${data.changeId}):`, {
-  //     //   changeElementClasses: Array.from(changeElement.classList),
-  //     //   parentClasses: changeElement.parentElement ? Array.from(changeElement.parentElement.classList) : [],
-  //     //   isMetricTemplate: isMetricTemplate,
-  //     //   isBoxTemplate: isBoxTemplate
-  //     // });
-  //     
-  //     if (isMetricTemplate) {
-  //       // New metric template (6-box grid)
-// console.log(`🎯 Applying NEW METRIC template for ${type}:`, {
-  //         growth: data.growth,
-  //         isPositive: isPositive,
-  //         arrow: arrow,
-  //         sign: sign,
-  //         elementId: data.elementId
-  //       });
-  //       
-  //       changeElement.innerHTML = `
-  //         <i class="fas ${arrow}"></i>
-  //         <span>${sign}${data.growth.toFixed(1)}%</span>
-  //       `;
-  //       changeElement.className = `kpi-metric-change ${isPositive ? 'positive' : 'negative'}`;
-  //     } else if (isBoxTemplate) {
-  //       // Previous box template
-  //       changeElement.innerHTML = `
-  //         <i class="fas ${arrow}"></i>
-  //         <span>${sign}${data.growth.toFixed(1)}%</span>
-  //       `;
-  //       changeElement.className = `kpi-box-change ${isPositive ? 'positive' : 'negative'}`;
-  //     } else {
-  //       // Legacy template support
-  //       changeElement.innerHTML = `
-  //         <i class="fas ${arrow}"></i> ${sign}${data.growth.toFixed(1)}%
-  //       `;
-  //       changeElement.className = `kpi-change ${isPositive ? 'positive' : 'negative'}`;
-  //     }
-  //   }
-  // }
-  // 
-/**
-  //  * Update status breakdown display with new metrics
-  //  */
-  // function updateStatusBreakdownWithNewMetrics(kpis) {
-  //   // console.log('📊 Updating status breakdown with new metrics structure');
-  //   
-  //   const total = kpis.effectiveTransactions; // Use effective transactions (excluding cancelled)
-  //   
-  //   // Update counts
-  //   const completedElement = document.getElementById('completed-count');
-  //   const paidElement = document.getElementById('paid-count');
-  //   const unpaidElement = document.getElementById('unpaid-count');
-  //   const refundedElement = document.getElementById('refunded-count');
-  //   
-  //   if (completedElement) completedElement.textContent = kpis.statusBreakdown.completed.count;
-  //   if (paidElement) paidElement.textContent = kpis.statusBreakdown.paid.count;
-  //   if (unpaidElement) unpaidElement.textContent = kpis.statusBreakdown.unpaid.count;
-  //   if (refundedElement) refundedElement.textContent = kpis.statusBreakdown.refunded.count;
-  //   
-  //   // Update percentages and bars
-  //   const completedPercent = total > 0 ? (kpis.statusBreakdown.completed.count / total * 100) : 0;
-  //   const paidPercent = total > 0 ? (kpis.statusBreakdown.paid.count / total * 100) : 0;
-  //   const unpaidPercent = total > 0 ? (kpis.statusBreakdown.unpaid.count / total * 100) : 0;
-  //   const refundedPercent = kpis.totalTransactions > 0 ? (kpis.statusBreakdown.refunded.count / kpis.totalTransactions * 100) : 0;
-  //   
-  //   // Update percentage displays
-  //   const completedPercentElement = document.getElementById('completed-percentage');
-  //   const paidPercentElement = document.getElementById('paid-percentage');
-  //   const unpaidPercentElement = document.getElementById('unpaid-percentage');
-  //   const refundedPercentElement = document.getElementById('refunded-percentage');
-  //   
-  //   if (completedPercentElement) completedPercentElement.textContent = completedPercent.toFixed(1) + '%';
-  //   if (paidPercentElement) paidPercentElement.textContent = paidPercent.toFixed(1) + '%';
-  //   if (unpaidPercentElement) unpaidPercentElement.textContent = unpaidPercent.toFixed(1) + '%';
-  //   if (refundedPercentElement) refundedPercentElement.textContent = refundedPercent.toFixed(1) + '%';
-  //   
-  //   // Update progress bars
-  //   const completedBar = document.getElementById('completed-bar');
-  //   const paidBar = document.getElementById('paid-bar');
-  //   const unpaidBar = document.getElementById('unpaid-bar');
-  //   const refundedBar = document.getElementById('refunded-bar');
-  //   
-  //   if (completedBar) completedBar.style.width = completedPercent + '%';
-  //   if (paidBar) paidBar.style.width = paidPercent + '%';
-  //   if (unpaidBar) unpaidBar.style.width = unpaidPercent + '%';
-  //   if (refundedBar) refundedBar.style.width = refundedPercent + '%';
-  //   
-// console.log('📊 Status breakdown updated:', {
+ * Update individual KPI card
+ */
+function updateKPICard(type, data) {
+  const valueElement = document.getElementById(data.elementId);
+  const changeElement = document.getElementById(data.changeId);
+  
+  console.log(`🔍 Looking for element: ${data.elementId}`);
+  console.log(`🔍 Element found:`, !!valueElement);
+  
+  if (!valueElement) {
+    console.warn(`❌ KPI element not found: ${data.elementId}`);
+    console.warn(`🔍 Available elements with 'revenue' in ID:`, 
+      Array.from(document.querySelectorAll('[id*="revenue"]')).map(el => el.id));
+    return;
+  }
+  
+  console.log(`💰 Updating KPI ${type}:`);
+  console.log(`  - Element ID: ${data.elementId}`);
+  console.log(`  - Raw value: ${data.value}`);
+  console.log(`  - Growth: ${data.growth}%`);
+  console.log(`  - Is percentage: ${data.isPercentage}`);
+  
+  if (valueElement) {
+    if (data.isPercentage) {
+      // For percentage values like refund rate
+      valueElement.textContent = data.value.toFixed(2) + '%';
+    } else if (type.includes('transaction') || type === 'effectiveTransactions') {
+      // For transaction counts
+      valueElement.textContent = data.value.toLocaleString();
+    } else {
+      // For currency values
+      valueElement.textContent = formatRevenue(data.value);
+    }
+  }
+  
+  if (changeElement) {
+    const isPositive = data.growth >= 0;
+    const arrow = isPositive ? 'fa-arrow-up' : 'fa-arrow-down';
+    const sign = data.growth >= 0 ? '+' : '';
+    
+    // Check which template we're using based on class names
+    const isMetricTemplate = changeElement.classList.contains('kpi-metric-change') || 
+                            changeElement.parentElement?.classList.contains('kpi-metric-box');
+    const isBoxTemplate = changeElement.classList.contains('kpi-box-change') || 
+                         changeElement.parentElement?.classList.contains('kpi-box');
+    
+    console.log(`🔍 Template Detection for ${type} (${data.changeId}):`, {
+      changeElementClasses: Array.from(changeElement.classList),
+      parentClasses: changeElement.parentElement ? Array.from(changeElement.parentElement.classList) : [],
+      isMetricTemplate: isMetricTemplate,
+      isBoxTemplate: isBoxTemplate
+    });
+    
+    if (isMetricTemplate) {
+      // New metric template (6-box grid)
+      console.log(`🎯 Applying NEW METRIC template for ${type}:`, {
+        growth: data.growth,
+        isPositive: isPositive,
+        arrow: arrow,
+        sign: sign,
+        elementId: data.elementId
+      });
+      
+      changeElement.innerHTML = `
+        <i class="fas ${arrow}"></i>
+        <span>${sign}${data.growth.toFixed(1)}%</span>
+      `;
+      changeElement.className = `kpi-metric-change ${isPositive ? 'positive' : 'negative'}`;
+    } else if (isBoxTemplate) {
+      // Previous box template
+      changeElement.innerHTML = `
+        <i class="fas ${arrow}"></i>
+        <span>${sign}${data.growth.toFixed(1)}%</span>
+      `;
+      changeElement.className = `kpi-box-change ${isPositive ? 'positive' : 'negative'}`;
+    } else {
+      // Legacy template support
+      changeElement.innerHTML = `
+        <i class="fas ${arrow}"></i> ${sign}${data.growth.toFixed(1)}%
+      `;
+      changeElement.className = `kpi-change ${isPositive ? 'positive' : 'negative'}`;
+    }
+  }
+}
 
-  //     completed: `${kpis.statusBreakdown.completed.count} (${completedPercent.toFixed(1)}%)`,
-  //     paid: `${kpis.statusBreakdown.paid.count} (${paidPercent.toFixed(1)}%)`,
-  //     unpaid: `${kpis.statusBreakdown.unpaid.count} (${unpaidPercent.toFixed(1)}%)`,
-  //     refunded: `${kpis.statusBreakdown.refunded.count} (${refundedPercent.toFixed(1)}%)`
-  //   });
-  // }
-  // 
 /**
-  //  * Update status breakdown display (legacy function for compatibility)
-  //  */
-  // function updateStatusBreakdown(kpis) {
-  //   // Check if we have new metrics structure
-  //   if (kpis.statusBreakdown) {
-  //     updateStatusBreakdownWithNewMetrics(kpis);
-  //     return;
-  //   }
-  //   
-  //   // Legacy fallback
-  //   const total = kpis.transactions?.current || 0;
-  //   
-  //   // Update counts
-  //   const completedElement = document.getElementById('completed-count');
-  //   const paidElement = document.getElementById('paid-count');
-  //   const unpaidElement = document.getElementById('unpaid-count');
-  //   
-  //   if (completedElement && kpis.completed) completedElement.textContent = kpis.completed.count;
-  //   if (paidElement && kpis.paid) paidElement.textContent = kpis.paid.count;
-  //   if (unpaidElement && kpis.unpaid) unpaidElement.textContent = kpis.unpaid.count;
-  //   
-  //   // Update percentages and bars
-  //   if (kpis.completed && kpis.paid && kpis.unpaid) {
-  //     const completedPercent = total > 0 ? (kpis.completed.count / total * 100) : 0;
-  //     const paidPercent = total > 0 ? (kpis.paid.count / total * 100) : 0;
-  //     const unpaidPercent = total > 0 ? (kpis.unpaid.count / total * 100) : 0;
-  //     
-  //     const completedPercentElement = document.getElementById('completed-percentage');
-  //     const paidPercentElement = document.getElementById('paid-percentage');
-  //     const unpaidPercentElement = document.getElementById('unpaid-percentage');
-  //     
-  //     if (completedPercentElement) completedPercentElement.textContent = completedPercent.toFixed(1) + '%';
-  //     if (paidPercentElement) paidPercentElement.textContent = paidPercent.toFixed(1) + '%';
-  //     if (unpaidPercentElement) unpaidPercentElement.textContent = unpaidPercent.toFixed(1) + '%';
-  //     
-  //     const completedBar = document.getElementById('completed-bar');
-  //     const paidBar = document.getElementById('paid-bar');
-  //     const unpaidBar = document.getElementById('unpaid-bar');
-  //     
-  //     if (completedBar) completedBar.style.width = completedPercent + '%';
-  //     if (paidBar) paidBar.style.width = paidPercent + '%';
-  //     if (unpaidBar) unpaidBar.style.width = unpaidPercent + '%';
-  //   }
-  // }
-  // 
+ * Update status breakdown display with new metrics
+ */
+function updateStatusBreakdownWithNewMetrics(kpis) {
+  console.log('📊 Updating status breakdown with new metrics structure');
+  
+  const total = kpis.effectiveTransactions; // Use effective transactions (excluding cancelled)
+  
+  // Update counts
+  const completedElement = document.getElementById('completed-count');
+  const paidElement = document.getElementById('paid-count');
+  const unpaidElement = document.getElementById('unpaid-count');
+  const refundedElement = document.getElementById('refunded-count');
+  
+  if (completedElement) completedElement.textContent = kpis.statusBreakdown.completed.count;
+  if (paidElement) paidElement.textContent = kpis.statusBreakdown.paid.count;
+  if (unpaidElement) unpaidElement.textContent = kpis.statusBreakdown.unpaid.count;
+  if (refundedElement) refundedElement.textContent = kpis.statusBreakdown.refunded.count;
+  
+  // Update percentages and bars
+  const completedPercent = total > 0 ? (kpis.statusBreakdown.completed.count / total * 100) : 0;
+  const paidPercent = total > 0 ? (kpis.statusBreakdown.paid.count / total * 100) : 0;
+  const unpaidPercent = total > 0 ? (kpis.statusBreakdown.unpaid.count / total * 100) : 0;
+  const refundedPercent = kpis.totalTransactions > 0 ? (kpis.statusBreakdown.refunded.count / kpis.totalTransactions * 100) : 0;
+  
+  // Update percentage displays
+  const completedPercentElement = document.getElementById('completed-percentage');
+  const paidPercentElement = document.getElementById('paid-percentage');
+  const unpaidPercentElement = document.getElementById('unpaid-percentage');
+  const refundedPercentElement = document.getElementById('refunded-percentage');
+  
+  if (completedPercentElement) completedPercentElement.textContent = completedPercent.toFixed(1) + '%';
+  if (paidPercentElement) paidPercentElement.textContent = paidPercent.toFixed(1) + '%';
+  if (unpaidPercentElement) unpaidPercentElement.textContent = unpaidPercent.toFixed(1) + '%';
+  if (refundedPercentElement) refundedPercentElement.textContent = refundedPercent.toFixed(1) + '%';
+  
+  // Update progress bars
+  const completedBar = document.getElementById('completed-bar');
+  const paidBar = document.getElementById('paid-bar');
+  const unpaidBar = document.getElementById('unpaid-bar');
+  const refundedBar = document.getElementById('refunded-bar');
+  
+  if (completedBar) completedBar.style.width = completedPercent + '%';
+  if (paidBar) paidBar.style.width = paidPercent + '%';
+  if (unpaidBar) unpaidBar.style.width = unpaidPercent + '%';
+  if (refundedBar) refundedBar.style.width = refundedPercent + '%';
+  
+  console.log('📊 Status breakdown updated:', {
+    completed: `${kpis.statusBreakdown.completed.count} (${completedPercent.toFixed(1)}%)`,
+    paid: `${kpis.statusBreakdown.paid.count} (${paidPercent.toFixed(1)}%)`,
+    unpaid: `${kpis.statusBreakdown.unpaid.count} (${unpaidPercent.toFixed(1)}%)`,
+    refunded: `${kpis.statusBreakdown.refunded.count} (${refundedPercent.toFixed(1)}%)`
+  });
+}
+
 /**
-  //  * Update conversion rates
-  //  */
-  // function updateConversionRates(conversion) {
-  //   document.getElementById('payment-rate').textContent = conversion.paymentRate.toFixed(1) + '%';
-  //   document.getElementById('completion-rate').textContent = conversion.completionRate.toFixed(1) + '%';
-  //   document.getElementById('success-rate').textContent = conversion.successRate.toFixed(1) + '%';
-  // }
-  // 
+ * Update status breakdown display (legacy function for compatibility)
+ */
+function updateStatusBreakdown(kpis) {
+  // Check if we have new metrics structure
+  if (kpis.statusBreakdown) {
+    updateStatusBreakdownWithNewMetrics(kpis);
+    return;
+  }
+  
+  // Legacy fallback
+  const total = kpis.transactions?.current || 0;
+  
+  // Update counts
+  const completedElement = document.getElementById('completed-count');
+  const paidElement = document.getElementById('paid-count');
+  const unpaidElement = document.getElementById('unpaid-count');
+  
+  if (completedElement && kpis.completed) completedElement.textContent = kpis.completed.count;
+  if (paidElement && kpis.paid) paidElement.textContent = kpis.paid.count;
+  if (unpaidElement && kpis.unpaid) unpaidElement.textContent = kpis.unpaid.count;
+  
+  // Update percentages and bars
+  if (kpis.completed && kpis.paid && kpis.unpaid) {
+    const completedPercent = total > 0 ? (kpis.completed.count / total * 100) : 0;
+    const paidPercent = total > 0 ? (kpis.paid.count / total * 100) : 0;
+    const unpaidPercent = total > 0 ? (kpis.unpaid.count / total * 100) : 0;
+    
+    const completedPercentElement = document.getElementById('completed-percentage');
+    const paidPercentElement = document.getElementById('paid-percentage');
+    const unpaidPercentElement = document.getElementById('unpaid-percentage');
+    
+    if (completedPercentElement) completedPercentElement.textContent = completedPercent.toFixed(1) + '%';
+    if (paidPercentElement) paidPercentElement.textContent = paidPercent.toFixed(1) + '%';
+    if (unpaidPercentElement) unpaidPercentElement.textContent = unpaidPercent.toFixed(1) + '%';
+    
+    const completedBar = document.getElementById('completed-bar');
+    const paidBar = document.getElementById('paid-bar');
+    const unpaidBar = document.getElementById('unpaid-bar');
+    
+    if (completedBar) completedBar.style.width = completedPercent + '%';
+    if (paidBar) paidBar.style.width = paidPercent + '%';
+    if (unpaidBar) unpaidBar.style.width = unpaidPercent + '%';
+  }
+}
+
 /**
-  //  * Load charts
-  //  */
-  // async function loadCharts(transactions, expenses) {
-  //   try {
-  //     // Since charts were removed, directly update the status detail table
-  //     // console.log('📊 Updating status detail table (charts removed)');
-  //     
-  //     // Calculate detailed status breakdown with amounts
-  //     const statusBreakdown = calculateDetailedStatusBreakdown(transactions);
-  //     
-  //     // Update the status detail table
-  //     updateStatusDetailTable(statusBreakdown);
-  //     
-  //     // console.log('✅ Status detail table updated with breakdown:', statusBreakdown);
-  //     
-  //   } catch (error) {
-  //     console.error('❌ Error updating status details:', error);
-  //   }
-  // }
-  // 
+ * Update conversion rates
+ */
+function updateConversionRates(conversion) {
+  document.getElementById('payment-rate').textContent = conversion.paymentRate.toFixed(1) + '%';
+  document.getElementById('completion-rate').textContent = conversion.completionRate.toFixed(1) + '%';
+  document.getElementById('success-rate').textContent = conversion.successRate.toFixed(1) + '%';
+}
+
 /**
-  //  * Load Chart.js library dynamically
-  //  */
-  // function loadChartJS() {
-  //   return new Promise((resolve, reject) => {
-  //     if (typeof Chart !== 'undefined') {
-  //       resolve();
-  //       return;
-  //     }
-  //     
-  //     const script = document.createElement('script');
-  //     script.src = 'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js';
-  //     script.onload = resolve;
-  //     script.onerror = reject;
-  //     document.head.appendChild(script);
-  //   });
-  // }
-  // 
+ * Load charts
+ */
+async function loadCharts(transactions, expenses) {
+  try {
+    // Since charts were removed, directly update the status detail table
+    console.log('📊 Updating status detail table (charts removed)');
+    
+    // Calculate detailed status breakdown with amounts
+    const statusBreakdown = calculateDetailedStatusBreakdown(transactions);
+    
+    // Update the status detail table
+    updateStatusDetailTable(statusBreakdown);
+    
+    console.log('✅ Status detail table updated with breakdown:', statusBreakdown);
+    
+  } catch (error) {
+    console.error('❌ Error updating status details:', error);
+  }
+}
+
 /**
-  //  * Render revenue by status chart - Hiển thị xu hướng doanh thu theo chu kỳ báo cáo
-  //  * @param {Array} transactions - Filtered transactions for current period
-  //  */
-  // function renderRevenueStatusChart(transactions) {
-  //   const canvas = document.getElementById('revenue-status-chart');
-  //   if (!canvas) return;
-  //   
-  //   const ctx = canvas.getContext('2d');
-  //   
-  //   // Get current report period from global filters
-  //   const currentPeriod = window.globalFilters?.period || 'this_month';
-  //   const dateRange = window.globalFilters?.dateRange || null;
-  //   
-  //   // console.log('📈 Rendering revenue trend chart for period:', currentPeriod);
-  //   
-  //   // Prepare data based on current report cycle
-  //   let chartData;
-  //   if (currentPeriod === 'all_time') {
-  //     // Show yearly data for all time
-  //     chartData = getYearlyDataByStatus(transactions);
-  //   } else if (['this_year', 'last_year'].includes(currentPeriod)) {
-  //     // Show monthly data for year periods
-  //     chartData = getMonthlyDataByStatus(transactions, currentPeriod);
-  //   } else if (['this_month', 'last_month', 'last_30_days'].includes(currentPeriod)) {
-  //     // Show weekly data for month periods
-  //     chartData = getWeeklyDataByStatus(transactions, currentPeriod);
-  //   } else if (['this_week', 'last_week', 'last_7_days'].includes(currentPeriod)) {
-  //     // Show daily data for week periods
-  //     chartData = getDailyDataByStatus(transactions, currentPeriod);
-  //   } else {
-  //     // Default: show last 6 months
-  //     chartData = getLastSixMonthsDataByStatus(transactions);
-  //   }
-  //   
-  //   // Destroy existing chart if it exists
-  //   if (window.revenueChart instanceof Chart) {
-  //     window.revenueChart.destroy();
-  //   }
-  // 
-  //   // Create modern revenue trend chart
-  //   window.revenueChart = new Chart(ctx, {
-  //     type: 'bar',
-  //     data: {
-  //       labels: chartData.labels,
-  //       datasets: [
-  //         {
-  //           label: 'Đã hoàn tất',
-  //           data: chartData.completed,
-  //           backgroundColor: '#27ae60',
-  //           borderColor: '#229954',
-  //           borderWidth: 1,
-  //           order: 1
-  //         },
-  //         {
-  //           label: 'Đã thanh toán',
-  //           data: chartData.paid,
-  //           backgroundColor: '#3498db',
-  //           borderColor: '#2980b9',
-  //           borderWidth: 1,
-  //           order: 2
-  //         },
-  //         {
-  //           label: 'Hoàn tiền',
-  //           data: chartData.refunded || chartData.unpaid,
-  //           backgroundColor: function(context) {
-  //             const value = context.parsed.y;
-  //             // Use different shades for negative values
-  //             return value < 0 ? '#c0392b' : '#e74c3c';
-  //           },
-  //           borderColor: '#c0392b',
-  //           borderWidth: function(context) {
-  //             const value = context.parsed.y;
-  //             // Thicker border for negative values to highlight
-  //             return value < 0 ? 3 : 1;
-  //           },
-  //           order: 3
-  //         }
-  //       ]
-  //     },
-  //     options: {
-  //       responsive: true,
-  //       maintainAspectRatio: false,
-  //       layout: {
-  //         padding: {
-  //           top: 20,
-  //           bottom: 20,
-  //           left: 10,
-  //           right: 10
-  //         }
-  //       },
-  //       interaction: {
-  //         mode: 'index',
-  //         intersect: false
-  //       },
-  //       plugins: {
-  //         title: {
-  //           display: true,
-  //           text: `Xu hướng doanh thu theo trạng thái - ${getPeriodDisplayName(currentPeriod)}`,
-  //           font: {
-  //             size: 14,
-  //             weight: 'bold'
-  //           },
-  //           padding: 20
-  //         },
-  //         legend: {
-  //           position: 'top',
-  //           labels: {
-  //             usePointStyle: true,
-  //             padding: 15,
-  //             font: {
-  //               size: 12
-  //             }
-  //           }
-  //         },
-  //         tooltip: {
-  //           backgroundColor: 'rgba(0, 0, 0, 0.8)',
-  //           titleColor: '#fff',
-  //           bodyColor: '#fff',
-  //           borderColor: '#fff',
-  //           borderWidth: 1,
-  //           callbacks: {
-  //             title: function(tooltipItems) {
-  //               return `Kỳ báo cáo: ${tooltipItems[0].label}`;
-  //             },
-  //             label: function(context) {
-  //               const value = formatRevenue(context.parsed.y);
-  //               const total = context.chart.data.datasets.reduce((sum, dataset) => {
-  //                 return sum + (dataset.data[context.dataIndex] || 0);
-  //               }, 0);
-  //               const percentage = total > 0 ? ((context.parsed.y / total) * 100).toFixed(1) : 0;
-  //               return `${context.dataset.label}: ${value} (${percentage}%)`;
-  //             },
-  //             footer: function(tooltipItems) {
-  //               const total = tooltipItems.reduce((sum, item) => sum + item.parsed.y, 0);
-  //               return `Tổng: ${formatRevenue(total)}`;
-  //             }
-  //           }
-  //         }
-  //       },
-  //       scales: {
-  //         x: {
-  //           stacked: false, // Changed to false to show individual bars
-  //           grid: {
-  //             display: false
-  //           },
-  //           ticks: {
-  //             font: {
-  //               size: 11
-  //             }
-  //           }
-  //         },
-  //         y: {
-  //           stacked: false, // Changed to false to show individual values
-  //           beginAtZero: false, // Allow negative values to show properly
-  //           grace: '10%', // Add 10% padding above and below
-  //           grid: {
-  //             color: 'rgba(0, 0, 0, 0.1)',
-  //             drawBorder: false
-  //           },
-  //           ticks: {
-  //             callback: function(value) {
-  //               return formatRevenue(value);
-  //             },
-  //             font: {
-  //               size: 11
-  //             },
-  //             maxTicksLimit: 8 // Limit ticks for better readability
-  //           },
-  //           // Advanced auto-scale for small values visibility
-  //           afterDataLimits: function(scale) {
-  //             const originalRange = scale.max - scale.min;
-  //             
-  //             // Calculate minimum visible bar height (at least 50 units = 50k VND)
-  //             const minVisibleValue = 50;
-  //             
-  //             // If range is too small, expand it
-  //             if (originalRange < minVisibleValue * 10) {
-  //               const center = (scale.max + scale.min) / 2;
-  //               const newRange = Math.max(minVisibleValue * 10, originalRange * 2);
-  //               scale.max = center + newRange / 2;
-  //               scale.min = center - newRange / 2;
-  //             }
-  //             
-  //             // Add substantial padding for small values
-  //             const range = scale.max - scale.min;
-  //             const padding = Math.max(range * 0.15, 200); // Increased padding (200 units = 200k VND)
-  //             scale.max += padding;
-  //             scale.min -= padding;
-  //             
-  //             // Special handling for negative values (refunds)
-  //             if (scale.min > -minVisibleValue && scale.max > 0) {
-  //               scale.min = Math.min(scale.min, -Math.max(scale.max * 0.3, minVisibleValue * 2));
-  //             }
-  //             
-  //             // Ensure zero line is visible if data crosses zero
-  //             if (scale.min < 0 && scale.max > 0) {
-  //               scale.min = Math.min(scale.min, -scale.max * 0.2);
-  //             }
-  //           }
-  //         }
-  //       },
-  //       elements: {
-  //         bar: {
-  //           borderRadius: 3,
-  //           // Ensure minimum bar height for visibility
-  //           minBarLength: 3
-  //         }
-  //       },
-  //       // Plugin to ensure small bars are visible
-  //       plugins: [
-  //         {
-  //           id: 'minBarHeight',
-  //           beforeDatasetDraw: function(chart, args, options) {
-  //             const dataset = args.dataset;
-  //             const meta = args.meta;
-  //             
-  //             // Adjust bars that are too small to see
-  //             meta.data.forEach((bar, index) => {
-  //               if (bar && dataset.data[index] !== 0) {
-  //                 const barHeight = Math.abs(bar.height);
-  //                 if (barHeight < 5) { // If bar is less than 5 pixels
-  //                   const sign = dataset.data[index] >= 0 ? 1 : -1;
-  //                   bar.height = 5 * sign; // Set minimum height
-  //                 }
-  //               }
-  //             });
-  //           }
-  //         }
-  //       ]
-  //     }
-  //   });
-  //   
-  // }
-  // 
+ * Load Chart.js library dynamically
+ */
+function loadChartJS() {
+  return new Promise((resolve, reject) => {
+    if (typeof Chart !== 'undefined') {
+      resolve();
+      return;
+    }
+    
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js';
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
+
 /**
-  //  * Render status distribution chart with detailed breakdown
-  //  */
-  // function renderStatusDistributionChart(transactions) {
-  //   const canvas = document.getElementById('status-distribution-chart');
-  //   if (!canvas) return;
-  //   
-  //   const ctx = canvas.getContext('2d');
-  //   
-  //   // Calculate detailed status breakdown with amounts
-  //   const statusBreakdown = calculateDetailedStatusBreakdown(transactions);
-  //   
-  //   // Destroy existing chart if it exists
-  //   if (window.statusDistributionChart instanceof Chart) {
-  //     window.statusDistributionChart.destroy();
-  //   }
-  //   
-  //   window.statusDistributionChart = new Chart(ctx, {
-  //     type: 'doughnut',
-  //     data: {
-  //       labels: ['Đã hoàn tất', 'Đã thanh toán', 'Hoàn tiền'],
-  //       datasets: [{
-  //         data: [statusBreakdown.completed.count, statusBreakdown.paid.count, statusBreakdown.refunded.count],
-  //         backgroundColor: function(context) {
-  //           const colors = [
-  //             '#27ae60', // Completed - Green
-  //             '#3498db', // Paid - Blue  
-  //             '#e74c3c'  // Refunded - Red (highlighted)
-  //           ];
-  //           const data = context.chart.data.datasets[0].data[context.dataIndex];
-  //           const total = context.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
-  //           const percentage = total > 0 ? (data / total) * 100 : 0;
-  //           
-  //           // Use brighter colors for small segments to make them more visible
-  //           if (percentage < 5) {
-  //             const brightColors = ['#2ecc71', '#5dade2', '#ff6b6b'];
-  //             return brightColors[context.dataIndex];
-  //           }
-  //           return colors[context.dataIndex];
-  //         },
-  //         borderColor: [
-  //           '#1e8449', // Darker green for better contrast
-  //           '#1f618d', // Darker blue for better contrast
-  //           '#922b21'  // Much darker red for better contrast
-  //         ],
-  //         borderWidth: function(context) {
-  //           // Make all borders thicker for better visibility
-  //           const data = context.chart.data.datasets[0].data[context.dataIndex];
-  //           const total = context.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
-  //           const percentage = total > 0 ? (data / total) * 100 : 0;
-  //           
-  //           // Progressive border thickness based on segment size
-  //           if (percentage < 2) {
-  //             return 6; // Very thick for tiny segments
-  //           } else if (percentage < 5) {
-  //             return 5; // Thick for small segments
-  //           } else if (context.dataIndex === 2) {
-  //             return 4; // Thick for refunds (always highlight)
-  //           }
-  //           return 3; // Standard thick border for all segments
-  //         },
-  //         hoverBackgroundColor: [
-  //           '#2ecc71',
-  //           '#5dade2', 
-  //           '#ec7063'
-  //         ],
-  //         hoverBorderWidth: function(context) {
-  //           const data = context.chart.data.datasets[0].data[context.dataIndex];
-  //           const total = context.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
-  //           const percentage = total > 0 ? (data / total) * 100 : 0;
-  //           
-  //           // Thicker hover borders for small segments and refunds
-  //           if (percentage < 5 || context.dataIndex === 2) {
-  //             return 6;
-  //           }
-  //           return 3;
-  //         }
-  //       }]
-  //     },
-  //     options: {
-  //       responsive: true,
-  //       maintainAspectRatio: true,
-  //       aspectRatio: 1, // Force 1:1 aspect ratio for perfect circle
-  //       cutout: '40%', // Optimal cutout for modern design
-  //       layout: {
-  //         padding: {
-  //           top: 20,
-  //           bottom: 20,
-  //           left: 20,
-  //           right: 20
-  //         }
-  //       },
-  //       plugins: {
-  //         legend: {
-  //           display: false // Hide default legend, we'll use custom table
-  //         },
-  //         tooltip: {
-  //           backgroundColor: function(context) {
-  //             const dataIndex = context.tooltip.dataPoints[0].dataIndex;
-  //             const data = context.tooltip.chart.data.datasets[0].data[dataIndex];
-  //             const total = context.tooltip.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
-  //             const percentage = total > 0 ? (data / total) * 100 : 0;
-  //             
-  //             // Brighter background for small segments
-  //             if (percentage < 5) {
-  //               return 'rgba(255, 255, 255, 0.95)';
-  //             }
-  //             return 'rgba(0, 0, 0, 0.9)';
-  //           },
-  //           titleColor: function(context) {
-  //             const dataIndex = context.tooltip.dataPoints[0].dataIndex;
-  //             const data = context.tooltip.chart.data.datasets[0].data[dataIndex];
-  //             const total = context.tooltip.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
-  //             const percentage = total > 0 ? (data / total) * 100 : 0;
-  //             
-  //             return percentage < 5 ? '#000' : '#fff';
-  //           },
-  //           bodyColor: function(context) {
-  //             const dataIndex = context.tooltip.dataPoints[0].dataIndex;
-  //             const data = context.tooltip.chart.data.datasets[0].data[dataIndex];
-  //             const total = context.tooltip.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
-  //             const percentage = total > 0 ? (data / total) * 100 : 0;
-  //             
-  //             return percentage < 5 ? '#000' : '#fff';
-  //           },
-  //           borderColor: function(context) {
-  //             const dataIndex = context.tooltip.dataPoints[0].dataIndex;
-  //             const data = context.tooltip.chart.data.datasets[0].data[dataIndex];
-  //             const total = context.tooltip.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
-  //             const percentage = total > 0 ? (data / total) * 100 : 0;
-  //             
-  //             return percentage < 5 ? '#000' : '#fff';
-  //           },
-  //           borderWidth: function(context) {
-  //             const dataIndex = context.tooltip.dataPoints[0].dataIndex;
-  //             const data = context.tooltip.chart.data.datasets[0].data[dataIndex];
-  //             const total = context.tooltip.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
-  //             const percentage = total > 0 ? (data / total) * 100 : 0;
-  //             
-  //             // Thicker border for small segments
-  //             return percentage < 5 ? 3 : 1;
-  //           },
-  //           padding: function(context) {
-  //             const dataIndex = context.tooltip.dataPoints[0].dataIndex;
-  //             const data = context.tooltip.chart.data.datasets[0].data[dataIndex];
-  //             const total = context.tooltip.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
-  //             const percentage = total > 0 ? (data / total) * 100 : 0;
-  //             
-  //             // Larger padding for small segments
-  //             return percentage < 5 ? 16 : 12;
-  //           },
-  //           callbacks: {
-  //             title: function(tooltipItems) {
-  //               const item = tooltipItems[0];
-  //               return `${item.label} - Chi tiết`;
-  //             },
-  //             label: function(context) {
-  //               const label = context.label || '';
-  //               const dataIndex = context.dataIndex;
-  //               const breakdown = statusBreakdown;
-  //               let statusData;
-  //               
-  //               if (dataIndex === 0) statusData = breakdown.completed;
-  //               else if (dataIndex === 1) statusData = breakdown.paid;
-  //               else statusData = breakdown.refunded;
-  //               
-  //               const total = breakdown.completed.count + breakdown.paid.count + breakdown.refunded.count;
-  //               const percentage = total > 0 ? ((statusData.count / total) * 100).toFixed(1) : 0;
-  //               
-  //               const lines = [
-  //                 `Số lượng: ${statusData.count} giao dịch`,
-  //                 `Tỷ lệ: ${percentage}%`,
-  //                 `Tổng tiền: ${formatRevenue(statusData.amount)}`,
-  //                 `Trung bình: ${formatRevenue(statusData.count > 0 ? statusData.amount / statusData.count : 0)}`
-  //               ];
-  //               
-  //               // Add special note for small segments
-  //               if (percentage < 5 && statusData.count > 0) {
-  //                 lines.push(''); // Empty line
-  //                 lines.push('⚠️ Phân khúc nhỏ - đã tăng cường hiển thị');
-  //               }
-  //               
-  //               // Add special note for refunds
-  //               if (dataIndex === 2 && statusData.amount < 0) {
-  //                 lines.push(''); // Empty line
-  //                 lines.push('🔴 Hoàn tiền - ảnh hưởng tiêu cực đến doanh thu');
-  //               }
-  //               
-  //               return lines;
-  //             },
-  //             footer: function(tooltipItems) {
-  //               const totalCount = statusBreakdown.completed.count + statusBreakdown.paid.count + statusBreakdown.refunded.count;
-  //               const totalAmount = statusBreakdown.completed.amount + statusBreakdown.paid.amount + statusBreakdown.refunded.amount;
-  //               return [
-  //                 ``,
-  //                 `Tổng cộng: ${totalCount} giao dịch`,
-  //                 `Tổng giá trị: ${formatRevenue(totalAmount)}`
-  //               ];
-  //             }
-  //           }
-  //         }
-  //       },
-  //       animation: {
-  //         animateScale: true,
-  //         animateRotate: true,
-  //         duration: 1200
-  //       },
-  //       // Ensure small segments are always visible
-  //       circumference: Math.PI * 2,
-  //       rotation: 0,
-  //       // Enhanced interaction for small segments
-  //       onHover: function(event, activeElements) {
-  //         if (activeElements.length > 0) {
-  //           event.native.target.style.cursor = 'pointer';
-  //         } else {
-  //           event.native.target.style.cursor = 'default';
-  //         }
-  //       },
-  //       elements: {
-  //         arc: {
-  //           // Ensure minimum angle for small segments
-  //           borderAlign: 'outer',
-  //           spacing: 2, // Add spacing between segments for better visibility
-  //           offset: function(context) {
-  //             const data = context.chart.data.datasets[0].data[context.dataIndex];
-  //             const total = context.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
-  //             const percentage = total > 0 ? (data / total) * 100 : 0;
-  //             
-  //             // Slightly offset small segments to make them more visible
-  //             if (percentage < 5) {
-  //               return 5;
-  //             }
-  //             return 0;
-  //           }
-  //         }
-  //       },
-  //       // Plugin to ensure minimum visibility and full circle display
-  //       plugins: [
-  //         {
-  //           id: 'minSegmentAngle',
-  //           beforeDraw: function(chart) {
-  //             const dataset = chart.data.datasets[0];
-  //             const total = dataset.data.reduce((sum, val) => sum + val, 0);
-  //             
-  //             // Ensure minimum 3% visibility for any non-zero segment
-  //             dataset.data.forEach((value, index) => {
-  //               if (value > 0 && (value / total) < 0.03) {
-  //                 const minValue = total * 0.03;
-  //                 dataset._originalData = dataset._originalData || [...dataset.data];
-  //                 dataset.data[index] = minValue;
-  //               }
-  //             });
-  //           }
-  //         },
-  //         {
-  //           id: 'forceFullCircle',
-  //           beforeDraw: function(chart) {
-  //             // Force chart to display full 360 degrees
-  //             const chartArea = chart.chartArea;
-  //             if (chartArea) {
-  //               const ctx = chart.ctx;
-  //               ctx.save();
-  //               
-  //               // Ensure the chart uses full canvas area
-  //               const size = Math.min(chartArea.width, chartArea.height);
-  //               const centerX = chartArea.left + chartArea.width / 2;
-  //               const centerY = chartArea.top + chartArea.height / 2;
-  //               
-  //               // Force circular constraint
-  //               chart.options.circumference = Math.PI * 2;
-  //               chart.options.rotation = 0;
-  //               
-  //               ctx.restore();
-  //             }
-  //           }
-  //         }
-  //       ]
-  //     }
-  //   });
-  //   
-  //   // Force chart to render with full circle
-  //   setTimeout(() => {
-  //     if (window.statusDistributionChart) {
-  //       window.statusDistributionChart.resize();
-  //       window.statusDistributionChart.update('none');
-  //     }
-  //   }, 100);
-  //   
-  //   // Update the detailed status table
-  //   updateStatusDetailTable(statusBreakdown);
-  //   
-// console.log('🍰 Status distribution chart with details rendered:', statusBreakdown);
-  // }
-  // 
+ * Render revenue by status chart - Hiển thị xu hướng doanh thu theo chu kỳ báo cáo
+ * @param {Array} transactions - Filtered transactions for current period
+ */
+function renderRevenueStatusChart(transactions) {
+  const canvas = document.getElementById('revenue-status-chart');
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  
+  // Get current report period from global filters
+  const currentPeriod = window.globalFilters?.period || 'this_month';
+  const dateRange = window.globalFilters?.dateRange || null;
+  
+  console.log('📈 Rendering revenue trend chart for period:', currentPeriod);
+  
+  // Prepare data based on current report cycle
+  let chartData;
+  if (currentPeriod === 'all_time') {
+    // Show yearly data for all time
+    chartData = getYearlyDataByStatus(transactions);
+  } else if (['this_year', 'last_year'].includes(currentPeriod)) {
+    // Show monthly data for year periods
+    chartData = getMonthlyDataByStatus(transactions, currentPeriod);
+  } else if (['this_month', 'last_month', 'last_30_days'].includes(currentPeriod)) {
+    // Show weekly data for month periods
+    chartData = getWeeklyDataByStatus(transactions, currentPeriod);
+  } else if (['this_week', 'last_week', 'last_7_days'].includes(currentPeriod)) {
+    // Show daily data for week periods
+    chartData = getDailyDataByStatus(transactions, currentPeriod);
+  } else {
+    // Default: show last 6 months
+    chartData = getLastSixMonthsDataByStatus(transactions);
+  }
+  
+  // Destroy existing chart if it exists
+  if (window.revenueChart instanceof Chart) {
+    window.revenueChart.destroy();
+  }
+
+  // Create modern revenue trend chart
+  window.revenueChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: chartData.labels,
+      datasets: [
+        {
+          label: 'Đã hoàn tất',
+          data: chartData.completed,
+          backgroundColor: '#27ae60',
+          borderColor: '#229954',
+          borderWidth: 1,
+          order: 1
+        },
+        {
+          label: 'Đã thanh toán',
+          data: chartData.paid,
+          backgroundColor: '#3498db',
+          borderColor: '#2980b9',
+          borderWidth: 1,
+          order: 2
+        },
+        {
+          label: 'Hoàn tiền',
+          data: chartData.refunded || chartData.unpaid,
+          backgroundColor: function(context) {
+            const value = context.parsed.y;
+            // Use different shades for negative values
+            return value < 0 ? '#c0392b' : '#e74c3c';
+          },
+          borderColor: '#c0392b',
+          borderWidth: function(context) {
+            const value = context.parsed.y;
+            // Thicker border for negative values to highlight
+            return value < 0 ? 3 : 1;
+          },
+          order: 3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: {
+        padding: {
+          top: 20,
+          bottom: 20,
+          left: 10,
+          right: 10
+        }
+      },
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
+      plugins: {
+        title: {
+          display: true,
+          text: `Xu hướng doanh thu theo trạng thái - ${getPeriodDisplayName(currentPeriod)}`,
+          font: {
+            size: 14,
+            weight: 'bold'
+          },
+          padding: 20
+        },
+        legend: {
+          position: 'top',
+          labels: {
+            usePointStyle: true,
+            padding: 15,
+            font: {
+              size: 12
+            }
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          borderColor: '#fff',
+          borderWidth: 1,
+          callbacks: {
+            title: function(tooltipItems) {
+              return `Kỳ báo cáo: ${tooltipItems[0].label}`;
+            },
+            label: function(context) {
+              const value = formatRevenue(context.parsed.y);
+              const total = context.chart.data.datasets.reduce((sum, dataset) => {
+                return sum + (dataset.data[context.dataIndex] || 0);
+              }, 0);
+              const percentage = total > 0 ? ((context.parsed.y / total) * 100).toFixed(1) : 0;
+              return `${context.dataset.label}: ${value} (${percentage}%)`;
+            },
+            footer: function(tooltipItems) {
+              const total = tooltipItems.reduce((sum, item) => sum + item.parsed.y, 0);
+              return `Tổng: ${formatRevenue(total)}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          stacked: false, // Changed to false to show individual bars
+          grid: {
+            display: false
+          },
+          ticks: {
+            font: {
+              size: 11
+            }
+          }
+        },
+        y: {
+          stacked: false, // Changed to false to show individual values
+          beginAtZero: false, // Allow negative values to show properly
+          grace: '10%', // Add 10% padding above and below
+          grid: {
+            color: 'rgba(0, 0, 0, 0.1)',
+            drawBorder: false
+          },
+          ticks: {
+            callback: function(value) {
+              return formatRevenue(value);
+            },
+            font: {
+              size: 11
+            },
+            maxTicksLimit: 8 // Limit ticks for better readability
+          },
+          // Advanced auto-scale for small values visibility
+          afterDataLimits: function(scale) {
+            const originalRange = scale.max - scale.min;
+            
+            // Calculate minimum visible bar height (at least 50 units = 50k VND)
+            const minVisibleValue = 50;
+            
+            // If range is too small, expand it
+            if (originalRange < minVisibleValue * 10) {
+              const center = (scale.max + scale.min) / 2;
+              const newRange = Math.max(minVisibleValue * 10, originalRange * 2);
+              scale.max = center + newRange / 2;
+              scale.min = center - newRange / 2;
+            }
+            
+            // Add substantial padding for small values
+            const range = scale.max - scale.min;
+            const padding = Math.max(range * 0.15, 200); // Increased padding (200 units = 200k VND)
+            scale.max += padding;
+            scale.min -= padding;
+            
+            // Special handling for negative values (refunds)
+            if (scale.min > -minVisibleValue && scale.max > 0) {
+              scale.min = Math.min(scale.min, -Math.max(scale.max * 0.3, minVisibleValue * 2));
+            }
+            
+            // Ensure zero line is visible if data crosses zero
+            if (scale.min < 0 && scale.max > 0) {
+              scale.min = Math.min(scale.min, -scale.max * 0.2);
+            }
+          }
+        }
+      },
+      elements: {
+        bar: {
+          borderRadius: 3,
+          // Ensure minimum bar height for visibility
+          minBarLength: 3
+        }
+      },
+      // Plugin to ensure small bars are visible
+      plugins: [
+        {
+          id: 'minBarHeight',
+          beforeDatasetDraw: function(chart, args, options) {
+            const dataset = args.dataset;
+            const meta = args.meta;
+            
+            // Adjust bars that are too small to see
+            meta.data.forEach((bar, index) => {
+              if (bar && dataset.data[index] !== 0) {
+                const barHeight = Math.abs(bar.height);
+                if (barHeight < 5) { // If bar is less than 5 pixels
+                  const sign = dataset.data[index] >= 0 ? 1 : -1;
+                  bar.height = 5 * sign; // Set minimum height
+                }
+              }
+            });
+          }
+        }
+      ]
+    }
+  });
+  
+}
+
 /**
-  //  * Calculate detailed status breakdown with counts and amounts
-  //  * @param {Array} transactions - Transactions to analyze
-  //  * @returns {Object} Detailed breakdown with counts and amounts
-  //  */
-  // function calculateDetailedStatusBreakdown(transactions) {
-  //   const breakdown = {
-  //     completed: { count: 0, amount: 0 },
-  //     paid: { count: 0, amount: 0 },
-  //     refunded: { count: 0, amount: 0 }
-  //   };
+ * Render status distribution chart with detailed breakdown
+ */
+function renderStatusDistributionChart(transactions) {
+  const canvas = document.getElementById('status-distribution-chart');
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  
+  // Calculate detailed status breakdown with amounts
+  const statusBreakdown = calculateDetailedStatusBreakdown(transactions);
+  
+  // Destroy existing chart if it exists
+  if (window.statusDistributionChart instanceof Chart) {
+    window.statusDistributionChart.destroy();
+  }
+  
+  window.statusDistributionChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Đã hoàn tất', 'Đã thanh toán', 'Hoàn tiền'],
+      datasets: [{
+        data: [statusBreakdown.completed.count, statusBreakdown.paid.count, statusBreakdown.refunded.count],
+        backgroundColor: function(context) {
+          const colors = [
+            '#27ae60', // Completed - Green
+            '#3498db', // Paid - Blue  
+            '#e74c3c'  // Refunded - Red (highlighted)
+          ];
+          const data = context.chart.data.datasets[0].data[context.dataIndex];
+          const total = context.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+          const percentage = total > 0 ? (data / total) * 100 : 0;
+          
+          // Use brighter colors for small segments to make them more visible
+          if (percentage < 5) {
+            const brightColors = ['#2ecc71', '#5dade2', '#ff6b6b'];
+            return brightColors[context.dataIndex];
+          }
+          return colors[context.dataIndex];
+        },
+        borderColor: [
+          '#1e8449', // Darker green for better contrast
+          '#1f618d', // Darker blue for better contrast
+          '#922b21'  // Much darker red for better contrast
+        ],
+        borderWidth: function(context) {
+          // Make all borders thicker for better visibility
+          const data = context.chart.data.datasets[0].data[context.dataIndex];
+          const total = context.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+          const percentage = total > 0 ? (data / total) * 100 : 0;
+          
+          // Progressive border thickness based on segment size
+          if (percentage < 2) {
+            return 6; // Very thick for tiny segments
+          } else if (percentage < 5) {
+            return 5; // Thick for small segments
+          } else if (context.dataIndex === 2) {
+            return 4; // Thick for refunds (always highlight)
+          }
+          return 3; // Standard thick border for all segments
+        },
+        hoverBackgroundColor: [
+          '#2ecc71',
+          '#5dade2', 
+          '#ec7063'
+        ],
+        hoverBorderWidth: function(context) {
+          const data = context.chart.data.datasets[0].data[context.dataIndex];
+          const total = context.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+          const percentage = total > 0 ? (data / total) * 100 : 0;
+          
+          // Thicker hover borders for small segments and refunds
+          if (percentage < 5 || context.dataIndex === 2) {
+            return 6;
+          }
+          return 3;
+        }
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 1, // Force 1:1 aspect ratio for perfect circle
+      cutout: '40%', // Optimal cutout for modern design
+      layout: {
+        padding: {
+          top: 20,
+          bottom: 20,
+          left: 20,
+          right: 20
+        }
+      },
+      plugins: {
+        legend: {
+          display: false // Hide default legend, we'll use custom table
+        },
+        tooltip: {
+          backgroundColor: function(context) {
+            const dataIndex = context.tooltip.dataPoints[0].dataIndex;
+            const data = context.tooltip.chart.data.datasets[0].data[dataIndex];
+            const total = context.tooltip.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+            const percentage = total > 0 ? (data / total) * 100 : 0;
+            
+            // Brighter background for small segments
+            if (percentage < 5) {
+              return 'rgba(255, 255, 255, 0.95)';
+            }
+            return 'rgba(0, 0, 0, 0.9)';
+          },
+          titleColor: function(context) {
+            const dataIndex = context.tooltip.dataPoints[0].dataIndex;
+            const data = context.tooltip.chart.data.datasets[0].data[dataIndex];
+            const total = context.tooltip.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+            const percentage = total > 0 ? (data / total) * 100 : 0;
+            
+            return percentage < 5 ? '#000' : '#fff';
+          },
+          bodyColor: function(context) {
+            const dataIndex = context.tooltip.dataPoints[0].dataIndex;
+            const data = context.tooltip.chart.data.datasets[0].data[dataIndex];
+            const total = context.tooltip.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+            const percentage = total > 0 ? (data / total) * 100 : 0;
+            
+            return percentage < 5 ? '#000' : '#fff';
+          },
+          borderColor: function(context) {
+            const dataIndex = context.tooltip.dataPoints[0].dataIndex;
+            const data = context.tooltip.chart.data.datasets[0].data[dataIndex];
+            const total = context.tooltip.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+            const percentage = total > 0 ? (data / total) * 100 : 0;
+            
+            return percentage < 5 ? '#000' : '#fff';
+          },
+          borderWidth: function(context) {
+            const dataIndex = context.tooltip.dataPoints[0].dataIndex;
+            const data = context.tooltip.chart.data.datasets[0].data[dataIndex];
+            const total = context.tooltip.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+            const percentage = total > 0 ? (data / total) * 100 : 0;
+            
+            // Thicker border for small segments
+            return percentage < 5 ? 3 : 1;
+          },
+          padding: function(context) {
+            const dataIndex = context.tooltip.dataPoints[0].dataIndex;
+            const data = context.tooltip.chart.data.datasets[0].data[dataIndex];
+            const total = context.tooltip.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+            const percentage = total > 0 ? (data / total) * 100 : 0;
+            
+            // Larger padding for small segments
+            return percentage < 5 ? 16 : 12;
+          },
+          callbacks: {
+            title: function(tooltipItems) {
+              const item = tooltipItems[0];
+              return `${item.label} - Chi tiết`;
+            },
+            label: function(context) {
+              const label = context.label || '';
+              const dataIndex = context.dataIndex;
+              const breakdown = statusBreakdown;
+              let statusData;
+              
+              if (dataIndex === 0) statusData = breakdown.completed;
+              else if (dataIndex === 1) statusData = breakdown.paid;
+              else statusData = breakdown.refunded;
+              
+              const total = breakdown.completed.count + breakdown.paid.count + breakdown.refunded.count;
+              const percentage = total > 0 ? ((statusData.count / total) * 100).toFixed(1) : 0;
+              
+              const lines = [
+                `Số lượng: ${statusData.count} giao dịch`,
+                `Tỷ lệ: ${percentage}%`,
+                `Tổng tiền: ${formatRevenue(statusData.amount)}`,
+                `Trung bình: ${formatRevenue(statusData.count > 0 ? statusData.amount / statusData.count : 0)}`
+              ];
+              
+              // Add special note for small segments
+              if (percentage < 5 && statusData.count > 0) {
+                lines.push(''); // Empty line
+                lines.push('⚠️ Phân khúc nhỏ - đã tăng cường hiển thị');
+              }
+              
+              // Add special note for refunds
+              if (dataIndex === 2 && statusData.amount < 0) {
+                lines.push(''); // Empty line
+                lines.push('🔴 Hoàn tiền - ảnh hưởng tiêu cực đến doanh thu');
+              }
+              
+              return lines;
+            },
+            footer: function(tooltipItems) {
+              const totalCount = statusBreakdown.completed.count + statusBreakdown.paid.count + statusBreakdown.refunded.count;
+              const totalAmount = statusBreakdown.completed.amount + statusBreakdown.paid.amount + statusBreakdown.refunded.amount;
+              return [
+                ``,
+                `Tổng cộng: ${totalCount} giao dịch`,
+                `Tổng giá trị: ${formatRevenue(totalAmount)}`
+              ];
+            }
+          }
+        }
+      },
+      animation: {
+        animateScale: true,
+        animateRotate: true,
+        duration: 1200
+      },
+      // Ensure small segments are always visible
+      circumference: Math.PI * 2,
+      rotation: 0,
+      // Enhanced interaction for small segments
+      onHover: function(event, activeElements) {
+        if (activeElements.length > 0) {
+          event.native.target.style.cursor = 'pointer';
+        } else {
+          event.native.target.style.cursor = 'default';
+        }
+      },
+      elements: {
+        arc: {
+          // Ensure minimum angle for small segments
+          borderAlign: 'outer',
+          spacing: 2, // Add spacing between segments for better visibility
+          offset: function(context) {
+            const data = context.chart.data.datasets[0].data[context.dataIndex];
+            const total = context.chart.data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+            const percentage = total > 0 ? (data / total) * 100 : 0;
+            
+            // Slightly offset small segments to make them more visible
+            if (percentage < 5) {
+              return 5;
+            }
+            return 0;
+          }
+        }
+      },
+      // Plugin to ensure minimum visibility and full circle display
+      plugins: [
+        {
+          id: 'minSegmentAngle',
+          beforeDraw: function(chart) {
+            const dataset = chart.data.datasets[0];
+            const total = dataset.data.reduce((sum, val) => sum + val, 0);
+            
+            // Ensure minimum 3% visibility for any non-zero segment
+            dataset.data.forEach((value, index) => {
+              if (value > 0 && (value / total) < 0.03) {
+                const minValue = total * 0.03;
+                dataset._originalData = dataset._originalData || [...dataset.data];
+                dataset.data[index] = minValue;
+              }
+            });
+          }
+        },
+        {
+          id: 'forceFullCircle',
+          beforeDraw: function(chart) {
+            // Force chart to display full 360 degrees
+            const chartArea = chart.chartArea;
+            if (chartArea) {
+              const ctx = chart.ctx;
+              ctx.save();
+              
+              // Ensure the chart uses full canvas area
+              const size = Math.min(chartArea.width, chartArea.height);
+              const centerX = chartArea.left + chartArea.width / 2;
+              const centerY = chartArea.top + chartArea.height / 2;
+              
+              // Force circular constraint
+              chart.options.circumference = Math.PI * 2;
+              chart.options.rotation = 0;
+              
+              ctx.restore();
+            }
+          }
+        }
+      ]
+    }
+  });
+  
+  // Force chart to render with full circle
+  setTimeout(() => {
+    if (window.statusDistributionChart) {
+      window.statusDistributionChart.resize();
+      window.statusDistributionChart.update('none');
+    }
+  }, 100);
+  
+  // Update the detailed status table
+  updateStatusDetailTable(statusBreakdown);
+  
+  console.log('🍰 Status distribution chart with details rendered:', statusBreakdown);
+}
+
+/**
+ * Calculate detailed status breakdown with counts and amounts
+ * @param {Array} transactions - Transactions to analyze
+ * @returns {Object} Detailed breakdown with counts and amounts
+ */
+function calculateDetailedStatusBreakdown(transactions) {
+  const breakdown = {
+    completed: { count: 0, amount: 0 },
+    paid: { count: 0, amount: 0 },
+    refunded: { count: 0, amount: 0 }
+  };
   
   transactions.forEach(rawTransaction => {
     // Normalize transaction data
@@ -1611,7 +1606,7 @@ function updateStatusDetailTable(statusBreakdown) {
   
   tableBody.innerHTML += totalRow;
   
-  // console.log('📊 Status detail table updated with breakdown:', statusBreakdown);
+  console.log('📊 Status detail table updated with breakdown:', statusBreakdown);
 }
 
 /**
@@ -2077,10 +2072,10 @@ function updateDataTables(transactions, expenses) {
   
   if (hasNewTables) {
     // New template - tables are updated via loadTopCustomers and loadTopProducts
-    // console.log('📊 Using new table template');
+    console.log('📊 Using new table template');
   } else if (hasOldTables) {
     // Old template
-    // console.log('📊 Using old table template');
+    console.log('📊 Using old table template');
     updateTopCustomersTable(transactions);
     updateRecentTransactionsTable(transactions);
     updateTopExpensesTable(expenses);
@@ -2196,7 +2191,7 @@ async function loadTopProducts(transactions = []) {
   try {
     const container = document.getElementById('top-software-body');
     if (!container) {
-// console.warn('❌ Top products container not found');
+      console.warn('❌ Top products container not found');
       return;
     }
 
@@ -2223,7 +2218,7 @@ async function loadTopProducts(transactions = []) {
     // Initialize view toggle handlers
     initProductViewToggle();
     
-    // console.log('✅ Enhanced top products loaded:', productAnalytics);
+    console.log('✅ Enhanced top products loaded:', productAnalytics);
   } catch (error) {
     console.error('❌ Error loading top products:', error);
     showError('Không thể tải dữ liệu sản phẩm hàng đầu');
@@ -2517,7 +2512,7 @@ async function loadTopCustomers(transactions = []) {
   try {
     const container = document.getElementById('top-customers-body');
     if (!container) {
-// console.warn('❌ Top customers container not found');
+      console.warn('❌ Top customers container not found');
       return;
     }
 
@@ -2544,7 +2539,7 @@ async function loadTopCustomers(transactions = []) {
     // Initialize view toggle handlers
     initCustomerViewToggle();
     
-    // console.log('✅ Enhanced top customers loaded:', customerAnalytics);
+    console.log('✅ Enhanced top customers loaded:', customerAnalytics);
   } catch (error) {
     console.error('❌ Error loading top customers:', error);
     showError('Không thể tải dữ liệu khách hàng hàng đầu');
@@ -2826,7 +2821,7 @@ async function loadSummaryStats() {
   try {
     const container = document.getElementById('summaryStats');
     if (!container) {
-// console.warn('❌ Summary stats container not found');
+      console.warn('❌ Summary stats container not found');
       return;
     }
 
@@ -2891,7 +2886,7 @@ async function loadSummaryStats() {
     `;
 
     container.innerHTML = html;
-    // console.log('✅ Summary stats loaded');
+    console.log('✅ Summary stats loaded');
   } catch (error) {
     console.error('❌ Error loading summary stats:', error);
     showError('Không thể tải thống kê tổng hợp');
@@ -2937,22 +2932,22 @@ function calculateOverviewKPIsNew(transactions, expenses, dateRange, period = 't
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
   
-// console.log('🆕 🔥 NEW FUNCTION - Date filtering setup:');
-// console.log(`  - Period parameter: "${period}"`);
-// console.log(`  - Period === 'all_time':`, period === 'all_time');
-// console.log(`  - Total transactions to filter: ${transactions.length}`);
-// console.log(`  - Total expenses to filter: ${expenses.length}`);
+  console.log('🆕 🔥 NEW FUNCTION - Date filtering setup:');
+  console.log(`  - Period parameter: "${period}"`);
+  console.log(`  - Period === 'all_time':`, period === 'all_time');
+  console.log(`  - Total transactions to filter: ${transactions.length}`);
+  console.log(`  - Total expenses to filter: ${expenses.length}`);
   
   // Filter data based on period - SIMPLIFIED LOGIC
   let filteredTransactions, filteredExpenses;
   
   if (period === 'all_time') {
-// console.log('🆕 💯 ALL TIME ACTIVATED - NO FILTERING!');
+    console.log('🆕 💯 ALL TIME ACTIVATED - NO FILTERING!');
     filteredTransactions = transactions;
     filteredExpenses = expenses;
-// console.log('🆕 💯 RESULT: transactions =', filteredTransactions.length);
+    console.log('🆕 💯 RESULT: transactions =', filteredTransactions.length);
   } else {
-// console.log('🆕 Using current month filter for period:', period);
+    console.log('🆕 Using current month filter for period:', period);
     filteredTransactions = transactions.filter(t => {
       const rawDate = t.transactionDate || t.ngayGiaoDich || t.date;
       const transactionDate = new Date(rawDate);
@@ -3004,9 +2999,9 @@ function calculateOverviewKPIsNew(transactions, expenses, dateRange, period = 't
   const totalRevenue = statusBreakdown.completed.revenue + statusBreakdown.paid.revenue + statusBreakdown.unpaid.revenue;
   const totalTransactions = filteredTransactions.length;
   
-  // console.log('🆕 📊 NEW FUNCTION Revenue calculation:');
-// console.log('  - Filtered transactions:', totalTransactions);
-// console.log('  - Total revenue calculated:', totalRevenue);
+  console.log('🆕 📊 NEW FUNCTION Revenue calculation:');
+  console.log('  - Filtered transactions:', totalTransactions);
+  console.log('  - Total revenue calculated:', totalRevenue);
   
   return {
     statusBreakdown: statusBreakdown,
@@ -3047,7 +3042,7 @@ function calculateOverviewKPIsNew(transactions, expenses, dateRange, period = 't
  * @param {Object} kpis - Business metrics from statisticsCore
  */
 function updateStatusBreakdownWithRefund(kpis) {
-  // console.log('📊 Updating status breakdown with refund support');
+  console.log('📊 Updating status breakdown with refund support');
   
   // Get current transactions for real status calculation
   const transactions = window.transactionList || [];
@@ -3110,7 +3105,7 @@ function updateStatusBreakdownWithRefund(kpis) {
     updateStatusHighlights(statusBreakdown, total);
   }
   
-  // console.log('📊 Status breakdown updated:', statusBreakdown);
+  console.log('📊 Status breakdown updated:', statusBreakdown);
 }
 
 /**
@@ -3145,7 +3140,7 @@ function updateStatusHighlights(statusBreakdown, total) {
     netElement.className = netRevenue >= 0 ? 'highlight-value positive' : 'highlight-value negative';
   }
   
-  // console.log('📈 Status highlights updated:', { refundImpact, successRate, netRevenue });
+  console.log('📈 Status highlights updated:', { refundImpact, successRate, netRevenue });
 }
 
 /**
@@ -3180,7 +3175,7 @@ function updateElementStyle(elementId, property, value) {
  */
 async function loadPendingTransactions(transactions = [], dateRange = null) {
   try {
-    // console.log('📋 Loading pending transactions...');
+    console.log('📋 Loading pending transactions...');
     
     // Use provided transactions or fallback to global
     if (!transactions || transactions.length === 0) {
@@ -3202,7 +3197,7 @@ async function loadPendingTransactions(transactions = [], dateRange = null) {
     // Update alerts
     updatePendingAlerts(pendingCategories);
     
-    // console.log('✅ Pending transactions loaded:', pendingCategories);
+    console.log('✅ Pending transactions loaded:', pendingCategories);
   } catch (error) {
     console.error('❌ Error loading pending transactions:', error);
     showError('Không thể tải giao dịch cần xử lý');
@@ -3528,7 +3523,7 @@ function updatePendingAlerts(categories) {
  */
 /*
 function exportStatusData() {
-  // console.log('💾 Exporting status data...');
+  console.log('💾 Exporting status data...');
   
   try {
     const transactions = window.transactionList || [];
@@ -3570,7 +3565,7 @@ function exportStatusData() {
     link.click();
     document.body.removeChild(link);
     
-    // console.log('✅ Status data exported successfully');
+    console.log('✅ Status data exported successfully');
   } catch (error) {
     console.error('❌ Error exporting status data:', error);
     alert('Lỗi xuất dữ liệu. Vui lòng thử lại.');
@@ -3582,7 +3577,7 @@ function exportStatusData() {
  * Action functions for pending transactions
  */
 async function markAsDelivered(transactionId) {
-// console.log('🚚 Marking as delivered:', transactionId);
+  console.log('🚚 Marking as delivered:', transactionId);
   
   // Show processing modal
   if (typeof window.showProcessingModal === 'function') {
@@ -3630,7 +3625,7 @@ async function markAsDelivered(transactionId) {
       duocSuaGiaoDichCuaAi: userInfo.duocSuaGiaoDichCuaAi || "chỉ bản thân"
     };
     
-// console.log("📤 Dữ liệu cập nhật gửi đi:", JSON.stringify(updateData, null, 2));
+    console.log("📤 Dữ liệu cập nhật gửi đi:", JSON.stringify(updateData, null, 2));
     
     // Send update request
     const response = await fetch(BACKEND_URL, {
@@ -3640,7 +3635,7 @@ async function markAsDelivered(transactionId) {
     });
     
     const result = await response.json();
-// console.log("📥 Kết quả từ server:", result);
+    console.log("📥 Kết quả từ server:", result);
     
     if (result.status === "success") {
       // Update local transaction data
@@ -3666,7 +3661,7 @@ async function markAsDelivered(transactionId) {
         window.showResultModal("Đã cập nhật trạng thái giao hàng thành công!", true);
       }
       
-      // console.log("✅ Cập nhật trạng thái giao hàng thành công");
+      console.log("✅ Cập nhật trạng thái giao hàng thành công");
     } else {
       throw new Error(result.message || 'Cập nhật thất bại');
     }
@@ -3686,7 +3681,7 @@ async function markAsDelivered(transactionId) {
 }
 
 function markAsPaid(transactionId) {
-  // console.log('💰 Marking as paid:', transactionId);
+  console.log('💰 Marking as paid:', transactionId);
   // Implementation would update payment status
   alert(`Gả lập: Đánh dấu giao dịch ${transactionId} đã thanh toán`);
   // Reload pending transactions with current date range
@@ -3696,13 +3691,13 @@ function markAsPaid(transactionId) {
 }
 
 function sendPaymentReminder(transactionId) {
-  // console.log('🔔 Sending payment reminder:', transactionId);
+  console.log('🔔 Sending payment reminder:', transactionId);
   // Implementation would send reminder
   alert(`Gả lập: Gửi nhắc nhở thanh toán cho giao dịch ${transactionId}`);
 }
 
 async function viewTransactionDetails(transactionId) {
-  // console.log('👁️ Viewing transaction details:', transactionId);
+  console.log('👁️ Viewing transaction details:', transactionId);
   
   try {
     // Find the transaction
@@ -3770,7 +3765,7 @@ async function viewTransactionDetails(transactionId) {
 }
 
 function markAllAsDelivered() {
-// console.log('🚚 Marking all as delivered');
+  console.log('🚚 Marking all as delivered');
   const checkedRows = document.querySelectorAll('.needs-delivery-table input[type="checkbox"]:checked');
   if (checkedRows.length === 0) {
     alert('Vui lòng chọn ít nhất một giao dịch');
@@ -3784,7 +3779,7 @@ function markAllAsDelivered() {
 }
 
 function markAllAsPaid() {
-  // console.log('💰 Marking all as paid');
+  console.log('💰 Marking all as paid');
   const checkedRows = document.querySelectorAll('.needs-payment-table input[type="checkbox"]:checked');
   if (checkedRows.length === 0) {
     alert('Vui lòng chọn ít nhất một giao dịch');
@@ -3798,18 +3793,18 @@ function markAllAsPaid() {
 }
 
 function sendPaymentReminders() {
-  // console.log('🔔 Sending payment reminders');
+  console.log('🔔 Sending payment reminders');
   const overdueCount = document.getElementById('overdue-count')?.textContent || 0;
   alert(`Gả lập: Gửi nhắc nhở thanh toán cho ${overdueCount} giao dịch quá hạn`);
 }
 
 function showOverdueDetails() {
-  // console.log('📄 Showing overdue details');
+  console.log('📄 Showing overdue details');
   alert('Gả lập: Hiển thị chi tiết các giao dịch quá hạn thanh toán');
 }
 
 function showUrgentDeliveries() {
-// console.log('🎆 Showing urgent deliveries');
+  console.log('🎆 Showing urgent deliveries');
   alert('Gả lập: Hiển thị danh sách giao hàng gấp');
 }
 
@@ -4106,7 +4101,7 @@ function calculateProductScore(product) {
  * Export functions for pending transactions
  */
 function exportNeedsDelivery() {
-  // console.log('💾 Exporting needs delivery data...');
+  console.log('💾 Exporting needs delivery data...');
   
   try {
     const transactions = window.transactionList || [];
@@ -4148,7 +4143,7 @@ function exportNeedsDelivery() {
     link.click();
     document.body.removeChild(link);
     
-    // console.log('✅ Needs delivery data exported successfully');
+    console.log('✅ Needs delivery data exported successfully');
   } catch (error) {
     console.error('❌ Error exporting needs delivery data:', error);
     alert('Lỗi xuất dữ liệu. Vui lòng thử lại.');
@@ -4156,7 +4151,7 @@ function exportNeedsDelivery() {
 }
 
 function exportNeedsPayment() {
-  // console.log('💾 Exporting needs payment data...');
+  console.log('💾 Exporting needs payment data...');
   
   try {
     const transactions = window.transactionList || [];
@@ -4198,7 +4193,7 @@ function exportNeedsPayment() {
     link.click();
     document.body.removeChild(link);
     
-    // console.log('✅ Needs payment data exported successfully');
+    console.log('✅ Needs payment data exported successfully');
   } catch (error) {
     console.error('❌ Error exporting needs payment data:', error);
     alert('Lỗi xuất dữ liệu. Vui lòng thử lại.');
@@ -4247,7 +4242,7 @@ window.calculateProductScore = calculateProductScore;
  * @param {string} customerIdentifier - Customer email or name to view
  */
 function viewCustomerDetails(customerIdentifier) {
-// console.log('👥 Viewing customer details:', customerIdentifier);
+  console.log('👥 Viewing customer details:', customerIdentifier);
   
   const transactions = window.transactionList || [];
   const customerTransactions = transactions.filter(rawTransaction => {
@@ -4286,7 +4281,7 @@ function viewCustomerDetails(customerIdentifier) {
  * @param {string} productName - Product name to view
  */
 function viewProductDetails(productName) {
-// console.log('📺 Viewing product details:', productName);
+  console.log('📺 Viewing product details:', productName);
   
   const transactions = window.transactionList || [];
   const productTransactions = transactions.filter(rawTransaction => {
@@ -4324,7 +4319,7 @@ function viewProductDetails(productName) {
  * Export enhanced customer data to CSV
  */
 function exportCustomerData() {
-  // console.log('💾 Exporting customer data...');
+  console.log('💾 Exporting customer data...');
   
   try {
     const transactions = window.transactionList || [];
@@ -4375,7 +4370,7 @@ function exportCustomerData() {
     link.click();
     document.body.removeChild(link);
     
-    // console.log('✅ Customer data exported successfully');
+    console.log('✅ Customer data exported successfully');
   } catch (error) {
     console.error('❌ Error exporting customer data:', error);
     alert('Lỗi xuất dữ liệu khách hàng. Vui lòng thử lại.');
@@ -4386,7 +4381,7 @@ function exportCustomerData() {
  * Export enhanced software/product data to CSV
  */
 function exportSoftwareData() {
-  // console.log('💾 Exporting software/product data...');
+  console.log('💾 Exporting software/product data...');
   
   try {
     const transactions = window.transactionList || [];
@@ -4449,7 +4444,7 @@ function exportSoftwareData() {
     link.click();
     document.body.removeChild(link);
     
-    // console.log('✅ Software/product data exported successfully');
+    console.log('✅ Software/product data exported successfully');
   } catch (error) {
     console.error('❌ Error exporting software data:', error);
     alert('Lỗi xuất dữ liệu sản phẩm. Vui lòng thử lại.');
@@ -4464,54 +4459,53 @@ function exportSoftwareData() {
  * @returns {Object} Updated business metrics
  */
 function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses, dateRange, allTransactions) {
-// console.log('🧮 Calculating updated business metrics with new logic...');
-// console.log('📊 Input data:', {
-
-  //     transactionsCount: filteredTransactions.length,
-  //     expensesCount: filteredExpenses.length,
-  //     dateRange: dateRange
-  //   });
-  //   
-  //   // Use pre-filtered transactions for current period metrics
-  //   // console.log(`📊 Working with ${filteredTransactions.length} pre-filtered transactions`);
-  //   // console.log(`📊 Total unfiltered transactions available: ${allTransactions ? allTransactions.length : 0}`);
-  //   
-  //   // Initialize metrics
-  //   const metrics = {
-  //     grossRevenue: 0,           // Doanh thu gộp = "đã hoàn tất" - "hoàn tiền"
-  //     pendingCollection: 0,      // Tiền đang chờ thu = "chưa thanh toán"
-  //     pendingPayment: 0,         // Tiền đang chờ chi = "đã thanh toán" 
-  //     totalRefunds: 0,           // Tổng tiền hoàn trả = "hoàn tiền"
-  //     refundRate: 0,             // Tỷ lệ hoàn tiền = số GD "hoàn tiền" / (tổng GD có hiệu lực)
-  //     
-  //     // Breakdown by status for detailed analysis
-  //     statusBreakdown: {
-  //       completed: { count: 0, amount: 0 },      // đã hoàn tất
-  //       paid: { count: 0, amount: 0 },           // đã thanh toán
-  //       unpaid: { count: 0, amount: 0 },         // chưa thanh toán
-  //       refunded: { count: 0, amount: 0 },       // hoàn tiền
-  //       cancelled: { count: 0, amount: 0 }       // đã hủy
-  //     },
-  //     
-  //     // Transaction counts
-  //     totalTransactions: 0,
-  //     effectiveTransactions: 0,   // Không bao gồm "đã hủy"
-  //     
-  //     // Previous period comparison (for growth calculations)
-  //     previousPeriod: {
-  //       grossRevenue: 0,
-  //       totalRefunds: 0,
-  //       effectiveTransactions: 0
-  //     }
-  //   };
+  console.log('🧮 Calculating updated business metrics with new logic...');
+  console.log('📊 Input data:', {
+    transactionsCount: filteredTransactions.length,
+    expensesCount: filteredExpenses.length,
+    dateRange: dateRange
+  });
   
-  // console.log(`📊 Processing ${filteredTransactions.length} transactions...`);
+  // Use pre-filtered transactions for current period metrics
+  console.log(`📊 Working with ${filteredTransactions.length} pre-filtered transactions`);
+  console.log(`📊 Total unfiltered transactions available: ${allTransactions ? allTransactions.length : 0}`);
+  
+  // Initialize metrics
+  const metrics = {
+    grossRevenue: 0,           // Doanh thu gộp = "đã hoàn tất" - "hoàn tiền"
+    pendingCollection: 0,      // Tiền đang chờ thu = "chưa thanh toán"
+    pendingPayment: 0,         // Tiền đang chờ chi = "đã thanh toán" 
+    totalRefunds: 0,           // Tổng tiền hoàn trả = "hoàn tiền"
+    refundRate: 0,             // Tỷ lệ hoàn tiền = số GD "hoàn tiền" / (tổng GD có hiệu lực)
+    
+    // Breakdown by status for detailed analysis
+    statusBreakdown: {
+      completed: { count: 0, amount: 0 },      // đã hoàn tất
+      paid: { count: 0, amount: 0 },           // đã thanh toán
+      unpaid: { count: 0, amount: 0 },         // chưa thanh toán
+      refunded: { count: 0, amount: 0 },       // hoàn tiền
+      cancelled: { count: 0, amount: 0 }       // đã hủy
+    },
+    
+    // Transaction counts
+    totalTransactions: 0,
+    effectiveTransactions: 0,   // Không bao gồm "đã hủy"
+    
+    // Previous period comparison (for growth calculations)
+    previousPeriod: {
+      grossRevenue: 0,
+      totalRefunds: 0,
+      effectiveTransactions: 0
+    }
+  };
+  
+  console.log(`📊 Processing ${filteredTransactions.length} transactions...`);
   
   // Process each transaction
   filteredTransactions.forEach((rawTransaction, index) => {
     const transaction = normalizeTransaction(rawTransaction);
     if (!transaction) {
-      // console.log(`⚠️ Transaction ${index} failed normalization:`, rawTransaction);
+      console.log(`⚠️ Transaction ${index} failed normalization:`, rawTransaction);
       return;
     }
     
@@ -4521,7 +4515,7 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
     
     // Debug first few transactions
     if (index < 5) {
-// console.log(`💳 Transaction ${index}:`, {
+      console.log(`💳 Transaction ${index}:`, {
         rawAmount: transaction.amount || transaction.doanhThu || transaction.revenue,
         parsedAmount: amount,
         rawStatus: transaction.loaiGiaoDich || transaction.transactionType,
@@ -4567,7 +4561,7 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
         break;
         
       default:
-// console.warn(`⚠️ Unknown transaction status: "${status}"`);
+        console.warn(`⚠️ Unknown transaction status: "${status}"`);
         // Treat unknown status as effective transaction
         metrics.effectiveTransactions++;
         break;
@@ -4575,96 +4569,94 @@ function calculateUpdatedBusinessMetrics(filteredTransactions, filteredExpenses,
   });
   
   // Calculate derived metrics
-// console.log('📊 Raw status breakdown before calculations:', {
-
-  //     completed: metrics.statusBreakdown.completed,
-  //     paid: metrics.statusBreakdown.paid,
-  //     unpaid: metrics.statusBreakdown.unpaid,
-  //     refunded: metrics.statusBreakdown.refunded,
-  //     cancelled: metrics.statusBreakdown.cancelled
-  //   });
-  //   
-  //   // Doanh thu gộp = Tổng tiền "đã hoàn tất" + Tổng tiền "đã thanh toán" - Tổng tiền "hoàn tiền"
-  //   metrics.grossRevenue = metrics.statusBreakdown.completed.amount + metrics.statusBreakdown.paid.amount - metrics.totalRefunds;
-  //   // console.log(`💰 Gross Revenue Calculation: ${metrics.statusBreakdown.completed.amount} + ${metrics.statusBreakdown.paid.amount} - ${metrics.totalRefunds} = ${metrics.grossRevenue}`);
-  //   
-  //   // Tỷ lệ hoàn tiền = Số giao dịch "hoàn tiền" / Tổng giao dịch có hiệu lực
-  //   // Giao dịch có hiệu lực = "đã hoàn tất" + "đã thanh toán" + "chưa thanh toán"
-  //   const validTransactionsForRefundRate = metrics.statusBreakdown.completed.count + 
-  //                                         metrics.statusBreakdown.paid.count + 
-  //                                         metrics.statusBreakdown.unpaid.count;
-  //   
-  //   metrics.refundRate = validTransactionsForRefundRate > 0 
-  //     ? (metrics.statusBreakdown.refunded.count / validTransactionsForRefundRate * 100)
-  //     : 0;
-  //   
-  //   // Calculate previous period for growth comparison
-  //   // For gross revenue, compare with same period of previous cycle (cùng kỳ chu kỳ trước)
-  //   if (dateRange && dateRange.start && dateRange.end && allTransactions) {
-  //     const samePeriodPreviousCycleRange = calculateSamePeriodPreviousCycle(dateRange);
-  //     // Use allTransactions to get data from previous period
-  //     const samePeriodTransactions = filterDataByDateRange(allTransactions || [], samePeriodPreviousCycleRange);
-  //     
-  //     // console.log('📊 Same period previous cycle range:', samePeriodPreviousCycleRange);
-  //     // console.log(`📊 Same period transactions found: ${samePeriodTransactions.length}`);
-  //     
-  //     samePeriodTransactions.forEach(rawTransaction => {
-  //       const transaction = normalizeTransaction(rawTransaction);
-  //       if (!transaction) return;
-  //       
-  //       const amount = parseFloat(transaction.amount || transaction.doanhThu || transaction.revenue || 0);
-  //       const status = (transaction.loaiGiaoDich || transaction.transactionType || '').toLowerCase().trim();
-  //       
-  //       switch (status) {
-  //         case 'đã hoàn tất':
-  //           metrics.previousPeriod.grossRevenue += amount;
-  //           metrics.previousPeriod.effectiveTransactions++;
-  //           break;
-  //         case 'đã thanh toán':
-  //           metrics.previousPeriod.grossRevenue += amount;
-  //           metrics.previousPeriod.effectiveTransactions++;
-  //           break;
-  //         case 'hoàn tiền':
-  //           metrics.previousPeriod.totalRefunds += Math.abs(amount);
-  //           break;
-  //         case 'chưa thanh toán':
-  //           metrics.previousPeriod.effectiveTransactions++;
-  //           break;
-  //       }
-  //     });
-  //     
-  //     metrics.previousPeriod.grossRevenue -= metrics.previousPeriod.totalRefunds;
-  //     
-// console.log('📊 Previous same period metrics:', {
-
-  //       grossRevenue: metrics.previousPeriod.grossRevenue,
-  //       totalRefunds: metrics.previousPeriod.totalRefunds,
-  //       effectiveTransactions: metrics.previousPeriod.effectiveTransactions
-  //     });
-  //   }
-  //   
-  //   // Calculate growth rates
-  //   metrics.growthRates = {
-  //     grossRevenue: calculateGrowthRate(metrics.grossRevenue, metrics.previousPeriod.grossRevenue),
-  //     pendingCollection: 0, // Growth for pending amounts might not be meaningful
-  //     pendingPayment: 0,
-  //     totalRefunds: calculateGrowthRate(metrics.totalRefunds, metrics.previousPeriod.totalRefunds),
-  //     effectiveTransactions: calculateGrowthRate(metrics.effectiveTransactions, metrics.previousPeriod.effectiveTransactions)
-  //   };
+  console.log('📊 Raw status breakdown before calculations:', {
+    completed: metrics.statusBreakdown.completed,
+    paid: metrics.statusBreakdown.paid,
+    unpaid: metrics.statusBreakdown.unpaid,
+    refunded: metrics.statusBreakdown.refunded,
+    cancelled: metrics.statusBreakdown.cancelled
+  });
   
-  // console.log('📈 DOANH THU GỘP - Growth Rate Calculation:');
-// console.log(`  Current Gross Revenue: ${metrics.grossRevenue}`);
-// console.log(`  Previous Period Gross Revenue: ${metrics.previousPeriod.grossRevenue}`);
-// console.log(`  Growth Rate: ${metrics.growthRates.grossRevenue.toFixed(2)}%`);
+  // Doanh thu gộp = Tổng tiền "đã hoàn tất" + Tổng tiền "đã thanh toán" - Tổng tiền "hoàn tiền"
+  metrics.grossRevenue = metrics.statusBreakdown.completed.amount + metrics.statusBreakdown.paid.amount - metrics.totalRefunds;
+  console.log(`💰 Gross Revenue Calculation: ${metrics.statusBreakdown.completed.amount} + ${metrics.statusBreakdown.paid.amount} - ${metrics.totalRefunds} = ${metrics.grossRevenue}`);
   
-  // console.log('📈 Final metrics calculated:');
-  // console.log('  💰 Doanh thu gộp:', formatCurrency(metrics.grossRevenue));
-// console.log('  ⏳ Tiền đang chờ thu:', formatCurrency(metrics.pendingCollection));
-// console.log('  💸 Tiền đang chờ chi:', formatCurrency(metrics.pendingPayment));
-  // console.log('  🔄 Tổng tiền hoàn trả:', formatCurrency(metrics.totalRefunds));
-  // console.log('  📊 Tỷ lệ hoàn tiền:', `${metrics.refundRate.toFixed(2)}%`);
-  // console.log('  📋 Status breakdown:', metrics.statusBreakdown);
-  // console.log('  📈 Growth rates:', metrics.growthRates);
+  // Tỷ lệ hoàn tiền = Số giao dịch "hoàn tiền" / Tổng giao dịch có hiệu lực
+  // Giao dịch có hiệu lực = "đã hoàn tất" + "đã thanh toán" + "chưa thanh toán"
+  const validTransactionsForRefundRate = metrics.statusBreakdown.completed.count + 
+                                        metrics.statusBreakdown.paid.count + 
+                                        metrics.statusBreakdown.unpaid.count;
+  
+  metrics.refundRate = validTransactionsForRefundRate > 0 
+    ? (metrics.statusBreakdown.refunded.count / validTransactionsForRefundRate * 100)
+    : 0;
+  
+  // Calculate previous period for growth comparison
+  // For gross revenue, compare with same period of previous cycle (cùng kỳ chu kỳ trước)
+  if (dateRange && dateRange.start && dateRange.end && allTransactions) {
+    const samePeriodPreviousCycleRange = calculateSamePeriodPreviousCycle(dateRange);
+    // Use allTransactions to get data from previous period
+    const samePeriodTransactions = filterDataByDateRange(allTransactions || [], samePeriodPreviousCycleRange);
+    
+    console.log('📊 Same period previous cycle range:', samePeriodPreviousCycleRange);
+    console.log(`📊 Same period transactions found: ${samePeriodTransactions.length}`);
+    
+    samePeriodTransactions.forEach(rawTransaction => {
+      const transaction = normalizeTransaction(rawTransaction);
+      if (!transaction) return;
+      
+      const amount = parseFloat(transaction.amount || transaction.doanhThu || transaction.revenue || 0);
+      const status = (transaction.loaiGiaoDich || transaction.transactionType || '').toLowerCase().trim();
+      
+      switch (status) {
+        case 'đã hoàn tất':
+          metrics.previousPeriod.grossRevenue += amount;
+          metrics.previousPeriod.effectiveTransactions++;
+          break;
+        case 'đã thanh toán':
+          metrics.previousPeriod.grossRevenue += amount;
+          metrics.previousPeriod.effectiveTransactions++;
+          break;
+        case 'hoàn tiền':
+          metrics.previousPeriod.totalRefunds += Math.abs(amount);
+          break;
+        case 'chưa thanh toán':
+          metrics.previousPeriod.effectiveTransactions++;
+          break;
+      }
+    });
+    
+    metrics.previousPeriod.grossRevenue -= metrics.previousPeriod.totalRefunds;
+    
+    console.log('📊 Previous same period metrics:', {
+      grossRevenue: metrics.previousPeriod.grossRevenue,
+      totalRefunds: metrics.previousPeriod.totalRefunds,
+      effectiveTransactions: metrics.previousPeriod.effectiveTransactions
+    });
+  }
+  
+  // Calculate growth rates
+  metrics.growthRates = {
+    grossRevenue: calculateGrowthRate(metrics.grossRevenue, metrics.previousPeriod.grossRevenue),
+    pendingCollection: 0, // Growth for pending amounts might not be meaningful
+    pendingPayment: 0,
+    totalRefunds: calculateGrowthRate(metrics.totalRefunds, metrics.previousPeriod.totalRefunds),
+    effectiveTransactions: calculateGrowthRate(metrics.effectiveTransactions, metrics.previousPeriod.effectiveTransactions)
+  };
+  
+  console.log('📈 DOANH THU GỘP - Growth Rate Calculation:');
+  console.log(`  Current Gross Revenue: ${metrics.grossRevenue}`);
+  console.log(`  Previous Period Gross Revenue: ${metrics.previousPeriod.grossRevenue}`);
+  console.log(`  Growth Rate: ${metrics.growthRates.grossRevenue.toFixed(2)}%`);
+  
+  console.log('📈 Final metrics calculated:');
+  console.log('  💰 Doanh thu gộp:', formatCurrency(metrics.grossRevenue));
+  console.log('  ⏳ Tiền đang chờ thu:', formatCurrency(metrics.pendingCollection));
+  console.log('  💸 Tiền đang chờ chi:', formatCurrency(metrics.pendingPayment));
+  console.log('  🔄 Tổng tiền hoàn trả:', formatCurrency(metrics.totalRefunds));
+  console.log('  📊 Tỷ lệ hoàn tiền:', `${metrics.refundRate.toFixed(2)}%`);
+  console.log('  📋 Status breakdown:', metrics.statusBreakdown);
+  console.log('  📈 Growth rates:', metrics.growthRates);
   
   return metrics;
 }
@@ -4678,7 +4670,7 @@ function calculateSamePeriodPreviousCycle(currentRange) {
   const startDate = new Date(currentRange.start);
   const endDate = new Date(currentRange.end);
   
-  // console.log('📅 Current period:', { start: currentRange.start, end: currentRange.end });
+  console.log('📅 Current period:', { start: currentRange.start, end: currentRange.end });
   
   // Calculate previous cycle by going back 1 month
   const prevStartDate = new Date(startDate);
@@ -4702,7 +4694,7 @@ function calculateSamePeriodPreviousCycle(currentRange) {
     end: prevEndDate.toISOString().split('T')[0]
   };
   
-  // console.log('📅 Same period previous cycle:', result);
+  console.log('📅 Same period previous cycle:', result);
   
   return result;
 }

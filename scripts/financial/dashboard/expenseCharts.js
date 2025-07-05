@@ -22,7 +22,7 @@ import {
 export function renderExpenseByCategoryChart(metrics, containerId = 'expenseByCategoryChart') {
   const container = document.getElementById(containerId);
   if (!container) {
-// console.warn(`Container #${containerId} not found for expense by category chart`);
+    console.warn(`Container #${containerId} not found for expense by category chart`);
     return;
   }
 
@@ -78,7 +78,7 @@ export function renderExpenseByCategoryChart(metrics, containerId = 'expenseByCa
 export function renderExpenseTrendChart(metrics, containerId = 'expenseTrendChart') {
   const container = document.getElementById(containerId);
   if (!container) {
-// console.warn(`Container #${containerId} not found for expense trend chart`);
+    console.warn(`Container #${containerId} not found for expense trend chart`);
     return;
   }
 
@@ -140,7 +140,7 @@ export function renderExpenseTrendChart(metrics, containerId = 'expenseTrendChar
 export function renderExpenseBudgetChart(metrics, budgetData = {}, containerId = 'expenseBudgetChart') {
   const container = document.getElementById(containerId);
   if (!container) {
-// console.warn(`Container #${containerId} not found for expense budget chart`);
+    console.warn(`Container #${containerId} not found for expense budget chart`);
     return;
   }
 
@@ -211,7 +211,7 @@ export function renderExpenseBudgetChart(metrics, budgetData = {}, containerId =
 export function renderExpenseEfficiencyChart(metrics, containerId = 'expenseEfficiencyChart') {
   const container = document.getElementById(containerId);
   if (!container) {
-// console.warn(`Container #${containerId} not found for expense efficiency chart`);
+    console.warn(`Container #${containerId} not found for expense efficiency chart`);
     return;
   }
 
@@ -297,7 +297,7 @@ export function renderExpenseEfficiencyChart(metrics, containerId = 'expenseEffi
 export function renderExpenseAnalyticsTable(metrics, containerId = 'expenseAnalyticsTable') {
   const container = document.getElementById(containerId);
   if (!container) {
-// console.warn(`Container #${containerId} not found for expense analytics table`);
+    console.warn(`Container #${containerId} not found for expense analytics table`);
     return;
   }
 
@@ -364,7 +364,7 @@ export function renderExpenseAnalyticsTable(metrics, containerId = 'expenseAnaly
 export function renderTopExpenseItems(expenseData, containerId = 'topExpenseItems', limit = 10) {
   const container = document.getElementById(containerId);
   if (!container) {
-// console.warn(`Container #${containerId} not found for top expense items`);
+    console.warn(`Container #${containerId} not found for top expense items`);
     return;
   }
 

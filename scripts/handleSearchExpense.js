@@ -11,7 +11,7 @@ export async function handleSearchExpense() {
   const isAdmin = window.userInfo && window.userInfo.vaiTro && window.userInfo.vaiTro.toLowerCase() === "admin";
   
   if (!isAdmin) {
-    // console.log("⚠️ Không phải admin - một số điều kiện tìm kiếm chi phí sẽ bị bỏ qua: ngày chi phí, sản phẩm, gói");
+    console.log("⚠️ Không phải admin - một số điều kiện tìm kiếm chi phí sẽ bị bỏ qua: ngày chi phí, sản phẩm, gói");
   }
 
   // Lấy giá trị từ trường ghi chú để kiểm tra tìm kiếm toàn cục
@@ -48,10 +48,10 @@ export async function handleSearchExpense() {
   if (isGlobalSearch) {
     // Tìm kiếm toàn cục - chỉ gửi text cần tìm
     conditions.globalSearchText = expenseNote;
-// console.log("🌍 Tìm kiếm toàn cục với từ khóa:", expenseNote);
+    console.log("🌍 Tìm kiếm toàn cục với từ khóa:", expenseNote);
   } else {
     // Tìm kiếm thông thường theo từng trường cụ thể
-    // console.log("🔍 Tìm kiếm theo trường cụ thể");
+    console.log("🔍 Tìm kiếm theo trường cụ thể");
     
     // Chỉ thêm điều kiện nếu người dùng đã nhập giá trị (và đối với một số field chỉ admin mới được tìm)
     const expenseDate = isAdmin ? getValue("expenseDate") : "";
@@ -105,7 +105,7 @@ export async function handleSearchExpense() {
   const hasConditions = Object.keys(conditions).length > 0;
   
   if (!hasConditions) {
-    // console.log("📋 Không có điều kiện tìm kiếm - sẽ lấy tất cả chi phí");
+    console.log("📋 Không có điều kiện tìm kiếm - sẽ lấy tất cả chi phí");
   }
 
   const data = {
@@ -114,7 +114,7 @@ export async function handleSearchExpense() {
     conditions: conditions
   };
 
-// console.log("📤 Tìm kiếm chi phí với điều kiện:", JSON.stringify(data, null, 2));
+  console.log("📤 Tìm kiếm chi phí với điều kiện:", JSON.stringify(data, null, 2));
 
   try {
     const res = await fetch(BACKEND_URL, {

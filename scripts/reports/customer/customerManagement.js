@@ -34,7 +34,7 @@ const customerState = {
  * @param {string} options.period - Period name (e.g., 'this_month', 'last_month')
  */
 export async function loadCustomerManagement(options = {}) {
-// console.log('👥 Loading customer management with options:', options);
+  console.log('👥 Loading customer management with options:', options);
   
   try {
     // Load template
@@ -47,74 +47,73 @@ export async function loadCustomerManagement(options = {}) {
     const transactions = window.transactionList || getFromStorage('transactions') || [];
     const expenses = window.expenseList || getFromStorage('expenses') || [];
     
-// console.log('👥 Customer management data:', {
+    console.log('👥 Customer management data:', {
+      transactions: transactions.length,
+      expenses: expenses.length
+    });
+    
+    // Get date range from options or global filters
+    const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
+    const period = options.period || window.globalFilters?.period || 'this_month';
+    
+    // Filter data by date range
+    const filteredTransactions = filterDataByDateRange(transactions, dateRange);
+    
+    // Process customer data
+    const customerData = processCustomerData(filteredTransactions);
+    
+    // Load all components
+    await Promise.all([
+      updateCustomerKPIs(customerData, period),
+      renderCustomerAcquisitionChart(customerData, period),
+      renderCustomerLifecycleChart(customerData),
+      updateCustomerSegmentation(customerData),
+      loadActiveCustomersTable(customerData),
+      loadCustomerInsights(customerData),
+      updateCRMTools(customerData)
+    ]);
+    
+    // Setup event handlers
+    setupCustomerManagementHandlers();
+    
+    console.log('✅ Customer management loaded successfully');
+    
+  } catch (error) {
+    console.error('❌ Error loading customer management:', error);
+    showError('Không thể tải quản lý khách hàng');
+  }
+}
 
-  //       transactions: transactions.length,
-  //       expenses: expenses.length
-  //     });
-  //     
-  //     // Get date range from options or global filters
-  //     const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
-  //     const period = options.period || window.globalFilters?.period || 'this_month';
-  //     
-  //     // Filter data by date range
-  //     const filteredTransactions = filterDataByDateRange(transactions, dateRange);
-  //     
-  //     // Process customer data
-  //     const customerData = processCustomerData(filteredTransactions);
-  //     
-  //     // Load all components
-  //     await Promise.all([
-  //       updateCustomerKPIs(customerData, period),
-  //       renderCustomerAcquisitionChart(customerData, period),
-  //       renderCustomerLifecycleChart(customerData),
-  //       updateCustomerSegmentation(customerData),
-  //       loadActiveCustomersTable(customerData),
-  //       loadCustomerInsights(customerData),
-  //       updateCRMTools(customerData)
-  //     ]);
-  //     
-  //     // Setup event handlers
-  //     setupCustomerManagementHandlers();
-  //     
-  //     // console.log('✅ Customer management loaded successfully');
-  //     
-  //   } catch (error) {
-  //     console.error('❌ Error loading customer management:', error);
-  //     showError('Không thể tải quản lý khách hàng');
-  //   }
-  // }
-  // 
 /**
-  //  * Load the customer management HTML template
-  //  */
-  // async function loadCustomerManagementHTML() {
-  //   const container = document.getElementById('report-customer');
-  //   if (!container) return;
-  //   
-  //   try {
-  //     const response = await fetch('./partials/tabs/report-pages/customer-management.html');
-  //     if (!response.ok) {
-  //       throw new Error('Template not found');
-  //     }
-  //     
-  //     const html = await response.text();
-  //     container.innerHTML = html;
-  //     container.classList.add('active');
-  //     
-  //     // console.log('✅ Customer management template loaded');
-  //     
-  //   } catch (error) {
-  //     console.error('❌ Could not load customer management template:', error);
-  //     throw error;
-  //   }
-  // }
-  // 
+ * Load the customer management HTML template
+ */
+async function loadCustomerManagementHTML() {
+  const container = document.getElementById('report-customer');
+  if (!container) return;
+  
+  try {
+    const response = await fetch('./partials/tabs/report-pages/customer-management.html');
+    if (!response.ok) {
+      throw new Error('Template not found');
+    }
+    
+    const html = await response.text();
+    container.innerHTML = html;
+    container.classList.add('active');
+    
+    console.log('✅ Customer management template loaded');
+    
+  } catch (error) {
+    console.error('❌ Could not load customer management template:', error);
+    throw error;
+  }
+}
+
 /**
-  //  * Process raw transaction data to extract customer information
-  //  */
-  // function processCustomerData(transactions) {
-  //   const customers = {};
+ * Process raw transaction data to extract customer information
+ */
+function processCustomerData(transactions) {
+  const customers = {};
   const currentDate = new Date();
   
   transactions.forEach(rawTransaction => {
@@ -208,7 +207,7 @@ export async function loadCustomerManagement(options = {}) {
  * Update customer KPI cards
  */
 async function updateCustomerKPIs(customerData, period) {
-// console.log('👥 Updating customer KPIs');
+  console.log('👥 Updating customer KPIs');
   
   // Calculate previous period for comparison
   const previousData = calculatePreviousPeriodCustomers(customerData, period);
@@ -227,14 +226,14 @@ async function updateCustomerKPIs(customerData, period) {
   updateChangeElement('total-customers-change', totalChange, 'count');
   updateChangeElement('active-customers-change', activePercentageChange, 'percentage');
   
-// console.log('👥 Customer KPIs updated:', customerData);
+  console.log('👥 Customer KPIs updated:', customerData);
 }
 
 /**
  * Render customer acquisition chart
  */
 async function renderCustomerAcquisitionChart(customerData, period) {
-  // console.log('📈 Rendering customer acquisition chart');
+  console.log('📈 Rendering customer acquisition chart');
   
   const canvas = document.getElementById('customer-acquisition-chart');
   if (!canvas) return;
@@ -322,7 +321,7 @@ async function renderCustomerAcquisitionChart(customerData, period) {
  * Render customer lifecycle chart
  */
 async function renderCustomerLifecycleChart(customerData) {
-  // console.log('🔄 Rendering customer lifecycle chart');
+  console.log('🔄 Rendering customer lifecycle chart');
   
   const canvas = document.getElementById('customer-lifecycle-chart');
   if (!canvas) return;
@@ -395,7 +394,7 @@ async function renderCustomerLifecycleChart(customerData) {
  * Update customer segmentation
  */
 async function updateCustomerSegmentation(customerData) {
-  // console.log('🎯 Updating customer segmentation');
+  console.log('🎯 Updating customer segmentation');
   
   const segments = calculateSegmentMetrics(customerData);
   
@@ -423,7 +422,7 @@ async function updateCustomerSegmentation(customerData) {
  * Load active customers table
  */
 async function loadActiveCustomersTable(customerData) {
-  // console.log('📋 Loading active customers table');
+  console.log('📋 Loading active customers table');
   
   customerState.filteredCustomers = customerData.customers;
   customerState.totalCustomers = customerData.customers.length;
@@ -512,7 +511,7 @@ function renderCustomersTable() {
  * Load customer insights
  */
 async function loadCustomerInsights(customerData) {
-  // console.log('💡 Loading customer insights');
+  console.log('💡 Loading customer insights');
   
   const insights = generateCustomerInsights(customerData, customerState.currentInsight);
   
@@ -560,7 +559,7 @@ async function loadCustomerInsights(customerData) {
  * Update CRM tools
  */
 async function updateCRMTools(customerData) {
-  // console.log('🛠️ Updating CRM tools');
+  console.log('🛠️ Updating CRM tools');
   
   // Update communication stats
   updateKPIElement('recent-emails', '12'); // Placeholder
@@ -925,31 +924,31 @@ window.refreshCustomerManagement = function() {
 };
 
 window.exportCustomerReport = function() {
-  // console.log('📊 Exporting customer report...');
+  console.log('📊 Exporting customer report...');
 };
 
 window.openAddCustomerModal = function() {
-// console.log('➕ Opening add customer modal...');
+  console.log('➕ Opening add customer modal...');
 };
 
 window.exportCustomerData = function() {
-  // console.log('📊 Exporting customer data...');
+  console.log('📊 Exporting customer data...');
 };
 
 window.toggleCustomerLifecycleView = function(viewType) {
-  // console.log(`🔄 Toggling lifecycle chart to ${viewType} view`);
+  console.log(`🔄 Toggling lifecycle chart to ${viewType} view`);
 };
 
 window.filterCustomers = function() {
   const searchTerm = document.getElementById('customer-search').value.toLowerCase();
   // Implementation for customer filtering
-  // console.log(`🔍 Filtering customers by: ${searchTerm}`);
+  console.log(`🔍 Filtering customers by: ${searchTerm}`);
 };
 
 window.filterByStatus = function() {
   const status = document.getElementById('customer-status-filter').value;
   // Implementation for status filtering
-  // console.log(`🔍 Filtering customers by status: ${status}`);
+  console.log(`🔍 Filtering customers by status: ${status}`);
 };
 
 window.toggleSelectAll = function() {
@@ -959,19 +958,19 @@ window.toggleSelectAll = function() {
 };
 
 window.viewCustomerDetails = function(customerId) {
-  // console.log(`👁️ Viewing customer details: ${customerId}`);
+  console.log(`👁️ Viewing customer details: ${customerId}`);
 };
 
 window.editCustomer = function(customerId) {
-  // console.log(`✏️ Editing customer: ${customerId}`);
+  console.log(`✏️ Editing customer: ${customerId}`);
 };
 
 window.messageCustomer = function(customerId) {
-// console.log(`💬 Messaging customer: ${customerId}`);
+  console.log(`💬 Messaging customer: ${customerId}`);
 };
 
 window.executeInsightAction = function(action, customerId) {
-  // console.log(`🎯 Executing action ${action} for customer: ${customerId}`);
+  console.log(`🎯 Executing action ${action} for customer: ${customerId}`);
 };
 
 window.previousCustomerPage = function() {
@@ -999,49 +998,49 @@ window.goToCustomerPage = function(page) {
 
 // CRM Tools functions
 window.sendBulkEmail = function() {
-// console.log('📧 Sending bulk email...');
+  console.log('📧 Sending bulk email...');
 };
 
 window.sendBulkSMS = function() {
-  // console.log('📱 Sending bulk SMS...');
+  console.log('📱 Sending bulk SMS...');
 };
 
 window.createNewsletter = function() {
-// console.log('📰 Creating newsletter...');
+  console.log('📰 Creating newsletter...');
 };
 
 window.viewPendingTickets = function() {
-// console.log('🎫 Viewing pending tickets...');
+  console.log('🎫 Viewing pending tickets...');
 };
 
 window.createNewTicket = function() {
-// console.log('🆕 Creating new ticket...');
+  console.log('🆕 Creating new ticket...');
 };
 
 window.manageLoyaltyProgram = function() {
-// console.log('🎁 Managing loyalty program...');
+  console.log('🎁 Managing loyalty program...');
 };
 
 window.distributeRewards = function() {
-// console.log('🏆 Distributing rewards...');
+  console.log('🏆 Distributing rewards...');
 };
 
 window.generateCustomerReport = function() {
-  // console.log('📄 Generating customer report...');
+  console.log('📄 Generating customer report...');
 };
 
 window.scheduleReport = function() {
-  // console.log('📅 Scheduling report...');
+  console.log('📅 Scheduling report...');
 };
 
 function refreshAcquisitionChart(view) {
-  // console.log(`🔄 Refreshing acquisition chart for view: ${view}`);
+  console.log(`🔄 Refreshing acquisition chart for view: ${view}`);
 }
 
 function refreshSegmentation() {
-  // console.log(`🔄 Refreshing segmentation for: ${customerState.currentSegment}`);
+  console.log(`🔄 Refreshing segmentation for: ${customerState.currentSegment}`);
 }
 
 function refreshInsights() {
-  // console.log(`🔄 Refreshing insights for: ${customerState.currentInsight}`);
+  console.log(`🔄 Refreshing insights for: ${customerState.currentInsight}`);
 }

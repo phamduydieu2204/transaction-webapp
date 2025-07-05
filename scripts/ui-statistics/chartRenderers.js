@@ -5,7 +5,7 @@
  * Handles all chart generation and data visualization components
  */
 
-// console.log('📦 chartRenderers.js module loading...');
+console.log('📦 chartRenderers.js module loading...');
 
 // Import rendering utilities
 import { 
@@ -45,7 +45,7 @@ export async function renderOverviewTab(expenseData, transactionData, financialA
       yLabel: "Số Tiền (VND)"
     });
     
-    // console.log("✅ Overview tab rendered");
+    console.log("✅ Overview tab rendered");
     
   } catch (error) {
     console.error("❌ Error rendering overview tab:", error);
@@ -71,7 +71,7 @@ export async function renderExpensesTab(expenseData, uiState) {
       showGrowthRate: uiState.showGrowthRate
     });
     
-    // console.log("✅ Expenses tab rendered");
+    console.log("✅ Expenses tab rendered");
     
   } catch (error) {
     console.error("❌ Error rendering expenses tab:", error);
@@ -104,7 +104,7 @@ export async function renderRevenueTab(transactionData, uiState) {
       showGrowthRate: uiState.showGrowthRate
     });
     
-    // console.log("✅ Revenue tab rendered");
+    console.log("✅ Revenue tab rendered");
     
   } catch (error) {
     console.error("❌ Error rendering revenue tab:", error);
@@ -117,7 +117,7 @@ export async function renderRevenueTab(transactionData, uiState) {
  */
 export async function renderEnhancedStatistics(expenseData, transactionData, financialAnalysis, globalFilters = null) {
   try {
-    // console.log("🎨 Rendering Enhanced Statistics with Business Overview Dashboard...");
+    console.log("🎨 Rendering Enhanced Statistics with Business Overview Dashboard...");
     
     // Use saved filters if no filters provided
     if (!globalFilters && window.globalFilters) {
@@ -145,20 +145,20 @@ export async function renderEnhancedStatistics(expenseData, transactionData, fin
     if (window.refreshCurrentReport && document.querySelector('.report-page.active')) {
       window.refreshCurrentReport();
     }
-    // console.log("✅ Business Overview Dashboard rendered");
+    console.log("✅ Business Overview Dashboard rendered");
     
     // 2. Render Export Controls
     renderExportControls({
       containerId: "statisticsExportControls",
       formats: ["csv", "json"],
-      onExport: window.handleDataExport || (() => // console.log("Export handler not found"))
+      onExport: window.handleDataExport || (() => console.log("Export handler not found"))
     });
-    // console.log("✅ Export controls rendered");
+    console.log("✅ Export controls rendered");
     
     // 3. Render Monthly Summary Table với filtered data
     await renderFilteredMonthlySummary(expenseData, globalFilters);
     
-// console.log("🎉 Enhanced Statistics rendering complete!");
+    console.log("🎉 Enhanced Statistics rendering complete!");
     
   } catch (error) {
     console.error("❌ Error rendering enhanced statistics:", error);
@@ -169,7 +169,7 @@ export async function renderEnhancedStatistics(expenseData, transactionData, fin
         containerId: "financialDashboard",
         globalFilters: globalFilters
       });
-      // console.log("✅ Fallback to old financial dashboard");
+      console.log("✅ Fallback to old financial dashboard");
     } catch (fallbackError) {
       console.error("❌ Fallback failed:", fallbackError);
       await renderDefaultTab(expenseData, financialAnalysis);
@@ -204,7 +204,7 @@ async function renderFilteredMonthlySummary(expenseData, globalFilters) {
       showGrowthRate: false
     });
     
-    // console.log("✅ Monthly summary table rendered");
+    console.log("✅ Monthly summary table rendered");
     
   } catch (error) {
     console.error("❌ Error rendering monthly summary:", error);
@@ -231,7 +231,7 @@ export async function renderDefaultTab(expenseData, financialAnalysis) {
       showGrowthRate: false
     });
     
-    // console.log("✅ Default tab rendered");
+    console.log("✅ Default tab rendered");
     
   } catch (error) {
     console.error("❌ Error rendering default tab:", error);
@@ -279,7 +279,7 @@ export function renderCustomChart(data, config) {
       responsive
     });
     
-    // console.log(`✅ Custom chart rendered in ${containerId}`);
+    console.log(`✅ Custom chart rendered in ${containerId}`);
     
   } catch (error) {
     console.error(`❌ Error rendering custom chart in ${containerId}:`, error);
@@ -322,7 +322,7 @@ export function renderComparisonChart(currentData, previousData, config) {
       showLegend: true
     });
     
-    // console.log(`✅ Comparison chart rendered in ${containerId}`);
+    console.log(`✅ Comparison chart rendered in ${containerId}`);
     
   } catch (error) {
     console.error(`❌ Error rendering comparison chart:`, error);
@@ -360,7 +360,7 @@ export function renderCategoryPieChart(data, config) {
       responsive: true
     });
     
-    // console.log(`✅ Category pie chart rendered in ${containerId}`);
+    console.log(`✅ Category pie chart rendered in ${containerId}`);
     
   } catch (error) {
     console.error(`❌ Error rendering category pie chart:`, error);
@@ -398,7 +398,7 @@ export function renderTrendChart(data, config) {
       responsive: true
     });
     
-    // console.log(`✅ Trend chart rendered in ${containerId}`);
+    console.log(`✅ Trend chart rendered in ${containerId}`);
     
   } catch (error) {
     console.error(`❌ Error rendering trend chart:`, error);
@@ -413,7 +413,7 @@ export function clearCharts(containerId) {
   const container = document.getElementById(containerId);
   if (container) {
     container.innerHTML = '';
-// console.log(`🧹 Charts cleared in ${containerId}`);
+    console.log(`🧹 Charts cleared in ${containerId}`);
   }
 }
 
@@ -448,7 +448,7 @@ export async function refreshAllCharts(data, config = {}) {
       }
     }
     
-    // console.log("✅ All charts refreshed");
+    console.log("✅ All charts refreshed");
     
   } catch (error) {
     console.error("❌ Error refreshing charts:", error);
@@ -462,4 +462,4 @@ window.renderExpensesTab = renderExpensesTab;
 window.renderRevenueTab = renderRevenueTab;
 window.renderDefaultTab = renderDefaultTab;
 
-// console.log('✅ chartRenderers.js module loaded successfully');
+console.log('✅ chartRenderers.js module loaded successfully');

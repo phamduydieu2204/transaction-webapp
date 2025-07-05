@@ -12,7 +12,7 @@ import { calculateCustomerLifetimeValue, calculateDaysBetween } from '../core/re
  * Load customer report
  */
 export async function loadCustomerReport() {
-// console.log('👥 Loading customer report');
+  console.log('👥 Loading customer report');
   
   try {
     await ensureDataIsLoaded();
@@ -24,7 +24,7 @@ export async function loadCustomerReport() {
       loadCustomerActivity()
     ]);
     
-    // console.log('✅ Customer report loaded');
+    console.log('✅ Customer report loaded');
   } catch (error) {
     console.error('❌ Error loading customer report:', error);
     showError('Không thể tải báo cáo khách hàng');

@@ -13,7 +13,7 @@ let employeeReportLoader = null;
  */
 export async function loadEmployeeReport() {
     try {
-// console.log('🧑‍💼 Loading Employee Report...');
+        console.log('🧑‍💼 Loading Employee Report...');
         
         // Ensure data is loaded first
         await ensureDataIsLoaded();
@@ -32,7 +32,7 @@ export async function loadEmployeeReport() {
         // Initialize the report
         await employeeReportLoader.init();
         
-        // console.log('✅ Employee Report loaded successfully');
+        console.log('✅ Employee Report loaded successfully');
         
     } catch (error) {
         console.error('❌ Failed to load Employee Report:', error);
@@ -62,7 +62,7 @@ async function loadEmployeeReportTemplate() {
         // Initialize Chart.js canvases
         initializeChartCanvases();
         
-        // console.log('📄 Employee report template loaded');
+        console.log('📄 Employee report template loaded');
         
     } catch (error) {
         console.error('Failed to load employee report template:', error);
@@ -130,7 +130,7 @@ export function exportEmployeeReport() {
     if (employeeReportLoader) {
         employeeReportLoader.exportData();
     } else {
-// console.warn('Employee report not initialized');
+        console.warn('Employee report not initialized');
     }
 }
 

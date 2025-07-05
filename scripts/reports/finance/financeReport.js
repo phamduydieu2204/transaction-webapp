@@ -10,14 +10,14 @@ import { ensureDataIsLoaded, showError } from '../core/reportHelpers.js';
  * Load finance report
  */
 export async function loadFinanceReport() {
-// console.log('💼 Loading finance report');
+  console.log('💼 Loading finance report');
   
   try {
     await ensureDataIsLoaded();
     
     const container = document.getElementById('report-finance');
     if (!container) {
-// console.warn('❌ Finance report container not found');
+      console.warn('❌ Finance report container not found');
       return;
     }
     
@@ -43,7 +43,7 @@ export async function loadFinanceReport() {
     `;
     
     container.innerHTML = html;
-    // console.log('✅ Finance report placeholder loaded');
+    console.log('✅ Finance report placeholder loaded');
   } catch (error) {
     console.error('❌ Error loading finance report:', error);
     showError('Không thể tải báo cáo tài chính');

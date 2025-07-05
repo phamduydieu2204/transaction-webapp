@@ -17,91 +17,90 @@ export async function deleteTransaction(
   openConfirmModal,
   getConstants
 ) {
-// console.log("🗑️ deleteTransaction được gọi với:", {
+  console.log("🗑️ deleteTransaction được gọi với:", {
+    index,
+    transactionListType: typeof transactionList,
+    transactionListLength: transactionList ? transactionList.length : 0,
+    hasUserInfo: !!userInfo
+  });
 
-  //     index,
-  //     transactionListType: typeof transactionList,
-  //     transactionListLength: transactionList ? transactionList.length : 0,
-  //     hasUserInfo: !!userInfo
-  //   });
-  // 
-  //   // Validation cơ bản trước
-  //   if (!transactionList || !Array.isArray(transactionList)) {
-  //     console.error("❌ TransactionList không hợp lệ:", transactionList);
-  //     if (showResultModal) {
-  //       showResultModal("Dữ liệu giao dịch không hợp lệ. Vui lòng tải lại trang.", false);
-  //     }
-  //     return;
-  //   }
-  // 
-  //   if (typeof index !== 'number' || index < 0) {
-  //     console.error("❌ Index không hợp lệ:", index);
-  //     if (showResultModal) {
-  //       showResultModal("Chỉ số giao dịch không hợp lệ.", false);
-  //     }
-  //     return;
-  //   }
-  // 
-  //   const transaction = transactionList[index];
-  // 
-  //   if (!transaction) {
-  //     console.error("❌ Giao dịch không tồn tại tại index:", index, "trong danh sách có", transactionList.length, "items");
-  //     if (showResultModal) {
-  //       showResultModal("Giao dịch không tồn tại. Vui lòng thử lại.", false);
-  //     }
-  //     return;
-  //   }
-  // 
-  //   // console.log("✅ Transaction found:", transaction.transactionId);
-  // 
-  //   const confirmMessage = `Bạn có chắc muốn xóa giao dịch ${transaction.transactionId}? ${
-  //     transaction.accountSheetId && transaction.customerEmail
-  //       ? `Giao dịch này sẽ được xóa và quyền chia sẻ tệp với email ${transaction.customerEmail} sẽ bị hủy.`
-  //       : ""
-  //   }`;
-  // 
-  //   // Hiển thị confirm modal ngay lập tức
-  //   const confirmDelete = await new Promise((resolve) => {
-  //     openConfirmModal(confirmMessage, resolve);
-  //   });
-  // 
-  //   if (!confirmDelete) {
-// console.log("Người dùng hủy xóa giao dịch");
-  //     return;
-  //   }
-  // 
-  //   // Khóa UI ngay sau khi user confirm
-  //   uiBlocker.block();
-  // 
-  //   // Xóa giao dịch khỏi UI ngay lập tức (optimistic update)
-  //   const removedTransaction = window.transactionList[index];
-  //   window.transactionList.splice(index, 1);
-  //   
-  //   // Update table ngay để user thấy giao dịch đã biến mất
-  //   updateTable(window.transactionList, window.currentPage || 1, window.itemsPerPage || 10,
-  //              formatDate, editTransaction, window.deleteTransaction, viewTransaction);
-  // 
-  //   // Validate session sau khi đã update UI
-  //   const sessionValid = await validateBeforeOperation();
-  //   if (!sessionValid) {
-  //     // Rollback nếu session invalid
-  //     window.transactionList.splice(index, 0, removedTransaction);
-  //     updateTable(window.transactionList, window.currentPage || 1, window.itemsPerPage || 10,
-  //                formatDate, editTransaction, window.deleteTransaction, viewTransaction);
-  //     uiBlocker.unblock();
-  //     return;
-  //   }
-  // 
-  //   const { BACKEND_URL } = getConstants();
-  // 
-  //   const data = {
-  //     action: "deleteTransaction",
-  //     transactionId: transaction.transactionId,
-  //     maNhanVien: userInfo.maNhanVien,
-  //     duocXoaGiaoDichCuaAi: userInfo.duocXoaGiaoDichCuaAi || "chỉ bản thân"
-  //   };
+  // Validation cơ bản trước
+  if (!transactionList || !Array.isArray(transactionList)) {
+    console.error("❌ TransactionList không hợp lệ:", transactionList);
+    if (showResultModal) {
+      showResultModal("Dữ liệu giao dịch không hợp lệ. Vui lòng tải lại trang.", false);
+    }
+    return;
+  }
 
-// console.log("📤 Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
+  if (typeof index !== 'number' || index < 0) {
+    console.error("❌ Index không hợp lệ:", index);
+    if (showResultModal) {
+      showResultModal("Chỉ số giao dịch không hợp lệ.", false);
+    }
+    return;
+  }
+
+  const transaction = transactionList[index];
+
+  if (!transaction) {
+    console.error("❌ Giao dịch không tồn tại tại index:", index, "trong danh sách có", transactionList.length, "items");
+    if (showResultModal) {
+      showResultModal("Giao dịch không tồn tại. Vui lòng thử lại.", false);
+    }
+    return;
+  }
+
+  console.log("✅ Transaction found:", transaction.transactionId);
+
+  const confirmMessage = `Bạn có chắc muốn xóa giao dịch ${transaction.transactionId}? ${
+    transaction.accountSheetId && transaction.customerEmail
+      ? `Giao dịch này sẽ được xóa và quyền chia sẻ tệp với email ${transaction.customerEmail} sẽ bị hủy.`
+      : ""
+  }`;
+
+  // Hiển thị confirm modal ngay lập tức
+  const confirmDelete = await new Promise((resolve) => {
+    openConfirmModal(confirmMessage, resolve);
+  });
+
+  if (!confirmDelete) {
+    console.log("Người dùng hủy xóa giao dịch");
+    return;
+  }
+
+  // Khóa UI ngay sau khi user confirm
+  uiBlocker.block();
+
+  // Xóa giao dịch khỏi UI ngay lập tức (optimistic update)
+  const removedTransaction = window.transactionList[index];
+  window.transactionList.splice(index, 1);
+  
+  // Update table ngay để user thấy giao dịch đã biến mất
+  updateTable(window.transactionList, window.currentPage || 1, window.itemsPerPage || 10,
+             formatDate, editTransaction, window.deleteTransaction, viewTransaction);
+
+  // Validate session sau khi đã update UI
+  const sessionValid = await validateBeforeOperation();
+  if (!sessionValid) {
+    // Rollback nếu session invalid
+    window.transactionList.splice(index, 0, removedTransaction);
+    updateTable(window.transactionList, window.currentPage || 1, window.itemsPerPage || 10,
+               formatDate, editTransaction, window.deleteTransaction, viewTransaction);
+    uiBlocker.unblock();
+    return;
+  }
+
+  const { BACKEND_URL } = getConstants();
+
+  const data = {
+    action: "deleteTransaction",
+    transactionId: transaction.transactionId,
+    maNhanVien: userInfo.maNhanVien,
+    duocXoaGiaoDichCuaAi: userInfo.duocXoaGiaoDichCuaAi || "chỉ bản thân"
+  };
+
+  console.log("📤 Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
 
   try {
     const response = await fetch(BACKEND_URL, {
@@ -113,7 +112,7 @@ export async function deleteTransaction(
     });
 
     const result = await response.json();
-// console.log("Kết quả từ server:", result);
+    console.log("Kết quả từ server:", result);
 
     if (result.status === "success") {
       // Giao dịch đã được xóa khỏi UI trước đó (optimistic update)

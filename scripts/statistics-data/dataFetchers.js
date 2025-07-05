@@ -17,7 +17,7 @@ export async function fetchExpenseData(options = {}) {
   const { timeout = 15000 } = options;
   const { BACKEND_URL } = getConstants();
   
-  // console.log("🔄 Fetching expense data from API...");
+  console.log("🔄 Fetching expense data from API...");
 
   try {
     // Setup timeout
@@ -41,7 +41,7 @@ export async function fetchExpenseData(options = {}) {
 
     if (result.status === "success") {
       const expenseData = result.data || [];
-      // console.log("✅ Expense data fetched successfully:", expenseData.length, "records");
+      console.log("✅ Expense data fetched successfully:", expenseData.length, "records");
       return expenseData;
     } else {
       throw new Error(result.message || "Unknown API error");
@@ -49,7 +49,7 @@ export async function fetchExpenseData(options = {}) {
 
   } catch (error) {
     if (error.name === 'AbortError') {
-// console.warn(`⚠️ Expense data fetch timeout after ${timeout}ms`);
+      console.warn(`⚠️ Expense data fetch timeout after ${timeout}ms`);
       throw new Error("Request timeout - please try again");
     } else {
       console.error("❌ Error fetching expense data:", error);
@@ -68,7 +68,7 @@ export async function fetchTransactionData(options = {}) {
   const { timeout = 15000 } = options;
   const { BACKEND_URL } = getConstants();
   
-  // console.log("🔄 Fetching transaction data from API...");
+  console.log("🔄 Fetching transaction data from API...");
 
   try {
     // Setup timeout
@@ -92,7 +92,7 @@ export async function fetchTransactionData(options = {}) {
 
     if (result.status === "success") {
       const transactionData = result.data || [];
-      // console.log("✅ Transaction data fetched successfully:", transactionData.length, "records");
+      console.log("✅ Transaction data fetched successfully:", transactionData.length, "records");
       return transactionData;
     } else {
       throw new Error(result.message || "Unknown API error");
@@ -100,7 +100,7 @@ export async function fetchTransactionData(options = {}) {
 
   } catch (error) {
     if (error.name === 'AbortError') {
-// console.warn(`⚠️ Transaction data fetch timeout after ${timeout}ms`);
+      console.warn(`⚠️ Transaction data fetch timeout after ${timeout}ms`);
       throw new Error("Request timeout - please try again");
     } else {
       console.error("❌ Error fetching transaction data:", error);
@@ -119,7 +119,7 @@ export async function fetchExpenseOptions(options = {}) {
   const { timeout = 10000 } = options;
   const { BACKEND_URL } = getConstants();
   
-  // console.log("🔄 Fetching expense options from API...");
+  console.log("🔄 Fetching expense options from API...");
 
   try {
     // Setup timeout
@@ -146,7 +146,7 @@ export async function fetchExpenseOptions(options = {}) {
         expenseMap: result.expenseMap || {},
         bankMap: result.bankMap || {}
       };
-      // console.log("✅ Expense options fetched successfully");
+      console.log("✅ Expense options fetched successfully");
       return optionsData;
     } else {
       throw new Error(result.message || "Unknown API error");
@@ -154,7 +154,7 @@ export async function fetchExpenseOptions(options = {}) {
 
   } catch (error) {
     if (error.name === 'AbortError') {
-// console.warn(`⚠️ Expense options fetch timeout after ${timeout}ms`);
+      console.warn(`⚠️ Expense options fetch timeout after ${timeout}ms`);
       throw new Error("Request timeout - please try again");
     } else {
       console.error("❌ Error fetching expense options:", error);
@@ -173,7 +173,7 @@ export async function searchExpenses(filters, options = {}) {
   const { timeout = 15000 } = options;
   const { BACKEND_URL } = getConstants();
   
-  // console.log("🔍 Searching expenses with filters:", filters);
+  console.log("🔍 Searching expenses with filters:", filters);
 
   try {
     // Setup timeout
@@ -184,7 +184,7 @@ export async function searchExpenses(filters, options = {}) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
-        action: "searchExpenses", // Keep as searchExpenses for user-initiated searches
+        action: "searchExpenses",
         ...filters
       }),
       signal: controller.signal
@@ -200,7 +200,7 @@ export async function searchExpenses(filters, options = {}) {
 
     if (result.status === "success") {
       const searchResults = result.data || [];
-      // console.log("✅ Expense search completed:", searchResults.length, "results");
+      console.log("✅ Expense search completed:", searchResults.length, "results");
       return searchResults;
     } else {
       throw new Error(result.message || "Search failed");
@@ -208,7 +208,7 @@ export async function searchExpenses(filters, options = {}) {
 
   } catch (error) {
     if (error.name === 'AbortError') {
-// console.warn(`⚠️ Expense search timeout after ${timeout}ms`);
+      console.warn(`⚠️ Expense search timeout after ${timeout}ms`);
       throw new Error("Search timeout - please try again");
     } else {
       console.error("❌ Error searching expenses:", error);
@@ -227,7 +227,7 @@ export async function searchTransactions(filters, options = {}) {
   const { timeout = 15000 } = options;
   const { BACKEND_URL } = getConstants();
   
-  // console.log("🔍 Searching transactions with filters:", filters);
+  console.log("🔍 Searching transactions with filters:", filters);
 
   try {
     // Setup timeout
@@ -254,7 +254,7 @@ export async function searchTransactions(filters, options = {}) {
 
     if (result.status === "success") {
       const searchResults = result.data || [];
-      // console.log("✅ Transaction search completed:", searchResults.length, "results");
+      console.log("✅ Transaction search completed:", searchResults.length, "results");
       return searchResults;
     } else {
       throw new Error(result.message || "Search failed");
@@ -262,7 +262,7 @@ export async function searchTransactions(filters, options = {}) {
 
   } catch (error) {
     if (error.name === 'AbortError') {
-// console.warn(`⚠️ Transaction search timeout after ${timeout}ms`);
+      console.warn(`⚠️ Transaction search timeout after ${timeout}ms`);
       throw new Error("Search timeout - please try again");
     } else {
       console.error("❌ Error searching transactions:", error);

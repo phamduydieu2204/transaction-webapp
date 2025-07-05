@@ -17,7 +17,7 @@ async function loadOverviewHTML_Optimized() {
   
   // Performance: Check if template is already loaded
   if (container.querySelector('#completed-revenue')) {
-    // console.log('⚡ Template already loaded, skipping fetch');
+    console.log('⚡ Template already loaded, skipping fetch');
     return;
   }
   
@@ -39,7 +39,7 @@ async function loadOverviewHTML_Optimized() {
     }
     
     const html = await response.text();
-    // console.log('⚡ Template loaded:', html.length, 'chars');
+    console.log('⚡ Template loaded:', html.length, 'chars');
     
     // Performance: Single DOM manipulation instead of multiple
     container.innerHTML = html;
@@ -50,9 +50,9 @@ async function loadOverviewHTML_Optimized() {
     const loaded = criticalElements.every(id => document.getElementById(id));
     
     if (loaded) {
-      // console.log('✅ Template loaded & verified successfully');
+      console.log('✅ Template loaded & verified successfully');
     } else {
-// console.warn('⚠️ Some template elements missing');
+      console.warn('⚠️ Some template elements missing');
     }
     
   } catch (error) {
@@ -77,13 +77,13 @@ class TemplateCache {
   async loadTemplate(url) {
     // Return cached template if available
     if (this.cache.has(url)) {
-      // console.log('⚡ Using cached template:', url);
+      console.log('⚡ Using cached template:', url);
       return this.cache.get(url);
     }
     
     // Return existing loading promise if already fetching
     if (this.loadingPromises.has(url)) {
-      // console.log('⚡ Template fetch in progress, waiting...');
+      console.log('⚡ Template fetch in progress, waiting...');
       return this.loadingPromises.get(url);
     }
     
@@ -117,7 +117,7 @@ class TemplateCache {
   
   clearCache() {
     this.cache.clear();
-    // console.log('🗑️ Template cache cleared');
+    console.log('🗑️ Template cache cleared');
   }
 }
 
@@ -133,7 +133,7 @@ async function loadOverviewHTML_Cached() {
   
   // Check if already loaded
   if (container.querySelector('#completed-revenue')) {
-    // console.log('⚡ Template already in DOM');
+    console.log('⚡ Template already in DOM');
     return;
   }
   
@@ -144,7 +144,7 @@ async function loadOverviewHTML_Cached() {
     requestAnimationFrame(() => {
       container.innerHTML = html;
       container.classList.add('active');
-      // console.log('✅ Template rendered with caching');
+      console.log('✅ Template rendered with caching');
     });
     
   } catch (error) {
@@ -162,13 +162,13 @@ async function preloadTemplates() {
     './partials/tabs/report-pages.html'
   ];
   
-  // console.log('⚡ Preloading templates...');
+  console.log('⚡ Preloading templates...');
   
   try {
     await Promise.all(templates.map(url => templateCache.loadTemplate(url)));
-    // console.log('✅ All templates preloaded');
+    console.log('✅ All templates preloaded');
   } catch (error) {
-// console.warn('⚠️ Template preloading failed:', error);
+    console.warn('⚠️ Template preloading failed:', error);
   }
 }
 

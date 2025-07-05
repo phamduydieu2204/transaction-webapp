@@ -53,7 +53,7 @@ export function login(userData) {
     // Show main content
     switchToTab('giao-dich');
     
-// console.log('User logged in:', userData.username);
+    console.log('User logged in:', userData.username);
     return true;
 }
 
@@ -80,7 +80,7 @@ export function logout() {
     // Clear any cached data
     clearCache();
     
-// console.log('User logged out');
+    console.log('User logged out');
 }
 
 /**
@@ -107,7 +107,7 @@ function checkSessionValidity() {
     
     if (!authData || !isSessionValid(authData)) {
         if (isAuthenticated()) {
-// console.warn('Session expired, logging out');
+            console.warn('Session expired, logging out');
             logout();
         }
     }
@@ -117,17 +117,17 @@ function checkSessionValidity() {
  * Validate session data
  */
 function isSessionValid(authData) {
-    // '🔐 Checking session validity...';
+    console.log('🔐 Checking session validity...');
     if (!authData || !authData.expiryTime) {
-        // console.log('❌ Session invalid: No auth data or expiry time');
+        console.log('❌ Session invalid: No auth data or expiry time');
         return false;
     }
     
     const now = Date.now();
     const isValid = now < authData.expiryTime;
-    // `🔐 Session expiry: ${new Date(authData.expiryTime.toLocaleString()}`);
-    // `🔐 Current time: ${new Date(now.toLocaleString()}`);
-    // `🔐 Session valid: ${isValid}`;
+    console.log(`🔐 Session expiry: ${new Date(authData.expiryTime).toLocaleString()}`);
+    console.log(`🔐 Current time: ${new Date(now).toLocaleString()}`);
+    console.log(`🔐 Session valid: ${isValid}`);
     
     return isValid;
 }
@@ -142,7 +142,7 @@ function restoreSession(authData) {
             isAuthenticated: true 
         });
         
-// console.log('Session restored for:', authData.user.username);
+        console.log('Session restored for:', authData.user.username);
     }
 }
 

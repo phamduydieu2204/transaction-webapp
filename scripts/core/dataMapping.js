@@ -92,7 +92,7 @@ export function getTransactionField(transaction, fieldName) {
   
   // Debug log for customer and email fields - disabled
   // if (fieldName === 'customerName' || fieldName === 'email' || fieldName === 'softwareName') {
-  //   // console.log(`🔍 Looking for ${fieldName}:`, {
+  //   console.log(`🔍 Looking for ${fieldName}:`, {
   //     possibleKeys,
   //     availableKeys: Object.keys(transaction),
   //     transaction: transaction
@@ -103,14 +103,14 @@ export function getTransactionField(transaction, fieldName) {
   for (const key of possibleKeys) {
     if (transaction.hasOwnProperty(key) && transaction[key] !== undefined && transaction[key] !== null) {
       // if (fieldName === 'customerName' || fieldName === 'email' || fieldName === 'softwareName') {
-      //   // console.log(`✅ Found ${fieldName} with key "${key}":`, transaction[key]);
+      //   console.log(`✅ Found ${fieldName} with key "${key}":`, transaction[key]);
       // }
       return transaction[key];
     }
   }
   
   // if (fieldName === 'customerName' || fieldName === 'email' || fieldName === 'softwareName') {
-  //   // console.log(`❌ No value found for ${fieldName}`);
+  //   console.log(`❌ No value found for ${fieldName}`);
   // }
   
   return null;
@@ -161,7 +161,7 @@ export function normalizeTransaction(rawTransaction) {
   
   // Debug log for customer data - disabled
   // if (normalized.customerName || normalized.email) {
-  //   // console.log('🔍 Normalized transaction:', {
+  //   console.log('🔍 Normalized transaction:', {
   //     customerName: normalized.customerName,
   //     email: normalized.email,
   //     revenue: normalized.revenue,
@@ -186,7 +186,7 @@ function normalizeDate(dateValue) {
       return date.toISOString();
     }
   } catch (e) {
-// console.warn('Invalid date value:', dateValue);
+    console.warn('Invalid date value:', dateValue);
   }
   
   return null;

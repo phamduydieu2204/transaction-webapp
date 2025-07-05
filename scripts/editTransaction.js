@@ -49,13 +49,12 @@ export async function editTransaction(index, transactionList, fetchSoftwareList,
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 
-  // console.log("📥 editTransaction - gọi fetchSoftwareList với:", {
-  //   softwareNameValue,
-  //   softwarePackageValue,
-  //   accountNameValue
-  // });
-  // console.log("🔎 typeof fetchSoftwareList =", typeof fetchSoftwareList);
-  
+console.log("📥 editTransaction - gọi fetchSoftwareList với:", {
+  softwareNameValue,
+  softwarePackageValue,
+  accountNameValue
+});
+console.log("🔎 typeof fetchSoftwareList =", typeof fetchSoftwareList);
   // Đã loại bỏ showProcessingModal để tránh trùng lặp với uiBlocker
 
   // ✅ Cập nhật danh sách dropdown với các giá trị gốc cần giữ lại
@@ -68,7 +67,7 @@ export async function editTransaction(index, transactionList, fetchSoftwareList,
     accountNameValue
   );
   
-  // Đã loại bỏ closeProcessingModal để tránh trùng lặp với uiBlocker
+    // Đã loại bỏ closeProcessingModal để tránh trùng lặp với uiBlocker
 
   // Setup transaction type dropdown for edit mode
   updateTransactionTypeForEdit(transactionTypeValue, transactionTypeValue);

@@ -57,7 +57,7 @@ export async function fetchExpenseData(options = {}) {
   const { valid, invalid } = validateExpenseArray(rawData);
   
   if (invalid.length > 0) {
-// console.warn(`⚠️ ${invalid.length} invalid expense records found`);
+    console.warn(`⚠️ ${invalid.length} invalid expense records found`);
   }
 
   const normalizedData = normalizeExpenseData(valid);
@@ -89,7 +89,7 @@ export async function fetchTransactionData(options = {}) {
   const { valid, invalid } = validateTransactionArray(rawData);
   
   if (invalid.length > 0) {
-// console.warn(`⚠️ ${invalid.length} invalid transaction records found`);
+    console.warn(`⚠️ ${invalid.length} invalid transaction records found`);
   }
 
   const normalizedData = normalizeTransactionData(valid);
@@ -175,7 +175,7 @@ export async function getCombinedStatistics(options = {}) {
     includeExpenses = true
   } = options;
 
-  // console.log("📊 Fetching combined statistics data...");
+  console.log("📊 Fetching combined statistics data...");
 
   try {
     const promises = [];
@@ -196,110 +196,109 @@ export async function getCombinedStatistics(options = {}) {
       timestamp: Date.now()
     };
 
-// console.log("✅ Combined statistics data ready:", {
+    console.log("✅ Combined statistics data ready:", {
+      expenses: combinedData.expenses.length,
+      transactions: combinedData.transactions.length
+    });
 
-  //       expenses: combinedData.expenses.length,
-  //       transactions: combinedData.transactions.length
-  //     });
-  // 
-  //     return combinedData;
-  // 
-  //   } catch (error) {
-  //     console.error("❌ Error fetching combined statistics:", error);
-  //     throw error;
-  //   }
-  // }
-  // 
+    return combinedData;
+
+  } catch (error) {
+    console.error("❌ Error fetching combined statistics:", error);
+    throw error;
+  }
+}
+
 /**
-  //  * Preloads data for faster display
-  //  * @param {Object} options - Preload options
-  //  * @returns {Promise<void>}
-  //  */
-  // export async function preloadStatisticsData(options = {}) {
-  //   const { background = true } = options;
-  // 
-  //   // console.log("🚀 Preloading statistics data...");
-  // 
-  //   try {
-  //     const promises = [
-  //       fetchExpenseData({ forceRefresh: false }),
-  //       fetchTransactionData({ forceRefresh: false }),
-  //       fetchExpenseOptions({ forceRefresh: false })
-  //     ];
-  // 
-  //     if (background) {
-  //       // Fire and forget
-  //       Promise.all(promises).catch(error => {
-// console.warn("⚠️ Background preload failed:", error);
-  //       });
-  //     } else {
-  //       // Wait for completion
-  //       await Promise.all(promises);
-  //       // console.log("✅ Statistics data preloaded successfully");
-  //     }
-  // 
-  //     // Optimize cache
-  //     optimizeCache();
-  //     
-  //   } catch (error) {
-  //     console.error("❌ Error preloading statistics data:", error);
-  //     throw error;
-  //   }
-  // }
-  // 
+ * Preloads data for faster display
+ * @param {Object} options - Preload options
+ * @returns {Promise<void>}
+ */
+export async function preloadStatisticsData(options = {}) {
+  const { background = true } = options;
+
+  console.log("🚀 Preloading statistics data...");
+
+  try {
+    const promises = [
+      fetchExpenseData({ forceRefresh: false }),
+      fetchTransactionData({ forceRefresh: false }),
+      fetchExpenseOptions({ forceRefresh: false })
+    ];
+
+    if (background) {
+      // Fire and forget
+      Promise.all(promises).catch(error => {
+        console.warn("⚠️ Background preload failed:", error);
+      });
+    } else {
+      // Wait for completion
+      await Promise.all(promises);
+      console.log("✅ Statistics data preloaded successfully");
+    }
+
+    // Optimize cache
+    optimizeCache();
+    
+  } catch (error) {
+    console.error("❌ Error preloading statistics data:", error);
+    throw error;
+  }
+}
+
 /**
-  //  * Exports data to different formats
-  //  * @param {Array} data - Data to export
-  //  * @param {string} format - Export format
-  //  * @param {string} filename - Output filename
-  //  * @returns {Promise<void>}
-  //  */
-  // export async function exportData(data, format = "csv", filename = "statistics") {
-// console.log(`📤 Exporting ${data.length} records as ${format}...`);
-  // 
-  //   try {
-  //     let content = "";
-  //     let mimeType = "";
-  //     let fileExtension = "";
-  // 
-  //     switch (format.toLowerCase()) {
-  //       case "csv":
-  //         content = convertToCSV(data);
-  //         mimeType = "text/csv";
-  //         fileExtension = ".csv";
-  //         break;
-  //       
-  //       case "json":
-  //         content = JSON.stringify(data, null, 2);
-  //         mimeType = "application/json";
-  //         fileExtension = ".json";
-  //         break;
-  //       
-  //       default:
-  //         throw new Error(`Unsupported export format: ${format}`);
-  //     }
-  // 
-  //     // Create and trigger download
-  //     const blob = new Blob([content], { type: mimeType });
-  //     const url = URL.createObjectURL(blob);
-  //     
-  //     const link = document.createElement('a');
-  //     link.href = url;
-  //     link.download = `${filename}_${new Date().toISOString().split('T')[0]}${fileExtension}`;
-  //     document.body.appendChild(link);
-  //     link.click();
-  //     document.body.removeChild(link);
-  //     
-  //     URL.revokeObjectURL(url);
-  //     
-  //     // console.log("✅ Export completed successfully");
-  //     
-  //   } catch (error) {
-  //     console.error("❌ Export failed:", error);
-  //     throw error;
-  //   }
-  // }
-  // 
+ * Exports data to different formats
+ * @param {Array} data - Data to export
+ * @param {string} format - Export format
+ * @param {string} filename - Output filename
+ * @returns {Promise<void>}
+ */
+export async function exportData(data, format = "csv", filename = "statistics") {
+  console.log(`📤 Exporting ${data.length} records as ${format}...`);
+
+  try {
+    let content = "";
+    let mimeType = "";
+    let fileExtension = "";
+
+    switch (format.toLowerCase()) {
+      case "csv":
+        content = convertToCSV(data);
+        mimeType = "text/csv";
+        fileExtension = ".csv";
+        break;
+      
+      case "json":
+        content = JSON.stringify(data, null, 2);
+        mimeType = "application/json";
+        fileExtension = ".json";
+        break;
+      
+      default:
+        throw new Error(`Unsupported export format: ${format}`);
+    }
+
+    // Create and trigger download
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${filename}_${new Date().toISOString().split('T')[0]}${fileExtension}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    URL.revokeObjectURL(url);
+    
+    console.log("✅ Export completed successfully");
+    
+  } catch (error) {
+    console.error("❌ Export failed:", error);
+    throw error;
+  }
+}
+
 // Re-export commonly used functions
-  // export { clearCache } from './statistics-data/dataCacheManager.js';
-  // export { getCacheStatus } from './statistics-data/dataCacheManager.js';
+export { clearCache } from './statistics-data/dataCacheManager.js';
+export { getCacheStatus } from './statistics-data/dataCacheManager.js';

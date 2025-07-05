@@ -42,7 +42,7 @@ if (typeof window !== 'undefined') {
  * Force refresh expense table (useful after adding new expense)
  */
 export function refreshExpenseTable() {
-  // console.log('🔄 Force refreshing expense table...');
+  console.log('🔄 Force refreshing expense table...');
   // Reset to first page to show newest expense
   window.currentExpensePage = 1;
   updateExpenseTable();
@@ -169,7 +169,7 @@ window.expenseGoToPage = expenseGoToPage;
 export function updateExpenseTable() {
   const table = document.querySelector('#expenseListTable');
   if (!table) {
-// console.warn('⚠️ Expense table not found');
+    console.warn('⚠️ Expense table not found');
     return;
   }
   
@@ -177,7 +177,7 @@ export function updateExpenseTable() {
   const tableBody = table.querySelector('tbody');
   
   if (!tableBody) {
-// console.warn('⚠️ Expense table body not found');
+    console.warn('⚠️ Expense table body not found');
     return;
   }
   
@@ -238,7 +238,7 @@ export function updateExpenseTable() {
   // Update pagination - Sử dụng component chung như transaction table
   updateExpensePagination(totalPages, currentPage);
   
-  // console.log(`📄 Displayed ${paginatedExpenses.length} expenses (page ${currentPage}/${totalPages}) with pagination`);
+  console.log(`📄 Displayed ${paginatedExpenses.length} expenses (page ${currentPage}/${totalPages}) with pagination`);
 }
 
 /**
@@ -249,110 +249,109 @@ function createExpenseRow(expense, index) {
   
   // Debug log để xem cấu trúc dữ liệu
   if (index === 0) {
-    // console.log('🔍 DEBUG: Sample expense data structure:', expense);
-    // console.log('🔍 Available keys:', Object.keys(expense));
+    console.log('🔍 DEBUG: Sample expense data structure:', expense);
+    console.log('🔍 Available keys:', Object.keys(expense));
     // Debug ngày tái tục
-// console.log('📅 DEBUG: Renew date fields:', {
-
-  //       renewDate: expense.renewDate,
-  //       expenseRenewDate: expense.expenseRenewDate,
-  //       ngayTaiTuc: expense.ngayTaiTuc
-  //     });
-  //   }
-  //   
-  //   // Format dates
-  //   const formattedDate = formatDate(expense.date || expense.ngay || expense.expenseDate);
-  //   const formattedRenewDate = formatDate(expense.renewDate || expense.expenseRenewDate || expense.ngayTaiTuc);
-  //   
-  //   // 1. Mã chi phí
-  //   const expenseId = expense.expenseId || expense.id || `EXP${index + 1}`;
-  //   
-  //   // 2. Ngày chi
-  //   const expenseDate = formattedDate;
-  //   
-  //   // 3. Loại kế toán
-  //   const accountingType = expense.accountingType || expense.loaiKeToan || '';
-  //   
-  //   // 4. Phân bổ (với icon)
-  //   const allocationHtml = (expense.periodicAllocation === 'Có' || expense.allocationPeriod) 
-  //     ? '<span style="color: #28a745;">✓ Có</span>' 
-  //     : '<span style="color: #6c757d;">✗ Không</span>';
-  //   
-  //   // 5. Thông tin khoản chi (gộp 4 trường)
-  //   const expenseInfoParts = [
-  //     expense.type || expense.category || expense.loai || '',
-  //     expense.category || expense.subCategory || '',
-  //     expense.product || expense.sanPham || '',
-  //     expense.package || expense.goi || ''
-  //   ].filter(part => part.trim() !== '');
-  //   const expenseInfo = expenseInfoParts.join(' - ') || (expense.description || expense.moTa || '');
-  //   
-  //   // 6. Số tiền (với đơn vị)
-  //   const currency = expense.currency || 'VND';
-  //   const amount = `${(expense.amount || expense.soTien || 0).toLocaleString()} ${currency}`;
-  //   
-  //   // 7. Chi tiết ngân hàng = Ngân hàng/Ví - Thông tin thẻ/Tài khoản
-  //   const bankName = expense.bank || expense.expenseBank || expense.nganHang || '';
-  //   const cardInfo = expense.card || expense.expenseCard || expense.cardInfo || expense.accountInfo || expense.taiKhoan || '';
-  //   
-  //   let bankDetails = '--';
-  //   if (bankName && cardInfo) {
-  //     bankDetails = `${bankName} - ${cardInfo}`;
-  //   } else if (bankName) {
-  //     bankDetails = bankName;
-  //   } else if (cardInfo) {
-  //     bankDetails = cardInfo;
-  //   }
-  //   
-  //   // 8. Ngày tái tục
-  //   const renewDate = formattedRenewDate || '--';
-  //   
-  //   // 9. Người nhận/Nhà cung cấp
-  //   const supplier = expense.supplier || expense.nhaCC || expense.nguoiNhan || expense.expenseSupplier || '--';
-  //   
-  //   // 10. Trạng thái
-  //   const status = expense.status || expense.trangThai || expense.expenseStatus || 'Đã thanh toán';
-  //   
-  //   // 11. Ghi chú
-  //   const note = expense.note || expense.ghiChu || expense.expenseNote || '';
-  //   
-  //   // Build row HTML theo thứ tự mới
-  //   tr.innerHTML = `
-  //     <td>${expenseId}</td>
-  //     <td>${expenseDate}</td>
-  //     <td>${accountingType}</td>
-  //     <td>${allocationHtml}</td>
-  //     <td>${expenseInfo}</td>
-  //     <td class="text-right">${amount}</td>
-  //     <td>${bankDetails}</td>
-  //     <td>${renewDate}</td>
-  //     <td>${supplier}</td>
-  //     <td>${status}</td>
-  //     <td>${note.replace(/\n/g, "<br>")}</td>
-  //     <td>
-  //       <select class="action-select" data-expense='${JSON.stringify(expense).replace(/'/g, "&apos;")}' onchange="handleExpenseAction(this, this.dataset.expense)">
-  //         <option value="">-- Chọn --</option>
-  //         <option value="view">Xem</option>
-  //         <option value="edit">Sửa</option>
-  //         <option value="delete">Xóa</option>
-  //       </select>
-  //     </td>
-  //   `;
-  //   
-  //   // Thêm styling cho các trường hợp đặc biệt
-  //   const expenseStatus = expense.status || expense.trangThai || expense.expenseStatus || '';
-  //   if (expenseStatus && expenseStatus.toLowerCase().includes('chưa thanh toán')) {
-  //     tr.style.backgroundColor = '#fff9c4'; // Màu vàng nhạt cho chưa thanh toán
-  //   }
-  //   
-  //   // Kiểm tra ngày tái tục đã hết hạn
-  //   const renewDateValue = expense.renewDate || expense.expenseRenewDate || expense.ngayTaiTuc;
-  //   if (renewDateValue) {
-  //     const today = new Date();
-  //     const parseDate = (str) => {
-  //       const [y, m, d] = (str || '').split('/').map(Number);
-  //       return new Date(y, m - 1, d);
-  //     };
+    console.log('📅 DEBUG: Renew date fields:', {
+      renewDate: expense.renewDate,
+      expenseRenewDate: expense.expenseRenewDate,
+      ngayTaiTuc: expense.ngayTaiTuc
+    });
+  }
+  
+  // Format dates
+  const formattedDate = formatDate(expense.date || expense.ngay || expense.expenseDate);
+  const formattedRenewDate = formatDate(expense.renewDate || expense.expenseRenewDate || expense.ngayTaiTuc);
+  
+  // 1. Mã chi phí
+  const expenseId = expense.expenseId || expense.id || `EXP${index + 1}`;
+  
+  // 2. Ngày chi
+  const expenseDate = formattedDate;
+  
+  // 3. Loại kế toán
+  const accountingType = expense.accountingType || expense.loaiKeToan || '';
+  
+  // 4. Phân bổ (với icon)
+  const allocationHtml = (expense.periodicAllocation === 'Có' || expense.allocationPeriod) 
+    ? '<span style="color: #28a745;">✓ Có</span>' 
+    : '<span style="color: #6c757d;">✗ Không</span>';
+  
+  // 5. Thông tin khoản chi (gộp 4 trường)
+  const expenseInfoParts = [
+    expense.type || expense.category || expense.loai || '',
+    expense.category || expense.subCategory || '',
+    expense.product || expense.sanPham || '',
+    expense.package || expense.goi || ''
+  ].filter(part => part.trim() !== '');
+  const expenseInfo = expenseInfoParts.join(' - ') || (expense.description || expense.moTa || '');
+  
+  // 6. Số tiền (với đơn vị)
+  const currency = expense.currency || 'VND';
+  const amount = `${(expense.amount || expense.soTien || 0).toLocaleString()} ${currency}`;
+  
+  // 7. Chi tiết ngân hàng = Ngân hàng/Ví - Thông tin thẻ/Tài khoản
+  const bankName = expense.bank || expense.expenseBank || expense.nganHang || '';
+  const cardInfo = expense.card || expense.expenseCard || expense.cardInfo || expense.accountInfo || expense.taiKhoan || '';
+  
+  let bankDetails = '--';
+  if (bankName && cardInfo) {
+    bankDetails = `${bankName} - ${cardInfo}`;
+  } else if (bankName) {
+    bankDetails = bankName;
+  } else if (cardInfo) {
+    bankDetails = cardInfo;
+  }
+  
+  // 8. Ngày tái tục
+  const renewDate = formattedRenewDate || '--';
+  
+  // 9. Người nhận/Nhà cung cấp
+  const supplier = expense.supplier || expense.nhaCC || expense.nguoiNhan || expense.expenseSupplier || '--';
+  
+  // 10. Trạng thái
+  const status = expense.status || expense.trangThai || expense.expenseStatus || 'Đã thanh toán';
+  
+  // 11. Ghi chú
+  const note = expense.note || expense.ghiChu || expense.expenseNote || '';
+  
+  // Build row HTML theo thứ tự mới
+  tr.innerHTML = `
+    <td>${expenseId}</td>
+    <td>${expenseDate}</td>
+    <td>${accountingType}</td>
+    <td>${allocationHtml}</td>
+    <td>${expenseInfo}</td>
+    <td class="text-right">${amount}</td>
+    <td>${bankDetails}</td>
+    <td>${renewDate}</td>
+    <td>${supplier}</td>
+    <td>${status}</td>
+    <td>${note.replace(/\n/g, "<br>")}</td>
+    <td>
+      <select class="action-select" data-expense='${JSON.stringify(expense).replace(/'/g, "&apos;")}' onchange="handleExpenseAction(this, this.dataset.expense)">
+        <option value="">-- Chọn --</option>
+        <option value="view">Xem</option>
+        <option value="edit">Sửa</option>
+        <option value="delete">Xóa</option>
+      </select>
+    </td>
+  `;
+  
+  // Thêm styling cho các trường hợp đặc biệt
+  const expenseStatus = expense.status || expense.trangThai || expense.expenseStatus || '';
+  if (expenseStatus && expenseStatus.toLowerCase().includes('chưa thanh toán')) {
+    tr.style.backgroundColor = '#fff9c4'; // Màu vàng nhạt cho chưa thanh toán
+  }
+  
+  // Kiểm tra ngày tái tục đã hết hạn
+  const renewDateValue = expense.renewDate || expense.expenseRenewDate || expense.ngayTaiTuc;
+  if (renewDateValue) {
+    const today = new Date();
+    const parseDate = (str) => {
+      const [y, m, d] = (str || '').split('/').map(Number);
+      return new Date(y, m - 1, d);
+    };
     const renewDateObj = parseDate(renewDateValue);
     if (renewDateObj < today) {
       tr.classList.add('expired-row');

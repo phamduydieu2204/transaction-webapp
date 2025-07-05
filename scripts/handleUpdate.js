@@ -4,13 +4,13 @@ import { validateBeforeOperation } from './core/sessionValidator.js';
 import { cacheManager } from './core/cacheManager.js';
 
 export async function handleUpdate() {
-  // console.log("🔄 handleUpdate được gọi");
+  console.log("🔄 handleUpdate được gọi");
   
   // Hiển thị processing modal ngay lập tức để ngăn chặn các hành động tiếp theo
   if (typeof window.showProcessingModal === 'function') {
     window.showProcessingModal("Đang xử lý cập nhật...");
   } else {
-// console.warn('⚠️ showProcessingModal not available, loading function...');
+    console.warn('⚠️ showProcessingModal not available, loading function...');
     // Dynamically load the function if not available
     try {
       const { showProcessingModal } = await import('./showProcessingModal.js');
@@ -36,7 +36,7 @@ export async function handleUpdate() {
   const stateId = window.getState ? window.getState().currentEditTransactionId : null;
   const currentEditTransactionId = windowId || stateId;
   
-  // console.log("🔍 Current edit IDs:", { windowId, stateId, currentEditTransactionId });
+  console.log("🔍 Current edit IDs:", { windowId, stateId, currentEditTransactionId });
   
   if (!currentEditTransactionId) {
     console.error("❌ Không có giao dịch nào đang được chỉnh sửa");
@@ -60,7 +60,7 @@ export async function handleUpdate() {
     return;
   }
   
-  // console.log("✅ User info:", userInfo.tenNhanVien);
+  console.log("✅ User info:", userInfo.tenNhanVien);
   
   // Tìm giao dịch đang chỉnh sửa
   const transactionList = window.transactionList || [];
@@ -76,7 +76,7 @@ export async function handleUpdate() {
     return;
   }
   
-  // console.log("✅ Found transaction to update:", transaction.transactionId);
+  console.log("✅ Found transaction to update:", transaction.transactionId);
   
   // Kiểm tra các trường bắt buộc
   const requiredFields = {
@@ -128,7 +128,7 @@ export async function handleUpdate() {
     }
   }
   
-  // console.log("✅ Validation passed");
+  console.log("✅ Validation passed");
   
   // Cập nhật text của processing modal đã hiển thị
   if (typeof window.updateProcessingModalText === 'function') {
@@ -164,7 +164,7 @@ export async function handleUpdate() {
     duocSuaGiaoDichCuaAi: userInfo.duocSuaGiaoDichCuaAi || "chỉ bản thân"
   };
 
-// console.log("📤 Dữ liệu cập nhật gửi đi:", JSON.stringify(data, null, 2));
+  console.log("📤 Dữ liệu cập nhật gửi đi:", JSON.stringify(data, null, 2));
 
   try {
     const response = await fetch(BACKEND_URL, {
@@ -174,7 +174,7 @@ export async function handleUpdate() {
     });
 
     const result = await response.json();
-// console.log("📥 Kết quả từ server:", result);
+    console.log("📥 Kết quả từ server:", result);
 
     if (result.status === "success") {
       // Reset currentEditTransactionId
@@ -194,7 +194,7 @@ export async function handleUpdate() {
         await window.loadTransactions();
       }
       
-      // console.log("✅ Cập nhật thành công");
+      console.log("✅ Cập nhật thành công");
       
       // Close processing modal
       if (typeof window.closeProcessingModal === 'function') {

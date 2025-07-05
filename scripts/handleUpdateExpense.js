@@ -11,11 +11,11 @@ import { renderExpenseStats } from './renderExpenseStats.js';
  */
 async function reloadExpenseData() {
   try {
-    // console.log('🔄 Reloading expense data from server...');
+    console.log('🔄 Reloading expense data from server...');
     const { BACKEND_URL } = getConstants();
     
     const data = {
-      action: "loadExpenses", // Changed from 'searchExpenses' to avoid logging as user search
+      action: "searchExpenses",
       maNhanVien: window.userInfo?.maNhanVien || "",
       conditions: {} // Empty conditions = get all expenses
     };
@@ -30,14 +30,14 @@ async function reloadExpenseData() {
     
     if (result.status === "success") {
       window.expenseList = result.data || [];
-      // console.log(`✅ Reloaded ${result.data.length} expenses from server`);
+      console.log(`✅ Reloaded ${result.data.length} expenses from server`);
       
       // Update table with fresh data
       if (typeof window.updateExpenseTable === 'function') {
         window.updateExpenseTable();
       }
     } else {
-// console.warn("⚠️ Failed to reload expense data:", result.message);
+      console.warn("⚠️ Failed to reload expense data:", result.message);
     }
   } catch (error) {
     console.error("❌ Error reloading expense data:", error);

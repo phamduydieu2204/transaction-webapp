@@ -115,12 +115,12 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script type="module">
-    // Starting application silently
+    // Starting application...
     
     // Load debug layout script first
     import('./scripts/debugLayout.js')
       .then(() => {
-        // Silent loading
+        // Debug layout script loaded
       })
       .catch(error => {
         console.error('❌ Error loading debug layout:', error);
@@ -129,7 +129,7 @@
     // Skip partialLoader for now and load main.js directly
     import('./scripts/main.js')
       .then(() => {
-        // Loading complete
+        // Main.js loaded successfully
       })
       .catch(error => {
         console.error('❌ Index.html: Error loading main.js:', error);
@@ -138,7 +138,7 @@
     // Load partials in background (non-blocking)
     import('./scripts/partialLoader.js')
       .then(({ initializePartials }) => {
-        // Background loading
+        // Loading partials in background...
         return initializePartials();
       })
       .then(() => {

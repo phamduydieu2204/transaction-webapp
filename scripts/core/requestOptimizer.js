@@ -22,7 +22,7 @@ export async function deduplicateRequest(key, requestFn, options = {}) {
 
   // Check if request is already in flight
   if (pendingRequests.has(key)) {
-    // console.log(`🔄 Reusing in-flight request for: ${key}`);
+    console.log(`🔄 Reusing in-flight request for: ${key}`);
     return pendingRequests.get(key);
   }
 
@@ -30,13 +30,13 @@ export async function deduplicateRequest(key, requestFn, options = {}) {
   if (!forceRefresh && requestCache.has(key)) {
     const cached = requestCache.get(key);
     if (Date.now() - cached.timestamp < cacheDuration) {
-      // console.log(`📦 Using cached response for: ${key}`);
+      console.log(`📦 Using cached response for: ${key}`);
       return Promise.resolve(cached.data);
     }
   }
 
   // Create new request
-  // console.log(`🚀 Making new request for: ${key}`);
+  console.log(`🚀 Making new request for: ${key}`);
   const requestPromise = requestFn()
     .then(data => {
       // Cache successful response
@@ -63,10 +63,10 @@ export async function deduplicateRequest(key, requestFn, options = {}) {
 export function clearRequestCache(key = null) {
   if (key) {
     requestCache.delete(key);
-// console.log(`🧹 Cleared cache for: ${key}`);
+    console.log(`🧹 Cleared cache for: ${key}`);
   } else {
     requestCache.clear();
-// console.log('🧹 Cleared all request cache');
+    console.log('🧹 Cleared all request cache');
   }
 }
 
@@ -119,7 +119,7 @@ export class RequestBatcher {
     const items = batch.map(b => b.item);
     
     try {
-      // console.log(`🎯 Processing batch of ${items.length} requests`);
+      console.log(`🎯 Processing batch of ${items.length} requests`);
       const results = await this.batchProcessor(items);
       
       // Resolve individual promises

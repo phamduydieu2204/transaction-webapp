@@ -32,82 +32,81 @@ window.reportState = reportState;
  * Initialize report menu controller
  */
 export function initReportMenu() {
-// console.log('🎮 Initializing report menu controller');
+  console.log('🎮 Initializing report menu controller');
   
   // Check if containers exist
-// console.log('🔍 Checking containers:', {
+  console.log('🔍 Checking containers:', {
+    revenueChart: !!document.getElementById('revenueChart'),
+    topProducts: !!document.getElementById('topProducts'),
+    topCustomers: !!document.getElementById('topCustomers'),
+    summaryStats: !!document.getElementById('summaryStats')
+  });
+  
+  // Setup menu click handlers
+  setupMenuHandlers();
+  
+  // Load default report
+  loadReport('overview');
+  
+  // Setup global functions
+  window.refreshCurrentReport = refreshCurrentReport;
+  window.exportCurrentReport = exportCurrentReport;
+  window.loadReport = loadReport;
+  
+  console.log('✅ Report menu controller initialized');
+}
 
-  //     revenueChart: !!document.getElementById('revenueChart'),
-  //     topProducts: !!document.getElementById('topProducts'),
-  //     topCustomers: !!document.getElementById('topCustomers'),
-  //     summaryStats: !!document.getElementById('summaryStats')
-  //   });
-  //   
-  //   // Setup menu click handlers
-  //   setupMenuHandlers();
-  //   
-  //   // Load default report
-  //   loadReport('overview');
-  //   
-  //   // Setup global functions
-  //   window.refreshCurrentReport = refreshCurrentReport;
-  //   window.exportCurrentReport = exportCurrentReport;
-  //   window.loadReport = loadReport;
-  //   
-  //   // console.log('✅ Report menu controller initialized');
-  // }
-  // 
 /**
-  //  * Setup menu item click handlers
-  //  */
-  // function setupMenuHandlers() {
-  //   const menuItems = document.querySelectorAll('.menu-item');
-  //   
-  //   menuItems.forEach(item => {
-  //     item.addEventListener('click', (e) => {
-  //       const reportType = item.dataset.report;
-  //       
-  //       // Update active menu item
-  //       menuItems.forEach(mi => mi.classList.remove('active'));
-  //       item.classList.add('active');
-  //       
-  //       // Load corresponding report
-  //       loadReport(reportType);
-  //     });
-  //   });
-  // }
-  // 
+ * Setup menu item click handlers
+ */
+function setupMenuHandlers() {
+  const menuItems = document.querySelectorAll('.menu-item');
+  
+  menuItems.forEach(item => {
+    item.addEventListener('click', (e) => {
+      const reportType = item.dataset.report;
+      
+      // Update active menu item
+      menuItems.forEach(mi => mi.classList.remove('active'));
+      item.classList.add('active');
+      
+      // Load corresponding report
+      loadReport(reportType);
+    });
+  });
+}
+
 /**
-  //  * Load a specific report
-  //  * @param {string} reportType - Type of report to load
-  //  */
-  // async function loadReport(reportType) {
-  //   if (reportState.isLoading) return;
-  //   
-  //   // console.log(`📊 Loading report: ${reportType}`);
-  //   
-  //   reportState.currentReport = reportType;
-  //   reportState.isLoading = true;
-  //   
-  //   // Hide all report pages
-  //   const reportPages = document.querySelectorAll('.report-page');
-  //   reportPages.forEach(page => page.classList.remove('active'));
-  //   
-  //   // Show selected report page
-  //   const selectedPage = document.getElementById(`report-${reportType}`);
-  //   if (selectedPage) {
-  //     selectedPage.classList.add('active');
-  //   }
-  //   
-  //   // Load report content based on type
-  //   try {
-  //     switch (reportType) {
-  //       case 'overview':
-  //         // Pass current date range and period
-  //         const options = {
-  //           dateRange: window.globalFilters?.dateRange || null,
-  //           period: window.globalFilters?.period || 'this_month'
-  //         };
+ * Load a specific report
+ * @param {string} reportType - Type of report to load
+ */
+async function loadReport(reportType) {
+  if (reportState.isLoading) return;
+  
+  console.log(`📊 Loading report: ${reportType}`);
+  
+  reportState.currentReport = reportType;
+  reportState.isLoading = true;
+  
+  // Hide all report pages
+  const reportPages = document.querySelectorAll('.report-page');
+  reportPages.forEach(page => page.classList.remove('active'));
+  
+  // Show selected report page
+  const selectedPage = document.getElementById(`report-${reportType}`);
+  if (selectedPage) {
+    selectedPage.classList.add('active');
+  }
+  
+  // Load report content based on type
+  try {
+    switch (reportType) {
+      case 'overview':
+        // Pass current date range and period
+        const options = {
+          dateRange: window.globalFilters?.dateRange || null,
+          period: window.globalFilters?.period || 'this_month'
+        };
         await loadOverviewReport(options);
         break;
       case 'revenue':
@@ -160,7 +159,7 @@ export function initReportMenu() {
         await loadRenewalReport();
         break;
       default:
-// console.warn(`Unknown report type: ${reportType}`);
+        console.warn(`Unknown report type: ${reportType}`);
     }
   } catch (error) {
     console.error(`Error loading report ${reportType}:`, error);

@@ -42,7 +42,7 @@ export class EmployeeCharts {
     renderPerformanceChart(employees) {
         const canvas = document.getElementById('employeePerformanceChart');
         if (!canvas) {
-// console.warn('Performance chart canvas not found');
+            console.warn('Performance chart canvas not found');
             return;
         }
 
@@ -118,7 +118,7 @@ export class EmployeeCharts {
     renderRevenueTrendChart(employees) {
         const canvas = document.getElementById('employeeRevenueChart');
         if (!canvas) {
-// console.warn('Revenue chart canvas not found');
+            console.warn('Revenue chart canvas not found');
             return;
         }
 
@@ -229,7 +229,7 @@ export class EmployeeCharts {
     renderDepartmentChart(departments) {
         const canvas = document.getElementById('departmentComparisonChart');
         if (!canvas) {
-// console.warn('Department chart canvas not found');
+            console.warn('Department chart canvas not found');
             return;
         }
 
@@ -473,7 +473,7 @@ export class EmployeeCharts {
      * Update chart period
      */
     updateChartPeriod(period, employees, departments) {
-// console.log(`Updating charts for period: ${period}`);
+        console.log(`Updating charts for period: ${period}`);
         
         // Filter data based on period
         const filteredEmployees = this.filterEmployeesByPeriod(employees, period);

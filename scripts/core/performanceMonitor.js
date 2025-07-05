@@ -70,7 +70,7 @@ class PerformanceMonitor {
       end: () => {
         const duration = performance.now() - start;
         this.metrics.moduleLoadTimes.set(moduleName, duration);
-        // console.log(`📊 Module ${moduleName} loaded in ${duration.toFixed(2)}ms`);
+        console.log(`📊 Module ${moduleName} loaded in ${duration.toFixed(2)}ms`);
       }
     };
   }
@@ -85,7 +85,7 @@ class PerformanceMonitor {
       end: () => {
         const duration = performance.now() - start;
         this.metrics.tabSwitchTimes.set(tabName, duration);
-        // console.log(`📊 Tab ${tabName} switched in ${duration.toFixed(2)}ms`);
+        console.log(`📊 Tab ${tabName} switched in ${duration.toFixed(2)}ms`);
       }
     };
   }
@@ -102,7 +102,7 @@ class PerformanceMonitor {
         const existing = this.metrics.apiCallTimes.get(apiName) || [];
         existing.push(duration);
         this.metrics.apiCallTimes.set(apiName, existing);
-        // console.log(`📊 API ${apiName} completed in ${duration.toFixed(2)}ms`);
+        console.log(`📊 API ${apiName} completed in ${duration.toFixed(2)}ms`);
       }
     };
   }
@@ -112,13 +112,13 @@ class PerformanceMonitor {
    */
   trackNavigation(url) {
     const start = performance.now();
-    // console.log(`🧭 Navigating to: ${url}`);
+    console.log(`🧭 Navigating to: ${url}`);
     
     // Return a tracker for the navigation completion
     return {
       end: () => {
         const duration = performance.now() - start;
-        // console.log(`📊 Navigation to ${url} took ${duration.toFixed(2)}ms`);
+        console.log(`📊 Navigation to ${url} took ${duration.toFixed(2)}ms`);
       }
     };
   }
@@ -153,7 +153,7 @@ class PerformanceMonitor {
         });
         lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
       } catch (e) {
-// console.warn('LCP measurement not supported');
+        console.warn('LCP measurement not supported');
       }
     }
 
@@ -201,12 +201,12 @@ class PerformanceMonitor {
     };
 
     console.group('📊 Performance Report');
-    // console.table(report.timing);
-// console.log('Module Loading:', report.modules);
-// console.log('Tab Switching:', report.tabs);
-// console.log('API Calls:', report.api);
-    if (memory) // console.log('Memory Usage:', memory);
-// console.log('Recommendations:', report.recommendations);
+    console.table(report.timing);
+    console.log('Module Loading:', report.modules);
+    console.log('Tab Switching:', report.tabs);
+    console.log('API Calls:', report.api);
+    if (memory) console.log('Memory Usage:', memory);
+    console.log('Recommendations:', report.recommendations);
     console.groupEnd();
 
     return report;
