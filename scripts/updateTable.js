@@ -595,3 +595,4 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
   //   
   //   // Đã loại bỏ debugTable để tăng performance
   // }
+}
