@@ -669,4 +669,5 @@ window.currentExpensePage = 1;
 
 // Start the app immediately when module loads
 startApp().catch(error => {
+  console.error('Failed to start app:', error);
 });
