@@ -43,16 +43,7 @@
           <div class="error-message" id="price-error"></div>
         </div>
         
-        <div class="form-field">
-          <label>Số người dùng cho phép</label>
-          <input type="number" id="allowedUsers" list="allowedUsersList" placeholder="Chọn hoặc nhập số người dùng" min="1" autocomplete="off">
-          <datalist id="allowedUsersList">
-            <!-- Options sẽ được thêm bằng JavaScript -->
-          </datalist>
-          <div class="error-message" id="allowedUsers-error"></div>
-        </div>
-        
-        <!-- Thông tin đơn hàng - 1 cột, kéo dài từ dòng 1 đến dòng 2 -->
+        <!-- Thông tin đơn hàng - Cột 5, kéo dài từ dòng 1 đến dòng 2 -->
         <div class="form-field note-field-tall">
           <label>Thông tin đơn hàng</label>
           <div class="order-info-container">
@@ -101,7 +92,7 @@
           <div class="error-message" id="standardName-error"></div>
         </div>
         
-        <!-- ✅ Dòng 3: ID Sheet Tài khoản, Ngày gia hạn, Ghi chú -->
+        <!-- ✅ Dòng 3: ID Sheet Tài khoản, Ngày gia hạn, Loại tệp, Số người dùng, Ghi chú (cột 5) -->
         <div class="form-field">
           <label>ID Sheet Tài khoản</label>
           <div class="date-input-container">
@@ -124,18 +115,28 @@
         </div>
         
         <div class="form-field">
-          <label>Ghi chú</label>
-          <textarea id="softwareNote" placeholder="Nhập ghi chú liên quan đến phần mềm"></textarea>
-          <div class="error-message" id="softwareNote-error"></div>
-        </div>
-        
-        <div class="form-field">
           <label>Loại tệp</label>
           <input type="text" id="fileType" list="fileTypeList" placeholder="Chọn hoặc nhập loại tệp" autocomplete="off">
           <datalist id="fileTypeList">
             <!-- Options sẽ được thêm bằng JavaScript -->
           </datalist>
           <div class="error-message" id="fileType-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label>Số người dùng cho phép</label>
+          <input type="number" id="allowedUsers" list="allowedUsersList" placeholder="Chọn hoặc nhập số người dùng" min="1" autocomplete="off">
+          <datalist id="allowedUsersList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
+          <div class="error-message" id="allowedUsers-error"></div>
+        </div>
+        
+        <!-- Ghi chú - Cột 5 -->
+        <div class="form-field">
+          <label>Ghi chú</label>
+          <textarea id="softwareNote" placeholder="Nhập ghi chú liên quan đến phần mềm"></textarea>
+          <div class="error-message" id="softwareNote-error"></div>
         </div>
       </div>
 
