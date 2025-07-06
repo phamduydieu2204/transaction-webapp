@@ -4,54 +4,33 @@
   <div class="form-container">
     <form id="sourceForm" onreset="handleSourceReset()">
       <!-- Hidden fields -->
-      <input type="hidden" id="sourceId">
       
       <!-- Source Form Grid -->
       <div class="transaction-form-grid">
         
-        <!-- Dòng 1: Tên nguồn hàng, Loại nguồn, Người liên hệ, Số điện thoại, Email -->
+        <!-- Dòng 1: Nhà cung cấp, Zalo, Facebook, Telegram, Website -->
         <div class="form-field">
-          <label class="required">Tên nguồn hàng <span class="required-asterisk">*</span></label>
-          <input type="text" id="sourceName" placeholder="Nhập tên nguồn hàng" required>
-          <div class="error-message" id="sourceName-error"></div>
+          <label class="required">Nhà cung cấp <span class="required-asterisk">*</span></label>
+          <input type="text" id="supplierName" placeholder="Nhập tên nhà cung cấp" required>
+          <div class="error-message" id="supplierName-error"></div>
         </div>
         
         <div class="form-field">
-          <label class="required">Loại nguồn <span class="required-asterisk">*</span></label>
-          <select id="sourceType" required>
-            <option value="">-- Chọn loại --</option>
-            <option value="nha-cung-cap">Nhà cung cấp</option>
-            <option value="nha-phan-phoi">Nhà phân phối</option>
-            <option value="nha-san-xuat">Nhà sản xuất</option>
-            <option value="dai-ly">Đại lý</option>
-            <option value="khac">Khác</option>
-          </select>
-          <div class="error-message" id="sourceType-error"></div>
+          <label>Zalo</label>
+          <input type="text" id="zaloContact" placeholder="Số Zalo hoặc tên Zalo">
+          <div class="error-message" id="zaloContact-error"></div>
         </div>
         
         <div class="form-field">
-          <label>Người liên hệ</label>
-          <input type="text" id="contactPerson" placeholder="Nhập tên người liên hệ">
-          <div class="error-message" id="contactPerson-error"></div>
+          <label>Facebook</label>
+          <input type="text" id="facebookContact" placeholder="Link Facebook hoặc tên Facebook">
+          <div class="error-message" id="facebookContact-error"></div>
         </div>
         
         <div class="form-field">
-          <label>Số điện thoại</label>
-          <input type="tel" id="phoneNumber" placeholder="Nhập số điện thoại">
-          <div class="error-message" id="phoneNumber-error"></div>
-        </div>
-        
-        <div class="form-field">
-          <label>Email</label>
-          <input type="email" id="emailAddress" placeholder="Nhập địa chỉ email">
-          <div class="error-message" id="emailAddress-error"></div>
-        </div>
-        
-        <!-- Dòng 2: Địa chỉ, Website, Mã số thuế, Ngân hàng, Số tài khoản -->
-        <div class="form-field">
-          <label>Địa chỉ</label>
-          <input type="text" id="address" placeholder="Nhập địa chỉ">
-          <div class="error-message" id="address-error"></div>
+          <label>Telegram</label>
+          <input type="text" id="telegramContact" placeholder="Username Telegram hoặc số điện thoại">
+          <div class="error-message" id="telegramContact-error"></div>
         </div>
         
         <div class="form-field">
@@ -60,68 +39,87 @@
           <div class="error-message" id="website-error"></div>
         </div>
         
+        <!-- Dòng 2: Tên phần mềm, Gói phần mềm, Đối tượng, Hình thức cấp tài khoản, Thời hạn -->
         <div class="form-field">
-          <label>Mã số thuế</label>
-          <input type="text" id="taxCode" placeholder="Nhập mã số thuế">
-          <div class="error-message" id="taxCode-error"></div>
+          <label class="required">Tên phần mềm <span class="required-asterisk">*</span></label>
+          <input type="text" id="softwareName" placeholder="Nhập tên phần mềm" required>
+          <div class="error-message" id="softwareName-error"></div>
         </div>
         
         <div class="form-field">
-          <label>Ngân hàng</label>
-          <input type="text" id="bankName" placeholder="Nhập tên ngân hàng">
-          <div class="error-message" id="bankName-error"></div>
+          <label>Gói phần mềm</label>
+          <input type="text" id="softwarePackage" placeholder="VD: Basic, Pro, Premium">
+          <div class="error-message" id="softwarePackage-error"></div>
         </div>
         
         <div class="form-field">
-          <label>Số tài khoản</label>
-          <input type="text" id="bankAccount" placeholder="Nhập số tài khoản">
-          <div class="error-message" id="bankAccount-error"></div>
-        </div>
-        
-        <!-- Dòng 3: Sản phẩm cung cấp, Điều khoản thanh toán, Thời gian giao hàng, Đánh giá, Ghi chú -->
-        <div class="form-field">
-          <label>Sản phẩm cung cấp</label>
-          <input type="text" id="products" placeholder="Danh sách sản phẩm">
-          <div class="error-message" id="products-error"></div>
-        </div>
-        
-        <div class="form-field">
-          <label>Điều khoản thanh toán</label>
-          <select id="paymentTerms">
-            <option value="">-- Chọn điều khoản --</option>
-            <option value="tien-mat">Tiền mặt</option>
-            <option value="chuyen-khoan">Chuyển khoản</option>
-            <option value="30-ngay">Net 30 ngày</option>
-            <option value="60-ngay">Net 60 ngày</option>
-            <option value="90-ngay">Net 90 ngày</option>
-            <option value="cod">COD</option>
+          <label>Đối tượng</label>
+          <select id="targetAudience">
+            <option value="">-- Chọn đối tượng --</option>
+            <option value="ca-nhan">Cá nhân</option>
+            <option value="doanh-nghiep">Doanh nghiệp</option>
+            <option value="hoc-sinh-sinh-vien">Học sinh - Sinh viên</option>
+            <option value="giao-vien">Giáo viên</option>
+            <option value="khac">Khác</option>
           </select>
-          <div class="error-message" id="paymentTerms-error"></div>
+          <div class="error-message" id="targetAudience-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label>Hình thức cấp tài khoản</label>
+          <select id="accountProvisionMethod">
+            <option value="">-- Chọn hình thức --</option>
+            <option value="tai-khoan-san">Tài khoản sẵn</option>
+            <option value="tao-moi">Tạo mới</option>
+            <option value="chia-se">Chia sẻ</option>
+            <option value="invite">Mời tham gia</option>
+            <option value="khac">Khác</option>
+          </select>
+          <div class="error-message" id="accountProvisionMethod-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label>Thời hạn</label>
+          <input type="text" id="duration" placeholder="VD: 1 tháng, 6 tháng, 1 năm">
+          <div class="error-message" id="duration-error"></div>
+        </div>
+        
+        <!-- Dòng 3: Giá nhập, Giá bán, Thời gian giao hàng, Yêu cầu khách hàng, Cách thức nâng cấp -->
+        <div class="form-field">
+          <label>Giá nhập</label>
+          <input type="text" id="purchasePrice" placeholder="Nhập giá mua từ nhà cung cấp">
+          <div class="error-message" id="purchasePrice-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label>Giá bán</label>
+          <input type="text" id="sellingPrice" placeholder="Nhập giá bán cho khách hàng">
+          <div class="error-message" id="sellingPrice-error"></div>
         </div>
         
         <div class="form-field">
           <label>Thời gian giao hàng</label>
-          <input type="text" id="deliveryTime" placeholder="VD: 3-5 ngày">
+          <input type="text" id="deliveryTime" placeholder="VD: Tức thì, 1-2 giờ, 1 ngày">
           <div class="error-message" id="deliveryTime-error"></div>
         </div>
         
         <div class="form-field">
-          <label>Đánh giá</label>
-          <select id="rating">
-            <option value="">-- Chọn đánh giá --</option>
-            <option value="5">⭐⭐⭐⭐⭐ Xuất sắc</option>
-            <option value="4">⭐⭐⭐⭐ Tốt</option>
-            <option value="3">⭐⭐⭐ Bình thường</option>
-            <option value="2">⭐⭐ Kém</option>
-            <option value="1">⭐ Rất kém</option>
-          </select>
-          <div class="error-message" id="rating-error"></div>
+          <label>Yêu cầu khách hàng</label>
+          <textarea id="customerRequirements" placeholder="Yêu cầu đối với khách hàng (VD: Email edu, Số điện thoại, v.v.)" rows="2"></textarea>
+          <div class="error-message" id="customerRequirements-error"></div>
         </div>
         
         <div class="form-field">
-          <label>Ghi chú</label>
-          <textarea id="sourceNote" placeholder="Nhập ghi chú về nguồn hàng" rows="3"></textarea>
-          <div class="error-message" id="sourceNote-error"></div>
+          <label>Cách thức nâng cấp</label>
+          <textarea id="upgradeMethod" placeholder="Mô tả cách thức nâng cấp gói/tài khoản" rows="2"></textarea>
+          <div class="error-message" id="upgradeMethod-error"></div>
+        </div>
+        
+        <!-- Dòng 4: Ghi chú khác -->
+        <div class="form-field" style="grid-column: span 5;">
+          <label>Ghi chú khác</label>
+          <textarea id="additionalNotes" placeholder="Ghi chú bổ sung khác" rows="3"></textarea>
+          <div class="error-message" id="additionalNotes-error"></div>
         </div>
       </div>
 
@@ -150,15 +148,16 @@
         <thead>
           <tr>
             <th>STT</th>
-            <th>Tên nguồn hàng</th>
-            <th>Loại nguồn</th>
-            <th>Người liên hệ</th>
-            <th>Số điện thoại</th>
-            <th>Email</th>
-            <th>Sản phẩm</th>
-            <th>Điều khoản TT</th>
-            <th>Đánh giá</th>
-            <th>Ghi chú</th>
+            <th>Nhà cung cấp</th>
+            <th>Tên phần mềm</th>
+            <th>Zalo</th>
+            <th>Facebook</th>
+            <th>Telegram</th>
+            <th>Website</th>
+            <th>Đối tượng</th>
+            <th>Hình thức cấp TK</th>
+            <th>Giá nhập</th>
+            <th>Giá bán</th>
             <th>Hành động</th>
           </tr>
         </thead>

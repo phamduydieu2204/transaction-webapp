@@ -149,15 +149,16 @@ function updateSourceTable() {
     return `
       <tr>
         <td>${rowNumber}</td>
-        <td>${source.sourceName || ''}</td>
-        <td>${getSourceTypeDisplay(source.sourceType)}</td>
-        <td>${source.contactPerson || ''}</td>
-        <td>${source.phoneNumber || ''}</td>
-        <td>${source.emailAddress || ''}</td>
-        <td>${source.products || ''}</td>
-        <td>${getPaymentTermsDisplay(source.paymentTerms)}</td>
-        <td>${getRatingDisplay(source.rating)}</td>
-        <td>${source.sourceNote || ''}</td>
+        <td>${source.supplierName || ''}</td>
+        <td>${source.softwareName || ''}</td>
+        <td>${source.zaloContact || ''}</td>
+        <td>${source.facebookContact || ''}</td>
+        <td>${source.telegramContact || ''}</td>
+        <td>${source.website || ''}</td>
+        <td>${getTargetAudienceDisplay(source.targetAudience)}</td>
+        <td>${getAccountProvisionDisplay(source.accountProvisionMethod)}</td>
+        <td>${source.purchasePrice || ''}</td>
+        <td>${source.sellingPrice || ''}</td>
         <td>
           <select class="action-select" onchange="handleSourceAction(this, ${globalIndex})">
             <option value="">Chọn</option>
@@ -319,8 +320,7 @@ function editSourceItem(source, index) {
   document.getElementById('rating').value = source.rating || '';
   document.getElementById('sourceNote').value = source.sourceNote || '';
   
-  // Store original ID for update
-  document.getElementById('sourceId').value = source.id || '';
+  // Store for update reference - using rowIndex
   
   // Scroll to form
   document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth' });
@@ -349,7 +349,7 @@ async function deleteSourceItem(source, index) {
     
     const result = await apiRequestJson({
       action: "deleteSource",
-      sourceId: source.id
+      rowIndex: source.rowIndex
     });
     
     // Close processing modal
@@ -512,9 +512,9 @@ window.handleSourceUpdate = async function() {
       showProcessingModalUnified('Đang cập nhật nguồn hàng...');
     }
     
-    // Prepare update data with original ID
+    // Prepare update data with original rowIndex
     const updateData = {
-      sourceId: document.getElementById('sourceId').value || originalSource.id,
+      rowIndex: originalSource.rowIndex,
       ...formData
     };
     
@@ -681,8 +681,7 @@ window.handleSourceReset = async function() {
     form.reset();
   }
   
-  // Clear hidden fields
-  document.getElementById('sourceId').value = '';
+  // Clear any stored edit references
   
   // Clear any error messages
   clearSourceFormErrors();
