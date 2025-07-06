@@ -11,76 +11,92 @@
         <!-- Dòng 1: Nhà cung cấp, Zalo, Facebook, Telegram, Website -->
         <div class="form-field">
           <label class="required">Nhà cung cấp <span class="required-asterisk">*</span></label>
-          <input type="text" id="supplierName" placeholder="Nhập tên nhà cung cấp" required>
+          <input type="text" id="supplierName" list="supplierNameList" placeholder="Chọn hoặc nhập tên nhà cung cấp" required autocomplete="off">
+          <datalist id="supplierNameList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
           <div class="error-message" id="supplierName-error"></div>
         </div>
         
         <div class="form-field">
           <label>Zalo</label>
-          <input type="text" id="zaloContact" placeholder="Số Zalo hoặc tên Zalo">
+          <input type="text" id="zaloContact" list="zaloContactList" placeholder="Chọn hoặc nhập Zalo" autocomplete="off">
+          <datalist id="zaloContactList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
           <div class="error-message" id="zaloContact-error"></div>
         </div>
         
         <div class="form-field">
           <label>Facebook</label>
-          <input type="text" id="facebookContact" placeholder="Link Facebook hoặc tên Facebook">
+          <input type="text" id="facebookContact" list="facebookContactList" placeholder="Chọn hoặc nhập Facebook" autocomplete="off">
+          <datalist id="facebookContactList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
           <div class="error-message" id="facebookContact-error"></div>
         </div>
         
         <div class="form-field">
           <label>Telegram</label>
-          <input type="text" id="telegramContact" placeholder="Username Telegram hoặc số điện thoại">
+          <input type="text" id="telegramContact" list="telegramContactList" placeholder="Chọn hoặc nhập Telegram" autocomplete="off">
+          <datalist id="telegramContactList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
           <div class="error-message" id="telegramContact-error"></div>
         </div>
         
         <div class="form-field">
           <label>Website</label>
-          <input type="url" id="website" placeholder="https://example.com">
+          <input type="text" id="website" list="websiteList" placeholder="Chọn hoặc nhập Website" autocomplete="off">
+          <datalist id="websiteList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
           <div class="error-message" id="website-error"></div>
         </div>
         
         <!-- Dòng 2: Tên phần mềm, Gói phần mềm, Đối tượng, Hình thức cấp tài khoản, Thời hạn -->
         <div class="form-field">
           <label class="required">Tên phần mềm <span class="required-asterisk">*</span></label>
-          <input type="text" id="softwareName" placeholder="Nhập tên phần mềm" required>
+          <input type="text" id="softwareName" list="softwareNameList" placeholder="Chọn hoặc nhập tên phần mềm" required autocomplete="off">
+          <datalist id="softwareNameList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
           <div class="error-message" id="softwareName-error"></div>
         </div>
         
         <div class="form-field">
           <label>Gói phần mềm</label>
-          <input type="text" id="softwarePackage" placeholder="VD: Basic, Pro, Premium">
+          <input type="text" id="softwarePackage" list="softwarePackageList" placeholder="Chọn hoặc nhập gói phần mềm" autocomplete="off">
+          <datalist id="softwarePackageList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
           <div class="error-message" id="softwarePackage-error"></div>
         </div>
         
         <div class="form-field">
           <label>Đối tượng</label>
-          <select id="targetAudience">
-            <option value="">-- Chọn đối tượng --</option>
-            <option value="ca-nhan">Cá nhân</option>
-            <option value="doanh-nghiep">Doanh nghiệp</option>
-            <option value="hoc-sinh-sinh-vien">Học sinh - Sinh viên</option>
-            <option value="giao-vien">Giáo viên</option>
-            <option value="khac">Khác</option>
-          </select>
+          <input type="text" id="targetAudience" list="targetAudienceList" placeholder="Chọn hoặc nhập đối tượng" autocomplete="off">
+          <datalist id="targetAudienceList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
           <div class="error-message" id="targetAudience-error"></div>
         </div>
         
         <div class="form-field">
           <label>Hình thức cấp tài khoản</label>
-          <select id="accountProvisionMethod">
-            <option value="">-- Chọn hình thức --</option>
-            <option value="tai-khoan-san">Tài khoản sẵn</option>
-            <option value="tao-moi">Tạo mới</option>
-            <option value="chia-se">Chia sẻ</option>
-            <option value="invite">Mời tham gia</option>
-            <option value="khac">Khác</option>
-          </select>
+          <input type="text" id="accountProvisionMethod" list="accountProvisionMethodList" placeholder="Chọn hoặc nhập hình thức cấp tài khoản" autocomplete="off">
+          <datalist id="accountProvisionMethodList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
           <div class="error-message" id="accountProvisionMethod-error"></div>
         </div>
         
         <div class="form-field">
           <label>Thời hạn</label>
-          <input type="text" id="duration" placeholder="VD: 1 tháng, 6 tháng, 1 năm">
+          <input type="text" id="duration" list="durationList" placeholder="Chọn hoặc nhập thời hạn" autocomplete="off">
+          <datalist id="durationList">
+            <!-- Options sẽ được thêm bằng JavaScript -->
+          </datalist>
           <div class="error-message" id="duration-error"></div>
         </div>
         

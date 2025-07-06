@@ -16,6 +16,20 @@ window.currentEditSourceIndex = -1;
 window.isSourceSearching = false;
 window.sourceSearchTerms = [];
 
+// Global variables for dropdown data
+window.sourceDropdownData = {
+  suppliers: [],
+  software: [],
+  zalo: [],
+  facebook: [],
+  telegram: [],
+  websites: [],
+  packages: [],
+  audiences: [],
+  provisionMethods: [],
+  durations: []
+};
+
 export function initSourceTab() {
   console.log('📦 Initializing source tab...');
   
@@ -24,6 +38,9 @@ export function initSourceTab() {
   
   // Load source data
   loadSourceData();
+  
+  // Initialize form event listeners
+  initFormEventListeners();
   
   console.log('✅ Source tab initialized');
 }
@@ -96,6 +113,9 @@ async function loadSourceData() {
     if (result.status === "success") {
       window.sourceList = result.data || [];
       console.log(`✅ Loaded ${window.sourceList.length} source items`);
+      
+      // Update dropdown data
+      updateDropdownData();
       
       // Update display
       updateSourceTable();
@@ -852,5 +872,155 @@ function isValidUrl(url) {
     return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
   } catch {
     return false;
+  }
+}
+
+// Initialize form event listeners for auto-fill functionality
+function initFormEventListeners() {
+  // Supplier name change event
+  const supplierNameInput = document.getElementById('supplierName');
+  if (supplierNameInput) {
+    supplierNameInput.addEventListener('input', handleSupplierNameChange);
+    supplierNameInput.addEventListener('change', handleSupplierNameChange);
+  }
+  
+  // Software name change event  
+  const softwareNameInput = document.getElementById('softwareName');
+  if (softwareNameInput) {
+    softwareNameInput.addEventListener('input', handleSoftwareNameChange);
+    softwareNameInput.addEventListener('change', handleSoftwareNameChange);
+  }
+}
+
+// Update dropdown data from loaded source list
+function updateDropdownData() {
+  const data = window.sourceList || [];
+  
+  // Reset dropdown data
+  window.sourceDropdownData = {
+    suppliers: [],
+    software: [],
+    zalo: [],
+    facebook: [],
+    telegram: [],
+    websites: [],
+    packages: [],
+    audiences: [],
+    provisionMethods: [],
+    durations: []
+  };
+  
+  // Extract unique values for each dropdown
+  data.forEach(item => {
+    if (item.supplierName && !window.sourceDropdownData.suppliers.includes(item.supplierName)) {
+      window.sourceDropdownData.suppliers.push(item.supplierName);
+    }
+    if (item.softwareName && !window.sourceDropdownData.software.includes(item.softwareName)) {
+      window.sourceDropdownData.software.push(item.softwareName);
+    }
+    if (item.zaloContact && !window.sourceDropdownData.zalo.includes(item.zaloContact)) {
+      window.sourceDropdownData.zalo.push(item.zaloContact);
+    }
+    if (item.facebookContact && !window.sourceDropdownData.facebook.includes(item.facebookContact)) {
+      window.sourceDropdownData.facebook.push(item.facebookContact);
+    }
+    if (item.telegramContact && !window.sourceDropdownData.telegram.includes(item.telegramContact)) {
+      window.sourceDropdownData.telegram.push(item.telegramContact);
+    }
+    if (item.website && !window.sourceDropdownData.websites.includes(item.website)) {
+      window.sourceDropdownData.websites.push(item.website);
+    }
+    if (item.softwarePackage && !window.sourceDropdownData.packages.includes(item.softwarePackage)) {
+      window.sourceDropdownData.packages.push(item.softwarePackage);
+    }
+    if (item.targetAudience && !window.sourceDropdownData.audiences.includes(item.targetAudience)) {
+      window.sourceDropdownData.audiences.push(item.targetAudience);
+    }
+    if (item.accountProvisionMethod && !window.sourceDropdownData.provisionMethods.includes(item.accountProvisionMethod)) {
+      window.sourceDropdownData.provisionMethods.push(item.accountProvisionMethod);
+    }
+    if (item.duration && !window.sourceDropdownData.durations.includes(item.duration)) {
+      window.sourceDropdownData.durations.push(item.duration);
+    }
+  });
+  
+  // Update all datalists
+  updateDatalist('supplierNameList', window.sourceDropdownData.suppliers);
+  updateDatalist('softwareNameList', window.sourceDropdownData.software);
+  updateDatalist('zaloContactList', window.sourceDropdownData.zalo);
+  updateDatalist('facebookContactList', window.sourceDropdownData.facebook);
+  updateDatalist('telegramContactList', window.sourceDropdownData.telegram);
+  updateDatalist('websiteList', window.sourceDropdownData.websites);
+  updateDatalist('softwarePackageList', window.sourceDropdownData.packages);
+  updateDatalist('targetAudienceList', window.sourceDropdownData.audiences);
+  updateDatalist('accountProvisionMethodList', window.sourceDropdownData.provisionMethods);
+  updateDatalist('durationList', window.sourceDropdownData.durations);
+}
+
+// Update a specific datalist with options
+function updateDatalist(listId, options) {
+  const datalist = document.getElementById(listId);
+  if (!datalist) return;
+  
+  datalist.innerHTML = '';
+  options.forEach(option => {
+    const optionElement = document.createElement('option');
+    optionElement.value = option;
+    datalist.appendChild(optionElement);
+  });
+}
+
+// Handle supplier name change - auto fill related fields
+function handleSupplierNameChange(event) {
+  const supplierName = event.target.value.trim();
+  if (!supplierName) return;
+  
+  // Find all records with this supplier name
+  const matchingRecords = window.sourceList.filter(item => 
+    item.supplierName && item.supplierName.toLowerCase() === supplierName.toLowerCase()
+  );
+  
+  if (matchingRecords.length === 0) return;
+  
+  // Auto-fill or update dropdown for related fields
+  autoFillOrUpdateDropdown('zaloContact', 'zaloContactList', matchingRecords.map(r => r.zaloContact).filter(Boolean));
+  autoFillOrUpdateDropdown('facebookContact', 'facebookContactList', matchingRecords.map(r => r.facebookContact).filter(Boolean));
+  autoFillOrUpdateDropdown('telegramContact', 'telegramContactList', matchingRecords.map(r => r.telegramContact).filter(Boolean));
+  autoFillOrUpdateDropdown('website', 'websiteList', matchingRecords.map(r => r.website).filter(Boolean));
+}
+
+// Handle software name change - auto fill related fields
+function handleSoftwareNameChange(event) {
+  const softwareName = event.target.value.trim();
+  if (!softwareName) return;
+  
+  // Find all records with this software name
+  const matchingRecords = window.sourceList.filter(item => 
+    item.softwareName && item.softwareName.toLowerCase() === softwareName.toLowerCase()
+  );
+  
+  if (matchingRecords.length === 0) return;
+  
+  // Auto-fill or update dropdown for related fields
+  autoFillOrUpdateDropdown('softwarePackage', 'softwarePackageList', matchingRecords.map(r => r.softwarePackage).filter(Boolean));
+  autoFillOrUpdateDropdown('targetAudience', 'targetAudienceList', matchingRecords.map(r => r.targetAudience).filter(Boolean));
+}
+
+// Auto-fill field if only one unique value, otherwise update dropdown
+function autoFillOrUpdateDropdown(fieldId, listId, values) {
+  const field = document.getElementById(fieldId);
+  const datalist = document.getElementById(listId);
+  
+  if (!field || !datalist) return;
+  
+  // Get unique values
+  const uniqueValues = [...new Set(values)];
+  
+  if (uniqueValues.length === 1) {
+    // Only one unique value - auto fill
+    field.value = uniqueValues[0];
+  } else if (uniqueValues.length > 1) {
+    // Multiple values - update dropdown
+    updateDatalist(listId, uniqueValues);
   }
 }
