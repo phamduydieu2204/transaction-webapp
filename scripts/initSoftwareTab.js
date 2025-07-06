@@ -112,8 +112,10 @@ async function loadSoftwareData() {
     console.log('🔄 Loading software data...');
     
     // Show loading modal
-    if (typeof showProcessingModalModern === 'function') {
-      showProcessingModalModern('Đang tải dữ liệu phần mềm...', 'Vui lòng đợi trong giây lát');
+    if (typeof showProcessingModalUnified === 'function') {
+      showProcessingModalUnified('Đang tải dữ liệu phần mềm...');
+    } else if (typeof showProcessingModal === 'function') {
+      showProcessingModal('Đang tải dữ liệu phần mềm...');
     }
     
     const result = await apiRequestJson({
@@ -121,8 +123,8 @@ async function loadSoftwareData() {
     });
     
     // Close loading modal
-    if (typeof closeProcessingModalModern === 'function') {
-      closeProcessingModalModern();
+    if (typeof closeProcessingModalUnified === 'function') {
+      closeProcessingModalUnified();
     }
     
     if (result.status === "success") {
@@ -153,8 +155,8 @@ async function loadSoftwareData() {
     
   } catch (error) {
     // Close loading modal if error occurs
-    if (typeof closeProcessingModalModern === 'function') {
-      closeProcessingModalModern();
+    if (typeof closeProcessingModalUnified === 'function') {
+      closeProcessingModalUnified();
     }
     
     console.error('❌ Error loading software data:', error);
@@ -163,8 +165,8 @@ async function loadSoftwareData() {
     updateSoftwareTotalDisplay();
     
     // Show error message
-    if (typeof showResultModalModern === 'function') {
-      showResultModalModern('Lỗi!', 'Không thể tải dữ liệu phần mềm', 'error');
+    if (typeof showResultModalUnified === 'function') {
+      showResultModalUnified('Không thể tải dữ liệu phần mềm', false);
     }
   }
 }
@@ -574,11 +576,10 @@ function editSoftwareItem(software, index) {
     }
     
     // Show success message
-    if (typeof showResultModalModern === 'function') {
-      showResultModalModern(
-        'Đã tải dữ liệu!', 
+    if (typeof showResultModalUnified === 'function') {
+      showResultModalUnified(
         `Dữ liệu phần mềm "${software.softwareName}" đã được tải vào form. Bạn có thể chỉnh sửa và nhấn "Cập nhật" để lưu thay đổi.`, 
-        'info'
+        true
       );
     }
     
@@ -647,8 +648,10 @@ window.handleSoftwareAdd = async function() {
     }
     
     // Show processing modal
-    if (typeof showProcessingModalModern === 'function') {
-      showProcessingModalModern('Đang thêm phần mềm...', 'Vui lòng đợi trong giây lát');
+    if (typeof showProcessingModalUnified === 'function') {
+      showProcessingModalUnified('Đang thêm phần mềm...');
+    } else if (typeof showProcessingModal === 'function') {
+      showProcessingModal('Đang thêm phần mềm...');
     }
     
     // Call backend API
@@ -658,14 +661,18 @@ window.handleSoftwareAdd = async function() {
     });
     
     // Close processing modal
-    if (typeof closeProcessingModalModern === 'function') {
-      closeProcessingModalModern();
+    if (typeof closeProcessingModalUnified === 'function') {
+      closeProcessingModalUnified();
+    } else if (typeof closeProcessingModal === 'function') {
+      closeProcessingModal();
     }
     
     if (result.status === "success") {
       // Show success message
-      if (typeof showResultModalModern === 'function') {
-        showResultModalModern('Thành công!', result.message || 'Phần mềm đã được thêm thành công', 'success');
+      if (typeof showResultModalUnified === 'function') {
+        showResultModalUnified(result.message || 'Phần mềm đã được thêm thành công', true);
+      } else if (typeof showResultModal === 'function') {
+        showResultModal(result.message || 'Phần mềm đã được thêm thành công', true);
       } else {
         alert('✅ ' + (result.message || 'Phần mềm đã được thêm thành công'));
       }
@@ -681,8 +688,8 @@ window.handleSoftwareAdd = async function() {
     } else {
       // Show error message
       const errorMessage = result.message || 'Có lỗi xảy ra khi thêm phần mềm';
-      if (typeof showResultModalModern === 'function') {
-        showResultModalModern('Lỗi!', errorMessage, 'error');
+      if (typeof showResultModalUnified === 'function') {
+        showResultModalUnified(errorMessage, false);
       } else {
         alert('❌ ' + errorMessage);
       }
@@ -691,13 +698,13 @@ window.handleSoftwareAdd = async function() {
     
   } catch (error) {
     // Close processing modal if still open
-    if (typeof closeProcessingModalModern === 'function') {
-      closeProcessingModalModern();
+    if (typeof closeProcessingModalUnified === 'function') {
+      closeProcessingModalUnified();
     }
     
     const errorMessage = 'Lỗi kết nối: ' + error.message;
-    if (typeof showResultModalModern === 'function') {
-      showResultModalModern('Lỗi kết nối!', errorMessage, 'error');
+    if (typeof showResultModalUnified === 'function') {
+      showResultModalUnified(errorMessage, false);
     } else {
       alert('❌ ' + errorMessage);
     }
@@ -710,8 +717,8 @@ window.handleSoftwareUpdate = async function() {
   
   // Check if we're in edit mode
   if (window.currentEditSoftwareIndex === -1) {
-    if (typeof showResultModalModern === 'function') {
-      showResultModalModern('Thông báo!', 'Vui lòng chọn một phần mềm để chỉnh sửa trước', 'warning');
+    if (typeof showResultModalUnified === 'function') {
+      showResultModalUnified('Vui lòng chọn một phần mềm để chỉnh sửa trước', false);
     } else {
       alert('⚠️ Vui lòng chọn một phần mềm để chỉnh sửa trước');
     }
@@ -721,8 +728,8 @@ window.handleSoftwareUpdate = async function() {
   // Get original software data
   const originalSoftware = window.softwareList[window.currentEditSoftwareIndex];
   if (!originalSoftware) {
-    if (typeof showResultModalModern === 'function') {
-      showResultModalModern('Lỗi!', 'Không tìm thấy dữ liệu phần mềm gốc', 'error');
+    if (typeof showResultModalUnified === 'function') {
+      showResultModalUnified('Không tìm thấy dữ liệu phần mềm gốc', false);
     } else {
       alert('❌ Không tìm thấy dữ liệu phần mềm gốc');
     }
@@ -739,8 +746,8 @@ window.handleSoftwareUpdate = async function() {
   
   try {
     // Show processing modal
-    if (typeof showProcessingModalModern === 'function') {
-      showProcessingModalModern('Đang cập nhật phần mềm...', 'Vui lòng đợi trong giây lát');
+    if (typeof showProcessingModalUnified === 'function') {
+      showProcessingModalUnified('Đang cập nhật phần mềm...');
     }
     
     // Prepare update data with original values for identification
@@ -763,14 +770,16 @@ window.handleSoftwareUpdate = async function() {
     });
     
     // Close processing modal
-    if (typeof closeProcessingModalModern === 'function') {
-      closeProcessingModalModern();
+    if (typeof closeProcessingModalUnified === 'function') {
+      closeProcessingModalUnified();
+    } else if (typeof closeProcessingModal === 'function') {
+      closeProcessingModal();
     }
     
     if (result.status === "success") {
       // Show success message
-      if (typeof showResultModalModern === 'function') {
-        showResultModalModern('Thành công!', result.message || 'Phần mềm đã được cập nhật thành công', 'success');
+      if (typeof showResultModalUnified === 'function') {
+        showResultModalUnified(result.message || 'Phần mềm đã được cập nhật thành công', true);
       } else {
         alert('✅ ' + (result.message || 'Phần mềm đã được cập nhật thành công'));
       }
@@ -786,8 +795,8 @@ window.handleSoftwareUpdate = async function() {
     } else {
       // Show error message
       const errorMessage = result.message || 'Có lỗi xảy ra khi cập nhật phần mềm';
-      if (typeof showResultModalModern === 'function') {
-        showResultModalModern('Lỗi!', errorMessage, 'error');
+      if (typeof showResultModalUnified === 'function') {
+        showResultModalUnified(errorMessage, false);
       } else {
         alert('❌ ' + errorMessage);
       }
@@ -796,13 +805,13 @@ window.handleSoftwareUpdate = async function() {
     
   } catch (error) {
     // Close processing modal if still open
-    if (typeof closeProcessingModalModern === 'function') {
-      closeProcessingModalModern();
+    if (typeof closeProcessingModalUnified === 'function') {
+      closeProcessingModalUnified();
     }
     
     const errorMessage = 'Lỗi kết nối: ' + error.message;
-    if (typeof showResultModalModern === 'function') {
-      showResultModalModern('Lỗi kết nối!', errorMessage, 'error');
+    if (typeof showResultModalUnified === 'function') {
+      showResultModalUnified(errorMessage, false);
     } else {
       alert('❌ ' + errorMessage);
     }
@@ -832,8 +841,8 @@ window.handleSoftwareReset = async function() {
     window.softwareSearchTerms = [];
     
     // Show loading modal while reloading data
-    if (typeof showProcessingModalModern === 'function') {
-      showProcessingModalModern('Đang tải lại dữ liệu...', 'Vui lòng đợi trong giây lát');
+    if (typeof showProcessingModalUnified === 'function') {
+      showProcessingModalUnified('Đang tải lại dữ liệu...');
     }
     
     try {
@@ -841,21 +850,21 @@ window.handleSoftwareReset = async function() {
       await loadSoftwareData();
       
       // Close processing modal
-      if (typeof closeProcessingModalModern === 'function') {
-        closeProcessingModalModern();
+      if (typeof closeProcessingModalUnified === 'function') {
+        closeProcessingModalUnified();
       }
       
       console.log('🔄 Cleared search mode and reloaded original data');
     } catch (error) {
       // Close processing modal if error occurs
-      if (typeof closeProcessingModalModern === 'function') {
-        closeProcessingModalModern();
+      if (typeof closeProcessingModalUnified === 'function') {
+        closeProcessingModalUnified();
       }
       
       console.error('❌ Error reloading data:', error);
       
-      if (typeof showResultModalModern === 'function') {
-        showResultModalModern('Lỗi!', 'Có lỗi xảy ra khi tải lại dữ liệu', 'error');
+      if (typeof showResultModalUnified === 'function') {
+        showResultModalUnified('Có lỗi xảy ra khi tải lại dữ liệu', false);
       }
     }
   }
@@ -924,8 +933,8 @@ function validateSoftwareForm(formData) {
   // Show summary error if validation fails
   if (!isValid) {
     console.warn('🔺 Form validation errors:', errors);
-    if (typeof showResultModalModern === 'function') {
-      showResultModalModern(
+    if (typeof showResultModalUnified === 'function') {
+      showResultModalUnified(
         'Lỗi nhập liệu!', 
         'Vui lòng kiểm tra các trường bắt buộc:\n• ' + errors.join('\n• '), 
         'error'
@@ -2030,8 +2039,8 @@ window.handleSoftwareUpdate = async function() {
   try {
     // Check if we have a software selected for editing
     if (window.currentEditSoftwareIndex === -1 || !window.softwareList[window.currentEditSoftwareIndex]) {
-      if (typeof showResultModalModern === 'function') {
-        showResultModalModern(
+      if (typeof showResultModalUnified === 'function') {
+        showResultModalUnified(
           'Chưa chọn phần mềm!', 
           'Vui lòng chọn một phần mềm từ danh sách để cập nhật bằng cách nhấp vào dòng trong bảng.', 
           'warning'
@@ -2068,8 +2077,8 @@ window.handleSoftwareUpdate = async function() {
       formData.standardName !== originalSoftware.standardName;
     
     if (!hasChanges) {
-      if (typeof showResultModalModern === 'function') {
-        showResultModalModern(
+      if (typeof showResultModalUnified === 'function') {
+        showResultModalUnified(
           'Không có thay đổi!', 
           'Không có thông tin nào được thay đổi. Vui lòng sửa đổi ít nhất một trường thông tin.', 
           'info'
@@ -2081,8 +2090,8 @@ window.handleSoftwareUpdate = async function() {
     }
     
     // Show processing modal
-    if (typeof showProcessingModalModern === 'function') {
-      showProcessingModalModern('Đang cập nhật phần mềm...', 'Vui lòng đợi trong giây lát');
+    if (typeof showProcessingModalUnified === 'function') {
+      showProcessingModalUnified('Đang cập nhật phần mềm...');
     }
     
     // Prepare update data with original identifiers
@@ -2103,14 +2112,16 @@ window.handleSoftwareUpdate = async function() {
     });
     
     // Close processing modal
-    if (typeof closeProcessingModalModern === 'function') {
-      closeProcessingModalModern();
+    if (typeof closeProcessingModalUnified === 'function') {
+      closeProcessingModalUnified();
+    } else if (typeof closeProcessingModal === 'function') {
+      closeProcessingModal();
     }
     
     if (result.status === "success") {
       // Show success message
-      if (typeof showResultModalModern === 'function') {
-        showResultModalModern('Thành công!', result.message || 'Phần mềm đã được cập nhật thành công', 'success');
+      if (typeof showResultModalUnified === 'function') {
+        showResultModalUnified(result.message || 'Phần mềm đã được cập nhật thành công', true);
       } else {
         alert('✅ ' + (result.message || 'Phần mềm đã được cập nhật thành công'));
       }
@@ -2128,8 +2139,8 @@ window.handleSoftwareUpdate = async function() {
       // Show error message
       console.error('❌ Error updating software:', result.message);
       
-      if (typeof showResultModalModern === 'function') {
-        showResultModalModern('Lỗi!', result.message || 'Có lỗi xảy ra khi cập nhật phần mềm', 'error');
+      if (typeof showResultModalUnified === 'function') {
+        showResultModalUnified(result.message || 'Có lỗi xảy ra khi cập nhật phần mềm', false);
       } else {
         alert('❌ ' + (result.message || 'Có lỗi xảy ra khi cập nhật phần mềm'));
       }
@@ -2139,13 +2150,13 @@ window.handleSoftwareUpdate = async function() {
     console.error('❌ Error in handleSoftwareUpdate:', error);
     
     // Close processing modal if it's open
-    if (typeof closeProcessingModalModern === 'function') {
-      closeProcessingModalModern();
+    if (typeof closeProcessingModalUnified === 'function') {
+      closeProcessingModalUnified();
     }
     
     const errorMessage = 'Có lỗi xảy ra khi cập nhật phần mềm. Vui lòng thử lại.';
-    if (typeof showResultModalModern === 'function') {
-      showResultModalModern('Lỗi!', errorMessage, 'error');
+    if (typeof showResultModalUnified === 'function') {
+      showResultModalUnified(errorMessage, false);
     } else {
       alert('❌ ' + errorMessage);
     }
@@ -2166,11 +2177,10 @@ window.handleSoftwareSearch = async function() {
     
     // Check if at least one search condition is provided
     if (Object.keys(conditions).length === 0) {
-      if (typeof showResultModalModern === 'function') {
-        showResultModalModern(
-          'Thiếu điều kiện tìm kiếm!', 
+      if (typeof showResultModalUnified === 'function') {
+        showResultModalUnified(
           'Vui lòng nhập ít nhất một điều kiện tìm kiếm trong form.', 
-          'warning'
+          false
         );
       } else {
         alert('⚠️ Vui lòng nhập ít nhất một điều kiện tìm kiếm');
@@ -2179,8 +2189,8 @@ window.handleSoftwareSearch = async function() {
     }
     
     // Show processing modal
-    if (typeof showProcessingModalModern === 'function') {
-      showProcessingModalModern('Đang tìm kiếm phần mềm...', 'Vui lòng đợi trong giây lát');
+    if (typeof showProcessingModalUnified === 'function') {
+      showProcessingModalUnified('Đang tìm kiếm phần mềm...');
     }
     
     // Get user info for authentication
@@ -2200,8 +2210,10 @@ window.handleSoftwareSearch = async function() {
     console.log('📥 DEBUG Frontend v3: Raw API response:', result);
     
     // Close processing modal
-    if (typeof closeProcessingModalModern === 'function') {
-      closeProcessingModalModern();
+    if (typeof closeProcessingModalUnified === 'function') {
+      closeProcessingModalUnified();
+    } else if (typeof closeProcessingModal === 'function') {
+      closeProcessingModal();
     }
     
     if (result.status === "success") {
@@ -2229,8 +2241,8 @@ window.handleSoftwareSearch = async function() {
       
       // Show success message
       const message = result.message || `Tìm thấy ${result.data.length} phần mềm phù hợp`;
-      if (typeof showResultModalModern === 'function') {
-        showResultModalModern('Tìm kiếm thành công!', message, 'success');
+      if (typeof showResultModalUnified === 'function') {
+        showResultModalUnified(message, true);
       } else {
         alert('✅ ' + message);
       }
@@ -2241,8 +2253,8 @@ window.handleSoftwareSearch = async function() {
       // Show error message
       console.error('❌ Error searching software:', result.message);
       
-      if (typeof showResultModalModern === 'function') {
-        showResultModalModern('Lỗi!', result.message || 'Có lỗi xảy ra khi tìm kiếm phần mềm', 'error');
+      if (typeof showResultModalUnified === 'function') {
+        showResultModalUnified(result.message || 'Có lỗi xảy ra khi tìm kiếm phần mềm', false);
       } else {
         alert('❌ ' + (result.message || 'Có lỗi xảy ra khi tìm kiếm phần mềm'));
       }
@@ -2252,13 +2264,13 @@ window.handleSoftwareSearch = async function() {
     console.error('❌ Error in handleSoftwareSearch:', error);
     
     // Close processing modal if it's open
-    if (typeof closeProcessingModalModern === 'function') {
-      closeProcessingModalModern();
+    if (typeof closeProcessingModalUnified === 'function') {
+      closeProcessingModalUnified();
     }
     
     const errorMessage = 'Có lỗi xảy ra khi tìm kiếm phần mềm. Vui lòng thử lại.';
-    if (typeof showResultModalModern === 'function') {
-      showResultModalModern('Lỗi!', errorMessage, 'error');
+    if (typeof showResultModalUnified === 'function') {
+      showResultModalUnified(errorMessage, false);
     } else {
       alert('❌ ' + errorMessage);
     }
@@ -2553,7 +2565,7 @@ function viewSoftwareItem(index) {
   console.log('👁️ Viewing software:', software.softwareName);
   
   // Use existing modal system to show software details
-  if (typeof showResultModalModern === 'function') {
+  if (typeof showResultModalUnified === 'function') {
     const details = `
       <div style="text-align: left; line-height: 1.6;">
         <h4>💻 ${software.softwareName} - ${software.softwarePackage}</h4>
@@ -2569,7 +2581,7 @@ function viewSoftwareItem(index) {
         ${software.orderInfo ? `<p><strong>Thông tin đơn hàng:</strong><br>${software.orderInfo}</p>` : ''}
       </div>
     `;
-    showResultModalModern('Chi tiết phần mềm', details, 'info');
+    showResultModalUnified('Chi tiết phần mềm', details, 'info');
   } else {
     // Fallback to alert if modal not available
     alert(`💻 ${software.softwareName}\n• Gói: ${software.softwarePackage}\n• Tài khoản: ${software.accountName}\n• Giá: ${formatCurrency(software.price)}`);
@@ -2585,8 +2597,8 @@ function openSoftwareSheet(index) {
   }
   
   if (!software.accountSheetId) {
-    if (typeof showResultModalModern === 'function') {
-      showResultModalModern('Thông báo', 'Phần mềm này chưa có liên kết tới Google Sheet', 'warning');
+    if (typeof showResultModalUnified === 'function') {
+      showResultModalUnified('Phần mềm này chưa có liên kết tới Google Sheet', false);
     } else {
       alert('⚠️ Phần mềm này chưa có liên kết tới Google Sheet');
     }
@@ -2602,8 +2614,8 @@ function openSoftwareSheet(index) {
   window.open(sheetUrl, '_blank');
   
   // Show confirmation
-  if (typeof showResultModalModern === 'function') {
-    showResultModalModern('Thành công', `Đã mở Google Sheet cho ${software.softwareName}`, 'success');
+  if (typeof showResultModalUnified === 'function') {
+    showResultModalUnified(`Đã mở Google Sheet cho ${software.softwareName}`, true);
   }
 }
 
