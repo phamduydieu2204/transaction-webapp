@@ -111,9 +111,19 @@ async function loadSoftwareData() {
   try {
     console.log('🔄 Loading software data...');
     
+    // Show loading modal
+    if (typeof showProcessingModalModern === 'function') {
+      showProcessingModalModern('Đang tải dữ liệu phần mềm...', 'Vui lòng đợi trong giây lát');
+    }
+    
     const result = await apiRequestJson({
       action: "getSoftwareListFull"
     });
+    
+    // Close loading modal
+    if (typeof closeProcessingModalModern === 'function') {
+      closeProcessingModalModern();
+    }
     
     if (result.status === "success") {
       window.softwareList = result.data || [];
@@ -142,10 +152,20 @@ async function loadSoftwareData() {
     }
     
   } catch (error) {
+    // Close loading modal if error occurs
+    if (typeof closeProcessingModalModern === 'function') {
+      closeProcessingModalModern();
+    }
+    
     console.error('❌ Error loading software data:', error);
     window.softwareList = [];
     updateSoftwareTable();
     updateSoftwareTotalDisplay();
+    
+    // Show error message
+    if (typeof showResultModalModern === 'function') {
+      showResultModalModern('Lỗi!', 'Không thể tải dữ liệu phần mềm', 'error');
+    }
   }
 }
 
@@ -791,7 +811,7 @@ window.handleSoftwareUpdate = async function() {
 };
 
 
-window.handleSoftwareReset = function() {
+window.handleSoftwareReset = async function() {
   console.log('🔄 Resetting software form...');
   
   // Clear all form fields
@@ -811,10 +831,33 @@ window.handleSoftwareReset = function() {
     window.isSoftwareSearching = false;
     window.softwareSearchTerms = [];
     
-    // Reload original data
-    loadSoftwareData();
+    // Show loading modal while reloading data
+    if (typeof showProcessingModalModern === 'function') {
+      showProcessingModalModern('Đang tải lại dữ liệu...', 'Vui lòng đợi trong giây lát');
+    }
     
-    console.log('🔄 Cleared search mode and reloaded original data');
+    try {
+      // Reload original data
+      await loadSoftwareData();
+      
+      // Close processing modal
+      if (typeof closeProcessingModalModern === 'function') {
+        closeProcessingModalModern();
+      }
+      
+      console.log('🔄 Cleared search mode and reloaded original data');
+    } catch (error) {
+      // Close processing modal if error occurs
+      if (typeof closeProcessingModalModern === 'function') {
+        closeProcessingModalModern();
+      }
+      
+      console.error('❌ Error reloading data:', error);
+      
+      if (typeof showResultModalModern === 'function') {
+        showResultModalModern('Lỗi!', 'Có lỗi xảy ra khi tải lại dữ liệu', 'error');
+      }
+    }
   }
   
   console.log('✅ Software form reset complete');
@@ -1975,9 +2018,12 @@ function fillFormFields(matchingSoftware, includeOptionalFields = true) {
 }
 
 // ========================================
-// UPDATE SOFTWARE FUNCTIONALITY
+// UPDATE SOFTWARE FUNCTIONALITY  
 // ========================================
+// NOTE: This is a duplicate function - the main implementation is at line 708
+// Keeping this commented out for reference
 
+/* DUPLICATE - COMMENTED OUT
 window.handleSoftwareUpdate = async function() {
   console.log('🔄 Updating software...');
   
@@ -2105,6 +2151,7 @@ window.handleSoftwareUpdate = async function() {
     }
   }
 };
+*/ // END OF DUPLICATE FUNCTION
 
 // ========================================
 // SEARCH SOFTWARE FUNCTIONALITY
