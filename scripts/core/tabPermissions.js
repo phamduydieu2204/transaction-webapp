@@ -11,10 +11,11 @@ import { getStateProperty } from './stateManager.js';
  * Tab mapping from Vietnamese to internal IDs
  */
 const TAB_MAPPING = {
-  'tất cả': ['giao-dich', 'phan-mem', 'chi-phi', 'thong-ke', 'bao-cao', 'cai-dat'],
+  'tất cả': ['giao-dich', 'phan-mem', 'chi-phi', 'nguon-hang', 'thong-ke', 'bao-cao', 'cai-dat'],
   'giao dịch': ['giao-dich'],
   'phần mềm': ['phan-mem'],
   'chi phí': ['chi-phi'],
+  'nguồn hàng': ['nguon-hang'],
   'thống kê': ['thong-ke'],
   'báo cáo': ['bao-cao'],
   'cài đặt': ['cai-dat']

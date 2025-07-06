@@ -78,6 +78,7 @@ export async function initializePartials() {
       // Secondary
       { elementId: 'software-tab-container', partialPath: './partials/tabs/software-tab.html', priority: 2 },
       { elementId: 'expense-tab-container', partialPath: './partials/tabs/expense-tab.html', priority: 2 },
+      { elementId: 'source-tab-container', partialPath: './partials/tabs/source-tab.html', priority: 2 },
       { elementId: 'statistics-tab-container', partialPath: './partials/tabs/statistics-tab.html', priority: 2 },
       { elementId: 'reports-tab-container', partialPath: './partials/tabs/reports-tab.html', priority: 2 },
       { elementId: 'settings-tab-container', partialPath: './partials/tabs/settings-tab.html', priority: 2 },

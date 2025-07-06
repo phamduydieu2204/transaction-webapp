@@ -1,0 +1,174 @@
+<!-- Tab Nguồn hàng -->
+<div id="tab-nguon-hang" class="tab-content">
+  <!-- Form Container -->
+  <div class="form-container">
+    <form id="sourceForm" onreset="handleSourceReset()">
+      <!-- Hidden fields -->
+      <input type="hidden" id="sourceId">
+      
+      <!-- Source Form Grid -->
+      <div class="transaction-form-grid">
+        
+        <!-- Dòng 1: Tên nguồn hàng, Loại nguồn, Người liên hệ, Số điện thoại, Email -->
+        <div class="form-field">
+          <label class="required">Tên nguồn hàng <span class="required-asterisk">*</span></label>
+          <input type="text" id="sourceName" placeholder="Nhập tên nguồn hàng" required>
+          <div class="error-message" id="sourceName-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label class="required">Loại nguồn <span class="required-asterisk">*</span></label>
+          <select id="sourceType" required>
+            <option value="">-- Chọn loại --</option>
+            <option value="nha-cung-cap">Nhà cung cấp</option>
+            <option value="nha-phan-phoi">Nhà phân phối</option>
+            <option value="nha-san-xuat">Nhà sản xuất</option>
+            <option value="dai-ly">Đại lý</option>
+            <option value="khac">Khác</option>
+          </select>
+          <div class="error-message" id="sourceType-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label>Người liên hệ</label>
+          <input type="text" id="contactPerson" placeholder="Nhập tên người liên hệ">
+          <div class="error-message" id="contactPerson-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label>Số điện thoại</label>
+          <input type="tel" id="phoneNumber" placeholder="Nhập số điện thoại">
+          <div class="error-message" id="phoneNumber-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label>Email</label>
+          <input type="email" id="emailAddress" placeholder="Nhập địa chỉ email">
+          <div class="error-message" id="emailAddress-error"></div>
+        </div>
+        
+        <!-- Dòng 2: Địa chỉ, Website, Mã số thuế, Ngân hàng, Số tài khoản -->
+        <div class="form-field">
+          <label>Địa chỉ</label>
+          <input type="text" id="address" placeholder="Nhập địa chỉ">
+          <div class="error-message" id="address-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label>Website</label>
+          <input type="url" id="website" placeholder="https://example.com">
+          <div class="error-message" id="website-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label>Mã số thuế</label>
+          <input type="text" id="taxCode" placeholder="Nhập mã số thuế">
+          <div class="error-message" id="taxCode-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label>Ngân hàng</label>
+          <input type="text" id="bankName" placeholder="Nhập tên ngân hàng">
+          <div class="error-message" id="bankName-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label>Số tài khoản</label>
+          <input type="text" id="bankAccount" placeholder="Nhập số tài khoản">
+          <div class="error-message" id="bankAccount-error"></div>
+        </div>
+        
+        <!-- Dòng 3: Sản phẩm cung cấp, Điều khoản thanh toán, Thời gian giao hàng, Đánh giá, Ghi chú -->
+        <div class="form-field">
+          <label>Sản phẩm cung cấp</label>
+          <input type="text" id="products" placeholder="Danh sách sản phẩm">
+          <div class="error-message" id="products-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label>Điều khoản thanh toán</label>
+          <select id="paymentTerms">
+            <option value="">-- Chọn điều khoản --</option>
+            <option value="tien-mat">Tiền mặt</option>
+            <option value="chuyen-khoan">Chuyển khoản</option>
+            <option value="30-ngay">Net 30 ngày</option>
+            <option value="60-ngay">Net 60 ngày</option>
+            <option value="90-ngay">Net 90 ngày</option>
+            <option value="cod">COD</option>
+          </select>
+          <div class="error-message" id="paymentTerms-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label>Thời gian giao hàng</label>
+          <input type="text" id="deliveryTime" placeholder="VD: 3-5 ngày">
+          <div class="error-message" id="deliveryTime-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label>Đánh giá</label>
+          <select id="rating">
+            <option value="">-- Chọn đánh giá --</option>
+            <option value="5">⭐⭐⭐⭐⭐ Xuất sắc</option>
+            <option value="4">⭐⭐⭐⭐ Tốt</option>
+            <option value="3">⭐⭐⭐ Bình thường</option>
+            <option value="2">⭐⭐ Kém</option>
+            <option value="1">⭐ Rất kém</option>
+          </select>
+          <div class="error-message" id="rating-error"></div>
+        </div>
+        
+        <div class="form-field">
+          <label>Ghi chú</label>
+          <textarea id="sourceNote" placeholder="Nhập ghi chú về nguồn hàng" rows="3"></textarea>
+          <div class="error-message" id="sourceNote-error"></div>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="button-row">
+        <button type="button" onclick="handleSourceAdd()">Thêm</button>
+        <button type="button" onclick="handleSourceUpdate()">Cập nhật</button>
+        <button type="button" onclick="handleSourceSearch()">Tìm kiếm</button>
+        <button type="reset">Làm mới</button>
+      </div>
+    </form>
+  </div>
+  
+  <!-- Source List Section -->
+  <div id="sourceSection" class="section">
+    <div class="section-header">
+      <h3>📋 Danh sách nguồn hàng</h3>
+      <div class="header-controls">
+        <span id="sourceTotalDisplay" class="total-display">Tổng: 0 nguồn hàng</span>
+      </div>
+    </div>
+
+    <!-- Source Table -->
+    <div class="table-container" style="margin-top: 10px;">
+      <table id="sourceListTable">
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Tên nguồn hàng</th>
+            <th>Loại nguồn</th>
+            <th>Người liên hệ</th>
+            <th>Số điện thoại</th>
+            <th>Email</th>
+            <th>Sản phẩm</th>
+            <th>Điều khoản TT</th>
+            <th>Đánh giá</th>
+            <th>Ghi chú</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody id="sourceTableBody">
+          <!-- Dữ liệu sẽ được thêm bằng JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" id="sourcePagination"></div>
+  </div>
+</div>

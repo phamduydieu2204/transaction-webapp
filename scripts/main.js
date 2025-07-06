@@ -28,6 +28,7 @@ import './detailModalUnified.js';
 import { initExpenseTab } from './initExpenseTab.js';
 import { initTransactionTab } from './initTransactionTab.js';
 import { initSoftwareTab } from './initSoftwareTab.js';
+import { initSourceTab } from './initSourceTab.js';
 import { initStatisticsTab } from './initStatisticsTab.js';
 
 // Import employee report modules
@@ -628,6 +629,14 @@ window.initSoftwareTab = () => {
     return initSoftwareTab();
   } else {
     console.warn('⚠️ initSoftwareTab function not available');
+  }
+};
+// Source tab function
+window.initSourceTab = () => {
+  if (typeof initSourceTab === 'function') {
+    return initSourceTab();
+  } else {
+    console.warn('⚠️ initSourceTab function not available');
   }
 };
 window.closeModal = closeModal;

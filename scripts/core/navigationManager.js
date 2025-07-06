@@ -44,6 +44,13 @@ const TAB_CONFIG = {
     preloadData: true,
     initFunction: 'initExpenseTab'
   },
+  'nguon-hang': {
+    name: 'Nguồn hàng',
+    icon: '📦',
+    requiresAuth: true,
+    preloadData: true,
+    initFunction: 'initSourceTab'
+  },
   'thong-ke': {
     name: 'Thống kê',
     icon: '📊',
