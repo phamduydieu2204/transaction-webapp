@@ -1013,14 +1013,19 @@ function autoFillOrUpdateDropdown(fieldId, listId, values) {
   
   if (!field || !datalist) return;
   
-  // Get unique values
-  const uniqueValues = [...new Set(values)];
+  // Filter out empty values
+  const nonEmptyValues = values.filter(value => value && value.trim() !== '');
+  
+  if (nonEmptyValues.length === 0) return;
+  
+  // Get unique values (loại bỏ trùng lặp)
+  const uniqueValues = [...new Set(nonEmptyValues)];
   
   if (uniqueValues.length === 1) {
-    // Only one unique value - auto fill
+    // Chỉ có 1 giá trị duy nhất (có thể từ nhiều dòng nhưng giá trị giống nhau) → auto-fill
     field.value = uniqueValues[0];
   } else if (uniqueValues.length > 1) {
-    // Multiple values - update dropdown
+    // Có 2+ giá trị khác nhau → hiển thị dropdown
     updateDatalist(listId, uniqueValues);
   }
 }
