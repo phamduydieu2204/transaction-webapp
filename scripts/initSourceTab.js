@@ -151,7 +151,7 @@ function updateSourceTable() {
   if (pageData.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="10" style="text-align: center; padding: 20px; color: #666;">
+        <td colspan="9" style="text-align: center; padding: 20px; color: #666;">
           Không có dữ liệu nguồn hàng
         </td>
       </tr>
@@ -167,13 +167,24 @@ function updateSourceTable() {
       <tr>
         <td>${rowNumber}</td>
         <td>${source.supplierName || ''}</td>
-        <td>${source.softwareName || ''}</td>
         <td>${source.zaloContact || ''}</td>
-        <td>${getTargetAudienceDisplay(source.targetAudience)}</td>
-        <td>${getAccountProvisionDisplay(source.accountProvisionMethod)}</td>
-        <td>${source.purchasePrice || ''}</td>
-        <td>${source.sellingPrice || ''}</td>
-        <td>${source.listedPrice || ''}</td>
+        <td>
+          <div style="margin-bottom: 5px;"><strong>${source.softwareName || ''}</strong></div>
+          ${source.softwarePackage ? `<div style="font-size: 0.9em; color: #666;">Gói: ${source.softwarePackage}</div>` : ''}
+          ${source.targetAudience ? `<div style="font-size: 0.9em; color: #666;">Đối tượng: ${getTargetAudienceDisplay(source.targetAudience)}</div>` : ''}
+          ${source.accountProvisionMethod ? `<div style="font-size: 0.9em; color: #666;">Cấp TK: ${getAccountProvisionDisplay(source.accountProvisionMethod)}</div>` : ''}
+        </td>
+        <td>${source.duration || ''}</td>
+        <td>
+          ${source.purchasePrice ? `<div style="margin-bottom: 3px;"><span style="font-size: 0.8em; color: #666;">Nhập:</span> ${source.purchasePrice}</div>` : ''}
+          ${source.sellingPrice ? `<div style="margin-bottom: 3px;"><span style="font-size: 0.8em; color: #666;">Bán:</span> ${source.sellingPrice}</div>` : ''}
+          ${source.listedPrice ? `<div style="margin-bottom: 3px;"><span style="font-size: 0.8em; color: #666;">Niêm yết:</span> ${source.listedPrice}</div>` : ''}
+        </td>
+        <td>${source.deliveryTime || ''}</td>
+        <td>
+          ${source.customerRequirements ? `<div style="margin-bottom: 5px;"><span style="font-size: 0.8em; color: #666;">Yêu cầu KH:</span><br>${source.customerRequirements}</div>` : ''}
+          ${source.sourceNote ? `<div><span style="font-size: 0.8em; color: #666;">Ghi chú:</span><br>${source.sourceNote}</div>` : ''}
+        </td>
         <td>
           <select class="action-select" onchange="handleSourceAction(this, ${globalIndex})">
             <option value="">Chọn</option>
