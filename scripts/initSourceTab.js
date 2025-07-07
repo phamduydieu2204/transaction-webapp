@@ -151,7 +151,7 @@ function updateSourceTable() {
   if (pageData.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="9" style="text-align: center; padding: 20px; color: #666;">
+        <td colspan="10" style="text-align: center; padding: 20px; color: #666;">
           Không có dữ liệu nguồn hàng
         </td>
       </tr>
@@ -174,35 +174,36 @@ function updateSourceTable() {
       </div>` : ''}
     `;
     
-    // Build software info without labels  
-    const softwareInfo = [
-      source.softwareName || '',
-      source.softwarePackage || '',
+    // Build software info - 2 lines without labels
+    const line1Parts = [source.softwareName || '', source.softwarePackage || ''].filter(part => part.trim() !== '');
+    const line2Parts = [
       source.targetAudience ? getTargetAudienceDisplay(source.targetAudience) : '',
       source.accountProvisionMethod ? getAccountProvisionDisplay(source.accountProvisionMethod) : ''
-    ].filter(part => part.trim() !== '').join(' - ');
+    ].filter(part => part.trim() !== '');
     
-    // Build price info in 3 separate lines
-    const priceInfo = `
-      ${source.purchasePrice ? `<div style="margin-bottom: 2px;">${source.purchasePrice}</div>` : '<div style="margin-bottom: 2px;">--</div>'}
-      ${source.sellingPrice ? `<div style="margin-bottom: 2px;">${source.sellingPrice}</div>` : '<div style="margin-bottom: 2px;">--</div>'}
-      ${source.listedPrice ? `<div>${source.listedPrice}</div>` : '<div>--</div>'}
+    const softwareInfo = `
+      <div style="margin-bottom: 2px; font-weight: 500;">${line1Parts.join(' - ') || '--'}</div>
+      <div style="font-size: 0.9em; color: #666;">${line2Parts.join(' - ') || '--'}</div>
     `;
     
-    const otherInfo = [
-      source.customerRequirements ? `Yêu cầu KH: ${source.customerRequirements}` : '',
-      source.sourceNote ? `Ghi chú: ${source.sourceNote}` : ''
-    ].filter(part => part.trim() !== '').join(' | ');
-
+    // Build price info - 3 lines with labels
+    const priceInfo = `
+      <div style="margin-bottom: 2px; font-size: 0.9em;"><strong>Giá nhập:</strong> ${source.purchasePrice || '--'}</div>
+      <div style="margin-bottom: 2px; font-size: 0.9em;"><strong>Giá bán:</strong> ${source.sellingPrice || '--'}</div>
+      <div style="font-size: 0.9em;"><strong>Giá niêm yết:</strong> ${source.listedPrice || '--'}</div>
+    `;
+    
     return `
       <tr>
         <td style="text-align: center; font-weight: 500;">${rowNumber}</td>
         <td style="max-width: 200px; word-wrap: break-word;">${supplierInfo}</td>
-        <td style="max-width: 300px; word-wrap: break-word;">${softwareInfo || '--'}</td>
+        <td style="max-width: 300px; word-wrap: break-word;">${softwareInfo}</td>
         <td style="text-align: center;">${source.duration || '--'}</td>
         <td style="max-width: 150px; word-wrap: break-word;">${priceInfo}</td>
         <td style="text-align: center;">${source.deliveryTime || '--'}</td>
-        <td style="max-width: 250px; word-wrap: break-word;">${otherInfo || '--'}</td>
+        <td style="max-width: 250px; word-wrap: break-word;">${source.upgradeMethod || '--'}</td>
+        <td style="max-width: 250px; word-wrap: break-word;">${source.sourceNote || '--'}</td>
+        <td style="max-width: 250px; word-wrap: break-word;">${source.customerRequirements || '--'}</td>
         <td style="text-align: center;">
           <select class="action-select" onchange="handleSourceAction(this, ${globalIndex})">
             <option value="">Chọn</option>
