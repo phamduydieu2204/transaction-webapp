@@ -21,9 +21,6 @@ window.sourceDropdownData = {
   suppliers: [],
   software: [],
   zalo: [],
-  facebook: [],
-  telegram: [],
-  websites: [],
   packages: [],
   audiences: [],
   provisionMethods: [],
@@ -154,7 +151,7 @@ function updateSourceTable() {
   if (pageData.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="11" style="text-align: center; padding: 20px; color: #666;">
+        <td colspan="9" style="text-align: center; padding: 20px; color: #666;">
           Không có dữ liệu nguồn hàng
         </td>
       </tr>
@@ -172,9 +169,6 @@ function updateSourceTable() {
         <td>${source.supplierName || ''}</td>
         <td>${source.softwareName || ''}</td>
         <td>${source.zaloContact || ''}</td>
-        <td>${source.facebookContact || ''}</td>
-        <td>${source.telegramContact || ''}</td>
-        <td>${source.website || ''}</td>
         <td>${getTargetAudienceDisplay(source.targetAudience)}</td>
         <td>${getAccountProvisionDisplay(source.accountProvisionMethod)}</td>
         <td>${source.purchasePrice || ''}</td>
@@ -356,7 +350,6 @@ function editSourceItem(source, index) {
   document.getElementById('phoneNumber').value = source.phoneNumber || '';
   document.getElementById('emailAddress').value = source.emailAddress || '';
   document.getElementById('address').value = source.address || '';
-  document.getElementById('website').value = source.website || '';
   document.getElementById('taxCode').value = source.taxCode || '';
   document.getElementById('bankName').value = source.bankName || '';
   document.getElementById('bankAccount').value = source.bankAccount || '';
@@ -785,7 +778,6 @@ function getSourceFormData() {
     phoneNumber: document.getElementById('phoneNumber')?.value?.trim() || '',
     emailAddress: document.getElementById('emailAddress')?.value?.trim() || '',
     address: document.getElementById('address')?.value?.trim() || '',
-    website: document.getElementById('website')?.value?.trim() || '',
     taxCode: document.getElementById('taxCode')?.value?.trim() || '',
     bankName: document.getElementById('bankName')?.value?.trim() || '',
     bankAccount: document.getElementById('bankAccount')?.value?.trim() || '',
@@ -846,11 +838,6 @@ function validateSourceForm(formData) {
     isValid = false;
   }
   
-  // Validate URL format if provided
-  if (formData.website && !isValidUrl(formData.website)) {
-    showFieldError('website', 'URL không hợp lệ (phải bắt đầu bằng http:// hoặc https://)');
-    isValid = false;
-  }
   
   return isValid;
 }
@@ -927,9 +914,6 @@ function updateDropdownData() {
     suppliers: [],
     software: [],
     zalo: [],
-    facebook: [],
-    telegram: [],
-    websites: [],
     packages: [],
     audiences: [],
     provisionMethods: [],
@@ -946,15 +930,6 @@ function updateDropdownData() {
     }
     if (item.zaloContact && !window.sourceDropdownData.zalo.includes(item.zaloContact)) {
       window.sourceDropdownData.zalo.push(item.zaloContact);
-    }
-    if (item.facebookContact && !window.sourceDropdownData.facebook.includes(item.facebookContact)) {
-      window.sourceDropdownData.facebook.push(item.facebookContact);
-    }
-    if (item.telegramContact && !window.sourceDropdownData.telegram.includes(item.telegramContact)) {
-      window.sourceDropdownData.telegram.push(item.telegramContact);
-    }
-    if (item.website && !window.sourceDropdownData.websites.includes(item.website)) {
-      window.sourceDropdownData.websites.push(item.website);
     }
     if (item.softwarePackage && !window.sourceDropdownData.packages.includes(item.softwarePackage)) {
       window.sourceDropdownData.packages.push(item.softwarePackage);
@@ -974,9 +949,6 @@ function updateDropdownData() {
   updateDatalist('supplierNameList', window.sourceDropdownData.suppliers);
   updateDatalist('softwareNameList', window.sourceDropdownData.software);
   updateDatalist('zaloContactList', window.sourceDropdownData.zalo);
-  updateDatalist('facebookContactList', window.sourceDropdownData.facebook);
-  updateDatalist('telegramContactList', window.sourceDropdownData.telegram);
-  updateDatalist('websiteList', window.sourceDropdownData.websites);
   updateDatalist('softwarePackageList', window.sourceDropdownData.packages);
   updateDatalist('targetAudienceList', window.sourceDropdownData.audiences);
   updateDatalist('accountProvisionMethodList', window.sourceDropdownData.provisionMethods);
@@ -1010,9 +982,6 @@ function handleSupplierNameChange(event) {
   
   // Auto-fill or update dropdown for related fields
   autoFillOrUpdateDropdown('zaloContact', 'zaloContactList', matchingRecords.map(r => r.zaloContact).filter(Boolean));
-  autoFillOrUpdateDropdown('facebookContact', 'facebookContactList', matchingRecords.map(r => r.facebookContact).filter(Boolean));
-  autoFillOrUpdateDropdown('telegramContact', 'telegramContactList', matchingRecords.map(r => r.telegramContact).filter(Boolean));
-  autoFillOrUpdateDropdown('website', 'websiteList', matchingRecords.map(r => r.website).filter(Boolean));
 }
 
 // Handle software name change - auto fill related fields

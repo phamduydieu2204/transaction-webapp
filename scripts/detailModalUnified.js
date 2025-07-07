@@ -184,8 +184,6 @@ export class DetailModal {
         return `tel:${value}`;
       case 'email':
         return `mailto:${value}`;
-      case 'website':
-        return value.startsWith('http') ? value : `https://${value}`;
       default:
         return value;
     }

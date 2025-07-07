@@ -8,7 +8,7 @@
       <!-- Source Form Grid -->
       <div class="transaction-form-grid">
         
-        <!-- Dòng 1: Nhà cung cấp, Zalo, Facebook, Telegram, Website -->
+        <!-- Dòng 1: Nhà cung cấp, Liên hệ -->
         <div class="form-field">
           <label class="required">Nhà cung cấp <span class="required-asterisk">*</span></label>
           <input type="text" id="supplierName" list="supplierNameList" placeholder="Chọn hoặc nhập tên nhà cung cấp" required autocomplete="off">
@@ -19,42 +19,15 @@
         </div>
         
         <div class="form-field">
-          <label>Zalo</label>
-          <input type="text" id="zaloContact" list="zaloContactList" placeholder="Chọn hoặc nhập Zalo" autocomplete="off">
+          <label>Liên hệ</label>
+          <input type="text" id="zaloContact" list="zaloContactList" placeholder="Chọn hoặc nhập thông tin liên hệ" autocomplete="off">
           <datalist id="zaloContactList">
             <!-- Options sẽ được thêm bằng JavaScript -->
           </datalist>
           <div class="error-message" id="zaloContact-error"></div>
         </div>
         
-        <div class="form-field">
-          <label>Facebook</label>
-          <input type="text" id="facebookContact" list="facebookContactList" placeholder="Chọn hoặc nhập Facebook" autocomplete="off">
-          <datalist id="facebookContactList">
-            <!-- Options sẽ được thêm bằng JavaScript -->
-          </datalist>
-          <div class="error-message" id="facebookContact-error"></div>
-        </div>
-        
-        <div class="form-field">
-          <label>Telegram</label>
-          <input type="text" id="telegramContact" list="telegramContactList" placeholder="Chọn hoặc nhập Telegram" autocomplete="off">
-          <datalist id="telegramContactList">
-            <!-- Options sẽ được thêm bằng JavaScript -->
-          </datalist>
-          <div class="error-message" id="telegramContact-error"></div>
-        </div>
-        
-        <div class="form-field">
-          <label>Website</label>
-          <input type="text" id="website" list="websiteList" placeholder="Chọn hoặc nhập Website" autocomplete="off">
-          <datalist id="websiteList">
-            <!-- Options sẽ được thêm bằng JavaScript -->
-          </datalist>
-          <div class="error-message" id="website-error"></div>
-        </div>
-        
-        <!-- Dòng 2: Tên phần mềm, Gói phần mềm, Đối tượng, Hình thức cấp tài khoản, Thời hạn -->
+        <!-- Dòng 2: Tên phần mềm, Gói phần mềm, Đối tượng, Hình thức cấp tài khoản -->
         <div class="form-field">
           <label class="required">Tên phần mềm <span class="required-asterisk">*</span></label>
           <input type="text" id="softwareName" list="softwareNameList" placeholder="Chọn hoặc nhập tên phần mềm" required autocomplete="off">
@@ -91,6 +64,7 @@
           <div class="error-message" id="accountProvisionMethod-error"></div>
         </div>
         
+        <!-- Dòng 3: Thời hạn, Giá nhập, Giá bán, Thời gian giao hàng -->
         <div class="form-field">
           <label>Thời hạn</label>
           <input type="text" id="duration" list="durationList" placeholder="Chọn hoặc nhập thời hạn" autocomplete="off">
@@ -99,8 +73,6 @@
           </datalist>
           <div class="error-message" id="duration-error"></div>
         </div>
-        
-        <!-- Dòng 3: Giá nhập, Giá bán, Thời gian giao hàng, Yêu cầu khách hàng, Cách thức nâng cấp -->
         <div class="form-field">
           <label>Giá nhập</label>
           <input type="text" id="purchasePrice" placeholder="Nhập giá mua từ nhà cung cấp">
@@ -119,19 +91,20 @@
           <div class="error-message" id="deliveryTime-error"></div>
         </div>
         
-        <div class="form-field">
+        <!-- Dòng 4: Yêu cầu khách hàng, Cách thức nâng cấp -->
+        <div class="form-field" style="grid-column: span 2;">
           <label>Yêu cầu khách hàng</label>
           <textarea id="customerRequirements" placeholder="Yêu cầu đối với khách hàng (VD: Email edu, Số điện thoại, v.v.)" rows="2"></textarea>
           <div class="error-message" id="customerRequirements-error"></div>
         </div>
         
-        <div class="form-field">
+        <div class="form-field" style="grid-column: span 3;">
           <label>Cách thức nâng cấp</label>
           <textarea id="upgradeMethod" placeholder="Mô tả cách thức nâng cấp gói/tài khoản" rows="2"></textarea>
           <div class="error-message" id="upgradeMethod-error"></div>
         </div>
         
-        <!-- Dòng 4: Ghi chú khác -->
+        <!-- Dòng 5: Ghi chú khác -->
         <div class="form-field" style="grid-column: span 5;">
           <label>Ghi chú khác</label>
           <textarea id="additionalNotes" placeholder="Ghi chú bổ sung khác" rows="3"></textarea>
@@ -166,10 +139,7 @@
             <th>STT</th>
             <th>Nhà cung cấp</th>
             <th>Tên phần mềm</th>
-            <th>Zalo</th>
-            <th>Facebook</th>
-            <th>Telegram</th>
-            <th>Website</th>
+            <th>Liên hệ</th>
             <th>Đối tượng</th>
             <th>Hình thức cấp TK</th>
             <th>Giá nhập</th>
