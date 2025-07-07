@@ -163,19 +163,31 @@ function updateSourceTable() {
     const globalIndex = startIndex + index;
     const rowNumber = globalIndex + 1;
     
-    // Build formatted data with consistent styling like expense table
+    // Build supplier info with contact (truncated with copy icon)
+    const contactInfo = source.zaloContact || '';
+    const truncatedContact = contactInfo.length > 10 ? contactInfo.substring(0, 10) + '...' : contactInfo;
+    const supplierInfo = `
+      <div style="font-weight: 500; margin-bottom: 3px;">${source.supplierName || '--'}</div>
+      ${contactInfo ? `<div style="font-size: 0.85em; color: #666; display: flex; align-items: center; gap: 5px;">
+        <span>${truncatedContact}</span>
+        <i class="fas fa-copy" style="cursor: pointer; color: #3498db;" onclick="copyToClipboard('${contactInfo}')" title="Copy: ${contactInfo}"></i>
+      </div>` : ''}
+    `;
+    
+    // Build software info without labels  
     const softwareInfo = [
       source.softwareName || '',
-      source.softwarePackage ? `Gói: ${source.softwarePackage}` : '',
-      source.targetAudience ? `Đối tượng: ${getTargetAudienceDisplay(source.targetAudience)}` : '',
-      source.accountProvisionMethod ? `Cấp TK: ${getAccountProvisionDisplay(source.accountProvisionMethod)}` : ''
+      source.softwarePackage || '',
+      source.targetAudience ? getTargetAudienceDisplay(source.targetAudience) : '',
+      source.accountProvisionMethod ? getAccountProvisionDisplay(source.accountProvisionMethod) : ''
     ].filter(part => part.trim() !== '').join(' - ');
     
-    const priceInfo = [
-      source.purchasePrice ? `Nhập: ${source.purchasePrice}` : '',
-      source.sellingPrice ? `Bán: ${source.sellingPrice}` : '',  
-      source.listedPrice ? `Niêm yết: ${source.listedPrice}` : ''
-    ].filter(part => part.trim() !== '').join(' | ');
+    // Build price info in 3 separate lines
+    const priceInfo = `
+      ${source.purchasePrice ? `<div style="margin-bottom: 2px;">${source.purchasePrice}</div>` : '<div style="margin-bottom: 2px;">--</div>'}
+      ${source.sellingPrice ? `<div style="margin-bottom: 2px;">${source.sellingPrice}</div>` : '<div style="margin-bottom: 2px;">--</div>'}
+      ${source.listedPrice ? `<div>${source.listedPrice}</div>` : '<div>--</div>'}
+    `;
     
     const otherInfo = [
       source.customerRequirements ? `Yêu cầu KH: ${source.customerRequirements}` : '',
@@ -185,11 +197,10 @@ function updateSourceTable() {
     return `
       <tr>
         <td style="text-align: center; font-weight: 500;">${rowNumber}</td>
-        <td>${source.supplierName || '--'}</td>
-        <td>${source.zaloContact || '--'}</td>
+        <td style="max-width: 200px; word-wrap: break-word;">${supplierInfo}</td>
         <td style="max-width: 300px; word-wrap: break-word;">${softwareInfo || '--'}</td>
         <td style="text-align: center;">${source.duration || '--'}</td>
-        <td style="max-width: 200px; word-wrap: break-word;">${priceInfo || '--'}</td>
+        <td style="max-width: 150px; word-wrap: break-word;">${priceInfo}</td>
         <td style="text-align: center;">${source.deliveryTime || '--'}</td>
         <td style="max-width: 250px; word-wrap: break-word;">${otherInfo || '--'}</td>
         <td style="text-align: center;">
@@ -204,6 +215,72 @@ function updateSourceTable() {
   }).join('');
   
   updateSourcePagination();
+}
+
+// Copy to clipboard function
+window.copyToClipboard = function(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    // Modern approach
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('Đã copy: ' + text, 'success');
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+      fallbackCopyTextToClipboard(text);
+    });
+  } else {
+    // Fallback for older browsers
+    fallbackCopyTextToClipboard(text);
+  }
+};
+
+function fallbackCopyTextToClipboard(text) {
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  textArea.style.top = "0";
+  textArea.style.left = "0";
+  textArea.style.position = "fixed";
+
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+
+  try {
+    const successful = document.execCommand('copy');
+    if (successful) {
+      showToast('Đã copy: ' + text, 'success');
+    } else {
+      showToast('Không thể copy', 'error');
+    }
+  } catch (err) {
+    console.error('Fallback: Oops, unable to copy', err);
+    showToast('Không thể copy', 'error');
+  }
+
+  document.body.removeChild(textArea);
+}
+
+function showToast(message, type) {
+  // Simple toast notification
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    background: ${type === 'success' ? '#28a745' : '#dc3545'};
+    color: white;
+    border-radius: 4px;
+    z-index: 10000;
+    font-size: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  `;
+  toast.textContent = message;
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.remove();
+  }, 2000);
 }
 
 // Get display text for source type
