@@ -783,21 +783,29 @@ window.handleSourceReset = async function() {
 
 // Get form data
 function getSourceFormData() {
+  // Get the source form to ensure we're getting the right elements
+  const sourceForm = document.getElementById('sourceForm');
+  if (!sourceForm) {
+    console.error('Source form not found');
+    return {};
+  }
+  
+  // Use form.elements to get the correct elements within the source form
   return {
-    supplierName: document.getElementById('supplierName')?.value?.trim() || '',
-    softwareName: document.getElementById('softwareName')?.value?.trim() || '',
-    zaloContact: document.getElementById('zaloContact')?.value?.trim() || '',
-    softwarePackage: document.getElementById('softwarePackage')?.value?.trim() || '',
-    targetAudience: document.getElementById('targetAudience')?.value?.trim() || '',
-    accountProvisionMethod: document.getElementById('accountProvisionMethod')?.value?.trim() || '',
-    duration: document.getElementById('duration')?.value?.trim() || '',
-    purchasePrice: document.getElementById('purchasePrice')?.value?.trim() || '',
-    sellingPrice: document.getElementById('sellingPrice')?.value?.trim() || '',
-    listedPrice: document.getElementById('listedPrice')?.value?.trim() || '',
-    sourceNote: document.getElementById('sourceNote')?.value?.trim() || '',
-    deliveryTime: document.getElementById('deliveryTime')?.value?.trim() || '',
-    customerRequirements: document.getElementById('customerRequirements')?.value?.trim() || '',
-    upgradeMethod: document.getElementById('upgradeMethod')?.value?.trim() || ''
+    supplierName: sourceForm.elements['supplierName']?.value?.trim() || '',
+    softwareName: sourceForm.elements['softwareName']?.value?.trim() || '',
+    zaloContact: sourceForm.elements['zaloContact']?.value?.trim() || '',
+    softwarePackage: sourceForm.elements['softwarePackage']?.value?.trim() || '',
+    targetAudience: sourceForm.elements['targetAudience']?.value?.trim() || '',
+    accountProvisionMethod: sourceForm.elements['accountProvisionMethod']?.value?.trim() || '',
+    duration: sourceForm.elements['duration']?.value?.trim() || '',
+    purchasePrice: sourceForm.elements['purchasePrice']?.value?.trim() || '',
+    sellingPrice: sourceForm.elements['sellingPrice']?.value?.trim() || '',
+    listedPrice: sourceForm.elements['listedPrice']?.value?.trim() || '',
+    sourceNote: sourceForm.elements['sourceNote']?.value?.trim() || '',
+    deliveryTime: sourceForm.elements['deliveryTime']?.value?.trim() || '',
+    customerRequirements: sourceForm.elements['customerRequirements']?.value?.trim() || '',
+    upgradeMethod: sourceForm.elements['upgradeMethod']?.value?.trim() || ''
   };
 }
 
@@ -805,44 +813,54 @@ function getSourceFormData() {
 function getSourceSearchConditions() {
   const conditions = {};
   
-  const supplierName = document.getElementById('supplierName')?.value?.trim();
+  // Get the source form to ensure we're getting the right elements
+  const sourceForm = document.getElementById('sourceForm');
+  if (!sourceForm) {
+    console.error('Source form not found');
+    return conditions;
+  }
+  
+  // Use form.elements to get the correct elements within the source form
+  const supplierName = sourceForm.elements['supplierName']?.value?.trim();
   if (supplierName) conditions.supplierName = supplierName;
   
-  const softwareName = document.getElementById('softwareName')?.value?.trim();
+  const softwareName = sourceForm.elements['softwareName']?.value?.trim();
   if (softwareName) conditions.softwareName = softwareName;
   
-  const zaloContact = document.getElementById('zaloContact')?.value?.trim();
+  const zaloContact = sourceForm.elements['zaloContact']?.value?.trim();
   if (zaloContact) conditions.zaloContact = zaloContact;
   
-  const softwarePackage = document.getElementById('softwarePackage')?.value?.trim();
+  const softwarePackage = sourceForm.elements['softwarePackage']?.value?.trim();
   if (softwarePackage) conditions.softwarePackage = softwarePackage;
   
-  const targetAudience = document.getElementById('targetAudience')?.value?.trim();
+  const targetAudience = sourceForm.elements['targetAudience']?.value?.trim();
   if (targetAudience) conditions.targetAudience = targetAudience;
   
-  const accountProvisionMethod = document.getElementById('accountProvisionMethod')?.value?.trim();
+  const accountProvisionMethod = sourceForm.elements['accountProvisionMethod']?.value?.trim();
   if (accountProvisionMethod) conditions.accountProvisionMethod = accountProvisionMethod;
   
-  const duration = document.getElementById('duration')?.value?.trim();
+  const duration = sourceForm.elements['duration']?.value?.trim();
   if (duration) conditions.duration = duration;
   
-  const purchasePrice = document.getElementById('purchasePrice')?.value?.trim();
+  const purchasePrice = sourceForm.elements['purchasePrice']?.value?.trim();
   if (purchasePrice) conditions.purchasePrice = purchasePrice;
   
-  const sellingPrice = document.getElementById('sellingPrice')?.value?.trim();
+  const sellingPrice = sourceForm.elements['sellingPrice']?.value?.trim();
   if (sellingPrice) conditions.sellingPrice = sellingPrice;
   
-  const listedPrice = document.getElementById('listedPrice')?.value?.trim();
+  const listedPrice = sourceForm.elements['listedPrice']?.value?.trim();
   if (listedPrice) conditions.listedPrice = listedPrice;
 
-  const deliveryTime = document.getElementById('deliveryTime')?.value?.trim();
+  const deliveryTime = sourceForm.elements['deliveryTime']?.value?.trim();
   if (deliveryTime) conditions.deliveryTime = deliveryTime;
 
-  const customerRequirements = document.getElementById('customerRequirements')?.value?.trim();
+  const customerRequirements = sourceForm.elements['customerRequirements']?.value?.trim();
   if (customerRequirements) conditions.customerRequirements = customerRequirements;
 
-  const upgradeMethod = document.getElementById('upgradeMethod')?.value?.trim();
+  const upgradeMethod = sourceForm.elements['upgradeMethod']?.value?.trim();
   if (upgradeMethod) conditions.upgradeMethod = upgradeMethod;
+  
+  console.log('Search conditions:', conditions);
   
   return conditions;
 }
