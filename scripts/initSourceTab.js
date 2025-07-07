@@ -356,6 +356,9 @@ function editSourceItem(source, index) {
   document.getElementById('sellingPrice').value = source.sellingPrice || '';
   document.getElementById('listedPrice').value = source.listedPrice || '';
   document.getElementById('sourceNote').value = source.sourceNote || '';
+  document.getElementById('deliveryTime').value = source.deliveryTime || '';
+  document.getElementById('customerRequirements').value = source.customerRequirements || '';
+  document.getElementById('upgradeMethod').value = source.upgradeMethod || '';
   
   // Store for update reference - using rowIndex
   
@@ -780,7 +783,10 @@ function getSourceFormData() {
     purchasePrice: document.getElementById('purchasePrice')?.value?.trim() || '',
     sellingPrice: document.getElementById('sellingPrice')?.value?.trim() || '',
     listedPrice: document.getElementById('listedPrice')?.value?.trim() || '',
-    sourceNote: document.getElementById('sourceNote')?.value?.trim() || ''
+    sourceNote: document.getElementById('sourceNote')?.value?.trim() || '',
+    deliveryTime: document.getElementById('deliveryTime')?.value?.trim() || '',
+    customerRequirements: document.getElementById('customerRequirements')?.value?.trim() || '',
+    upgradeMethod: document.getElementById('upgradeMethod')?.value?.trim() || ''
   };
 }
 
@@ -817,6 +823,15 @@ function getSourceSearchConditions() {
   
   const listedPrice = document.getElementById('listedPrice')?.value?.trim();
   if (listedPrice) conditions.listedPrice = listedPrice;
+
+  const deliveryTime = document.getElementById('deliveryTime')?.value?.trim();
+  if (deliveryTime) conditions.deliveryTime = deliveryTime;
+
+  const customerRequirements = document.getElementById('customerRequirements')?.value?.trim();
+  if (customerRequirements) conditions.customerRequirements = customerRequirements;
+
+  const upgradeMethod = document.getElementById('upgradeMethod')?.value?.trim();
+  if (upgradeMethod) conditions.upgradeMethod = upgradeMethod;
   
   return conditions;
 }
