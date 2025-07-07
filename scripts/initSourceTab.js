@@ -998,7 +998,13 @@ function updateDatalist(listId, options) {
   if (!datalist) return;
   
   datalist.innerHTML = '';
-  options.forEach(option => {
+  
+  // Sort options alphabetically (ABC order)
+  const sortedOptions = [...options].sort((a, b) => {
+    return a.localeCompare(b, 'vi', { sensitivity: 'base' });
+  });
+  
+  sortedOptions.forEach(option => {
     const optionElement = document.createElement('option');
     optionElement.value = option;
     datalist.appendChild(optionElement);
