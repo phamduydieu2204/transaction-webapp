@@ -225,6 +225,32 @@ function getRatingDisplay(rating) {
   return stars;
 }
 
+// Get display text for target audience
+function getTargetAudienceDisplay(audience) {
+  const audienceMap = {
+    'ca-nhan': 'Cá nhân',
+    'doanh-nghiep': 'Doanh nghiệp',
+    'hoc-sinh-sinh-vien': 'Học sinh - Sinh viên',
+    'gia-dinh': 'Gia đình',
+    'chuyen-gia': 'Chuyên gia',
+    'khac': 'Khác'
+  };
+  return audienceMap[audience] || audience || '';
+}
+
+// Get display text for account provision method
+function getAccountProvisionDisplay(method) {
+  const methodMap = {
+    'tu-dong': 'Tự động',
+    'thu-cong': 'Thủ công',
+    'api': 'API',
+    'email': 'Email',
+    'sms': 'SMS',
+    'khac': 'Khác'
+  };
+  return methodMap[method] || method || '';
+}
+
 // Update total display
 function updateSourceTotalDisplay() {
   const totalDisplay = document.getElementById('sourceTotalDisplay');
