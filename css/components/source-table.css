@@ -1,0 +1,256 @@
+/* ==========================================================================
+   SOURCE TABLE STYLING - Đồng bộ với expense table
+   ========================================================================== */
+
+/* Container - Hoàn toàn loại bỏ scroll riêng */
+.source-table-container {
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  width: 100%;
+  /* FORCE: Loại bỏ mọi scroll riêng */
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+  max-height: none !important;
+  height: auto !important;
+}
+
+/* FORCE: Override mọi scroll có thể từ CSS khác */
+#sourceSection {
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+  max-height: none !important;
+  height: auto !important;
+}
+
+/* FORCE: Override .table-container khi ở tab nguồn hàng */
+#tab-nguon-hang .table-container,
+#tab-nguon-hang .source-table-container {
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+  max-height: none !important;
+  height: auto !important;
+}
+
+/* FORCE: Override mọi wrapper có thể gây scroll */
+#tab-nguon-hang div[class*="table"],
+#tab-nguon-hang div[class*="container"] {
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+/* FORCE: Đặc biệt override cho bất kỳ element nào trong tab nguồn hàng */
+#tab-nguon-hang * {
+  max-height: none !important;
+}
+
+#tab-nguon-hang *:not(body):not(html) {
+  overflow-y: visible !important;
+}
+
+/* Table Structure - Mở rộng đầy đủ như expense table */
+#sourceListTable {
+  width: 100%;
+  min-width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+  background: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* FORCE: Không scroll trong table */
+  overflow: visible !important;
+}
+
+/* ===== HEADER STYLING (Giống expense table) ===== */
+#sourceListTable thead {
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+#sourceListTable thead th {
+  background: transparent;
+  color: #ffffff;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.8px;
+  padding: 16px 12px;
+  border-bottom: 3px solid rgba(255,255,255,0.2);
+  border-right: 1px solid rgba(255,255,255,0.1);
+  white-space: nowrap;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#sourceListTable thead th:hover {
+  background-color: rgba(255,255,255,0.1);
+}
+
+#sourceListTable thead th:last-child {
+  border-right: none;
+}
+
+/* ===== BODY STYLING (Giống expense table) ===== */
+#sourceListTable td {
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  min-width: 100px;
+  max-width: 600px;
+  border: 1px solid #e9ecef;
+  padding: 12px;
+  text-align: left;
+  background-color: #ffffff;
+  color: #495057;
+  font-size: 14px;
+  line-height: 1.4;
+  vertical-align: top;
+}
+
+/* Row styling */
+#sourceListTable tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+#sourceListTable tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+#sourceListTable tbody tr:hover {
+  background-color: #e3f2fd;
+}
+
+/* ===== COLUMN ALIGNMENT ===== */
+/* Căn giữa cho STT */
+#sourceListTable td:first-child {
+  text-align: center;
+  font-weight: 500;
+  width: 60px;
+}
+
+/* Căn phải cho cột giá tiền */
+#sourceListTable td:nth-child(6) {
+  text-align: left;
+}
+
+/* Căn giữa cho thời hạn */
+#sourceListTable td:nth-child(5) {
+  text-align: center;
+}
+
+/* Căn giữa cho hành động */
+#sourceListTable td:last-child {
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ===== ACTION SELECT DROPDOWN (Giống expense table) ===== */
+.action-select {
+  padding: 6px 10px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: #ffffff;
+  color: #495057;
+  font-size: 13px;
+  cursor: pointer;
+  min-width: 100px;
+  transition: all 0.2s ease;
+  background-image: linear-gradient(45deg, transparent 50%, #495057 50%), linear-gradient(135deg, #495057 50%, transparent 50%);
+  background-position: calc(100% - 20px) calc(1em + 2px), calc(100% - 15px) calc(1em + 2px);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.action-select:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.action-select:hover {
+  border-color: #3498db;
+  background-color: #f8f9fa;
+}
+
+/* ===== SPECIAL STYLING FOR COMBINED COLUMNS ===== */
+/* Software column - combine multiple info */
+#sourceListTable td:nth-child(4) div {
+  margin-bottom: 5px;
+}
+
+#sourceListTable td:nth-child(4) div:last-child {
+  margin-bottom: 0;
+}
+
+/* Price column - combine multiple prices */
+#sourceListTable td:nth-child(6) div {
+  margin-bottom: 3px;
+}
+
+#sourceListTable td:nth-child(6) div:last-child {
+  margin-bottom: 0;
+}
+
+/* Other info column */
+#sourceListTable td:nth-child(8) div {
+  margin-bottom: 5px;
+}
+
+#sourceListTable td:nth-child(8) div:last-child {
+  margin-bottom: 0;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (min-width: 1200px) {
+  #sourceListTable thead th {
+    padding: 14px 10px;
+    font-size: 12px;
+  }
+  
+  #sourceListTable td {
+    padding: 10px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 768px) {
+  .source-table-container {
+    padding: 15px;
+  }
+  
+  #sourceListTable thead th {
+    padding: 12px 8px;
+    font-size: 11px;
+  }
+  
+  #sourceListTable td {
+    padding: 8px;
+    font-size: 12px;
+    min-width: 80px;
+  }
+}
+
+/* ===== SPECIAL ROW STATES ===== */
+/* Highlight row on edit */
+.editing-row {
+  background-color: #fff3cd !important;
+}
+
+.editing-row td {
+  background-color: #fff3cd !important;
+}
+
+/* ===== PAGINATION STYLING ===== */
+/* Sử dụng CSS chung từ pagination-unified.css */
+/* Không cần CSS riêng nữa vì đã có CSS thống nhất */

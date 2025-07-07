@@ -163,29 +163,36 @@ function updateSourceTable() {
     const globalIndex = startIndex + index;
     const rowNumber = globalIndex + 1;
     
+    // Build formatted data with consistent styling like expense table
+    const softwareInfo = [
+      source.softwareName || '',
+      source.softwarePackage ? `Gói: ${source.softwarePackage}` : '',
+      source.targetAudience ? `Đối tượng: ${getTargetAudienceDisplay(source.targetAudience)}` : '',
+      source.accountProvisionMethod ? `Cấp TK: ${getAccountProvisionDisplay(source.accountProvisionMethod)}` : ''
+    ].filter(part => part.trim() !== '').join(' - ');
+    
+    const priceInfo = [
+      source.purchasePrice ? `Nhập: ${source.purchasePrice}` : '',
+      source.sellingPrice ? `Bán: ${source.sellingPrice}` : '',  
+      source.listedPrice ? `Niêm yết: ${source.listedPrice}` : ''
+    ].filter(part => part.trim() !== '').join(' | ');
+    
+    const otherInfo = [
+      source.customerRequirements ? `Yêu cầu KH: ${source.customerRequirements}` : '',
+      source.sourceNote ? `Ghi chú: ${source.sourceNote}` : ''
+    ].filter(part => part.trim() !== '').join(' | ');
+
     return `
       <tr>
-        <td>${rowNumber}</td>
-        <td>${source.supplierName || ''}</td>
-        <td>${source.zaloContact || ''}</td>
-        <td>
-          <div style="margin-bottom: 5px;"><strong>${source.softwareName || ''}</strong></div>
-          ${source.softwarePackage ? `<div style="font-size: 0.9em; color: #666;">Gói: ${source.softwarePackage}</div>` : ''}
-          ${source.targetAudience ? `<div style="font-size: 0.9em; color: #666;">Đối tượng: ${getTargetAudienceDisplay(source.targetAudience)}</div>` : ''}
-          ${source.accountProvisionMethod ? `<div style="font-size: 0.9em; color: #666;">Cấp TK: ${getAccountProvisionDisplay(source.accountProvisionMethod)}</div>` : ''}
-        </td>
-        <td>${source.duration || ''}</td>
-        <td>
-          ${source.purchasePrice ? `<div style="margin-bottom: 3px;"><span style="font-size: 0.8em; color: #666;">Nhập:</span> ${source.purchasePrice}</div>` : ''}
-          ${source.sellingPrice ? `<div style="margin-bottom: 3px;"><span style="font-size: 0.8em; color: #666;">Bán:</span> ${source.sellingPrice}</div>` : ''}
-          ${source.listedPrice ? `<div style="margin-bottom: 3px;"><span style="font-size: 0.8em; color: #666;">Niêm yết:</span> ${source.listedPrice}</div>` : ''}
-        </td>
-        <td>${source.deliveryTime || ''}</td>
-        <td>
-          ${source.customerRequirements ? `<div style="margin-bottom: 5px;"><span style="font-size: 0.8em; color: #666;">Yêu cầu KH:</span><br>${source.customerRequirements}</div>` : ''}
-          ${source.sourceNote ? `<div><span style="font-size: 0.8em; color: #666;">Ghi chú:</span><br>${source.sourceNote}</div>` : ''}
-        </td>
-        <td>
+        <td style="text-align: center; font-weight: 500;">${rowNumber}</td>
+        <td>${source.supplierName || '--'}</td>
+        <td>${source.zaloContact || '--'}</td>
+        <td style="max-width: 300px; word-wrap: break-word;">${softwareInfo || '--'}</td>
+        <td style="text-align: center;">${source.duration || '--'}</td>
+        <td style="max-width: 200px; word-wrap: break-word;">${priceInfo || '--'}</td>
+        <td style="text-align: center;">${source.deliveryTime || '--'}</td>
+        <td style="max-width: 250px; word-wrap: break-word;">${otherInfo || '--'}</td>
+        <td style="text-align: center;">
           <select class="action-select" onchange="handleSourceAction(this, ${globalIndex})">
             <option value="">Chọn</option>
             <option value="edit">✏️ Sửa</option>
