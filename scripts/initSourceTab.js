@@ -151,7 +151,7 @@ function updateSourceTable() {
   if (pageData.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="9" style="text-align: center; padding: 20px; color: #666;">
+        <td colspan="10" style="text-align: center; padding: 20px; color: #666;">
           Không có dữ liệu nguồn hàng
         </td>
       </tr>
@@ -173,6 +173,7 @@ function updateSourceTable() {
         <td>${getAccountProvisionDisplay(source.accountProvisionMethod)}</td>
         <td>${source.purchasePrice || ''}</td>
         <td>${source.sellingPrice || ''}</td>
+        <td>${source.listedPrice || ''}</td>
         <td>
           <select class="action-select" onchange="handleSourceAction(this, ${globalIndex})">
             <option value="">Chọn</option>
@@ -344,19 +345,16 @@ function editSourceItem(source, index) {
   window.currentEditSourceIndex = index;
   
   // Fill form with source data
-  document.getElementById('sourceName').value = source.sourceName || '';
-  document.getElementById('sourceType').value = source.sourceType || '';
-  document.getElementById('contactPerson').value = source.contactPerson || '';
-  document.getElementById('phoneNumber').value = source.phoneNumber || '';
-  document.getElementById('emailAddress').value = source.emailAddress || '';
-  document.getElementById('address').value = source.address || '';
-  document.getElementById('taxCode').value = source.taxCode || '';
-  document.getElementById('bankName').value = source.bankName || '';
-  document.getElementById('bankAccount').value = source.bankAccount || '';
-  document.getElementById('products').value = source.products || '';
-  document.getElementById('paymentTerms').value = source.paymentTerms || '';
-  document.getElementById('deliveryTime').value = source.deliveryTime || '';
-  document.getElementById('rating').value = source.rating || '';
+  document.getElementById('supplierName').value = source.supplierName || '';
+  document.getElementById('softwareName').value = source.softwareName || '';
+  document.getElementById('zaloContact').value = source.zaloContact || '';
+  document.getElementById('softwarePackage').value = source.softwarePackage || '';
+  document.getElementById('targetAudience').value = source.targetAudience || '';
+  document.getElementById('accountProvisionMethod').value = source.accountProvisionMethod || '';
+  document.getElementById('duration').value = source.duration || '';
+  document.getElementById('purchasePrice').value = source.purchasePrice || '';
+  document.getElementById('sellingPrice').value = source.sellingPrice || '';
+  document.getElementById('listedPrice').value = source.listedPrice || '';
   document.getElementById('sourceNote').value = source.sourceNote || '';
   
   // Store for update reference - using rowIndex
@@ -367,7 +365,7 @@ function editSourceItem(source, index) {
   // Show notification
   if (typeof showResultModalUnified === 'function') {
     showResultModalUnified(
-      `Dữ liệu nguồn hàng "${source.sourceName}" đã được tải vào form. Bạn có thể chỉnh sửa và nhấn "Cập nhật" để lưu thay đổi.`, 
+      `Dữ liệu nguồn hàng "${source.supplierName || source.softwareName}" đã được tải vào form. Bạn có thể chỉnh sửa và nhấn "Cập nhật" để lưu thay đổi.`, 
       true
     );
   }
@@ -375,7 +373,7 @@ function editSourceItem(source, index) {
 
 // Delete source item
 async function deleteSourceItem(source, index) {
-  const confirmDelete = confirm(`Bạn có chắc chắn muốn xóa nguồn hàng "${source.sourceName}"?`);
+  const confirmDelete = confirm(`Bạn có chắc chắn muốn xóa nguồn hàng "${source.supplierName || source.softwareName}"?`);
   if (!confirmDelete) return;
   
   try {
@@ -772,19 +770,16 @@ window.handleSourceReset = async function() {
 // Get form data
 function getSourceFormData() {
   return {
-    sourceName: document.getElementById('sourceName')?.value?.trim() || '',
-    sourceType: document.getElementById('sourceType')?.value || '',
-    contactPerson: document.getElementById('contactPerson')?.value?.trim() || '',
-    phoneNumber: document.getElementById('phoneNumber')?.value?.trim() || '',
-    emailAddress: document.getElementById('emailAddress')?.value?.trim() || '',
-    address: document.getElementById('address')?.value?.trim() || '',
-    taxCode: document.getElementById('taxCode')?.value?.trim() || '',
-    bankName: document.getElementById('bankName')?.value?.trim() || '',
-    bankAccount: document.getElementById('bankAccount')?.value?.trim() || '',
-    products: document.getElementById('products')?.value?.trim() || '',
-    paymentTerms: document.getElementById('paymentTerms')?.value || '',
-    deliveryTime: document.getElementById('deliveryTime')?.value?.trim() || '',
-    rating: document.getElementById('rating')?.value || '',
+    supplierName: document.getElementById('supplierName')?.value?.trim() || '',
+    softwareName: document.getElementById('softwareName')?.value?.trim() || '',
+    zaloContact: document.getElementById('zaloContact')?.value?.trim() || '',
+    softwarePackage: document.getElementById('softwarePackage')?.value?.trim() || '',
+    targetAudience: document.getElementById('targetAudience')?.value?.trim() || '',
+    accountProvisionMethod: document.getElementById('accountProvisionMethod')?.value?.trim() || '',
+    duration: document.getElementById('duration')?.value?.trim() || '',
+    purchasePrice: document.getElementById('purchasePrice')?.value?.trim() || '',
+    sellingPrice: document.getElementById('sellingPrice')?.value?.trim() || '',
+    listedPrice: document.getElementById('listedPrice')?.value?.trim() || '',
     sourceNote: document.getElementById('sourceNote')?.value?.trim() || ''
   };
 }
@@ -793,23 +788,35 @@ function getSourceFormData() {
 function getSourceSearchConditions() {
   const conditions = {};
   
-  const sourceName = document.getElementById('sourceName')?.value?.trim();
-  if (sourceName) conditions.sourceName = sourceName;
+  const supplierName = document.getElementById('supplierName')?.value?.trim();
+  if (supplierName) conditions.supplierName = supplierName;
   
-  const sourceType = document.getElementById('sourceType')?.value;
-  if (sourceType) conditions.sourceType = sourceType;
+  const softwareName = document.getElementById('softwareName')?.value?.trim();
+  if (softwareName) conditions.softwareName = softwareName;
   
-  const contactPerson = document.getElementById('contactPerson')?.value?.trim();
-  if (contactPerson) conditions.contactPerson = contactPerson;
+  const zaloContact = document.getElementById('zaloContact')?.value?.trim();
+  if (zaloContact) conditions.zaloContact = zaloContact;
   
-  const phoneNumber = document.getElementById('phoneNumber')?.value?.trim();
-  if (phoneNumber) conditions.phoneNumber = phoneNumber;
+  const softwarePackage = document.getElementById('softwarePackage')?.value?.trim();
+  if (softwarePackage) conditions.softwarePackage = softwarePackage;
   
-  const products = document.getElementById('products')?.value?.trim();
-  if (products) conditions.products = products;
+  const targetAudience = document.getElementById('targetAudience')?.value?.trim();
+  if (targetAudience) conditions.targetAudience = targetAudience;
   
-  const rating = document.getElementById('rating')?.value;
-  if (rating) conditions.rating = rating;
+  const accountProvisionMethod = document.getElementById('accountProvisionMethod')?.value?.trim();
+  if (accountProvisionMethod) conditions.accountProvisionMethod = accountProvisionMethod;
+  
+  const duration = document.getElementById('duration')?.value?.trim();
+  if (duration) conditions.duration = duration;
+  
+  const purchasePrice = document.getElementById('purchasePrice')?.value?.trim();
+  if (purchasePrice) conditions.purchasePrice = purchasePrice;
+  
+  const sellingPrice = document.getElementById('sellingPrice')?.value?.trim();
+  if (sellingPrice) conditions.sellingPrice = sellingPrice;
+  
+  const listedPrice = document.getElementById('listedPrice')?.value?.trim();
+  if (listedPrice) conditions.listedPrice = listedPrice;
   
   return conditions;
 }
@@ -822,22 +829,31 @@ function validateSourceForm(formData) {
   clearSourceFormErrors();
   
   // Validate required fields
-  if (!formData.sourceName) {
-    showFieldError('sourceName', 'Vui lòng nhập tên nguồn hàng');
+  if (!formData.supplierName) {
+    showFieldError('supplierName', 'Vui lòng nhập tên nhà cung cấp');
     isValid = false;
   }
   
-  if (!formData.sourceType) {
-    showFieldError('sourceType', 'Vui lòng chọn loại nguồn');
+  if (!formData.softwareName) {
+    showFieldError('softwareName', 'Vui lòng nhập tên phần mềm');
     isValid = false;
   }
   
-  // Validate email format if provided
-  if (formData.emailAddress && !isValidEmail(formData.emailAddress)) {
-    showFieldError('emailAddress', 'Email không hợp lệ');
+  // Validate price fields format if provided
+  if (formData.purchasePrice && !isValidPrice(formData.purchasePrice)) {
+    showFieldError('purchasePrice', 'Giá mua không hợp lệ');
     isValid = false;
   }
   
+  if (formData.sellingPrice && !isValidPrice(formData.sellingPrice)) {
+    showFieldError('sellingPrice', 'Giá bán không hợp lệ');
+    isValid = false;
+  }
+  
+  if (formData.listedPrice && !isValidPrice(formData.listedPrice)) {
+    showFieldError('listedPrice', 'Giá niêm yết không hợp lệ');
+    isValid = false;
+  }
   
   return isValid;
 }
@@ -886,6 +902,12 @@ function isValidUrl(url) {
   } catch {
     return false;
   }
+}
+
+// Price validation
+function isValidPrice(price) {
+  const priceRegex = /^\d+(\.\d+)?$/;
+  return priceRegex.test(price);
 }
 
 // Initialize form event listeners for auto-fill functionality
@@ -999,6 +1021,24 @@ function handleSoftwareNameChange(event) {
   // Auto-fill or update dropdown for related fields
   autoFillOrUpdateDropdown('softwarePackage', 'softwarePackageList', matchingRecords.map(r => r.softwarePackage).filter(Boolean));
   autoFillOrUpdateDropdown('targetAudience', 'targetAudienceList', matchingRecords.map(r => r.targetAudience).filter(Boolean));
+  autoFillOrUpdateDropdown('accountProvisionMethod', 'accountProvisionMethodList', matchingRecords.map(r => r.accountProvisionMethod).filter(Boolean));
+  autoFillOrUpdateDropdown('duration', 'durationList', matchingRecords.map(r => r.duration).filter(Boolean));
+  
+  // Auto-fill price fields if only one unique value
+  const uniquePurchasePrices = [...new Set(matchingRecords.map(r => r.purchasePrice).filter(Boolean))];
+  if (uniquePurchasePrices.length === 1) {
+    document.getElementById('purchasePrice').value = uniquePurchasePrices[0];
+  }
+  
+  const uniqueSellingPrices = [...new Set(matchingRecords.map(r => r.sellingPrice).filter(Boolean))];
+  if (uniqueSellingPrices.length === 1) {
+    document.getElementById('sellingPrice').value = uniqueSellingPrices[0];
+  }
+  
+  const uniqueListedPrices = [...new Set(matchingRecords.map(r => r.listedPrice).filter(Boolean))];
+  if (uniqueListedPrices.length === 1) {
+    document.getElementById('listedPrice').value = uniqueListedPrices[0];
+  }
 }
 
 // Auto-fill field if only one unique value, otherwise update dropdown
