@@ -1054,6 +1054,18 @@ function initFormEventListeners() {
     softwareNameInput.addEventListener('input', handleSoftwareNameChange);
     softwareNameInput.addEventListener('change', handleSoftwareNameChange);
   }
+  
+  // Software package focus event - refresh dropdown based on current software name
+  const softwarePackageInput = document.getElementById('softwarePackage');
+  if (softwarePackageInput) {
+    softwarePackageInput.addEventListener('focus', function() {
+      const currentSoftwareName = document.getElementById('softwareName').value.trim();
+      if (currentSoftwareName) {
+        // Re-trigger the software name change handler to refresh the package dropdown
+        handleSoftwareNameChange({ target: { value: currentSoftwareName } });
+      }
+    });
+  }
 }
 
 // Update dropdown data from loaded source list
@@ -1109,7 +1121,12 @@ function updateDropdownData() {
 // Update a specific datalist with options
 function updateDatalist(listId, options) {
   const datalist = document.getElementById(listId);
-  if (!datalist) return;
+  if (!datalist) {
+    console.warn(`⚠️ Datalist with ID "${listId}" not found`);
+    return;
+  }
+  
+  console.log(`🔄 Updating datalist "${listId}" with ${options.length} options:`, options);
   
   datalist.innerHTML = '';
   
@@ -1126,6 +1143,8 @@ function updateDatalist(listId, options) {
     optionElement.value = option;
     datalist.appendChild(optionElement);
   });
+  
+  console.log(`✅ Successfully updated datalist "${listId}" with ${sortedOptions.length} sorted options`);
 }
 
 // Handle supplier name change - auto fill related fields
@@ -1148,6 +1167,8 @@ function handleSupplierNameChange(event) {
 function handleSoftwareNameChange(event) {
   const softwareName = event.target.value.trim();
   
+  console.log(`🔍 Software name changed to: "${softwareName}"`);
+  
   // If software name is empty, reset dropdowns to show all values
   if (!softwareName) {
     // Clear the software package field
@@ -1157,27 +1178,47 @@ function handleSoftwareNameChange(event) {
     updateDatalist('targetAudienceList', window.sourceDropdownData.audiences);
     updateDatalist('accountProvisionMethodList', window.sourceDropdownData.provisionMethods);
     updateDatalist('durationList', window.sourceDropdownData.durations);
+    console.log('📋 Reset all dropdowns to original values');
     return;
   }
   
-  // Find all records with this software name
+  // Find all records with this software name (case insensitive)
   const matchingRecords = window.sourceList.filter(item => 
     item.softwareName && item.softwareName.toLowerCase() === softwareName.toLowerCase()
   );
   
+  console.log(`📊 Found ${matchingRecords.length} matching records for software: "${softwareName}"`);
+  
   if (matchingRecords.length === 0) {
-    // No matching records, but keep current dropdowns
+    // No matching records found
+    console.log('⚠️ No matching records found, keeping current dropdowns');
     return;
   }
   
-  // Always update dropdown for software package with filtered values
-  const softwarePackages = matchingRecords.map(r => r.softwarePackage).filter(Boolean);
+  // Extract and filter software packages for matching software name
+  const softwarePackages = matchingRecords
+    .map(r => r.softwarePackage)
+    .filter(pkg => pkg && pkg.toString().trim() !== ''); // Filter out empty/null values
+  
+  // Get unique packages while preserving order
   const uniquePackages = [...new Set(softwarePackages)];
+  
+  console.log(`📦 Found ${uniquePackages.length} unique packages:`, uniquePackages);
+  
+  // Always update the software package dropdown with filtered values
   updateDatalist('softwarePackageList', uniquePackages);
+  
+  // Clear current package value if it's not in the filtered list
+  const currentPackageValue = document.getElementById('softwarePackage').value;
+  if (currentPackageValue && !uniquePackages.includes(currentPackageValue)) {
+    document.getElementById('softwarePackage').value = '';
+    console.log('🧹 Cleared package field as current value is not in filtered list');
+  }
   
   // Auto-fill package field if only one unique value
   if (uniquePackages.length === 1) {
     document.getElementById('softwarePackage').value = uniquePackages[0];
+    console.log(`✅ Auto-filled package field with: "${uniquePackages[0]}"`);
   }
   
   // Auto-fill or update dropdown for other related fields
