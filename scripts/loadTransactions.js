@@ -57,14 +57,14 @@ export async function loadTransactionsOptimized(userInfo, updateTable, formatDat
       requestKey,
       async () => {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 seconds timeout
 
         try {
           // Create a custom fetch with timeout since apiRequestJson doesn't support signal
           const response = await Promise.race([
             apiRequestJson(data),
             new Promise((_, reject) => 
-              setTimeout(() => reject(new Error('Request timeout')), 10000)
+              setTimeout(() => reject(new Error('Request timeout')), 30000)
             )
           ]);
 
@@ -130,7 +130,7 @@ export async function loadTransactionsOptimized(userInfo, updateTable, formatDat
     
   } catch (err) {
     if (err.name === 'AbortError') {
-      console.warn("⚠️ Load transactions bị timeout sau 15 giây");
+      console.warn("⚠️ Load transactions bị timeout sau 30 giây");
       return { status: "error", message: "Tải dữ liệu quá lâu, vui lòng thử lại" };
     }
     
@@ -161,7 +161,7 @@ export async function loadTransactions(userInfo, updateTable, formatDate, editTr
   try {
     // ✅ SỬ DỤNG TIMEOUT ĐỂ TRÁNH BLOCK UI QUÁ LÂU
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 giây timeout
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 giây timeout
 
     const response = await fetch(BACKEND_URL, {
       method: "POST",
@@ -235,7 +235,7 @@ export async function loadTransactions(userInfo, updateTable, formatDate, editTr
     
   } catch (err) {
     if (err.name === 'AbortError') {
-      console.warn("⚠️ Load transactions bị timeout sau 30 giây");
+      console.warn("⚠️ Load transactions bị timeout sau 60 giây");
       return { status: "error", message: "Tải dữ liệu quá lâu, vui lòng thử lại" };
     }
     
