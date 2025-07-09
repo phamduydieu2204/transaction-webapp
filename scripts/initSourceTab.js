@@ -945,7 +945,8 @@ function getSourceSearchConditions() {
   const upgradeMethod = sourceForm.elements['sourceUpgradeMethod']?.value?.trim();
   if (upgradeMethod) conditions.upgradeMethod = upgradeMethod;
   
-  console.log('Search conditions:', conditions);
+  console.log('🔍 Search conditions being sent to backend:', conditions);
+  console.log('🔍 Number of search conditions:', Object.keys(conditions).length);
   
   return conditions;
 }
