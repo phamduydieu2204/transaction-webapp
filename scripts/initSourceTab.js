@@ -1147,17 +1147,40 @@ function handleSupplierNameChange(event) {
 // Handle software name change - auto fill related fields
 function handleSoftwareNameChange(event) {
   const softwareName = event.target.value.trim();
-  if (!softwareName) return;
+  
+  // If software name is empty, reset dropdowns to show all values
+  if (!softwareName) {
+    // Clear the software package field
+    document.getElementById('softwarePackage').value = '';
+    // Reset all dropdowns to original values
+    updateDatalist('softwarePackageList', window.sourceDropdownData.packages);
+    updateDatalist('targetAudienceList', window.sourceDropdownData.audiences);
+    updateDatalist('accountProvisionMethodList', window.sourceDropdownData.provisionMethods);
+    updateDatalist('durationList', window.sourceDropdownData.durations);
+    return;
+  }
   
   // Find all records with this software name
   const matchingRecords = window.sourceList.filter(item => 
     item.softwareName && item.softwareName.toLowerCase() === softwareName.toLowerCase()
   );
   
-  if (matchingRecords.length === 0) return;
+  if (matchingRecords.length === 0) {
+    // No matching records, but keep current dropdowns
+    return;
+  }
   
-  // Auto-fill or update dropdown for related fields
-  autoFillOrUpdateDropdown('softwarePackage', 'softwarePackageList', matchingRecords.map(r => r.softwarePackage).filter(Boolean));
+  // Always update dropdown for software package with filtered values
+  const softwarePackages = matchingRecords.map(r => r.softwarePackage).filter(Boolean);
+  const uniquePackages = [...new Set(softwarePackages)];
+  updateDatalist('softwarePackageList', uniquePackages);
+  
+  // Auto-fill package field if only one unique value
+  if (uniquePackages.length === 1) {
+    document.getElementById('softwarePackage').value = uniquePackages[0];
+  }
+  
+  // Auto-fill or update dropdown for other related fields
   autoFillOrUpdateDropdown('targetAudience', 'targetAudienceList', matchingRecords.map(r => r.targetAudience).filter(Boolean));
   autoFillOrUpdateDropdown('accountProvisionMethod', 'accountProvisionMethodList', matchingRecords.map(r => r.accountProvisionMethod).filter(Boolean));
   autoFillOrUpdateDropdown('duration', 'durationList', matchingRecords.map(r => r.duration).filter(Boolean));
