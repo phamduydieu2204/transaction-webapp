@@ -441,20 +441,20 @@ function editSourceItem(source, index) {
   window.currentEditSourceIndex = index;
   
   // Fill form with source data
-  document.getElementById('supplierName').value = source.supplierName || '';
-  document.getElementById('softwareName').value = source.softwareName || '';
-  document.getElementById('zaloContact').value = source.zaloContact || '';
-  document.getElementById('softwarePackage').value = source.softwarePackage || '';
-  document.getElementById('targetAudience').value = source.targetAudience || '';
-  document.getElementById('accountProvisionMethod').value = source.accountProvisionMethod || '';
-  document.getElementById('duration').value = source.duration || '';
-  document.getElementById('purchasePrice').value = source.purchasePrice || '';
-  document.getElementById('sellingPrice').value = source.sellingPrice || '';
-  document.getElementById('listedPrice').value = source.listedPrice || '';
+  document.getElementById('sourceSupplierName').value = source.supplierName || '';
+  document.getElementById('sourceSoftwareName').value = source.softwareName || '';
+  document.getElementById('sourceZaloContact').value = source.zaloContact || '';
+  document.getElementById('sourceSoftwarePackage').value = source.softwarePackage || '';
+  document.getElementById('sourceTargetAudience').value = source.targetAudience || '';
+  document.getElementById('sourceAccountProvisionMethod').value = source.accountProvisionMethod || '';
+  document.getElementById('sourceDuration').value = source.duration || '';
+  document.getElementById('sourcePurchasePrice').value = source.purchasePrice || '';
+  document.getElementById('sourceSellingPrice').value = source.sellingPrice || '';
+  document.getElementById('sourceListedPrice').value = source.listedPrice || '';
   document.getElementById('sourceNote').value = source.sourceNote || '';
-  document.getElementById('deliveryTime').value = source.deliveryTime || '';
-  document.getElementById('customerRequirements').value = source.customerRequirements || '';
-  document.getElementById('upgradeMethod').value = source.upgradeMethod || '';
+  document.getElementById('sourceDeliveryTime').value = source.deliveryTime || '';
+  document.getElementById('sourceCustomerRequirements').value = source.customerRequirements || '';
+  document.getElementById('sourceUpgradeMethod').value = source.upgradeMethod || '';
   
   // Store for update reference - using rowIndex
   
@@ -877,20 +877,20 @@ function getSourceFormData() {
   
   // Use form.elements to get the correct elements within the source form
   return {
-    supplierName: sourceForm.elements['supplierName']?.value?.trim() || '',
-    softwareName: sourceForm.elements['softwareName']?.value?.trim() || '',
-    zaloContact: sourceForm.elements['zaloContact']?.value?.trim() || '',
-    softwarePackage: sourceForm.elements['softwarePackage']?.value?.trim() || '',
-    targetAudience: sourceForm.elements['targetAudience']?.value?.trim() || '',
-    accountProvisionMethod: sourceForm.elements['accountProvisionMethod']?.value?.trim() || '',
-    duration: sourceForm.elements['duration']?.value?.trim() || '',
-    purchasePrice: sourceForm.elements['purchasePrice']?.value?.trim() || '',
-    sellingPrice: sourceForm.elements['sellingPrice']?.value?.trim() || '',
-    listedPrice: sourceForm.elements['listedPrice']?.value?.trim() || '',
+    supplierName: sourceForm.elements['sourceSupplierName']?.value?.trim() || '',
+    softwareName: sourceForm.elements['sourceSoftwareName']?.value?.trim() || '',
+    zaloContact: sourceForm.elements['sourceZaloContact']?.value?.trim() || '',
+    softwarePackage: sourceForm.elements['sourceSoftwarePackage']?.value?.trim() || '',
+    targetAudience: sourceForm.elements['sourceTargetAudience']?.value?.trim() || '',
+    accountProvisionMethod: sourceForm.elements['sourceAccountProvisionMethod']?.value?.trim() || '',
+    duration: sourceForm.elements['sourceDuration']?.value?.trim() || '',
+    purchasePrice: sourceForm.elements['sourcePurchasePrice']?.value?.trim() || '',
+    sellingPrice: sourceForm.elements['sourceSellingPrice']?.value?.trim() || '',
+    listedPrice: sourceForm.elements['sourceListedPrice']?.value?.trim() || '',
     sourceNote: sourceForm.elements['sourceNote']?.value?.trim() || '',
-    deliveryTime: sourceForm.elements['deliveryTime']?.value?.trim() || '',
-    customerRequirements: sourceForm.elements['customerRequirements']?.value?.trim() || '',
-    upgradeMethod: sourceForm.elements['upgradeMethod']?.value?.trim() || ''
+    deliveryTime: sourceForm.elements['sourceDeliveryTime']?.value?.trim() || '',
+    customerRequirements: sourceForm.elements['sourceCustomerRequirements']?.value?.trim() || '',
+    upgradeMethod: sourceForm.elements['sourceUpgradeMethod']?.value?.trim() || ''
   };
 }
 
@@ -906,43 +906,43 @@ function getSourceSearchConditions() {
   }
   
   // Use form.elements to get the correct elements within the source form
-  const supplierName = sourceForm.elements['supplierName']?.value?.trim();
+  const supplierName = sourceForm.elements['sourceSupplierName']?.value?.trim();
   if (supplierName) conditions.supplierName = supplierName;
   
-  const softwareName = sourceForm.elements['softwareName']?.value?.trim();
+  const softwareName = sourceForm.elements['sourceSoftwareName']?.value?.trim();
   if (softwareName) conditions.softwareName = softwareName;
   
-  const zaloContact = sourceForm.elements['zaloContact']?.value?.trim();
+  const zaloContact = sourceForm.elements['sourceZaloContact']?.value?.trim();
   if (zaloContact) conditions.zaloContact = zaloContact;
   
-  const softwarePackage = sourceForm.elements['softwarePackage']?.value?.trim();
+  const softwarePackage = sourceForm.elements['sourceSoftwarePackage']?.value?.trim();
   if (softwarePackage) conditions.softwarePackage = softwarePackage;
   
-  const targetAudience = sourceForm.elements['targetAudience']?.value?.trim();
+  const targetAudience = sourceForm.elements['sourceTargetAudience']?.value?.trim();
   if (targetAudience) conditions.targetAudience = targetAudience;
   
-  const accountProvisionMethod = sourceForm.elements['accountProvisionMethod']?.value?.trim();
+  const accountProvisionMethod = sourceForm.elements['sourceAccountProvisionMethod']?.value?.trim();
   if (accountProvisionMethod) conditions.accountProvisionMethod = accountProvisionMethod;
   
-  const duration = sourceForm.elements['duration']?.value?.trim();
+  const duration = sourceForm.elements['sourceDuration']?.value?.trim();
   if (duration) conditions.duration = duration;
   
-  const purchasePrice = sourceForm.elements['purchasePrice']?.value?.trim();
+  const purchasePrice = sourceForm.elements['sourcePurchasePrice']?.value?.trim();
   if (purchasePrice) conditions.purchasePrice = purchasePrice;
   
-  const sellingPrice = sourceForm.elements['sellingPrice']?.value?.trim();
+  const sellingPrice = sourceForm.elements['sourceSellingPrice']?.value?.trim();
   if (sellingPrice) conditions.sellingPrice = sellingPrice;
   
-  const listedPrice = sourceForm.elements['listedPrice']?.value?.trim();
+  const listedPrice = sourceForm.elements['sourceListedPrice']?.value?.trim();
   if (listedPrice) conditions.listedPrice = listedPrice;
 
-  const deliveryTime = sourceForm.elements['deliveryTime']?.value?.trim();
+  const deliveryTime = sourceForm.elements['sourceDeliveryTime']?.value?.trim();
   if (deliveryTime) conditions.deliveryTime = deliveryTime;
 
-  const customerRequirements = sourceForm.elements['customerRequirements']?.value?.trim();
+  const customerRequirements = sourceForm.elements['sourceCustomerRequirements']?.value?.trim();
   if (customerRequirements) conditions.customerRequirements = customerRequirements;
 
-  const upgradeMethod = sourceForm.elements['upgradeMethod']?.value?.trim();
+  const upgradeMethod = sourceForm.elements['sourceUpgradeMethod']?.value?.trim();
   if (upgradeMethod) conditions.upgradeMethod = upgradeMethod;
   
   console.log('Search conditions:', conditions);
@@ -959,28 +959,28 @@ function validateSourceForm(formData) {
   
   // Validate required fields
   if (!formData.supplierName) {
-    showFieldError('supplierName', 'Vui lòng nhập tên nhà cung cấp');
+    showFieldError('sourceSupplierName', 'Vui lòng nhập tên nhà cung cấp');
     isValid = false;
   }
   
   if (!formData.softwareName) {
-    showFieldError('softwareName', 'Vui lòng nhập tên phần mềm');
+    showFieldError('sourceSoftwareName', 'Vui lòng nhập tên phần mềm');
     isValid = false;
   }
   
   // Validate price fields format if provided
   if (formData.purchasePrice && !isValidPrice(formData.purchasePrice)) {
-    showFieldError('purchasePrice', 'Giá mua không hợp lệ');
+    showFieldError('sourcePurchasePrice', 'Giá mua không hợp lệ');
     isValid = false;
   }
   
   if (formData.sellingPrice && !isValidPrice(formData.sellingPrice)) {
-    showFieldError('sellingPrice', 'Giá bán không hợp lệ');
+    showFieldError('sourceSellingPrice', 'Giá bán không hợp lệ');
     isValid = false;
   }
   
   if (formData.listedPrice && !isValidPrice(formData.listedPrice)) {
-    showFieldError('listedPrice', 'Giá niêm yết không hợp lệ');
+    showFieldError('sourceListedPrice', 'Giá niêm yết không hợp lệ');
     isValid = false;
   }
   
@@ -1042,24 +1042,24 @@ function isValidPrice(price) {
 // Initialize form event listeners for auto-fill functionality
 function initFormEventListeners() {
   // Supplier name change event
-  const supplierNameInput = document.getElementById('supplierName');
+  const supplierNameInput = document.getElementById('sourceSupplierName');
   if (supplierNameInput) {
     supplierNameInput.addEventListener('input', handleSupplierNameChange);
     supplierNameInput.addEventListener('change', handleSupplierNameChange);
   }
   
   // Software name change event  
-  const softwareNameInput = document.getElementById('softwareName');
+  const softwareNameInput = document.getElementById('sourceSoftwareName');
   if (softwareNameInput) {
     softwareNameInput.addEventListener('input', handleSoftwareNameChange);
     softwareNameInput.addEventListener('change', handleSoftwareNameChange);
   }
   
   // Software package focus event - refresh dropdown based on current software name
-  const softwarePackageInput = document.getElementById('softwarePackage');
+  const softwarePackageInput = document.getElementById('sourceSoftwarePackage');
   if (softwarePackageInput) {
     softwarePackageInput.addEventListener('focus', function() {
-      const currentSoftwareName = document.getElementById('softwareName').value.trim();
+      const currentSoftwareName = document.getElementById('sourceSoftwareName').value.trim();
       if (currentSoftwareName) {
         // Re-trigger the software name change handler to refresh the package dropdown
         handleSoftwareNameChange({ target: { value: currentSoftwareName } });
@@ -1109,13 +1109,13 @@ function updateDropdownData() {
   });
   
   // Update all datalists
-  updateDatalist('supplierNameList', window.sourceDropdownData.suppliers);
-  updateDatalist('softwareNameList', window.sourceDropdownData.software);
-  updateDatalist('zaloContactList', window.sourceDropdownData.zalo);
-  updateDatalist('softwarePackageList', window.sourceDropdownData.packages);
-  updateDatalist('targetAudienceList', window.sourceDropdownData.audiences);
-  updateDatalist('accountProvisionMethodList', window.sourceDropdownData.provisionMethods);
-  updateDatalist('durationList', window.sourceDropdownData.durations);
+  updateDatalist('sourceSupplierNameList', window.sourceDropdownData.suppliers);
+  updateDatalist('sourceSoftwareNameList', window.sourceDropdownData.software);
+  updateDatalist('sourceZaloContactList', window.sourceDropdownData.zalo);
+  updateDatalist('sourceSoftwarePackageList', window.sourceDropdownData.packages);
+  updateDatalist('sourceTargetAudienceList', window.sourceDropdownData.audiences);
+  updateDatalist('sourceAccountProvisionMethodList', window.sourceDropdownData.provisionMethods);
+  updateDatalist('sourceDurationList', window.sourceDropdownData.durations);
 }
 
 // Update a specific datalist with options
@@ -1160,7 +1160,7 @@ function handleSupplierNameChange(event) {
   if (matchingRecords.length === 0) return;
   
   // Auto-fill or update dropdown for related fields
-  autoFillOrUpdateDropdown('zaloContact', 'zaloContactList', matchingRecords.map(r => r.zaloContact).filter(Boolean));
+  autoFillOrUpdateDropdown('sourceZaloContact', 'sourceZaloContactList', matchingRecords.map(r => r.zaloContact).filter(Boolean));
 }
 
 // Handle software name change - auto fill related fields
@@ -1172,12 +1172,12 @@ function handleSoftwareNameChange(event) {
   // If software name is empty, reset dropdowns to show all values
   if (!softwareName) {
     // Clear the software package field
-    document.getElementById('softwarePackage').value = '';
+    document.getElementById('sourceSoftwarePackage').value = '';
     // Reset all dropdowns to original values
-    updateDatalist('softwarePackageList', window.sourceDropdownData.packages);
-    updateDatalist('targetAudienceList', window.sourceDropdownData.audiences);
-    updateDatalist('accountProvisionMethodList', window.sourceDropdownData.provisionMethods);
-    updateDatalist('durationList', window.sourceDropdownData.durations);
+    updateDatalist('sourceSoftwarePackageList', window.sourceDropdownData.packages);
+    updateDatalist('sourceTargetAudienceList', window.sourceDropdownData.audiences);
+    updateDatalist('sourceAccountProvisionMethodList', window.sourceDropdownData.provisionMethods);
+    updateDatalist('sourceDurationList', window.sourceDropdownData.durations);
     console.log('📋 Reset all dropdowns to original values');
     return;
   }
@@ -1206,40 +1206,40 @@ function handleSoftwareNameChange(event) {
   console.log(`📦 Found ${uniquePackages.length} unique packages:`, uniquePackages);
   
   // Always update the software package dropdown with filtered values
-  updateDatalist('softwarePackageList', uniquePackages);
+  updateDatalist('sourceSoftwarePackageList', uniquePackages);
   
   // Clear current package value if it's not in the filtered list
-  const currentPackageValue = document.getElementById('softwarePackage').value;
+  const currentPackageValue = document.getElementById('sourceSoftwarePackage').value;
   if (currentPackageValue && !uniquePackages.includes(currentPackageValue)) {
-    document.getElementById('softwarePackage').value = '';
+    document.getElementById('sourceSoftwarePackage').value = '';
     console.log('🧹 Cleared package field as current value is not in filtered list');
   }
   
   // Auto-fill package field if only one unique value
   if (uniquePackages.length === 1) {
-    document.getElementById('softwarePackage').value = uniquePackages[0];
+    document.getElementById('sourceSoftwarePackage').value = uniquePackages[0];
     console.log(`✅ Auto-filled package field with: "${uniquePackages[0]}"`);
   }
   
   // Auto-fill or update dropdown for other related fields
-  autoFillOrUpdateDropdown('targetAudience', 'targetAudienceList', matchingRecords.map(r => r.targetAudience).filter(Boolean));
-  autoFillOrUpdateDropdown('accountProvisionMethod', 'accountProvisionMethodList', matchingRecords.map(r => r.accountProvisionMethod).filter(Boolean));
-  autoFillOrUpdateDropdown('duration', 'durationList', matchingRecords.map(r => r.duration).filter(Boolean));
+  autoFillOrUpdateDropdown('sourceTargetAudience', 'sourceTargetAudienceList', matchingRecords.map(r => r.targetAudience).filter(Boolean));
+  autoFillOrUpdateDropdown('sourceAccountProvisionMethod', 'sourceAccountProvisionMethodList', matchingRecords.map(r => r.accountProvisionMethod).filter(Boolean));
+  autoFillOrUpdateDropdown('sourceDuration', 'sourceDurationList', matchingRecords.map(r => r.duration).filter(Boolean));
   
   // Auto-fill price fields if only one unique value
   const uniquePurchasePrices = [...new Set(matchingRecords.map(r => r.purchasePrice).filter(Boolean))];
   if (uniquePurchasePrices.length === 1) {
-    document.getElementById('purchasePrice').value = uniquePurchasePrices[0];
+    document.getElementById('sourcePurchasePrice').value = uniquePurchasePrices[0];
   }
   
   const uniqueSellingPrices = [...new Set(matchingRecords.map(r => r.sellingPrice).filter(Boolean))];
   if (uniqueSellingPrices.length === 1) {
-    document.getElementById('sellingPrice').value = uniqueSellingPrices[0];
+    document.getElementById('sourceSellingPrice').value = uniqueSellingPrices[0];
   }
   
   const uniqueListedPrices = [...new Set(matchingRecords.map(r => r.listedPrice).filter(Boolean))];
   if (uniqueListedPrices.length === 1) {
-    document.getElementById('listedPrice').value = uniqueListedPrices[0];
+    document.getElementById('sourceListedPrice').value = uniqueListedPrices[0];
   }
 }
 
