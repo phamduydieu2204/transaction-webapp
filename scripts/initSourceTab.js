@@ -735,6 +735,20 @@ window.handleSourceSearch = async function() {
       return;
     }
     
+    // ✅ LOGIC ĐẶC BIỆT: Nếu có ghi chú, chỉ tìm kiếm theo ghi chú
+    if (conditions.sourceNote) {
+      console.log('🔍 Special search mode: searching by note only');
+      conditions.isNoteOnlySearch = true;
+      // Giữ lại chỉ trường ghi chú
+      const noteValue = conditions.sourceNote;
+      Object.keys(conditions).forEach(key => {
+        if (key !== 'sourceNote' && key !== 'isNoteOnlySearch') {
+          delete conditions[key];
+        }
+      });
+      conditions.sourceNote = noteValue;
+    }
+    
     // Show processing modal
     if (typeof showProcessingModalUnified === 'function') {
       showProcessingModalUnified('Đang tìm kiếm nguồn hàng...');
@@ -944,6 +958,9 @@ function getSourceSearchConditions() {
 
   const upgradeMethod = sourceForm.elements['sourceUpgradeMethod']?.value?.trim();
   if (upgradeMethod) conditions.upgradeMethod = upgradeMethod;
+  
+  const sourceNote = sourceForm.elements['sourceNote']?.value?.trim();
+  if (sourceNote) conditions.sourceNote = sourceNote;
   
   console.log('🔍 Search conditions being sent to backend:', conditions);
   console.log('🔍 Number of search conditions:', Object.keys(conditions).length);
