@@ -1115,7 +1115,10 @@ function updateDatalist(listId, options) {
   
   // Sort options alphabetically (ABC order)
   const sortedOptions = [...options].sort((a, b) => {
-    return a.localeCompare(b, 'vi', { sensitivity: 'base' });
+    // Convert to strings to ensure localeCompare works
+    const strA = String(a);
+    const strB = String(b);
+    return strA.localeCompare(strB, 'vi', { sensitivity: 'base' });
   });
   
   sortedOptions.forEach(option => {
