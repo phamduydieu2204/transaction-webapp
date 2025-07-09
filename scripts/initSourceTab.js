@@ -1055,9 +1055,13 @@ function initFormEventListeners() {
     softwareNameInput.addEventListener('change', handleSoftwareNameChange);
   }
   
-  // Software package focus event - refresh dropdown based on current software name
+  // Software package change event
   const softwarePackageInput = document.getElementById('sourceSoftwarePackage');
   if (softwarePackageInput) {
+    softwarePackageInput.addEventListener('input', handleSoftwarePackageChange);
+    softwarePackageInput.addEventListener('change', handleSoftwarePackageChange);
+    
+    // Focus event - refresh dropdown based on current software name
     softwarePackageInput.addEventListener('focus', function() {
       const currentSoftwareName = document.getElementById('sourceSoftwareName').value.trim();
       if (currentSoftwareName) {
@@ -1065,6 +1069,20 @@ function initFormEventListeners() {
         handleSoftwareNameChange({ target: { value: currentSoftwareName } });
       }
     });
+  }
+  
+  // Target audience change event
+  const targetAudienceInput = document.getElementById('sourceTargetAudience');
+  if (targetAudienceInput) {
+    targetAudienceInput.addEventListener('input', handleTargetAudienceChange);
+    targetAudienceInput.addEventListener('change', handleTargetAudienceChange);
+  }
+  
+  // Account provision method change event
+  const accountProvisionInput = document.getElementById('sourceAccountProvisionMethod');
+  if (accountProvisionInput) {
+    accountProvisionInput.addEventListener('input', handleAccountProvisionMethodChange);
+    accountProvisionInput.addEventListener('change', handleAccountProvisionMethodChange);
   }
 }
 
@@ -1163,17 +1181,17 @@ function handleSupplierNameChange(event) {
   autoFillOrUpdateDropdown('sourceZaloContact', 'sourceZaloContactList', matchingRecords.map(r => r.zaloContact).filter(Boolean));
 }
 
-// Handle software name change - auto fill related fields
+// Handle software name change - filter package dropdown only
 function handleSoftwareNameChange(event) {
   const softwareName = event.target.value.trim();
   
   console.log(`🔍 Software name changed to: "${softwareName}"`);
   
-  // If software name is empty, reset dropdowns to show all values
+  // Clear dependent fields when software name changes
+  clearDependentFields(['sourceSoftwarePackage', 'sourceTargetAudience', 'sourceAccountProvisionMethod', 'sourceDuration']);
+  
+  // If software name is empty, reset all dropdowns to show all values
   if (!softwareName) {
-    // Clear the software package field
-    document.getElementById('sourceSoftwarePackage').value = '';
-    // Reset all dropdowns to original values
     updateDatalist('sourceSoftwarePackageList', window.sourceDropdownData.packages);
     updateDatalist('sourceTargetAudienceList', window.sourceDropdownData.audiences);
     updateDatalist('sourceAccountProvisionMethodList', window.sourceDropdownData.provisionMethods);
@@ -1190,56 +1208,252 @@ function handleSoftwareNameChange(event) {
   console.log(`📊 Found ${matchingRecords.length} matching records for software: "${softwareName}"`);
   
   if (matchingRecords.length === 0) {
-    // No matching records found
-    console.log('⚠️ No matching records found, keeping current dropdowns');
+    console.log('⚠️ No matching records found, resetting dropdowns');
+    updateDatalist('sourceSoftwarePackageList', []);
+    updateDatalist('sourceTargetAudienceList', []);
+    updateDatalist('sourceAccountProvisionMethodList', []);
+    updateDatalist('sourceDurationList', []);
     return;
   }
   
-  // Extract and filter software packages for matching software name
+  // Update only the software package dropdown with filtered values
   const softwarePackages = matchingRecords
     .map(r => r.softwarePackage)
-    .filter(pkg => pkg && pkg.toString().trim() !== ''); // Filter out empty/null values
+    .filter(pkg => pkg && pkg.toString().trim() !== '');
   
-  // Get unique packages while preserving order
   const uniquePackages = [...new Set(softwarePackages)];
   
   console.log(`📦 Found ${uniquePackages.length} unique packages:`, uniquePackages);
-  
-  // Always update the software package dropdown with filtered values
   updateDatalist('sourceSoftwarePackageList', uniquePackages);
   
-  // Clear current package value if it's not in the filtered list
-  const currentPackageValue = document.getElementById('sourceSoftwarePackage').value;
-  if (currentPackageValue && !uniquePackages.includes(currentPackageValue)) {
-    document.getElementById('sourceSoftwarePackage').value = '';
-    console.log('🧹 Cleared package field as current value is not in filtered list');
-  }
+  // Reset other dropdowns until package is selected
+  updateDatalist('sourceTargetAudienceList', []);
+  updateDatalist('sourceAccountProvisionMethodList', []);
+  updateDatalist('sourceDurationList', []);
   
   // Auto-fill package field if only one unique value
   if (uniquePackages.length === 1) {
     document.getElementById('sourceSoftwarePackage').value = uniquePackages[0];
     console.log(`✅ Auto-filled package field with: "${uniquePackages[0]}"`);
+    // Trigger package change event
+    handleSoftwarePackageChange({ target: { value: uniquePackages[0] } });
+  }
+}
+
+// Clear dependent fields utility function
+function clearDependentFields(fieldIds) {
+  fieldIds.forEach(fieldId => {
+    const field = document.getElementById(fieldId);
+    if (field) {
+      field.value = '';
+    }
+  });
+}
+
+// Get filtered records based on current selections
+function getFilteredRecords() {
+  const softwareName = document.getElementById('sourceSoftwareName').value.trim();
+  const softwarePackage = document.getElementById('sourceSoftwarePackage').value.trim();
+  const targetAudience = document.getElementById('sourceTargetAudience').value.trim();
+  const accountProvisionMethod = document.getElementById('sourceAccountProvisionMethod').value.trim();
+  
+  let filteredRecords = window.sourceList || [];
+  
+  if (softwareName) {
+    filteredRecords = filteredRecords.filter(item => 
+      item.softwareName && item.softwareName.toLowerCase() === softwareName.toLowerCase()
+    );
   }
   
-  // Auto-fill or update dropdown for other related fields
-  autoFillOrUpdateDropdown('sourceTargetAudience', 'sourceTargetAudienceList', matchingRecords.map(r => r.targetAudience).filter(Boolean));
-  autoFillOrUpdateDropdown('sourceAccountProvisionMethod', 'sourceAccountProvisionMethodList', matchingRecords.map(r => r.accountProvisionMethod).filter(Boolean));
-  autoFillOrUpdateDropdown('sourceDuration', 'sourceDurationList', matchingRecords.map(r => r.duration).filter(Boolean));
+  if (softwarePackage) {
+    filteredRecords = filteredRecords.filter(item => 
+      item.softwarePackage && item.softwarePackage.toLowerCase() === softwarePackage.toLowerCase()
+    );
+  }
+  
+  if (targetAudience) {
+    filteredRecords = filteredRecords.filter(item => 
+      item.targetAudience && item.targetAudience.toLowerCase() === targetAudience.toLowerCase()
+    );
+  }
+  
+  if (accountProvisionMethod) {
+    filteredRecords = filteredRecords.filter(item => 
+      item.accountProvisionMethod && item.accountProvisionMethod.toLowerCase() === accountProvisionMethod.toLowerCase()
+    );
+  }
+  
+  return filteredRecords;
+}
+
+// Handle software package change - filter target audience dropdown
+function handleSoftwarePackageChange(event) {
+  const softwarePackage = event.target.value.trim();
+  
+  console.log(`📦 Software package changed to: "${softwarePackage}"`);
+  
+  // Clear dependent fields
+  clearDependentFields(['sourceTargetAudience', 'sourceAccountProvisionMethod', 'sourceDuration']);
+  
+  if (!softwarePackage) {
+    updateDatalist('sourceTargetAudienceList', []);
+    updateDatalist('sourceAccountProvisionMethodList', []);
+    updateDatalist('sourceDurationList', []);
+    return;
+  }
+  
+  // Get filtered records based on software name and package
+  const filteredRecords = getFilteredRecords();
+  
+  console.log(`🎯 Found ${filteredRecords.length} records for software package: "${softwarePackage}"`);
+  
+  if (filteredRecords.length === 0) {
+    updateDatalist('sourceTargetAudienceList', []);
+    updateDatalist('sourceAccountProvisionMethodList', []);
+    updateDatalist('sourceDurationList', []);
+    return;
+  }
+  
+  // Update target audience dropdown
+  const targetAudiences = filteredRecords
+    .map(r => r.targetAudience)
+    .filter(audience => audience && audience.toString().trim() !== '');
+  
+  const uniqueAudiences = [...new Set(targetAudiences)];
+  console.log(`👥 Found ${uniqueAudiences.length} unique target audiences:`, uniqueAudiences);
+  
+  updateDatalist('sourceTargetAudienceList', uniqueAudiences);
+  
+  // Reset subsequent dropdowns
+  updateDatalist('sourceAccountProvisionMethodList', []);
+  updateDatalist('sourceDurationList', []);
+  
+  // Auto-fill if only one option
+  if (uniqueAudiences.length === 1) {
+    document.getElementById('sourceTargetAudience').value = uniqueAudiences[0];
+    console.log(`✅ Auto-filled target audience: "${uniqueAudiences[0]}"`);
+    handleTargetAudienceChange({ target: { value: uniqueAudiences[0] } });
+  }
+}
+
+// Handle target audience change - filter account provision method dropdown
+function handleTargetAudienceChange(event) {
+  const targetAudience = event.target.value.trim();
+  
+  console.log(`👥 Target audience changed to: "${targetAudience}"`);
+  
+  // Clear dependent fields
+  clearDependentFields(['sourceAccountProvisionMethod', 'sourceDuration']);
+  
+  if (!targetAudience) {
+    updateDatalist('sourceAccountProvisionMethodList', []);
+    updateDatalist('sourceDurationList', []);
+    return;
+  }
+  
+  // Get filtered records
+  const filteredRecords = getFilteredRecords();
+  
+  console.log(`🔐 Found ${filteredRecords.length} records for target audience: "${targetAudience}"`);
+  
+  if (filteredRecords.length === 0) {
+    updateDatalist('sourceAccountProvisionMethodList', []);
+    updateDatalist('sourceDurationList', []);
+    return;
+  }
+  
+  // Update account provision method dropdown
+  const provisionMethods = filteredRecords
+    .map(r => r.accountProvisionMethod)
+    .filter(method => method && method.toString().trim() !== '');
+  
+  const uniqueMethods = [...new Set(provisionMethods)];
+  console.log(`🔐 Found ${uniqueMethods.length} unique provision methods:`, uniqueMethods);
+  
+  updateDatalist('sourceAccountProvisionMethodList', uniqueMethods);
+  
+  // Reset subsequent dropdowns
+  updateDatalist('sourceDurationList', []);
+  
+  // Auto-fill if only one option
+  if (uniqueMethods.length === 1) {
+    document.getElementById('sourceAccountProvisionMethod').value = uniqueMethods[0];
+    console.log(`✅ Auto-filled provision method: "${uniqueMethods[0]}"`);
+    handleAccountProvisionMethodChange({ target: { value: uniqueMethods[0] } });
+  }
+}
+
+// Handle account provision method change - filter duration dropdown
+function handleAccountProvisionMethodChange(event) {
+  const accountProvisionMethod = event.target.value.trim();
+  
+  console.log(`🔐 Account provision method changed to: "${accountProvisionMethod}"`);
+  
+  // Clear dependent fields
+  clearDependentFields(['sourceDuration']);
+  
+  if (!accountProvisionMethod) {
+    updateDatalist('sourceDurationList', []);
+    return;
+  }
+  
+  // Get filtered records
+  const filteredRecords = getFilteredRecords();
+  
+  console.log(`⏰ Found ${filteredRecords.length} records for provision method: "${accountProvisionMethod}"`);
+  
+  if (filteredRecords.length === 0) {
+    updateDatalist('sourceDurationList', []);
+    return;
+  }
+  
+  // Update duration dropdown
+  const durations = filteredRecords
+    .map(r => r.duration)
+    .filter(duration => duration && duration.toString().trim() !== '');
+  
+  const uniqueDurations = [...new Set(durations)];
+  console.log(`⏰ Found ${uniqueDurations.length} unique durations:`, uniqueDurations);
+  
+  updateDatalist('sourceDurationList', uniqueDurations);
+  
+  // Auto-fill if only one option
+  if (uniqueDurations.length === 1) {
+    document.getElementById('sourceDuration').value = uniqueDurations[0];
+    console.log(`✅ Auto-filled duration: "${uniqueDurations[0]}"`);
+  }
+  
+  // Auto-fill price fields if records match exactly
+  autoFillPriceFields(filteredRecords);
+}
+
+// Auto-fill price fields based on exact matches
+function autoFillPriceFields(records) {
+  if (records.length === 0) return;
   
   // Auto-fill price fields if only one unique value
-  const uniquePurchasePrices = [...new Set(matchingRecords.map(r => r.purchasePrice).filter(Boolean))];
+  const uniquePurchasePrices = [...new Set(records.map(r => r.purchasePrice).filter(Boolean))];
   if (uniquePurchasePrices.length === 1) {
     document.getElementById('sourcePurchasePrice').value = uniquePurchasePrices[0];
+    console.log(`💰 Auto-filled purchase price: "${uniquePurchasePrices[0]}"`);
   }
   
-  const uniqueSellingPrices = [...new Set(matchingRecords.map(r => r.sellingPrice).filter(Boolean))];
+  const uniqueSellingPrices = [...new Set(records.map(r => r.sellingPrice).filter(Boolean))];
   if (uniqueSellingPrices.length === 1) {
     document.getElementById('sourceSellingPrice').value = uniqueSellingPrices[0];
+    console.log(`💰 Auto-filled selling price: "${uniqueSellingPrices[0]}"`);
   }
   
-  const uniqueListedPrices = [...new Set(matchingRecords.map(r => r.listedPrice).filter(Boolean))];
+  const uniqueListedPrices = [...new Set(records.map(r => r.listedPrice).filter(Boolean))];
   if (uniqueListedPrices.length === 1) {
     document.getElementById('sourceListedPrice').value = uniqueListedPrices[0];
+    console.log(`💰 Auto-filled listed price: "${uniqueListedPrices[0]}"`);
+  }
+  
+  const uniqueDeliveryTimes = [...new Set(records.map(r => r.deliveryTime).filter(Boolean))];
+  if (uniqueDeliveryTimes.length === 1) {
+    document.getElementById('sourceDeliveryTime').value = uniqueDeliveryTimes[0];
+    console.log(`🚚 Auto-filled delivery time: "${uniqueDeliveryTimes[0]}"`);
   }
 }
 
