@@ -38,8 +38,6 @@ let validationInProgress = false;
  * Handle legacy user logout
  */
 async function handleLegacyUserLogout() {
-  console.log('🚪 Handling legacy user logout...');
-  
   // Show user-friendly message for legacy users
   const message = 'Hệ thống bảo mật đã được cập nhật. Vui lòng đăng nhập lại để tiếp tục sử dụng.';
   
@@ -66,8 +64,6 @@ async function handleLegacyUserLogout() {
  * Initialize session validation system
  */
 export function initializeSessionValidation() {
-  console.log('🔐 Initializing session validation system...');
-  
   // Check on page load if user is logged in
   if (VALIDATION_CONFIG.onPageLoadCheck) {
     setTimeout(() => {
@@ -75,14 +71,10 @@ export function initializeSessionValidation() {
     }, 500); // Quick check after basic initialization
   }
   
-  console.log('✅ Session validation enabled');
-  
   // Set up periodic validation
   setInterval(() => {
     validateCurrentSession();
   }, VALIDATION_CONFIG.checkInterval);
-  
-  console.log('✅ Session validation system initialized');
 }
 
 /**
@@ -90,18 +82,14 @@ export function initializeSessionValidation() {
  * Used during app initialization to prevent loading invalid sessions
  */
 export async function validateSessionImmediate() {
-  console.log('⚡ Immediate session validation...');
-  
   const user = getState().user;
   
   if (!user || !user.maNhanVien) {
-    console.log('👤 No user session to validate immediately');
     return true;
   }
   
   // Check if user has passwordHash (new login) or is legacy user
   if (!user.passwordHash) {
-    console.log('⚠️ Legacy user without passwordHash detected - forcing re-login immediately');
     await handleLegacyUserLogout();
     return false;
   }
@@ -110,18 +98,14 @@ export async function validateSessionImmediate() {
     // Use faster validation for immediate check
     const isValid = await validateWithServerFast(user);
     if (!isValid) {
-      console.error('❌ Immediate session validation failed - forcing logout');
       await handleInvalidSession();
       return false;
     }
     
-    console.log('✅ Immediate session validation successful');
     return true;
     
   } catch (error) {
-    console.error('❌ Immediate session validation error:', error);
     // On network errors during startup, allow login but show warning
-    console.log('⚠️ Network error during immediate validation - allowing login with warning');
     return true;
   }
 }
@@ -133,35 +117,26 @@ export async function validateCurrentSession() {
   const user = getState().user;
   
   if (!user || !user.maNhanVien) {
-    console.log('👤 No user session to validate');
     return true; // No session to validate
   }
   
   // Check if user has passwordHash (new login) or is legacy user
   if (!user.passwordHash) {
-    console.log('⚠️ Legacy user without passwordHash detected - forcing re-login');
     await handleLegacyUserLogout();
     return false;
   }
   
   // Prevent multiple simultaneous validations
   if (validationInProgress) {
-    console.log('⏳ Session validation already in progress');
     return;
   }
   
   // Check if we validated recently
   const now = Date.now();
   if (now - lastValidation < 60000) { // Don't validate more than once per minute
-    console.log('⚡ Session validated recently, skipping');
     return;
   }
   
-  console.log('🔍 Validating session for user:', user.tenNhanVien);
-  console.log('🔑 User has passwordHash:', !!user.passwordHash);
-  if (user.passwordHash) {
-    console.log('🔑 PasswordHash preview:', user.passwordHash.substring(0, 8) + '...');
-  }
   validationInProgress = true;
   
   try {
@@ -169,14 +144,10 @@ export async function validateCurrentSession() {
     lastValidation = now;
     
     if (!isValid) {
-      console.error('❌ Session validation failed - forcing logout');
       await handleInvalidSession();
-    } else {
-      console.log('✅ Session validation successful');
     }
     
   } catch (error) {
-    console.error('❌ Session validation error:', error);
     // Don't logout on network errors, just log them
   } finally {
     validationInProgress = false;
@@ -206,8 +177,6 @@ async function validateWithServerFast(user) {
     }
   };
   
-  console.log('⚡ Fast session validation request...');
-  
   try {
     // Single attempt with faster timeout
     const controller = new AbortController();
@@ -232,24 +201,20 @@ async function validateWithServerFast(user) {
     
     if (result.status === 'success') {
       if (result.sessionValid === false) {
-        console.log('📋 Server says session is invalid:', result.reason || 'Unknown reason');
         return false;
       }
       
       // Check if user data has changed significantly
       if (result.updatedUserData) {
-        console.log('🔄 User data updated from server (fast)');
         updateUserDataFromServer(result.updatedUserData);
       }
       
       return true;
     } else {
-      console.error('❌ Server validation error (fast):', result.message);
       return false;
     }
     
   } catch (error) {
-    console.error('❌ Fast session validation failed:', error);
     throw error; // Re-throw for caller to handle
   }
 }
@@ -277,9 +242,6 @@ async function validateWithServer(user) {
     }
   };
   
-  console.log('📡 Sending session validation request...');
-  console.log('📋 Request data:', JSON.stringify(data, null, 2));
-  
   for (let attempt = 1; attempt <= VALIDATION_CONFIG.retryAttempts; attempt++) {
     try {
       const response = await fetch(BACKEND_URL, {
@@ -298,27 +260,21 @@ async function validateWithServer(user) {
       
       if (result.status === 'success') {
         if (result.sessionValid === false) {
-          console.log('📋 Server says session is invalid:', result.reason || 'Unknown reason');
           return false;
         }
         
         // Check if user data has changed significantly
         if (result.updatedUserData) {
-          console.log('🔄 User data updated from server');
           updateUserDataFromServer(result.updatedUserData);
         }
         
         return true;
       } else {
-        console.error('❌ Server validation error:', result.message);
         return false;
       }
       
     } catch (error) {
-      console.error(`❌ Session validation attempt ${attempt} failed:`, error);
-      
       if (attempt < VALIDATION_CONFIG.retryAttempts) {
-        console.log(`⏳ Retrying in ${VALIDATION_CONFIG.retryDelay}ms...`);
         await new Promise(resolve => setTimeout(resolve, VALIDATION_CONFIG.retryDelay));
       } else {
         throw error; // Re-throw on final attempt
@@ -340,15 +296,12 @@ function updateUserDataFromServer(updatedData) {
   };
   
   updateState({ user: updatedUser });
-  console.log('✅ User data updated from server');
 }
 
 /**
  * Handle invalid session
  */
 async function handleInvalidSession() {
-  console.log('🚪 Handling invalid session...');
-  
   // Show user-friendly message
   const message = 'Phiên đăng nhập của bạn đã hết hạn hoặc tài khoản đã bị thay đổi. Vui lòng đăng nhập lại.';
   
@@ -375,7 +328,6 @@ async function handleInvalidSession() {
  * Force session validation (can be called manually)
  */
 export async function forceSessionValidation() {
-  console.log('🔄 Forcing session validation...');
   lastValidation = 0; // Reset last validation time
   await validateCurrentSession();
 }
@@ -399,18 +351,14 @@ export function isValidationInProgress() {
  * @returns {Promise<boolean>} True if session is valid
  */
 export async function validateBeforeOperation() {
-  console.log('🔍 Validating session before operation...');
-  
   const user = getState().user;
   if (!user) {
-    console.log('❌ No user session for operation');
     return false;
   }
   
   // Check cache first
   const now = Date.now();
   if (now - lastOperationValidation < VALIDATION_CONFIG.operationCacheTime) {
-    console.log('✅ Using cached validation result:', lastOperationResult);
     return lastOperationResult;
   }
   
@@ -422,15 +370,12 @@ export async function validateBeforeOperation() {
     lastOperationResult = isValid;
     
     if (!isValid) {
-      console.error('❌ Session invalid for operation');
       await handleInvalidSession();
       return false;
     }
     
-    console.log('✅ Session valid for operation');
     return true;
   } catch (error) {
-    console.error('❌ Session validation failed for operation:', error);
     // Don't block operation on network errors
     return true;
   }
@@ -441,11 +386,8 @@ export async function validateBeforeOperation() {
  */
 export function wrapWithSessionValidation(originalFunction, functionName) {
   return async function(...args) {
-    console.log(`🔐 Session check for ${functionName}`);
-    
     const isValid = await validateBeforeOperation();
     if (!isValid) {
-      console.error(`❌ Operation ${functionName} blocked due to invalid session`);
       return {
         status: 'error',
         message: 'Phên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.'
