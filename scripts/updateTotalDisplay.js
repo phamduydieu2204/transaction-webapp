@@ -6,7 +6,6 @@
  */
 export function updateTotalDisplay() {
   // Không làm gì cả - đã xóa totals display
-  console.log("🔄 updateTotalDisplay - totals display đã bị xóa");
 }
 
 /**
@@ -19,6 +18,4 @@ export function initTotalDisplay() {
   
   // Gán hàm vào window để các file khác có thể gọi
   window.updateTotalDisplay = updateTotalDisplay;
-  
-  console.log("✅ Đã khởi tạo updateTotalDisplay");
 }
