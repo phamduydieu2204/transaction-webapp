@@ -20,7 +20,6 @@ function getTodayFormatted() {
 }
 
 export async function handleAdd(userInfo, currentEditTransactionId, loadTransactions, handleReset, updatePackageList, showProcessingModal, showResultModal) {
-  console.log("🔍 handleAdd được gọi");
   
   // Kiểm tra nếu người dùng đang cố thêm giao dịch hoàn tiền hoặc hủy giao dịch trực tiếp
   const transactionTypeElement = document.getElementById("transactionType");
@@ -35,7 +34,6 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
   
   // Kiểm tra nếu đang trong tiến trình sửa thì hiển thị modal ngay tức thì
   if (window.currentEditTransactionId !== null) {
-    console.log("Đang trong tiến trình sửa, mở modal lựa chọn thêm/cập nhật...");
     openAddOrUpdateModal();
     return;
   }
@@ -57,7 +55,6 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
   }
   
   // Use the current form values for dates (don't force update to today)
-  console.log("📅 Using current form date values for new transaction");
 
   if (!userInfo) {
     showResultModal("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.", false);
@@ -83,7 +80,6 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
   for (const [fieldId, fieldName] of Object.entries(requiredFields)) {
     const element = document.getElementById(fieldId);
     if (!element) {
-      console.error(`Không tìm thấy element với id: ${fieldId}`);
       continue;
     }
     
@@ -139,7 +135,6 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
     originalTransactionId: transactionType === "Hoàn Tiền" ? currentEditTransactionId : null
   };
 
-  console.log("📤 Dữ liệu gửi đi:", JSON.stringify(data, null, 2));
 
   try {
     const result = await apiRequestJson(data);
@@ -188,7 +183,6 @@ export async function handleAdd(userInfo, currentEditTransactionId, loadTransact
     }
   } catch (err) {
     showResultModal(`Lỗi kết nối server: ${err.message}`, false);
-    console.error("Lỗi:", err);
   } finally {
     // Luôn mở khóa UI khi kết thúc
     uiBlocker.unblock();

@@ -6,12 +6,10 @@ import { updateTransactionTypeForEdit } from './transactionTypeManager.js';
 export async function editTransaction(index, transactionList, fetchSoftwareList, updatePackageList, updateAccountList) {
   // Kiểm tra index hợp lệ và lấy giao dịch tương ứng
   if (!transactionList || !Array.isArray(transactionList) || index < 0 || index >= transactionList.length) {
-    console.error("Danh sách giao dịch không hợp lệ hoặc chỉ số không hợp lệ:", { index, transactionList });
     return;
   }
   const transaction = transactionList[index];
   if (!transaction) {
-    console.error("Giao dịch không tồn tại tại chỉ số:", index);
     return;
   }
 
@@ -49,12 +47,6 @@ export async function editTransaction(index, transactionList, fetchSoftwareList,
   document.getElementById("revenue").value = transaction.revenue;
   document.getElementById("note").value = transaction.note;
 
-console.log("📥 editTransaction - gọi fetchSoftwareList với:", {
-  softwareNameValue,
-  softwarePackageValue,
-  accountNameValue
-});
-console.log("🔎 typeof fetchSoftwareList =", typeof fetchSoftwareList);
   // Đã loại bỏ showProcessingModal để tránh trùng lặp với uiBlocker
 
   // ✅ Cập nhật danh sách dropdown với các giá trị gốc cần giữ lại

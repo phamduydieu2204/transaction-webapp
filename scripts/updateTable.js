@@ -54,7 +54,6 @@ function handleTransactionActionByIndex(selectElement) {
   if (!action) return;
   
   const globalIndex = parseInt(selectElement.dataset.index);
-  console.log('🔍 Transaction action:', action, 'Index:', globalIndex);
   
   // Reset dropdown to default
   selectElement.value = '';
@@ -62,24 +61,15 @@ function handleTransactionActionByIndex(selectElement) {
   // Get transaction from window.transactionList
   const transaction = window.transactionList[globalIndex];
   if (!transaction) {
-    console.error('❌ Transaction not found at index:', globalIndex);
     return;
   }
   
-  console.log('🔍 Found transaction:', {
-    action,
-    globalIndex,
-    transaction,
-    transactionId: transaction.transactionId,
-    transactionListLength: window.transactionList ? window.transactionList.length : 0
-  });
   
   // Execute action based on selection
   switch (action) {
     case 'view':
       if (typeof window.viewTransaction === 'function') {
         // Pass globalIndex directly - it's already the correct index
-        console.log('🔍 View action - using globalIndex:', globalIndex);
         window.viewTransaction(globalIndex, window.transactionList, window.formatDate);
       }
       break;
@@ -94,13 +84,8 @@ function handleTransactionActionByIndex(selectElement) {
       }
       break;
     case 'updateCookie':
-      console.log('🍪 Update cookie action triggered for index:', globalIndex);
-      console.log('🍪 Transaction:', transaction);
-      console.log('🍪 handleUpdateCookie function exists:', typeof window.handleUpdateCookie === 'function');
       if (typeof window.handleUpdateCookie === 'function') {
         window.handleUpdateCookie(globalIndex);
-      } else {
-        console.error('❌ handleUpdateCookie function not found');
       }
       break;
     case 'changePassword':
@@ -111,8 +96,6 @@ function handleTransactionActionByIndex(selectElement) {
     case 'checkAccess':
       if (typeof window.checkSheetAccess === 'function') {
         window.checkSheetAccess(transaction);
-      } else {
-        console.error('checkSheetAccess function not found');
       }
       break;
   }
@@ -264,7 +247,6 @@ function copyOrderInfo(transaction, button) {
       button.style.borderColor = '#007bff';
     }, 2000);
   }).catch((err) => {
-    console.error('Failed to copy order info:', err);
     
     // Show error feedback
     const originalContent = button.innerHTML;
@@ -286,7 +268,6 @@ function copyOrderInfo(transaction, button) {
 export function updateTable(transactionList, currentPage, itemsPerPage, formatDate, editTransaction, deleteTransaction, viewTransaction) {
   const tableBody = document.querySelector("#transactionTable tbody");
   if (!tableBody) {
-    console.error("❌ Không tìm thấy tbody của transactionTable");
     return;
   }
   
@@ -304,10 +285,6 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
   const isLink = (text) => /^https?:\/\//i.test(text);
 
-  console.log("📌 BẮT ĐẦU HIỂN THỊ GIAO DỊCH");
-  console.log("🟢 Vai trò:", window.userInfo?.vaiTro);
-  console.log("🟢 isSearching:", window.isSearching);
-  console.log("🟢 todayFormatted:", todayFormatted);
 
   // Get background color based on transaction type
   const getTransactionRowColor = (transactionType) => {
@@ -341,7 +318,6 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
     totalRevenue = transactionList.reduce((sum, t) => {
       return sum + (parseFloat(t.revenue) || 0);
     }, 0);
-    console.log("🔍 Đang tìm kiếm - Tổng doanh thu:", totalRevenue);
   } else {
     totalRevenue = transactionList.reduce((sum, t) => {
       if (t.transactionDate && t.transactionDate.startsWith(todayFormatted)) {
@@ -349,7 +325,6 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
       }
       return sum;
     }, 0);
-    console.log("📅 Không tìm kiếm - Tổng doanh thu hôm nay:", totalRevenue);
   }
 
   // ✅ Build and append rows
@@ -460,14 +435,6 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
     // Debug employee code
     if (index === 0) {
-      console.log('🔍 First transaction employee data:', {
-        maNhanVien: transaction.maNhanVien,
-        tenNhanVien: transaction.tenNhanVien,
-        employeeCode: employeeCode,
-        color: employeeColor,
-        allKeys: Object.keys(transaction)
-      });
-      console.log('🔍 Employee code determined:', employeeCode);
     }
     
     const infoCell = `
@@ -564,10 +531,8 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
 
   // ✅ Lưu tổng doanh thu vào biến global và cập nhật hiển thị
   window.totalRevenue = totalRevenue;
-  console.log("✅ Đã lưu totalRevenue:", totalRevenue);
 
   // Không cần cập nhật hiển thị totals nữa - đã xóa
-  console.log("✅ Đã lưu totalRevenue:", totalRevenue, "- Không hiển thị totals");
   
   // ✅ Add event listener for copy order buttons
   if (!tableBody.hasAttribute('data-copy-events-attached')) {
@@ -584,7 +549,6 @@ export function updateTable(transactionList, currentPage, itemsPerPage, formatDa
             const transaction = JSON.parse(transactionData.replace(/&apos;/g, "'"));
             copyOrderInfo(transaction, button);
           } catch (error) {
-            console.error('Error parsing transaction data:', error);
           }
         }
       }

@@ -45,12 +45,9 @@ class LazyLoader {
    */
   async doLoadModule(modulePath, key) {
     try {
-      console.log(`🔄 Lazy loading: ${key}`);
       const module = await import(modulePath);
-      console.log(`✅ Loaded: ${key}`);
       return module;
     } catch (error) {
-      console.error(`❌ Failed to load ${key}:`, error);
       throw error;
     }
   }
