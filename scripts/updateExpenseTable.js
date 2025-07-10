@@ -42,7 +42,6 @@ if (typeof window !== 'undefined') {
  * Force refresh expense table (useful after adding new expense)
  */
 export function refreshExpenseTable() {
-  console.log('🔄 Force refreshing expense table...');
   // Reset to first page to show newest expense
   window.currentExpensePage = 1;
   updateExpenseTable();
@@ -169,7 +168,6 @@ window.expenseGoToPage = expenseGoToPage;
 export function updateExpenseTable() {
   const table = document.querySelector('#expenseListTable');
   if (!table) {
-    console.warn('⚠️ Expense table not found');
     return;
   }
   
@@ -177,7 +175,6 @@ export function updateExpenseTable() {
   const tableBody = table.querySelector('tbody');
   
   if (!tableBody) {
-    console.warn('⚠️ Expense table body not found');
     return;
   }
   
@@ -238,7 +235,6 @@ export function updateExpenseTable() {
   // Update pagination - Sử dụng component chung như transaction table
   updateExpensePagination(totalPages, currentPage);
   
-  console.log(`📄 Displayed ${paginatedExpenses.length} expenses (page ${currentPage}/${totalPages}) with pagination`);
 }
 
 /**
@@ -249,14 +245,7 @@ function createExpenseRow(expense, index) {
   
   // Debug log để xem cấu trúc dữ liệu
   if (index === 0) {
-    console.log('🔍 DEBUG: Sample expense data structure:', expense);
-    console.log('🔍 Available keys:', Object.keys(expense));
     // Debug ngày tái tục
-    console.log('📅 DEBUG: Renew date fields:', {
-      renewDate: expense.renewDate,
-      expenseRenewDate: expense.expenseRenewDate,
-      ngayTaiTuc: expense.ngayTaiTuc
-    });
   }
   
   // Format dates
