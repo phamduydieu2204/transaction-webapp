@@ -29,7 +29,6 @@ class CSSOptimizer {
       };
       
       link.onerror = () => {
-        console.error(`Failed to load CSS: ${href}`);
         reject(new Error(`Failed to load CSS: ${href}`));
       };
       

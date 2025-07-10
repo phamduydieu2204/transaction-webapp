@@ -18,7 +18,6 @@ class CSSOptimizer {
    */
   async loadCriticalCSS() {
     if (this.criticalCSS) {
-      console.log('⚡ Critical CSS already loaded');
       return;
     }
     
@@ -35,10 +34,8 @@ class CSSOptimizer {
       document.head.insertBefore(style, document.head.firstChild);
       
       this.criticalCSS = css;
-      console.log('✅ Critical CSS loaded inline (', css.length, 'chars)');
       
     } catch (error) {
-      console.warn('⚠️ Critical CSS loading failed:', error);
     }
   }
   
@@ -47,7 +44,6 @@ class CSSOptimizer {
    */
   loadCSS(href, media = 'all') {
     if (this.loadedSheets.has(href)) {
-      console.log('⚡ CSS already loaded:', href);
       return Promise.resolve();
     }
     
@@ -60,12 +56,10 @@ class CSSOptimizer {
       link.onload = () => {
         link.media = media; // Switch to correct media
         this.loadedSheets.add(href);
-        console.log('✅ CSS loaded:', href);
         resolve();
       };
       
       link.onerror = () => {
-        console.error('❌ CSS loading failed:', href);
         reject(new Error(`CSS loading failed: ${href}`));
       };
       
@@ -94,7 +88,6 @@ class CSSOptimizer {
     link.onload = () => {
       link.rel = 'stylesheet';
       this.loadedSheets.add(href);
-      console.log('⚡ CSS preloaded & applied:', href);
     };
     
     document.head.appendChild(link);
@@ -116,7 +109,6 @@ class CSSOptimizer {
     const trigger = document.querySelector(triggerSelector);
     if (trigger) {
       observer.observe(trigger);
-      console.log('👁️ CSS will load when', triggerSelector, 'is visible');
     }
   }
   
@@ -161,8 +153,6 @@ class CSSOptimizer {
         // Some rules can't be deleted, ignore
       }
     });
-    
-    console.log(`🗑️ Removed ${rulesToRemove.length} unused CSS rules`);
   }
   
   /**
@@ -174,7 +164,6 @@ class CSSOptimizer {
         this.removeUnusedCSS(stylesheet);
       } catch (e) {
         // Cross-origin stylesheets can't be accessed
-        console.log('⚠️ Cannot optimize cross-origin stylesheet');
       }
     });
   }
@@ -198,8 +187,6 @@ export async function initCSSOptimizations() {
   
   // Lazy load table-specific CSS when tables section is visible
   optimizer.loadCSSOnDemand('./css/components/tables.css', '.tables-row');
-  
-  console.log('✅ CSS optimizations initialized');
   
   return optimizer;
 }
@@ -226,8 +213,6 @@ export function optimizeFontLoading() {
       link.rel = 'stylesheet';
     }, 100);
   });
-  
-  console.log('⚡ Font loading optimized');
 }
 
 /**
@@ -245,8 +230,6 @@ export function addResourceHints() {
     Object.assign(link, hint);
     document.head.appendChild(link);
   });
-  
-  console.log('🔗 Resource hints added');
 }
 
 export default CSSOptimizer;
