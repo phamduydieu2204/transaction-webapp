@@ -23,8 +23,6 @@ function setupSoftwareDropdownHandlers() {
     
     // Create the event handler
     softwareNameSelect.changeHandler = function() {
-      console.log('🔄 Software name changed:', this.value);
-      
       // Update package list based on selected software
       if (window.softwareData) {
         updatePackageList(window.softwareData, null, updateAccountList, null);
@@ -33,7 +31,6 @@ function setupSoftwareDropdownHandlers() {
     
     // Add the event listener
     softwareNameSelect.addEventListener('change', softwareNameSelect.changeHandler);
-    console.log('✅ Software name change handler attached');
   }
   
   if (softwarePackageSelect) {
@@ -44,8 +41,6 @@ function setupSoftwareDropdownHandlers() {
     
     // Create the event handler
     softwarePackageSelect.changeHandler = function() {
-      console.log('🔄 Software package changed:', this.value);
-      
       // Update account list based on selected software and package
       if (window.softwareData) {
         updateAccountList(window.softwareData, null);
@@ -54,7 +49,6 @@ function setupSoftwareDropdownHandlers() {
     
     // Add the event listener
     softwarePackageSelect.addEventListener('change', softwarePackageSelect.changeHandler);
-    console.log('✅ Software package change handler attached');
   }
 }
 
@@ -63,16 +57,14 @@ function setupSoftwareDropdownHandlers() {
  */
 async function initializeSoftwareData() {
   if (!window.softwareData || window.softwareData.length === 0) {
-    console.log('📦 Loading software data...');
     try {
       // Import fetchSoftwareList
       const { fetchSoftwareList } = await import('./fetchSoftwareList.js');
       
       // Load software data
       await fetchSoftwareList(null, window.softwareData, updatePackageList, updateAccountList);
-      console.log('✅ Software data loaded');
     } catch (error) {
-      console.error('❌ Error loading software data:', error);
+      // Silent fail
     }
   }
 }
@@ -81,8 +73,6 @@ async function initializeSoftwareData() {
  * Initialize the transaction tab
  */
 export async function initTransactionTab() {
-  console.log('💰 Initializing transaction tab...');
-  
   try {
     // Initialize date calculations and defaults
     initializeDateCalculations();
@@ -95,10 +85,8 @@ export async function initTransactionTab() {
     
     // Setup software dropdown cascading handlers
     setupSoftwareDropdownHandlers();
-    
-    console.log('✅ Transaction tab initialized successfully');
   } catch (error) {
-    console.error('❌ Error initializing transaction tab:', error);
+    // Silent fail
   }
 }
 
