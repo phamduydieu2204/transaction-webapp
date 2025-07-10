@@ -161,7 +161,6 @@ function updateSourceTable() {
   
   tbody.innerHTML = pageData.map((source, index) => {
     const globalIndex = startIndex + index;
-    const rowNumber = globalIndex + 1;
     
     // Build supplier info with contact (truncated with copy icon)
     const contactInfo = source.zaloContact || '';
@@ -195,7 +194,7 @@ function updateSourceTable() {
     
     return `
       <tr>
-        <td style="text-align: center; font-weight: 500;">${rowNumber}</td>
+        <td style="text-align: center; font-weight: 600; color: #2c3e50;">${source.sourceCode || 'N/A'}</td>
         <td style="max-width: 200px; word-wrap: break-word;">${supplierInfo}</td>
         <td style="max-width: 300px; word-wrap: break-word;">${softwareInfo}</td>
         <td style="text-align: center;">${source.duration || '--'}</td>
