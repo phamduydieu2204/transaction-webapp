@@ -3539,6 +3539,17 @@ async function markAsPaid(transactionId) {
       window.showProcessingModal("Đang cập nhật trạng thái thanh toán...");
     }
 
+    // Validate session before updating transaction
+    if (typeof window.validateBeforeOperation === 'function') {
+      const sessionValid = await window.validateBeforeOperation();
+      if (!sessionValid) {
+        if (typeof window.closeProcessingModal === 'function') {
+          window.closeProcessingModal();
+        }
+        return;
+      }
+    }
+
     // Find the transaction to update
     let transaction = null;
     
@@ -3558,6 +3569,14 @@ async function markAsPaid(transactionId) {
     }
 
     console.log('Found transaction to mark as paid:', transaction.transactionId);
+
+    // Get user info for editor permissions
+    const userInfo = window.getState ? window.getState().user : null;
+    if (!userInfo) {
+      throw new Error("Không tìm thấy thông tin nhân viên. Vui lòng đăng nhập lại.");
+    }
+
+    console.log("✅ User info for markAsPaid:", userInfo.tenNhanVien);
 
     // Get backend URL
     const { BACKEND_URL } = getConstants();
@@ -3581,7 +3600,11 @@ async function markAsPaid(transactionId) {
       revenue: transaction.revenue,
       note: transaction.note || "",
       tenNhanVien: transaction.tenNhanVien,
-      maNhanVien: transaction.maNhanVien
+      maNhanVien: transaction.maNhanVien,
+      // Add editor information for permission check
+      editorTenNhanVien: userInfo.tenNhanVien,
+      editorMaNhanVien: userInfo.maNhanVien,
+      duocSuaGiaoDichCuaAi: userInfo.duocSuaGiaoDichCuaAi || "chỉ bản thân"
     };
 
     // Send update request
