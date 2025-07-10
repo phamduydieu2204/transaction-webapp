@@ -3039,6 +3039,12 @@ async function loadPendingTransactions(transactions = [], dateRange = null) {
     // Categorize pending transactions
     const pendingCategories = categorizePendingTransactions(transactions);
     
+    // Store pending data globally for viewTransactionDetails access
+    window.pendingTransactions = {
+      needsDelivery: pendingCategories.needsDelivery,
+      needsPayment: pendingCategories.needsPayment
+    };
+    
     // Update summary badges
     updatePendingSummary(pendingCategories);
     
@@ -3323,13 +3329,13 @@ async function loadNeedsPaymentTable(needsPayment) {
           ${isOverdue ? '<i class="fas fa-exclamation-triangle overdue-icon"></i>' : ''}
         </td>
         <td class="action-cell">
-          <button class="action-btn-small payment" onclick="markAsPaid('${transaction.id || ''}')" title="Đánh dấu đã thanh toán">
+          <button class="action-btn-small payment" onclick="markAsPaid('${transaction.transactionId || transaction.id || ''}')" title="Đánh dấu đã thanh toán">
             <i class="fas fa-dollar-sign"></i>
           </button>
-          <button class="action-btn-small reminder" onclick="sendPaymentReminder('${transaction.id || ''}')" title="Gửi nhắc nhở">
+          <button class="action-btn-small reminder" onclick="sendPaymentReminder('${transaction.transactionId || transaction.id || ''}')" title="Gửi nhắc nhở">
             <i class="fas fa-bell"></i>
           </button>
-          <button class="action-btn-small details" onclick="viewTransactionDetails('${transaction.id || ''}')" title="Xem chi tiết">
+          <button class="action-btn-small details" onclick="viewTransactionDetails('${transaction.transactionId || transaction.id || ''}')" title="Xem chi tiết">
             <i class="fas fa-eye"></i>
           </button>
         </td>
@@ -3541,10 +3547,43 @@ function sendPaymentReminder(transactionId) {
 async function viewTransactionDetails(transactionId) {
   
   try {
-    // Find the transaction
-    const transaction = window.transactionList?.find(t => t.transactionId === transactionId);
+    // Debug logging
+    console.log('viewTransactionDetails called with ID:', transactionId);
+    console.log('Available data sources:', {
+      transactionList: !!window.transactionList,
+      transactionListLength: window.transactionList?.length || 0,
+      pendingTransactions: !!window.pendingTransactions,
+      needsPaymentLength: window.pendingTransactions?.needsPayment?.length || 0,
+      needsDeliveryLength: window.pendingTransactions?.needsDelivery?.length || 0
+    });
+    
+    // Find the transaction in multiple sources
+    let transaction = null;
+    
+    // First, try to find in main transaction list
+    if (window.transactionList && window.transactionList.length > 0) {
+      transaction = window.transactionList.find(t => t.transactionId === transactionId || t.id === transactionId);
+    }
+    
+    // If not found, try in pending transactions
+    if (!transaction && window.pendingTransactions) {
+      if (window.pendingTransactions.needsPayment) {
+        transaction = window.pendingTransactions.needsPayment.find(t => t.transactionId === transactionId || t.id === transactionId);
+      }
+      if (!transaction && window.pendingTransactions.needsDelivery) {
+        transaction = window.pendingTransactions.needsDelivery.find(t => t.transactionId === transactionId || t.id === transactionId);
+      }
+    }
+    
+    console.log('Found transaction:', !!transaction, transaction?.transactionId || transaction?.id);
+    
     if (!transaction) {
-      throw new Error('Không tìm thấy giao dịch');
+      console.error('Transaction not found. Available transactions:', {
+        mainList: window.transactionList?.map(t => ({ id: t.id, transactionId: t.transactionId })) || [],
+        needsPayment: window.pendingTransactions?.needsPayment?.map(t => ({ id: t.id, transactionId: t.transactionId })) || [],
+        needsDelivery: window.pendingTransactions?.needsDelivery?.map(t => ({ id: t.id, transactionId: t.transactionId })) || []
+      });
+      throw new Error(`Không tìm thấy giao dịch với ID: ${transactionId}`);
     }
     
     // Check if viewTransaction function is available
