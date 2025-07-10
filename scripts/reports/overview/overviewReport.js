@@ -7,6 +7,7 @@
 import { ensureDataIsLoaded, showError } from '../core/reportHelpers.js';
 import { formatRevenue, formatCurrency, formatDate } from '../../formatDate.js';
 import { getFromStorage } from '../../core/stateManager.js';
+import { getConstants } from '../../constants.js';
 import { 
   calculateBusinessMetrics,
   calculateTotalRevenue,
@@ -3530,13 +3531,117 @@ async function markAsDelivered(transactionId) {
   }
 }
 
-function markAsPaid(transactionId) {
-  // Implementation would update payment status
-  alert(`Gả lập: Đánh dấu giao dịch ${transactionId} đã thanh toán`);
-  // Reload pending transactions with current date range
-  const dateRange = window.globalFilters?.dateRange || null;
-  const transactions = window.transactionList || [];
-  loadPendingTransactions(transactions, dateRange);
+async function markAsPaid(transactionId) {
+  console.log('markAsPaid called with ID:', transactionId);
+  
+  try {
+    // Show processing modal
+    if (typeof window.showProcessingModal === 'function') {
+      window.showProcessingModal("Đang cập nhật trạng thái thanh toán...");
+    }
+
+    // Find the transaction to update
+    let transaction = null;
+    
+    // Search in main transaction list
+    if (window.transactionList && window.transactionList.length > 0) {
+      transaction = window.transactionList.find(t => t.transactionId === transactionId || t.id === transactionId);
+    }
+    
+    // Search in pending transactions if not found in main list
+    if (!transaction && window.pendingTransactions) {
+      transaction = window.pendingTransactions.needsPayment?.find(t => t.transactionId === transactionId || t.id === transactionId) ||
+                   window.pendingTransactions.needsDelivery?.find(t => t.transactionId === transactionId || t.id === transactionId);
+    }
+
+    if (!transaction) {
+      throw new Error(`Không tìm thấy giao dịch với ID: ${transactionId}`);
+    }
+
+    console.log('Found transaction to mark as paid:', transaction.transactionId);
+
+    // Get backend URL
+    const { BACKEND_URL } = getConstants();
+    
+    // Prepare update data - change transactionType to "Đã hoàn tất"
+    const updateData = {
+      action: "updateTransaction",
+      transactionId: transaction.transactionId || transaction.id,
+      transactionType: "Đã hoàn tất", // Change from "Chưa thanh toán" to "Đã hoàn tất"
+      transactionDate: transaction.transactionDate,
+      customerName: transaction.customerName,
+      customerEmail: transaction.customerEmail,
+      customerPhone: transaction.customerPhone,
+      duration: transaction.duration,
+      startDate: transaction.startDate,
+      endDate: transaction.endDate,
+      deviceCount: transaction.deviceCount,
+      softwareName: transaction.softwareName,
+      softwarePackage: transaction.softwarePackage,
+      accountName: transaction.accountName,
+      revenue: transaction.revenue,
+      note: transaction.note || "",
+      tenNhanVien: transaction.tenNhanVien,
+      maNhanVien: transaction.maNhanVien
+    };
+
+    // Send update request
+    const response = await fetch(BACKEND_URL, {
+      method: "POST", 
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updateData)
+    });
+
+    const result = await response.json();
+    console.log('Update response:', result);
+
+    if (result.status === "success") {
+      // Clear cache
+      if (window.cacheManager && window.cacheManager.clearTransactionCaches) {
+        window.cacheManager.clearTransactionCaches();
+      }
+      
+      // Reload transactions to get fresh data
+      if (window.loadTransactions) {
+        await window.loadTransactions();
+      }
+      
+      // Reload pending transactions with current date range
+      const dateRange = window.globalFilters?.dateRange || null;
+      const transactions = window.transactionList || [];
+      await loadPendingTransactions(transactions, dateRange);
+      
+      // Close processing modal
+      if (typeof window.closeProcessingModal === 'function') {
+        window.closeProcessingModal();
+      }
+      
+      // Show success message
+      if (typeof window.showResultModal === 'function') {
+        window.showResultModal("Đã cập nhật trạng thái thanh toán thành công!", true);
+      } else {
+        alert("Đã đánh dấu giao dịch đã thanh toán thành công!");
+      }
+      
+    } else {
+      throw new Error(result.message || 'Cập nhật thất bại');
+    }
+
+  } catch (error) {
+    console.error('Error in markAsPaid:', error);
+    
+    // Close processing modal
+    if (typeof window.closeProcessingModal === 'function') {
+      window.closeProcessingModal();
+    }
+    
+    // Show error message
+    if (typeof window.showResultModal === 'function') {
+      window.showResultModal(`Lỗi: ${error.message}`, false);
+    } else {
+      alert(`Lỗi: ${error.message}`);
+    }
+  }
 }
 
 function sendPaymentReminder(transactionId) {
