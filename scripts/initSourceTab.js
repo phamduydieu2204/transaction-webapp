@@ -28,7 +28,6 @@ window.sourceDropdownData = {
 };
 
 export function initSourceTab() {
-  console.log('📦 Initializing source tab...');
   
   // Initialize pagination controls
   initSourcePagination();
@@ -39,7 +38,6 @@ export function initSourceTab() {
   // Initialize form event listeners
   initFormEventListeners();
   
-  console.log('✅ Source tab initialized');
 }
 
 // Initialize pagination for source list
@@ -87,7 +85,6 @@ function initSourcePagination() {
 // Load source data from backend
 async function loadSourceData() {
   try {
-    console.log('🔄 Loading source data...');
     
     // Show loading modal
     if (typeof showProcessingModalUnified === 'function') {
@@ -109,7 +106,6 @@ async function loadSourceData() {
     
     if (result.status === "success") {
       window.sourceList = result.data || [];
-      console.log(`✅ Loaded ${window.sourceList.length} source items`);
       
       // Update dropdown data
       updateDropdownData();
@@ -127,7 +123,6 @@ async function loadSourceData() {
       closeProcessingModal();
     }
     
-    console.error('❌ Error loading source data:', error);
     window.sourceList = [];
     updateSourceTable();
     updateSourceTotalDisplay();
@@ -224,7 +219,6 @@ window.copyToClipboard = function(text) {
     navigator.clipboard.writeText(text).then(() => {
       showToast('Đã copy: ' + text, 'success');
     }).catch(err => {
-      console.error('Failed to copy: ', err);
       fallbackCopyTextToClipboard(text);
     });
   } else {
@@ -252,7 +246,6 @@ function fallbackCopyTextToClipboard(text) {
       showToast('Không thể copy', 'error');
     }
   } catch (err) {
-    console.error('Fallback: Oops, unable to copy', err);
     showToast('Không thể copy', 'error');
   }
 
@@ -434,7 +427,6 @@ window.handleSourceAction = function(selectElement, index) {
 
 // Edit source item
 function editSourceItem(source, index) {
-  console.log(`📝 Editing source at index ${index}:`, source);
   
   // Set the edit index
   window.currentEditSourceIndex = index;
@@ -520,7 +512,6 @@ async function deleteSourceItem(source, index) {
       closeProcessingModal();
     }
     
-    console.error('❌ Error deleting source:', error);
     
     if (typeof showResultModalUnified === 'function') {
       showResultModalUnified('Có lỗi xảy ra khi xóa nguồn hàng', false);
@@ -530,7 +521,6 @@ async function deleteSourceItem(source, index) {
 
 // Handle add source
 window.handleSourceAdd = async function() {
-  console.log('🔄 Adding new source...');
   
   try {
     // Get form data
@@ -577,7 +567,6 @@ window.handleSourceAdd = async function() {
       // Reload source data to reflect changes
       await loadSourceData();
       
-      console.log('✅ Source added successfully:', result.data);
       
     } else {
       // Show error message
@@ -587,7 +576,6 @@ window.handleSourceAdd = async function() {
       } else {
         alert('❌ ' + errorMessage);
       }
-      console.error('❌ Error adding source:', result.message);
     }
     
   } catch (error) {
@@ -598,7 +586,6 @@ window.handleSourceAdd = async function() {
       closeProcessingModal();
     }
     
-    console.error('❌ Error in handleSourceAdd:', error);
     const errorMessage = 'Có lỗi kết nối. Vui lòng thử lại sau.';
     if (typeof showResultModalUnified === 'function') {
       showResultModalUnified(errorMessage, false);
@@ -610,7 +597,6 @@ window.handleSourceAdd = async function() {
 
 // Handle update source
 window.handleSourceUpdate = async function() {
-  console.log('🔄 Updating source...');
   
   // Check if we're in edit mode
   if (window.currentEditSourceIndex === -1) {
@@ -653,7 +639,6 @@ window.handleSourceUpdate = async function() {
       ...formData
     };
     
-    console.log('Source update data:', updateData);
     
     // Call backend API
     const result = await apiRequestJson({
@@ -682,7 +667,6 @@ window.handleSourceUpdate = async function() {
       // Reload source data to reflect changes
       await loadSourceData();
       
-      console.log('✅ Source updated successfully:', result.data);
       
     } else {
       // Show error message
@@ -692,7 +676,6 @@ window.handleSourceUpdate = async function() {
       } else {
         alert('❌ ' + errorMessage);
       }
-      console.error('❌ Error updating source:', result.message);
     }
     
   } catch (error) {
@@ -703,7 +686,6 @@ window.handleSourceUpdate = async function() {
       closeProcessingModal();
     }
     
-    console.error('❌ Error in handleSourceUpdate:', error);
     const errorMessage = 'Có lỗi kết nối. Vui lòng thử lại sau.';
     if (typeof showResultModalUnified === 'function') {
       showResultModalUnified(errorMessage, false);
@@ -715,7 +697,6 @@ window.handleSourceUpdate = async function() {
 
 // Handle search source
 window.handleSourceSearch = async function() {
-  console.log('🔍 Starting source search...');
   
   try {
     // Get search conditions from form
@@ -736,7 +717,6 @@ window.handleSourceSearch = async function() {
     
     // ✅ LOGIC ĐẶC BIỆT: Nếu có ghi chú, chỉ tìm kiếm theo ghi chú
     if (conditions.sourceNote) {
-      console.log('🔍 Special search mode: searching by note only');
       conditions.isNoteOnlySearch = true;
       // Giữ lại chỉ trường ghi chú
       const noteValue = conditions.sourceNote;
@@ -789,7 +769,6 @@ window.handleSourceSearch = async function() {
         alert(count > 0 ? '✅ ' + message : '⚠️ ' + message);
       }
       
-      console.log(`✅ Search completed: ${count} sources found`);
       
     } else {
       // Show error message
@@ -799,7 +778,6 @@ window.handleSourceSearch = async function() {
       } else {
         alert('❌ ' + errorMessage);
       }
-      console.error('❌ Error searching sources:', result.message);
     }
     
   } catch (error) {
@@ -810,7 +788,6 @@ window.handleSourceSearch = async function() {
       closeProcessingModal();
     }
     
-    console.error('❌ Error in handleSourceSearch:', error);
     const errorMessage = 'Có lỗi kết nối. Vui lòng thử lại sau.';
     if (typeof showResultModalUnified === 'function') {
       showResultModalUnified(errorMessage, false);
@@ -822,7 +799,6 @@ window.handleSourceSearch = async function() {
 
 // Handle reset source form
 window.handleSourceReset = async function() {
-  console.log('🔄 Resetting source form...');
   
   // Clear all form fields
   const form = document.getElementById('sourceForm');
@@ -859,7 +835,6 @@ window.handleSourceReset = async function() {
         closeProcessingModal();
       }
       
-      console.log('🔄 Cleared search mode and reloaded original data');
     } catch (error) {
       // Close processing modal if error occurs
       if (typeof closeProcessingModalUnified === 'function') {
@@ -868,7 +843,6 @@ window.handleSourceReset = async function() {
         closeProcessingModal();
       }
       
-      console.error('❌ Error reloading data:', error);
       
       if (typeof showResultModalUnified === 'function') {
         showResultModalUnified('Có lỗi xảy ra khi tải lại dữ liệu', false);
@@ -876,7 +850,6 @@ window.handleSourceReset = async function() {
     }
   }
   
-  console.log('✅ Source form reset complete');
 };
 
 // Get form data
@@ -884,7 +857,6 @@ function getSourceFormData() {
   // Get the source form to ensure we're getting the right elements
   const sourceForm = document.getElementById('sourceForm');
   if (!sourceForm) {
-    console.error('Source form not found');
     return {};
   }
   
@@ -914,7 +886,6 @@ function getSourceSearchConditions() {
   // Get the source form to ensure we're getting the right elements
   const sourceForm = document.getElementById('sourceForm');
   if (!sourceForm) {
-    console.error('Source form not found');
     return conditions;
   }
   
@@ -961,8 +932,6 @@ function getSourceSearchConditions() {
   const sourceNote = sourceForm.elements['sourceNote']?.value?.trim();
   if (sourceNote) conditions.sourceNote = sourceNote;
   
-  console.log('🔍 Search conditions being sent to backend:', conditions);
-  console.log('🔍 Number of search conditions:', Object.keys(conditions).length);
   
   return conditions;
 }
@@ -1157,11 +1126,9 @@ function updateDropdownData() {
 function updateDatalist(listId, options) {
   const datalist = document.getElementById(listId);
   if (!datalist) {
-    console.warn(`⚠️ Datalist with ID "${listId}" not found`);
     return;
   }
   
-  console.log(`🔄 Updating datalist "${listId}" with ${options.length} options:`, options);
   
   datalist.innerHTML = '';
   
@@ -1179,7 +1146,6 @@ function updateDatalist(listId, options) {
     datalist.appendChild(optionElement);
   });
   
-  console.log(`✅ Successfully updated datalist "${listId}" with ${sortedOptions.length} sorted options`);
 }
 
 // Handle supplier name change - auto fill related fields
@@ -1202,7 +1168,6 @@ function handleSupplierNameChange(event) {
 function handleSoftwareNameChange(event) {
   const softwareName = event.target.value.trim();
   
-  console.log(`🔍 Software name changed to: "${softwareName}"`);
   
   // Clear dependent fields when software name changes
   clearDependentFields(['sourceSoftwarePackage', 'sourceTargetAudience', 'sourceAccountProvisionMethod', 'sourceDuration']);
@@ -1213,7 +1178,6 @@ function handleSoftwareNameChange(event) {
     updateDatalist('sourceTargetAudienceList', window.sourceDropdownData.audiences);
     updateDatalist('sourceAccountProvisionMethodList', window.sourceDropdownData.provisionMethods);
     updateDatalist('sourceDurationList', window.sourceDropdownData.durations);
-    console.log('📋 Reset all dropdowns to original values');
     return;
   }
   
@@ -1222,10 +1186,8 @@ function handleSoftwareNameChange(event) {
     item.softwareName && item.softwareName.toLowerCase() === softwareName.toLowerCase()
   );
   
-  console.log(`📊 Found ${matchingRecords.length} matching records for software: "${softwareName}"`);
   
   if (matchingRecords.length === 0) {
-    console.log('⚠️ No matching records found, resetting dropdowns');
     updateDatalist('sourceSoftwarePackageList', []);
     updateDatalist('sourceTargetAudienceList', []);
     updateDatalist('sourceAccountProvisionMethodList', []);
@@ -1240,7 +1202,6 @@ function handleSoftwareNameChange(event) {
   
   const uniquePackages = [...new Set(softwarePackages)];
   
-  console.log(`📦 Found ${uniquePackages.length} unique packages:`, uniquePackages);
   updateDatalist('sourceSoftwarePackageList', uniquePackages);
   
   // Reset other dropdowns until package is selected
@@ -1251,7 +1212,6 @@ function handleSoftwareNameChange(event) {
   // Auto-fill package field if only one unique value
   if (uniquePackages.length === 1) {
     document.getElementById('sourceSoftwarePackage').value = uniquePackages[0];
-    console.log(`✅ Auto-filled package field with: "${uniquePackages[0]}"`);
     // Trigger package change event
     handleSoftwarePackageChange({ target: { value: uniquePackages[0] } });
   }
@@ -1307,7 +1267,6 @@ function getFilteredRecords() {
 function handleSoftwarePackageChange(event) {
   const softwarePackage = event.target.value.trim();
   
-  console.log(`📦 Software package changed to: "${softwarePackage}"`);
   
   // Clear dependent fields
   clearDependentFields(['sourceTargetAudience', 'sourceAccountProvisionMethod', 'sourceDuration']);
@@ -1322,7 +1281,6 @@ function handleSoftwarePackageChange(event) {
   // Get filtered records based on software name and package
   const filteredRecords = getFilteredRecords();
   
-  console.log(`🎯 Found ${filteredRecords.length} records for software package: "${softwarePackage}"`);
   
   if (filteredRecords.length === 0) {
     updateDatalist('sourceTargetAudienceList', []);
@@ -1337,7 +1295,6 @@ function handleSoftwarePackageChange(event) {
     .filter(audience => audience && audience.toString().trim() !== '');
   
   const uniqueAudiences = [...new Set(targetAudiences)];
-  console.log(`👥 Found ${uniqueAudiences.length} unique target audiences:`, uniqueAudiences);
   
   updateDatalist('sourceTargetAudienceList', uniqueAudiences);
   
@@ -1348,7 +1305,6 @@ function handleSoftwarePackageChange(event) {
   // Auto-fill if only one option
   if (uniqueAudiences.length === 1) {
     document.getElementById('sourceTargetAudience').value = uniqueAudiences[0];
-    console.log(`✅ Auto-filled target audience: "${uniqueAudiences[0]}"`);
     handleTargetAudienceChange({ target: { value: uniqueAudiences[0] } });
   }
 }
@@ -1357,7 +1313,6 @@ function handleSoftwarePackageChange(event) {
 function handleTargetAudienceChange(event) {
   const targetAudience = event.target.value.trim();
   
-  console.log(`👥 Target audience changed to: "${targetAudience}"`);
   
   // Clear dependent fields
   clearDependentFields(['sourceAccountProvisionMethod', 'sourceDuration']);
@@ -1371,7 +1326,6 @@ function handleTargetAudienceChange(event) {
   // Get filtered records
   const filteredRecords = getFilteredRecords();
   
-  console.log(`🔐 Found ${filteredRecords.length} records for target audience: "${targetAudience}"`);
   
   if (filteredRecords.length === 0) {
     updateDatalist('sourceAccountProvisionMethodList', []);
@@ -1385,7 +1339,6 @@ function handleTargetAudienceChange(event) {
     .filter(method => method && method.toString().trim() !== '');
   
   const uniqueMethods = [...new Set(provisionMethods)];
-  console.log(`🔐 Found ${uniqueMethods.length} unique provision methods:`, uniqueMethods);
   
   updateDatalist('sourceAccountProvisionMethodList', uniqueMethods);
   
@@ -1395,7 +1348,6 @@ function handleTargetAudienceChange(event) {
   // Auto-fill if only one option
   if (uniqueMethods.length === 1) {
     document.getElementById('sourceAccountProvisionMethod').value = uniqueMethods[0];
-    console.log(`✅ Auto-filled provision method: "${uniqueMethods[0]}"`);
     handleAccountProvisionMethodChange({ target: { value: uniqueMethods[0] } });
   }
 }
@@ -1404,7 +1356,6 @@ function handleTargetAudienceChange(event) {
 function handleAccountProvisionMethodChange(event) {
   const accountProvisionMethod = event.target.value.trim();
   
-  console.log(`🔐 Account provision method changed to: "${accountProvisionMethod}"`);
   
   // Clear dependent fields
   clearDependentFields(['sourceDuration']);
@@ -1417,7 +1368,6 @@ function handleAccountProvisionMethodChange(event) {
   // Get filtered records
   const filteredRecords = getFilteredRecords();
   
-  console.log(`⏰ Found ${filteredRecords.length} records for provision method: "${accountProvisionMethod}"`);
   
   if (filteredRecords.length === 0) {
     updateDatalist('sourceDurationList', []);
@@ -1430,14 +1380,12 @@ function handleAccountProvisionMethodChange(event) {
     .filter(duration => duration && duration.toString().trim() !== '');
   
   const uniqueDurations = [...new Set(durations)];
-  console.log(`⏰ Found ${uniqueDurations.length} unique durations:`, uniqueDurations);
   
   updateDatalist('sourceDurationList', uniqueDurations);
   
   // Auto-fill if only one option
   if (uniqueDurations.length === 1) {
     document.getElementById('sourceDuration').value = uniqueDurations[0];
-    console.log(`✅ Auto-filled duration: "${uniqueDurations[0]}"`);
   }
   
   // Auto-fill price fields if records match exactly
@@ -1452,25 +1400,21 @@ function autoFillPriceFields(records) {
   const uniquePurchasePrices = [...new Set(records.map(r => r.purchasePrice).filter(Boolean))];
   if (uniquePurchasePrices.length === 1) {
     document.getElementById('sourcePurchasePrice').value = uniquePurchasePrices[0];
-    console.log(`💰 Auto-filled purchase price: "${uniquePurchasePrices[0]}"`);
   }
   
   const uniqueSellingPrices = [...new Set(records.map(r => r.sellingPrice).filter(Boolean))];
   if (uniqueSellingPrices.length === 1) {
     document.getElementById('sourceSellingPrice').value = uniqueSellingPrices[0];
-    console.log(`💰 Auto-filled selling price: "${uniqueSellingPrices[0]}"`);
   }
   
   const uniqueListedPrices = [...new Set(records.map(r => r.listedPrice).filter(Boolean))];
   if (uniqueListedPrices.length === 1) {
     document.getElementById('sourceListedPrice').value = uniqueListedPrices[0];
-    console.log(`💰 Auto-filled listed price: "${uniqueListedPrices[0]}"`);
   }
   
   const uniqueDeliveryTimes = [...new Set(records.map(r => r.deliveryTime).filter(Boolean))];
   if (uniqueDeliveryTimes.length === 1) {
     document.getElementById('sourceDeliveryTime').value = uniqueDeliveryTimes[0];
-    console.log(`🚚 Auto-filled delivery time: "${uniqueDeliveryTimes[0]}"`);
   }
 }
 
