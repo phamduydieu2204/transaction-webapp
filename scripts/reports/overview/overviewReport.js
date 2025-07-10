@@ -24,7 +24,6 @@ import {
 } from '../../core/dataMapping.js';
 import { initOverviewLazyLoading, preloadCriticalElements } from '../../utils/lazyLoader.js';
 import { initCSSOptimizations, optimizeFontLoading, addResourceHints } from '../../utils/cssOptimizer.js';
-import { getConstants } from '../../constants.js';
 
 /**
  * Load overview report (Tổng quan kinh doanh)
