@@ -26,7 +26,6 @@ import {
  * @param {string} options.period - Period name (e.g., 'this_month', 'last_month')
  */
 export async function loadRevenueAnalysis(options = {}) {
-  console.log('📈 Loading revenue analysis with options:', options);
   
   try {
     // Load template
@@ -39,10 +38,6 @@ export async function loadRevenueAnalysis(options = {}) {
     const transactions = window.transactionList || getFromStorage('transactions') || [];
     const expenses = window.expenseList || getFromStorage('expenses') || [];
     
-    console.log('📊 Revenue analysis data:', {
-      transactions: transactions.length,
-      expenses: expenses.length
-    });
     
     // Get date range from options or global filters
     const dateRange = options.dateRange || window.globalFilters?.dateRange || null;
@@ -64,10 +59,8 @@ export async function loadRevenueAnalysis(options = {}) {
     // Setup event handlers
     setupRevenueAnalysisHandlers();
     
-    console.log('✅ Revenue analysis loaded successfully');
     
   } catch (error) {
-    console.error('❌ Error loading revenue analysis:', error);
     showError('Không thể tải phân tích doanh thu');
   }
 }
@@ -89,10 +82,8 @@ async function loadRevenueAnalysisHTML() {
     container.innerHTML = html;
     container.classList.add('active');
     
-    console.log('✅ Revenue analysis template loaded');
     
   } catch (error) {
-    console.error('❌ Could not load revenue analysis template:', error);
     throw error;
   }
 }
@@ -101,7 +92,6 @@ async function loadRevenueAnalysisHTML() {
  * Update revenue KPI cards
  */
 async function updateRevenueKPIs(transactions, period) {
-  console.log('💰 Updating revenue KPIs');
   
   // Calculate current period metrics
   const currentMetrics = calculateRevenueMetrics(transactions);
@@ -137,7 +127,6 @@ async function updateRevenueKPIs(transactions, period) {
       `${currentMetrics.highestTransaction.customer} - ${currentMetrics.highestTransaction.product || 'N/A'}`);
   }
   
-  console.log('💰 Revenue KPIs updated:', currentMetrics);
 }
 
 /**
@@ -190,7 +179,6 @@ function calculateRevenueMetrics(transactions) {
  * Render revenue trend chart
  */
 async function renderRevenueTrendChart(transactions, period) {
-  console.log('📈 Rendering revenue trend chart');
   
   const canvas = document.getElementById('revenue-trend-chart');
   if (!canvas) return;
@@ -280,7 +268,6 @@ async function renderRevenueTrendChart(transactions, period) {
  * Render revenue category chart (pie/bar)
  */
 async function renderRevenueCategoryChart(transactions) {
-  console.log('🍰 Rendering revenue category chart');
   
   const canvas = document.getElementById('revenue-category-chart');
   if (!canvas) return;
@@ -344,7 +331,6 @@ async function renderRevenueCategoryChart(transactions) {
  * Load top customers by revenue
  */
 async function loadTopCustomersByRevenue(transactions) {
-  console.log('👥 Loading top customers by revenue');
   
   const customerRevenue = calculateCustomerRevenue(transactions);
   const topCustomers = customerRevenue
@@ -397,7 +383,6 @@ async function loadTopCustomersByRevenue(transactions) {
  * Load top products by revenue
  */
 async function loadTopProductsByRevenue(transactions) {
-  console.log('💻 Loading top products by revenue');
   
   const productRevenue = calculateProductRevenue(transactions);
   const topProducts = productRevenue
@@ -450,7 +435,6 @@ async function loadTopProductsByRevenue(transactions) {
  * Update revenue insights
  */
 async function updateRevenueInsights(transactions) {
-  console.log('💡 Updating revenue insights');
   
   const insights = generateRevenueInsights(transactions);
   
@@ -757,34 +741,27 @@ window.refreshRevenueAnalysis = function() {
 };
 
 window.exportRevenueReport = function() {
-  console.log('📊 Exporting revenue report...');
   // Implementation for export functionality
 };
 
 window.exportCustomerRevenueData = function() {
-  console.log('📊 Exporting customer revenue data...');
 };
 
 window.exportProductRevenueData = function() {
-  console.log('📊 Exporting product revenue data...');
 };
 
 window.toggleChartView = function(chartType, viewType) {
-  console.log(`🔄 Toggling ${chartType} chart to ${viewType} view`);
 };
 
 function refreshRevenueChart(period) {
-  console.log(`🔄 Refreshing revenue chart for period: ${period}`);
   // Implementation for chart refresh
 }
 
 function refreshCustomerTable(view) {
-  console.log(`🔄 Refreshing customer table for view: ${view}`);
   // Implementation for table refresh
 }
 
 function refreshProductTable(sort) {
-  console.log(`🔄 Refreshing product table for sort: ${sort}`);
   // Implementation for table refresh
 }
 
