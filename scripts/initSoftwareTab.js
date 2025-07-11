@@ -2233,6 +2233,16 @@ function getSoftwareSearchConditions() {
   // Get form values
   const getValue = (id) => document.getElementById(id)?.value?.trim() || '';
   
+  const note = getValue('softwareNote');
+  
+  // Check if note field has data
+  if (note) {
+    // If note has data, perform global search with note value only
+    conditions.globalSearch = note;
+    return conditions;
+  }
+  
+  // If note is empty, get other field values
   const softwareName = getValue('softwareFormName');
   const softwarePackage = getValue('softwareFormPackage');
   const accountName = getValue('softwareFormAccount');
